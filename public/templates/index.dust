@@ -1,0 +1,12 @@
+{>"layouts/master" /}
+
+{<body}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <h1>{@pre type="content" key="greeting"/}</h1>
+                <button class="btn btn-success">Submit</button>
+            </div>
+        </div>
+    </div>
+{/body}
