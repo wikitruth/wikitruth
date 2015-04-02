@@ -1,4 +1,3 @@
-wikitruth
-=======
+# wikitruth
 
-Wikipedia and Quora-like system but with a vetting mechanism to verify facts from trash
+Wikipedia and Quora-like system with a vetting mechanism to classify facts from opinions
