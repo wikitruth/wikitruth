@@ -2,11 +2,14 @@
 
 
 requirejs.config({
-    paths: {}
+    paths: {
+        'jquery': '../components/jquery/dist/jquery.min',
+        'bootstrap': '../components/bootstrap/dist/js/bootstrap.min'
+    }
 });
 
 
-require([/* Dependencies */], function () {
+require(['jquery', 'bootstrap'], function () {
 
     var app = {
         initialize: function () {
