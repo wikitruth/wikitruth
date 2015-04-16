@@ -1,0 +1,13 @@
+{>"_layouts/master" /}
+
+{<body}
+
+    <h1 class="page-header">Discussions</h1>
+    <h4 class="text-muted"><a href="/discuss">Categories</a> / Scientific Theories / Big Bang Theory</h4>
+    <ul class="list-group">
+        <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Thread</li>
+        <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Big Bang Theory <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 5,140</span></li>
+        <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Theory of Evolution <span class="label label-primary">featured</span> <span class="label label-danger">hot</span> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 10,456</span></li>
+    </ul>
+    <p><a class="btn btn-primary" href="/" role="button">View more &raquo;</a></p>
+{/body}
