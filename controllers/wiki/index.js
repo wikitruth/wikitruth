@@ -10,4 +10,8 @@ module.exports = function (router) {
         res.render('wiki/index', model);
         //res.send('<code><pre>' + JSON.stringify(model, null, 2) + '</pre></code>');
     });
+
+    router.get('/topic', function (req, res) {
+        res.render('wiki/topic', model);
+    });
 };
