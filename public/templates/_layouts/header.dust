@@ -5,7 +5,7 @@
             <li role="presentation"><a href="/wiki">Encyclopedia</a></li>
             <li role="presentation"><a href="/answers">Answers</a></li>
             <li role="presentation"><a href="/discuss">Discussions</a></li>
-            <li role="presentation"><a href="#">Contact</a></li>
+            <li role="presentation"><a href="#">About</a></li>
         </ul>
     </nav>
     <h3 class="text-muted"><span class="glyphicon glyphicon-leaf" aria-hidden="true"></span> wikitruth</h3>
