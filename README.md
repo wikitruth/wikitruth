@@ -25,6 +25,18 @@ General Characteristics of most Discussions and Internet Forums
 * Non-sense comments often prevail due to numbers
 * Truth is hard to find
 
+Related Systems:
+* Yahoo! Answers
+* Quora
+* Answers.com
+* GotQuestions.org
+* Wikipedia
+* Citizendium
+* Conservapedia.com
+* StackExchange
+* Debate.org
+* rationalwiki.org
+
 How to run
 -
 1. Install nodejs
