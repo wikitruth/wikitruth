@@ -8,14 +8,14 @@ This project does not intend to replace Wikipedia or other crowded-sourced encyc
 
 If someone wanted to find information about different topics or explore the vast information from the internet, there is Wikipedia and Google, but to see what is really the truth, then this is where they can go.
 
-General Assumptions
+**General Assumptions**
 * A lot of people are having difficulty to find true information and difficulty to determine which one to believe.
 * The world will be a better place if people will know the real truth and can easily find it, and distinguish it from random claims and opinions.
 * There is lots of information in the world, truth and lies lying around and intertwined together. People cannot easily differentiate between truth and lie because information is highly unorganized and a lot is unverifiable especially in the internet.
 * If we can have a place where truth and lies are clearly organized, categories and distinctly separated, then people will easily see the truth and will know what is a lie.
 * If people knows the truth, there will be less war in the world, less disagreements, better governance and politics, better education system, only one religion, better environment, better relationship between humans, better health, more love and there will be peace.
 
-General Characteristics of most Discussions and Internet Forums
+**General Characteristics of most Discussions and Internet Forums**
 * Mostly single-sided, controlled by users with admin privileges or by the majority
 * Citing unverified or unverifiable sources
 * Chaotic, unorganized or uncontrollable
@@ -25,7 +25,7 @@ General Characteristics of most Discussions and Internet Forums
 * Non-sense comments often prevail due to numbers
 * Truth is hard to find
 
-Related Systems:
+**Related Systems:**
 * Yahoo! Answers
 * Quora
 * Answers.com
