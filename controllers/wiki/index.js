@@ -14,4 +14,8 @@ module.exports = function (router) {
     router.get('/topic', function (req, res) {
         res.render('wiki/topic', model);
     });
+
+    router.get('/verses', function (req, res) {
+        res.render('wiki/verses', model);
+    });
 };
