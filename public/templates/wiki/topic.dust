@@ -2,10 +2,10 @@
 
 {<body}
 
-    <h1 class="page-header text-primary"><span class="text-muted">Encyclopedia /</span> Big Bang Theory</h1>
+    <h1 class="page-header text-primary"><span class="text-muted">Encyclopedia /</span> Theory of Evolution</h1>
     <div class="btn-group" role="group" aria-label="">
         <button type="button" class="btn btn-primary">At a glance</button>
-        <button type="button" class="btn btn-default">Verses (Facts)</button>
+        <a class="btn btn-default" href="/wiki/verses">Verses (Facts)</a>
         <button type="button" class="btn btn-default">Issues &amp; Questions</button>
         <button type="button" class="btn btn-default">Related Topics</button>
     </div>
