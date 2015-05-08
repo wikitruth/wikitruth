@@ -1,0 +1,24 @@
+{
+  "name": "wikitruth",
+  "version": "0.0.1",
+  "homepage": "https://github.com/dsalunga/wikitruth",
+  "authors": [
+    "Daniel Salunga <dsalunga@live.com>"
+  ],
+  "main": "app.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "public/components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.4",
+    "dustjs-linkedin-helpers": "~1.2.0",
+    "dustjs-linkedin": "~2.3.0",
+    "requirejs": "^2.1.11"
+  }
+}
