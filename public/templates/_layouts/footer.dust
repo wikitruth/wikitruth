@@ -1,4 +1,11 @@
 <!-- Site footer -->
 <footer class="footer">
-    <p>&copy; wikitruth 2015</p>
+    <p class="pull-left">&copy; wikitruth 2015</p>
+    <nav class="pull-right">
+        <ul class="nav nav-pills pull-right">
+            <li role="presentation" class="active1 hidden-xs"><a href="/">Home</a></li>
+            <li role="presentation"><a href="//blog.wikitruth.co">Blog</a></li>
+            <li role="presentation"><a href="#">About</a></li>
+        </ul>
+    </nav>
 </footer>
