@@ -1,12 +1,12 @@
 <div class="header clearfix">
     <nav>
         <ul class="nav nav-pills pull-right">
-            <li role="presentation" class="active1"><a href="/">Home</a></li>
+            <li role="presentation" class="active1 hidden-xs"><a href="/">Home</a></li>
             <li role="presentation"><a href="/wiki">Encyclopedia</a></li>
             <li role="presentation"><a href="/answers">Answers</a></li>
             <li role="presentation"><a href="/discuss">Discussions</a></li>
-            <li role="presentation"><a href="#">About</a></li>
+            <li role="presentation" class="hidden-xs"><a href="#">About</a></li>
         </ul>
     </nav>
-    <h3 class="text-muted"><span class="glyphicon glyphicon-leaf" aria-hidden="true"></span> wikitruth</h3>
+    <h3 class="text-muted"><a href="/" title="Home"><span class="glyphicon glyphicon-leaf" aria-hidden="true"></span><span class="hidden-xs"> wikitruth</span></a></h3>
 </div>
