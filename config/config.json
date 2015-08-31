@@ -1,4 +1,7 @@
 {
+    "mongodb": {
+        "uri": "mongodb://localhost/wikitruth"
+    },
 
     "express": {
         "view cache": false,
