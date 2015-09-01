@@ -1,0 +1,48 @@
+{>"dust/layouts/master" /}
+
+{<body}
+    <!--{@pre type="content" key="greeting"/}-->
+
+    <!-- Jumbotron -->
+    <div class="jumbotron">
+        <h1>welcome to wikitruth!</h1>
+        <p class="lead">Cras justo odio, dapibus ac facilisis in, egestas eget quam. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet.</p>
+        <p><a class="btn btn-lg btn-success" href="#" role="button">Get started today</a></p>
+    </div>
+
+
+    {!<div class="article-heading js-article-heading js-geopattern" style="background-image: url();">
+        <div class="wrap">
+            <div class="icon-container">
+                <span class="mega-octicon octicon-markdown"></span>
+            </div>
+            <h1>Mastering Markdown</h1>
+      <span class="article-read-time article-meta">
+        <span class="octicon octicon-clock"></span> 3 minute read
+      </span>
+            <a class="article-pdf article-meta" href="/pdfs/markdown-cheatsheet-online.pdf" onclick="_gaq.push(['_trackEvent', 'PDF Download', 'Click', 'markdown-cheatsheet-online.pdf']);">
+                <span class="octicon octicon-cloud-download"></span> Download PDF version
+            </a>
+        </div>
+    </div>!}
+
+    <!-- Example row of columns -->
+    <div class="row">
+        <div class="col-lg-4">
+            <h2>Encyclopedia</h2>
+            <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+            <p><a class="btn btn-primary" href="/wiki" role="button">View details &raquo;</a></p>
+        </div>
+        <div class="col-lg-4">
+            <h2>Answers</h2>
+            <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+            <p><a class="btn btn-primary" href="/answers" role="button">View details &raquo;</a></p>
+        </div>
+        <div class="col-lg-4">
+            <h2>Discussions</h2>
+            <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa.</p>
+            <p><a class="btn btn-primary" href="/discuss" role="button">View details &raquo;</a></p>
+        </div>
+    </div>
+
+{/body}

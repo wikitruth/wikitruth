@@ -37,10 +37,61 @@ If someone wanted to find information about different topics or explore the vast
 * Debate.org
 * rationalwiki.org
 
-How to run
--
-1. Install nodejs
-2. > npm install -g yo generator-kraken bower grunt-cli
-3. > npm install
-4. > npm start
-5. Open http://localhost:8000/ in your browser.
+
+## Requirements
+
+You need [Node.js](http://nodejs.org/download/) and
+[MongoDB](http://www.mongodb.org/downloads) installed and running.
+
+We use [`bcrypt`](https://github.com/ncb000gt/node.bcrypt.js) for hashing
+secrets. If you have issues during installation related to `bcrypt` then [refer
+to this wiki
+page](https://github.com/jedireza/drywall/wiki/bcrypt-Installation-Trouble).
+
+We use [`emailjs`](https://github.com/eleith/emailjs) for email transport. If
+you have issues sending email [refer to this wiki
+page](https://github.com/jedireza/drywall/wiki/Trouble-sending-email).
+
+
+## Installation
+
+* Install nodejs
+
+* ```bash
+$ git clone git@github.com:dsalunga/wikitruth.git && cd ./wikitruth
+$ npm install -g yo generator-kraken bower grunt-cli
+$ npm install
+```
+
+
+## Running the app
+
+```bash
+$ npm start
+
+# > wikitruth@0.0.0 start .../wikitruth
+# > grunt
+
+# Running "copy:vendor" (copy) task
+# ...
+
+# Running "concurrent:dev" (concurrent) task
+# Running "watch" task
+# Running "nodemon:dev" (nodemon) task
+# Waiting...
+# [nodemon] v1.3.7
+# [nodemon] to restart at any time, enter `rs`
+# [nodemon] watching: *.*
+# [nodemon] starting `node app.js`
+# Server is running on port 8000
+```
+
+Now just use the reset password feature to set a password.
+
+ - Go to `http://localhost:8000/login/forgot/`
+ - Submit your email address and wait a second.
+ - Go check your email and get the reset link.
+ - `http://localhost:8000/login/reset/:email/:token/`
+ - Set a new password.
+
+Login. Customize. Enjoy.

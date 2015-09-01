@@ -49,7 +49,6 @@
             }
         }
 
-        
         ,"expressView": {
             "priority": 100,
             "enabled": true,
@@ -57,16 +56,14 @@
                 "name": "engine-munger/lib/expressView"
             }
         }
-        
 
-        
 
         ,"fileNotFound": {
             "enabled": true,
             "priority": 130,
             "module": {
                 "name": "kraken-js/middleware/404",
-                "arguments": [ "errors/404" ]
+                "arguments": [ "dust/errors/404" ]
             }
         }
 
@@ -75,10 +72,8 @@
             "priority": 140,
             "module": {
                 "name": "kraken-js/middleware/500",
-                "arguments": [ "errors/500" ]
+                "arguments": [ "dust/errors/500" ]
             }
         }
-
-        
     }
 }

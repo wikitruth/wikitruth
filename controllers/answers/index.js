@@ -8,6 +8,6 @@ module.exports = function (router) {
     var model = new AnswersModel();
 
     router.get('/', function (req, res) {
-        res.render('answers/index', model);
+        res.render('dust/answers/index', model);
     });
 };
