@@ -1,0 +1,23 @@
+<!-- Site footer -->
+{!<footer class="footer">
+    <p class="pull-left">&copy; wikitruth 2015</p>
+    <nav class="pull-right">
+        <ul class="nav nav-pills pull-right">
+            <li role="presentation" class="active1"><a href="/">Home</a></li>
+            <li role="presentation"><a href="//blog.wikitruth.co">Blog</a></li>
+            <li role="presentation"><a href="#">About</a></li>
+        </ul>
+    </nav>
+</footer>!}
+
+<div class="footer">
+    <div class="container"><span class="copyright pull-right">&copy; 2015 Wikitruth <span class="hidden-xs">Foundation</span></span>
+        <ul class="links">
+            <li><a href="/">Home</a></li>
+            <li><a href="//blog.wikitruth.co">Blog</a></li>
+            <li><a href="/about/">About</a></li>
+            <li><a href="/contact/">Contact</a></li>
+        </ul>
+        <div class="clearfix"></div>
+    </div>
+</div>

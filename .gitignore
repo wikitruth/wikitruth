@@ -1,3 +1,6 @@
 .build
 .idea
 node_modules
+
+public/vendor
+.nodemonignore

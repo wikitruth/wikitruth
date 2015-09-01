@@ -1,0 +1,62 @@
+doctype html
+html
+  head
+    block head
+      title #{title}
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    link(rel='stylesheet', href='/layouts/core.min.css?#{cacheBreaker}')
+    block neck
+  body
+    div.navbar.navbar-default.navbar-fixed-top
+      div.container
+        div.navbar-header
+          a.navbar-brand(href='/')
+            img.navbar-logo(src='/img/logo-64x64.png', alt='Logo')
+            span.navbar-brand-label #{projectName}
+          button.navbar-toggle.collapsed(data-toggle='collapse', data-target='.my-navbar-collapse')
+            span.icon-bar
+            span.icon-bar
+            span.icon-bar
+        div.navbar-collapse.my-navbar-collapse.collapse
+          ul.nav.navbar-nav
+            //li: a(href='/') Home
+            li: a(href='/wiki/') Wiki
+            li: a(href='/answers/') Answers
+            li: a(href='/discuss/') Discuss
+            //li: a(href='/about/') About
+          ul.nav.navbar-nav.navbar-right
+            if user && user.username
+              li: a(href='#{user.defaultReturnUrl}')
+                i.fa.fa-user
+                |  #{user.username}
+            else
+              li: a(href='/login/')
+                i.fa.fa-user
+                |  Login
+              li: a(href='/signup/')
+                i.fa.fa-user
+                |  Sign Up
+
+    div.page
+      div.container
+        block body
+
+    div.footer
+      div.container
+        span.copyright.pull-right
+          |&#169; #{copyrightYear} #{copyrightName}
+        ul.links
+          li: a(href='/') Home
+          li: a(href='//blog.wikitruth.co') Blog
+          li: a(href='/about/') About
+          li: a(href='/contact/') Contact
+        div.clearfix
+
+    div.ajax-spinner
+      img(src='/img/ajax-pulse.gif', alt='Loading')
+
+    //if lte IE 9
+      script(src='/layouts/ie-sucks.min.js?#{cacheBreaker}')
+    script(src='/layouts/core.min.js?#{cacheBreaker}')
+
+    block feet
