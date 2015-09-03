@@ -5,8 +5,8 @@ var sendVerificationEmail = function(req, res, options) {
     from: req.app.config.smtp.from.name +' <'+ req.app.config.smtp.from.address +'>',
     to: options.email,
     subject: 'Verify Your '+ req.app.config.projectName +' Account',
-    textPath: 'account/verification/email-text.jade',
-    htmlPath: 'account/verification/email-html.jade',
+    textPath: 'jade/account/verification/email-text.jade',
+    htmlPath: 'jade/account/verification/email-html.jade',
     locals: {
       verifyURL: req.protocol +'://'+ req.headers.host +'/account/verification/' + options.verificationToken + '/',
       projectName: req.app.config.projectName

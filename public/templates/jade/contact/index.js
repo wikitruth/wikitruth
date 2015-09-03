@@ -33,8 +33,8 @@ exports.sendMessage = function(req, res){
       replyTo: req.body.email,
       to: req.app.config.systemEmail,
       subject: req.app.config.projectName +' contact form',
-      textPath: 'contact/email-text.jade',
-      htmlPath: 'contact/email-html.jade',
+      textPath: 'jade/contact/email-text.jade',
+      htmlPath: 'jade/contact/email-html.jade',
       locals: {
         name: req.body.name,
         email: req.body.email,
