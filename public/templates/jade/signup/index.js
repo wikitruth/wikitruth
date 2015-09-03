@@ -137,8 +137,8 @@ exports.signup = function(req, res){
       from: req.app.config.smtp.from.name +' <'+ req.app.config.smtp.from.address +'>',
       to: req.body.email,
       subject: 'Your '+ req.app.config.projectName +' Account',
-      textPath: 'signup/email-text',
-      htmlPath: 'signup/email-html',
+      textPath: 'signup/email-text.jade',
+      htmlPath: 'signup/email-html.jade',
       locals: {
         username: req.body.username,
         email: req.body.email,
@@ -443,8 +443,8 @@ exports.signupSocial = function(req, res){
       from: req.app.config.smtp.from.name +' <'+ req.app.config.smtp.from.address +'>',
       to: req.body.email,
       subject: 'Your '+ req.app.config.projectName +' Account',
-      textPath: 'signup/email-text',
-      htmlPath: 'signup/email-html',
+      textPath: 'signup/email-text.jade',
+      htmlPath: 'signup/email-html.jade',
       locals: {
         username: workflow.user.username,
         email: req.body.email,
