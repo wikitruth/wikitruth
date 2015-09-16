@@ -58,7 +58,7 @@ page](https://github.com/jedireza/drywall/wiki/Trouble-sending-email).
 Install nodejs
 
 ```bash
-$ git clone git@github.com:dsalunga/wikitruth.git && cd ./wikitruth
+$ git clone git@github.com:wikitruth/wikitruth.git && cd ./wikitruth
 $ npm install -g yo generator-kraken bower grunt-cli
 $ npm install
 ```

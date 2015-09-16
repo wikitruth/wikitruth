@@ -1,10 +1,7 @@
 {
   "name": "wikitruth",
   "version": "0.0.1",
-  "homepage": "https://github.com/dsalunga/wikitruth",
-  "authors": [
-    "Daniel Salunga <dsalunga@live.com>"
-  ],
+  "homepage": "https://github.com/wikitruth/wikitruth",
   "main": "app.js",
   "license": "MIT",
   "ignore": [
