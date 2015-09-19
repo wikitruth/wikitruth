@@ -4,14 +4,14 @@
 
     <h1 class="page-header text-primary"><span class="text-muted">Wiki /</span> Theory of Evolution</h1>
     <div class="btn-group" role="group" aria-label="">
-        <a href="/wiki/topic/" class="btn btn-default">At a glance</a>
-        <button type="button" class="btn btn-primary">Verses (Facts)</button>
-        <button type="button" class="btn btn-default">Issues &amp; Questions</button>
-        <button type="button" class="btn btn-default">Related Topics</button>
+        <a href="/wiki/topic/" class="btn btn-default">Overview</a>
+        <button type="button" class="btn btn-primary">Arguments (1,023)</button>
+        <button type="button" class="btn btn-default">Questions (122)</button>
+        <button type="button" class="btn btn-default">Related</button>
     </div>
     <br/><br/>
     <ul class="list-group">
-        <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Verse</li>
+        <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Arguments</li>
         <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Birds Prove Natural Selection is Naturally Wrong <span class="label label-danger">negative</span> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 10,456</span></li>
         <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> The Galapagos Lizard is a perfect example <span class="label label-success">positive</span> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 434</span></li>
         <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Species Without a Link Proves Evolution is Wrong <span class="label label-danger">negative</span> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 434</span></li>

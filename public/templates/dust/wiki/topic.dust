@@ -4,10 +4,10 @@
 
     <h1 class="page-header text-primary"><span class="text-muted">Wiki /</span> Theory of Evolution</h1>
     <div class="btn-group" role="group" aria-label="">
-        <button type="button" class="btn btn-primary">At a glance</button>
-        <a class="btn btn-default" href="/wiki/verses">Verses (Facts)</a>
-        <button type="button" class="btn btn-default">Issues &amp; Questions</button>
-        <button type="button" class="btn btn-default">Related Topics</button>
+        <button type="button" class="btn btn-primary">Overview</button>
+        <a class="btn btn-default" href="/wiki/verses">Arguments (1,023)</a>
+        <button type="button" class="btn btn-default">Questions (122)</button>
+        <button type="button" class="btn btn-default">Related</button>
     </div>
     <br/><br/>
     <div id="lipsum">
