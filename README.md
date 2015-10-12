@@ -61,6 +61,33 @@ $ npm install -g yo generator-kraken bower grunt-cli
 $ npm install
 ```
 
+## Setup
+
+First you need to edit your config file.
+
+```bash
+$ vi ./config.js #set mongodb and email credentials
+```
+
+Next, you need a few records in the database to start using the user system.
+
+Run these commands on mongo via the terminal. __Obviously you should use your
+email address.__
+
+```js
+use wikitruth; // or your mongo db name if different
+```
+
+```js
+db.admingroups.insert({ _id: 'root', name: 'Root' });
+db.admins.insert({ name: {first: 'Root', last: 'Admin', full: 'Root Admin'}, groups: ['root'] });
+var rootAdmin = db.admins.findOne();
+db.users.save({ username: 'root', isActive: 'yes', email: 'your@email.addy', roles: {admin: rootAdmin._id} });
+var rootUser = db.users.findOne();
+rootAdmin.user = { id: rootUser._id, name: rootUser.username };
+db.admins.save(rootAdmin);
+```
+
 
 ## Running the app
 

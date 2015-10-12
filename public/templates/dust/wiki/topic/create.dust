@@ -1,0 +1,17 @@
+{>"dust/layouts/master" /}
+
+{<body}
+    <h1 class="page-header text-primary"><span class="text-muted">Wiki /</span> New Topic</h1>
+    <form method="post">
+        <input type="hidden" name="_csrf" value="{_csrf}">
+        <div class="form-group">
+            <label for="inputName">Topic</label>
+            <input type="text" name="name" id="inputName" class="form-control"/>
+        </div>
+        <div class="form-group">
+            <label for="inputContent">Summary</label>
+            <textarea class="form-control" id="inputContent" name="content" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button> <a class="btn btn-default" href=".." role="button">Cancel</a>
+    </form>
+{/body}
