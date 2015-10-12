@@ -55,7 +55,7 @@ exports = module.exports = function(app, mongoose) {
 
     return false;
   };
-  adminSchema.plugin(require('./plugins/pagedFind'));
+  adminSchema.plugin(require('../plugins/pagedFind'));
   adminSchema.index({ 'user.id': 1 });
   adminSchema.index({ search: 1 });
   adminSchema.set('autoIndex', (app.get('env') === 'development'));

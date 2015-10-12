@@ -61,7 +61,7 @@ exports = module.exports = function(app, mongoose) {
       done(err, res);
     });
   };
-  userSchema.plugin(require('./plugins/pagedFind'));
+  userSchema.plugin(require('../plugins/pagedFind'));
   userSchema.index({ username: 1 }, { unique: true });
   userSchema.index({ email: 1 }, { unique: true });
   userSchema.index({ timeCreated: 1 });

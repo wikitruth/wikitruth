@@ -26,14 +26,11 @@
             }
         }
     },
-    
 
     "i18n": {
         "contentPath": "path:./locales",
         "fallback": "en-US"
     },
-    
-    
 
     "middleware": {
 
@@ -56,7 +53,6 @@
                 "name": "engine-munger/lib/expressView"
             }
         }
-
 
         ,"fileNotFound": {
             "enabled": true,

@@ -2,15 +2,18 @@
 
 exports = module.exports = function(app, mongoose) {
   //embeddable docs first
-  require('./schema/Note')(app, mongoose);
-  require('./schema/Status')(app, mongoose);
-  require('./schema/StatusLog')(app, mongoose);
-  require('./schema/Category')(app, mongoose);
+  require('./account/Note')(app, mongoose);
+  require('./account/Status')(app, mongoose);
+  require('./account/StatusLog')(app, mongoose);
+  require('./account/Category')(app, mongoose);
 
   //then regular docs
-  require('./schema/User')(app, mongoose);
-  require('./schema/Admin')(app, mongoose);
-  require('./schema/AdminGroup')(app, mongoose);
-  require('./schema/Account')(app, mongoose);
-  require('./schema/LoginAttempt')(app, mongoose);
+  require('./account/User')(app, mongoose);
+  require('./account/Admin')(app, mongoose);
+  require('./account/AdminGroup')(app, mongoose);
+  require('./account/Account')(app, mongoose);
+  require('./account/LoginAttempt')(app, mongoose);
+
+  // core
+  require('./core/Topic')(app, mongoose);
 };

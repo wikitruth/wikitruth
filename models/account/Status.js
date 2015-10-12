@@ -6,7 +6,7 @@ exports = module.exports = function(app, mongoose) {
     pivot: { type: String, default: '' },
     name: { type: String, default: '' }
   });
-  statusSchema.plugin(require('./plugins/pagedFind'));
+  statusSchema.plugin(require('../plugins/pagedFind'));
   statusSchema.index({ pivot: 1 });
   statusSchema.index({ name: 1 });
   statusSchema.set('autoIndex', (app.get('env') === 'development'));

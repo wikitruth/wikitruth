@@ -13,10 +13,8 @@ var config = require('./config/config'),
     mongoose = require('mongoose'),
     helmet = require('helmet'),
     cons = require('consolidate'),
-    csrf = require('csurf');
-
-var kraken = require('kraken-js');
-
+    csrf = require('csurf'),
+    kraken = require('kraken-js');
 
 var options, app;
 
@@ -62,8 +60,9 @@ app.disable('x-powered-by');
 //app.set('port', config.port);
 //app.set('views', path.join(__dirname, 'views'));
 //app.set('view engine', 'jade');
-app.engine( 'jade', cons.jade );
-app.engine( 'mustache', cons.mustache );
+app.engine('jade', cons.jade);
+app.engine('mst', cons.mustache);
+app.engine('hbs', cons.handlebars);
 
 //middleware
 app.use(require('morgan')('dev'));
@@ -81,12 +80,12 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(csrf({ cookie: { signed: true } }));
+//app.use(csrf({ cookie: { signed: true } }));
 helmet(app);
 
 //response locals
 app.use(function(req, res, next) {
-    res.cookie('_csrfToken', req.csrfToken());
+    //res.cookie('_csrfToken', req.csrfToken());
     res.locals.user = {};
     res.locals.user.defaultReturnUrl = req.user && req.user.defaultReturnUrl();
     res.locals.user.username = req.user && req.user.username;

@@ -35,7 +35,7 @@ exports = module.exports = function(app, mongoose) {
     },
     search: [String]
   });
-  accountSchema.plugin(require('./plugins/pagedFind'));
+  accountSchema.plugin(require('../plugins/pagedFind'));
   accountSchema.index({ user: 1 });
   accountSchema.index({ 'status.id': 1 });
   accountSchema.index({ search: 1 });
