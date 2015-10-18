@@ -11,7 +11,7 @@ html
     div.navbar.navbar-inverse.navbar-fixed-top
       div.container
         div.navbar-header
-          a.navbar-brand(href='/admin/')
+          a.navbar-brand(href='/')
             img.navbar-logo(src='/img/logo-64x64.png', alt='Logo')
             span.navbar-brand-label #{projectName}
           button.navbar-toggle.collapsed(data-toggle='collapse', data-target='.my-navbar-collapse')
@@ -20,6 +20,7 @@ html
             span.icon-bar
         div.navbar-collapse.my-navbar-collapse.collapse
           ul.nav.navbar-nav
+            li: a(href='/admin/') Home
             li.dropdown
               a.dropdown-toggle(href='#', data-toggle='dropdown')
                 | System&nbsp;

@@ -1,7 +1,10 @@
 {>"dust/layouts/master" /}
 
-{<body}
+{<title}
+    Discussion Categories - {titleSlogan}
+{/title}
 
+{<body}
     <h1 class="page-header">Discuss</h1>
     <h4 class="text-muted">Categories</h4>
     <ul class="list-group">

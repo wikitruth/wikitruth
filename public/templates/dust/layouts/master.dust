@@ -5,7 +5,11 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {! The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags !}
-    <title>{+title}Wikitruth, the truth in totality of human knowledge{/title}</title>
+    {?pageTitle}
+        <title>{pageTitle} - {titleSlogan}</title>
+    {:else}
+        <title>{+title}{titleSlogan}{/title}</title>
+    {/pageTitle}
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="/css/app.css" />
@@ -21,31 +25,19 @@
     <![endif]-->
 </head>
 <body>
-
     {>"dust/layouts/header" /}
-
     <div class="container">
         {+body /}
     </div>
-
-    {!<div class="page">
-    </div>!}
-
     {>"dust/layouts/footer" /}
 
     {!<div class="container">
-
         {>"dust/layouts/header" /}
-
         {+body /}
-
         {>"dust/layouts/footer" /}
-
     </div> <!-- /container -->!}
 
-<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-<!-- Include all compiled plugins (below), or include individual files as needed -->
 <script data-main="/js/app" src="/components/requirejs/require.js"></script>
 <!--<script src="/components/js/bootstrap.min.js"></script>-->
     <script>
@@ -53,7 +45,6 @@
                     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
                 m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
         })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
         ga('create', 'UA-66543450-1', 'auto');
         ga('send', 'pageview');
     </script>
