@@ -5,11 +5,6 @@ var path = require('path');
 
 module.exports = function (grunt) {
 
-    // Load the project's grunt tasks from a directory
-    require('grunt-config-dir')(grunt, {
-        configDir: require('path').resolve('tasks')
-    });
-    
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         copy: {
@@ -218,6 +213,11 @@ module.exports = function (grunt) {
         }
     });
 
+    // Load the project's grunt tasks from a directory
+    require('grunt-config-dir')(grunt, {
+        configDir: require('path').resolve('tasks')
+    });
+
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-jshint');
@@ -233,7 +233,8 @@ module.exports = function (grunt) {
     grunt.registerTask('lint', ['jshint']);
 
     // Register group tasks
-    grunt.registerTask('build2', [ 'jshint', 'less', 'requirejs', 'i18n', 'copyto' ]);
+    grunt.registerTask('build-kraken', [ 'jshint', 'less', 'requirejs', 'i18n', 'copyto' ]);
     grunt.registerTask('test', [ 'jshint', 'mochacli' ]);
 
+    grunt.registerTask('build-all', [ 'build', 'build-kraken' ]);
 };

@@ -8,6 +8,7 @@ exports.companyName = 'Wikitruth Foundation';
 exports.projectName = 'Wikitruth';
 exports.systemEmail = 'your@email.addy';
 exports.cryptoKey = 'abc123';
+exports.titleSlogan = 'Wikitruth, the truth in totality of human knowledge';
 exports.loginAttempts = {
   forIp: 50,
   forIpAndUser: 7,
@@ -16,8 +17,8 @@ exports.loginAttempts = {
 exports.requireAccountVerification = false;
 exports.smtp = {
   from: {
-    name: process.env.SMTP_FROM_NAME || exports.projectName +' Website',
     address: process.env.SMTP_FROM_ADDRESS || 'your@email.addy'
+    name: process.env.SMTP_FROM_NAME || exports.projectName /* +' Website'*/,
   },
   credentials: {
     user: process.env.SMTP_USERNAME || 'your@email.addy',

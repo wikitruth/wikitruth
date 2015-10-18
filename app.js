@@ -37,7 +37,7 @@ app.use(kraken(options));
 
 
 
-/* start of drywell */
+/* start of drywell routines */
 
 //keep reference to config
 app.config = config;
@@ -89,11 +89,17 @@ app.use(function(req, res, next) {
     res.locals.user = {};
     res.locals.user.defaultReturnUrl = req.user && req.user.defaultReturnUrl();
     res.locals.user.username = req.user && req.user.username;
+    if(req.user && req.user.username) {
+        res.locals.isContributor = true;
+    } else if(res.locals.isContributor) {
+        delete res.locals.isContributor;
+    }
     next();
 });
 
 //global locals
 app.locals.projectName = app.config.projectName;
+app.locals.titleSlogan = app.config.titleSlogan;
 app.locals.copyrightYear = new Date().getFullYear();
 app.locals.copyrightName = app.config.companyName;
 app.locals.cacheBreaker = 'br34k-01';

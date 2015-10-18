@@ -4,3 +4,10 @@ node_modules
 
 public/vendor
 .nodemonignore
+core.min.css
+public/layouts/core.min.js
+public/layouts/core.min.js.map
+public/layouts/ie-sucks.min.js
+public/layouts/ie-sucks.min.js.map
+public/layouts/admin.min.js
+public/layouts/admin.min.js.map

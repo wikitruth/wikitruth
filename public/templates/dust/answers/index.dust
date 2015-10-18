@@ -1,7 +1,9 @@
 {>"dust/layouts/master" /}
 
+{<title}
+    Answers - {titleSlogan}
+{/title}
+
 {<body}
-
     <h1 class="page-header">Answers</h1>
-
 {/body}

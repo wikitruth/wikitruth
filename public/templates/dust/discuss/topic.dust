@@ -1,7 +1,10 @@
 {>"dust/layouts/master" /}
 
-{<body}
+{<title}
+    Dicussion Topic - {titleSlogan}
+{/title}
 
+{<body}
     <h1 class="page-header">Discuss</h1>
     <h4 class="text-muted"><a href="/discuss">Categories</a> / Scientific Theories / Big Bang Theory</h4>
     <ul class="list-group">

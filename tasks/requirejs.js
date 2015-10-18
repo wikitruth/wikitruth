@@ -10,6 +10,7 @@ module.exports = function requirejs(grunt) {
         build: {
             options: {
                 baseUrl: 'public/js',
+                mainConfigFile: 'public/js/config.js',
                 dir: '.build/js',
                 optimize: 'uglify',
                 modules: [

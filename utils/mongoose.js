@@ -1,6 +1,4 @@
-/**
- * Created by dcsalunga on 21/8/15.
- */
+'use strict';
 
 var mongoose = require('mongoose'),
     kraken = require('../app').kraken;

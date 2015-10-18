@@ -1,17 +1,15 @@
 {>"dust/layouts/master" /}
 
+{<title}
+    {topic.title} - {titleSlogan}
+{/title}
+
 {<body}
 
-    <h1 class="page-header text-primary"><span class="text-muted">Wiki /</span> Theory of Evolution</h1>
-    <div class="btn-group" role="group" aria-label="">
-        <button type="button" class="btn btn-primary">Overview</button>
-        <a class="btn btn-default" href="/wiki/verses">Arguments (1,023)</a>
-        <button type="button" class="btn btn-default">Questions (122)</button>
-        <button type="button" class="btn btn-default">Related</button>
-    </div>
-    <br/><br/>
+    {>"dust/wiki/header" tab="overview" /}
     <div id="lipsum">
-        <p>
+        <p>{topic.content}</p>
+        {!<p>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tempus euismod faucibus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Ut euismod a lectus in posuere. Aenean quis finibus ipsum. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur varius cursus nisi. Suspendisse potenti. Duis sit amet nulla lacus. In tincidunt, eros quis dictum hendrerit, nibh metus accumsan est, in aliquam enim enim a erat.
         </p>
         <p>
@@ -25,7 +23,7 @@
         </p>
         <p>
             Aliquam eleifend ac enim vitae commodo. Phasellus egestas vel libero ut convallis. Praesent massa magna, consectetur congue ornare eget, feugiat ut arcu. Donec rhoncus ligula quis enim tempor, non consectetur arcu pulvinar. Donec viverra sem vitae porta consectetur. Vivamus consectetur augue sit amet convallis elementum. Maecenas convallis scelerisque iaculis. Pellentesque sed condimentum mauris.
-        </p>
+        </p>!}
     </div>
-    <p><a class="btn btn-primary" href="/" role="button">View more &raquo;</a></p>
+    {!<p><a class="btn btn-primary" href="/" role="button">View more &raquo;</a></p>!}
 {/body}

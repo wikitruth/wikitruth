@@ -7,7 +7,8 @@
   "scripts": {
     "test": "grunt test",
     "start": "grunt",
-    "update": "david update"
+    "update": "david update",
+    "all": "npm run build && npm run test"
   },
   "dependencies": {
     "adaro": "^0.1.7",
@@ -34,7 +35,7 @@
     "less": "^1.7.5",
     "localizr": "^0.1.6",
     "method-override": "^2.x.x",
-    "mongoose": "^4.1.10",
+    "mongoose": "^4.1.11",
     "morgan": "^1.x.x",
     "passport": "^0.2.x",
     "passport-facebook": "^2.x.x",
