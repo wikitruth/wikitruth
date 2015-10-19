@@ -2,6 +2,7 @@
 
 var utils = require('../../utils/utils'),
     mongoose = require('mongoose'),
+    modelTypes = require('../../models/constants').MODEL_TYPES,
     db = require('../../app').db.models;
 
 module.exports = function (router) {
@@ -20,7 +21,7 @@ module.exports = function (router) {
 
     router.get('/topic', function (req, res) {
         var model = {};
-        db.Topic.findOne({_id: req.query.id}, function(err, result) {
+        db.Topic.findOne({_id: req.query.topic}, function(err, result) {
             model.topic = result;
             res.render('dust/wiki/topic', model);
         });
@@ -28,8 +29,8 @@ module.exports = function (router) {
 
     router.get('/topic/create', function (req, res) {
         var model = {};
-        if(req.query.id) {
-            db.Topic.findOne({_id: req.query.id}, function (err, result) {
+        if(req.query.topic) {
+            db.Topic.findOne({_id: req.query.topic}, function (err, result) {
                 model.topic = result;
                 res.render('dust/wiki/topic/create', model);
             });
@@ -40,7 +41,7 @@ module.exports = function (router) {
 
     router.post('/topic/create', function (req, res) {
         var query = {
-            _id: req.query.id ? req.query.id : new mongoose.Types.ObjectId()
+            _id: req.query.topic ? req.query.topic : new mongoose.Types.ObjectId()
         };
 
         db.Topic.findOne(query, function(err, result) {
@@ -60,7 +61,7 @@ module.exports = function (router) {
                 }
 
                 if(result) {
-                    res.redirect('/wiki/topic?id=' + req.query.id);
+                    res.redirect('/wiki/topic?topic=' + req.query.topic);
                 } else {
                     res.redirect('/wiki');
                 }
@@ -68,11 +69,86 @@ module.exports = function (router) {
         });
     });
 
+    /* Arguments */
+
     router.get('/arguments', function (req, res) {
         var model = {};
-        db.Topic.findOne({_id: req.query.id}, function(err, result) {
+        db.Topic.findOne({_id: req.query.topic}, function(err, result) {
             model.topic = result;
-            res.render('dust/wiki/arguments', model);
+            db.Argument.find({ ownerId: result._id, ownerType: modelTypes.topic }, function(err, results) {
+                results.forEach(function(result) {
+                    result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                });
+                model.arguments = results;
+                res.render('dust/wiki/arguments', model);
+            });
+        });
+    });
+
+    router.get('/argument', function (req, res) {
+        var model = {};
+        db.Topic.findOne({_id: req.query.topic}, function (err, result) {
+            model.topic = result;
+            db.Argument.findOne({_id: req.query.argument}, function(err, result) {
+                model.argument = result;
+                res.render('dust/wiki/argument', model);
+            });
+        });
+
+    });
+
+    router.get('/argument/create', function (req, res) {
+        var model = {};
+        db.Topic.findOne({_id: req.query.topic}, function (err, result) {
+            model.topic = result;
+            if(req.query.argument) {
+                db.Argument.findOne({_id: req.query.argument}, function (err, result) {
+                    model.argument = result;
+                    res.render('dust/wiki/argument/create', model);
+                });
+            } else {
+                res.render('dust/wiki/argument/create', model);
+            }
+        });
+    });
+
+    router.post('/argument/create', function (req, res) {
+        var query = {
+            _id: req.query.argument ? req.query.argument : new mongoose.Types.ObjectId()
+        };
+
+        db.Argument.findOne(query, function(err, result) {
+            var entity = result ? result : {};
+            entity.content = req.body.content;
+            entity.title = req.body.title;
+            entity.editUserId = req.user.id;
+            entity.editDate = Date.now();
+            if(!result) {
+                entity.createUserId = req.user.id;
+                entity.createDate = Date.now();
+            }
+            if(!entity.ownerId) {
+                /*if(req.query.argument) { // parent is an argument
+                    entity.ownerId = req.query.argument;
+                    entity.ownerType = modelTypes.argument;
+                } else*/
+                if(req.query.topic) { // parent is a topic
+                    entity.ownerId = req.query.topic;
+                    entity.ownerType = modelTypes.topic;
+                }
+            }
+
+            db.Argument.update(query, entity, {upsert: true}, function(err, writeResult) {
+                if (err) {
+                    throw err;
+                }
+
+                if(result) {
+                    res.redirect('/wiki/argument?topic=' + req.query.topic + '&argument=' + req.query.argument);
+                } else {
+                    res.redirect('/wiki/arguments?topic=' + req.query.topic);
+                }
+            });
         });
     });
 };

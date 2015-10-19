@@ -9,6 +9,10 @@
     {>"dust/wiki/header" tab="arguments" /}
     <ul class="list-group">
         <li class="list-group-item highlight"><span class="glyphicon glyphicon-flash text-success" aria-hidden="true"></span> Arguments</li>
+        {#arguments}
+            <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> <a href="/wiki/argument?topic={topic._id}&amp;argument={_id}">{title}</a> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+        {/arguments}
+        {!
         <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Birds Prove Natural Selection is Naturally Wrong <span class="label label-danger">negative</span> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 10,456</span></li>
         <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> The Galapagos Lizard is a perfect example <span class="label label-success">positive</span> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 434</span></li>
         <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Species Without a Link Proves Evolution is Wrong <span class="label label-danger">negative</span> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 434</span></li>
@@ -20,6 +24,7 @@
         <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Origin of Matter and Stars Proves Evolution is Wrong <span class="label label-danger">negative</span> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 343</span></li>
         <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Lack of Life on Mars Proves Evolution is Wrong <span class="label label-danger">negative</span> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 56,012</span></li>
         <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Radio Silence from Space Proves Evolution is Wrong <span class="label label-danger">negative</span> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 343</span></li>
+        !}
     </ul>
-    <p><a class="btn btn-primary" href="/" role="button">View more &raquo;</a></p>
+    {!<p><a class="btn btn-primary" href="/" role="button">View more &raquo;</a></p>!}
 {/body}

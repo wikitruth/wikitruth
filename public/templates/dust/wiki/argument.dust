@@ -1,0 +1,29 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {argument.title} - {titleSlogan}
+{/title}
+
+{<body}
+
+    {>"dust/wiki/header" tab="overview" /}
+    <div id="lipsum">
+        <p>{argument.content}</p>
+        {!<p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tempus euismod faucibus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Ut euismod a lectus in posuere. Aenean quis finibus ipsum. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur varius cursus nisi. Suspendisse potenti. Duis sit amet nulla lacus. In tincidunt, eros quis dictum hendrerit, nibh metus accumsan est, in aliquam enim enim a erat.
+        </p>
+        <p>
+            Fusce ut auctor lacus. In hac habitasse platea dictumst. Maecenas et congue arcu, at porttitor lacus. Duis at nulla nulla. Sed a hendrerit nibh. Nunc scelerisque, diam nec lobortis dapibus, turpis velit sagittis justo, in elementum est ligula a nunc. Ut ac malesuada risus. Quisque lobortis mauris et finibus egestas. Donec vel nulla suscipit, lacinia dolor in, pretium arcu.
+        </p>
+        <p>
+            Morbi scelerisque leo et augue rutrum, nec tempus est mollis. Maecenas vel eleifend neque, at mollis metus. Ut sollicitudin purus est, id bibendum mauris pharetra non. Aenean efficitur ipsum vel felis placerat ullamcorper. Morbi pharetra commodo massa, vitae varius urna. In nec enim eu urna vulputate interdum. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi posuere massa ac erat tempus feugiat. Mauris viverra varius tellus id tincidunt. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec fermentum ac odio id rhoncus. Nunc rutrum nisl nec nulla suscipit accumsan. Curabitur interdum a tellus ut imperdiet.
+        </p>
+        <p>
+            Curabitur velit nisi, tempus ut magna eu, malesuada consequat nibh. Sed gravida felis ac auctor feugiat. Phasellus pharetra dui erat. Suspendisse ac aliquam tortor, sed porta mauris. Fusce lobortis molestie vehicula. Proin sed eros vel ex cursus bibendum sit amet sed diam. Donec efficitur mi lacus, pretium maximus mi molestie at. Phasellus ut nisl mollis, pellentesque felis eget, varius justo. In non molestie diam, vel tincidunt leo. Vivamus at diam tortor. Vestibulum enim diam, egestas ac bibendum at, luctus ac velit. Sed imperdiet vehicula ante, id cursus ante pharetra at. Ut ultrices augue eget justo pretium lobortis. Maecenas quis sem ligula. Suspendisse potenti. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.
+        </p>
+        <p>
+            Aliquam eleifend ac enim vitae commodo. Phasellus egestas vel libero ut convallis. Praesent massa magna, consectetur congue ornare eget, feugiat ut arcu. Donec rhoncus ligula quis enim tempor, non consectetur arcu pulvinar. Donec viverra sem vitae porta consectetur. Vivamus consectetur augue sit amet convallis elementum. Maecenas convallis scelerisque iaculis. Pellentesque sed condimentum mauris.
+        </p>!}
+    </div>
+    {!<p><a class="btn btn-primary" href="/" role="button">View more &raquo;</a></p>!}
+{/body}
