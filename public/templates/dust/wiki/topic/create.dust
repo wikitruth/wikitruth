@@ -16,6 +16,7 @@
             <label for="inputContent">Summary</label>
             <textarea class="form-control" id="inputContent" name="content" rows="3">{topic.content}</textarea>
         </div>
-        <button type="submit" class="btn btn-primary">Submit</button> <a class="btn btn-default" href=".." role="button">Cancel</a>
+        <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
+        <a class="btn btn-default" href="{?topic}/wiki/topic?topic={topic._id}{:else}/wiki{/topic}" role="button">Cancel</a>
     </form>
 {/body}

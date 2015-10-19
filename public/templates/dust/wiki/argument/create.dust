@@ -1,0 +1,22 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {?argument}Edit{:else}New{/argument} Argument - {titleSlogan}
+{/title}
+
+{<body}
+    <h1 class="page-header text-primary"><span class="text-muted"><a href="/wiki">Wiki</a> /</span> {?argument}Edit{:else}New{/argument} Argument</h1>
+    <form method="post">
+        <input type="hidden" name="_csrf" value="{_csrf}">
+        <div class="form-group">
+            <label for="inputName">Argument</label>
+            <input type="text" name="title" id="inputName" value="{argument.title}" class="form-control"/>
+        </div>
+        <div class="form-group">
+            <label for="inputContent">Summary</label>
+            <textarea class="form-control" id="inputContent" name="content" rows="3">{argument.content}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
+        <a class="btn btn-default" href="{?argument}/wiki/argument?topic={topic._id}&amp;argument={argument._id}{:else}/wiki/topic?topic={topic._id}{/argument}" role="button">Cancel</a>
+    </form>
+{/body}

@@ -14,8 +14,9 @@
     <ul class="list-group">
         <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Topic</li>
         {#topics}
-            <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> <a href="/wiki/topic/?id={_id}">{title}</a> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+            <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> <a href="/wiki/topic?topic={_id}">{title}</a> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
         {/topics}
+        {!
         <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Big Bang Theory <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 5,140</span></li>
         <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> <a href="/wiki/topic/">Theory of Evolution</a> <span class="label label-primary">featured</span> <span class="label label-danger">hot</span> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 10,456</span></li>
         <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Global warming <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 434</span></li>
@@ -37,6 +38,7 @@
         <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Euthanasia <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 45</span></li>
         <!--<li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Premarital sex</li>-->
         <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Marriage <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 90</span></li>
+        !}
     </ul>
     <p><a class="btn btn-primary" href="/" role="button">View more &raquo;</a></p>
 {/body}
