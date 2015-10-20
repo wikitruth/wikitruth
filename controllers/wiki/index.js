@@ -1,6 +1,7 @@
 'use strict';
 
 var utils = require('../../utils/utils'),
+    wikiUtils = require('../../utils/wikiUtils'),
     mongoose = require('mongoose'),
     modelTypes = require('../../models/constants').MODEL_TYPES,
     db = require('../../app').db.models;
@@ -23,6 +24,7 @@ module.exports = function (router) {
         var model = {};
         db.Topic.findOne({_id: req.query.topic}, function(err, result) {
             model.topic = result;
+            wikiUtils.appendTopicOwnerFlag(req, result, model);
             res.render('dust/wiki/topic', model);
         });
     });
@@ -75,6 +77,7 @@ module.exports = function (router) {
         var model = {};
         db.Topic.findOne({_id: req.query.topic}, function(err, result) {
             model.topic = result;
+            wikiUtils.appendTopicOwnerFlag(req, result, model);
             db.Argument.find({ ownerId: result._id, ownerType: modelTypes.topic }, function(err, results) {
                 results.forEach(function(result) {
                     result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
@@ -91,10 +94,10 @@ module.exports = function (router) {
             model.topic = result;
             db.Argument.findOne({_id: req.query.argument}, function(err, result) {
                 model.argument = result;
+                wikiUtils.appendArgumentOwnerFlag(req, result, model);
                 res.render('dust/wiki/argument', model);
             });
         });
-
     });
 
     router.get('/argument/create', function (req, res) {
