@@ -10,7 +10,7 @@ module.exports = function (router) {
 
     router.get('/', function (req, res) {
         var model = {};
-        db.Topic.find({}, function(err, results) {
+        db.Topic.find({}).sort({ title: 1 }).exec(function(err, results) {
             results.forEach(function(result) {
                 result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
             });
@@ -78,7 +78,7 @@ module.exports = function (router) {
         db.Topic.findOne({_id: req.query.topic}, function(err, result) {
             model.topic = result;
             wikiUtils.appendTopicOwnerFlag(req, result, model);
-            db.Argument.find({ ownerId: result._id, ownerType: modelTypes.topic }, function(err, results) {
+            db.Argument.find({ ownerId: result._id, ownerType: modelTypes.topic }).sort({ title: 1 }).exec(function(err, results) {
                 results.forEach(function(result) {
                     result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
                 });

@@ -10,7 +10,7 @@
     <p class="lead" style="margin-bottom: 10px">
         <a href="/wiki/topic?topic={topic._id}">{topic.title}</a></p>
     <div id="lipsum">
-        <p>{topic.content}</p>
+        <p>{topic.content|s}</p>
         {!<p>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tempus euismod faucibus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Ut euismod a lectus in posuere. Aenean quis finibus ipsum. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur varius cursus nisi. Suspendisse potenti. Duis sit amet nulla lacus. In tincidunt, eros quis dictum hendrerit, nibh metus accumsan est, in aliquam enim enim a erat.
         </p>
