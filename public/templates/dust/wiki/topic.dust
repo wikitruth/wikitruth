@@ -7,6 +7,8 @@
 {<body}
 
     {>"dust/wiki/header" tab="overview" /}
+    <p class="lead" style="margin-bottom: 10px">
+        <a href="/wiki/topic?topic={topic._id}">{topic.title}</a></p>
     <div id="lipsum">
         <p>{topic.content}</p>
         {!<p>

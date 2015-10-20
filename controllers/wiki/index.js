@@ -154,4 +154,57 @@ module.exports = function (router) {
             });
         });
     });
+
+    /* Questions */
+
+    router.get('/questions', function (req, res) {
+        var model = {};
+        db.Topic.findOne({_id: req.query.topic}, function (err, result) {
+            model.topic = result;
+            wikiUtils.appendTopicOwnerFlag(req, result, model);
+            if(req.query.argument) {
+                db.Argument.findOne({_id: req.query.argument}, function (err, result) {
+                    model.argument = result;
+                    wikiUtils.appendArgumentOwnerFlag(req, result, model);
+                    res.render('dust/wiki/questions', model);
+                });
+            } else {
+                res.render('dust/wiki/questions', model);
+            }
+        });
+    });
+
+    router.get('/question/create', function (req, res) {
+        var model = {};
+        db.Topic.findOne({_id: req.query.topic}, function (err, result) {
+            model.topic = result;
+            if(req.query.argument) {
+                db.Argument.findOne({_id: req.query.argument}, function (err, result) {
+                    model.argument = result;
+                    res.render('dust/wiki/question/create', model);
+                });
+            } else {
+                res.render('dust/wiki/question/create', model);
+            }
+        });
+    });
+
+    /* Related */
+
+    router.get('/related', function (req, res) {
+        var model = {};
+        db.Topic.findOne({_id: req.query.topic}, function (err, result) {
+            model.topic = result;
+            wikiUtils.appendTopicOwnerFlag(req, result, model);
+            if(req.query.argument) {
+                db.Argument.findOne({_id: req.query.argument}, function (err, result) {
+                    model.argument = result;
+                    wikiUtils.appendArgumentOwnerFlag(req, result, model);
+                    res.render('dust/wiki/related', model);
+                });
+            } else {
+                res.render('dust/wiki/related', model);
+            }
+        });
+    });
 };
