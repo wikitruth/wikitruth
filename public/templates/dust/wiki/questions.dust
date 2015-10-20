@@ -1,0 +1,11 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    Questions: {topic.title} - {titleSlogan}
+{/title}
+
+{<body}
+
+    {>"dust/wiki/header" tab="questions" /}
+    {>"dust/help-us" /}
+{/body}

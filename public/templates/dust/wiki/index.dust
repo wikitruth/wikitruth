@@ -40,5 +40,5 @@
         <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Marriage <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 90</span></li>
         !}
     </ul>
-    <p><a class="btn btn-primary" href="/" role="button">View more &raquo;</a></p>
+    {!<p><a class="btn btn-primary" href="/" role="button">View more &raquo;</a></p>!}
 {/body}
