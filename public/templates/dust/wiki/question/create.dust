@@ -5,7 +5,7 @@
 {/title}
 
 {<body}
-    <h1 class="page-header text-primary"><span class="text-muted"><a href="/wiki">Wiki</a> /</span> New Question</h1>
+    <h2 class="page-header text-primary"><span class="text-muted"><a href="/wiki">Wiki</a> /</span> New Question</h2>
     {>"dust/help-us" /}
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
