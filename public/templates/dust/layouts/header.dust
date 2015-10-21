@@ -26,9 +26,9 @@
         <div class="navbar-collapse my-navbar-collapse collapse">
             <ul class="nav navbar-nav">
                 <!--<li class="hidden-xs"><a href="/">Home</a></li>-->
-                <li><a href="/wiki">Truth</a></li>
-                <li><a href="/religion">Religion</a></li>
-                <li><a href="/morality">Morality</a></li>
+                <li><a href="/wiki"><i class="fa fa-globe"></i> Truth</a></li>
+                <li><a href="/religion"><i class="fa fa-book"></i> Religion</a></li>
+                <li><a href="/morality"><i class="fa fa-heart"></i> Morality</a></li>
                 <!--<li class="hidden-xs"><a href="/about/">About</a></li>-->
             </ul>
             <ul class="nav navbar-nav navbar-right">

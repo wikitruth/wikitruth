@@ -20,9 +20,15 @@ html
         div.navbar-collapse.my-navbar-collapse.collapse
           ul.nav.navbar-nav
             //li: a(href='/') Home
-            li: a(href='/wiki') Truth
-            li: a(href='/religion') Religion
-            li: a(href='/morality') Morality
+            li: a(href='/wiki')
+              i.fa.fa-globe
+              |  Truth
+            li: a(href='/religion')
+              i.fa.fa-book
+              |  Religion
+            li: a(href='/morality')
+              i.fa.fa-heart
+              |  Morality
             //li: a(href='/about/') About
           ul.nav.navbar-nav.navbar-right
             if user && user.username
