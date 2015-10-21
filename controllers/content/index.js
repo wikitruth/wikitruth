@@ -6,10 +6,9 @@ var utils = require('../../utils/utils'),
     constants = require('../../models/constants'),
     db = require('../../app').db.models;
 
-exports.init = function(req, res){
-  var model = {};
-  db.Content.findOne({ id: 'about' }, function(err, result) {
-    model.content = result;
-    res.render('jade/about/index.jade', model);
-  });
+module.exports = function (router) {
+    var model = {};
+    router.get('/edit', function (req, res) {
+        res.render('dust/page/edit', model);
+    });
 };
