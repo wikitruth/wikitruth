@@ -7,8 +7,12 @@ var utils = require('../../utils/utils'),
     db = require('../../app').db.models;
 
 module.exports = function (router) {
-    var model = {};
-    router.get('/edit', function (req, res) {
-        res.render('dust/page/edit', model);
+
+    router.get('/:id', function (req, res) {
+        var model = {};
+        db.Page.findOne({id: req.params.id}, function(err, result) {
+            model.page = result;
+            res.render('dust/about/page', model);
+        });
     });
 };

@@ -10,7 +10,7 @@ module.exports = function (router) {
 
     router.get('/', function (req, res) {
         var model = {};
-        db.Topic.find({}).sort({ title: 1 }).exec(function(err, results) {
+        db.Topic.find({}).limit(100).sort({ title: 1 }).exec(function(err, results) {
             results.forEach(function(result) {
                 result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
             });
@@ -75,17 +75,31 @@ module.exports = function (router) {
 
     router.get('/arguments', function (req, res) {
         var model = {};
-        db.Topic.findOne({_id: req.query.topic}, function(err, result) {
-            model.topic = result;
-            wikiUtils.appendTopicOwnerFlag(req, result, model);
-            db.Argument.find({ ownerId: result._id, ownerType: modelTypes.topic }).sort({ title: 1 }).exec(function(err, results) {
+        if(req.query.topic) {
+            db.Topic.findOne({_id: req.query.topic}, function(err, result) {
+                model.topic = result;
+                wikiUtils.appendTopicOwnerFlag(req, result, model);
+                db.Argument.find({ ownerId: result._id, ownerType: modelTypes.topic }).sort({ title: 1 }).exec(function(err, results) {
+                    results.forEach(function(result) {
+                        result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                    });
+                    model.arguments = results;
+                    res.render('dust/wiki/arguments', model);
+                });
+            });
+        } else {
+            // Top Discussions
+            db.Argument.find({ ownerType: modelTypes.topic }).limit(100).exec(function(err, results) {
                 results.forEach(function(result) {
+                    result.topic = {
+                        _id: result.ownerId
+                    };
                     result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
                 });
                 model.arguments = results;
                 res.render('dust/wiki/arguments', model);
             });
-        });
+        }
     });
 
     router.get('/argument', function (req, res) {
@@ -159,19 +173,25 @@ module.exports = function (router) {
 
     router.get('/questions', function (req, res) {
         var model = {};
-        db.Topic.findOne({_id: req.query.topic}, function (err, result) {
-            model.topic = result;
-            wikiUtils.appendTopicOwnerFlag(req, result, model);
-            if(req.query.argument) {
-                db.Argument.findOne({_id: req.query.argument}, function (err, result) {
-                    model.argument = result;
-                    wikiUtils.appendArgumentOwnerFlag(req, result, model);
+        if(req.query.topic) {
+            db.Topic.findOne({_id: req.query.topic}, function (err, result) {
+                model.topic = result;
+                wikiUtils.appendTopicOwnerFlag(req, result, model);
+                if(req.query.argument) {
+                    db.Argument.findOne({_id: req.query.argument}, function (err, result) {
+                        model.argument = result;
+                        wikiUtils.appendArgumentOwnerFlag(req, result, model);
+                        res.render('dust/wiki/questions', model);
+                    });
+                } else {
                     res.render('dust/wiki/questions', model);
-                });
-            } else {
-                res.render('dust/wiki/questions', model);
-            }
-        });
+                }
+            });
+        } else {
+            // Top Questions
+            // TODO: Filter top 100 based on number of activities
+            res.render('dust/wiki/questions', model);
+        }
     });
 
     router.get('/question/create', function (req, res) {

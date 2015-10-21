@@ -5,7 +5,10 @@
 {/title}
 
 {<body}
-
-    {>"dust/wiki/header" tab="questions" /}
+    {?topic}
+        {>"dust/wiki/topic-header" tab="questions" /}
+    {:else}
+        {>"dust/wiki/index-header" tab="top-questions" /}
+    {/topic}
     {>"dust/help-us" /}
 {/body}

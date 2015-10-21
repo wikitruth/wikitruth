@@ -5,12 +5,7 @@
 {/title}
 
 {<body}
-    <h1 class="page-header"><i class="fa fa-globe"></i> Truth &amp; Reality</h1>
-    <h4 class="text-muted" style="line-height: 30px;">Top popular topics
-        {?isContributor}
-        <div class="pull-right"><a href="/wiki/topic/create" class="btn btn-default"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Topic</a></div>
-        {/isContributor}
-    </h4>
+    {>"dust/wiki/index-header" tab="top-topics" /}
     <ul class="list-group">
         <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Topic</li>
         {#topics}

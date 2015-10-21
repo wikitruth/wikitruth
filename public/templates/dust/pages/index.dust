@@ -1,0 +1,18 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    My Pages - {titleSlogan}
+{/title}
+
+{<body}
+    {>"dust/pages/header" tab="-pages" /}
+    {?pages}
+        <ul class="list-group">
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Page</li>
+            {#pages}
+                <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> <a href="/pages/page?id={_id}">{title}</a></li>
+            {/pages}
+        </ul>
+    {/pages}
+
+{/body}

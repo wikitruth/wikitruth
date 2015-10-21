@@ -1,13 +1,13 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {argument.title} - {titleSlogan}
+    {page.title} - {titleSlogan}
 {/title}
 
 {<body}
-    {>"dust/wiki/topic-header" tab="overview" /}
+    {>"dust/pages/header" tab="-pages" /}
     <div id="lipsum">
-        <p>{argument.content|s}</p>
+        <p>{page.content|s}</p>
         {!<p>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tempus euismod faucibus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Ut euismod a lectus in posuere. Aenean quis finibus ipsum. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur varius cursus nisi. Suspendisse potenti. Duis sit amet nulla lacus. In tincidunt, eros quis dictum hendrerit, nibh metus accumsan est, in aliquam enim enim a erat.
         </p>
