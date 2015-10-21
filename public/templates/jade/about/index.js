@@ -1,10 +1,10 @@
 'use strict';
 
-var utils = require('../../utils/utils'),
-    wikiUtils = require('../../utils/wikiUtils'),
+var utils = require('../../../../utils/utils'),
+    wikiUtils = require('../../../../utils/wikiUtils'),
     mongoose = require('mongoose'),
-    constants = require('../../models/constants'),
-    db = require('../../app').db.models;
+    constants = require('../../../../models/constants'),
+    db = require('../../../../app').db.models;
 
 exports.init = function(req, res){
   var model = {};
