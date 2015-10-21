@@ -8,8 +8,8 @@ var utils = require('../../../../utils/utils'),
 
 exports.init = function(req, res){
   var model = {};
-  db.Content.findOne({ id: 'about' }, function(err, result) {
-    model.content = result;
+  db.Page.findOne({ id: 'about' }, function(err, result) {
+    model.page = result ? result : {};
     res.render('jade/about/index.jade', model);
   });
 };

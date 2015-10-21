@@ -6,9 +6,12 @@
 
 {<body}
 
-    {>"dust/wiki/header" tab="overview" /}
-    <p class="lead" style="margin-bottom: 10px">
-        <a href="/wiki/topic?topic={topic._id}">{topic.title}</a></p>
+    {>"dust/wiki/topic-header" tab="overview" /}
+    <div style="margin-bottom: 10px">
+        <p class="lead" style="margin-bottom: 0">
+            <a href="/wiki/topic?topic={topic._id}">{topic.title}</a></p>
+        <span style="color: #f0ad4e" title="Pending peer review and acceptance (verdict)"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></span>
+    </div>
     <div id="lipsum">
         <p>{topic.content|s}</p>
         {!<p>

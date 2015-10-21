@@ -1,0 +1,31 @@
+<h1 class="page-header text-primary">
+    <span class="text-muted">
+        <i class="fa fa-book"></i> <a href="/pages">Pages</a>
+        {?page}
+        &nbsp;/&nbsp;
+        <a href="/pages/page?id={page._id}">{page.title}</a>
+        {/page}
+    </span>
+</h1>
+{#user.username}
+    <div class="btn-group" role="group" aria-label="" style="margin-bottom: 10px">
+        <a class="btn btn-{@eq key=tab value="pages"}primary{:else}default{/eq}" href="/pages">
+            <span class="glyphicon glyphicon-file" aria-hidden="true"></span> My Pages
+        </a>
+        <a class="btn btn-default dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+            {?isContributor}
+                {?page}
+                    <li><a href="/pages/create?id={page._id}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Page</a></li>
+                    <li role="separator" class="divider"></li>
+                {/page}
+                <li><a href="/pages/create"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Page</a></li>
+
+            {/isContributor}
+        </ul>
+    </div>
+{:else}
+    <h4 class="text-muted">Please login before you can create pages.</h4>
+{/user.username}

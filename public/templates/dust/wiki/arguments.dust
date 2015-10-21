@@ -5,8 +5,11 @@
 {/title}
 
 {<body}
-
-    {>"dust/wiki/header" tab="arguments" /}
+    {?topic}
+        {>"dust/wiki/topic-header" tab="arguments" /}
+    {:else}
+        {>"dust/wiki/index-header" tab="top-arguments" /}
+    {/topic}
     <ul class="list-group">
         <li class="list-group-item highlight"><span class="glyphicon glyphicon-flash text-success" aria-hidden="true"></span> Arguments</li>
         {#arguments}
