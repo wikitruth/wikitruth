@@ -18,4 +18,5 @@ exports = module.exports = function(app, mongoose) {
   require('./core/Topic')(app, mongoose);
   require('./core/Argument')(app, mongoose);
   require('./core/Question')(app, mongoose);
+  require('./core/Content')(app, mongoose);
 };

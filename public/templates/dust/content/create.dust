@@ -5,7 +5,7 @@
 {/title}
 
 {<body}
-    <h1 class="page-header text-primary"><span class="text-muted"><a href="/">Home</a> /</span> {?content}Edit{:else}New{/content} Content</h1>
+    <h2 class="page-header text-primary"><span class="text-muted"><a href="/">Home</a> /</span> {?content}Edit{:else}New{/content} Content</h2>
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
         <div class="form-group">

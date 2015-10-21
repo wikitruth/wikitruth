@@ -1,19 +1,24 @@
-<h1 class="page-header text-primary">
+<h2 class="page-header text-primary">
     <span class="text-muted">
-        <a href="/wiki">Wiki</a>
+        <a href="/wiki">Truth</a>
         &nbsp;/&nbsp;
         <a href="/wiki/topic?topic={topic._id}">{topic.title}</a>
     </span>
-</h1>
+</h2>
 <div class="btn-group" role="group" aria-label="">
     {^argument}
-        <a class="btn btn-{@eq key=tab value="overview"}primary{:else}default{/eq}" href="/wiki/topic?topic={topic._id}"><span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a>
-        <a class="btn btn-{@eq key=tab value="arguments"}primary{:else}default{/eq}" href="/wiki/arguments?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments (1,023)</a>
+        <a class="btn btn-{@eq key=tab value="overview"}primary{:else}default{/eq}" href="/wiki/topic?topic={topic._id}">
+            <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a>
+        <a class="btn btn-{@eq key=tab value="arguments"}primary{:else}default{/eq}" href="/wiki/arguments?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
+            <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments<span class="hidden-xs"> (1,023)</span></a>
     {:else}
-        <a class="btn btn-{@eq key=tab value="overview"}primary{:else}default{/eq}" href="/wiki/argument?topic={topic._id}&amp;argument={argument._id}"><span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a>
+        <a class="btn btn-{@eq key=tab value="overview"}primary{:else}default{/eq}" href="/wiki/argument?topic={topic._id}&amp;argument={argument._id}">
+            <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a>
     {/argument}
-    <a class="btn btn-{@eq key=tab value="questions"}primary{:else}default{/eq}" href="/wiki/questions?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions (122)</a>
-    <a class="btn btn-{@eq key=tab value="related"}primary{:else}default{/eq}" href="/wiki/related?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}"><span class="glyphicon glyphicon-random" aria-hidden="true"></span> Related</a>
+    <a class="btn btn-{@eq key=tab value="questions"}primary{:else}default{/eq}" href="/wiki/questions?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
+        <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions<span class="hidden-xs"> (122)</span></a>
+    <a class="hidden-xs btn btn-{@eq key=tab value="related"}primary{:else}default{/eq}" href="/wiki/related?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
+        <span class="glyphicon glyphicon-random" aria-hidden="true"></span> Related</a>
     {?isContributor}
     <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
         <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span>
@@ -32,8 +37,12 @@
             {/isArgumentOwner}
         {/argument}
 
-        <li><a href="/wiki/question/create?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> New Question</a></li>
+        <li><a href="/wiki/question/create?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
+            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> New Question</a></li>
         {!<li><a href="#">Separated link</a></li>!}
+        <li role="separator" class="visible-xs divider"></li>
+        <li class="visible-xs"><a href="/wiki/related?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
+            <span class="glyphicon glyphicon-random" aria-hidden="true"></span> Related</a></li>
     </ul>
     {/isContributor}
 </div>
