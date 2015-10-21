@@ -5,6 +5,6 @@
 {/title}
 
 {<body}
-    <h1 class="page-header">Religion &amp; Beliefs</h1>
+    <h1 class="page-header"><i class="fa fa-book"></i> Religion &amp; Beliefs</h1>
     {>"dust/help-us" /}
 {/body}
