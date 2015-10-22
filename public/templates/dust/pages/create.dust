@@ -6,7 +6,7 @@
 
 {<body}
     <h1 class="page-header text-primary">
-        <span class="text-muted"><i class="fa fa-book"></i> <a href="/pages">Pages</a> / {?page}<a href="/pages/page?id={page._id}">{page.title}</a> / Edit{:else}New Page{/page}</span></h1>
+        <span class="text-muted"><i class="fa fa-book"></i> <a href="/pages">Pages</a> / {?parent}<a href="/pages/page?id={parent._id}">{parent.title}</a> /{/parent} {?page}<a href="/pages/page?id={page._id}">{page.title}</a> / Edit{:else}New Page{/page}</span></h1>
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
         <div class="form-group">
@@ -22,6 +22,14 @@
             <input type="text" name="id" id="inputId" value="{page.id}" class="form-control"/>
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
-        <a class="btn btn-default" href="/pages{?page}/page?id={page._id}{/page}" role="button">Cancel</a>
+        {?parent}
+            {?page}
+                <a class="btn btn-default" href="/pages/page?parent={parent._id}&amp;id={page._id}" role="button">Cancel</a>
+            {:else}
+                <a class="btn btn-default" href="/pages/page?id={parent._id}" role="button">Cancel</a>
+            {/page}
+        {:else}
+            <a class="btn btn-default" href="/pages{?page}/page?id={page._id}{/page}" role="button">Cancel</a>
+        {/parent}
     </form>
 {/body}

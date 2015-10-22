@@ -5,6 +5,7 @@ exports = module.exports = function(app, mongoose) {
     id: { type: String },
     content: { type: String, default: '' },
     title: { type: String, default: '' },
+    parentId: { type: mongoose.Schema.ObjectId },
     createDate: { type: Date, default: Date.now },
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     editDate: { type: Date, default: Date.now },

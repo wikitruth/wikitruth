@@ -1,9 +1,13 @@
 <h1 class="page-header text-primary">
     <span class="text-muted">
         <i class="fa fa-book"></i> <a href="/pages">Pages</a>
+        {?parent}
+            &nbsp;/&nbsp;
+            <a href="/pages/page?id={parent._id}">{parent.title}</a>
+        {/parent}
         {?page}
-        &nbsp;/&nbsp;
-        <a href="/pages/page?id={page._id}">{page.title}</a>
+            &nbsp;/&nbsp;
+            <a href="/pages/page?id={page._id}{?parent}&amp;parent={parent._id}{/parent}">{page.title}</a>
         {/page}
     </span>
 </h1>
@@ -12,17 +16,21 @@
         <a class="btn btn-{@eq key=tab value="pages"}primary{:else}default{/eq}" href="/pages">
             <span class="glyphicon glyphicon-file" aria-hidden="true"></span> My Pages
         </a>
+        {?page}
+            <a class="btn btn-{@eq key=tab value="children"}primary{:else}default{/eq}" href="/pages?parent={?parent}{parent._id}{:else}{page._id}{/parent}">
+            <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Child Pages
+        </a>
+        {/page}
         <a class="btn btn-default dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
             <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span>
         </a>
         <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
             {?isContributor}
                 {?page}
-                    <li><a href="/pages/create?id={page._id}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Page</a></li>
+                    <li><a href="/pages/create?id={page._id}{?parent}&amp;parent={parent._id}{/parent}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Page</a></li>
                     <li role="separator" class="divider"></li>
                 {/page}
-                <li><a href="/pages/create"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Page</a></li>
-
+                <li><a href="/pages/create{?page}?parent={?parent}{parent._id}{:else}{page._id}{/parent}{/page}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Page</a></li>
             {/isContributor}
         </ul>
     </div>
