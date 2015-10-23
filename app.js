@@ -89,6 +89,13 @@ app.use(function(req, res, next) {
     res.locals.user = {};
     res.locals.user.defaultReturnUrl = req.user && req.user.defaultReturnUrl();
     res.locals.user.username = req.user && req.user.username;
+
+    if(req.user && req.user.isAdmin()){
+        res.locals.user.isAdmin = true;
+    } else if(res.locals.isAdmin) {
+        delete res.locals.isAdmin;
+    }
+
     if(req.user && req.user.username) {
         res.locals.isContributor = true;
     } else if(res.locals.isContributor) {

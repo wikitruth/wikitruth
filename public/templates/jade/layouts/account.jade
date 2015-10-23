@@ -19,14 +19,23 @@ html
             span.icon-bar
         div.navbar-collapse.my-navbar-collapse.collapse
           ul.nav.navbar-nav
-            li: a(href='/') Home
+            //li: a(href='/') Home
+            li: a(href='/account/') Home
             li: a(href='/pages/') My Pages
-            li: a(href='/account/') My Account
-            li: a(href='/account/settings/') Settings
+            //li: a(href='/account/settings/') Settings
           ul.nav.navbar-nav.navbar-right
-            li: a(href='/logout/')
-              i.fa.fa-user
-              |  Sign Out
+            li.dropdown
+              a.dropdown-toggle(href='#', data-toggle='dropdown')
+                i.fa.fa-user
+                |  #{user.username}&nbsp;
+                span.caret
+              ul.dropdown-menu
+                if user && user.isAdmin
+                  li: a(href='/admin') Admin Area
+                li: a(href='/account') My Account
+                li: a(href='/account/settings/') Settings
+                li.divider
+                li: a(href='/logout/') Sign Out
 
     div.page
       div.container
@@ -36,10 +45,14 @@ html
       div.container
         div.inner
           span.copyright.pull-right
-            |&#169; #{copyrightYear} #{copyrightName}
+            |&#169; #{copyrightYear}&nbsp;
+            a(href='https://github.com/wikitruth', target='_blank') #{copyrightName}
           ul.links
             li: a(href='/') Home
-            li: a(href='/logout/') Sign Out
+            li: a(href='https://www.facebook.com/wikitruth.co') Facebook
+            //li: a(href='//blog.wikitruth.co') Blog
+            li: a(href='/about/') About
+            li: a(href='/contact/') Contact
           div.clearfix
 
     div.ajax-spinner
