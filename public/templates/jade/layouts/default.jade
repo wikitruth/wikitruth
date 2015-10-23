@@ -32,9 +32,18 @@ html
             //li: a(href='/about/') About
           ul.nav.navbar-nav.navbar-right
             if user && user.username
-              li: a(href='#{user.defaultReturnUrl}')
-                i.fa.fa-user
-                |  #{user.username}
+              li.dropdown
+                a.dropdown-toggle(href='#', data-toggle='dropdown')
+                  i.fa.fa-user
+                  |  #{user.username}&nbsp;
+                  span.caret
+                ul.dropdown-menu
+                  if user && user.isAdmin
+                    li: a(href='/admin') Admin Area
+                  li: a(href='/account') My Account
+                  li: a(href='/account/settings/') Settings
+                  li.divider
+                  li: a(href='/logout/') Sign Out
             else
               li: a(href='/login/')
                 i.fa.fa-user
