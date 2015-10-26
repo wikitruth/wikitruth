@@ -1,0 +1,12 @@
+li.dropdown
+    a.dropdown-toggle(href='#', data-toggle='dropdown')
+        i.fa.fa-user
+        |  #{user.username}&nbsp;
+        span.caret
+    ul.dropdown-menu
+        if user && user.isAdmin
+            li: a(href='/admin') Admin Area
+        li: a(href='/account') My Account
+        li: a(href='/account/settings/') Settings
+        li.divider
+        li: a(href='/logout/') Sign Out

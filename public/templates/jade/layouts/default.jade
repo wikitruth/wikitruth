@@ -23,7 +23,7 @@ html
             li: a(href='/wiki')
               i.fa.fa-globe
               |  Truth
-            li: a(href='/religion')
+            li: a(href='/ideology')
               i.fa.fa-book
               |  Religion
             li: a(href='/morality')
@@ -32,18 +32,7 @@ html
             //li: a(href='/about/') About
           ul.nav.navbar-nav.navbar-right
             if user && user.username
-              li.dropdown
-                a.dropdown-toggle(href='#', data-toggle='dropdown')
-                  i.fa.fa-user
-                  |  #{user.username}&nbsp;
-                  span.caret
-                ul.dropdown-menu
-                  if user && user.isAdmin
-                    li: a(href='/admin') Admin Area
-                  li: a(href='/account') My Account
-                  li: a(href='/account/settings/') Settings
-                  li.divider
-                  li: a(href='/logout/') Sign Out
+              include account-nav.jade
             else
               li: a(href='/login/')
                 i.fa.fa-user
@@ -56,25 +45,8 @@ html
       div.container
         block body
 
-    div.footer
-      div.container
-        span.copyright.pull-right
-          |&#169; #{copyrightYear}&nbsp;
-          a(href='https://github.com/wikitruth', target='_blank') #{copyrightName}
-        ul.links
-          li: a(href='/') Home
-          li: a(href='https://www.facebook.com/wikitruth.co') Facebook
-          //li: a(href='//blog.wikitruth.co') Blog
-          li: a(href='/about/') About
-          li: a(href='/contact/') Contact
-        div.clearfix
+    include footer.jade
 
-    div.ajax-spinner
-      img(src='/img/ajax-pulse.gif', alt='Loading')
-
-    //if lte IE 9
-      script(src='/layouts/ie-sucks.min.js?#{cacheBreaker}')
-    script(src='/layouts/core.min.js?#{cacheBreaker}')
     script.
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
                 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

@@ -1,0 +1,16 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    Religion &amp; Beliefs - {titleSlogan}
+{/title}
+
+{<body}
+    {>"dust/ideology/index-header" tab="top-items" /}
+    <ul class="list-group">
+        <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Entry</li>
+        {#items}
+            <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> <a href="/ideology/entry?id={_id}">{title}</a> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+        {/items}
+    </ul>
+{!<p><a class="btn btn-primary" href="/" role="button">View more &raquo;</a></p>!}
+{/body}

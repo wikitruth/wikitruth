@@ -1,0 +1,14 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    Questions: {item.title} - {titleSlogan}
+{/title}
+
+{<body}
+    {?topic}
+        {>"dust/ideology/item-header" tab="questions" /}
+    {:else}
+        {>"dust/ideology/index-header" tab="top-questions" /}
+    {/topic}
+    {>"dust/help-us" /}
+{/body}

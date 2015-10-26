@@ -1,0 +1,10 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    Related: {item.title} - {titleSlogan}
+{/title}
+
+{<body}
+    {>"dust/ideology/item-header" tab="related" /}
+    {>"dust/help-us" /}
+{/body}
