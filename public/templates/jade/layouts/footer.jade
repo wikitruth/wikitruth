@@ -1,0 +1,20 @@
+div.footer
+    div.container
+        div.inner
+            span.copyright.pull-right
+                |&#169; #{copyrightYear}&nbsp;
+                a(href='https://github.com/wikitruth', target='_blank') #{copyrightName}
+            ul.links
+                li: a(href='/') Home
+                li: a(href='https://www.facebook.com/wikitruth.co') Facebook
+                //li: a(href='//blog.wikitruth.co') Blog
+                li: a(href='/about/') About
+                li: a(href='/contact/') Contact
+            div.clearfix
+
+div.ajax-spinner
+    img(src='/img/ajax-pulse.gif', alt='Loading')
+
+//if lte IE 9
+      script(src='/layouts/ie-sucks.min.js?#{cacheBreaker}')
+script(src='/layouts/core.min.js?#{cacheBreaker}')

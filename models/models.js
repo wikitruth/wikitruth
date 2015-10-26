@@ -19,4 +19,7 @@ exports = module.exports = function(app, mongoose) {
   require('./schema/core/Argument')(app, mongoose);
   require('./schema/core/Question')(app, mongoose);
   require('./schema/core/Page')(app, mongoose);
+
+  // ideology
+  require('./schema/ideology/Ideology')(app, mongoose);
 };

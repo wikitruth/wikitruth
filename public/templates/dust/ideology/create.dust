@@ -1,0 +1,26 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {?item}Edit{:else}New{/item} Entry - {titleSlogan}
+{/title}
+
+{<body}
+    <h2 class="page-header text-primary"><span class="text-muted"><a href="/ideology">Ideology</a> /</span> {?item}Edit{:else}New{/item} Entry</h2>
+    <form method="post">
+        <input type="hidden" name="_csrf" value="{_csrf}">
+        <div class="form-group">
+            <label for="inputName">Ideology</label>
+            <input type="text" name="title" id="inputName" value="{item.title}" class="form-control"/>
+        </div>
+        <div class="form-group">
+            <label for="inputContent">Summary</label>
+            <textarea class="form-control" id="inputContent" name="content" rows="12">{item.content}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="inputReferences">References</label>
+            <textarea class="form-control" id="inputReferences" name="references" rows="3">{item.references}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
+        <a class="btn btn-default" href="{?item}/ideology/entry?id={item._id}{:else}/ideology{/item}" role="button">Cancel</a>
+    </form>
+{/body}

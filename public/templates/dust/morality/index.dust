@@ -1,10 +1,10 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    Morality &amp; Values - {titleSlogan}
+    Morality &amp; Ethics - {titleSlogan}
 {/title}
 
 {<body}
-    <h1 class="page-header"><i class="fa fa-heart"></i> Morality &amp; Values</h1>
+    <h1 class="page-header"><i class="fa fa-heart"></i> Morality &amp; Ethics</h1>
     {>"dust/help-us" /}
 {/body}
