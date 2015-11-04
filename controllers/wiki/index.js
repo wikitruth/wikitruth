@@ -7,6 +7,18 @@ var utils       = require('../../utils/utils'),
     db          = require('../../app').db.models,
     async       = require('async');
 
+function setArgumentModel(req, model, callback) {
+    if(req.query.argument) {
+        db.Argument.findOne({_id: req.query.argument}, function (err, result) {
+            model.argument = result;
+            wikiUtils.appendArgumentOwnerFlag(req, result, model);
+            callback();
+        });
+    } else {
+        callback();
+    }
+}
+
 function setTopicModels(req, model, callback) {
     if(req.query.topic) {
         async.series({
@@ -95,13 +107,11 @@ module.exports = function (router) {
                 }
             },
             parent: function(callback) {
-                if(req.query.topic) {
-                    db.Topic.findOne({_id: req.query.topic}, function (err, result) {
-                        model.parent = result;
-                        callback();
-                    });
-                } else if(model.topic && model.topic.parentId) {
-                    db.Topic.findOne({_id: model.topic.parentId}, function (err, result) {
+                var query = {
+                    _id: req.query.topic ? req.query.topic : model.topic && model.topic.parentId ? model.topic.parentId : null
+                };
+                if(query._id) {
+                    db.Topic.findOne(query, function (err, result) {
                         model.parent = result;
                         callback();
                     });
@@ -118,7 +128,6 @@ module.exports = function (router) {
         var query = {
             _id: req.query.id ? req.query.id : new mongoose.Types.ObjectId()
         };
-
         db.Topic.findOne(query, function(err, result) {
             var entity = result ? result : {};
             entity.content = req.body.content;
@@ -177,9 +186,7 @@ module.exports = function (router) {
     router.get('/argument', function (req, res) {
         var model = {};
         setTopicModels(req, model, function () {
-            db.Argument.findOne({_id: req.query.argument}, function(err, result) {
-                model.argument = result;
-                wikiUtils.appendArgumentOwnerFlag(req, result, model);
+            setArgumentModel(req, model, function () {
                 res.render('dust/wiki/argument', model);
             });
         });
@@ -188,14 +195,9 @@ module.exports = function (router) {
     router.get('/argument/create', function (req, res) {
         var model = {};
         setTopicModels(req, model, function () {
-            if(req.query.argument) {
-                db.Argument.findOne({_id: req.query.argument}, function (err, result) {
-                    model.argument = result;
-                    res.render('dust/wiki/argument/create', model);
-                });
-            } else {
+            setArgumentModel(req, model, function () {
                 res.render('dust/wiki/argument/create', model);
-            }
+            });
         });
     });
 
@@ -241,33 +243,22 @@ module.exports = function (router) {
     router.get('/questions', function (req, res) {
         var model = {};
         setTopicModels(req, model, function () {
-            if(req.query.argument) {
-                db.Argument.findOne({_id: req.query.argument}, function (err, result) {
-                    model.argument = result;
-                    wikiUtils.appendArgumentOwnerFlag(req, result, model);
-                    res.render('dust/wiki/questions', model);
-                });
-            } else {
-                if(!model.topic) {
+            setArgumentModel(req, model, function () {
+                if(!req.query.argument && !model.topic) {
                     // Show Top Questions
                     // TODO: Filter top 100 based on number of activities
                 }
                 res.render('dust/wiki/questions', model);
-            }
+            });
         });
     });
 
     router.get('/question/create', function (req, res) {
         var model = {};
         setTopicModels(req, model, function () {
-            if(req.query.argument) {
-                db.Argument.findOne({_id: req.query.argument}, function (err, result) {
-                    model.argument = result;
-                    res.render('dust/wiki/question/create', model);
-                });
-            } else {
+            setArgumentModel(req, model, function () {
                 res.render('dust/wiki/question/create', model);
-            }
+            });
         });
     });
 
@@ -276,15 +267,9 @@ module.exports = function (router) {
     router.get('/related', function (req, res) {
         var model = {};
         setTopicModels(req, model, function() {
-            if(req.query.argument) {
-                db.Argument.findOne({_id: req.query.argument}, function (err, result) {
-                    model.argument = result;
-                    wikiUtils.appendArgumentOwnerFlag(req, result, model);
-                    res.render('dust/wiki/related', model);
-                });
-            } else {
+            setArgumentModel(req, model, function () {
                 res.render('dust/wiki/related', model);
-            }
+            });
         });
     });
 };

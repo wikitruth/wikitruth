@@ -52,8 +52,6 @@
             {:else}
                 <a class="btn btn-default" href="/wiki" role="button">Cancel</a>
             {/parent}
-
         {/topic}
-
     </form>
 {/body}
