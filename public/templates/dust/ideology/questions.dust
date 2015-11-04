@@ -5,10 +5,10 @@
 {/title}
 
 {<body}
-    {?topic}
+    {?item}
         {>"dust/ideology/item-header" tab="questions" /}
     {:else}
         {>"dust/ideology/index-header" tab="top-questions" /}
-    {/topic}
+    {/item}
     {>"dust/help-us" /}
 {/body}
