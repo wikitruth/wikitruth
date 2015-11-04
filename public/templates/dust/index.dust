@@ -37,7 +37,7 @@
             <p><a class="btn btn-primary" href="/wiki" role="button">Read now &raquo;</a></p>
         </div>
         <div class="col-lg-4">
-            <h2><i class="fa fa-book"></i> Religion &amp; Beliefs</h2>
+            <h2><i class="fa fa-book"></i> Religions &amp; Worldviews</h2>
             <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
             <p><a class="btn btn-primary" href="/ideology" role="button">Read now &raquo;</a></p>
         </div>

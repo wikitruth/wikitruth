@@ -2,6 +2,14 @@
     <span class="text-muted">
         <a href="/wiki">Truth</a>
         &nbsp;/&nbsp;
+        {?parent}
+            {?parent.parentId}
+                <a href="/wiki/topic?topic={parent.parentId}">..</a>
+                &nbsp;/&nbsp;
+            {/parent.parentId}
+            <a href="/wiki/topic?topic={parent._id}">{parent.title}</a>
+            &nbsp;/&nbsp;
+        {/parent}
         <a href="/wiki/topic?topic={topic._id}">{topic.title}</a>
     </span>
 </h2>
@@ -9,14 +17,16 @@
     {^argument}
         <a class="btn btn-{@eq key=tab value="overview"}primary{:else}default{/eq}" href="/wiki/topic?topic={topic._id}">
             <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a>
+        <a class="btn btn-{@eq key=tab value="topics"}primary{:else}default{/eq}" href="/wiki?topic={topic._id}">
+            <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Topics</a>
         <a class="btn btn-{@eq key=tab value="arguments"}primary{:else}default{/eq}" href="/wiki/arguments?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
-            <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments<span class="hidden-xs"> (1,023)</span></a>
+            <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments{!<span class="hidden-xs"> (1,023)</span>!}</a>
     {:else}
         <a class="btn btn-{@eq key=tab value="overview"}primary{:else}default{/eq}" href="/wiki/argument?topic={topic._id}&amp;argument={argument._id}">
             <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a>
     {/argument}
     <a class="btn btn-{@eq key=tab value="questions"}primary{:else}default{/eq}" href="/wiki/questions?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
-        <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions<span class="hidden-xs"> (122)</span></a>
+        <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions{!<span class="hidden-xs"> (122)</span>!}</a>
     <a class="hidden-xs btn btn-{@eq key=tab value="related"}primary{:else}default{/eq}" href="/wiki/related?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
         <span class="glyphicon glyphicon-random" aria-hidden="true"></span> Related</a>
     <a class="btn btn-default dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -26,11 +36,11 @@
     {?isContributor}
         {^argument}
             {?isTopicOwner}
-                <li><a href="/wiki/topic/create?topic={topic._id}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Topic</a></li>
-                <li><a href="#"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Child Topics</a></li>
-                {!<li><a href="#"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit References</a></li>!}
-                <li role="separator" class="divider"></li>
+                <li><a href="/wiki/topic/create?id={topic._id}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Topic</a></li>
             {/isTopicOwner}
+            <li><a href="/wiki/topic/create?topic={topic._id}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Topic</a></li>
+            {!<li><a href="#"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit References</a></li>!}
+            <li role="separator" class="divider"></li>
             <li><a href="/wiki/argument/create?topic={topic._id}"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> New Argument</a></li>
         {:else}
             {?isArgumentOwner}

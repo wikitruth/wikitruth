@@ -5,7 +5,28 @@
 {/title}
 
 {<body}
-    <h2 class="page-header text-primary"><span class="text-muted"><a href="/wiki">Wiki</a> /</span> {?argument}Edit{:else}New{/argument} Argument</h2>
+    <h2 class="page-header text-primary">
+        <span class="text-muted">
+            <a href="/wiki">Truth</a>
+            &nbsp;/&nbsp;
+            {?parent}
+                {?parent.parentId}
+                    <a href="/wiki/topic?topic={parent.parentId}">..</a>
+                    &nbsp;/&nbsp;
+                {/parent.parentId}
+                <a href="/wiki/topic?topic={parent._id}">{parent.title}</a>
+                &nbsp;/&nbsp;
+            {/parent}
+            <a href="/wiki/topic?topic={topic._id}">{topic.title}</a>
+            &nbsp;/&nbsp;
+            {?argument}
+                <a href="/wiki/topic?topic={argument._id}">{argument.title}</a>
+                &nbsp;/&nbsp;Edit
+            {:else}
+                New Argument
+            {/argument}
+        </span>
+    </h2>
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
         <div class="form-group">
@@ -21,6 +42,6 @@
             <textarea class="form-control" id="inputReferences" name="references" rows="2">{argument.references}</textarea>
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
-        <a class="btn btn-default" href="{?argument}/wiki/argument?topic={topic._id}&amp;argument={argument._id}{:else}/wiki/topic?topic={topic._id}{/argument}" role="button">Cancel</a>
+        <a class="btn btn-default" href="{?argument}/wiki/argument?topic={topic._id}&amp;argument={argument._id}{:else}/wiki/arguments?topic={topic._id}{/argument}" role="button">Cancel</a>
     </form>
 {/body}
