@@ -36,6 +36,16 @@
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user"></i> {user.username} <span class="caret"></span></a>
                         <ul class="dropdown-menu">
+                            <li class="dropdown-header">Content</li>
+                            <li><a href="#/switch?content=1">{?showVerified}<i class="fa fa-circle"></i>{:else}<i class="fa fa-circle-o"></i>{/showVerified} Verified</a></li>
+                            <li><a href="#/switch?content=2">{^showVerified}<i class="fa fa-circle"></i>{:else}<i class="fa fa-circle-o"></i>{/showVerified} Latest</a></li>
+                            <li><a href="#/switch?content=3">{?showEverything}<i class="fa fa-circle"></i>{:else}<i class="fa fa-circle-o"></i>{/showEverything} Everything</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li class="dropdown-header">Role</li>
+                            <li><a href="#/switch?role=2">{?isContributor}<i class="fa fa-circle"></i>{:else}<i class="fa fa-circle-o"></i>{/isContributor} Contributor</a></li>
+                            <li><a href="#/switch?role=1">{^isContributor}<i class="fa fa-circle"></i>{:else}<i class="fa fa-circle-o"></i>{/isContributor} Reader</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li class="dropdown-header">Account</li>
                             {?user.isAdmin}
                                 <li><a href="/admin">Admin Area</a></li>
                             {/user.isAdmin}
