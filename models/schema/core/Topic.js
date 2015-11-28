@@ -8,7 +8,14 @@ exports = module.exports = function(app, mongoose) {
     createDate: { type: Date, default: Date.now },
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     editDate: { type: Date, default: Date.now },
-    editUserId: { type: mongoose.Schema.ObjectId, ref: 'User' }
+    editUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
+    outline: [
+      {
+        listType: { type: String }, // core-args, subtopics, supplement-args, faq
+        id: { type: mongoose.Schema.ObjectId },
+        title: { type: String } // Friendly title/caption
+      }
+    ]
   });
   schema.plugin(require('../plugins/pagedFind'));
   schema.index({ title: 1 });
