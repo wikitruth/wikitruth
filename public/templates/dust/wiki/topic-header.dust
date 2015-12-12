@@ -11,6 +11,7 @@
             &nbsp;/&nbsp;
         {/parent}
         <a href="/wiki/topic?topic={topic._id}">{topic.title}</a>
+        {@eq key=tab value="link-to"}&nbsp;/&nbsp;Links{/eq}
     </span>
 </h2>
 <div class="btn-group" role="group" aria-label="">
@@ -18,7 +19,7 @@
         <a class="btn btn-{@eq key=tab value="overview"}primary{:else}default{/eq}" href="/wiki/topic?topic={topic._id}">
             <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a>
         <a class="btn btn-{@eq key=tab value="topics"}primary{:else}default{/eq}" href="/wiki?topic={topic._id}">
-            <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Topics</a>
+            <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Subtopics</a>
         <a class="btn btn-{@eq key=tab value="arguments"}primary{:else}default{/eq}" href="/wiki/arguments?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
             <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments{!<span class="hidden-xs"> (1,023)</span>!}</a>
     {:else}
@@ -37,14 +38,16 @@
         {^argument}
             {?isTopicOwner}
                 <li><a href="/wiki/topic/create?id={topic._id}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Topic</a></li>
+                <li><a href="/wiki/outline/link?topic={topic._id}"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> Manage Links</a></li>
             {/isTopicOwner}
-            <li><a href="/wiki/topic/create?topic={topic._id}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Topic</a></li>
+            <li><a href="/wiki/topic/create?topic={topic._id}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Subtopic</a></li>
             {!<li><a href="#"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit References</a></li>!}
             <li role="separator" class="divider"></li>
             <li><a href="/wiki/argument/create?topic={topic._id}"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> New Argument</a></li>
         {:else}
             {?isArgumentOwner}
                 <li><a href="/wiki/argument/create?topic={topic._id}&amp;argument={argument._id}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Argument</a></li>
+                <li><a href="/wiki/outline/link?topic={topic._id}&amp;argument={argument._id}"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> Manage Links</a></li>
                 <li role="separator" class="divider"></li>
             {/isArgumentOwner}
         {/argument}
@@ -63,8 +66,7 @@
 {?argument}
     <div style="margin-bottom: 10px">
         <p class="lead" style="margin-bottom: 0">
-            <a href="/wiki/argument?topic={topic._id}&amp;argument={argument._id}">{argument.title}</a></p>
-        <span style="color: #f0ad4e" title="Pending peer review and acceptance (verdict)"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></span>
+            <a href="/wiki/argument?topic={topic._id}&amp;argument={argument._id}">{argument.title}</a> <span style="color: #f0ad4e; font-size: 14px" title="Pending peer review and acceptance (verdict)"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></span></p>
     </div>
 {:else}
 {/argument}

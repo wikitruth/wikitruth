@@ -1,0 +1,60 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    Link To - {titleSlogan}
+{/title}
+
+{<body}
+    {>"dust/wiki/topic-header" tab="link-to" /}
+    <form method="post">
+        <input type="hidden" name="_csrf" value="{_csrf}">
+        <div class="form-group">
+            <label for="inputName">{?argument}Argument to link{:else}Topic to link{/argument}:</label>
+            <input type="text" name="title" id="inputName" value="{?argument}{argument.title}{:else}{topic.title}{/argument}" class="form-control" readonly="readonly" />
+            <br/>
+        </div>
+        <div class="form-group">
+            <label for="inputParent">Link to parent (Topic):</label>
+            <input type="text" name="parent" id="inputParent" value="{?argument}{topic.title}{:else}{parent.title}{/argument}" class="form-control" readonly="readonly"/>
+            <br/>
+        </div>
+        <div class="form-group">
+            <label for="inputReferences">Link to list</label>
+            <div class="radio">
+                <label class="text-success">
+                    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+                    Core Arguments <span class="glyphicon glyphicon-question-sign" title="Valued arguments" aria-hidden="true"></span>
+                </label>
+            </div>
+            <div class="radio">
+                <label class="text-success">
+                    <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+                    Sample Argument List 2 <span class="glyphicon glyphicon-question-sign" title="Valued arguments" aria-hidden="true"></span>
+                </label>
+            </div>
+            <div class="radio">
+                <label class="text-warning">
+                    <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+                    Sample Argument List 5 <span class="glyphicon glyphicon-question-sign" title="Unvalued arguments" aria-hidden="true"></span>
+                </label>
+            </div>
+            <div class="radio disabled">
+                <label class="text-warning">
+                    <input type="radio" name="optionsRadios" id="optionsRadios3" value="option3" disabled>
+                    Uncategorized List <span class="glyphicon glyphicon-question-sign" title="Unvalued arguments" aria-hidden="true"></span>
+                </label>
+            </div>
+            <br/>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
+        {?topic}
+            <a class="btn btn-default" href="/wiki/topic?topic={topic._id}" role="button">Cancel</a>
+        {:else}
+            {?parent}
+                <a class="btn btn-default" href="/wiki/topic?topic={parent._id}" role="button">Cancel</a>
+            {:else}
+                <a class="btn btn-default" href="/wiki" role="button">Cancel</a>
+            {/parent}
+        {/topic}
+    </form>
+{/body}

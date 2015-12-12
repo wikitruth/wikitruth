@@ -11,12 +11,21 @@ exports = module.exports = function(app, mongoose) {
     editUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     outline: [
       {
-        listType: { type: String }, // core-args, subtopics, supplement-args, faq
+        listType: { type: Number }, // MODEL_TYPES
         id: { type: mongoose.Schema.ObjectId },
-        title: { type: String } // Friendly title/caption
+        title: { type: String }, // Friendly title/caption
+        isDefault: { type: Boolean }, // default=uncategorized
+        isValued: { type: Boolean },
+        items: [{
+          id: { type: mongoose.Schema.ObjectId },
+          isPro: { type: Boolean }
+        }]
       }
     ]
   });
+  schema.methods.link = function() {
+    return false;
+  };
   schema.plugin(require('../plugins/pagedFind'));
   schema.index({ title: 1 });
   schema.set('autoIndex', (app.get('env') === 'development'));

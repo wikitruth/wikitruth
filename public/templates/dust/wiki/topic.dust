@@ -13,6 +13,7 @@
         <span style="color: #f0ad4e" title="Pending peer review and acceptance (verdict)"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></span>
     </div>
     <div id="lipsum">
+        <a href="/wiki/topic/create?id={topic._id}" title="Edit Outline"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>
         <p>{topic.content|s}</p>
         {!<p>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tempus euismod faucibus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Ut euismod a lectus in posuere. Aenean quis finibus ipsum. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur varius cursus nisi. Suspendisse potenti. Duis sit amet nulla lacus. In tincidunt, eros quis dictum hendrerit, nibh metus accumsan est, in aliquam enim enim a erat.

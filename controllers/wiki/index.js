@@ -19,11 +19,11 @@ function setArgumentModel(req, model, callback) {
     }
 }
 
-function setTopicModels(req, model, callback) {
-    if(req.query.topic) {
+function setTopicModels(query, model, callback) {
+    if(query.topic) {
         async.series({
             topic: function (callback) {
-                db.Topic.findOne({_id: req.query.topic}, function(err, result) {
+                db.Topic.findOne({_id: query.topic}, function(err, result) {
                     if(result) {
                         model.topic = result;
                         wikiUtils.appendTopicOwnerFlag(req, result, model);
@@ -69,7 +69,7 @@ module.exports = function (router) {
         var model = {};
         async.parallel({
             topic: function(callback){
-                setTopicModels(req, model, callback);
+                setTopicModels(req.query, model, callback);
             },
             topics: function(callback) {
                 var query = req.query.topic ? { parentId: req.query.topic } : { parentId: null};
@@ -88,7 +88,7 @@ module.exports = function (router) {
 
     router.get('/topic', function (req, res) {
         var model = {};
-        setTopicModels(req, model, function() {
+        setTopicModels(req.query, model, function() {
             res.render('dust/wiki/topic', model);
         });
     });
@@ -159,7 +159,7 @@ module.exports = function (router) {
     router.get('/arguments', function (req, res) {
         var model = {};
         if(req.query.topic) {
-            setTopicModels(req, model, function () {
+            setTopicModels(req.query, model, function () {
                 db.Argument.find({ ownerId: model.topic._id, ownerType: modelTypes.topic }).sort({ title: 1 }).exec(function(err, results) {
                     results.forEach(function(result) {
                         result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
@@ -185,7 +185,7 @@ module.exports = function (router) {
 
     router.get('/argument', function (req, res) {
         var model = {};
-        setTopicModels(req, model, function () {
+        setTopicModels(req.query, model, function () {
             setArgumentModel(req, model, function () {
                 res.render('dust/wiki/argument', model);
             });
@@ -194,7 +194,7 @@ module.exports = function (router) {
 
     router.get('/argument/create', function (req, res) {
         var model = {};
-        setTopicModels(req, model, function () {
+        setTopicModels(req.query, model, function () {
             setArgumentModel(req, model, function () {
                 res.render('dust/wiki/argument/create', model);
             });
@@ -238,11 +238,40 @@ module.exports = function (router) {
         });
     });
 
+    /* Outline */
+
+    router.get('/outline/link', function (req, res) {
+        var model = {};
+        setArgumentModel(req, model, function () {
+            var query = model.argument ? { "topic": model.argument.ownerId } : req.query;
+            setTopicModels(query, model, function () {
+                //var item = model.argument ? model.argument : model.topic;
+                var parent = null;
+                if(model.argument) {
+
+                } else if(model.topic) {
+
+                }
+
+                res.render('dust/wiki/link-to', model);
+            });
+        });
+    });
+
+    router.get('/outline/create', function (req, res) {
+        var model = {};
+        setTopicModels(req.query, model, function () {
+            setArgumentModel(req, model, function () {
+                res.render('dust/wiki/outline/create', model);
+            });
+        });
+    });
+
     /* Questions */
 
     router.get('/questions', function (req, res) {
         var model = {};
-        setTopicModels(req, model, function () {
+        setTopicModels(req.query, model, function () {
             setArgumentModel(req, model, function () {
                 if(!req.query.argument && !model.topic) {
                     // Show Top Questions
@@ -255,7 +284,7 @@ module.exports = function (router) {
 
     router.get('/question/create', function (req, res) {
         var model = {};
-        setTopicModels(req, model, function () {
+        setTopicModels(req.query, model, function () {
             setArgumentModel(req, model, function () {
                 res.render('dust/wiki/question/create', model);
             });
@@ -266,7 +295,7 @@ module.exports = function (router) {
 
     router.get('/related', function (req, res) {
         var model = {};
-        setTopicModels(req, model, function() {
+        setTopicModels(req.query, model, function() {
             setArgumentModel(req, model, function () {
                 res.render('dust/wiki/related', model);
             });
