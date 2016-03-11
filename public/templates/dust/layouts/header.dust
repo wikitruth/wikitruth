@@ -28,7 +28,7 @@
                 <!--<li class="hidden-xs"><a href="/">Home</a></li>-->
                 <li><a href="/wiki"><i class="fa fa-globe"></i> Truth</a></li>
                 <li><a href="/ideology"><i class="fa fa-book"></i> Religion</a></li>
-                <li><a href="/morality"><i class="fa fa-heart"></i> Morality</a></li>
+                <li><a href="/morality"><i class="fa fa-balance-scale"></i> Morality</a></li>
                 <!--<li class="hidden-xs"><a href="/about/">About</a></li>-->
             </ul>
             <ul class="nav navbar-nav navbar-right">

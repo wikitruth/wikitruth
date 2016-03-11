@@ -5,6 +5,6 @@
 {/title}
 
 {<body}
-    <h1 class="page-header"><i class="fa fa-heart"></i> Morality &amp; Ethics</h1>
+    <h1 class="page-header"><i class="fa fa-balance-scale"></i> Morality &amp; Ethics</h1>
     {>"dust/help-us" /}
 {/body}

@@ -42,7 +42,7 @@
             <p><a class="btn btn-primary" href="/ideology" role="button">Explore &raquo;</a></p>
         </div>
         <div class="col-lg-4">
-            <h2><i class="fa fa-heart"></i> Morality &amp; Ethics</h2>
+            <h2><i class="fa fa-balance-scale"></i> Morality &amp; Ethics</h2>
             <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa.</p>
             <p><a class="btn btn-primary" href="/morality" role="button">Explore &raquo;</a></p>
         </div>
