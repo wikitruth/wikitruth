@@ -1,7 +1,7 @@
 'use strict';
 
 var utils = require('../../utils/utils'),
-    wikiUtils = require('../../utils/wikiUtils'),
+    flowUtils = require('../../utils/flowUtils'),
     mongoose = require('mongoose'),
     constants = require('../../models/constants'),
     db = require('../../app').db.models;

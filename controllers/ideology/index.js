@@ -1,7 +1,7 @@
 'use strict';
 
 var utils       = require('../../utils/utils'),
-    wikiUtils   = require('../../utils/wikiUtils'),
+    flowUtils   = require('../../utils/flowUtils'),
     mongoose    = require('mongoose'),
     constants   = require('../../models/constants'),
     async       = require('async'),
@@ -11,7 +11,7 @@ function setItemModel(req, model, callback) {
     if(req.query.id) {
         db.Ideology.findOne({_id: req.query.id}, function (err, result) {
             model.item = result;
-            wikiUtils.appendOwnerFlag(req, result, model);
+            flowUtils.appendOwnerFlag(req, result, model);
             callback();
         });
     } else {
@@ -26,7 +26,7 @@ function setItemModels(req, model, callback) {
                 db.Ideology.findOne({_id: req.query.id}, function(err, result) {
                     if(result) {
                         model.item = result;
-                        wikiUtils.appendOwnerFlag(req, result, model);
+                        flowUtils.appendOwnerFlag(req, result, model);
                     }
                     callback();
                 });
