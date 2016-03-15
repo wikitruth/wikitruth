@@ -1,7 +1,7 @@
 'use strict';
 
 var utils       = require('../../utils/utils'),
-    wikiUtils   = require('../../utils/wikiUtils'),
+    flowUtils   = require('../../utils/flowUtils'),
     mongoose    = require('mongoose'),
     constants   = require('../../models/constants'),
     async       = require('async'),
@@ -17,7 +17,7 @@ module.exports = function (router) {
                     if(req.query.parent) {
                         db.Page.findOne({_id: req.query.parent}, function(err, result) {
                             model.page = result;
-                            wikiUtils.appendOwnerFlag(req, result, model);
+                            flowUtils.appendOwnerFlag(req, result, model);
                             callback();
                         });
                     } else {
@@ -93,7 +93,7 @@ module.exports = function (router) {
             page: function(callback) {
                 db.Page.findOne({_id: req.query.id}, function(err, result) {
                     model.page = result;
-                    wikiUtils.appendOwnerFlag(req, result, model);
+                    flowUtils.appendOwnerFlag(req, result, model);
                     callback();
                 });
             }
@@ -111,7 +111,7 @@ module.exports = function (router) {
                     if(req.query.parent) {
                         db.Page.findOne({_id: req.query.parent}, function(err, result) {
                             model.parent = result;
-                            //wikiUtils.appendOwnerFlag(req, result, model);
+                            //flowUtils.appendOwnerFlag(req, result, model);
                             callback();
                         });
                     } else {

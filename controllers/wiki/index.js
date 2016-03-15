@@ -1,7 +1,7 @@
 'use strict';
 
 var utils       = require('../../utils/utils'),
-    wikiUtils   = require('../../utils/wikiUtils'),
+    flowUtils   = require('../../utils/flowUtils'),
     mongoose    = require('mongoose'),
     modelTypes  = require('../../models/constants').MODEL_TYPES,
     db          = require('../../app').db.models,
@@ -11,7 +11,7 @@ function setArgumentModel(req, model, callback) {
     if(req.query.argument) {
         db.Argument.findOne({_id: req.query.argument}, function (err, result) {
             model.argument = result;
-            wikiUtils.appendArgumentOwnerFlag(req, result, model);
+            flowUtils.appendArgumentOwnerFlag(req, result, model);
             callback();
         });
     } else {
@@ -26,7 +26,7 @@ function setTopicModels(req, model, callback) {
                 db.Topic.findOne({_id: req.query.topic}, function(err, result) {
                     if(result) {
                         model.topic = result;
-                        wikiUtils.appendTopicOwnerFlag(req, result, model);
+                        flowUtils.appendTopicOwnerFlag(req, result, model);
                     }
                     callback();
                 });
