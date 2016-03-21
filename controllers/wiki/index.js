@@ -87,8 +87,35 @@ module.exports = function (router) {
     });
 
     router.get('/topic', function (req, res) {
+        // Topic home: display top subtopics, top arguments
         var model = {};
-        setTopicModels(req, model, function() {
+        async.parallel({
+            topic: function(callback){
+                setTopicModels(req, model, callback);
+            },
+            topics: function(callback) {
+                // Top Subtopics
+                var query = { parentId: req.query.topic };
+                db.Topic.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                    results.forEach(function(result) {
+                        result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                    });
+                    model.topics = results;
+                    callback();
+                });
+            },
+            arguments: function(callback) {
+                // Top Arguments
+                var query = { ownerId: req.query.topic, ownerType: modelTypes.topic };
+                db.Argument.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                    results.forEach(function(result) {
+                        result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                    });
+                    model.arguments = results;
+                    callback();
+                });
+            }
+        }, function (err, results) {
             res.render('dust/wiki/topic', model);
         });
     });

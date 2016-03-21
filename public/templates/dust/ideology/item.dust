@@ -16,4 +16,13 @@
         <p>{item.content|s}</p>
     </div>
     {!<p><a class="btn btn-primary" href="/" role="button">View more &raquo;</a></p>!}
+    {?items}
+    <ul class="list-group top-list-items">
+        <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Entries</li>
+        {#items}
+            <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> <a href="/ideology/entry?id={_id}">{title}</a> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+        {/items}
+    </ul>
+    <div class="top-list-items-more"><a href="/ideology?id={item._id}" role="button">more &raquo;</a></div>
+    {/items}
 {/body}

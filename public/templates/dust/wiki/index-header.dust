@@ -7,10 +7,10 @@
         <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> Topics
     </a>
     <a class="hidden-xs btn btn-{@eq key=tab value="top-arguments"}primary{:else}default{/eq}" href="/wiki/arguments">
-        <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Top Discussions
+        <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Discussions
     </a>
     <a class="hidden-xs btn btn-{@eq key=tab value="top-questions"}primary{:else}default{/eq}" href="/wiki/questions">
-        <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Top Questions
+        <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions
     </a>
     <a class="btn btn-default dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
         <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span>
