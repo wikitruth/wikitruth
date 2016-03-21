@@ -74,9 +74,24 @@ module.exports = function (router) {
         });
     });
 
+    // item details
     router.get('/entry', function (req, res) {
         var model = {};
-        setItemModels(req, model, function() {
+        async.parallel({
+            item: function(callback){
+                setItemModels(req, model, callback);
+            },
+            items: function(callback) {
+                var query = { parentId: req.query.id };
+                db.Ideology.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                    results.forEach(function(result) {
+                        result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                    });
+                    model.items = results;
+                    callback();
+                });
+            }
+        }, function (err, results) {
             res.render('dust/ideology/item', model);
         });
     });
