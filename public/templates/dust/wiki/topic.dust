@@ -10,7 +10,11 @@
     <div style="margin-bottom: 10px">
         <p class="lead" style="margin-bottom: 0">
             <a href="/wiki/topic?topic={topic._id}">{topic.title}</a></p>
+        {?isContributor}
+            {?isTopicOwner}
         <a href="/wiki/topic/create?id={topic._id}" title="Edit Outline"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>&nbsp;
+            {/isTopicOwner}
+        {/isContributor}
         <span style="color: #f0ad4e" title="Pending review (verdict)"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></span>
     </div>
     <div id="lipsum">
