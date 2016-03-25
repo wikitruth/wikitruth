@@ -26,7 +26,7 @@
         <a class="btn btn-{@eq key=tab value="overview"}primary{:else}default{/eq}" href="/wiki/argument?topic={topic._id}&amp;argument={argument._id}">
             <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a>
     {/argument}
-    <a class="btn btn-{@eq key=tab value="questions"}primary{:else}default{/eq}" href="/wiki/questions?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
+    <a class="hidden-xs btn btn-{@eq key=tab value="questions"}primary{:else}default{/eq}" href="/wiki/questions?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
         <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions{!<span class="hidden-xs"> (122)</span>!}</a>
     <a class="hidden-xs btn btn-{@eq key=tab value="related"}primary{:else}default{/eq}" href="/wiki/related?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
         <span class="glyphicon glyphicon-random" aria-hidden="true"></span> Related</a>
@@ -57,6 +57,8 @@
         <li role="separator" class="divider"></li>
     {:else}
     {/isContributor}
+        <li class="visible-xs"><a href="/wiki/questions?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
+            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions</a></li>
         <li class="visible-xs"><a href="/wiki/related?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
             <span class="glyphicon glyphicon-random" aria-hidden="true"></span> Related</a></li>
         <li><a href="#"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Details</a></li>

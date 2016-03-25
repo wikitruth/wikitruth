@@ -108,7 +108,7 @@ app.use(function(req, res, next) {
 app.locals.projectName = app.config.projectName;
 app.locals.titleSlogan = app.config.titleSlogan;
 app.locals.copyrightYear = new Date().getFullYear();
-app.locals.copyrightName = app.config.companyName;
+//app.locals.copyrightName = app.config.companyName;
 app.locals.cacheBreaker = 'br34k-01';
 
 //setup passport
