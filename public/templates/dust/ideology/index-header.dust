@@ -1,4 +1,4 @@
-<h1 class="page-header"><i class="fa fa-book"></i> Religion, Ideologies &amp; Worldviews</h1>
+<h1 class="page-header"><i class="fa fa-book"></i> Religion &amp; Worldviews</h1>
 <div class="btn-group" role="group" aria-label="" style="margin-bottom: 10px">
     <a class="btn btn-{@eq key=tab value="top-items"}primary{:else}default{/eq}" href="/ideology/">
         <span class="glyphicon glyphicon-file" aria-hidden="true"></span> All Worldviews<span class="hidden-xs hidden"> (122)</span>
