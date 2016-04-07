@@ -6,7 +6,7 @@
     <!-- Jumbotron -->
     <div class="jumbotron">
         <h1>The Wikitruth Project</h1>
-        <p class="lead">A Wikipedia and Quora-like system which uses dialectics along with a vetting mechanism to verify truth from lies, facts from trash. A system aiming to end cyclic discussions and debates on the internet.</p>
+        <p class="lead">A system with a structured way of discussion and contribution (with similarities to Wikipedia and Quora) which uses dialectics and a vetting mechanism to verify truth from lies, facts from trash. A system aiming to end cyclic discussions and debates on the internet.</p>
     {#user.username}
         <p><a class="btn btn-lg btn-success" href="/about" role="button">Learn more &raquo;</a></p>
     {:else}
@@ -33,17 +33,17 @@
     <div class="row">
         <div class="col-lg-4 col-md-6 col-sm-6">
             <h2><i class="fa fa-globe"></i> Truth &amp; Reality</h2>
-            <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+            <p>Find out the truth and reality on important topics that impact the society including controversies around politics, environments, culture and conspiracy theories that divide the society and result to conflict.</p>
             <p><a class="btn btn-default btn-block" href="/wiki" role="button">Explore &raquo;</a></p>
         </div>
         <div class="col-lg-4 col-md-6 col-sm-6">
             <h2><i class="fa fa-book"></i> Religions &amp; Worldviews</h2>
-            <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+            <p>Compilation of world religions, ideologies, philosophies and worldviews with details on their achievements or issues, their primary belief or doctrines categorized by good, the bad, and the dangerous.</p>
             <p><a class="btn btn-default btn-block" href="/ideology" role="button">Explore &raquo;</a></p>
         </div>
         <div class="col-lg-4 col-md-6 col-sm-6">
             <h2><i class="fa fa-balance-scale"></i> Morality &amp; Ethics</h2>
-            <p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa.</p>
+            <p>Virtues, morally right and wrong acts supported by reason, facts and human consensus under the notion that there are right and wrong that most people can agree with and find them fair, logical and reasonable.</p>
             <p><a class="btn btn-default btn-block" href="/morality" role="button">Explore &raquo;</a></p>
         </div>
     </div>
