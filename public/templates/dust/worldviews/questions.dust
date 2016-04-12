@@ -6,9 +6,9 @@
 
 {<body}
     {?item}
-        {>"dust/ideology/item-header" tab="questions" /}
+        {>"dust/worldviews/entry-header" tab="questions" /}
     {:else}
-        {>"dust/ideology/index-header" tab="top-questions" /}
+        {>"dust/worldviews/index-header" tab="top-questions" /}
     {/item}
     {>"dust/help-us" /}
 {/body}

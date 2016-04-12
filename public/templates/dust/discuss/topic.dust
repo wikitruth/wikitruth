@@ -6,7 +6,7 @@
 
 {<body}
     <h1 class="page-header">Discuss</h1>
-    <h4 class="text-muted"><a href="/discuss">Categories</a> / Scientific Theories / Big Bang Theory</h4>
+    <h4 class="text-muted"><a href="{paths.discuss.index}">Categories</a> / Scientific Theories / Big Bang Theory</h4>
     <ul class="list-group">
         <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Thread</li>
         <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Big Bang Theory <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 5,140</span></li>

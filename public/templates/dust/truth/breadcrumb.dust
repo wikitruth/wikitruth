@@ -1,0 +1,12 @@
+<a href="{paths.truth.index}">Truth</a>
+&nbsp;/&nbsp;
+{?parent}
+    {?parent.parentId}
+        <a href="{paths.truth.topics.entry}?topic={parent.parentId}">..</a>
+        &nbsp;/&nbsp;
+    {/parent.parentId}
+    <a href="{paths.truth.topics.entry}?topic={parent._id}">{parent.title}</a>
+    &nbsp;/&nbsp;
+{/parent}
+<a href="{paths.truth.topics.entry}?topic={topic._id}">{topic.title}</a>
+{@eq key=tab value="link-to"}&nbsp;/&nbsp;Links{/eq}

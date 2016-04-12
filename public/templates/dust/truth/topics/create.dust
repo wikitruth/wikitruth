@@ -7,18 +7,18 @@
 {<body}
     <h2 class="page-header text-primary">
         <span class="text-muted">
-            <a href="/wiki">Truth</a>
+            <a href="{paths.truth.index}">Truth</a>
             &nbsp;/&nbsp;
             {?parent}
                 {?parent.parentId}
-                    <a href="/wiki/topic?topic={parent.parentId}">..</a>
+                    <a href="{paths.truth.topics.entry}?topic={parent.parentId}">..</a>
                     &nbsp;/&nbsp;
                 {/parent.parentId}
-                <a href="/wiki/topic?topic={parent._id}">{parent.title}</a>
+                <a href="{paths.truth.topics.entry}?topic={parent._id}">{parent.title}</a>
                 &nbsp;/&nbsp;
             {/parent}
             {?topic}
-                <a href="/wiki/topic?topic={topic._id}">{topic.title}</a>
+                <a href="{paths.truth.topics.entry}?topic={topic._id}">{topic.title}</a>
                 &nbsp;/&nbsp;Edit
             {:else}
                 New Topic
@@ -45,12 +45,12 @@
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
         {?topic}
-            <a class="btn btn-default" href="/wiki/topic?topic={topic._id}" role="button">Cancel</a>
+            <a class="btn btn-default" href="{paths.truth.topics.entry}?topic={topic._id}" role="button">Cancel</a>
         {:else}
             {?parent}
-                <a class="btn btn-default" href="/wiki/topic?topic={parent._id}" role="button">Cancel</a>
+                <a class="btn btn-default" href="{paths.truth.topics.entry}?topic={parent._id}" role="button">Cancel</a>
             {:else}
-                <a class="btn btn-default" href="/wiki" role="button">Cancel</a>
+                <a class="btn btn-default" href="{paths.truth.index}" role="button">Cancel</a>
             {/parent}
         {/topic}
     </form>

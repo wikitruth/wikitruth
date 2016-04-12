@@ -26,9 +26,9 @@
         <div class="navbar-collapse my-navbar-collapse collapse">
             <ul class="nav navbar-nav">
                 <!--<li class="hidden-xs"><a href="/">Home</a></li>-->
-                <li><a href="/wiki"><i class="fa fa-globe"></i> Truth</a></li>
-                <li><a href="/ideology"><i class="fa fa-book"></i> Religion</a></li>
-                <li><a href="/morality"><i class="fa fa-balance-scale"></i> Morality</a></li>
+                <li><a href="{paths.truth.index}"><i class="fa fa-globe"></i> Truth</a></li>
+                <li><a href="{paths.worldviews.index}"><i class="fa fa-book"></i> Religion</a></li>
+                <li><a href="{paths.morality.index}"><i class="fa fa-balance-scale"></i> Morality</a></li>
                 <!--<li class="hidden-xs"><a href="/about/">About</a></li>-->
             </ul>
             <ul class="nav navbar-nav navbar-right">
@@ -47,17 +47,17 @@
                             <li role="separator" class="divider"></li>
                             <li class="dropdown-header">Account</li>
                             {?user.isAdmin}
-                                <li><a href="/admin">Admin Area</a></li>
+                                <li><a href="{paths.admin}">Admin Area</a></li>
                             {/user.isAdmin}
-                            <li><a href="/account">My Account</a></li>
-                            <li><a href="/account/settings/">Settings</a></li>
+                            <li><a href="{paths.account}">My Account</a></li>
+                            <li><a href="{paths.account.settings}">Settings</a></li>
                             <li role="separator" class="divider"></li>
-                            <li><a href="/logout">Sign Out</a></li>
+                            <li><a href="{paths.logout}">Sign Out</a></li>
                         </ul>
                     </li>
                 {:else}
-                    <li><a href="/login/"><i class="fa fa-user"></i> Login</a></li>
-                    <li><a href="/signup/"><i class="fa fa-user"></i> Sign Up</a></li>
+                    <li><a href="{paths.login}"><i class="fa fa-user"></i> Login</a></li>
+                    <li><a href="{paths.signup}"><i class="fa fa-user"></i> Sign Up</a></li>
                 {/user.username}
             </ul>
         </div>

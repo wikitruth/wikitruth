@@ -1,9 +1,12 @@
 'use strict';
 
+var paths       = require('../../models/paths'),
+    templates   = require('../../models/templates');
+
 module.exports = function (router) {
     var model = {};
 
     router.get('/', function (req, res) {
-        res.render('dust/morality/index', model);
+        res.render(templates.morality.index, model);
     });
 };

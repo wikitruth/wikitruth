@@ -6,9 +6,9 @@
 
 {<body}
     {?topic}
-        {>"dust/wiki/topic-header" tab="questions" /}
+        {>"dust/truth/entry-header" tab="questions" /}
     {:else}
-        {>"dust/wiki/index-header" tab="top-questions" /}
+        {>"dust/truth/index-header" tab="top-questions" /}
     {/topic}
     {>"dust/help-us" /}
 {/body}

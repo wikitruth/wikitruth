@@ -3,27 +3,27 @@
     {!<a class="btn btn-{@eq key=tab value="top-topics"}primary{:else}default{/eq}" href="/wiki">
         <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Top Topics<span class="hidden-xs hidden"> (122)</span>
     </a>!}
-    <a class="btn btn-{@eq key=tab value="categories"}primary{:else}default{/eq}" href="/wiki">
+    <a class="btn btn-{@eq key=tab value="categories"}primary{:else}default{/eq}" href="{paths.truth.index}">
         <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> Topics
     </a>
-    <a class="btn btn-{@eq key=tab value="top-arguments"}primary{:else}default{/eq}" href="/wiki/arguments">
+    <a class="btn btn-{@eq key=tab value="top-arguments"}primary{:else}default{/eq}" href="{paths.truth.arguments.index}">
         <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments
     </a>
-    <a class="btn btn-{@eq key=tab value="top-questions"}primary{:else}default{/eq}" href="/wiki/questions">
+    <a class="btn btn-{@eq key=tab value="top-questions"}primary{:else}default{/eq}" href="{paths.truth.questions.index}">
         <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions
     </a>
+    {?isContributor}
     <a class="btn btn-default dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
         <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span>
     </a>
     <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
-        {?isContributor}
-        <li><a href="/wiki/topic/create">
+        <li><a href="{paths.truth.topics.create}">
             <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Topic</a></li>
         <li role="separator" class="visible-xs divider"></li>
-        {/isContributor}
         {!<li class="visible-xs"><a href="#"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments</a></li>
         <li class="visible-xs"><a href="#"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions</a></li>!}
     </ul>
+    {/isContributor}
 </div>
 {!<h4 class="text-muted" style="line-height: 30px;">Top popular topics
 </h4>!}

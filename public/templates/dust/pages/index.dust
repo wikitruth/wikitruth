@@ -16,7 +16,7 @@
             <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Pages</li>
         {#pages}
             <li class="list-group-item">
-                <span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> <a href="/pages/page?id={_id}{?parentId}&amp;parent={parentId}{/parentId}">{title}</a></li>
+                <span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> <a href="{paths.pages.page}?id={_id}{?parentId}&amp;parent={parentId}{/parentId}">{title}</a></li>
         {/pages}
         </ul>
     {:else}
@@ -25,13 +25,13 @@
                 <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> {?page}Child Pages{:else}Pages{/page}</li>
                 {#pageNodes}
                     <li class="list-group-item">
-                        <span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> <a href="/pages/page?id={_id}{?parentId}&amp;parent={parentId}{/parentId}">{title}</a></li>
+                        <span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> <a href="{paths.pages.page}?id={_id}{?parentId}&amp;parent={parentId}{/parentId}">{title}</a></li>
                     {?children}
                     <li class="list-group-item">
                         <ul>
                             {#children}
                             <li style="list-style-type: none;">
-                                <span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> <a href="/pages/page?id={_id}{?parentId}&amp;parent={parentId}{/parentId}">{title}</a></li>
+                                <span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> <a href="{paths.pages.page}?id={_id}{?parentId}&amp;parent={parentId}{/parentId}">{title}</a></li>
                             {/children}
                         </ul>
                     </li>

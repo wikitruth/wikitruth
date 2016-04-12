@@ -6,14 +6,14 @@
 
 {<body}
     {?item}
-        {>"dust/ideology/item-header" tab="items" /}
+        {>"dust/worldviews/entry-header" tab="items" /}
     {:else}
-        {>"dust/ideology/index-header" tab="top-items" /}
+        {>"dust/worldviews/index-header" tab="top-items" /}
     {/item}
     <ul class="list-group">
         <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Entries</li>
         {#items}
-            <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> <a href="/ideology/entry?id={_id}">{title}</a> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+            <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> <a href="{paths.worldviews.entry}?id={_id}">{title}</a> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
         {/items}
     </ul>
 {!<p><a class="btn btn-primary" href="/" role="button">View more &raquo;</a></p>!}

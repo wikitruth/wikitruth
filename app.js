@@ -1,20 +1,22 @@
 'use strict';
 
 //dependencies
-var config = require('./config/config'),
-    express = require('express'),
-    cookieParser = require('cookie-parser'),
-    bodyParser = require('body-parser'),
-    session = require('express-session'),
-    mongoStore = require('connect-mongo')(session),
-    http = require('http'),
-    path = require('path'),
-    passport = require('passport'),
-    mongoose = require('mongoose'),
-    helmet = require('helmet'),
-    cons = require('consolidate'),
-    csrf = require('csurf'),
-    kraken = require('kraken-js');
+var config          = require('./config/config'),
+    paths           = require('./models/paths'),
+    templates       = require('./models/templates'),
+    express         = require('express'),
+    cookieParser    = require('cookie-parser'),
+    bodyParser      = require('body-parser'),
+    session         = require('express-session'),
+    mongoStore      = require('connect-mongo')(session),
+    http            = require('http'),
+    path            = require('path'),
+    passport        = require('passport'),
+    mongoose        = require('mongoose'),
+    helmet          = require('helmet'),
+    cons            = require('consolidate'),
+    csrf            = require('csurf'),
+    kraken          = require('kraken-js');
 
 var options, app;
 
@@ -110,6 +112,9 @@ app.locals.titleSlogan = app.config.titleSlogan;
 app.locals.copyrightYear = new Date().getFullYear();
 //app.locals.copyrightName = app.config.companyName;
 app.locals.cacheBreaker = 'br34k-01';
+
+app.locals.paths = paths;
+app.locals.templates = templates;
 
 //setup passport
 require('./middlewares/passport')(app, passport);
