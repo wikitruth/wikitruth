@@ -2,6 +2,8 @@
 
 var utils       = require('../../utils/utils'),
     flowUtils   = require('../../utils/flowUtils'),
+    paths       = require('../../models/paths'),
+    templates   = require('../../models/templates'),
     mongoose    = require('mongoose'),
     constants   = require('../../models/constants'),
     async       = require('async'),
@@ -70,7 +72,7 @@ module.exports = function (router) {
                 });
             }
         }, function (err, results) {
-            res.render('dust/ideology/index', model);
+            res.render(templates.worldviews.index, model);
         });
     });
 
@@ -92,7 +94,7 @@ module.exports = function (router) {
                 });
             }
         }, function (err, results) {
-            res.render('dust/ideology/item', model);
+            res.render(templates.worldviews.entry, model);
         });
     });
 
@@ -123,7 +125,7 @@ module.exports = function (router) {
                 }
             }
         }, function (err, results) {
-            res.render('dust/ideology/create', model);
+            res.render(templates.worldviews.create, model);
         });
     });
 
@@ -147,11 +149,11 @@ module.exports = function (router) {
                     throw err;
                 }
                 if(result) {
-                    res.redirect('/ideology/entry?id=' + req.query._id);
+                    res.redirect(paths.worldviews.entry + '?id=' + req.query._id);
                 } else if(req.query.id) {
-                    res.redirect('/ideology?id=' + req.query.id);
+                    res.redirect(paths.worldviews.index + '?id=' + req.query.id);
                 } else {
-                    res.redirect('/ideology');
+                    res.redirect(paths.worldviews.index);
                 }
             });
         });
@@ -166,14 +168,14 @@ module.exports = function (router) {
                 // Top Questions
                 // TODO: Filter top 100 based on number of activities
             }
-            res.render('dust/ideology/questions', model);
+            res.render(templates.worldviews.index, model);
         });
     });
 
     router.get('/question/create', function (req, res) {
         var model = {};
         setItemModel(req, model, function() {
-            res.render('dust/ideology/question/create', model);
+            res.render(templates.worldviews.questions.create, model);
         });
     });
 
@@ -182,7 +184,7 @@ module.exports = function (router) {
     router.get('/related', function (req, res) {
         var model = {};
         setItemModel(req, model, function() {
-            res.render('dust/ideology/related', model);
+            res.render(templates.worldviews.related, model);
         });
     });
 };

@@ -6,14 +6,14 @@
 
 {<body}
     {?topic}
-        {>"dust/wiki/topic-header" tab="arguments" /}
+        {>"dust/truth/entry-header" tab="arguments" /}
     {:else}
-        {>"dust/wiki/index-header" tab="top-arguments" /}
+        {>"dust/truth/index-header" tab="top-arguments" /}
     {/topic}
     <ul class="list-group">
         <li class="list-group-item highlight"><span class="glyphicon glyphicon-flash text-success" aria-hidden="true"></span> Arguments</li>
         {#arguments}
-            <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> <a href="/wiki/argument?topic={topic._id}&amp;argument={_id}">{title}</a> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+            <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> <a href="{paths.truth.arguments.entry}?topic={topic._id}&amp;argument={_id}">{title}</a> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
         {/arguments}
         {!
         <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Birds Prove Natural Selection is Naturally Wrong <span class="label label-danger">negative</span> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 10,456</span></li>

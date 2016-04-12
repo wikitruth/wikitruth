@@ -5,7 +5,7 @@
 {/title}
 
 {<body}
-    <div class="page-header"><h1><a href="/about">About</a> {?page}/ {page.title}{/page}</h1></div>
+    <div class="page-header"><h1><a href="{paths.about}">About</a> {?page}/ {page.title}{/page}</h1></div>
     <div>
         <p>{page.content|s}</p>
     </div>

@@ -1,21 +1,20 @@
 'use strict';
 
-
-var DiscussModel = require('../../models/discuss');
-
+var paths       = require('../../models/paths'),
+    templates   = require('../../models/templates');
 
 module.exports = function (router) {
-    var model = new DiscussModel();
+    var model = {};
 
     router.get('/', function (req, res) {
-        res.render('dust/discuss/index', model);
+        res.render(templates.discuss.index, model);
     });
 
     router.get('/category/', function (req, res) {
-        res.render('dust/discuss/category', model);
+        res.render(templates.discuss.category, model);
     });
 
     router.get('/category/topic/', function (req, res) {
-        res.render('dust/discuss/topic', model);
+        res.render(templates.discuss.topic, model);
     });
 };

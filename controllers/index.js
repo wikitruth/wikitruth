@@ -1,13 +1,11 @@
 'use strict';
-
-
-var IndexModel = require('../models/index');
-
+var paths       = require('../models/paths'),
+    templates   = require('../models/templates');
 
 module.exports = function (router) {
-    var model = new IndexModel();
+    var model = {};
 
     router.get('/', function (req, res) {
-        res.render('dust/index', model);
+        res.render(templates.index, model);
     });
 };

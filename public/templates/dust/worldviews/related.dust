@@ -5,6 +5,6 @@
 {/title}
 
 {<body}
-    {>"dust/ideology/item-header" tab="related" /}
+    {>"dust/worldviews/entry-header" tab="related" /}
     {>"dust/help-us" /}
 {/body}

@@ -163,8 +163,12 @@ module.exports = function (grunt) {
               jshintrc: '.jshintrc-server'
             },
             src: [
-              'schema/**/*.js',
-              'views/**/*.js'
+                '*.js',
+                'controllers/**/*.js',
+                'utils/**/*.js',
+                'middlewares/**/*.js',
+                'models/**/*.js',
+                'public/templates/jade/**/*.js'
             ]
           }
         },
@@ -220,7 +224,7 @@ module.exports = function (grunt) {
 
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-uglify');
-    grunt.loadNpmTasks('grunt-contrib-jshint');
+    //grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-less');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-contrib-watch');
@@ -229,12 +233,12 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-newer');
   
     grunt.registerTask('default', ['copy:vendor', 'newer:uglify', 'newer:less', 'concurrent']);
-    grunt.registerTask('build', ['copy:vendor', 'uglify', 'less']);
+    grunt.registerTask('build-jade', ['copy:vendor', 'uglify', 'less']);
     grunt.registerTask('lint', ['jshint']);
 
     // Register group tasks
     grunt.registerTask('build-kraken', [ 'jshint', 'less', 'requirejs', 'i18n', 'copyto' ]);
     grunt.registerTask('test', [ 'jshint', 'mochacli' ]);
 
-    grunt.registerTask('build-all', [ 'build', 'build-kraken' ]);
+    grunt.registerTask('build', [ 'build-jade', 'build-kraken' ]);
 };

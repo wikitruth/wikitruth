@@ -21,5 +21,5 @@ exports = module.exports = function(app, mongoose) {
   require('./schema/core/Page')(app, mongoose);
 
   // ideology
-  require('./schema/ideology/Ideology')(app, mongoose);
+  require('./schema/worldviews/Ideology')(app, mongoose);
 };

@@ -1,13 +1,12 @@
 'use strict';
 
-
-var AnswersModel = require('../../models/answers');
-
+var paths       = require('../../models/paths'),
+    templates   = require('../../models/templates');
 
 module.exports = function (router) {
-    var model = new AnswersModel();
+    var model = {};
 
     router.get('/', function (req, res) {
-        res.render('dust/answers/index', model);
+        res.render(templates.answers.index, model);
     });
 };

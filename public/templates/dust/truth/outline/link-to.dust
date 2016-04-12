@@ -5,7 +5,7 @@
 {/title}
 
 {<body}
-    {>"dust/wiki/topic-header" tab="link-to" /}
+    {>"dust/truth/entry-header" tab="link-to" /}
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
         <div class="form-group">
@@ -48,12 +48,12 @@
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
         {?topic}
-            <a class="btn btn-default" href="/wiki/topic?topic={topic._id}" role="button">Cancel</a>
+            <a class="btn btn-default" href="{paths.truth.topics.entry}?topic={topic._id}" role="button">Cancel</a>
         {:else}
             {?parent}
-                <a class="btn btn-default" href="/wiki/topic?topic={parent._id}" role="button">Cancel</a>
+                <a class="btn btn-default" href="{paths.truth.topics.entry}?topic={parent._id}" role="button">Cancel</a>
             {:else}
-                <a class="btn btn-default" href="/wiki" role="button">Cancel</a>
+                <a class="btn btn-default" href="{paths.truth.index}" role="button">Cancel</a>
             {/parent}
         {/topic}
     </form>

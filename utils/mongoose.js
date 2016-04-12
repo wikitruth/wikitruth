@@ -19,4 +19,4 @@ module.exports = function(){
         mongoose.connect(uri, {server:{auto_reconnect:true}});
         console.log('[mongoose] reconnect');
     });
-}
+};

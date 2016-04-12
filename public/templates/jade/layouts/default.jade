@@ -20,13 +20,13 @@ html
         div.navbar-collapse.my-navbar-collapse.collapse
           ul.nav.navbar-nav
             //li: a(href='/') Home
-            li: a(href='/wiki')
+            li: a(href='#{paths.truth.index}')
               i.fa.fa-globe
               |  Truth
-            li: a(href='/ideology')
+            li: a(href='#{paths.worldviews.index}')
               i.fa.fa-book
               |  Religion
-            li: a(href='/morality')
+            li: a(href='#{paths.morality.index}')
               i.fa.fa-balance-scale
               |  Morality
             //li: a(href='/about/') About
@@ -34,10 +34,10 @@ html
             if user && user.username
               include account-nav.jade
             else
-              li: a(href='/login/')
+              li: a(href='#{paths.login}')
                 i.fa.fa-user
                 |  Login
-              li: a(href='/signup/')
+              li: a(href='#{paths.signup}')
                 i.fa.fa-user
                 |  Sign Up
 

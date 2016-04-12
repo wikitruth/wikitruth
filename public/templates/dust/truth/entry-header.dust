@@ -1,0 +1,64 @@
+<h2 class="page-header text-primary">
+    <span class="text-muted">
+        {>"dust/truth/breadcrumb" /}
+    </span>
+</h2>
+<div class="btn-group" role="group" aria-label="">
+    {^argument}
+        <a class="btn btn-{@eq key=tab value="overview"}primary{:else}default{/eq}" href="{paths.truth.topics.entry}?topic={topic._id}">
+            <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a>
+        <a class="btn btn-{@eq key=tab value="topics"}primary{:else}default{/eq}" href="{paths.truth.index}?topic={topic._id}">
+            <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Subtopics</a>
+        <a class="btn btn-{@eq key=tab value="arguments"}primary{:else}default{/eq}" href="{paths.truth.arguments.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
+            <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments{!<span class="hidden-xs"> (1,023)</span>!}</a>
+    {:else}
+        <a class="btn btn-{@eq key=tab value="overview"}primary{:else}default{/eq}" href="{paths.truth.arguments.entry}?topic={topic._id}&amp;argument={argument._id}">
+            <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a>
+    {/argument}
+    <a class="hidden-xs btn btn-{@eq key=tab value="questions"}primary{:else}default{/eq}" href="{paths.truth.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
+        <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions{!<span class="hidden-xs"> (122)</span>!}</a>
+    <a class="hidden-xs btn btn-{@eq key=tab value="related"}primary{:else}default{/eq}" href="{paths.truth.related}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
+        <span class="glyphicon glyphicon-random" aria-hidden="true"></span> Related</a>
+    <a class="btn btn-default dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+        <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+    {?isContributor}
+        {^argument}
+            {?isTopicOwner}
+                <li><a href="{paths.truth.topics.create}?id={topic._id}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Topic</a></li>
+                <li><a href="{paths.truth.outline.link}?topic={topic._id}"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> Manage Links</a></li>
+            {/isTopicOwner}
+            <li><a href="{paths.truth.topics.create}?topic={topic._id}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Subtopic</a></li>
+            {!<li><a href="#"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit References</a></li>!}
+            <li role="separator" class="divider"></li>
+            <li><a href="{paths.truth.arguments.create}?topic={topic._id}"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> New Argument</a></li>
+        {:else}
+            {?isArgumentOwner}
+                <li><a href="{paths.truth.arguments.create}?topic={topic._id}&amp;argument={argument._id}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Argument</a></li>
+                <li><a href="{paths.truth.outline.link}?topic={topic._id}&amp;argument={argument._id}"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> Manage Links</a></li>
+                <li role="separator" class="divider"></li>
+            {/isArgumentOwner}
+        {/argument}
+        <li><a href="{paths.truth.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
+        <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> New Question</a></li>
+        {!<li><a href="#">Separated link</a></li>!}
+        <li role="separator" class="divider"></li>
+    {:else}
+    {/isContributor}
+        <li class="visible-xs"><a href="{paths.truth.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
+            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions</a></li>
+        <li class="visible-xs"><a href="{paths.truth.related}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
+            <span class="glyphicon glyphicon-random" aria-hidden="true"></span> Related</a></li>
+        <li><a href="#"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Details</a></li>
+    </ul>
+</div>
+<br/><br/>
+{?argument}
+    <div style="margin-bottom: 10px">
+        <p class="lead" style="margin-bottom: 0">
+            <a href="{paths.truth.arguments.entry}?topic={topic._id}&amp;argument={argument._id}">{argument.title}</a>&nbsp;
+            <span style="color: #f0ad4e; font-size: 14px" title="Pending peer review and acceptance (verdict)"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></span></p>
+    </div>
+{:else}
+{/argument}
