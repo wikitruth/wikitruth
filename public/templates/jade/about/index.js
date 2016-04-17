@@ -1,10 +1,6 @@
 'use strict';
 
-var utils = require('../../../../utils/utils'),
-    flowUtils = require('../../../../utils/flowUtils'),
-    mongoose = require('mongoose'),
-    constants = require('../../../../models/constants'),
-    db = require('../../../../app').db.models;
+var db = require('../../../../app').db.models;
 
 exports.init = function(req, res){
   var model = {};

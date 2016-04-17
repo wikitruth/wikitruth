@@ -1,6 +1,6 @@
 'use strict';
-var paths       = require('../models/paths'),
-    templates   = require('../models/templates');
+
+var templates   = require('../models/templates');
 
 module.exports = function (router) {
     var model = {};

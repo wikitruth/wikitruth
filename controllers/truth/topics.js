@@ -6,7 +6,7 @@ var mongoose    = require('mongoose'),
     templates   = require('../../models/templates'),
     utils       = require('../../utils/utils'),
     flowUtils   = require('../../utils/flowUtils'),
-    modelTypes  = require('../../models/constants').MODEL_TYPES,
+    modelTypes  = require('../../models/constants').OBJECT_TYPES,
     db          = require('../../app').db.models;
 
 module.exports = function (router) {
@@ -84,6 +84,7 @@ module.exports = function (router) {
             var entity = result ? result : {};
             entity.content = req.body.content;
             entity.title = req.body.title;
+            entity.references = req.body.references;
             entity.editUserId = req.user.id;
             entity.editDate = Date.now();
             if(!result) {

@@ -1,12 +1,10 @@
 'use strict';
 
-// FIXME: Not used at the moment.
 module.exports = function jshint(grunt) {
     // Load task
     grunt.loadNpmTasks('grunt-contrib-jshint');
 
-    // Options
-    return {
+    var old = {
         files: [
             'controllers/**/*.js',
             'utils/**/*.js',
@@ -14,6 +12,36 @@ module.exports = function jshint(grunt) {
         ],
         options: {
             jshintrc: '.jshintrc'
+        }
+    };
+
+    // Options
+    return {
+        client: {
+            options: {
+                jshintrc: '.jshintrc-client',
+                ignores: [
+                    'public/layouts/**/*.min.js',
+                    'public/views/**/*.min.js'
+                ]
+            },
+            src: [
+                'public/layouts/**/*.js',
+                'public/views/**/*.js'
+            ]
+        },
+        server: {
+            options: {
+                jshintrc: '.jshintrc-server'
+            },
+            src: [
+                '*.js',
+                'controllers/**/*.js',
+                'utils/**/*.js',
+                'middlewares/**/*.js',
+                'models/**/*.js',
+                'public/templates/jade/**/*.js'
+            ]
         }
     };
 };

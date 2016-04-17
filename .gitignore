@@ -2,8 +2,8 @@
 .idea
 node_modules
 
-public/vendor
 .nodemonignore
-core.min.css
+public/layouts/*.min.css
 public/layouts/*.min.js
 public/layouts/*.min.js.map
+public/components

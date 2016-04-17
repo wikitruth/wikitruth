@@ -5,11 +5,11 @@
 {/title}
 
 {<body}
-    {>"dust/wiki/index-header" tab="top-topics" /}
+    {>"dust/truth/index-header" tab="top-topics" /}
     <ul class="list-group">
-        <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Topic</li>
+        <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Topics</li>
         {#topics}
-            <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> <a href="/wiki/topic?topic={_id}">{title}</a> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+            <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> <a href="{templates.truth.topics.entry}?topic={_id}">{title}</a> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
         {/topics}
         {!
         <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Big Bang Theory <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 5,140</span></li>

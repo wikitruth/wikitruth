@@ -7,10 +7,11 @@ module.exports = function less(grunt) {
 
     // Options
     return {
+        options: {
+            cleancss: false,
+            compress: true
+        },
         build: {
-            options: {
-                cleancss: false
-            },
             files: [{
                 expand: true,
                 cwd: 'public/css',
@@ -18,6 +19,26 @@ module.exports = function less(grunt) {
                 dest: '.build/css/',
                 ext: '.css'
             }]
+        },
+        layouts: {
+            files: {
+                'public/layouts/core.min.css': [
+                    'public/less/bootstrap-build.less',
+                    'public/less/font-awesome-build.less',
+                    'public/layouts/core.less'
+                ],
+                'public/layouts/admin.min.css': ['public/layouts/admin.less']
+            }
+        },
+        views: {
+            files: [{
+                expand: true,
+                cwd: 'public/views/',
+                src: ['**/*.less'],
+                dest: 'public/views/',
+                ext: '.min.css'
+            }]
         }
+
     };
 };

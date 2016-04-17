@@ -1,13 +1,7 @@
 'use strict';
 
-var utils       = require('../../utils/utils'),
-    flowUtils   = require('../../utils/flowUtils'),
-    paths       = require('../../models/paths'),
-    templates   = require('../../models/templates'),
-    mongoose    = require('mongoose'),
-    modelTypes  = require('../../models/constants').MODEL_TYPES,
-    db          = require('../../app').db.models,
-    async       = require('async');
+var flowUtils   = require('../../utils/flowUtils'),
+    templates   = require('../../models/templates');
 
 module.exports = function (router) {
 
@@ -19,12 +13,12 @@ module.exports = function (router) {
             var query = model.argument ? { 'topic': model.argument.ownerId } : req.query;
             flowUtils.setTopicModels({query: query}, model, function () {
                 //var item = model.argument ? model.argument : model.topic;
-                var parent = null;
+                /*var parent = null;
                 if(model.argument) {
 
                 } else if(model.topic) {
 
-                }
+                }*/
 
                 res.render(templates.truth.outline.linkTo, model);
             });

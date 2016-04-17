@@ -1,11 +1,6 @@
 'use strict';
 
-var utils       = require('../../utils/utils'),
-    flowUtils   = require('../../utils/flowUtils'),
-    paths       = require('../../models/paths'),
-    templates   = require('../../models/templates'),
-    mongoose    = require('mongoose'),
-    constants   = require('../../models/constants'),
+var templates   = require('../../models/templates'),
     db = require('../../app').db.models;
 
 module.exports = function (router) {
