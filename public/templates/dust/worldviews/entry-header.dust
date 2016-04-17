@@ -1,26 +1,26 @@
 <h2 class="page-header text-primary">
     <span class="text-muted">
-        <a href="/ideology">Religion</a>
+        <a href="{paths.worldviews.index}">Religion</a>
         &nbsp;/&nbsp;
         {?parent}
             {?parent.parentId}
-                <a href="/ideology/entry?id={parent.parentId}">..</a>
+                <a href="{paths.worldviews.entry}?id={parent.parentId}">..</a>
                 &nbsp;/&nbsp;
             {/parent.parentId}
-            <a href="/ideology/entry?id={parent._id}">{parent.title}</a>
+            <a href="{paths.worldviews.entry}?id={parent._id}">{parent.title}</a>
             &nbsp;/&nbsp;
         {/parent}
-        <a href="/ideology/entry?id={item._id}">{item.title}</a>
+        <a href="{paths.worldviews.entry}?id={item._id}">{item.title}</a>
     </span>
 </h2>
 <div class="btn-group" role="group" aria-label="">
-    <a class="btn btn-{@eq key=tab value="overview"}primary{:else}default{/eq}" href="/ideology/entry?id={item._id}">
+    <a class="btn btn-{@eq key=tab value="overview"}primary{:else}default{/eq}" href="{paths.worldviews.entry}?id={item._id}">
         <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a>
-    <a class="btn btn-{@eq key=tab value="items"}primary{:else}default{/eq}" href="/ideology?id={item._id}">
+    <a class="btn btn-{@eq key=tab value="items"}primary{:else}default{/eq}" href="{paths.worldviews.index}?id={item._id}">
         <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Entries</a>
-    <a class="btn btn-{@eq key=tab value="questions"}primary{:else}default{/eq}" href="/ideology/questions?id={item._id}">
+    <a class="btn btn-{@eq key=tab value="questions"}primary{:else}default{/eq}" href="{paths.worldviews.questions.index}?id={item._id}">
         <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions{!<span class="hidden-xs"> (122)</span>!}</a>
-    <a class="hidden-xs btn btn-{@eq key=tab value="related"}primary{:else}default{/eq}" href="/ideology/related?id={item._id}">
+    <a class="hidden-xs btn btn-{@eq key=tab value="related"}primary{:else}default{/eq}" href="{paths.worldviews.related}?id={item._id}">
         <span class="glyphicon glyphicon-random" aria-hidden="true"></span> Related</a>
     <a class="btn btn-default dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
         <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span>
@@ -28,17 +28,17 @@
     <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
     {?isContributor}
         {?isItemOwner}
-            <li><a href="/ideology/create?_id={item._id}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Entry</a></li>
+            <li><a href="{paths.worldviews.create}?_id={item._id}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Entry</a></li>
             {!<li><a href="#"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Child Entries</a></li>!}
         {/isItemOwner}
-        <li><a href="/ideology/create{?item}?id={item._id}{/item}">
+        <li><a href="{paths.worldviews.create}{?item}?id={item._id}{/item}">
             <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Entry</a></li>
         <li role="separator" class="divider"></li>
-        <li><a href="#/ideology/question/create?id={item._id}">
+        <li><a href="#{paths.worldviews.questions.create}?id={item._id}">
             <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> New Question</a></li>
         <li role="separator" class="divider"></li>
     {/isContributor}
-        <li class="visible-xs"><a href="/ideology/related?id={item._id}">
+        <li class="visible-xs"><a href="{paths.worldviews.related}?id={item._id}">
             <span class="glyphicon glyphicon-random" aria-hidden="true"></span> Related</a></li>
         <li><a href="#"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Details</a></li>
     </ul>

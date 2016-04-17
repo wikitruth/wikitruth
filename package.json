@@ -10,6 +10,10 @@
     "update": "david update",
     "all": "npm run build && npm run test"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wikitruth/wikitruth.git"
+  },
   "dependencies": {
     "adaro": "^0.1.7",
     "async": "^1.x.x",
@@ -50,7 +54,6 @@
     "underscore": "^1.x.x"
   },
   "devDependencies": {
-    "bootstrap": "^3.x.x",
     "david": "^6.x.x",
     "font-awesome": "^4.x.x",
     "grunt": "^0.4.5",
@@ -70,11 +73,6 @@
     "grunt-contrib-watch": "^0.6.x",
     "grunt-newer": "^1.x.x",
     "grunt-nodemon": "^0.4.x",
-    "html5shiv": "^3.x.x",
-    "jquery": "^2.x.x",
-    "jquery.cookie": "^1.x.x",
-    "moment": "^2.x.x",
-    "respond.js": "^1.x.x",
     "mocha": "^1.18.0",
     "supertest": "^0.9.0"
   },

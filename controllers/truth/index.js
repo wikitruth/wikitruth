@@ -2,10 +2,7 @@
 
 var utils       = require('../../utils/utils'),
     flowUtils   = require('../../utils/flowUtils'),
-    paths       = require('../../models/paths'),
     templates   = require('../../models/templates'),
-    mongoose    = require('mongoose'),
-    modelTypes  = require('../../models/constants').MODEL_TYPES,
     db          = require('../../app').db.models,
     async       = require('async');
 
@@ -30,14 +27,28 @@ module.exports = function (router) {
                 flowUtils.setTopicModels(req, model, callback);
             },
             topics: function(callback) {
-                var query = req.query.topic ? { parentId: req.query.topic } : { parentId: null};
-                db.Topic.find(query).limit(100).sort({ title: 1 }).exec(function(err, results) {
+                // display 15 if top topics, 100 if has topic parameter
+                var query = req.query.topic ? { parentId: req.query.topic } : {};
+                db.Topic.find(query).limit(req.query.topic ? 100 : 15).sort({ title: 1 }).exec(function(err, results) {
                     results.forEach(function(result) {
                         result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
                     });
                     model.topics = results;
                     callback();
                 });
+            },
+            categories: function(callback) {
+                if(!req.query.topic) {
+                    db.Topic.find({parentId: null}).sort({title: 1}).exec(function (err, results) {
+                        results.forEach(function (result) {
+                            result.comments = utils.numberWithCommas(utils.randomInt(1, 100000));
+                        });
+                        model.categories = results;
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
             }
         }, function (err, results) {
             res.render(templates.truth.topics.index, model);

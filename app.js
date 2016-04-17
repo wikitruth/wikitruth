@@ -9,13 +9,11 @@ var config          = require('./config/config'),
     bodyParser      = require('body-parser'),
     session         = require('express-session'),
     mongoStore      = require('connect-mongo')(session),
-    http            = require('http'),
-    path            = require('path'),
     passport        = require('passport'),
     mongoose        = require('mongoose'),
     helmet          = require('helmet'),
     cons            = require('consolidate'),
-    csrf            = require('csurf'),
+    //csrf            = require('csurf'),
     kraken          = require('kraken-js');
 
 var options, app;

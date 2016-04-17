@@ -7,18 +7,18 @@
 {<body}
     <h2 class="page-header text-primary">
         <span class="text-muted">
-            <a href="/ideology">Religion</a>
+            <a href="{paths.worldviews.index}">Religion</a>
             &nbsp;/&nbsp;
             {?parent}
                 {?parent.parentId}
-                    <a href="/ideology/entry?id={parent.parentId}">..</a>
+                    <a href="{paths.worldviews.entry}?id={parent.parentId}">..</a>
                     &nbsp;/&nbsp;
                 {/parent.parentId}
-                <a href="/ideology/entry?id={parent._id}">{parent.title}</a>
+                <a href="{paths.worldviews.entry}?id={parent._id}">{parent.title}</a>
                 &nbsp;/&nbsp;
             {/parent}
             {?item}
-                <a href="/ideology/entry?id={item._id}">{item.title}</a>
+                <a href="{paths.worldviews.entry}?id={item._id}">{item.title}</a>
                 &nbsp;/&nbsp;Edit
             {:else}
                 New Entry
@@ -45,12 +45,12 @@
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
         {?item}
-            <a class="btn btn-default" href="/ideology/entry?id={item._id}" role="button">Cancel</a>
+            <a class="btn btn-default" href="{paths.worldviews.entry}?id={item._id}" role="button">Cancel</a>
         {:else}
             {?parent}
-                <a class="btn btn-default" href="/ideology/entry?id={parent._id}" role="button">Cancel</a>
+                <a class="btn btn-default" href="{paths.worldviews.entry}?id={parent._id}" role="button">Cancel</a>
             {:else}
-                <a class="btn btn-default" href="/ideology" role="button">Cancel</a>
+                <a class="btn btn-default" href="{paths.worldviews.index}" role="button">Cancel</a>
             {/parent}
         {/item}
     </form>

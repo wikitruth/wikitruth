@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-    MODEL_TYPES: {
+    OBJECT_TYPES: {
         topic: 1,
         argument: 2,
         question: 3,

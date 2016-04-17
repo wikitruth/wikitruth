@@ -8,7 +8,7 @@ var kraken = require('kraken-js'),
     request = require('supertest');
 
 
-describe('/wiki', function () {
+describe('/truth', function () {
 
     var app, mock;
 
@@ -32,7 +32,7 @@ describe('/wiki', function () {
 
     it('should say "hello"', function (done) {
         request(mock)
-            .get('/wiki')
+            .get('/truth')
             .expect(200)
             .expect('Content-Type', /html/)
             

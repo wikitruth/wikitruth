@@ -27,7 +27,8 @@ module.exports = {
         questions: {
             index: 'dust/worldviews/questions/index',
             create: 'dust/worldviews/questions/create'
-        }
+        },
+        related: 'dust/worldviews/related'
     },
     morality: {
         index: 'dust/morality/index'

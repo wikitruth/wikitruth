@@ -5,6 +5,6 @@
 {/title}
 
 {<body}
-    {>"dust/wiki/entry-header" tab="related" /}
+    {>"dust/truth/entry-header" tab="related" /}
     {>"dust/help-us" /}
 {/body}
