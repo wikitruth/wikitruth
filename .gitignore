@@ -1,9 +1,12 @@
 .build
 .idea
-node_modules
-
 .nodemonignore
+node_modules
+public/css
 public/layouts/*.min.css
 public/layouts/*.min.js
 public/layouts/*.min.js.map
+public/views/**/*.min.css
+public/views/**/*.min.js
+public/views/**/*.min.js.map
 public/components
