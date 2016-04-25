@@ -1,12 +1,14 @@
 <a href="{paths.truth.index}">Truth</a>
-&nbsp;/&nbsp;
 {?parent}
     {?parent.parentId}
-        <a href="{paths.truth.topics.entry}?topic={parent.parentId}">..</a>
         &nbsp;/&nbsp;
+        <a href="{paths.truth.topics.entry}?topic={parent.parentId}">..</a>
     {/parent.parentId}
-    <a href="{paths.truth.topics.entry}?topic={parent._id}">{parent.title}</a>
     &nbsp;/&nbsp;
+    <a href="{paths.truth.topics.entry}?topic={parent._id}">{parent.title}</a>
 {/parent}
-<a href="{paths.truth.topics.entry}?topic={topic._id}">{topic.title}</a>
+{?topic}
+    &nbsp;/&nbsp;
+    <a href="{paths.truth.topics.entry}?topic={topic._id}">{topic.title}</a>
+{/topic}
 {@eq key=tab value="link-to"}&nbsp;/&nbsp;Links{/eq}
