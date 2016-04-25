@@ -20,7 +20,8 @@ module.exports = function clean(grunt) {
         css: {
             src: [
                 'public/layouts/**/*.min.css',
-                'public/views/**/*.min.css'
+                'public/views/**/*.min.css',
+                'public/css/**/*.min.css'
             ]
         }
         /*components: {
