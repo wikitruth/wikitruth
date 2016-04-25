@@ -15,5 +15,10 @@ module.exports = {
     ARGUMENT_TYPES: {
         positive: 1,
         negative: 2
+    },
+    CORE_GROUPS: {
+        truth: 1,
+        worldview: 2,
+        morality: 3
     }
 };
