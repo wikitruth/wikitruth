@@ -15,7 +15,7 @@ exports.find = function(req, res, next){
     filters.name = new RegExp('^.*?'+ req.query.name +'.*$', 'i');
   }
 
-  req.app.db.models.Category.pagedFind({
+  req.app.db.models.AccountCategory.pagedFind({
     filters: filters,
     keys: 'pivot name',
     limit: req.query.limit,
@@ -39,7 +39,7 @@ exports.find = function(req, res, next){
 };
 
 exports.read = function(req, res, next){
-  req.app.db.models.Category.findById(req.params.id).exec(function(err, category) {
+  req.app.db.models.AccountCategory.findById(req.params.id).exec(function(err, category) {
     if (err) {
       return next(err);
     }
@@ -76,7 +76,7 @@ exports.create = function(req, res, next){
   });
 
   workflow.on('duplicateCategoryCheck', function() {
-    req.app.db.models.Category.findById(req.app.utility.slugify(req.body.pivot +' '+ req.body.name)).exec(function(err, category) {
+    req.app.db.models.AccountCategory.findById(req.app.utility.slugify(req.body.pivot +' '+ req.body.name)).exec(function(err, category) {
       if (err) {
         return workflow.emit('exception', err);
       }
@@ -97,7 +97,7 @@ exports.create = function(req, res, next){
       name: req.body.name
     };
 
-    req.app.db.models.Category.create(fieldsToSet, function(err, category) {
+    req.app.db.models.AccountCategory.create(fieldsToSet, function(err, category) {
       if (err) {
         return workflow.emit('exception', err);
       }
@@ -138,7 +138,7 @@ exports.update = function(req, res, next){
       name: req.body.name
     };
 
-    req.app.db.models.Category.findByIdAndUpdate(req.params.id, fieldsToSet, function(err, category) {
+    req.app.db.models.AccountCategory.findByIdAndUpdate(req.params.id, fieldsToSet, function(err, category) {
       if (err) {
         return workflow.emit('exception', err);
       }
@@ -164,7 +164,7 @@ exports.delete = function(req, res, next){
   });
 
   workflow.on('deleteCategory', function(err) {
-    req.app.db.models.Category.findByIdAndRemove(req.params.id, function(err, category) {
+    req.app.db.models.AccountCategory.findByIdAndRemove(req.params.id, function(err, category) {
       if (err) {
         return workflow.emit('exception', err);
       }

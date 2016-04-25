@@ -7,6 +7,11 @@ module.exports = {
     about: {
         index: 'dust/about/page'
     },
+    pages: {
+        index: 'dust/pages/index',
+        page: 'dust/pages/page',
+        create: 'dust/pages/create'
+    },
     answers: {
         index: 'dust/answers/index'
     },
@@ -14,11 +19,6 @@ module.exports = {
         index: 'dust/discuss/index',
         category: 'dust/discuss/category',
         topic: 'dust/discuss/topic'
-    },
-    pages: {
-        index: 'dust/pages/index',
-        page: 'dust/pages/page',
-        create: 'dust/pages/create'
     },
     worldviews: {
         create: 'dust/worldviews/create',

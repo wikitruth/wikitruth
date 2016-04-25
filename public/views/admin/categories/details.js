@@ -5,7 +5,7 @@
 
   app = app || {};
 
-  app.Category = Backbone.Model.extend({
+  app.AccountCategory = Backbone.Model.extend({
     idAttribute: '_id',
     url: function() {
       return '/admin/categories/'+ this.id +'/';
@@ -130,7 +130,7 @@
     el: '.page .container',
     initialize: function() {
       app.mainView = this;
-      this.model = new app.Category( JSON.parse( unescape($('#data-record').html()) ) );
+      this.model = new app.AccountCategory( JSON.parse( unescape($('#data-record').html()) ) );
 
       app.headerView = new app.HeaderView();
       app.detailsView = new app.DetailsView();
