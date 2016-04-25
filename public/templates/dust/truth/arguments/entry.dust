@@ -6,14 +6,14 @@
 
 {<body}
     {>"dust/truth/entry-header" tab="overview" /}
-    <div id="lipsum">
+    <div>
         <p>{argument.content|s}</p>
-        {!<p>
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tempus euismod faucibus. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Ut euismod a lectus in posuere. Aenean quis finibus ipsum. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Curabitur varius cursus nisi. Suspendisse potenti. Duis sit amet nulla lacus. In tincidunt, eros quis dictum hendrerit, nibh metus accumsan est, in aliquam enim enim a erat.
-        </p>
-        <p>
-            Aliquam eleifend ac enim vitae commodo. Phasellus egestas vel libero ut convallis. Praesent massa magna, consectetur congue ornare eget, feugiat ut arcu. Donec rhoncus ligula quis enim tempor, non consectetur arcu pulvinar. Donec viverra sem vitae porta consectetur. Vivamus consectetur augue sit amet convallis elementum. Maecenas convallis scelerisque iaculis. Pellentesque sed condimentum mauris.
-        </p>!}
+        {?argument.references}
+            <br/>
+            <small class="text-muted">
+                <span class="text-uppercase">References</span>
+                <p>{argument.references|s}</p>
+            </small>
+        {/argument.references}
     </div>
-    {!<p><a class="btn btn-primary" href="/" role="button">View more &raquo;</a></p>!}
 {/body}

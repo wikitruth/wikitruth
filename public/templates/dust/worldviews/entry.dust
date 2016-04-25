@@ -12,10 +12,16 @@
             <a href="{paths.worldviews.entry}?id={item._id}">{item.title}</a></p>
         {!<span style="color: #f0ad4e" title="Pending peer review and acceptance (verdict)"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></span>!}
     </div>
-    <div id="lipsum">
+    <div>
         <p>{item.content|s}</p>
+        {?item.references}
+            <br/>
+            <small class="text-muted">
+                <span class="text-uppercase">References</span>
+                <p>{item.references|s}</p>
+            </small>
+        {/item.references}
     </div>
-    {!<p><a class="btn btn-primary" href="/" role="button">View more &raquo;</a></p>!}
     {?items}
     <ul class="list-group top-list-items">
         <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Entries</li>

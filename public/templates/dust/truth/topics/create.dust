@@ -7,19 +7,10 @@
 {<body}
     <h2 class="page-header text-primary">
         <span class="text-muted">
-            <a href="{paths.truth.index}">Truth</a>
+            {>"dust/truth/breadcrumb" /}
             &nbsp;/&nbsp;
-            {?parent}
-                {?parent.parentId}
-                    <a href="{paths.truth.topics.entry}?topic={parent.parentId}">..</a>
-                    &nbsp;/&nbsp;
-                {/parent.parentId}
-                <a href="{paths.truth.topics.entry}?topic={parent._id}">{parent.title}</a>
-                &nbsp;/&nbsp;
-            {/parent}
             {?topic}
-                <a href="{paths.truth.topics.entry}?topic={topic._id}">{topic.title}</a>
-                &nbsp;/&nbsp;Edit
+                Edit
             {:else}
                 New Topic
             {/topic}
