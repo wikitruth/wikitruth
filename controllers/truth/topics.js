@@ -95,8 +95,8 @@ module.exports = function (router) {
                 if (err) {
                     throw err;
                 }
-                res.redirect(result ? paths.truth.topics.entry : paths.truth.index
-                    + (req.query.topic ? '?topic=' + req.query.id : '')
+                res.redirect(result ? paths.truth.topics.entry : paths.truth.index +
+                    (req.query.topic ? '?topic=' + req.query.id : '')
                 );
             });
         });

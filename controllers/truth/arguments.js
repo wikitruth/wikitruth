@@ -85,9 +85,9 @@ module.exports = function (router) {
                 if (err) {
                     throw err;
                 }
-                res.redirect(result ? paths.truth.arguments.entry : paths.truth.arguments.index
-                    + '?topic=' + req.query.topic
-                    + (result ? '&argument=' + req.query.argument : '')
+                res.redirect(result ? paths.truth.arguments.entry : paths.truth.arguments.index +
+                    '?topic=' + req.query.topic +
+                    (result ? '&argument=' + req.query.argument : '')
                 );
             });
         });

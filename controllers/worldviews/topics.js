@@ -133,8 +133,8 @@ module.exports = function (router) {
                 if (err) {
                     throw err;
                 }
-                res.redirect(result ? paths.worldviews.topics.entry : paths.worldviews.index
-                    + (req.query.topic ? '?topic=' + req.query.id : '')
+                res.redirect(result ? paths.worldviews.topics.entry : paths.worldviews.index +
+                    (req.query.topic ? '?topic=' + req.query.id : '')
                 );
             });
         });
