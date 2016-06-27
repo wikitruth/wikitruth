@@ -10,9 +10,12 @@ exports = module.exports = function(app, mongoose) {
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     editDate: { type: Date, default: Date.now },
     editUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
+    ownerId: { type: mongoose.Schema.ObjectId, default: null },
+    ownerType: { type: Number, default: -1 }, // OBJECT_TYPES
+    groupId: { type: Number, default: -1 },
     outline: [
       {
-        listType: { type: Number }, // MODEL_TYPES
+        listType: { type: Number }, // OBJECT_TYPES
         id: { type: mongoose.Schema.ObjectId },
         title: { type: String }, // Friendly title/caption
         isDefault: { type: Boolean }, // default=uncategorized

@@ -11,27 +11,31 @@
         {>"dust/truth/index-header" tab="categories" /}
     {/topic}
     {?categories}
-    <ul class="list-group">
-        <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Categories</li>
-        {#categories}
-            <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
-                <a href="{paths.truth.topics.entry}?topic={_id}">{title}</a> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
-        {/categories}
-    </ul>
-    <ul class="list-group">
-        <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Top Topics</li>
-        {#topics}
-            <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
-                <a href="{paths.truth.topics.entry}?topic={_id}">{title}</a> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
-        {/topics}
-    </ul>
-    {:else}
         <ul class="list-group">
-            <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Topics</li>
-            {#topics}
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Categories</li>
+            {#categories}
                 <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
-                    <a href="{paths.truth.topics.entry}?topic={_id}">{title}</a> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
-            {/topics}
+                    <a href="{paths.truth.topics.entry}?topic={_id}">{title}</a> <span class="pull-right text-muted"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+            {/categories}
         </ul>
+        {?topics}
+            <ul class="list-group">
+                <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Top Topics</li>
+                {#topics}
+                    <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
+                        <a href="{paths.truth.topics.entry}?topic={_id}">{title}</a> <span class="pull-right text-muted"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+                {/topics}
+            </ul>
+        {/topics}
+    {:else}
+        {?topics}
+            <ul class="list-group">
+                <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Topics</li>
+                {#topics}
+                    <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
+                        <a href="{paths.truth.topics.entry}?topic={_id}">{title}</a> <span class="pull-right text-muted"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+                {/topics}
+            </ul>
+        {/topics}
     {/categories}
 {/body}

@@ -1,0 +1,33 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {?argument}Edit{:else}New{/argument} Argument - {titleSlogan}
+{/title}
+
+{<body}
+    {>"dust/worldviews/breadcrumb" /}
+    <h1 class="page-header">
+        {?argument}
+            Edit Argument
+        {:else}
+            New Argument
+        {/argument}
+    </h1>
+    <form method="post">
+        <input type="hidden" name="_csrf" value="{_csrf}">
+        <div class="form-group">
+            <label for="inputName">Argument</label>
+            <input type="text" name="title" id="inputName" value="{argument.title}" class="form-control"/>
+        </div>
+        <div class="form-group">
+            <label for="inputContent">Summary</label>
+            <textarea class="form-control" id="inputContent" name="content" rows="12">{argument.content}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="inputReferences">References</label>
+            <textarea class="form-control" id="inputReferences" name="references" rows="2">{argument.references}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
+        <a class="btn btn-default" href="{?argument}{paths.worldviews.arguments.entry}?topic={topic._id}&amp;argument={argument._id}{:else}{paths.worldviews.arguments.index}?topic={topic._id}{/argument}" role="button">Cancel</a>
+    </form>
+{/body}

@@ -1,0 +1,45 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {?topic}Edit{:else}New{/topic} Topic - {titleSlogan}
+{/title}
+
+{<body}
+    {>"dust/worldviews/breadcrumb" /}
+    <h1 class="page-header">
+        {?topic}
+            Edit Topic
+        {:else}
+            New Topic
+        {/topic}
+    </h1>
+    <form method="post">
+        <input type="hidden" name="_csrf" value="{_csrf}">
+        <div class="form-group">
+            <label for="inputName">Topic</label>
+            <input type="text" name="title" id="inputName" value="{topic.title}" class="form-control"/>
+        </div>
+        <div class="form-group">
+            <label for="inputContent">Summary</label>
+            <textarea class="form-control" id="inputContent" name="content" rows="12">{topic.content}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="inputReferences">References</label>
+            <textarea class="form-control" id="inputReferences" name="references" rows="3">{topic.references}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="inputParent">Parent</label>
+            <input type="text" name="parent" id="inputParent" value="{?topic}{topic.parentId}{:else}{parent._id}{/topic}" class="form-control"/>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
+        {?topic}
+            <a class="btn btn-default" href="{paths.worldviews.topics.entry}?topic={topic._id}" role="button">Cancel</a>
+        {:else}
+            {?parent}
+                <a class="btn btn-default" href="{paths.worldviews.topics.entry}?topic={parent._id}" role="button">Cancel</a>
+            {:else}
+                <a class="btn btn-default" href="{paths.worldviews.index}" role="button">Cancel</a>
+            {/parent}
+        {/topic}
+    </form>
+{/body}

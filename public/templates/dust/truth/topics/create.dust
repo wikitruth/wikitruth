@@ -5,17 +5,14 @@
 {/title}
 
 {<body}
-    <h2 class="page-header text-primary">
-        <span class="text-muted">
-            {>"dust/truth/breadcrumb" /}
-            &nbsp;/&nbsp;
-            {?topic}
-                Edit
-            {:else}
-                New Topic
-            {/topic}
-        </span>
-    </h2>
+    {>"dust/truth/breadcrumb" /}
+    <h1 class="page-header">
+        {?topic}
+            Edit Topic
+        {:else}
+            New Topic
+        {/topic}
+    </h1>
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
         <div class="form-group">

@@ -20,19 +20,6 @@ module.exports = {
         category: 'dust/discuss/category',
         topic: 'dust/discuss/topic'
     },
-    worldviews: {
-        create: 'dust/worldviews/create',
-        entry: 'dust/worldviews/entry',
-        index: 'dust/worldviews/index',
-        questions: {
-            index: 'dust/worldviews/questions/index',
-            create: 'dust/worldviews/questions/create'
-        },
-        related: 'dust/worldviews/related'
-    },
-    morality: {
-        index: 'dust/morality/index'
-    },
     truth: {
         indexHeader: 'dust/truth/index-header',
         entryHeader: 'dust/truth/entry-header',
@@ -49,12 +36,55 @@ module.exports = {
         },
         questions: {
             index: 'dust/truth/questions/index',
-            create: 'dust/truth/questions/create'
+            create: 'dust/truth/questions/create',
+            entry: 'dust/truth/questions/entry'
         },
         outline: {
             create: 'dust/truth/outline/create',
             linkTo: 'dust/truth/outline/link-to'
         },
         related: 'dust/truth/related'
+    },
+    worldviews: {
+        create: 'dust/worldviews/create',
+        entry: 'dust/worldviews/entry',
+        index: 'dust/worldviews/index',
+        topics: {
+            index: 'dust/worldviews/topics/index',
+            create: 'dust/worldviews/topics/create',
+            entry: 'dust/worldviews/topics/entry'
+        },
+        arguments: {
+            index: 'dust/worldviews/arguments/index',
+            create: 'dust/worldviews/arguments/create',
+            entry: 'dust/worldviews/arguments/entry'
+        },
+        questions: {
+            index: 'dust/worldviews/questions/index',
+            create: 'dust/worldviews/questions/create',
+            entry: 'dust/worldviews/questions/entry'
+        },
+        related: 'dust/worldviews/related'
+    },
+    morality: {
+        index: 'dust/morality/index',
+        indexHeader: 'dust/morality/index-header',
+        entryHeader: 'dust/morality/entry-header',
+        topics: {
+            index: 'dust/morality/topics/index',
+            create: 'dust/morality/topics/create',
+            entry: 'dust/morality/topics/entry'
+        },
+        arguments: {
+            index: 'dust/morality/arguments/index',
+            create: 'dust/morality/arguments/create',
+            entry: 'dust/morality/arguments/entry'
+        },
+        questions: {
+            index: 'dust/morality/questions/index',
+            create: 'dust/morality/questions/create',
+            entry: 'dust/morality/questions/entry'
+        },
+        related: 'dust/morality/related'
     }
 };

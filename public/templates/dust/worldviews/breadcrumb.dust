@@ -1,0 +1,31 @@
+<br/>
+<ol class="breadcrumb">
+    <li><a href="{paths.worldviews.index}">Religion</a></li>
+    {?parent}
+        {?parent.parentId}
+            <li><a href="{paths.worldviews.entry}?id={parent.parentId}">..</a></li>
+        {/parent.parentId}
+        <li><a href="{paths.worldviews.entry}?id={parent._id}">{parent.title}</a></li>
+    {/parent}
+    {?item}
+        <li><a href="{paths.worldviews.entry}?id={item._id}">{item.title}</a></li>
+    {/item}
+    {?parentTopic}
+        {?parentTopic.parentId}
+            <li><a href="{paths.worldviews.topics.entry}?topic={parentTopic.parentId}">..</a></li>
+        {/parentTopic.parentId}
+        <li><a href="{paths.worldviews.topics.entry}?topic={parentTopic._id}">{parentTopic.title}</a></li>
+    {/parentTopic}
+    {?topic}
+        <li><a href="{paths.worldviews.topics.entry}?topic={topic._id}">{topic.title}</a></li>
+    {/topic}
+    {?argument}
+        <li><a href="{paths.worldviews.arguments.entry}?topic={topic._id}&amp;argument={argument._id}">{argument.title}</a></li>
+    {/argument}
+    {?question}
+        <li><a href="{paths.worldviews.questions.entry}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}">{question.title}</a></li>
+    {/question}
+    {@eq key=tab value="link-to"}
+        <li class="active">Links</li>
+    {/eq}
+</ol>

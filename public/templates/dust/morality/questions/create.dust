@@ -1,0 +1,41 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    New Question - {titleSlogan}
+{/title}
+
+{<body}
+    <h2 class="page-header text-primary">
+        <span class="text-muted">
+            {>"dust/morality/breadcrumb" /}
+            &nbsp;/&nbsp;
+            {?question}
+                <a href="{paths.morality.topics.entry}?topic={question._id}">{question.title}</a>
+                &nbsp;/&nbsp;Edit
+            {:else}
+                New Question
+            {/question}
+        </span>
+    </h2>
+    {>"dust/help-us" /}
+    <form method="post">
+        <input type="hidden" name="_csrf" value="{_csrf}">
+        {!
+        <div class="form-group">
+            <label for="inputName">Topic</label>
+            <input type="text" name="title" id="inputName" value="{topic.title}" class="form-control"/>
+        </div>
+        <div class="form-group">
+            <label for="inputContent">Summary</label>
+            <textarea class="form-control" id="inputContent" name="content" rows="12">{topic.content}</textarea>
+        </div>
+        !}
+        {!<button type="submit" class="btn btn-primary">Submit</button>&nbsp;!}
+        {^argument}
+            <a class="btn btn-default" href="{?topic}{paths.morality.questions.index}?topic={topic._id}{:else}{paths.morality.index}{/topic}" role="button">Cancel</a>
+        {:else}
+            <a class="btn btn-default" href="{paths.morality.questions.index}?topic={topic._id}&amp;argument={argument._id}" role="button">Cancel</a>
+        {/argument}
+
+    </form>
+{/body}

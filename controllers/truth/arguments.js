@@ -5,7 +5,7 @@ var mongoose    = require('mongoose'),
     flowUtils   = require('../../utils/flowUtils'),
     paths       = require('../../models/paths'),
     templates   = require('../../models/templates'),
-    modelTypes  = require('../../models/constants').OBJECT_TYPES,
+    constants   = require('../../models/constants'),
     db          = require('../../app').db.models;
 
 module.exports = function (router) {
@@ -16,7 +16,7 @@ module.exports = function (router) {
         var model = {};
         if(req.query.topic) {
             flowUtils.setTopicModels(req, model, function () {
-                db.Argument.find({ ownerId: model.topic._id, ownerType: modelTypes.topic }).sort({ title: 1 }).exec(function(err, results) {
+                db.Argument.find({ ownerId: model.topic._id, ownerType: constants.OBJECT_TYPES.topic }).sort({ title: 1 }).exec(function(err, results) {
                     results.forEach(function(result) {
                         result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
                     });
@@ -26,7 +26,7 @@ module.exports = function (router) {
             });
         } else {
             // Top Discussions
-            db.Argument.find({ ownerType: modelTypes.topic }).limit(100).exec(function(err, results) {
+            db.Argument.find({ ownerType: constants.OBJECT_TYPES.topic, groupId: constants.CORE_GROUPS.truth }).limit(100).exec(function(err, results) {
                 results.forEach(function(result) {
                     result.topic = {
                         _id: result.ownerId
@@ -58,9 +58,7 @@ module.exports = function (router) {
     });
 
     router.post('/create', function (req, res) {
-        var query = {
-            _id: req.query.argument ? req.query.argument : new mongoose.Types.ObjectId()
-        };
+        var query = { _id: req.query.argument || new mongoose.Types.ObjectId() };
         db.Argument.findOne(query, function(err, result) {
             var entity = result ? result : {};
             entity.content = req.body.content;
@@ -71,6 +69,7 @@ module.exports = function (router) {
             if(!result) {
                 entity.createUserId = req.user.id;
                 entity.createDate = Date.now();
+                entity.groupId = constants.CORE_GROUPS.truth;
             }
             if(!entity.ownerId) {
                 /*if(req.query.argument) { // parent is an argument
@@ -79,18 +78,17 @@ module.exports = function (router) {
                 } else*/
                 if(req.query.topic) { // parent is a topic
                     entity.ownerId = req.query.topic;
-                    entity.ownerType = modelTypes.topic;
+                    entity.ownerType = constants.OBJECT_TYPES.topic;
                 }
             }
             db.Argument.update(query, entity, {upsert: true}, function(err, writeResult) {
                 if (err) {
                     throw err;
                 }
-                if(result) {
-                    res.redirect(paths.truth.argument.entry + '?topic=' + req.query.topic + '&argument=' + req.query.argument);
-                } else {
-                    res.redirect(paths.truth.arguments.index + '?topic=' + req.query.topic);
-                }
+                res.redirect(result ? paths.truth.arguments.entry : paths.truth.arguments.index
+                    + '?topic=' + req.query.topic
+                    + (result ? '&argument=' + req.query.argument : '')
+                );
             });
         });
     });

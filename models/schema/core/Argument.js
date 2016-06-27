@@ -6,12 +6,13 @@ exports = module.exports = function(app, mongoose) {
     content: { type: String, default: '' },
     references: { type: String, default: '' },
     ownerId: { type: mongoose.Schema.ObjectId },
-    ownerType: { type: Number }, // MODEL_TYPES
+    ownerType: { type: Number }, // OBJECT_TYPES
     createDate: { type: Date, default: Date.now },
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     editDate: { type: Date, default: Date.now },
     editUserId: { type: mongoose.Schema.ObjectId, ref: 'User'},
     type: { type: Number }, // ARGUMENT_TYPES
+    groupId: { type: Number, default: -1 },
     linkedArguments: [
       {
         argumentId: { type: mongoose.Schema.ObjectId },

@@ -12,7 +12,7 @@
     </span>
 </h1>
 {#user.username}
-    <div class="btn-group" role="group" aria-label="" style="margin-bottom: 10px">
+    <div class="btn-group entry-tabs" role="group" aria-label="">
         <a class="btn btn-{@eq key=tab value="pages"}primary{:else}default{/eq}" href="{paths.pages.index}">
             <span class="glyphicon glyphicon-file" aria-hidden="true"></span> My Pages
         </a>

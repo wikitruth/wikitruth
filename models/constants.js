@@ -18,7 +18,7 @@ module.exports = {
     },
     CORE_GROUPS: {
         truth: 1,
-        worldview: 2,
+        worldviews: 2,
         morality: 3
     }
 };
