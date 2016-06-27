@@ -87,9 +87,9 @@ module.exports = function (router) {
                 if (err) {
                     throw err;
                 }
-                res.redirect(result ? paths.worldviews.arguments.entry : paths.worldviews.arguments.index
-                    + '?topic=' + req.query.topic
-                    + (result ? '&argument=' + req.query.argument : '')
+                res.redirect(result ? paths.worldviews.arguments.entry : paths.worldviews.arguments.index +
+                    '?topic=' + req.query.topic +
+                    (result ? '&argument=' + req.query.argument : '')
                 );
             });
         });

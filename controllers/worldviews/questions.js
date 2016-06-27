@@ -93,10 +93,10 @@ module.exports = function (router) {
                 if (err) {
                     throw err;
                 }
-                res.redirect((result ? paths.worldviews.questions.entry : paths.worldviews.questions.index)
-                    + '?topic=' + req.query.topic
-                    + (req.query.argument ? '&argument=' + req.query.argument : '')
-                    + (result ? '&question=' + req.query.question : ''));
+                res.redirect((result ? paths.worldviews.questions.entry : paths.worldviews.questions.index) +
+                    '?topic=' + req.query.topic +
+                    (req.query.argument ? '&argument=' + req.query.argument : '') +
+                    (result ? '&question=' + req.query.question : ''));
             });
         });
     });
