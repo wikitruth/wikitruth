@@ -1,0 +1,49 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {topic.title} - {titleSlogan}
+{/title}
+
+{<body}
+    {>"dust/worldviews/entry-header" tab="overview" /}
+    <div class="entry-header">
+        {?isContributor}
+            {?isTopicOwner}
+                <a href="{paths.worldviews.topics.create}?id={topic._id}" title="Edit Outline"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>&nbsp;
+            {/isTopicOwner}
+        {/isContributor}
+        <span style="color: #f0ad4e" title="Pending review (verdict)"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></span>
+    </div>
+    <div>
+        <p>{topic.content|s}</p>
+        {?topic.references}
+            <br/>
+            <small class="text-muted">
+                <span class="text-uppercase">References</span>
+                <p>{topic.references|s}</p>
+            </small>
+        {/topic.references}
+    </div>
+    {?topics}
+    <ul class="list-group top-list-items">
+        <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Top Subtopics</li>
+        {#topics}
+        <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
+            <a href="{paths.worldviews.topics.entry}?topic={_id}">{title}</a> <span class="pull-right text-muted">
+                <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+        {/topics}
+    </ul>
+    <div class="top-list-items-more"><a href="{paths.worldviews.index}?topic={topic._id}" role="button">more &raquo;</a></div>
+    {/topics}
+    {?arguments}
+    <ul class="list-group top-list-items">
+        <li class="list-group-item highlight"><span class="glyphicon glyphicon-flash text-success" aria-hidden="true"></span> Top Arguments</li>
+        {#arguments}
+        <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
+            <a href="{paths.worldviews.arguments.entry}?topic={topic._id}&amp;argument={_id}">{title}</a> <span class="pull-right text-muted">
+                <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+        {/arguments}
+    </ul>
+    <div class="top-list-items-more"><a href="{paths.worldviews.arguments.index}?topic={topic._id}" role="button">more &raquo;</a></div>
+    {/arguments}
+{/body}

@@ -1,0 +1,37 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {?topic}Topics for {topic.title}{:else}Topics{/topic} - {titleSlogan}
+{/title}
+
+{<body}
+    {?topic}
+        {>"dust/morality/entry-header" tab="topics" /}
+    {:else}
+        {>"dust/morality/index-header" tab="categories" /}
+    {/topic}
+    {?categories}
+    <ul class="list-group">
+        <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Categories</li>
+        {#categories}
+            <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
+                <a href="{paths.morality.topics.entry}?topic={_id}">{title}</a> <span class="pull-right text-muted"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+        {/categories}
+    </ul>
+    <ul class="list-group">
+        <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Top Topics</li>
+        {#topics}
+            <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
+                <a href="{paths.morality.topics.entry}?topic={_id}">{title}</a> <span class="pull-right text-muted"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+        {/topics}
+    </ul>
+    {:else}
+        <ul class="list-group">
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Topics</li>
+            {#topics}
+                <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
+                    <a href="{paths.morality.topics.entry}?topic={_id}">{title}</a> <span class="pull-right text-muted"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+            {/topics}
+        </ul>
+    {/categories}
+{/body}

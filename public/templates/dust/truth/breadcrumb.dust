@@ -1,14 +1,22 @@
-<a href="{paths.truth.index}">Truth</a>
-{?parent}
-    {?parent.parentId}
-        &nbsp;/&nbsp;
-        <a href="{paths.truth.topics.entry}?topic={parent.parentId}">..</a>
-    {/parent.parentId}
-    &nbsp;/&nbsp;
-    <a href="{paths.truth.topics.entry}?topic={parent._id}">{parent.title}</a>
-{/parent}
-{?topic}
-    &nbsp;/&nbsp;
-    <a href="{paths.truth.topics.entry}?topic={topic._id}">{topic.title}</a>
-{/topic}
-{@eq key=tab value="link-to"}&nbsp;/&nbsp;Links{/eq}
+<br/>
+<ol class="breadcrumb">
+    <li><a href="{paths.truth.index}">Truth</a></li>
+    {?parent}
+        {?parent.parentId}
+            <li><a href="{paths.truth.topics.entry}?topic={parent.parentId}">..</a></li>
+        {/parent.parentId}
+        <li><a href="{paths.truth.topics.entry}?topic={parent._id}">{parent.title}</a></li>
+    {/parent}
+    {?topic}
+        <li><a href="{paths.truth.topics.entry}?topic={topic._id}">{topic.title}</a></li>
+    {/topic}
+    {?argument}
+        <li><a href="{paths.truth.arguments.entry}?topic={topic._id}&amp;argument={argument._id}">{argument.title}</a></li>
+    {/argument}
+    {?question}
+        <li><a href="{paths.truth.questions.entry}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}">{question.title}</a></li>
+    {/question}
+    {@eq key=tab value="link-to"}
+        <li class="active">Links</li>
+    {/eq}
+</ol>

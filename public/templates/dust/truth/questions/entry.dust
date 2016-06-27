@@ -1,0 +1,19 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {question.title} - {titleSlogan}
+{/title}
+
+{<body}
+    {>"dust/truth/entry-header" tab="overview" /}
+    <div>
+        <p>{question.content|s}</p>
+        {?question.references}
+            <br/>
+            <small class="text-muted">
+                <span class="text-uppercase">References</span>
+                <p>{argument.references|s}</p>
+            </small>
+        {/question.references}
+    </div>
+{/body}

@@ -5,18 +5,14 @@
 {/title}
 
 {<body}
-    <h2 class="page-header text-primary">
-        <span class="text-muted">
-            {>"dust/truth/breadcrumb" /}
-            &nbsp;/&nbsp;
-            {?argument}
-                <a href="{paths.truth.arguments.entry}?topic={topic._id}&amp;argument={argument._id}">{argument.title}</a>
-                &nbsp;/&nbsp;Edit
-            {:else}
-                New Argument
-            {/argument}
-        </span>
-    </h2>
+    {>"dust/truth/breadcrumb" /}
+    <h1 class="page-header">
+        {?argument}
+            Edit Argument
+        {:else}
+            New Argument
+        {/argument}
+    </h1>
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
         <div class="form-group">

@@ -1,0 +1,30 @@
+<ol class="breadcrumb">
+    <li><a href="{paths.morality.index}">Morality</a></li>
+    {?parent}
+        {?parent.parentId}
+            <li><a href="{paths.morality.topics.entry}?topic={parent.parentId}">..</a></li>
+        {/parent.parentId}
+        <li><a href="{paths.morality.topics.entry}?topic={parent._id}">{parent.title}</a></li>
+    {/parent}
+    {?topic}
+        <li><a href="{paths.morality.topics.entry}?topic={topic._id}">{topic.title}</a></li>
+    {/topic}
+    {@eq key=tab value="link-to"}
+        <li class="active">Links</li>
+    {/eq}
+</ol>
+{!<a href="{paths.morality.index}">Morality</a>
+{?parent}
+    {?parent.parentId}
+        &nbsp;/&nbsp;
+        <a href="{paths.morality.topics.entry}?topic={parent.parentId}">..</a>
+    {/parent.parentId}
+    &nbsp;/&nbsp;
+    <a href="{paths.morality.topics.entry}?topic={parent._id}">{parent.title}</a>
+{/parent}
+{?topic}
+    &nbsp;/&nbsp;
+    <a href="{paths.morality.topics.entry}?topic={topic._id}">{topic.title}</a>
+{/topic}
+{@eq key=tab value="link-to"}&nbsp;/&nbsp;Links{/eq}
+!}

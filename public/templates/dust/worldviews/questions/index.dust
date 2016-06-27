@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    Questions: {item.title} - {titleSlogan}
+    Questions: {?argument}{argument.title}{:else}{topic.title}{/argument} - {titleSlogan}
 {/title}
 
 {<body}
@@ -10,5 +10,13 @@
     {:else}
         {>"dust/worldviews/index-header" tab="top-questions" /}
     {/item}
-    {>"dust/help-us" /}
+    {?questions}
+        <ul class="list-group">
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Questions</li>
+            {#questions}
+                <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
+                    <a href="{paths.worldviews.questions.entry}?id={item._id}&amp;question={_id}{?topic}&amp;topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}">{title}</a> <span class="pull-right text-muted"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+            {/questions}
+        </ul>
+    {/questions}
 {/body}

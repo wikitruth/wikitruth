@@ -25,19 +25,19 @@ module.exports = {
     truth: {
         index: '/truth',
         topics: {
-            index: '/truth/topics',
-            entry: '/truth/topics/entry',
+            index:  '/truth/topics',
+            entry:  '/truth/topics/entry',
             create: '/truth/topics/create'
         },
         arguments: {
-            index: '/truth/arguments',
-            entry: '/truth/arguments/entry',
+            index:  '/truth/arguments',
+            entry:  '/truth/arguments/entry',
             create: '/truth/arguments/create'
         },
         questions: {
             create: '/truth/questions/create',
-            index: '/truth/questions',
-            entry: '/truth/questions/entry'
+            index:  '/truth/questions',
+            entry:  '/truth/questions/entry'
         },
         outline: {
             link: '/truth/outline/link'
@@ -48,13 +48,40 @@ module.exports = {
         index: '/worldviews',
         entry: '/worldviews/entry',
         create: '/worldviews/create',
+        topics: {
+            index: '/worldviews/topics',
+            entry: '/worldviews/topics/entry',
+            create: '/worldviews/topics/create'
+        },
+        arguments: {
+            index: '/worldviews/arguments',
+            entry: '/worldviews/arguments/entry',
+            create: '/worldviews/arguments/create'
+        },
         questions: {
             index: '/worldviews/questions',
-            create: '/worldviews/questions/create'
+            create: '/worldviews/questions/create',
+            entry:  '/worldviews/questions/entry'
         },
         related: '/worldviews/related'
     },
     morality: {
-        index: '/morality'
+        index: '/morality',
+        topics: {
+            index: '/morality/topics',
+            entry: '/morality/topics/entry',
+            create: '/morality/topics/create'
+        },
+        arguments: {
+            index: '/morality/arguments',
+            entry: '/morality/arguments/entry',
+            create: '/morality/arguments/create'
+        },
+        questions: {
+            create: '/morality/questions/create',
+            index: '/morality/questions',
+            entry: '/morality/questions/entry'
+        },
+        related: '/morality/related'
     }
 };

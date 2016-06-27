@@ -1,0 +1,17 @@
+{?question}
+    {question.title}
+{:else}
+    {?argument}
+        {argument.title}
+    {:else}
+        {?topic}
+            {topic.title}
+        {:else}
+            {?item}
+                {item.title}
+            {:else}
+                Religion
+            {/item}
+        {/topic}
+    {/argument}
+{/question}

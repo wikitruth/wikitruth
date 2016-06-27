@@ -60,6 +60,20 @@ function setWorldviewModels(req, model, callback) {
     }
 }
 
+function setQuestionModel(req, model, callback) {
+    if(req.query.question) {
+        db.Question.findOne({_id: req.query.question}, function (err, result) {
+            model.question = result;
+            if(isOwner(req, result, model)) {
+                model.isQuestionOwner = true;
+            }
+            callback();
+        });
+    } else {
+        callback();
+    }
+}
+
 function setArgumentModel(req, model, callback) {
     if(req.query.argument) {
         db.Argument.findOne({_id: req.query.argument}, function (err, result) {
@@ -114,5 +128,6 @@ module.exports = {
     setWorldviewModel: setWorldviewModel,
     setWorldviewModels: setWorldviewModels,
     setArgumentModel: setArgumentModel,
-    setTopicModels: setTopicModels
+    setTopicModels: setTopicModels,
+    setQuestionModel: setQuestionModel
 };

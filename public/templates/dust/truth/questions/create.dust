@@ -1,36 +1,33 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    New Question - {titleSlogan}
+    {?question}Edit{:else}New{/question} Question - {titleSlogan}
 {/title}
 
 {<body}
-    <h2 class="page-header text-primary">
-        <span class="text-muted">
-            {>"dust/truth/breadcrumb" /}
-            &nbsp;/&nbsp;
-            {?question}
-                <a href="{paths.truth.topics.entry}?topic={question._id}">{question.title}</a>
-                &nbsp;/&nbsp;Edit
-            {:else}
-                New Question
-            {/question}
-        </span>
-    </h2>
-    {>"dust/help-us" /}
+    {>"dust/truth/breadcrumb" /}
+    <h1 class="page-header">
+        {?question}
+            Edit Question
+        {:else}
+            New Question
+        {/question}
+    </h1>
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
-        {!
         <div class="form-group">
-            <label for="inputName">Topic</label>
-            <input type="text" name="title" id="inputName" value="{topic.title}" class="form-control"/>
+            <label for="inputName">Question</label>
+            <input type="text" name="title" id="inputName" value="{question.title}" class="form-control"/>
         </div>
         <div class="form-group">
             <label for="inputContent">Summary</label>
-            <textarea class="form-control" id="inputContent" name="content" rows="12">{topic.content}</textarea>
+            <textarea class="form-control" id="inputContent" name="content" rows="12">{question.content}</textarea>
         </div>
-        !}
-        {!<button type="submit" class="btn btn-primary">Submit</button>&nbsp;!}
+        <div class="form-group">
+            <label for="inputReferences">References</label>
+            <textarea class="form-control" id="inputReferences" name="references" rows="3">{question.references}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
         {^argument}
             <a class="btn btn-default" href="{?topic}{paths.truth.questions.index}?topic={topic._id}{:else}{paths.truth.index}{/topic}" role="button">Cancel</a>
         {:else}

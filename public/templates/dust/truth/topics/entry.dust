@@ -5,14 +5,11 @@
 {/title}
 
 {<body}
-
     {>"dust/truth/entry-header" tab="overview" /}
-    <div style="margin-bottom: 10px">
-        <p class="lead" style="margin-bottom: 0">
-            <a href="{paths.truth.topics.entry}?topic={topic._id}">{topic.title}</a></p>
+    <div class="entry-header">
         {?isContributor}
             {?isTopicOwner}
-        <a href="{paths.truth.topics.create}?id={topic._id}" title="Edit Outline"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>&nbsp;
+                <a href="{paths.truth.topics.create}?id={topic._id}" title="Edit Outline"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>&nbsp;
             {/isTopicOwner}
         {/isContributor}
         <span style="color: #f0ad4e" title="Pending review (verdict)"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></span>
@@ -28,25 +25,25 @@
         {/topic.references}
     </div>
     {?topics}
-    <ul class="list-group top-list-items">
-        <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Top Subtopics</li>
-        {#topics}
-        <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
-            <a href="{paths.truth.topics.entry}?topic={_id}">{title}</a> <span class="pull-right">
-                <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
-        {/topics}
-    </ul>
-    <div class="top-list-items-more"><a href="{paths.truth.index}?topic={topic._id}" role="button">more &raquo;</a></div>
+        <ul class="list-group top-list-items">
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Top Subtopics</li>
+            {#topics}
+            <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
+                <a href="{paths.truth.topics.entry}?topic={_id}">{title}</a> <span class="pull-right text-muted">
+                    <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+            {/topics}
+        </ul>
+        <div class="top-list-items-more"><a href="{paths.truth.index}?topic={topic._id}" role="button">more &raquo;</a></div>
     {/topics}
     {?arguments}
-    <ul class="list-group top-list-items">
-        <li class="list-group-item highlight"><span class="glyphicon glyphicon-flash text-success" aria-hidden="true"></span> Top Arguments</li>
-        {#arguments}
-        <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
-            <a href="{paths.truth.arguments.entry}?topic={topic._id}&amp;argument={_id}">{title}</a> <span class="pull-right">
-                <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
-        {/arguments}
-    </ul>
-    <div class="top-list-items-more"><a href="{paths.truth.arguments.index}?topic={topic._id}" role="button">more &raquo;</a></div>
+        <ul class="list-group top-list-items">
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-flash text-success" aria-hidden="true"></span> Top Arguments</li>
+            {#arguments}
+            <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
+                <a href="{paths.truth.arguments.entry}?topic={topic._id}&amp;argument={_id}">{title}</a> <span class="pull-right text-muted">
+                    <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+            {/arguments}
+        </ul>
+        <div class="top-list-items-more"><a href="{paths.truth.arguments.index}?topic={topic._id}" role="button">more &raquo;</a></div>
     {/arguments}
 {/body}
