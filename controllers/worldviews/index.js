@@ -6,6 +6,7 @@ var utils       = require('../../utils/utils'),
     templates   = require('../../models/templates'),
     mongoose    = require('mongoose'),
     async       = require('async'),
+    constants   = require('../../models/constants'),
     db          = require('../../app').db.models;
 
 module.exports = function (router) {
@@ -13,16 +14,16 @@ module.exports = function (router) {
     router.get('/', function (req, res) {
         var model = {};
         async.parallel({
-            item: function(callback){
+            worldview: function(callback){
                 flowUtils.setWorldviewModels(req, model, callback);
             },
-            items: function(callback) {
-                var query = req.query.id ? { parentId: req.query.id } : { parentId: null};
+            worldviews: function(callback) {
+                var query = req.query.worldview ? { parentId: req.query.worldview } : { parentId: null};
                 db.Ideology.find(query).limit(100).sort({ title: 1 }).exec(function(err, results) {
                     results.forEach(function(result) {
                         result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
                     });
-                    model.items = results;
+                    model.worldviews = results;
                     callback();
                 });
             }
@@ -31,20 +32,53 @@ module.exports = function (router) {
         });
     });
 
-    // item details
+    // worldview details
     router.get('/entry', function (req, res) {
         var model = {};
         async.parallel({
-            item: function(callback){
+            worldview: function(callback){
                 flowUtils.setWorldviewModels(req, model, callback);
             },
-            items: function(callback) {
-                var query = { parentId: req.query.id };
+            worldviews: function(callback) {
+                var query = { parentId: req.query.worldview };
                 db.Ideology.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
                     results.forEach(function(result) {
                         result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
                     });
-                    model.items = results;
+                    model.worldviews = results;
+                    callback();
+                });
+            },
+            topics: function(callback) {
+                // Top Subtopics
+                var query = { parentId: null, ownerId: req.query.worldview, ownerType: constants.OBJECT_TYPES.worldview, groupId: constants.CORE_GROUPS.worldviews };
+                db.Topic.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                    results.forEach(function(result) {
+                        result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                    });
+                    model.topics = results;
+                    callback();
+                });
+            },
+            arguments: function(callback) {
+                // Top Arguments
+                var query = { ownerId: req.query.worldview, ownerType: constants.OBJECT_TYPES.worldview, groupId: constants.CORE_GROUPS.worldviews };
+                db.Argument.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                    results.forEach(function(result) {
+                        result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                    });
+                    model.arguments = results;
+                    callback();
+                });
+            },
+            questions: function (callback) {
+                // Top Questions
+                var query = { ownerId: req.query.worldview, ownerType: constants.OBJECT_TYPES.worldview, groupId: constants.CORE_GROUPS.worldviews };
+                db.Question.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                    results.forEach(function(result) {
+                        result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                    });
+                    model.questions = results;
                     callback();
                 });
             }
@@ -56,23 +90,23 @@ module.exports = function (router) {
     router.get('/create', function (req, res) {
         var model = {};
         async.series({
-            item: function(callback){
-                if(req.query._id) {
-                    db.Ideology.findOne({_id: req.query._id}, function (err, result) {
-                        model.item = result;
+            worldview: function(callback){
+                if(req.query.id) {
+                    db.Ideology.findOne({_id: req.query.id}, function (err, result) {
+                        model.worldview = result;
                         callback();
                     });
                 } else {
                     callback();
                 }
             },
-            parent: function(callback) {
+            parentWorldview: function(callback) {
                 var query = {
-                    _id: req.query.id ? req.query.id : model.item && model.item.parentId ? model.item.parentId : null
+                    _id: req.query.worldview ? req.query.worldview : model.worldview && model.worldview.parentId ? model.worldview.parentId : null
                 };
                 if(query._id) {
                     db.Ideology.findOne(query, function (err, result) {
-                        model.parent = result;
+                        model.parentWorldview = result;
                         callback();
                     });
                 } else {
@@ -86,7 +120,7 @@ module.exports = function (router) {
 
     router.post('/create', function (req, res) {
         var query = {
-            _id: req.query._id ? req.query._id : new mongoose.Types.ObjectId()
+            _id: req.query.id ? req.query.id : new mongoose.Types.ObjectId()
         };
         db.Ideology.findOne(query, function(err, result) {
             var entity = result ? result : {};
@@ -105,33 +139,11 @@ module.exports = function (router) {
                     throw err;
                 }
                 if(result) {
-                    res.redirect(paths.worldviews.entry + '?id=' + req.query._id);
-                } else if(req.query.id) {
-                    res.redirect(paths.worldviews.index + '?id=' + req.query.id);
+                    res.redirect(paths.worldviews.entry + '?worldview=' + result._id);
                 } else {
-                    res.redirect(paths.worldviews.index);
+                    res.redirect(paths.worldviews.index + (req.query.id ? '?worldview=' + req.query.id : ''));
                 }
             });
-        });
-    });
-
-    /* Questions */
-
-    router.get('/questions', function (req, res) {
-        var model = {};
-        flowUtils.setWorldviewModel(req, model, function() {
-            /*if(!req.query.id) {
-                // Top Questions
-                // TODO: Filter top 100 based on number of activities
-            }*/
-            res.render(templates.worldviews.questions.index, model);
-        });
-    });
-
-    router.get('/questions/create', function (req, res) {
-        var model = {};
-        flowUtils.setWorldviewModel(req, model, function() {
-            res.render(templates.worldviews.questions.create, model);
         });
     });
 

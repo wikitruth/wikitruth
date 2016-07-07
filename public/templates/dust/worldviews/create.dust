@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {?item}Edit{:else}New{/item} Entry - {titleSlogan}
+    {?worldview}Edit{:else}New{/worldview} Entry - {titleSlogan}
 {/title}
 
 {<body}
@@ -11,47 +11,47 @@
             &nbsp;/&nbsp;
             {?parent}
                 {?parent.parentId}
-                    <a href="{paths.worldviews.entry}?id={parent.parentId}">..</a>
+                    <a href="{paths.worldviews.entry}?worldview={parent.parentId}">..</a>
                     &nbsp;/&nbsp;
                 {/parent.parentId}
-                <a href="{paths.worldviews.entry}?id={parent._id}">{parent.title}</a>
+                <a href="{paths.worldviews.entry}?worldview={parent._id}">{parent.title}</a>
                 &nbsp;/&nbsp;
             {/parent}
-            {?item}
-                <a href="{paths.worldviews.entry}?id={item._id}">{item.title}</a>
+            {?worldview}
+                <a href="{paths.worldviews.entry}?worldview={worldview._id}">{worldview.title}</a>
                 &nbsp;/&nbsp;Edit
             {:else}
                 New Entry
-            {/item}
+            {/worldview}
         </span>
     </h2>
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
         <div class="form-group">
             <label for="inputName">Title</label>
-            <input type="text" name="title" id="inputName" value="{item.title}" class="form-control"/>
+            <input type="text" name="title" id="inputName" value="{worldview.title}" class="form-control"/>
         </div>
         <div class="form-group">
             <label for="inputContent">Summary</label>
-            <textarea class="form-control" id="inputContent" name="content" rows="12">{item.content}</textarea>
+            <textarea class="form-control" id="inputContent" name="content" rows="12">{worldview.content}</textarea>
         </div>
         <div class="form-group">
             <label for="inputReferences">References</label>
-            <textarea class="form-control" id="inputReferences" name="references" rows="3">{item.references}</textarea>
+            <textarea class="form-control" id="inputReferences" name="references" rows="3">{worldview.references}</textarea>
         </div>
         <div class="form-group">
             <label for="inputParent">Parent</label>
-            <input type="text" name="parent" id="inputParent" value="{?item}{item.parentId}{:else}{parent._id}{/item}" class="form-control"/>
+            <input type="text" name="parent" id="inputParent" value="{?worldview}{worldview.parentId}{:else}{parent._id}{/worldview}" class="form-control"/>
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
-        {?item}
-            <a class="btn btn-default" href="{paths.worldviews.entry}?id={item._id}" role="button">Cancel</a>
+        {?worldview}
+            <a class="btn btn-default" href="{paths.worldviews.entry}?worldview={worldview._id}" role="button">Cancel</a>
         {:else}
             {?parent}
-                <a class="btn btn-default" href="{paths.worldviews.entry}?id={parent._id}" role="button">Cancel</a>
+                <a class="btn btn-default" href="{paths.worldviews.entry}?worldview={parent._id}" role="button">Cancel</a>
             {:else}
                 <a class="btn btn-default" href="{paths.worldviews.index}" role="button">Cancel</a>
             {/parent}
-        {/item}
+        {/worldview}
     </form>
 {/body}

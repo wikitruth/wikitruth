@@ -5,19 +5,19 @@
 {/title}
 
 {<body}
-    {?item}
-        {>"dust/worldviews/entry-header" tab="items" /}
+    {?worldview}
+        {>"dust/worldviews/entry-header" tab="worldviews" /}
     {:else}
-        {>"dust/worldviews/index-header" tab="top-items" /}
-    {/item}
-    {?items}
+        {>"dust/worldviews/index-header" tab="top-worldviews" /}
+    {/worldview}
+    {?worldviews}
         <ul class="list-group">
-            <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Entries</li>
-            {#items}
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Worldviews</li>
+            {#worldviews}
                 <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
-                    <a href="{paths.worldviews.entry}?id={_id}">{title}</a> <span class="pull-right text-muted">
+                    <a href="{paths.worldviews.entry}?worldview={_id}">{title}</a> <span class="pull-right text-muted">
                     <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
-            {/items}
+            {/worldviews}
         </ul>
-    {/items}
+    {/worldviews}
 {/body}

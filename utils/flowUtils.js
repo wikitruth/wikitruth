@@ -17,11 +17,14 @@ function appendOwnerFlag(req, item, model) {
 }
 
 function setWorldviewModel(req, model, callback) {
-    if(req.query.id) {
-        db.Ideology.findOne({_id: req.query.id}, function (err, result) {
-            model.item = result;
+    if(req.query.worldview) {
+        db.Ideology.findOne({_id: req.query.worldview}, function (err, result) {
             appendOwnerFlag(req, result, model);
-            callback();
+            db.User.findOne({_id: result.editUserId}, function (err, user) {
+                result.editUsername = user.username;
+                model.worldview = result;
+                callback(err);
+            });
         });
     } else {
         callback();
@@ -29,22 +32,16 @@ function setWorldviewModel(req, model, callback) {
 }
 
 function setWorldviewModels(req, model, callback) {
-    if(req.query.id) {
+    if(req.query.worldview) {
         async.series({
-            item: function (callback) {
-                db.Ideology.findOne({_id: req.query.id}, function(err, result) {
-                    if(result) {
-                        model.item = result;
-                        appendOwnerFlag(req, result, model);
-                    }
-                    callback();
-                });
+            worldview: function (callback) {
+                setWorldviewModel(req, model, callback);
             },
-            parent: function (callback) {
-                if(model.item && model.item.parentId) {
-                    db.Ideology.findOne({_id: model.item.parentId}, function (err, result) {
+            parentWorldview: function (callback) {
+                if(model.worldview && model.worldview.parentId) {
+                    db.Ideology.findOne({_id: model.worldview.parentId}, function (err, result) {
                         if (result) {
-                            model.parent = result;
+                            model.parentWorldview = result;
                         }
                         callback();
                     });
@@ -63,11 +60,14 @@ function setWorldviewModels(req, model, callback) {
 function setQuestionModel(req, model, callback) {
     if(req.query.question) {
         db.Question.findOne({_id: req.query.question}, function (err, result) {
-            model.question = result;
             if(isOwner(req, result, model)) {
                 model.isQuestionOwner = true;
             }
-            callback();
+            db.User.findOne({_id: result.editUserId}, function (err, user) {
+                result.editUsername = user.username;
+                model.question = result;
+                callback(err);
+            });
         });
     } else {
         callback();
@@ -77,11 +77,14 @@ function setQuestionModel(req, model, callback) {
 function setArgumentModel(req, model, callback) {
     if(req.query.argument) {
         db.Argument.findOne({_id: req.query.argument}, function (err, result) {
-            model.argument = result;
             if(isOwner(req, result, model)) {
                 model.isArgumentOwner = true;
             }
-            callback();
+            db.User.findOne({_id: result.editUserId}, function (err, user) {
+                result.editUsername = user.username;
+                model.argument = result;
+                callback(err);
+            });
         });
     } else {
         callback();
@@ -93,20 +96,21 @@ function setTopicModels(req, model, callback) {
         async.series({
             topic: function (callback) {
                 db.Topic.findOne({_id: req.query.topic}, function(err, result) {
-                    if(result) {
-                        model.topic = result;
-                        if(isOwner(req, result, model)) {
-                            model.isTopicOwner = true;
-                        }
+                    if(isOwner(req, result, model)) {
+                        model.isTopicOwner = true;
                     }
-                    callback();
+                    db.User.findOne({_id: result.editUserId}, function (err, user) {
+                        result.editUsername = user.username;
+                        model.topic = result;
+                        callback(err);
+                    });
                 });
             },
-            parent: function (callback) {
+            parentTopic: function (callback) {
                 if(model.topic && model.topic.parentId) {
                     db.Topic.findOne({_id: model.topic.parentId}, function (err, result) {
                         if (result) {
-                            model.parent = result;
+                            model.parentTopic = result;
                         }
                         callback();
                     });

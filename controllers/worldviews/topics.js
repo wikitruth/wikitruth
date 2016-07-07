@@ -14,7 +14,7 @@ module.exports = function (router) {
     router.get('/', function (req, res) {
         var model = {};
         async.parallel({
-            item: function(callback){
+            worldview: function(callback){
                 flowUtils.setWorldviewModels(req, model, callback);
             },
             topic: function(callback){
@@ -22,20 +22,31 @@ module.exports = function (router) {
             },
             topics: function(callback) {
                 // display 15 if top topics, 100 if has topic parameter
-                var query = req.query.topic ? { parentId: req.query.topic } : { groupId: constants.CORE_GROUPS.worldviews };
-                db.Topic.find(query).limit(req.query.topic ? 100 : 15).sort({ title: 1 }).exec(function(err, results) {
+                var query = { groupId: constants.CORE_GROUPS.worldviews };
+                if(req.query.worldview) {
+                    query.ownerId = req.query.worldview;
+                    query.ownerType = constants.OBJECT_TYPES.worldview;
+                    query.parentId = req.query.topic ? req.query.topic : null;
+                }
+                db.Topic.find(query).limit(req.query.worldview ? 100 : 15).sort({ title: 1 }).exec(function(err, results) {
                     results.forEach(function(result) {
                         result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                        result.worldview = {
+                            _id: result.ownerId
+                        };
                     });
                     model.topics = results;
                     callback();
                 });
-            },
+            }/*,
             categories: function(callback) {
-                if(!req.query.topic) {
+                if(!req.query.topic && !req.query.worldview) {
                     db.Topic.find({parentId: null, groupId: constants.CORE_GROUPS.worldviews }).sort({title: 1}).exec(function (err, results) {
                         results.forEach(function (result) {
                             result.comments = utils.numberWithCommas(utils.randomInt(1, 100000));
+                            result.worldview = {
+                                _id: result.ownerId
+                            };
                         });
                         model.categories = results;
                         callback();
@@ -43,7 +54,44 @@ module.exports = function (router) {
                 } else {
                     callback();
                 }
-            }
+            },
+            arguments: function(callback) {
+                if(req.query.topic || req.query.worldview) {
+                    var query = {};
+                    if(req.query.topic) {
+                        query.ownerId = req.query.topic;
+                        query.ownerType = constants.OBJECT_TYPES.topic;
+                    } else {
+                        query.ownerId = req.query.worldview;
+                        query.ownerType = constants.OBJECT_TYPES.worldview;
+                    }
+                    db.Argument.find(query).sort({ title: 1 }).exec(function(err, results) {
+                        results.forEach(function(result) {
+                            result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                        });
+                        model.arguments = results;
+                        callback();
+                    });
+                } else {
+                    // Top Arguments
+                    db.Argument.find({ groupId: constants.CORE_GROUPS.worldviews }).limit(100).exec(function(err, results) {
+                        results.forEach(function(result) {
+                            if(result.ownerType === constants.OBJECT_TYPES.topic) {
+                                result.topic = {
+                                    _id: result.ownerId
+                                };
+                            } else {
+                                result.worldview = {
+                                    _id: result.ownerId
+                                };
+                            }
+                            result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                        });
+                        model.arguments = results;
+                        callback();
+                    });
+                }
+            }*/
         }, function (err, results) {
             res.render(templates.worldviews.topics.index, model);
         });
@@ -53,6 +101,9 @@ module.exports = function (router) {
         // Topic home: display top subtopics, top arguments
         var model = {};
         async.parallel({
+            worldview: function(callback){
+                flowUtils.setWorldviewModels(req, model, callback);
+            },
             topic: function(callback){
                 flowUtils.setTopicModels(req, model, callback);
             },
@@ -77,6 +128,17 @@ module.exports = function (router) {
                     model.arguments = results;
                     callback();
                 });
+            },
+            questions: function (callback) {
+                // Top Questions
+                var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, groupId: constants.CORE_GROUPS.worldviews };
+                db.Question.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                    results.forEach(function(result) {
+                        result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                    });
+                    model.questions = results;
+                    callback();
+                });
             }
         }, function (err, results) {
             res.render(templates.worldviews.topics.entry, model);
@@ -86,6 +148,9 @@ module.exports = function (router) {
     router.get('/create', function (req, res) {
         var model = {};
         async.series({
+            worldview: function(callback){
+                flowUtils.setWorldviewModels(req, model, callback);
+            },
             topic: function(callback){
                 if(req.query.id) {
                     db.Topic.findOne({_id: req.query.id}, function (err, result) {
@@ -96,15 +161,22 @@ module.exports = function (router) {
                     callback();
                 }
             },
-            parent: function(callback) {
+            parentTopic: function(callback) {
                 var query = {
                     _id: req.query.topic ? req.query.topic : model.topic && model.topic.parentId ? model.topic.parentId : null
                 };
                 if(query._id) {
                     db.Topic.findOne(query, function (err, result) {
-                        model.parent = result;
+                        model.parentTopic = result;
                         callback();
                     });
+                    /*if(req.query.worldview) {
+                        db.Ideology.findOne({_id: query}, function(err, result) {
+                            model.parent = result;
+                            callback();
+                        });
+                    } else {
+                    }*/
                 } else {
                     callback();
                 }
@@ -128,14 +200,20 @@ module.exports = function (router) {
                 entity.createDate = Date.now();
                 entity.groupId = constants.CORE_GROUPS.worldviews;
             }
+            if(req.query.worldview && (!entity.ownerId || entity.ownerId.toString() !== req.query.worldview)) {
+                entity.ownerId = req.query.worldview;
+                entity.ownerType = constants.OBJECT_TYPES.worldview;
+            }
             entity.parentId = req.body.parent ? req.body.parent : null;
             db.Topic.update(query, entity, {upsert: true}, function(err, writeResult) {
                 if (err) {
                     throw err;
                 }
-                res.redirect(result ? paths.worldviews.topics.entry : paths.worldviews.index +
-                    (req.query.topic ? '?topic=' + req.query.id : '')
-                );
+                if(result) {
+                    res.redirect(paths.worldviews.topics.entry + '?worldview=' + req.query.worldview + '&amp;topic=' + result._id);
+                } else {
+                    res.redirect(paths.worldviews.topics.index + '?worldview=' + req.query.worldview + (req.query.id ? '&amp;topic=' + req.query.id : ''));
+                }
             });
         });
     });

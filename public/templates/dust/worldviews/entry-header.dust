@@ -5,31 +5,31 @@
         {^argument}
             {^topic}
                 {! worldview !}
-                <a class="btn btn-{@eq key=tab value="overview"}primary{:else}default{/eq}" href="{paths.worldviews.entry}?id={item._id}">
+                <a class="btn btn-{@eq key=tab value="overview"}primary{:else}default{/eq}" href="{paths.worldviews.entry}?worldview={worldview._id}">
                     <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a>
-                <a class="btn btn-{@eq key=tab value="items"}primary{:else}default{/eq}" href="{paths.worldviews.index}?id={item._id}">
+                <a class="btn btn-{@eq key=tab value="worldviews"}primary{:else}default{/eq}" href="{paths.worldviews.index}?worldview={worldview._id}">
                     <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Worldviews</a>
             {:else}
                 {! topic !}
-                <a class="btn btn-{@eq key=tab value="overview"}primary{:else}default{/eq}" href="{paths.worldviews.topics.entry}?id={item._id}&amp;topic={topic._id}">
+                <a class="btn btn-{@eq key=tab value="overview"}primary{:else}default{/eq}" href="{paths.worldviews.topics.entry}?worldview={worldview._id}&amp;topic={topic._id}">
                     <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a>
             {/topic}
-            <a class="btn btn-{@eq key=tab value="topics"}primary{:else}default{/eq}" href="{paths.worldviews.topics.index}?id={item._id}{?topic}&amp;topic={topic._id}{/topic}">
-                <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Topics</a>
-            <a class="hidden-xs btn btn-{@eq key=tab value="arguments"}primary{:else}default{/eq}" href="{paths.worldviews.arguments.index}?id={item._id}{?topic}&amp;topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}">
+            <a class="btn btn-{@eq key=tab value="topics"}primary{:else}default{/eq}" href="{paths.worldviews.topics.index}?worldview={worldview._id}{?topic}&amp;topic={topic._id}{/topic}">
+                <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> Topics</a>
+            <a class="hidden-xxs btn btn-{@eq key=tab value="arguments"}primary{:else}default{/eq}" href="{paths.worldviews.arguments.index}?worldview={worldview._id}{?topic}&amp;topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}">
                 <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments</a>
         {:else}
             {! argument !}
-            <a class="btn btn-{@eq key=tab value="overview"}primary{:else}default{/eq}" href="{paths.worldviews.arguments.entry}?id={item._id}{?topic}&amp;topic={topic._id}{/topic}&amp;argument={argument._id}">
+            <a class="btn btn-{@eq key=tab value="overview"}primary{:else}default{/eq}" href="{paths.worldviews.arguments.entry}?worldview={worldview._id}{?topic}&amp;topic={topic._id}{/topic}&amp;argument={argument._id}">
                 <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a>
         {/argument}
-        <a class="hidden-xs btn btn-{@eq key=tab value="questions"}primary{:else}default{/eq}" href="{paths.worldviews.questions.index}?id={item._id}{?topic}&amp;topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}">
+        <a class="hidden-xs btn btn-{@eq key=tab value="questions"}primary{:else}default{/eq}" href="{paths.worldviews.questions.index}?worldview={worldview._id}{?topic}&amp;topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}">
             <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions{!<span class="hidden-xs"> (122)</span>!}</a>
     {:else}
-        <a class="btn btn-{@eq key=tab value="overview"}primary{:else}default{/eq}" href="{paths.worldviews.questions.entry}?id={item._id}{?topic}&amp;topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}">
+        <a class="btn btn-{@eq key=tab value="overview"}primary{:else}default{/eq}" href="{paths.worldviews.questions.entry}?worldview={worldview._id}{?topic}&amp;topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}">
             <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a>
     {/question}
-    {!<a class="hidden-xs btn btn-{@eq key=tab value="related"}primary{:else}default{/eq}" href="{paths.worldviews.related}?id={item._id}{?topic}&amp;topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}">
+    {!<a class="hidden-xs btn btn-{@eq key=tab value="related"}primary{:else}default{/eq}" href="{paths.worldviews.related}?worldview={worldview._id}{?topic}&amp;topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}">
         <span class="glyphicon glyphicon-random" aria-hidden="true"></span> Related</a>!}
     <a class="btn btn-default dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
         <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span>
@@ -40,40 +40,40 @@
                 {^argument}
                     {^topic}
                         {?isItemOwner}
-                            <li><a href="{paths.worldviews.create}?_id={item._id}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Worldview</a></li>
+                            <li><a href="{paths.worldviews.create}?id={worldview._id}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Worldview</a></li>
                         {/isItemOwner}
-                        <li><a href="{paths.worldviews.create}{?item}?id={item._id}{/item}">
+                        <li><a href="{paths.worldviews.create}{?worldview}?worldview={worldview._id}{/worldview}">
                             <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Worldview</a></li>
                         <li role="separator" class="divider"></li>
                     {:else}
                         {?isTopicOwner}
-                            <li><a href="{paths.worldviews.topics.create}?id={item._id}{?topic}&amp;topic={topic._id}{/topic}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Topic</a></li>
-                            <li><a href="{paths.worldviews.outline.link}?id={item._id}{?topic}&amp;topic={topic._id}{/topic}"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> Manage Links</a></li>
+                            <li><a href="{paths.worldviews.topics.create}?worldview={worldview._id}{?topic}&amp;id={topic._id}{/topic}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Topic</a></li>
+                            <li><a href="{paths.worldviews.outline.link}?worldview={worldview._id}{?topic}&amp;topic={topic._id}{/topic}"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> Manage Links</a></li>
                         {/isTopicOwner}
                     {/topic}
-                    <li><a href="{paths.worldviews.topics.create}?id={item._id}{?topic}&amp;topic={topic._id}{/topic}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Topic</a></li>
+                    <li><a href="{paths.worldviews.topics.create}?worldview={worldview._id}{?topic}&amp;topic={topic._id}{/topic}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Topic</a></li>
                     <li role="separator" class="divider"></li>
-                    <li><a href="{paths.worldviews.arguments.create}?id={item._id}{?topic}&amp;topic={topic._id}{/topic}"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> New Argument</a></li>
+                    <li><a href="{paths.worldviews.arguments.create}?worldview={worldview._id}{?topic}&amp;topic={topic._id}{/topic}"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> New Argument</a></li>
                 {:else}
                     {?isArgumentOwner}
-                        <li><a href="{paths.worldviews.arguments.create}?id={item._id}{?topic}&amp;topic={topic._id}{/topic}&amp;argument={argument._id}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Argument</a></li>
-                        <li><a href="{paths.worldviews.outline.link}?id={item._id}{?topic}&amp;topic={topic._id}{/topic}&amp;argument={argument._id}"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> Manage Links</a></li>
+                        <li><a href="{paths.worldviews.arguments.create}?worldview={worldview._id}{?topic}&amp;topic={topic._id}{/topic}&amp;argument={argument._id}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Argument</a></li>
+                        <li><a href="{paths.worldviews.outline.link}?worldview={worldview._id}{?topic}&amp;topic={topic._id}{/topic}&amp;argument={argument._id}"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> Manage Links</a></li>
                         <li role="separator" class="divider"></li>
                     {/isArgumentOwner}
                 {/argument}
             {:else}
                 {?isQuestionOwner}
-                    <li><a href="{paths.worldviews.questions.create}?id={item._id}{?topic}&amp;topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Question</a></li>
+                    <li><a href="{paths.worldviews.questions.create}?worldview={worldview._id}{?topic}&amp;topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Question</a></li>
                 {/isQuestionOwner}
             {/question}
-            <li><a href="{paths.worldviews.questions.create}?id={item._id}{?topic}&amp;topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}">
+            <li><a href="{paths.worldviews.questions.create}?worldview={worldview._id}{?topic}&amp;topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}">
                 <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> New Question</a></li>
             <li role="separator" class="divider"></li>
         {:else}
         {/isContributor}
-        <li class="visible-xs"><a href="{paths.worldviews.questions.index}?id={item._id}{?topic}&amp;topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}">
+        <li class="visible-xs"><a href="{paths.worldviews.questions.index}?worldview={worldview._id}{?topic}&amp;topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}">
             <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions</a></li>
-        {!<li class="visible-xs"><a href="{paths.worldviews.related}?id={item._id}topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}">
+        {!<li class="visible-xs"><a href="{paths.worldviews.related}?worldview={worldview._id}topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}">
             <span class="glyphicon glyphicon-random" aria-hidden="true"></span> Related</a></li>!}
         <li><a href="#"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Details</a></li>
     </ul>

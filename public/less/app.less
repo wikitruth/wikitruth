@@ -1,4 +1,6 @@
 /*@import "../components/bootstrap/less/bootstrap";*/
+@import "../components/bootstrap/less/mixins/responsive-visibility";
+@import "bootstrap-vars";
 
 /* Space out content a bit */
 body {
@@ -120,5 +122,14 @@ body {
 
   .entry-status {
     color: #f0ad4e; font-size: 14px;
+  }
+}
+
+
+@screen-xxs-max:             (@screen-xs-min - 1);
+
+.hidden-xxs {
+  @media (max-width: @screen-xxs-max) {
+    .responsive-invisibility();
   }
 }

@@ -12,12 +12,25 @@
     </div>
     <div>
         <p>{argument.content|s}</p>
-        {?argument.references}
-            <br/>
-            <small class="text-muted">
-                <span class="text-uppercase">References</span>
-                <p>{argument.references|s}</p>
-            </small>
-        {/argument.references}
     </div>
+    {?questions}
+        <ul class="list-group top-list-items">
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-question-sign text-success" aria-hidden="true"></span> Top Questions</li>
+            {#questions}
+                <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
+                    <a href="{paths.truth.questions.entry}?topic={topic._id}&amp;argument={argument._id}&amp;question={_id}">{title}</a> <span class="pull-right text-muted">
+                    <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+            {/questions}
+        </ul>
+        <div class="top-list-items-more"><a href="{paths.truth.questions.index}?topic={question._id}&amp;argument={argument._id}" role="button">more &raquo;</a></div>
+    {/questions}
+    {?argument.references}
+        <small class="text-muted">
+            <span class="text-uppercase">References</span>
+            <p>{argument.references|s}</p>
+        </small>
+    {/argument.references}
+    <small class="text-muted">
+        Last modified by {argument.editUsername} on {argument.editDate}.
+    </small>
 {/body}

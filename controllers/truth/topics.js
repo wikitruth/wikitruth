@@ -39,12 +39,26 @@ module.exports = function (router) {
                     model.arguments = results;
                     callback();
                 });
+            },
+            questions: function (callback) {
+                // Top Questions
+                var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, groupId: constants.CORE_GROUPS.truth };
+                db.Question.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                    results.forEach(function(result) {
+                        result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                    });
+                    model.questions = results;
+                    callback();
+                });
             }
         }, function (err, results) {
             res.render(templates.truth.topics.entry, model);
         });
     });
 
+    /**
+     * basic rule: id is the entry, query.topic or topic.parentId is the parent.
+     */
     router.get('/create', function (req, res) {
         var model = {};
         async.series({
@@ -95,8 +109,8 @@ module.exports = function (router) {
                 if (err) {
                     throw err;
                 }
-                res.redirect(result ? paths.truth.topics.entry : paths.truth.index +
-                    (req.query.topic ? '?topic=' + req.query.id : '')
+                res.redirect((result ? paths.truth.topics.entry : paths.truth.index) +
+                    (result ? '?topic=' + result._id : '')
                 );
             });
         });

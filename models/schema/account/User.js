@@ -35,11 +35,11 @@ exports = module.exports = function(app, mongoose) {
     var returnUrl = '/';
     /*if (this.canPlayRoleOf('account')) {
       returnUrl = '/account/';
-    }*/
+    }
 
     if (this.canPlayRoleOf('admin')) {
       returnUrl = '/admin/';
-    }
+    }*/
 
     return returnUrl;
   };

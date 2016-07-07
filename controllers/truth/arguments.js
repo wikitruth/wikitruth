@@ -43,7 +43,15 @@ module.exports = function (router) {
         var model = {};
         flowUtils.setTopicModels(req, model, function () {
             flowUtils.setArgumentModel(req, model, function () {
-                res.render(templates.truth.arguments.entry, model);
+                // Top Questions
+                var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument, groupId: constants.CORE_GROUPS.truth };
+                db.Question.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                    results.forEach(function(result) {
+                        result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                    });
+                    model.questions = results;
+                    res.render(templates.truth.arguments.entry, model);
+                });
             });
         });
     });
@@ -82,12 +90,9 @@ module.exports = function (router) {
                 }
             }
             db.Argument.update(query, entity, {upsert: true}, function(err, writeResult) {
-                if (err) {
-                    throw err;
-                }
-                res.redirect(result ? paths.truth.arguments.entry : paths.truth.arguments.index +
-                    '?topic=' + req.query.topic +
-                    (result ? '&argument=' + req.query.argument : '')
+                res.redirect((result ? paths.truth.arguments.entry : paths.truth.arguments.index)
+                    + '?topic=' + req.query.topic
+                    + (result ? '&argument=' + req.query.argument : '')
                 );
             });
         });
