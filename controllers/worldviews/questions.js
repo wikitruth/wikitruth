@@ -14,29 +14,39 @@ module.exports = function (router) {
 
     router.get('/', function (req, res) {
         var model = {};
-        if(req.query.topic) {
-            flowUtils.setTopicModels(req, model, function () {
-                flowUtils.setArgumentModel(req, model, function () {
-                    var query = req.query.argument ?
-                    { ownerId: model.argument._id, ownerType: constants.OBJECT_TYPES.argument } :
-                    { ownerId: model.topic._id, ownerType: constants.OBJECT_TYPES.topic };
-                    db.Question.find(query).sort({ title: 1 }).exec(function(err, results) {
-                        results.forEach(function(result) {
-                            result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+        if (req.query.worldview) {
+            flowUtils.setWorldviewModels(req, model, function () {
+                flowUtils.setTopicModels(req, model, function () {
+                    flowUtils.setArgumentModel(req, model, function () {
+                        var query = {};
+                        if(req.query.argument) {
+                            query.ownerId = model.argument._id;
+                            query.ownerType = constants.OBJECT_TYPES.argument;
+                        } else if(req.query.topic) {
+                            query.ownerId = model.topic._id;
+                            query.ownerType = constants.OBJECT_TYPES.topic;
+                        } else {
+                            query.ownerId = model.worldview._id;
+                            query.ownerType = constants.OBJECT_TYPES.worldview;
+                        }
+                        db.Question.find(query).sort({title: 1}).exec(function (err, results) {
+                            results.forEach(function (result) {
+                                result.comments = utils.numberWithCommas(utils.randomInt(1, 100000));
+                            });
+                            model.questions = results;
+                            res.render(templates.worldviews.questions.index, model);
                         });
-                        model.questions = results;
-                        res.render(templates.worldviews.questions.index, model);
                     });
                 });
             });
         } else {
             // Top Questions
-            db.Question.find({ ownerType: constants.OBJECT_TYPES.topic, groupId: constants.CORE_GROUPS.worldviews }).limit(100).exec(function(err, results) {
-                results.forEach(function(result) {
+            db.Question.find({ groupId: constants.CORE_GROUPS.worldviews }).limit(100).exec(function (err, results) {
+                results.forEach(function (result) {
                     result.topic = {
                         _id: result.ownerId
                     };
-                    result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                    result.comments = utils.numberWithCommas(utils.randomInt(1, 100000));
                 });
                 model.questions = results;
                 res.render(templates.worldviews.questions.index, model);
@@ -46,10 +56,12 @@ module.exports = function (router) {
 
     router.get('/entry', function (req, res) {
         var model = {};
-        flowUtils.setTopicModels(req, model, function () {
-            flowUtils.setArgumentModel(req, model, function () {
-                flowUtils.setQuestionModel(req, model, function () {
-                    res.render(templates.worldviews.questions.entry, model);
+        flowUtils.setWorldviewModels(req, model, function () {
+            flowUtils.setTopicModels(req, model, function () {
+                flowUtils.setArgumentModel(req, model, function () {
+                    flowUtils.setQuestionModel(req, model, function () {
+                        res.render(templates.worldviews.questions.entry, model);
+                    });
                 });
             });
         });
@@ -57,10 +69,12 @@ module.exports = function (router) {
 
     router.get('/create', function (req, res) {
         var model = {};
-        flowUtils.setTopicModels(req, model, function () {
-            flowUtils.setArgumentModel(req, model, function () {
-                flowUtils.setQuestionModel(req, model, function () {
-                    res.render(templates.worldviews.questions.create, model);
+        flowUtils.setWorldviewModels(req, model, function () {
+            flowUtils.setTopicModels(req, model, function () {
+                flowUtils.setArgumentModel(req, model, function () {
+                    flowUtils.setQuestionModel(req, model, function () {
+                        res.render(templates.worldviews.questions.create, model);
+                    });
                 });
             });
         });
@@ -87,16 +101,17 @@ module.exports = function (router) {
                 } else if(req.query.topic) { // parent is a topic
                     entity.ownerId = req.query.topic;
                     entity.ownerType = constants.OBJECT_TYPES.topic;
+                } else {
+                    entity.ownerId = req.query.worldview;
+                    entity.ownerType = constants.OBJECT_TYPES.worldview;
                 }
             }
             db.Question.update(query, entity, {upsert: true}, function(err, writeResult) {
-                if (err) {
-                    throw err;
-                }
-                res.redirect((result ? paths.worldviews.questions.entry : paths.worldviews.questions.index) +
-                    '?topic=' + req.query.topic +
-                    (req.query.argument ? '&argument=' + req.query.argument : '') +
-                    (result ? '&question=' + req.query.question : ''));
+                res.redirect((result ? paths.worldviews.questions.entry : paths.worldviews.questions.index)
+                    + '?worldview=' + req.query.worldview
+                    + (req.query.topic ? '&topic=' + req.query.topic : '')
+                    + (req.query.argument ? '&argument=' + req.query.argument : '')
+                    + (result ? '&question=' + req.query.question : ''));
             });
         });
     });

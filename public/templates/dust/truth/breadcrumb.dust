@@ -1,12 +1,12 @@
 <br/>
 <ol class="breadcrumb">
     <li><a href="{paths.truth.index}">Truth</a></li>
-    {?parent}
-        {?parent.parentId}
-            <li><a href="{paths.truth.topics.entry}?topic={parent.parentId}">..</a></li>
-        {/parent.parentId}
-        <li><a href="{paths.truth.topics.entry}?topic={parent._id}">{parent.title}</a></li>
-    {/parent}
+    {?parentTopic}
+        {?parentTopic.parentId}
+            <li><a href="{paths.truth.topics.entry}?topic={parentTopic.parentId}">..</a></li>
+        {/parentTopic.parentId}
+        <li><a href="{paths.truth.topics.entry}?topic={parentTopic._id}">{parentTopic.title}</a></li>
+    {/parentTopic}
     {?topic}
         <li><a href="{paths.truth.topics.entry}?topic={topic._id}">{topic.title}</a></li>
     {/topic}

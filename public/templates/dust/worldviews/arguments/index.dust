@@ -5,16 +5,16 @@
 {/title}
 
 {<body}
-    {?item}
+    {?worldview}
         {>"dust/worldviews/entry-header" tab="arguments" /}
     {:else}
         {>"dust/worldviews/index-header" tab="top-arguments" /}
-    {/item}
+    {/worldview}
     {?arguments}
         <ul class="list-group">
-            <li class="list-group-item highlight"><span class="glyphicon glyphicon-flash text-success" aria-hidden="true"></span> Arguments</li>
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-flash text-success" aria-hidden="true"></span> {^worldview}Top {/worldview}Arguments</li>
             {#arguments}
-                <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> <a href="{paths.worldviews.arguments.entry}?topic={topic._id}&amp;argument={_id}">{title}</a> <span class="pull-right text-muted"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+                <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> <a href="{paths.worldviews.arguments.entry}?worldview={worldview._id}{?topic}&amp;topic={topic._id}{/topic}&amp;argument={_id}">{title}</a> <span class="pull-right text-muted"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
             {/arguments}
             {!
             <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Birds Prove Natural Selection is Naturally Wrong <span class="label label-danger">negative</span> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 10,456</span></li>

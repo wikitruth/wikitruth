@@ -6,14 +6,14 @@
             <a class="btn btn-{@eq key=tab value="overview"}primary{:else}default{/eq}" href="{paths.truth.topics.entry}?topic={topic._id}">
                 <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a>
             <a class="btn btn-{@eq key=tab value="topics"}primary{:else}default{/eq}" href="{paths.truth.index}?topic={topic._id}">
-                <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Topics</a>
+                <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> Topics</a>
             <a class="btn btn-{@eq key=tab value="arguments"}primary{:else}default{/eq}" href="{paths.truth.arguments.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
                 <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments{!<span class="hidden-xs"> (1,023)</span>!}</a>
         {:else}
             <a class="btn btn-{@eq key=tab value="overview"}primary{:else}default{/eq}" href="{paths.truth.arguments.entry}?topic={topic._id}&amp;argument={argument._id}">
                 <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a>
         {/argument}
-        <a class="hidden-xs btn btn-{@eq key=tab value="questions"}primary{:else}default{/eq}" href="{paths.truth.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
+        <a class="hidden-xxs btn btn-{@eq key=tab value="questions"}primary{:else}default{/eq}" href="{paths.truth.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
             <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions{!<span class="hidden-xs"> (122)</span>!}</a>
     {:else}
         <a class="btn btn-{@eq key=tab value="overview"}primary{:else}default{/eq}" href="{paths.truth.questions.entry}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}">

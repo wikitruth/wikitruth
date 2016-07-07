@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    Related: {item.title} - {titleSlogan}
+    Related: {worldview.title} - {titleSlogan}
 {/title}
 
 {<body}

@@ -50,7 +50,9 @@ module.exports = function (router) {
         var model = {};
         flowUtils.setTopicModels(req, model, function() {
             flowUtils.setArgumentModel(req, model, function () {
-                res.render(templates.truth.related, model);
+                flowUtils.setQuestionModel(req, model, function () {
+                    res.render(templates.truth.related, model);
+                });
             });
         });
     });

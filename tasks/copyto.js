@@ -11,7 +11,8 @@ module.exports = function copyto(grunt) {
             files: [{
                 cwd: 'public',
                 src: ['**/*'],
-                dest: '.build/'
+                dest: '.build/',
+                expand: true
             }],
             options: {
                 ignore: [

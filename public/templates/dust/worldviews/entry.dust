@@ -1,35 +1,70 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {item.title} - {titleSlogan}
+    {worldview.title} - {titleSlogan}
 {/title}
 
 {<body}
     {>"dust/worldviews/entry-header" tab="overview" /}
     <div class="entry-header">
         {!<p class="lead">
-            <a href="{paths.worldviews.entry}?id={item._id}">{item.title}</a></p>!}
+            <a href="{paths.worldviews.entry}?worldview={worldview._id}">{worldview.title}</a></p>!}
         <span style="color: #f0ad4e" title="Pending peer review and acceptance (verdict)"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></span>
     </div>
     <div>
-        <p>{item.content|s}</p>
-        {?item.references}
-            <br/>
-            <small class="text-muted">
-                <span class="text-uppercase">References</span>
-                <p>{item.references|s}</p>
-            </small>
-        {/item.references}
+        <p>{worldview.content|s}</p>
     </div>
-    {?items}
-    <ul class="list-group top-list-items">
-        <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Entries</li>
-        {#items}
-            <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
-                <a href="{paths.worldviews.entry}?id={_id}">{title}</a> <span class="pull-right text-muted">
+    {?worldviews}
+        <ul class="list-group top-list-items">
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Top Worldviews</li>
+            {#worldviews}
+                <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
+                    <a href="{paths.worldviews.entry}?worldview={_id}">{title}</a> <span class="pull-right text-muted">
+                        <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+            {/worldviews}
+        </ul>
+        <div class="top-list-items-more"><a href="{paths.worldviews.index}?worldview={worldview._id}" role="button">more &raquo;</a></div>
+    {/worldviews}
+    {?topics}
+        <ul class="list-group top-list-items">
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Top Topics</li>
+            {#topics}
+                <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
+                    <a href="{paths.worldviews.topics.entry}?worldview={worldview._id}&amp;topic={_id}">{title}</a> <span class="pull-right text-muted">
                     <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
-        {/items}
-    </ul>
-    <div class="top-list-items-more"><a href="{paths.worldviews.index}?id={item._id}" role="button">more &raquo;</a></div>
-    {/items}
+            {/topics}
+        </ul>
+        <div class="top-list-items-more"><a href="{paths.worldviews.topics.index}?worldview={worldview._id}" role="button">more &raquo;</a></div>
+    {/topics}
+    {?arguments}
+        <ul class="list-group top-list-items">
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-flash text-success" aria-hidden="true"></span> Top Arguments</li>
+            {#arguments}
+                <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
+                    <a href="{paths.worldviews.arguments.entry}?worldview={worldview._id}&amp;argument={_id}">{title}</a> <span class="pull-right text-muted">
+                    <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+            {/arguments}
+        </ul>
+        <div class="top-list-items-more"><a href="{paths.worldviews.arguments.index}?worldview={worldview._id}" role="button">more &raquo;</a></div>
+    {/arguments}
+    {?questions}
+        <ul class="list-group top-list-items">
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-question-sign text-success" aria-hidden="true"></span> Top Questions</li>
+            {#questions}
+                <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
+                    <a href="{paths.worldviews.questions.entry}?worldview={worldview._id}&amp;question={_id}">{title}</a> <span class="pull-right text-muted">
+                    <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+            {/questions}
+        </ul>
+        <div class="top-list-items-more"><a href="{paths.worldviews.questions.index}?worldview={worldview._id}" role="button">more &raquo;</a></div>
+    {/questions}
+    {?worldview.references}
+        <small class="text-muted">
+            <span class="text-uppercase">References</span>
+            <p>{worldview.references|s}</p>
+        </small>
+    {/worldview.references}
+    <small class="text-muted">
+        Last modified by {worldview.editUsername} on {worldview.editDate}.
+    </small>
 {/body}

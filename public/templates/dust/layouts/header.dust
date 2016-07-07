@@ -48,7 +48,7 @@
                             {?user.isAdmin}
                                 <li><a href="{paths.admin}">Admin Area</a></li>
                             {/user.isAdmin}
-                            <li><a href="{paths.account}">My Account</a></li>
+                            <li><a href="{paths.account.index}">My Account</a></li>
                             <li><a href="{paths.account.settings}">Settings</a></li>
                             <li role="separator" class="divider"></li>
                             <li><a href="{paths.logout}">Sign Out</a></li>

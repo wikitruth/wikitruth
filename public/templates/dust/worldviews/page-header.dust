@@ -7,11 +7,11 @@
         {?topic}
             {topic.title}
         {:else}
-            {?item}
-                {item.title}
+            {?worldview}
+                {worldview.title}
             {:else}
                 Religion
-            {/item}
+            {/worldview}
         {/topic}
     {/argument}
 {/question}

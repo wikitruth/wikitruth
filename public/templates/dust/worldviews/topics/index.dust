@@ -5,37 +5,35 @@
 {/title}
 
 {<body}
-    {?item}
+    {?worldview}
         {>"dust/worldviews/entry-header" tab="topics" /}
     {:else}
         {>"dust/worldviews/index-header" tab="categories" /}
-    {/item}
-    {?categories}
+    {/worldview}
+    {!{?categories}
         <ul class="list-group">
-            <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Categories</li>
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span> Categories</li>
             {#categories}
-                <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
-                    <a href="{paths.worldviews.topics.entry}?topic={_id}">{title}</a> <span class="pull-right text-muted"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+                <li class="list-group-item"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp;
+                    <a href="{paths.worldviews.topics.entry}?worldview={worldview._id}&amp;topic={_id}">{title}</a> <span class="pull-right text-muted"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
             {/categories}
         </ul>
-        {?topics}
-            <ul class="list-group">
-                <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Top Topics</li>
-                {#topics}
-                    <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
-                        <a href="{paths.worldviews.topics.entry}?topic={_id}">{title}</a> <span class="pull-right text-muted"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
-                {/topics}
-            </ul>
-        {/topics}
-    {:else}
-        {?topics}
-            <ul class="list-group">
-                <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Topics</li>
-                {#topics}
-                    <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
-                        <a href="{paths.worldviews.topics.entry}?topic={_id}">{title}</a> <span class="pull-right text-muted"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
-                {/topics}
-            </ul>
-        {/topics}
-    {/categories}
+    {/categories}!}
+    {?topics}
+        <ul class="list-group">
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> {^worldview}Top {/worldview}Topics</li>
+            {#topics}
+                <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
+                    <a href="{paths.worldviews.topics.entry}?worldview={worldview._id}&amp;topic={_id}">{title}</a> <span class="pull-right text-muted"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+            {/topics}
+        </ul>
+    {/topics}
+    {?arguments}
+        <ul class="list-group">
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-flash text-success" aria-hidden="true"></span> {^worldview}Top {/worldview}Arguments</li>
+            {#arguments}
+                <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> <a href="{paths.worldviews.arguments.entry}?worldview={worldview._id}&amp;topic={topic._id}&amp;argument={_id}">{title}</a> <span class="pull-right text-muted"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+            {/arguments}
+        </ul>
+    {/arguments}
 {/body}

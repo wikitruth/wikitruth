@@ -122,6 +122,7 @@ require('./middlewares/routes')(app, passport);
 
 //custom (friendly) error handler
 app.use(require('./public/templates/jade/http/index').http500);
+// check https://github.com/krakenjs/kraken-js/issues/447
 
 //setup utilities
 app.utility = {};
