@@ -1,14 +1,20 @@
 <ol class="breadcrumb">
     <li><a href="{paths.morality.index}">Morality</a></li>
-    {?parent}
-        {?parent.parentId}
-            <li><a href="{paths.morality.topics.entry}?topic={parent.parentId}">..</a></li>
-        {/parent.parentId}
-        <li><a href="{paths.morality.topics.entry}?topic={parent._id}">{parent.title}</a></li>
-    {/parent}
+    {?parentTopic}
+        {?parentTopic.parentId}
+            <li><a href="{paths.morality.topics.entry}?topic={parentTopic.parentId}">..</a></li>
+        {/parentTopic.parentId}
+        <li><a href="{paths.morality.topics.entry}?topic={parentTopic._id}">{parentTopic.title}</a></li>
+    {/parentTopic}
     {?topic}
         <li><a href="{paths.morality.topics.entry}?topic={topic._id}">{topic.title}</a></li>
     {/topic}
+    {?argument}
+        <li><a href="{paths.morality.arguments.entry}?topic={topic._id}&amp;argument={argument._id}">{argument.title}</a></li>
+    {/argument}
+    {?question}
+        <li><a href="{paths.morality.questions.entry}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}">{question.title}</a></li>
+    {/question}
     {@eq key=tab value="link-to"}
         <li class="active">Links</li>
     {/eq}

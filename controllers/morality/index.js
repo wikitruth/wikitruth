@@ -10,7 +10,7 @@ var utils       = require('../../utils/utils'),
 module.exports = function (router) {
 
     router.get('/', function (req, res) {
-        var model = { groupId: constants.CORE_GROUPS.morality };
+        var model = {};
         async.parallel({
             topic: function(callback){
                 flowUtils.setTopicModels(req, model, callback);
@@ -50,7 +50,9 @@ module.exports = function (router) {
         var model = {};
         flowUtils.setTopicModels(req, model, function() {
             flowUtils.setArgumentModel(req, model, function () {
-                res.render(templates.morality.related, model);
+                flowUtils.setQuestionModel(req, model, function () {
+                    res.render(templates.morality.related, model);
+                });
             });
         });
     });

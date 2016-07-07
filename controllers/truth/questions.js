@@ -90,9 +90,6 @@ module.exports = function (router) {
                 }
             }
             db.Question.update(query, entity, {upsert: true}, function(err, writeResult) {
-                if (err) {
-                    throw err;
-                }
                 res.redirect((result ? paths.truth.questions.entry : paths.truth.questions.index) +
                     '?topic=' + req.query.topic +
                     (req.query.argument ? '&argument=' + req.query.argument : '') +

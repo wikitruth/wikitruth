@@ -20,7 +20,7 @@ module.exports = function (router) {
             },
             topics: function(callback) {
                 // Top Subtopics
-                var query = { parentId: req.query.topic };
+                var query = { parentId: req.query.topic, groupId: constants.CORE_GROUPS.morality };
                 db.Topic.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
                     results.forEach(function(result) {
                         result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
@@ -31,12 +31,23 @@ module.exports = function (router) {
             },
             arguments: function(callback) {
                 // Top Arguments
-                var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic };
+                var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, groupId: constants.CORE_GROUPS.morality };
                 db.Argument.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
                     results.forEach(function(result) {
                         result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
                     });
                     model.arguments = results;
+                    callback();
+                });
+            },
+            questions: function (callback) {
+                // Top Questions
+                var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, groupId: constants.CORE_GROUPS.morality };
+                db.Question.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                    results.forEach(function(result) {
+                        result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                    });
+                    model.questions = results;
                     callback();
                 });
             }
@@ -45,6 +56,9 @@ module.exports = function (router) {
         });
     });
 
+    /**
+     * basic rule: id is the entry, query.topic or topic.parentId is the parent.
+     */
     router.get('/create', function (req, res) {
         var model = {};
         async.series({
@@ -58,13 +72,13 @@ module.exports = function (router) {
                     callback();
                 }
             },
-            parent: function(callback) {
+            parentTopic: function(callback) {
                 var query = {
                     _id: req.query.topic ? req.query.topic : model.topic && model.topic.parentId ? model.topic.parentId : null
                 };
                 if(query._id) {
                     db.Topic.findOne(query, function (err, result) {
-                        model.parent = result;
+                        model.parentTopic = result;
                         callback();
                     });
                 } else {
@@ -77,9 +91,7 @@ module.exports = function (router) {
     });
 
     router.post('/create', function (req, res) {
-        var query = {
-            _id: req.query.id ? req.query.id : new mongoose.Types.ObjectId()
-        };
+        var query = { _id: req.query.id || new mongoose.Types.ObjectId() };
         db.Topic.findOne(query, function(err, result) {
             var entity = result ? result : {};
             entity.content = req.body.content;
@@ -94,16 +106,9 @@ module.exports = function (router) {
             }
             entity.parentId = req.body.parent ? req.body.parent : null;
             db.Topic.update(query, entity, {upsert: true}, function(err, writeResult) {
-                if (err) {
-                    throw err;
-                }
-                if(result) {
-                    res.redirect(paths.morality.topics.entry + '?topic=' + req.query.id);
-                } else if(req.query.topic) {
-                    res.redirect(paths.morality.index + '?topic=' + req.query.topic);
-                } else {
-                    res.redirect(paths.morality.index);
-                }
+                res.redirect((result ? paths.morality.topics.entry : paths.morality.index)
+                    + (result ? '?topic=' + result._id : req.query.topic ? '?topic=' + req.query.topic : '')
+                );
             });
         });
     });

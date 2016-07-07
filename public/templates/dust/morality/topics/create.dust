@@ -5,17 +5,14 @@
 {/title}
 
 {<body}
-    <h2 class="page-header text-primary">
-        <span class="text-muted">
-            {>"dust/morality/breadcrumb" /}
-            &nbsp;/&nbsp;
-            {?topic}
-                Edit
-            {:else}
-                New Topic
-            {/topic}
-        </span>
-    </h2>
+    {>"dust/morality/breadcrumb" /}
+    <h1 class="page-header">
+        {?topic}
+            Edit Topic
+        {:else}
+            New Topic
+        {/topic}
+    </h1>
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
         <div class="form-group">
@@ -32,14 +29,14 @@
         </div>
         <div class="form-group">
             <label for="inputParent">Parent</label>
-            <input type="text" name="parent" id="inputParent" value="{?topic}{topic.parentId}{:else}{parent._id}{/topic}" class="form-control"/>
+            <input type="text" name="parent" id="inputParent" value="{?topic}{topic.parentId}{:else}{parentTopic._id}{/topic}" class="form-control"/>
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
         {?topic}
             <a class="btn btn-default" href="{paths.morality.topics.entry}?topic={topic._id}" role="button">Cancel</a>
         {:else}
             {?parent}
-                <a class="btn btn-default" href="{paths.morality.topics.entry}?topic={parent._id}" role="button">Cancel</a>
+                <a class="btn btn-default" href="{paths.morality.topics.entry}?topic={parentTopic._id}" role="button">Cancel</a>
             {:else}
                 <a class="btn btn-default" href="{paths.morality.index}" role="button">Cancel</a>
             {/parent}

@@ -21,9 +21,9 @@ module.exports = {
         topic: 'dust/discuss/topic'
     },
     truth: {
+        index: 'dust/truth/index',
         indexHeader: 'dust/truth/index-header',
         entryHeader: 'dust/truth/entry-header',
-        index: 'dust/truth/index',
         topics: {
             index: 'dust/truth/topics/index',
             create: 'dust/truth/topics/create',
@@ -84,6 +84,10 @@ module.exports = {
             index: 'dust/morality/questions/index',
             create: 'dust/morality/questions/create',
             entry: 'dust/morality/questions/entry'
+        },
+        outline: {
+            create: 'dust/morality/outline/create',
+            linkTo: 'dust/morality/outline/link-to'
         },
         related: 'dust/morality/related'
     }

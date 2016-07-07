@@ -46,10 +46,8 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-nodemon');
     grunt.loadNpmTasks('grunt-newer');
   
-    grunt.registerTask('default', ['copy:components', 'newer:uglify', 'newer:less', 'concurrent']);
+    grunt.registerTask('default', ['copy:components', 'newer:uglify', 'less', 'concurrent']);
     grunt.registerTask('lint', ['jshint']);
     grunt.registerTask('test', [ 'jshint', 'mochacli' ]);
-    grunt.registerTask('build-jade', ['copy:components', 'uglify', 'newer:less']);
-    grunt.registerTask('build-dust', [ 'jshint', 'newer:less', 'requirejs', 'i18n', 'copyto' ]);
-    grunt.registerTask('build', [ 'build-jade', 'build-dust' ]);
+    grunt.registerTask('build', [ 'copy:components', 'uglify', 'less', 'requirejs', 'i18n', 'copyto', 'jshint' ]);
 };

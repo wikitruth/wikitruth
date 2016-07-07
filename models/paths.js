@@ -82,6 +82,9 @@ module.exports = {
             index: '/morality/questions',
             entry: '/morality/questions/entry'
         },
+        outline: {
+            link: '/morality/outline/link'
+        },
         related: '/morality/related'
     }
 };
