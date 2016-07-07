@@ -1,0 +1,21 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {question.title} - {titleSlogan}
+{/title}
+
+{<body}
+    {>"dust/morality/entry-header" tab="overview" /}
+    <div>
+        <p>{question.content|s}</p>
+    </div>
+    {?question.references}
+        <small class="text-muted">
+            <span class="text-uppercase">References</span>
+            <p>{question.references|s}</p>
+        </small>
+    {/question.references}
+    <small class="text-muted">
+        Last modified by {question.editUsername} on {question.editDate}.
+    </small>
+{/body}

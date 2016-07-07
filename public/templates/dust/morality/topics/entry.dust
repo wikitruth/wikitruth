@@ -5,11 +5,8 @@
 {/title}
 
 {<body}
-
     {>"dust/morality/entry-header" tab="overview" /}
     <div class="entry-header">
-        <p class="lead">
-            <a href="{paths.morality.topics.entry}?topic={topic._id}">{topic.title}</a></p>
         {?isContributor}
             {?isTopicOwner}
         <a href="{paths.morality.topics.create}?id={topic._id}" title="Edit Outline"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>&nbsp;
@@ -19,19 +16,12 @@
     </div>
     <div>
         <p>{topic.content|s}</p>
-        {?topic.references}
-            <br/>
-            <small class="text-muted">
-                <span class="text-uppercase">References</span>
-                <p>{topic.references|s}</p>
-            </small>
-        {/topic.references}
     </div>
     {?topics}
     <ul class="list-group top-list-items">
-        <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Top Subtopics</li>
+        <li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span> Top Topics</li>
         {#topics}
-        <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
+        <li class="list-group-item"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp;
             <a href="{paths.morality.topics.entry}?topic={_id}">{title}</a> <span class="pull-right text-muted">
                 <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
         {/topics}
@@ -49,4 +39,24 @@
     </ul>
     <div class="top-list-items-more"><a href="{paths.morality.arguments.index}?topic={topic._id}" role="button">more &raquo;</a></div>
     {/arguments}
+    {?questions}
+        <ul class="list-group top-list-items">
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-question-sign text-success" aria-hidden="true"></span> Top Questions</li>
+            {#questions}
+                <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
+                    <a href="{paths.morality.questions.entry}?topic={topic._id}&amp;question={_id}">{title}</a> <span class="pull-right text-muted">
+                    <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+            {/questions}
+        </ul>
+        <div class="top-list-items-more"><a href="{paths.morality.questions.index}?topic={question._id}" role="button">more &raquo;</a></div>
+    {/questions}
+    {?topic.references}
+        <small class="text-muted">
+            <span class="text-uppercase">References</span>
+            <p>{topic.references|s}</p>
+        </small>
+    {/topic.references}
+    <small class="text-muted">
+        Last modified by {topic.editUsername} on {topic.editDate}.
+    </small>
 {/body}

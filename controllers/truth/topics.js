@@ -72,13 +72,13 @@ module.exports = function (router) {
                     callback();
                 }
             },
-            parent: function(callback) {
+            parentTopic: function(callback) {
                 var query = {
                     _id: req.query.topic ? req.query.topic : model.topic && model.topic.parentId ? model.topic.parentId : null
                 };
                 if(query._id) {
                     db.Topic.findOne(query, function (err, result) {
-                        model.parent = result;
+                        model.parentTopic = result;
                         callback();
                     });
                 } else {
@@ -106,9 +106,6 @@ module.exports = function (router) {
             }
             entity.parentId = req.body.parent ? req.body.parent : null;
             db.Topic.update(query, entity, {upsert: true}, function(err, writeResult) {
-                if (err) {
-                    throw err;
-                }
                 res.redirect((result ? paths.truth.topics.entry : paths.truth.index) +
                     (result ? '?topic=' + result._id : '')
                 );

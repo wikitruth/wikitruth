@@ -5,7 +5,7 @@ var mongoose    = require('mongoose'),
     flowUtils   = require('../../utils/flowUtils'),
     paths       = require('../../models/paths'),
     templates   = require('../../models/templates'),
-    constants  = require('../../models/constants'),
+    constants   = require('../../models/constants'),
     db          = require('../../app').db.models;
 
 module.exports = function (router) {
@@ -43,7 +43,15 @@ module.exports = function (router) {
         var model = {};
         flowUtils.setTopicModels(req, model, function () {
             flowUtils.setArgumentModel(req, model, function () {
-                res.render(templates.morality.arguments.entry, model);
+                // Top Questions
+                var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument, groupId: constants.CORE_GROUPS.morality };
+                db.Question.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                    results.forEach(function(result) {
+                        result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                    });
+                    model.questions = results;
+                    res.render(templates.morality.arguments.entry, model);
+                });
             });
         });
     });
@@ -58,9 +66,7 @@ module.exports = function (router) {
     });
 
     router.post('/create', function (req, res) {
-        var query = {
-            _id: req.query.argument ? req.query.argument : new mongoose.Types.ObjectId()
-        };
+        var query = { _id: req.query.argument || new mongoose.Types.ObjectId() };
         db.Argument.findOne(query, function(err, result) {
             var entity = result ? result : {};
             entity.content = req.body.content;
@@ -80,14 +86,10 @@ module.exports = function (router) {
                 }
             }
             db.Argument.update(query, entity, {upsert: true}, function(err, writeResult) {
-                if (err) {
-                    throw err;
-                }
-                if(result) {
-                    res.redirect(paths.morality.arguments.entry + '?topic=' + req.query.topic + '&argument=' + req.query.argument);
-                } else {
-                    res.redirect(paths.morality.arguments.index + '?topic=' + req.query.topic);
-                }
+                res.redirect((result ? paths.morality.arguments.entry : paths.morality.arguments.index)
+                    + '?topic=' + req.query.topic
+                    + (result ? '&argument=' + req.query.argument : '')
+                );
             });
         });
     });
