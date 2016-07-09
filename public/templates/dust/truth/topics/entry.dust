@@ -9,10 +9,11 @@
     <div class="entry-header">
         {?isContributor}
             {?isTopicOwner}
-                <a href="{paths.truth.topics.create}?id={topic._id}" title="Edit Outline"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>&nbsp;
+                <a href="{paths.truth.topics.create}?id={topic._id}" title="Edit Outline"><span class="label label-primary"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit</span></a>&nbsp;
             {/isTopicOwner}
         {/isContributor}
-        <span style="color: #f0ad4e" title="Pending review (verdict)"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></span>
+        {!<span style="color: #f0ad4e" title="Pending review (verdict)"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></span>!}
+        <span class="label label-warning" title="This content is not yet reviewed, please take caution."><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Pending</span>{!<span class="label label-success">Verified</span> <span class="label label-danger">Issues</span>!}
     </div>
     <div>
         <p>{topic.content|s}</p>
@@ -48,7 +49,7 @@
                     <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
             {/questions}
         </ul>
-        <div class="top-list-items-more"><a href="{paths.truth.questions.index}?topic={question._id}" role="button">more &raquo;</a></div>
+        <div class="top-list-items-more"><a href="{paths.truth.questions.index}?topic={topic._id}" role="button">more &raquo;</a></div>
     {/questions}
     {?topic.references}
         <small class="text-muted">

@@ -9,10 +9,10 @@
     <div class="entry-header">
         {?isContributor}
             {?isTopicOwner}
-                <a href="{paths.worldviews.topics.create}?worldview={worldview._id}&amp;id={topic._id}" title="Edit Outline"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>&nbsp;
+                <a href="{paths.worldviews.topics.create}?worldview={worldview._id}&amp;id={topic._id}" title="Edit Outline"><span class="label label-primary"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit</span></a>&nbsp;
             {/isTopicOwner}
         {/isContributor}
-        <span style="color: #f0ad4e" title="Pending review (verdict)"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></span>
+        <span class="label label-warning" title="This content is not yet reviewed, please take caution."><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Pending</span>
     </div>
     <div>
         <p>{topic.content|s}</p>
@@ -48,7 +48,7 @@
                     <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
             {/questions}
         </ul>
-        <div class="top-list-items-more"><a href="{paths.worldviews.questions.index}?worldview={worldview._id}&amp;topic={question._id}" role="button">more &raquo;</a></div>
+        <div class="top-list-items-more"><a href="{paths.worldviews.questions.index}?worldview={worldview._id}&amp;topic={topic._id}" role="button">more &raquo;</a></div>
     {/questions}
     {?topic.references}
         <small class="text-muted">
