@@ -210,9 +210,9 @@ module.exports = function (router) {
                     throw err;
                 }
                 if(result) {
-                    res.redirect(paths.worldviews.topics.entry + '?worldview=' + req.query.worldview + '&amp;topic=' + result._id);
+                    res.redirect(paths.worldviews.topics.entry + '?worldview=' + req.query.worldview + '&topic=' + result._id);
                 } else {
-                    res.redirect(paths.worldviews.topics.index + '?worldview=' + req.query.worldview + (req.query.id ? '&amp;topic=' + req.query.id : ''));
+                    res.redirect(paths.worldviews.topics.index + '?worldview=' + req.query.worldview + (req.query.id ? '&topic=' + req.query.id : req.query.topic ? '&topic=' + req.query.topic : ''));
                 }
             });
         });

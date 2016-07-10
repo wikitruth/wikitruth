@@ -107,7 +107,7 @@ module.exports = function (router) {
             entity.parentId = req.body.parent ? req.body.parent : null;
             db.Topic.update(query, entity, {upsert: true}, function(err, writeResult) {
                 res.redirect((result ? paths.truth.topics.entry : paths.truth.index) +
-                    (result ? '?topic=' + result._id : '')
+                    (result ? '?topic=' + result._id : req.query.topic ? '?topic=' + req.query.topic : '')
                 );
             });
         });
