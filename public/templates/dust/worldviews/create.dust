@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {?worldview}Edit{:else}New{/worldview} Entry - {titleSlogan}
+    {?worldview}Edit{:else}New{/worldview} Worldview - {titleSlogan}
 {/title}
 
 {<body}
@@ -21,7 +21,7 @@
                 <a href="{paths.worldviews.entry}?worldview={worldview._id}">{worldview.title}</a>
                 &nbsp;/&nbsp;Edit
             {:else}
-                New Entry
+                New Worldview
             {/worldview}
         </span>
     </h2>

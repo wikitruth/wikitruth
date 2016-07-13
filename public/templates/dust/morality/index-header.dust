@@ -1,29 +1,35 @@
 <h1 class="page-header"><i class="fa fa-balance-scale"></i> Morality &amp; Reality</h1>
-<div class="btn-group entry-tabs" role="group" aria-label="">
+<ul class="nav nav-tabs wt-tabs" role="tablist">
     {!<a class="btn btn-{@eq key=tab value="top-topics"}primary{:else}default{/eq}" href="/wiki">
         <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Top Topics<span class="hidden-xs hidden"> (122)</span>
     </a>!}
-    <a class="btn btn-{@eq key=tab value="categories"}primary{:else}default{/eq}" href="{paths.morality.index}">
-        <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> Topics
-    </a>
-    <a class="btn btn-{@eq key=tab value="top-arguments"}primary{:else}default{/eq}" href="{paths.morality.arguments.index}">
-        <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments
-    </a>
-    <a class="btn btn-{@eq key=tab value="top-questions"}primary{:else}default{/eq}" href="{paths.morality.questions.index}">
-        <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions
-    </a>
+    <li role="presentation"{@eq key=tab value="categories"} class="active"{/eq}>
+        <a href="{paths.morality.index}" role="tab">
+            <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> Topics
+        </a>
+    </li>
+    <li role="presentation"{@eq key=tab value="top-arguments"} class="active"{/eq}>
+        <a href="{paths.morality.arguments.index}" role="tab">
+            <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments
+        </a>
+    </li>
+    <li role="presentation"{@eq key=tab value="top-questions"} class="active"{/eq}>
+        <a href="{paths.morality.questions.index}" role="tab">
+            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions
+        </a>
+    </li>
     {?isContributor}
-    <a class="btn btn-default dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-        <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span>
-    </a>
-    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
-        <li><a href="{paths.morality.topics.create}">
-            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Topic</a></li>
-        <li role="separator" class="visible-xs divider"></li>
-        {!<li class="visible-xs"><a href="#"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments</a></li>
-        <li class="visible-xs"><a href="#"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions</a></li>!}
-    </ul>
+        <li role="presentation" class="dropdown"><a href="#" id="wtTabMore" class="dropdown-toggle" data-toggle="dropdown" aria-controls="wtTabMore-contents" aria-expanded="false">
+            <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span> {!<span class="caret"></span>!}</a>
+            <ul class="dropdown-menu" aria-labelledby="wtTabMore" id="wtTabMore-contents">
+                <li><a href="{paths.morality.topics.create}" role="tab">
+                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Topic</a></li>
+                {!<li role="separator" class="visible-xs divider"></li>
+                <li class="visible-xs"><a href="#"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments</a></li>
+                <li class="visible-xs"><a href="#"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions</a></li>!}
+            </ul>
+        </li>
     {/isContributor}
-</div>
+</ul>
 {!<h4 class="text-muted" style="line-height: 30px;">Top popular topics
 </h4>!}
