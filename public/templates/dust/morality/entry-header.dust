@@ -1,64 +1,77 @@
 {>"dust/morality/breadcrumb" /}
 <h1 class="page-header">{>"dust/morality/page-header" /}</h1>
-<div class="btn-group" role="group" aria-label="">
+<ul class="nav nav-tabs wt-tabs" role="tablist">
     {^question}
         {^argument}
-            <a class="btn btn-{@eq key=tab value="overview"}primary{:else}default{/eq}" href="{paths.morality.topics.entry}?topic={topic._id}">
-                <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a>
-            <a class="btn btn-{@eq key=tab value="topics"}primary{:else}default{/eq}" href="{paths.morality.index}?topic={topic._id}">
-                <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> Topics</a>
-            <a class="btn btn-{@eq key=tab value="arguments"}primary{:else}default{/eq}" href="{paths.morality.arguments.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
-                <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments{!<span class="hidden-xs"> (1,023)</span>!}</a>
+            <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
+                <a href="{paths.morality.topics.entry}?topic={topic._id}" role="tab">
+                    <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a>
+            </li>
+            <li role="presentation"{@eq key=tab value="topics"} class="active"{/eq}>
+                <a href="{paths.morality.index}?topic={topic._id}" role="tab">
+                    <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> Topics</a>
+            </li>
+            <li role="presentation"{@eq key=tab value="arguments"} class="active"{/eq}>
+                <a href="{paths.morality.arguments.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
+                    <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments{!<span class="hidden-xs"> (1,023)</span>!}</a>
+            </li>
         {:else}
-            <a class="btn btn-{@eq key=tab value="overview"}primary{:else}default{/eq}" href="{paths.morality.arguments.entry}?topic={topic._id}&amp;argument={argument._id}">
-                <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a>
+            <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
+                <a href="{paths.morality.arguments.entry}?topic={topic._id}&amp;argument={argument._id}" role="tab">
+                    <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a>
+            </li>
         {/argument}
-        <a class="hidden-xxs btn btn-{@eq key=tab value="questions"}primary{:else}default{/eq}" href="{paths.morality.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
-            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions{!<span class="hidden-xs"> (122)</span>!}</a>
+        <li role="presentation"{@eq key=tab value="questions"} class="active"{/eq}>
+            <a href="{paths.morality.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
+                <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions{!<span class="hidden-xs"> (122)</span>!}</a>
+        </li>
     {:else}
-        <a class="btn btn-{@eq key=tab value="overview"}primary{:else}default{/eq}" href="{paths.morality.questions.entry}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}">
-            <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a>
+        <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
+            <a href="{paths.morality.questions.entry}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}" role="tab">
+                <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a>
+        </li>
     {/question}
+    {!<li role="presentation"{@eq key=tab value="related"} class="active"{/eq}>
     <a class="hidden-xs btn btn-{@eq key=tab value="related"}primary{:else}default{/eq}" href="{paths.morality.related}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}">
         <span class="glyphicon glyphicon-random" aria-hidden="true"></span> Related</a>
-    <a class="btn btn-default dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-        <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span>
-    </a>
-    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
-    {?isContributor}
-        {^question}
-            {^argument}
-                {?isTopicOwner}
-                    <li><a href="{paths.morality.topics.create}?id={topic._id}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Topic</a></li>
-                    <li><a href="{paths.morality.outline.link}?topic={topic._id}"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> Manage Links</a></li>
-                {/isTopicOwner}
-                <li><a href="{paths.morality.topics.create}?topic={topic._id}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Subtopic</a></li>
-                {!<li><a href="#"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit References</a></li>!}
-                <li role="separator" class="divider"></li>
-                <li><a href="{paths.morality.arguments.create}?topic={topic._id}"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> New Argument</a></li>
-            {:else}
-                {?isArgumentOwner}
-                    <li><a href="{paths.morality.arguments.create}?topic={topic._id}&amp;argument={argument._id}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Argument</a></li>
-                    <li><a href="{paths.morality.outline.link}?topic={topic._id}&amp;argument={argument._id}"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> Manage Links</a></li>
+    </li>!}
+    <li role="presentation" class="dropdown"><a href="#" id="wtTabMore" class="dropdown-toggle" data-toggle="dropdown" aria-controls="wtTabMore-contents" aria-expanded="false">
+        <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span> {!<span class="caret"></span>!}</a>
+        <ul class="dropdown-menu" aria-labelledby="wtTabMore" id="wtTabMore-contents">
+        {?isContributor}
+            {^question}
+                {^argument}
+                    {?isTopicOwner}
+                        <li><a href="{paths.morality.topics.create}?id={topic._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Topic</a></li>
+                        <li><a href="{paths.morality.outline.link}?topic={topic._id}" role="tab"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> Manage Links</a></li>
+                    {/isTopicOwner}
+                    <li><a href="{paths.morality.topics.create}?topic={topic._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Subtopic</a></li>
+                    {!<li><a href="#"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit References</a></li>!}
                     <li role="separator" class="divider"></li>
-                {/isArgumentOwner}
-            {/argument}
+                    <li><a href="{paths.morality.arguments.create}?topic={topic._id}" role="tab"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> New Argument</a></li>
+                {:else}
+                    {?isArgumentOwner}
+                        <li><a href="{paths.morality.arguments.create}?topic={topic._id}&amp;argument={argument._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Argument</a></li>
+                        <li><a href="{paths.morality.outline.link}?topic={topic._id}&amp;argument={argument._id}" role="tab"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> Manage Links</a></li>
+                        <li role="separator" class="divider"></li>
+                    {/isArgumentOwner}
+                {/argument}
+            {:else}
+                {?isQuestionOwner}
+                    <li><a href="{paths.morality.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Question</a></li>
+                {/isQuestionOwner}
+            {/question}
+            <li><a href="{paths.morality.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
+                <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> New Question</a></li>
+            {!<li><a href="#">Separated link</a></li>!}
+            <li role="separator" class="divider"></li>
         {:else}
-            {?isQuestionOwner}
-                <li><a href="{paths.morality.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Question</a></li>
-            {/isQuestionOwner}
-        {/question}
-        <li><a href="{paths.morality.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
-            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> New Question</a></li>
-        {!<li><a href="#">Separated link</a></li>!}
-        <li role="separator" class="divider"></li>
-    {:else}
-    {/isContributor}
-        <li class="visible-xs"><a href="{paths.morality.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
-            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions</a></li>
-        <li class="visible-xs"><a href="{paths.morality.related}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">
-            <span class="glyphicon glyphicon-random" aria-hidden="true"></span> Related</a></li>
-        <li><a href="#"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Details</a></li>
-    </ul>
-</div>
-<br/><br/>
+        {/isContributor}
+            <li class="visible-xs"><a href="{paths.morality.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
+                <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions</a></li>
+            <li class="visible-xs"><a href="{paths.morality.related}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
+                <span class="glyphicon glyphicon-random" aria-hidden="true"></span> Related</a></li>
+            <li><a href="#" role="tab"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Details</a></li>
+        </ul>
+    </li>
+</ul>

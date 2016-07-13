@@ -126,10 +126,23 @@ body {
 }
 
 
-@screen-xxs-max:             (@screen-xs-min - 1);
+@screen-xxs-max: (@screen-xs-min - 1);
 
 .hidden-xxs {
   @media (max-width: @screen-xxs-max) {
     .responsive-invisibility();
   }
+}
+
+.nav.nav-tabs.wt-tabs {
+  margin-bottom: 20px;
+}
+
+.nav.nav-tabs.wt-tabs>li.active>a {
+  border-color: #d26911 #e5e5e5 transparent;
+  border-top-width: 2px;
+}
+
+.nav.nav-tabs.wt-tabs>li>a {
+  border-top-width: 2px;
 }

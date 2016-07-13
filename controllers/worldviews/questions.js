@@ -43,9 +43,15 @@ module.exports = function (router) {
             // Top Questions
             db.Question.find({ groupId: constants.CORE_GROUPS.worldviews }).limit(100).exec(function (err, results) {
                 results.forEach(function (result) {
-                    result.topic = {
-                        _id: result.ownerId
-                    };
+                    if(result.ownerType === constants.OBJECT_TYPES.topic) {
+                        result.topic = {
+                            _id: result.ownerId
+                        };
+                    } else if(result.ownerType === constants.OBJECT_TYPES.worldview) {
+                        result.worldview = {
+                            _id: result.ownerId
+                        };
+                    }
                     result.comments = utils.numberWithCommas(utils.randomInt(1, 100000));
                 });
                 model.questions = results;
