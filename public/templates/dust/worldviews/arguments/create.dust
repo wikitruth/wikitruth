@@ -31,3 +31,18 @@
         <a class="btn btn-default" href="{?argument}{paths.worldviews.arguments.entry}?topic={topic._id}&amp;argument={argument._id}{:else}{paths.worldviews.arguments.index}?topic={topic._id}{/argument}" role="button">Cancel</a>
     </form>
 {/body}
+
+{<footer}
+    <link rel="stylesheet" href="/components/summernote/dist/summernote.css">
+    <script type="text/javascript" src="/components/summernote/dist/summernote.min.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            $('#inputContent').summernote({
+                height: 350
+            });
+            $('#inputReferences').summernote({
+                height: 150
+            });
+        });
+    </script>
+{/footer}

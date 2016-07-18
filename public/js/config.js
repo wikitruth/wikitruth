@@ -6,6 +6,5 @@ requirejs.config({
         'bootstrap': '../components/bootstrap/dist/js/bootstrap.min'
     },
     useStrict: true,
-    shim: {
-    }
+    shim: true
 });
