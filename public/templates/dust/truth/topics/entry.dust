@@ -7,13 +7,13 @@
 {<body}
     {>"dust/truth/entry-header" tab="overview" /}
     <div class="entry-header">
-        {?isContributor}
-            {?isTopicOwner}
-                <a href="{paths.truth.topics.create}?id={topic._id}" title="Edit Outline"><span class="label label-primary"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit</span></a>&nbsp;
-            {/isTopicOwner}
-        {/isContributor}
         {!<span style="color: #f0ad4e" title="Pending review (verdict)"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></span>!}
         <span class="label label-warning" title="This content is not yet reviewed, please take caution."><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Pending</span>{!<span class="label label-success">Verified</span> <span class="label label-danger">Issues</span>!}
+        {?isContributor}
+            {?isTopicOwner}
+                &nbsp;<a href="{paths.truth.topics.create}?id={topic._id}" title="Edit Outline" class="no-underline"><span class="label label-primary"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit</span></a>
+            {/isTopicOwner}
+        {/isContributor}
     </div>
     <div>
         <p>{topic.content|s}</p>
