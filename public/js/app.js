@@ -1,6 +1,6 @@
 'use strict';
 
-require(['jquery', 'bootstrap'], function () {
+require(['jquery', 'bootstrap'], function ($) {
     var app = {
         initialize: function () {
             // Your code here
