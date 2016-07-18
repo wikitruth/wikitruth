@@ -12,18 +12,18 @@
     {/topic}
     {?categories}
         <ul class="list-group">
-            <li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span> Categories</li>
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp;&nbsp;CATEGORIES</li>
             {#categories}
-                <li class="list-group-item"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp;
-                    <a href="{paths.truth.topics.entry}?topic={_id}">{title}</a> <span class="pull-right text-muted"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+                <li class="list-group-item"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp;&nbsp;
+                    <a href="{paths.truth.topics.entry}?topic={_id}">{title}</a> <span class="pull-right text-muted hide"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
             {/categories}
         </ul>
     {/categories}
     {?topics}
         <ul class="list-group">
-            <li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span> {?categories}Top {/categories}Topics</li>
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp;&nbsp;{?categories}Top {/categories}Topics</li>
             {#topics}
-                <li class="list-group-item"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp;
+                <li class="list-group-item"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp;&nbsp;
                     <a href="{paths.truth.topics.entry}?topic={_id}">{title}</a> <span class="pull-right text-muted"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
             {/topics}
         </ul>

@@ -8,6 +8,11 @@
     {>"dust/truth/entry-header" tab="overview" /}
     <div class="entry-header">
         <span class="label label-warning" title="This content is not yet reviewed, please take caution."><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Pending</span>
+        {?isContributor}
+            {?isQuestionOwner}
+                &nbsp;<a href="{paths.truth.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}" title="Edit Outline" class="no-underline"><span class="label label-primary"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit</span></a>
+            {/isQuestionOwner}
+        {/isContributor}
     </div>
     <div>
         <p>{question.content|s}</p>
