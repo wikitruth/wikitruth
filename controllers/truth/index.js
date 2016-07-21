@@ -18,9 +18,9 @@ module.exports = function (router) {
             topics: function(callback) {
                 // display 15 if top topics, 100 if has topic parameter
                 var query = req.query.topic ? { parentId: req.query.topic } : { groupId: constants.CORE_GROUPS.truth };
-                db.Topic.find(query).limit(req.query.topic ? 100 : 15).sort({ title: 1 }).exec(function(err, results) {
+                db.Topic.find(query).limit(req.query.topic ? 100 : 15).sort(req.query.topic ? { title: 1 } : {}).exec(function(err, results) {
                     results.forEach(function(result) {
-                        result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                        result.comments = utils.randomInt(0,999);
                     });
                     model.topics = results;
                     callback();

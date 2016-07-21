@@ -50,10 +50,12 @@
     <script type="text/javascript">
         $(function() {
             $('#inputContent').summernote({
-                height: 350
+                height: WT_CONSTANTS.summernote.contentHeight,
+                toolbar: WT_CONSTANTS.summernote.contentToolbar
             });
             $('#inputReferences').summernote({
-                height: 150
+                height: WT_CONSTANTS.summernote.referenceHeight,
+                toolbar: WT_CONSTANTS.summernote.referenceToolbar
             });
         });
     </script>

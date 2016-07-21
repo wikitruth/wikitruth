@@ -21,9 +21,9 @@ module.exports = function (router) {
             topics: function(callback) {
                 // Top Subtopics
                 var query = { parentId: req.query.topic, groupId: constants.CORE_GROUPS.truth };
-                db.Topic.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                db.Topic.find(query).limit(15).exec(function(err, results) {
                     results.forEach(function(result) {
-                        result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                        result.comments = utils.randomInt(0,999);
                     });
                     model.topics = results;
                     callback();
@@ -32,9 +32,9 @@ module.exports = function (router) {
             arguments: function(callback) {
                 // Top Arguments
                 var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, groupId: constants.CORE_GROUPS.truth };
-                db.Argument.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                db.Argument.find(query).limit(15).exec(function(err, results) {
                     results.forEach(function(result) {
-                        result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                        result.comments = utils.randomInt(0,999);
                     });
                     model.arguments = results;
                     callback();
@@ -43,9 +43,9 @@ module.exports = function (router) {
             questions: function (callback) {
                 // Top Questions
                 var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, groupId: constants.CORE_GROUPS.truth };
-                db.Question.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                db.Question.find(query).limit(15).exec(function(err, results) {
                     results.forEach(function(result) {
-                        result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                        result.comments = utils.randomInt(0,999);
                     });
                     model.questions = results;
                     callback();
