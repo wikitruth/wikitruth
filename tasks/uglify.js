@@ -40,7 +40,8 @@ module.exports = function uglify(grunt) {
                     'public/components/respond/src/respond.js',
                     'public/layouts/ie-sucks.js'
                 ],
-                'public/layouts/admin.min.js': ['public/layouts/admin.js']
+                'public/layouts/admin.min.js': ['public/layouts/admin.js'],
+                'public/js/app.min.js': ['public/js/app.js']
             }
         },
         views: {

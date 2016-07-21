@@ -8,7 +8,7 @@ module.exports = function clean(grunt) {
     // Options
     return {
         tmp: 'tmp',
-        build: '.build/templates',
+        build: '.build',
         js: {
             src: [
                 'public/layouts/**/*.min.js',
@@ -17,13 +17,15 @@ module.exports = function clean(grunt) {
                 'public/views/**/*.min.js.map'
             ]
         },
-        css: {
+        css: 'public/css',
+        /*css: {
             src: [
-                'public/layouts/**/*.min.css',
-                'public/views/**/*.min.css',
-                'public/css/**/*.min.css'
+                'public/layouts/**|*.min.css',
+                'public/views/**|*.min.css',
+                'public/css/**|*.min.css'
             ]
-        }
+        },*/
+        components: 'public/components'
         /*components: {
             src: ['public/components/**']
         }*/
