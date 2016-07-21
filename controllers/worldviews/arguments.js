@@ -19,7 +19,7 @@ module.exports = function (router) {
                 flowUtils.setTopicModels(req, model, function () {
                     db.Argument.find({ ownerId: model.topic._id, ownerType: constants.OBJECT_TYPES.topic }).sort({ title: 1 }).exec(function(err, results) {
                         results.forEach(function(result) {
-                            result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                            result.comments = utils.randomInt(0,999);
                         });
                         model.arguments = results;
                         res.render(templates.worldviews.arguments.index, model);
@@ -28,7 +28,7 @@ module.exports = function (router) {
             } else if(req.query.worldview) {
                 db.Argument.find({ ownerId: model.worldview._id, ownerType: constants.OBJECT_TYPES.worldview }).sort({ title: 1 }).exec(function(err, results) {
                         results.forEach(function(result) {
-                            result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                            result.comments = utils.randomInt(0,999);
                         });
                         model.arguments = results;
                         res.render(templates.worldviews.arguments.index, model);
@@ -46,7 +46,7 @@ module.exports = function (router) {
                                 _id: result.ownerId
                             };
                         }
-                        result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                        result.comments = utils.randomInt(0,999);
                     });
                     model.arguments = results;
                     res.render(templates.worldviews.arguments.index, model);
@@ -64,7 +64,7 @@ module.exports = function (router) {
                     var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument, groupId: constants.CORE_GROUPS.worldviews };
                     db.Question.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
                         results.forEach(function(result) {
-                            result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                            result.comments = utils.randomInt(0,999);
                         });
                         model.questions = results;
                         res.render(templates.worldviews.arguments.entry, model);

@@ -23,7 +23,7 @@ module.exports = function (router) {
                 var query = { parentId: req.query.topic, groupId: constants.CORE_GROUPS.morality };
                 db.Topic.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
                     results.forEach(function(result) {
-                        result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                        result.comments = utils.randomInt(0,999);
                     });
                     model.topics = results;
                     callback();
@@ -34,7 +34,7 @@ module.exports = function (router) {
                 var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, groupId: constants.CORE_GROUPS.morality };
                 db.Argument.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
                     results.forEach(function(result) {
-                        result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                        result.comments = utils.randomInt(0,999);
                     });
                     model.arguments = results;
                     callback();
@@ -45,7 +45,7 @@ module.exports = function (router) {
                 var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, groupId: constants.CORE_GROUPS.morality };
                 db.Question.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
                     results.forEach(function(result) {
-                        result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                        result.comments = utils.randomInt(0,999);
                     });
                     model.questions = results;
                     callback();

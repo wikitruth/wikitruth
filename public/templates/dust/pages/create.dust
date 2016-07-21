@@ -40,7 +40,8 @@
     <script type="text/javascript">
         $(function() {
             $('#inputContent').summernote({
-                height: 350
+                height: WT_CONSTANTS.summernote.contentHeight,
+                toolbar: WT_CONSTANTS.summernote.contentToolbar
             });
         });
     </script>

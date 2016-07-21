@@ -30,7 +30,7 @@ module.exports = function (router) {
                 }
                 db.Topic.find(query).limit(req.query.worldview ? 100 : 15).sort({ title: 1 }).exec(function(err, results) {
                     results.forEach(function(result) {
-                        result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                        result.comments = utils.randomInt(0,999);
                         result.worldview = {
                             _id: result.ownerId
                         };
@@ -67,7 +67,7 @@ module.exports = function (router) {
                     }
                     db.Argument.find(query).sort({ title: 1 }).exec(function(err, results) {
                         results.forEach(function(result) {
-                            result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                            result.comments = utils.randomInt(0,999);
                         });
                         model.arguments = results;
                         callback();
@@ -85,7 +85,7 @@ module.exports = function (router) {
                                     _id: result.ownerId
                                 };
                             }
-                            result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                            result.comments = utils.randomInt(0,999);
                         });
                         model.arguments = results;
                         callback();
@@ -112,7 +112,7 @@ module.exports = function (router) {
                 var query = { parentId: req.query.topic, groupId: constants.CORE_GROUPS.worldviews };
                 db.Topic.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
                     results.forEach(function(result) {
-                        result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                        result.comments = utils.randomInt(0,999);
                     });
                     model.topics = results;
                     callback();
@@ -123,7 +123,7 @@ module.exports = function (router) {
                 var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, groupId: constants.CORE_GROUPS.worldviews };
                 db.Argument.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
                     results.forEach(function(result) {
-                        result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                        result.comments = utils.randomInt(0,999);
                     });
                     model.arguments = results;
                     callback();
@@ -134,7 +134,7 @@ module.exports = function (router) {
                 var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, groupId: constants.CORE_GROUPS.worldviews };
                 db.Question.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
                     results.forEach(function(result) {
-                        result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                        result.comments = utils.randomInt(0,999);
                     });
                     model.questions = results;
                     callback();

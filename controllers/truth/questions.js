@@ -22,7 +22,7 @@ module.exports = function (router) {
                     { ownerId: model.topic._id, ownerType: constants.OBJECT_TYPES.topic };
                     db.Question.find(query).sort({ title: 1 }).exec(function(err, results) {
                         results.forEach(function(result) {
-                            result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                            result.comments = utils.randomInt(0,999);
                         });
                         model.questions = results;
                         res.render(templates.truth.questions.index, model);
@@ -36,7 +36,7 @@ module.exports = function (router) {
                     result.topic = {
                         _id: result.ownerId
                     };
-                    result.comments = utils.numberWithCommas(utils.randomInt(1,100000));
+                    result.comments = utils.randomInt(0,999);
                 });
                 model.questions = results;
                 res.render(templates.truth.questions.index, model);
