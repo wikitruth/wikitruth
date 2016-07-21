@@ -9,9 +9,9 @@ module.exports = function requirejs(grunt) {
 	return {
         build: {
             options: {
-                baseUrl: 'public/js',
-                mainConfigFile: 'public/js/config.js',
-                dir: '.build/js',
+                baseUrl: 'public/js/requirejs',
+                mainConfigFile: 'public/js/requirejs/config.js',
+                dir: '.build/js/requirejs',
                 optimize: 'uglify',
                 modules: [
                     { name: 'app' }

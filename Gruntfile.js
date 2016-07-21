@@ -45,9 +45,9 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-concurrent');
     grunt.loadNpmTasks('grunt-nodemon');
     grunt.loadNpmTasks('grunt-newer');
-  
-    grunt.registerTask('default', ['copy:components', 'newer:uglify', 'less', 'concurrent']);
+
     grunt.registerTask('lint', ['jshint']);
     grunt.registerTask('test', [ 'jshint', 'mochacli' ]);
-    grunt.registerTask('build', [ 'copy:components', 'uglify', 'less', 'requirejs', 'i18n', 'copyto', 'jshint' ]);
+    grunt.registerTask('build', [ 'jshint', /*'copy:components',*/ 'newer:uglify', 'newer:less', 'requirejs', 'i18n', 'copyto', 'clean:css' ]);
+    grunt.registerTask('default', ['concurrent']); //['copy:components', 'newer:uglify', 'less', 'concurrent']);
 };
