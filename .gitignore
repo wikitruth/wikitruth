@@ -3,6 +3,8 @@
 .nodemonignore
 node_modules
 public/css
+public/js/*.min.js
+public/js/*.min.js.map
 public/layouts/*.min.css
 public/layouts/*.min.js
 public/layouts/*.min.js.map
