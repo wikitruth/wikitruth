@@ -42,7 +42,7 @@ module.exports = function (router) {
     router.get('/entry', function (req, res) {
         var model = {};
         flowUtils.setTopicModels(req, model, function () {
-            flowUtils.setArgumentModel(req, model, function () {
+            flowUtils.setArgumentModels(req, model, function () {
                 // Top Questions
                 var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument, groupId: constants.CORE_GROUPS.morality };
                 db.Question.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
@@ -59,7 +59,7 @@ module.exports = function (router) {
     router.get('/create', function (req, res) {
         var model = {};
         flowUtils.setTopicModels(req, model, function () {
-            flowUtils.setArgumentModel(req, model, function () {
+            flowUtils.setArgumentModels(req, model, function () {
                 res.render(templates.morality.arguments.create, model);
             });
         });

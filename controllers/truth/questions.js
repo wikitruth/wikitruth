@@ -16,7 +16,7 @@ module.exports = function (router) {
         var model = {};
         if(req.query.topic) {
             flowUtils.setTopicModels(req, model, function () {
-                flowUtils.setArgumentModel(req, model, function () {
+                flowUtils.setArgumentModels(req, model, function () {
                     var query = req.query.argument ?
                     { ownerId: model.argument._id, ownerType: constants.OBJECT_TYPES.argument } :
                     { ownerId: model.topic._id, ownerType: constants.OBJECT_TYPES.topic };
@@ -47,7 +47,7 @@ module.exports = function (router) {
     router.get('/entry', function (req, res) {
         var model = {};
         flowUtils.setTopicModels(req, model, function () {
-            flowUtils.setArgumentModel(req, model, function () {
+            flowUtils.setArgumentModels(req, model, function () {
                 flowUtils.setQuestionModel(req, model, function () {
                     res.render(templates.truth.questions.entry, model);
                 });
@@ -58,7 +58,7 @@ module.exports = function (router) {
     router.get('/create', function (req, res) {
         var model = {};
         flowUtils.setTopicModels(req, model, function () {
-            flowUtils.setArgumentModel(req, model, function () {
+            flowUtils.setArgumentModels(req, model, function () {
                 flowUtils.setQuestionModel(req, model, function () {
                     res.render(templates.truth.questions.create, model);
                 });

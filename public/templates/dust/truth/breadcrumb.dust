@@ -10,6 +10,12 @@
     {?topic}
         <li><a href="{paths.truth.topics.entry}?topic={topic._id}">{topic.title}</a></li>
     {/topic}
+    {?parentArgument}
+        {?parentArgument.parentId}
+            <li><a href="{paths.truth.arguments.entry}?topic={topic._id}&amp;argument={parentArgument.parentId}">..</a></li>
+        {/parentArgument.parentId}
+        <li><a href="{paths.truth.arguments.entry}?topic={topic._id}&amp;argument={parentArgument._id}">{parentArgument.title}</a></li>
+    {/parentArgument}
     {?argument}
         <li><a href="{paths.truth.arguments.entry}?topic={topic._id}&amp;argument={argument._id}">{argument.title}</a></li>
     {/argument}

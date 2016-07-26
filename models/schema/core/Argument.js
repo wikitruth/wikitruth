@@ -5,6 +5,7 @@ exports = module.exports = function(app, mongoose) {
     title: { type: String, default: '' },
     content: { type: String, default: '' },
     references: { type: String, default: '' },
+    parentId: { type: mongoose.Schema.ObjectId, default: null },
     ownerId: { type: mongoose.Schema.ObjectId },
     ownerType: { type: Number }, // OBJECT_TYPES
     createDate: { type: Date, default: Date.now },

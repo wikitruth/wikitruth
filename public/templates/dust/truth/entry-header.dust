@@ -11,16 +11,16 @@
                 <a href="{paths.truth.index}?topic={topic._id}" role="tab">
                     <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> Topics</a>
             </li>
-            <li role="presentation"{@eq key=tab value="arguments"} class="active"{/eq}>
-                <a href="{paths.truth.arguments.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" aria-controls="home" role="tab">
-                    <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments{!<span class="hidden-xs"> (1,023)</span>!}</a>
-            </li>
         {:else}
             <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
                 <a href="{paths.truth.arguments.entry}?topic={topic._id}&amp;argument={argument._id}" role="tab">
                     <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a>
             </li>
         {/argument}
+        <li role="presentation"{@eq key=tab value="arguments"} class="active"{/eq}>
+            <a href="{paths.truth.arguments.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" aria-controls="home" role="tab">
+                <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments{!<span class="hidden-xs"> (1,023)</span>!}</a>
+        </li>
         <li role="presentation"{@eq key=tab value="questions"} class="active"{/eq}>
             <a href="{paths.truth.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
                 <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions{!<span class="hidden-xs"> (122)</span>!}</a>
@@ -42,20 +42,20 @@
                 {^question}
                     {^argument}
                         {?isTopicOwner}
-                            <li><a href="{paths.truth.topics.create}?id={topic._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Topic</a></li>
                             <li><a href="{paths.truth.outline.link}?topic={topic._id}" role="tab"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> Manage Links</a></li>
+                            <li><a href="{paths.truth.topics.create}?id={topic._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Topic</a></li>
                         {/isTopicOwner}
                         <li><a href="{paths.truth.topics.create}?topic={topic._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Topic</a></li>
                         {!<li><a href="#"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit References</a></li>!}
                         <li role="separator" class="divider"></li>
-                        <li><a href="{paths.truth.arguments.create}?topic={topic._id}" role="tab"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> New Argument</a></li>
                     {:else}
                         {?isArgumentOwner}
-                            <li><a href="{paths.truth.arguments.create}?topic={topic._id}&amp;argument={argument._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Argument</a></li>
                             <li><a href="{paths.truth.outline.link}?topic={topic._id}&amp;argument={argument._id}" role="tab"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> Manage Links</a></li>
-                            <li role="separator" class="divider"></li>
+                            <li><a href="{paths.truth.arguments.create}?topic={topic._id}&amp;argument={argument._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Argument</a></li>
                         {/isArgumentOwner}
                     {/argument}
+                    <li><a href="{paths.truth.arguments.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> New Argument</a></li>
+                    <li role="separator" class="divider"></li>
                 {:else}
                     {?isQuestionOwner}
                         <li><a href="{paths.truth.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Question</a></li>

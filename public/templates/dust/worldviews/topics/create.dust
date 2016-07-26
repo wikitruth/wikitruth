@@ -35,11 +35,11 @@
         {?topic}
             <a class="btn btn-default" href="{paths.worldviews.topics.entry}?worldview={worldview._id}&amp;topic={topic._id}" role="button">Cancel</a>
         {:else}
-            {?parent}
+            {?parentTopic}
                 <a class="btn btn-default" href="{paths.worldviews.topics.entry}?worldview={worldview._id}&amp;topic={parentTopic._id}" role="button">Cancel</a>
             {:else}
                 <a class="btn btn-default" href="{paths.worldviews.index}?worldview={worldview._id}" role="button">Cancel</a>
-            {/parent}
+            {/parentTopic}
         {/topic}
     </form>
 {/body}
