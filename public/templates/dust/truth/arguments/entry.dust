@@ -10,13 +10,24 @@
         <span class="label label-warning" title="This content is not yet reviewed, please take caution."><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Pending</span>
         {?isContributor}
             {?isArgumentOwner}
-                &nbsp;<a href="{paths.truth.arguments.create}?topic={topic._id}&amp;argument={argument._id}" title="Edit Outline" class="no-underline"><span class="label label-primary"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit</span></a>
+                &nbsp;<a href="{paths.truth.arguments.create}?topic={topic._id}&amp;id={argument._id}" title="Edit Outline" class="no-underline"><span class="label label-primary"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit</span></a>
             {/isArgumentOwner}
         {/isContributor}
     </div>
     <div>
         <p>{argument.content|s}</p>
     </div>
+    {?arguments}
+        <ul class="list-group top-list-items">
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-flash text-success" aria-hidden="true"></span> Top Arguments</li>
+            {#arguments}
+            <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
+                <a href="{paths.truth.arguments.entry}?topic={topic._id}&amp;argument={_id}">{title}</a> <span class="pull-right text-muted">
+                    <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+            {/arguments}
+        </ul>
+        <div class="top-list-items-more"><a href="{paths.truth.arguments.index}?topic={topic._id}&amp;argument={argument._id}" role="button">more &raquo;</a></div>
+    {/arguments}
     {?questions}
         <ul class="list-group top-list-items">
             <li class="list-group-item highlight"><span class="glyphicon glyphicon-question-sign text-success" aria-hidden="true"></span> Top Questions</li>

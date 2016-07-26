@@ -49,7 +49,7 @@ module.exports = function (router) {
     router.get('/related', function (req, res) {
         var model = {};
         flowUtils.setTopicModels(req, model, function() {
-            flowUtils.setArgumentModel(req, model, function () {
+            flowUtils.setArgumentModels(req, model, function () {
                 flowUtils.setQuestionModel(req, model, function () {
                     res.render(templates.truth.related, model);
                 });

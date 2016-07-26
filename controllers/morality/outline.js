@@ -9,7 +9,7 @@ module.exports = function (router) {
 
     router.get('/link', function (req, res) {
         var model = {};
-        flowUtils.setArgumentModel(req, model, function () {
+        flowUtils.setArgumentModels(req, model, function () {
             var query = model.argument ? { 'topic': model.argument.ownerId } : req.query;
             flowUtils.setTopicModels({query: query}, model, function () {
                 //var item = model.argument ? model.argument : model.topic;
@@ -28,7 +28,7 @@ module.exports = function (router) {
     router.get('/create', function (req, res) {
         var model = {};
         flowUtils.setTopicModels(req, model, function () {
-            flowUtils.setArgumentModel(req, model, function () {
+            flowUtils.setArgumentModels(req, model, function () {
                 res.render(templates.morality.outline.create, model);
             });
         });

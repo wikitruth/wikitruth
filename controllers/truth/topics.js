@@ -31,7 +31,12 @@ module.exports = function (router) {
             },
             arguments: function(callback) {
                 // Top Arguments
-                var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, groupId: constants.CORE_GROUPS.truth };
+                var query = {
+                    parentId: null,
+                    ownerId: req.query.topic,
+                    ownerType: constants.OBJECT_TYPES.topic,
+                    groupId: constants.CORE_GROUPS.truth
+                };
                 db.Argument.find(query).limit(15).exec(function(err, results) {
                     results.forEach(function(result) {
                         result.comments = utils.randomInt(0,999);
@@ -73,9 +78,7 @@ module.exports = function (router) {
                 }
             },
             parentTopic: function(callback) {
-                var query = {
-                    _id: req.query.topic ? req.query.topic : model.topic && model.topic.parentId ? model.topic.parentId : null
-                };
+                var query = { _id: req.query.topic ? req.query.topic : model.topic && model.topic.parentId ? model.topic.parentId : null };
                 if(query._id) {
                     db.Topic.findOne(query, function (err, result) {
                         model.parentTopic = result;

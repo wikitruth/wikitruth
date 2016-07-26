@@ -74,17 +74,35 @@ function setQuestionModel(req, model, callback) {
     }
 }
 
-function setArgumentModel(req, model, callback) {
+function setArgumentModels(req, model, callback) {
     if(req.query.argument) {
-        db.Argument.findOne({_id: req.query.argument}, function (err, result) {
-            if(isOwner(req, result, model)) {
-                model.isArgumentOwner = true;
+        async.series({
+            argument: function (callback) {
+                db.Argument.findOne({_id: req.query.argument}, function (err, result) {
+                    if (isOwner(req, result, model)) {
+                        model.isArgumentOwner = true;
+                    }
+                    db.User.findOne({_id: result.editUserId}, function (err, user) {
+                        result.editUsername = user.username;
+                        model.argument = result;
+                        callback(err);
+                    });
+                });
+            },
+            parentArgument: function (callback) {
+                if(model.argument && model.argument.parentId) {
+                    db.Argument.findOne({_id: model.argument.parentId}, function (err, result) {
+                        if (result) {
+                            model.parentArgument = result;
+                        }
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
             }
-            db.User.findOne({_id: result.editUserId}, function (err, user) {
-                result.editUsername = user.username;
-                model.argument = result;
-                callback(err);
-            });
+        }, function (err, results) {
+            callback();
         });
     } else {
         callback();
@@ -131,7 +149,7 @@ module.exports = {
     appendOwnerFlag: appendOwnerFlag,
     setWorldviewModel: setWorldviewModel,
     setWorldviewModels: setWorldviewModels,
-    setArgumentModel: setArgumentModel,
+    setArgumentModels: setArgumentModels,
     setTopicModels: setTopicModels,
     setQuestionModel: setQuestionModel
 };

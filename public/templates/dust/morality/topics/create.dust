@@ -35,11 +35,11 @@
         {?topic}
             <a class="btn btn-default" href="{paths.morality.topics.entry}?topic={topic._id}" role="button">Cancel</a>
         {:else}
-            {?parent}
+            {?parentTopic}
                 <a class="btn btn-default" href="{paths.morality.topics.entry}?topic={parentTopic._id}" role="button">Cancel</a>
             {:else}
                 <a class="btn btn-default" href="{paths.morality.index}" role="button">Cancel</a>
-            {/parent}
+            {/parentTopic}
         {/topic}
     </form>
 {/body}

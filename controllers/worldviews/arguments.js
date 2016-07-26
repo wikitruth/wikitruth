@@ -59,7 +59,7 @@ module.exports = function (router) {
         var model = {};
         flowUtils.setWorldviewModels(req, model, function () {
             flowUtils.setTopicModels(req, model, function () {
-                flowUtils.setArgumentModel(req, model, function () {
+                flowUtils.setArgumentModels(req, model, function () {
                     // Top Questions
                     var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument, groupId: constants.CORE_GROUPS.worldviews };
                     db.Question.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
@@ -78,7 +78,7 @@ module.exports = function (router) {
         var model = {};
         flowUtils.setWorldviewModels(req, model, function () {
             flowUtils.setTopicModels(req, model, function () {
-                flowUtils.setArgumentModel(req, model, function () {
+                flowUtils.setArgumentModels(req, model, function () {
                     res.render(templates.worldviews.arguments.create, model);
                 });
             });

@@ -25,10 +25,22 @@
         </div>
         <div class="form-group">
             <label for="inputReferences">References</label>
-            <textarea class="form-control" id="inputReferences" name="references" rows="2">{argument.references}</textarea>
+            <textarea class="form-control" id="inputReferences" name="references" rows="3">{argument.references}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="inputParent">Parent</label>
+            <input type="text" name="parent" id="inputParent" value="{?argument}{argument.parentId}{:else}{parentArgument._id}{/argument}" class="form-control"/>
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
-        <a class="btn btn-default" href="{?argument}{paths.truth.arguments.entry}?topic={topic._id}&amp;argument={argument._id}{:else}{paths.truth.arguments.index}?topic={topic._id}{/argument}" role="button">Cancel</a>
+        {?argument}
+            <a class="btn btn-default" href="{paths.truth.arguments.entry}?{?topic}topic={topic._id}&amp;{/topic}argument={argument._id}" role="button">Cancel</a>
+        {:else}
+            {?parentArgument}
+                <a class="btn btn-default" href="{paths.truth.arguments.entry}?{?topic}topic={topic._id}&amp;{/topic}argument={parentArgument._id}" role="button">Cancel</a>
+            {:else}
+                <a class="btn btn-default" href="{paths.truth.index}" role="button">Cancel</a>
+            {/parentArgument}
+        {/argument}
     </form>
 {/body}
 

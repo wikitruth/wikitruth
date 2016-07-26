@@ -17,7 +17,7 @@ module.exports = function (router) {
         if (req.query.worldview) {
             flowUtils.setWorldviewModels(req, model, function () {
                 flowUtils.setTopicModels(req, model, function () {
-                    flowUtils.setArgumentModel(req, model, function () {
+                    flowUtils.setArgumentModels(req, model, function () {
                         var query = {};
                         if(req.query.argument) {
                             query.ownerId = model.argument._id;
@@ -64,7 +64,7 @@ module.exports = function (router) {
         var model = {};
         flowUtils.setWorldviewModels(req, model, function () {
             flowUtils.setTopicModels(req, model, function () {
-                flowUtils.setArgumentModel(req, model, function () {
+                flowUtils.setArgumentModels(req, model, function () {
                     flowUtils.setQuestionModel(req, model, function () {
                         res.render(templates.worldviews.questions.entry, model);
                     });
@@ -77,7 +77,7 @@ module.exports = function (router) {
         var model = {};
         flowUtils.setWorldviewModels(req, model, function () {
             flowUtils.setTopicModels(req, model, function () {
-                flowUtils.setArgumentModel(req, model, function () {
+                flowUtils.setArgumentModels(req, model, function () {
                     flowUtils.setQuestionModel(req, model, function () {
                         res.render(templates.worldviews.questions.create, model);
                     });
