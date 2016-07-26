@@ -4,7 +4,7 @@ var WT_CONSTANTS = {
         contentToolbar: [
             ['style', ['style']],
             ['font', ['bold', 'underline', 'strikethrough', 'clear']],
-            ['fontname', ['fontname']],
+            /*['fontname', ['fontname']],*/
             ['color', ['color']],
             ['para', ['ul', 'ol', 'paragraph']],
             ['table', ['table']],
