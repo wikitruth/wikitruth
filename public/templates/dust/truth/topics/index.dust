@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {?topic}Topics for {topic.title}{:else}Topics{/topic} - {titleSlogan}
+    {?topic}Topics for {topic.title}{:else}Truth &amp; Reality{/topic} - {titleSlogan}
 {/title}
 
 {<body}

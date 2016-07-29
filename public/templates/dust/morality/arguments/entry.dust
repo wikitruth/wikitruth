@@ -21,7 +21,7 @@
                     <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
             {/questions}
         </ul>
-        <div class="top-list-items-more"><a href="{paths.morality.questions.index}?topic={topic._id}&amp;argument={argument._id}" role="button">more &raquo;</a></div>
+        <div class="top-list-items-more"><a href="{paths.morality.questions.index}?topic={topic._id}&amp;argument={argument._id}" role="button">View All &raquo;</a></div>
     {/questions}
     {?argument.references}
         <small class="text-muted">
