@@ -1,0 +1,15 @@
+{!<span style="color: #f0ad4e" title="Pending review (verdict)"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></span>!}
+{!{?isContributor}
+    {?isTopicOwner}
+        &nbsp;<a href="{paths.truth.topics.create}?id={topic._id}" title="Edit Outline" class="no-underline"><span class="label label-primary"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit</span></a>
+    {/isTopicOwner}
+    {?isArgumentOwner}
+        &nbsp;<a href="{paths.truth.arguments.create}?topic={topic._id}&amp;id={argument._id}" title="Edit Outline" class="no-underline"><span class="label label-primary"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit</span></a>
+    {/isArgumentOwner}
+    {?isQuestionOwner}
+        &nbsp;<a href="{paths.truth.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}" title="Edit Outline" class="no-underline"><span class="label label-primary"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit</span></a>
+    {/isQuestionOwner}
+{/isContributor}!}
+<a href="{paths.truth.verdict.update}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" title="Update Verdict" class="no-underline"><span class="label label-warning" title="This content is not yet reviewed, please take caution."><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Claim (Pending)</span></a>
+{!<span class="label label-success">Verified</span> <span class="label label-danger">Issues</span>!}
+{!&nbsp;<span class="label label-primary"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Update Verdict</span>!}

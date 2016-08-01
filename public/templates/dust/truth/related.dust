@@ -1,10 +1,10 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    Related: {topic.title} - {titleSlogan}
+    {topic.title}: Related - {titleSlogan}
 {/title}
 
 {<body}
-    {>"dust/truth/entry-header" tab="related" /}
+    {>"dust/truth/common/entry-header" tab="related" /}
     {>"dust/help-us" /}
 {/body}

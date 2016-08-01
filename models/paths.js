@@ -42,6 +42,9 @@ module.exports = {
         outline: {
             link: '/truth/outline/link'
         },
+        verdict: {
+            update: '/truth/verdict/update'
+        },
         related: '/truth/related'
     },
     worldviews: {

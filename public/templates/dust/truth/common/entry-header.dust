@@ -1,5 +1,5 @@
-{>"dust/truth/breadcrumb" /}
-<h1 class="page-header">{>"dust/truth/page-header" /}</h1>
+{>"dust/truth/common/breadcrumb" /}
+{>"dust/truth/common/page-header" /}
 <ul class="nav nav-tabs wt-tabs" role="tablist">
     {^question}
         {^argument}

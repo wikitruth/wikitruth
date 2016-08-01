@@ -49,6 +49,7 @@ module.exports = function (router) {
         flowUtils.setTopicModels(req, model, function () {
             flowUtils.setArgumentModels(req, model, function () {
                 flowUtils.setQuestionModel(req, model, function () {
+                    model.entry = model.question;
                     res.render(templates.truth.questions.entry, model);
                 });
             });
