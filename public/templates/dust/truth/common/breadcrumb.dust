@@ -25,4 +25,7 @@
     {@eq key=tab value="link-to"}
         <li class="active">Links</li>
     {/eq}
+    {@eq key=tab value="update-verdict"}
+        <li class="active">Verdict</li>
+    {/eq}
 </ol>

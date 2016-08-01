@@ -1,14 +1,14 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    Questions: {?argument}{argument.title}{:else}{topic.title}{/argument} - {titleSlogan}
+    {?argument}{argument.title}{:else}{topic.title}{/argument}: Questions - {titleSlogan}
 {/title}
 
 {<body}
     {?topic}
-        {>"dust/truth/entry-header" tab="questions" /}
+        {>"dust/truth/common/entry-header" tab="questions" /}
     {:else}
-        {>"dust/truth/index-header" tab="top-questions" /}
+        {>"dust/truth/common/index-header" tab="top-questions" /}
     {/topic}
     {?questions}
         <ul class="list-group">

@@ -1,0 +1,87 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    Update Verdict - {titleSlogan}
+{/title}
+
+{<body}
+    {>"dust/truth/common/breadcrumb" tab="update-verdict" /}
+    {>"dust/truth/common/page-header" tab="update-verdict" /}
+    <form method="post">
+        <input type="hidden" name="_csrf" value="{_csrf}">
+        <div class="form-group">
+            <label for="inputReferences">Definitive <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a></label>
+            <div class="radio">
+                <label class="text-success">
+                    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1">
+                    True
+                </label>
+            </div>
+            <div class="radio">
+                <label class="text-danger">
+                    <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+                    False
+                </label>
+            </div>
+            <div class="radio">
+                <label class="text-warning">
+                    <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+                    Claim (inconclusive, need more supporting arguments or evidences)
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputReferences">Positive Probabilistic <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a></label>
+            <div class="radio">
+                <label class="text-success">
+                    <input type="radio" name="optionsRadios" id="optionsRadios3" value="option3">
+                    Most Likely True
+                </label>
+            </div>
+            <div class="radio">
+                <label class="text-success">
+                    <input type="radio" name="optionsRadios" id="optionsRadios3" value="option3">
+                    Very / Highly Likely
+                </label>
+            </div>
+            <div class="radio">
+                <label class="text-success">
+                    <input type="radio" name="optionsRadios" id="optionsRadios3" value="option3">
+                    Likely / More likely than not
+                </label>
+            </div>
+            <div class="radio">
+                <label class="text-success">
+                    <input type="radio" name="optionsRadios" id="optionsRadios3" value="option3">
+                    Makes Sense
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputReferences">Negative Probabilistic <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a></label>
+            <div class="radio">
+                <label class="text-warning">
+                    <input type="radio" name="optionsRadios" id="optionsRadios3" value="option3">
+                    Unlikely
+                </label>
+            </div>
+            <div class="radio">
+                <label class="text-warning">
+                    <input type="radio" name="optionsRadios" id="optionsRadios3" value="option3">
+                    Very / Highly Unlikely
+                </label>
+            </div>
+        </div>
+        <br/>
+        <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
+        {?topic}
+            <a class="btn btn-default" href="{paths.truth.topics.entry}?topic={topic._id}" role="button">Cancel</a>
+        {:else}
+            {?parent}
+                <a class="btn btn-default" href="{paths.truth.topics.entry}?topic={parent._id}" role="button">Cancel</a>
+            {:else}
+                <a class="btn btn-default" href="{paths.truth.index}" role="button">Cancel</a>
+            {/parent}
+        {/topic}
+    </form>
+{/body}

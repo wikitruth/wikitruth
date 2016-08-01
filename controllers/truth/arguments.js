@@ -29,6 +29,12 @@ module.exports = function (router) {
                     db.Argument.find(query).sort({ title: 1 }).exec(function(err, results) {
                         results.forEach(function(result) {
                             result.comments = utils.randomInt(0,999);
+                            if(utils.randomBool()) {
+                                result.isLink = true;
+                            }
+                            if(query.parentId && utils.randomBool()) {
+                                result.pro = true;
+                            }
                         });
                         model.arguments = results;
                         res.render(templates.truth.arguments.index, model);
@@ -70,6 +76,12 @@ module.exports = function (router) {
                 db.Argument.find(query).limit(15).exec(function(err, results) {
                     results.forEach(function(result) {
                         result.comments = utils.randomInt(0,999);
+                        if(utils.randomBool()) {
+                            result.isLink = true;
+                        }
+                        if(utils.randomBool()) {
+                            result.pro = true;
+                        }
                     });
                     model.arguments = results;
                     callback();
@@ -87,6 +99,7 @@ module.exports = function (router) {
                 });
             }
         }, function (err, results) {
+            model.entry = model.argument;
             res.render(templates.truth.arguments.entry, model);
         });
     });

@@ -1,14 +1,14 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {?topic}Topics for {topic.title}{:else}Truth &amp; Reality{/topic} - {titleSlogan}
+    {?topic}{topic.title}: Topics{:else}Truth &amp; Reality{/topic} - {titleSlogan}
 {/title}
 
 {<body}
     {?topic}
-        {>"dust/truth/entry-header" tab="topics" /}
+        {>"dust/truth/common/entry-header" tab="topics" /}
     {:else}
-        {>"dust/truth/index-header" tab="categories" /}
+        {>"dust/truth/common/index-header" tab="categories" /}
     {/topic}
     {?categories}
         <ul class="list-group">

@@ -5,7 +5,7 @@
 {/title}
 
 {<body}
-    {>"dust/truth/breadcrumb" /}
+    {>"dust/truth/common/breadcrumb" /}
     <h1 class="page-header">
         {?question}
             Edit Question

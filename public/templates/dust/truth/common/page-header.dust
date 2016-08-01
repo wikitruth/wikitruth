@@ -1,0 +1,19 @@
+<h1 class="page-header">
+    {?question}
+        {question.title}
+    {:else}
+        {?argument}
+            {argument.title}
+        {:else}
+            {?topic}
+                {topic.title}
+            {/topic}
+        {/argument}
+    {/question}
+    {@eq key=tab value="link-to"}
+        :&nbsp;Links
+    {/eq}
+    {@eq key=tab value="update-verdict"}
+        :&nbsp;Verdict
+    {/eq}
+</h1>

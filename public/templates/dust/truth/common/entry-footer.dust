@@ -1,0 +1,9 @@
+{?entry.references}
+    <small class="text-muted">
+        <span class="text-uppercase">References</span>
+        <p>{entry.references|s}</p>
+    </small>
+{/entry.references}
+<small class="text-muted">
+    Last modified by {entry.editUsername} on {entry.editDate}.
+</small>

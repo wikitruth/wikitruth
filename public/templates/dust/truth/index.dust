@@ -5,34 +5,11 @@
 {/title}
 
 {<body}
-    {>"dust/truth/index-header" tab="top-topics" /}
+    {>"dust/truth/common/index-header" tab="top-topics" /}
     <ul class="list-group">
         <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Topics</li>
         {#topics}
             <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> <a href="{templates.truth.topics.entry}?topic={_id}">{title}</a> <span class="pull-right text-muted"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
         {/topics}
-        {!
-        <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Big Bang Theory <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 5,140</span></li>
-        <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> <a href="/wiki/topic/">Theory of Evolution</a> <span class="label label-primary">featured</span> <span class="label label-danger">hot</span> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 10,456</span></li>
-        <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Global warming <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 434</span></li>
-        <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Moon landing <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 780</span></li>
-        <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> 1993 World Trade Center bombing <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 1,201</span></li>
-        <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> War and terrorism <span class="label label-primary">featured</span> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 601</span></li>
-        <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Life after death <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 509</span></li>
-        <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Cannabis (drug) <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 1,233</span></li>
-        <!--<li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Smoking <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 433</span></li>-->
-        <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> LBGT <span class="label label-primary">featured</span> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 343</span></li>
-        <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Religion <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 56,012</span></li>
-        <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Atheism <span class="label label-primary">featured</span> <span class="label label-danger">hot</span> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 343</span></li>
-        <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Vaccination <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 988</span></li>
-        <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Genetically modified organism <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 311</span></li>
-        <!--<li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Education <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 23</span></li>-->
-        <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Human sexuality <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 343</span></li>
-        <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> HIV/AIDS <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 3,440</span></li>
-        <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Abortion <span class="label label-primary">featured</span> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 780</span></li>
-        <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Euthanasia <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 45</span></li>
-        <!--<li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Premarital sex</li>-->
-        <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Marriage <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 90</span></li>
-        !}
     </ul>
 {/body}

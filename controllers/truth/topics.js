@@ -40,6 +40,9 @@ module.exports = function (router) {
                 db.Argument.find(query).limit(15).exec(function(err, results) {
                     results.forEach(function(result) {
                         result.comments = utils.randomInt(0,999);
+                        if(utils.randomBool()) {
+                            result.isLink = true;
+                        }
                     });
                     model.arguments = results;
                     callback();
@@ -57,6 +60,7 @@ module.exports = function (router) {
                 });
             }
         }, function (err, results) {
+            model.entry = model.topic;
             res.render(templates.truth.topics.entry, model);
         });
     });

@@ -43,6 +43,9 @@ module.exports = {
             create: 'dust/truth/outline/create',
             linkTo: 'dust/truth/outline/link-to'
         },
+        verdict: {
+            update: 'dust/truth/verdict/update'
+        },
         related: 'dust/truth/related'
     },
     worldviews: {

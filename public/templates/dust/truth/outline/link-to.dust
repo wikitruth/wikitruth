@@ -5,7 +5,8 @@
 {/title}
 
 {<body}
-    {>"dust/truth/entry-header" tab="link-to" /}
+    {>"dust/truth/common/breadcrumb" tab="link-to" /}
+    {>"dust/truth/common/page-header" tab="link-to" /}
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
         <div class="form-group">
