@@ -15,9 +15,9 @@
     </div>
     {?topics}
         <ul class="list-group top-list-items">
-            <li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span> Top Topics</li>
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp; Top Topics</li>
             {#topics}
-            <li class="list-group-item"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp;
+            <li class="list-group-item"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp;&nbsp;
                 <a href="{paths.truth.topics.entry}?topic={_id}">{title}</a> <span class="pull-right text-muted">
                     <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
             {/topics}

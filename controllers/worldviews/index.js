@@ -18,14 +18,32 @@ module.exports = function (router) {
                 flowUtils.setWorldviewModels(req, model, callback);
             },
             worldviews: function(callback) {
-                var query = req.query.worldview ? { parentId: req.query.worldview } : { parentId: null};
-                db.Ideology.find(query).limit(100).sort({ title: 1 }).exec(function(err, results) {
-                    results.forEach(function(result) {
-                        result.comments = utils.randomInt(0,999);
+                var query = req.query.worldview ? { parentId: req.query.worldview } : {};
+                db.Ideology.find(query).limit(100).sort(query.parentId ? { title: 1 } : {}).exec(function(err, results) {
+                    results.forEach(function (result) {
+                        result.comments = utils.randomInt(0, 999);
                     });
                     model.worldviews = results;
                     callback();
                 });
+            },
+            categories: function(callback) {
+                if(!req.query.worldview) {
+                    db.Ideology.find({ parentId: null }).limit(100).sort({ title: 1 }).exec(function(err, results) {
+                        async.each(results, function(result, callback) {
+                            result.comments = utils.numberWithCommas(utils.randomInt(1, 100000));
+                            db.Ideology.find( { parentId: result._id } ).limit(2).sort({ title: 1 }).exec(function(err, subworldviews) {
+                                result.subworldviews = subworldviews;
+                                callback();
+                            });
+                        }, function(err) {
+                            model.categories = results;
+                            callback();
+                        });
+                    });
+                } else {
+                    callback();
+                }
             }
         }, function (err, results) {
             res.render(templates.worldviews.index, model);

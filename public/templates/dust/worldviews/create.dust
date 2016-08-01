@@ -9,14 +9,14 @@
         <span class="text-muted">
             <a href="{paths.worldviews.index}">Religion</a>
             &nbsp;/&nbsp;
-            {?parent}
-                {?parent.parentId}
-                    <a href="{paths.worldviews.entry}?worldview={parent.parentId}">..</a>
+            {?parentWorldview}
+                {?parentWorldview.parentId}
+                    <a href="{paths.worldviews.entry}?worldview={parentWorldview.parentId}">..</a>
                     &nbsp;/&nbsp;
-                {/parent.parentId}
-                <a href="{paths.worldviews.entry}?worldview={parent._id}">{parent.title}</a>
+                {/parentWorldview.parentId}
+                <a href="{paths.worldviews.entry}?worldview={parentWorldview._id}">{parentWorldview.title}</a>
                 &nbsp;/&nbsp;
-            {/parent}
+            {/parentWorldview}
             {?worldview}
                 <a href="{paths.worldviews.entry}?worldview={worldview._id}">{worldview.title}</a>
                 &nbsp;/&nbsp;Edit

@@ -29,11 +29,16 @@ module.exports = function (router) {
             categories: function(callback) {
                 if(!req.query.topic) {
                     db.Topic.find({parentId: null, groupId: constants.CORE_GROUPS.morality}).sort({title: 1}).exec(function (err, results) {
-                        results.forEach(function (result) {
+                        async.each(results, function(result, callback) {
                             result.comments = utils.numberWithCommas(utils.randomInt(1, 100000));
+                            db.Topic.find( { parentId: result._id } ).limit(2).sort({ title: 1 }).exec(function(err, subtopics) {
+                                result.subtopics = subtopics;
+                                callback();
+                            });
+                        }, function(err) {
+                            model.categories = results;
+                            callback();
                         });
-                        model.categories = results;
-                        callback();
                     });
                 } else {
                     callback();

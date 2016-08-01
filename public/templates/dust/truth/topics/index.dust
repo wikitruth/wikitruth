@@ -11,13 +11,41 @@
         {>"dust/truth/common/index-header" tab="categories" /}
     {/topic}
     {?categories}
-        <ul class="list-group">
+        {!<ul class="list-group">
             <li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp;&nbsp;CATEGORIES</li>
             {#categories}
                 <li class="list-group-item"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp;&nbsp;
                     <a href="{paths.truth.topics.entry}?topic={_id}">{title}</a> <span class="pull-right text-muted hide"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
             {/categories}
-        </ul>
+        </ul>!}
+        <h3 class="page-header">Categories</h3>
+        <div class="row">
+            {#categories}
+                <div class="col-lg-4 col-md-6 col-sm-6">{! 73px !}
+                    <div class="media wt-category">
+                        <div class="media-left media-top">
+                            <a href="{paths.truth.topics.entry}?topic={_id}">
+                                <div class="photo-placeholder"></div>
+                                {!<img class="media-object" data-src="holder.js/64x64" alt="{firstName} {lastName}">!}
+                            </a>
+                        </div>
+                        <div class="media-body">
+                            <h4 class="media-heading"><a href="{paths.truth.topics.entry}?topic={_id}">{title}</a></h4>
+                            <p>
+                                {?subtopics}
+                                    {#subtopics}
+                                        <div><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;<a href="{paths.truth.topics.entry}?topic={_id}">{title}</a></div>
+                                    {/subtopics}
+                                {/subtopics}
+                                <div><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;<a href="{paths.truth.topics.index}?topic={topic._id}" role="button">more &raquo;</a></div>
+                                {!<span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}!}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {/categories}
+        </div>
+        <br/>
     {/categories}
     {?topics}
         <ul class="list-group">
