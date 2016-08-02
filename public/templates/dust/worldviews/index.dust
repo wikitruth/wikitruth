@@ -43,7 +43,7 @@
 
     {?worldviews}
         <ul class="list-group">
-            <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>{^worldview}Top {/worldview} Worldviews</li>
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> {^worldview}Top {/worldview} Worldviews</li>
             {#worldviews}
                 <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
                     <a href="{paths.worldviews.entry}?worldview={_id}">{title}</a> <span class="pull-right text-muted">
