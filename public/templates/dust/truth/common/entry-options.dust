@@ -38,8 +38,9 @@
 </div>
 <ul class="nav nav-tabs wt-tabs-l2" role="tablist">
     {!<li role="presentation" class="active"><a href="#" role="tab"><span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a></li>!}
-    <li role="presentation" class="active"><a href="#" role="tab"><i class="fa fa-home" aria-hidden="true"></i> Timeline</a></li>
-    <li role="presentation" class=""><a href="#" role="tab"><i class="fa fa-comments" aria-hidden="true"></i> Discussion</a></li>
-    <li role="presentation" class=""><a href="#" role="tab"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> Issues</a></li>
-    <li role="presentation" class=""><a href="#" role="tab"><i class="fa fa-tags" aria-hidden="true"></i> Tags</a></li>
+    <li role="presentation" class="active"><a href="#" role="tab" title="Timeline"><i class="fa fa-home" aria-hidden="true"></i><span class="hidden-xs"> Timeline</span></a></li>
+    <li role="presentation" class=""><a href="#" role="tab" title="Discussions"><i class="fa fa-comments" aria-hidden="true"></i> Discussion</a></li>
+    <li role="presentation" class=""><a href="#" role="tab" title="Issues"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> Issues</a></li>
+    <li role="presentation" class=""><a href="#" role="tab" title="Tags"><i class="fa fa-tags" aria-hidden="true"></i><span class="hidden-xxs"> Tags</span></a></li>
+    <li role="presentation" class=""><a href="#" role="tab" title="Opinions"><i class="fa fa-comments-o" aria-hidden="true"></i><span class="hidden-xxs"> Opinions</span></a></li>
 </ul>
