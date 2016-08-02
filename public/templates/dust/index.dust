@@ -48,4 +48,84 @@
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-lg-4 col-md-6 col-sm-6 wt-section-col">
+            <h4 class="page-header" style="color: #767676">Topics in Truth</h4>
+            {#truth}
+                <div class="media wt-category">
+                    <div class="media-left media-top">
+                        <a href="{paths.truth.topics.entry}?topic={_id}">
+                            <div class="photo-placeholder"></div>
+                            {!<img class="media-object" data-src="holder.js/64x64" alt="{firstName} {lastName}">!}
+                        </a>
+                    </div>
+                    <div class="media-body">
+                        <h4 class="media-heading"><a href="{paths.truth.topics.entry}?topic={_id}">{title}</a></h4>
+                        <div>
+                            {?subtopics}
+                                {#subtopics}
+                                    <div><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;<a href="{paths.truth.topics.entry}?topic={_id}">{title}</a></div>
+                                {/subtopics}
+                            {/subtopics}
+                            <div><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;<a href="{paths.truth.index}?topic={_id}" role="button">more &raquo;</a></div>
+                            {!<span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}!}
+                        </div>
+                    </div>
+                </div>
+            {/truth}
+        </div>
+
+        <div class="col-lg-4 col-md-6 col-sm-6 wt-section-col">
+            <h4 class="page-header" style="color: #767676">Top Worldviews</h4>
+            {#worldviews}
+                <div class="media wt-category">
+                    <div class="media-left media-top">
+                        <a href="{paths.worldviews.entry}?worldview={_id}">
+                            <div class="photo-placeholder"></div>
+                            {!<img class="media-object" data-src="holder.js/64x64" alt="{firstName} {lastName}">!}
+                        </a>
+                    </div>
+                    <div class="media-body">
+                        <h4 class="media-heading"><a href="{paths.worldviews.entry}?worldview={_id}">{title}</a></h4>
+                        <div>
+                            {?subworldviews}
+                                {#subworldviews}
+                                    <div><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;<a href="{paths.worldviews.entry}?worldview={_id}">{title}</a></div>
+                                {/subworldviews}
+                            {/subworldviews}
+                            <div><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;<a href="{paths.worldviews.index}?worldview={_id}" role="button">more &raquo;</a></div>
+                            {!<span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}!}
+                        </div>
+                    </div>
+                </div>
+            {/worldviews}
+        </div>
+
+        <div class="col-lg-4 col-md-6 col-sm-6 wt-section-col">
+            <h4 class="page-header" style="color: #767676">Topics in Morality</h4>
+            {#morality}
+                <div class="media wt-category">
+                    <div class="media-left media-top">
+                        <a href="{paths.morality.topics.entry}?topic={_id}">
+                            <div class="photo-placeholder"></div>
+                            {!<img class="media-object" data-src="holder.js/64x64" alt="{firstName} {lastName}">!}
+                        </a>
+                    </div>
+                    <div class="media-body">
+                        <h4 class="media-heading"><a href="{paths.morality.topics.entry}?topic={_id}">{title}</a></h4>
+                        <div>
+                            {?subtopics}
+                                {#subtopics}
+                                    <div><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;<a href="{paths.morality.topics.entry}?topic={_id}">{title}</a></div>
+                                {/subtopics}
+                            {/subtopics}
+                            <div><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;<a href="{paths.morality.index}?topic={_id}" role="button">more &raquo;</a></div>
+                            {!<span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}!}
+                        </div>
+                    </div>
+                </div>
+            {/morality}
+        </div>
+    </div>
+
 {/body}

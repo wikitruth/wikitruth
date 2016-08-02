@@ -24,22 +24,22 @@
                 <div class="col-lg-4 col-md-6 col-sm-6">{! 73px !}
                     <div class="media wt-category">
                         <div class="media-left media-top">
-                            <a href="{paths.truth.topics.entry}?topic={_id}">
+                            <a href="{paths.morality.topics.entry}?topic={_id}">
                                 <div class="photo-placeholder"></div>
                                 {!<img class="media-object" data-src="holder.js/64x64" alt="{firstName} {lastName}">!}
                             </a>
                         </div>
                         <div class="media-body">
-                            <h4 class="media-heading"><a href="{paths.truth.topics.entry}?topic={_id}">{title}</a></h4>
-                        <p>
-                            {?subtopics}
-                                {#subtopics}
-                                    <div><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;<a href="{paths.truth.topics.entry}?topic={_id}">{title}</a></div>
+                            <h4 class="media-heading"><a href="{paths.morality.topics.entry}?topic={_id}">{title}</a></h4>
+                            <div>
+                                {?subtopics}
+                                    {#subtopics}
+                                        <div><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;<a href="{paths.morality.topics.entry}?topic={_id}">{title}</a></div>
+                                    {/subtopics}
                                 {/subtopics}
-                            {/subtopics}
-                            <div><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;<a href="{paths.truth.topics.index}?topic={topic._id}" role="button">more &raquo;</a></div>
-                            {!<span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}!}
-                            </p>
+                                <div><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;<a href="{paths.morality.index}?topic={_id}" role="button">more &raquo;</a></div>
+                                {!<span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}!}
+                            </div>
                         </div>
                     </div>
                 </div>

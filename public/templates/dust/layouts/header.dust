@@ -18,29 +18,50 @@
         <div class="navbar-header">
             <a href="/" class="navbar-brand">
                 <img src="/img/logo-64x64.png" alt="Logo" class="navbar-logo">
-                    <span class="navbar-brand-label hidden-xs-x">{projectName}</span></a>
-            <button data-toggle="collapse" data-target=".my-navbar-collapse" class="navbar-toggle collapsed">
-                <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>
+                    <span class="navbar-brand-label"><span class="hidden-xxs-x">{projectName}</span></span></a>
+            {!<button data-toggle="collapse" data-target=".my-navbar-collapse" class="navbar-toggle collapsed">
+                <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>!}
         </div>
         <div class="navbar-collapse my-navbar-collapse collapse">
             <ul class="nav navbar-nav">
                 <!--<li class="hidden-xs"><a href="/">Home</a></li>-->
-                <li><a href="{paths.truth.index}"><i class="fa fa-globe"></i> Truth</a></li>
-                <li><a href="{paths.worldviews.index}"><i class="fa fa-book"></i> Religion</a></li>
-                <li><a href="{paths.morality.index}"><i class="fa fa-balance-scale"></i> Morality</a></li>
+                <li><a href="{paths.truth.index}"><i class="fa fa-globe"></i><span class="hidden-xxs"> Truth</span></a></li>
+                <li><a href="{paths.worldviews.index}"><i class="fa fa-book"></i><span class="hidden-xs"> Religion</span></a></li>
+                <li><a href="{paths.morality.index}"><i class="fa fa-balance-scale"></i><span class="hidden-xs"> Morality</span></a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <li class="dropdown-header">Members</li>
+                        <li><a href="#"><i class="fa fa-user"></i> Contributors</a></li>
+                        <li><a href="#"><i class="fa fa-user"></i> Reviewers</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li class="dropdown-header">more</li>
+                        <li><a href="#"><span class="glyphicon glyphicon-font" aria-hidden="true"></span> Dictionary</a></li>
+                        <li><a href="#"><i class="fa fa-book"></i> Manuscripts</a></li>
+                    </ul>
+                </li>
                 <!--<li class="hidden-xs"><a href="/about/">About</a></li>-->
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                {#user.username}
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user"></i> {user.username} <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li class="dropdown-header">Content</li>
-                            <li><a href="#/switch?content=1">{?showVerified}<i class="fa fa-circle"></i>{:else}<i class="fa fa-circle-o"></i>{/showVerified} Verified</a></li>
-                            <li><a href="#/switch?content=2">{^showVerified}<i class="fa fa-circle"></i>{:else}<i class="fa fa-circle-o"></i>{/showVerified} Latest</a></li>
-                            <li><a href="#/switch?content=3">{?showEverything}<i class="fa fa-circle"></i>{:else}<i class="fa fa-circle-o"></i>{/showEverything} Everything</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        {?user.username}
+                            <span class="hidden-xxs"><i class="fa fa-user"></i> {user.username} <span class="caret"></span></span>
+                            <i class="fa fa-navicon visible-xxs"></i>
+                        {:else}
+                            <i class="fa fa-navicon"></i>
+                        {/user.username}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <li class="dropdown-header">Content View</li>
+                        <li><a href="#/switch?content=1">{?showVerified}<i class="fa fa-circle"></i>{:else}<i class="fa fa-circle-o"></i>{/showVerified} Verified</a></li>
+                        <li><a href="#/switch?content=2">{^showVerified}<i class="fa fa-circle"></i>{:else}<i class="fa fa-circle-o"></i>{/showVerified} Latest</a></li>
+                        <li><a href="#/switch?content=3">{?showEverything}<i class="fa fa-circle"></i>{:else}<i class="fa fa-circle-o"></i>{/showEverything} Everything</a></li>
+                        {#user.username}
                             <li role="separator" class="divider"></li>
-                            <li class="dropdown-header">Role</li>
+                            <li class="dropdown-header">My Role</li>
                             <li><a href="#/switch?role=2">{?isContributor}<i class="fa fa-circle"></i>{:else}<i class="fa fa-circle-o"></i>{/isContributor} Contributor</a></li>
                             <li><a href="#/switch?role=1">{^isContributor}<i class="fa fa-circle"></i>{:else}<i class="fa fa-circle-o"></i>{/isContributor} Reader</a></li>
                             <li role="separator" class="divider"></li>
@@ -52,12 +73,19 @@
                             <li><a href="{paths.account.settings}">Settings</a></li>
                             <li role="separator" class="divider"></li>
                             <li><a href="{paths.logout}">Sign Out</a></li>
-                        </ul>
-                    </li>
+                        {:else}
+                            <li role="separator" class="divider"></li>
+                            <li class="dropdown-header">Account</li>
+                            <li><a href="{paths.login}"><i class="fa fa-user"></i> Login</a></li>
+                            <li><a href="{paths.signup}"><i class="fa fa-user"></i> Sign Up</a></li>
+                        {/user.username}
+                    </ul>
+                </li>
+                {!{#user.username}
                 {:else}
                     <li><a href="{paths.login}"><i class="fa fa-user"></i> Login</a></li>
                     <li><a href="{paths.signup}"><i class="fa fa-user"></i> Sign Up</a></li>
-                {/user.username}
+                {/user.username}!}
             </ul>
         </div>
     </div>

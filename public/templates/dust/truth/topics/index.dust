@@ -31,15 +31,15 @@
                         </div>
                         <div class="media-body">
                             <h4 class="media-heading"><a href="{paths.truth.topics.entry}?topic={_id}">{title}</a></h4>
-                            <p>
+                            <div>
                                 {?subtopics}
                                     {#subtopics}
                                         <div><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;<a href="{paths.truth.topics.entry}?topic={_id}">{title}</a></div>
                                     {/subtopics}
                                 {/subtopics}
-                                <div><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;<a href="{paths.truth.topics.index}?topic={topic._id}" role="button">more &raquo;</a></div>
+                                <div><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;<a href="{paths.truth.index}?topic={_id}" role="button">more &raquo;</a></div>
                                 {!<span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}!}
-                            </p>
+                            </div>
                         </div>
                     </div>
                 </div>
