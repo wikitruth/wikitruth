@@ -25,15 +25,15 @@
                         </div>
                         <div class="media-body">
                             <h4 class="media-heading"><a href="{paths.worldviews.entry}?worldview={_id}">{title}</a></h4>
-                            <p>
-                            {?subworldviews}
-                                {#subworldviews}
-                                    <div><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;<a href="{paths.worldviews.entry}?worldview={_id}">{title}</a></div>
+                            <div>
+                                {?subworldviews}
+                                    {#subworldviews}
+                                        <div><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;<a href="{paths.worldviews.entry}?worldview={_id}">{title}</a></div>
+                                    {/subworldviews}
                                 {/subworldviews}
-                            {/subworldviews}
-                            <div><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;<a href="{paths.worldviews.index}?worldview={_id}" role="button">more &raquo;</a></div>
-                            {!<span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}!}
-                            </p>
+                                <div><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;<a href="{paths.worldviews.index}?worldview={_id}" role="button">more &raquo;</a></div>
+                                {!<span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}!}
+                            </div>
                         </div>
                     </div>
                 </div>

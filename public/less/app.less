@@ -1,6 +1,7 @@
 /*@import "../components/bootstrap/less/bootstrap";*/
 @import "../components/bootstrap/less/mixins/responsive-visibility";
 @import "bootstrap-vars";
+@import "bootstrap/responsive-utilities-xxs";
 
 /* Space out content a bit */
 body {
@@ -132,14 +133,6 @@ body {
 }
 
 
-@screen-xxs-max: (@screen-xs-min - 1);
-
-.hidden-xxs {
-  @media (max-width: @screen-xxs-max) {
-    .responsive-invisibility();
-  }
-}
-
 .breadcrumb {
   a {
     color: #555;
@@ -179,6 +172,10 @@ a.no-underline:hover {
 /* prevent comments from overlapping */
 .list-group .list-group-item {
   overflow: hidden;
+}
+
+.list-group .list-group-item.highlight {
+  background-color: #f8f8f8;
 }
 
 .wt-section-col {
