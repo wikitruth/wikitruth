@@ -17,7 +17,7 @@
         <input type="hidden" name="_csrf" value="{_csrf}">
         <div class="form-group">
             <label for="inputName">Question</label>
-            <textarea name="title" id="inputName" value="{question.title}" class="form-control" rows="1"></textarea>
+            <textarea name="title" id="inputName" class="form-control" rows="1">{question.title}</textarea>
         </div>
         <div class="form-group">
             <label for="inputContent">Summary</label>
