@@ -4,6 +4,7 @@ html
     block head
       title #{title}
     meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    link(rel='stylesheet', href='/css/app.min.css?#{cacheBreaker}')
     link(rel='stylesheet', href='/layouts/core.min.css?#{cacheBreaker}')
     link(rel='stylesheet', href='/layouts/admin.min.css?#{cacheBreaker}')
     block neck
@@ -20,11 +21,18 @@ html
             span.icon-bar
         div.navbar-collapse.my-navbar-collapse.collapse
           ul.nav.navbar-nav
-            li: a(href='/admin/') Home
+            li
+              a(href='/admin/')
+                i.fa.fa-home
+                span.hidden-xs
+                  |  Home
             //li: a(href='/account/') My Account
             li.dropdown
               a.dropdown-toggle(href='#', data-toggle='dropdown')
-                | System&nbsp;
+                i.fa.fa-gear
+                span.hidden-xxs
+                  |  System
+                |&nbsp;
                 span.caret
               ul.dropdown-menu
                 li.dropdown-header Pivoted Settings
@@ -41,7 +49,7 @@ html
               |  Sign Out
             //ul.nav.navbar-nav.navbar-right
             include account-nav.jade
-          form.navbar-form.pull-right#_search
+          form.navbar-form.pull-right.hidden-xs#_search
 
     div.page
       div.container
