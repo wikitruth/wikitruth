@@ -11,7 +11,7 @@
         <input type="hidden" name="_csrf" value="{_csrf}">
         <div class="form-group">
             <label for="inputTitle">Title</label>
-            <textarea name="title" id="inputTitle" value="{page.title}" class="form-control" rows="1"></textarea>
+            <textarea name="title" id="inputTitle" class="form-control" rows="1">{page.title}</textarea>
         </div>
         <div class="form-group">
             <label for="inputContent">Content</label>
@@ -19,7 +19,7 @@
         </div>
         <div class="form-group">
             <label for="inputId">ID</label>
-            <textarea name="id" id="inputId" value="{page.id}" class="form-control" rows="1"></textarea>
+            <textarea name="id" id="inputId" class="form-control" rows="1">{page.id}</textarea>
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
         {?parent}
