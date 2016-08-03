@@ -15,13 +15,13 @@
     </li>
     <li role="presentation"{@eq key=tab value="top-questions"} class="active"{/eq}>
         <a href="{paths.truth.questions.index}" role="tab">
-            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions
+            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span><span class="hidden-xxs"> Questions</span>
         </a>
     </li>
     {?isContributor}
         <li role="presentation" class="dropdown"><a href="#" id="wtTabMore" class="dropdown-toggle" data-toggle="dropdown" aria-controls="wtTabMore-contents" aria-expanded="false">
             <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span> {!<span class="caret"></span>!}</a>
-        <ul class="dropdown-menu" aria-labelledby="wtTabMore" id="wtTabMore-contents">
+        <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="wtTabMore" id="wtTabMore-contents">
             <li role="tab"><a href="{paths.truth.topics.create}">
                 <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Topic</a></li>
             {!<li role="separator" class="visible-xs divider"></li>

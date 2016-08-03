@@ -11,7 +11,7 @@
                 </li>
                 <li role="presentation"{@eq key=tab value="worldviews"} class="active"{/eq}>
                     <a href="{paths.worldviews.index}?worldview={worldview._id}" role="tab">
-                        <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Worldviews</a>
+                        <span class="glyphicon glyphicon-file" aria-hidden="true"></span><span class="hidden-xxs"> Worldviews</span></a>
                 </li>
             {:else}
                 {! topic !}
@@ -22,11 +22,11 @@
             {/topic}
             <li role="presentation"{@eq key=tab value="topics"} class="active"{/eq}>
                 <a href="{paths.worldviews.topics.index}?worldview={worldview._id}{?topic}&amp;topic={topic._id}{/topic}" role="tab">
-                    <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> Topics</a>
+                    <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span><span class="hidden-xs"> Topics</span></a>
             </li>
             <li role="presentation"{@eq key=tab value="arguments"} class="active"{/eq}>
                 <a href="{paths.worldviews.arguments.index}?worldview={worldview._id}{?topic}&amp;topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
-                    <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments</a>
+                    <span class="glyphicon glyphicon-flash" aria-hidden="true"></span><span class="hidden-xs"> Arguments</span></a>
             </li>
         {:else}
             {! argument !}
@@ -37,7 +37,7 @@
         {/argument}
         <li role="presentation"{@eq key=tab value="questions"} class="active"{/eq}>
             <a href="{paths.worldviews.questions.index}?worldview={worldview._id}{?topic}&amp;topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
-                <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions{!<span class="hidden-xs"> (122)</span>!}</a>
+                <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span><span class="hidden-xs"> Questions</span>{!<span class="hidden-xs"> (122)</span>!}</a>
         </li>
     {:else}
         <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
@@ -49,7 +49,7 @@
         <span class="glyphicon glyphicon-random" aria-hidden="true"></span> Related</a>!}
     <li role="presentation" class="dropdown"><a href="#" id="wtTabMore" class="dropdown-toggle" data-toggle="dropdown" aria-controls="wtTabMore-contents" aria-expanded="false">
         <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span> {!<span class="caret"></span>!}</a>
-        <ul class="dropdown-menu" aria-labelledby="wtTabMore" id="wtTabMore-contents">
+        <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="wtTabMore" id="wtTabMore-contents">
             {?isContributor}
                 {^question}
                     {^argument}

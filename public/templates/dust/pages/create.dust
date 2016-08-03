@@ -11,7 +11,7 @@
         <input type="hidden" name="_csrf" value="{_csrf}">
         <div class="form-group">
             <label for="inputTitle">Title</label>
-            <input type="text" name="title" id="inputTitle" value="{page.title}" class="form-control"/>
+            <textarea name="title" id="inputTitle" value="{page.title}" class="form-control" rows="1"></textarea>
         </div>
         <div class="form-group">
             <label for="inputContent">Content</label>
@@ -19,7 +19,7 @@
         </div>
         <div class="form-group">
             <label for="inputId">ID</label>
-            <input type="text" name="id" id="inputId" value="{page.id}" class="form-control"/>
+            <textarea name="id" id="inputId" value="{page.id}" class="form-control" rows="1"></textarea>
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
         {?parent}
@@ -36,9 +36,11 @@
 
 {<footer}
     <link rel="stylesheet" href="/components/summernote/dist/summernote.css">
-    <script type="text/javascript" src="/components/summernote/dist/summernote.min.js"></script>
+    <script src="/components/textarea-autosize/dist/jquery.textarea_autosize.min.js"></script>
+    <script src="/components/summernote/dist/summernote.min.js"></script>
     <script type="text/javascript">
         $(function() {
+            $('#inputTitle,#inputId').textareaAutoSize();
             $('#inputContent').summernote({
                 height: WT_CONSTANTS.summernote.contentHeight,
                 toolbar: WT_CONSTANTS.summernote.contentToolbar

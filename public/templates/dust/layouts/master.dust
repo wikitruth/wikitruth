@@ -5,11 +5,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     {! The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags !}
-    {?pageTitle}
-        <title>{pageTitle} - {titleSlogan}</title>
-    {:else}
-        <title>{+title}{titleSlogan}{/title}</title>
-    {/pageTitle}
+    <title>
+        {?pageTitle}
+            {pageTitle} - {titleSlogan}
+        {:else}
+            {+title}{titleSlogan}{/title}
+        {/pageTitle}
+    </title>
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="/css/app.min.css" />
@@ -32,11 +34,6 @@
     </div>
     {>"dust/layouts/footer" /}
 
-    {!<div class="container">
-        {>"dust/layouts/header" /}
-        {+body /}
-        {>"dust/layouts/footer" /}
-    </div> <!-- /container -->!}
     {!<script data-main="/js/requirejs/app" src="/components/requirejs/require.js"></script>!}
     <script src="/components/jquery/dist/jquery.min.js"></script>
     <script src="/components/bootstrap/dist/js/bootstrap.min.js"></script>

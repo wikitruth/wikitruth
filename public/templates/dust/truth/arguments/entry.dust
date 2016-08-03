@@ -9,10 +9,10 @@
     <div class="entry-header">
         {>"dust/truth/common/entry-verdict" /}
     </div>
-    <div>
+    <div class="text-body">
         <p>{argument.content|s}</p>
-        {>"dust/truth/common/entry-options" /}
     </div>
+    {>"dust/truth/common/entry-options" /}
     {?arguments}
         <ul class="list-group top-list-items">
             <li class="list-group-item highlight"><span class="glyphicon glyphicon-flash text-success" aria-hidden="true"></span> Top Arguments</li>

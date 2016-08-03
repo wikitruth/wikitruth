@@ -13,7 +13,7 @@
             </li>
             <li role="presentation"{@eq key=tab value="arguments"} class="active"{/eq}>
                 <a href="{paths.morality.arguments.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
-                    <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments{!<span class="hidden-xs"> (1,023)</span>!}</a>
+                    <span class="glyphicon glyphicon-flash" aria-hidden="true"></span><span class="hidden-xxs"> Arguments</span>{!<span class="hidden-xs"> (1,023)</span>!}</a>
             </li>
         {:else}
             <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
@@ -23,7 +23,7 @@
         {/argument}
         <li role="presentation"{@eq key=tab value="questions"} class="active"{/eq}>
             <a href="{paths.morality.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
-                <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions{!<span class="hidden-xs"> (122)</span>!}</a>
+                <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span><span class="hidden-xs"> Questions</span>{!<span class="hidden-xs"> (122)</span>!}</a>
         </li>
     {:else}
         <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
@@ -37,7 +37,7 @@
     </li>!}
     <li role="presentation" class="dropdown"><a href="#" id="wtTabMore" class="dropdown-toggle" data-toggle="dropdown" aria-controls="wtTabMore-contents" aria-expanded="false">
         <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span> {!<span class="caret"></span>!}</a>
-        <ul class="dropdown-menu" aria-labelledby="wtTabMore" id="wtTabMore-contents">
+        <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="wtTabMore" id="wtTabMore-contents">
         {?isContributor}
             {^question}
                 {^argument}

@@ -9,9 +9,9 @@
     <div class="entry-header">
         {>"dust/truth/common/entry-verdict" /}
     </div>
-    <div>
+    <div class="text-body">
         <p>{question.content|s}</p>
-        {>"dust/truth/common/entry-options" /}
     </div>
+    {>"dust/truth/common/entry-options" /}
     {>"dust/truth/common/entry-footer" /}
 {/body}
