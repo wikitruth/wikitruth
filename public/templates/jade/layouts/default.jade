@@ -13,7 +13,12 @@ html
         div.navbar-header
           a.navbar-brand(href='/')
             img.navbar-logo(src='/img/logo-64x64.png', alt='Logo')
-            span.navbar-brand-label #{projectName}
+            span.navbar-brand-label
+              if user && user.username
+                | #{projectName}
+              else
+                span.hidden-xxs
+                  | #{projectName}
           button.navbar-toggle.collapsed(data-toggle='collapse', data-target='.my-navbar-collapse')
             span.icon-bar
             span.icon-bar
@@ -23,13 +28,16 @@ html
             //li: a(href='/') Home
             li: a(href='#{paths.truth.index}')
               i.fa.fa-globe
-              |  Truth
+              span.hidden-xs
+                |  Truth
             li: a(href='#{paths.worldviews.index}')
               i.fa.fa-book
-              |  Religion
+              span.hidden-xs
+                |  Religion
             li: a(href='#{paths.morality.index}')
               i.fa.fa-balance-scale
-              |  Morality
+              span.hidden-xs
+                |  Morality
             //li: a(href='/about/') About
           ul.nav.navbar-nav.navbar-right
             if user && user.username
