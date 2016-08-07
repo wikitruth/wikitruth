@@ -97,6 +97,28 @@ module.exports = function (router) {
                     model.questions = results;
                     callback();
                 });
+            },
+            issues: function (callback) {
+                // Top Issues
+                var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument, groupId: constants.CORE_GROUPS.truth };
+                db.Issue.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                    results.forEach(function(result) {
+                        result.comments = utils.randomInt(0,999);
+                    });
+                    model.issues = results;
+                    callback();
+                });
+            },
+            opinions: function (callback) {
+                // Top Opinions
+                var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument, groupId: constants.CORE_GROUPS.truth };
+                db.Opinion.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                    results.forEach(function(result) {
+                        result.comments = utils.randomInt(0,999);
+                    });
+                    model.opinions = results;
+                    callback();
+                });
             }
         }, function (err, results) {
             model.entry = model.argument;

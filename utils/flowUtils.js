@@ -74,6 +74,40 @@ function setQuestionModel(req, model, callback) {
     }
 }
 
+function setIssueModel(req, model, callback) {
+    if(req.query.issue) {
+        db.Issue.findOne({_id: req.query.issue}, function (err, result) {
+            if(isOwner(req, result, model)) {
+                model.isIssueOwner = true;
+            }
+            db.User.findOne({_id: result.editUserId}, function (err, user) {
+                result.editUsername = user.username;
+                model.issue = result;
+                callback(err);
+            });
+        });
+    } else {
+        callback();
+    }
+}
+
+function setOpinionModel(req, model, callback) {
+    if(req.query.opinion) {
+        db.Opinion.findOne({_id: req.query.opinion}, function (err, result) {
+            if(isOwner(req, result, model)) {
+                model.isOpinionOwner = true;
+            }
+            db.User.findOne({_id: result.editUserId}, function (err, user) {
+                result.editUsername = user.username;
+                model.opinion = result;
+                callback(err);
+            });
+        });
+    } else {
+        callback();
+    }
+}
+
 function setArgumentModels(req, model, callback) {
     if(req.query.argument) {
         async.series({
@@ -151,5 +185,7 @@ module.exports = {
     setWorldviewModels: setWorldviewModels,
     setArgumentModels: setArgumentModels,
     setTopicModels: setTopicModels,
-    setQuestionModel: setQuestionModel
+    setQuestionModel: setQuestionModel,
+    setIssueModel: setIssueModel,
+    setOpinionModel: setOpinionModel
 };

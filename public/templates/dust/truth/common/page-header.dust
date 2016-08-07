@@ -1,15 +1,23 @@
 <h1 class="page-header">
-    {?question}
-        {question.title}
+    {?opinion}
+        {opinion.title}
     {:else}
-        {?argument}
-            {argument.title}
+        {?issue}
+            {issue.title}
         {:else}
-            {?topic}
-                {topic.title}
-            {/topic}
-        {/argument}
-    {/question}
+            {?question}
+                {question.title}
+            {:else}
+                {?argument}
+                    {argument.title}
+                {:else}
+                    {?topic}
+                        {topic.title}
+                    {/topic}
+                {/argument}
+            {/question}
+        {/issue}
+    {/opinion}
     {@eq key=tab value="link-to"}
         :&nbsp;Links
     {/eq}

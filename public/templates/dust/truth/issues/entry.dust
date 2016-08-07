@@ -1,0 +1,17 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {entry.title} - {titleSlogan}
+{/title}
+
+{<body}
+    {>"dust/truth/common/entry-header" tab="overview" /}
+    <div class="entry-header">
+        {>"dust/truth/common/entry-verdict" /}
+    </div>
+    <div class="text-body">
+        <p>{entry.content|s}</p>
+    </div>
+    {>"dust/truth/common/entry-options" /}
+    {>"dust/truth/common/entry-footer" /}
+{/body}

@@ -1,0 +1,18 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {?argument}{argument.title}{:else}{topic.title}{/argument}: Issues - {titleSlogan}
+{/title}
+
+{<body}
+    {>"dust/truth/common/entry-header" tab="issues" /}
+    {?issues}
+        <ul class="list-group wt-list">
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Issues</li>
+            {#issues}
+                <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
+                    <a href="{paths.truth.issues.entry}?issue={_id}{?topic}&amp;topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}">{title}</a> <span class="pull-right text-muted"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+            {/issues}
+        </ul>
+    {/issues}
+{/body}

@@ -11,7 +11,7 @@
         {>"dust/truth/common/index-header" tab="top-questions" /}
     {/topic}
     {?questions}
-        <ul class="list-group">
+        <ul class="list-group wt-list">
             <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> {^topic}Top {/topic}Questions</li>
             {#questions}
                 <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
