@@ -1,6 +1,7 @@
 'use strict';
 
 var mongoose    = require('mongoose'),
+    async       = require('async'),
     utils       = require('../../utils/utils'),
     flowUtils   = require('../../utils/flowUtils'),
     paths       = require('../../models/paths'),
@@ -18,8 +19,8 @@ module.exports = function (router) {
             flowUtils.setTopicModels(req, model, function () {
                 flowUtils.setArgumentModels(req, model, function () {
                     var query = req.query.argument ?
-                    { ownerId: model.argument._id, ownerType: constants.OBJECT_TYPES.argument } :
-                    { ownerId: model.topic._id, ownerType: constants.OBJECT_TYPES.topic };
+                        { ownerId: model.argument._id, ownerType: constants.OBJECT_TYPES.argument } :
+                        { ownerId: model.topic._id, ownerType: constants.OBJECT_TYPES.topic };
                     db.Question.find(query).sort({ title: 1 }).exec(function(err, results) {
                         results.forEach(function(result) {
                             result.comments = utils.randomInt(0,999);
@@ -46,13 +47,41 @@ module.exports = function (router) {
 
     router.get('/entry', function (req, res) {
         var model = {};
-        flowUtils.setTopicModels(req, model, function () {
-            flowUtils.setArgumentModels(req, model, function () {
-                flowUtils.setQuestionModel(req, model, function () {
-                    model.entry = model.question;
-                    res.render(templates.truth.questions.entry, model);
+        async.parallel({
+            topic: function(callback){
+                flowUtils.setTopicModels(req, model, callback);
+            },
+            argument: function (callback) {
+                flowUtils.setArgumentModels(req, model, callback);
+            },
+            question: function (callback) {
+                flowUtils.setQuestionModel(req, model, callback);
+            },
+            issues: function (callback) {
+                // Top Issues
+                var query = { ownerId: req.query.question, ownerType: constants.OBJECT_TYPES.question, groupId: constants.CORE_GROUPS.truth };
+                db.Issue.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                    results.forEach(function(result) {
+                        result.comments = utils.randomInt(0,999);
+                    });
+                    model.issues = results;
+                    callback();
                 });
-            });
+            },
+            opinions: function (callback) {
+                // Top Opinions
+                var query = { ownerId: req.query.question, ownerType: constants.OBJECT_TYPES.question, groupId: constants.CORE_GROUPS.truth };
+                db.Opinion.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                    results.forEach(function(result) {
+                        result.comments = utils.randomInt(0,999);
+                    });
+                    model.opinions = results;
+                    callback();
+                });
+            }
+        }, function (err, results) {
+            model.entry = model.question;
+            res.render(templates.truth.questions.entry, model);
         });
     });
 

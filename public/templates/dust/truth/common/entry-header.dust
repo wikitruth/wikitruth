@@ -1,36 +1,60 @@
 {>"dust/truth/common/breadcrumb" /}
 {>"dust/truth/common/page-header" /}
 <ul class="nav nav-tabs wt-tabs" role="tablist">
-    {^question}
-        {^argument}
-            <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
-                <a href="{paths.truth.topics.entry}?topic={topic._id}" role="tab">
-                    <span class="glyphicon glyphicon-home" aria-hidden="true"></span><span class="hidden-xxs"> Overview</span></a>
+    {^opinion}
+        {^issue}
+            {^question}
+                {^argument}
+                    <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
+                        <a href="{paths.truth.topics.entry}?topic={topic._id}" role="tab">
+                            <span class="glyphicon glyphicon-home" aria-hidden="true"></span><span class="hidden-xxs"> Overview</span></a>
+                    </li>
+                    <li role="presentation"{@eq key=tab value="topics"} class="active"{/eq}>
+                        <a href="{paths.truth.index}?topic={topic._id}" role="tab">
+                            <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span><span class="hidden-xs"> Topics</span></a>
+                    </li>
+                {:else}
+                    <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
+                        <a href="{paths.truth.arguments.entry}?topic={topic._id}&amp;argument={argument._id}" role="tab">
+                            <span class="glyphicon glyphicon-home" aria-hidden="true"></span> Overview</a>
+                    </li>
+                {/argument}
+                <li role="presentation"{@eq key=tab value="arguments"} class="active"{/eq}>
+                    <a href="{paths.truth.arguments.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" aria-controls="home" role="tab">
+                        <span class="glyphicon glyphicon-flash" aria-hidden="true"></span><span class="hidden-xs"> Arguments</span></a>
+                </li>
+                <li role="presentation"{@eq key=tab value="questions"} class="active"{/eq}>
+                    <a href="{paths.truth.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
+                        <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span><span class="hidden-xs"> Questions</span></a>
+                </li>
+            {:else}
+                <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
+                    <a href="{paths.truth.questions.entry}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}" role="tab">
+                        <span class="glyphicon glyphicon-home" aria-hidden="true"></span> Overview</a>
+                </li>
+            {/question}
+            <li role="presentation"{@eq key=tab value="issues"} class="active"{/eq}>
+                <a href="{paths.truth.issues.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
+                    <i class="fa fa-exclamation-circle" aria-hidden="true"></i><span class="hidden-xs"> Issues</span></a>
             </li>
-            <li role="presentation"{@eq key=tab value="topics"} class="active"{/eq}>
-                <a href="{paths.truth.index}?topic={topic._id}" role="tab">
-                    <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span> Topics</a>
+            <li role="presentation"{@eq key=tab value="opinions"} class="active"{/eq}>
+                <a href="{paths.truth.opinions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
+                    <i class="fa fa-comments-o" aria-hidden="true"></i><span class="hidden-xs"> Opinions</span></a>
             </li>
         {:else}
             <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
-                <a href="{paths.truth.arguments.entry}?topic={topic._id}&amp;argument={argument._id}" role="tab">
-                    <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a>
+                <a href="{paths.truth.issues.entry}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;issue={issue._id}" role="tab">
+                    <span class="glyphicon glyphicon-home" aria-hidden="true"></span> Overview</a>
             </li>
-        {/argument}
-        <li role="presentation"{@eq key=tab value="arguments"} class="active"{/eq}>
-            <a href="{paths.truth.arguments.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" aria-controls="home" role="tab">
-                <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments{!<span class="hidden-xs"> (1,023)</span>!}</a>
-        </li>
-        <li role="presentation"{@eq key=tab value="questions"} class="active"{/eq}>
-            <a href="{paths.truth.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
-                <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span><span class="hidden-xs"> Questions</span>{!<span class="hidden-xs"> (122)</span>!}</a>
-        </li>
+        {/issue}
     {:else}
         <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
-            <a href="{paths.truth.questions.entry}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}" role="tab">
-                <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a>
+            <a href="{paths.truth.opinions.entry}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;opinion={opinion._id}" role="tab">
+                <span class="glyphicon glyphicon-home" aria-hidden="true"></span> Overview</a>
         </li>
-    {/question}
+    {/opinion}
+
+
     {!<li role="presentation"{@eq key=tab value="related"} class="active"{/eq}>
         <a href="{paths.truth.related}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
             <span class="glyphicon glyphicon-random" aria-hidden="true"></span> Related</a>
@@ -60,7 +84,12 @@
                         {/isQuestionOwner}!}
                     {/question}
                     <li><a href="{paths.truth.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
-                        <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> New Question</a></li>
+                        <span class="fa fa-question-circle" aria-hidden="true"></span> New Question</a></li>
+                <li role="separator" class="divider"></li>
+                <li><a href="{paths.truth.issues.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
+                    <span class="fa fa-exclamation-circle" aria-hidden="true"></span> New Issue</a></li>
+                <li><a href="{paths.truth.opinions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
+                    <span class="fa fa-comments-o" aria-hidden="true"></span> New Opinion</a></li>
                     {!<li role="separator" class="divider"></li>!}
                 {!<li>
                     <a href="{paths.truth.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">

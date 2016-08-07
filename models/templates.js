@@ -39,6 +39,16 @@ module.exports = {
             create: 'dust/truth/questions/create',
             entry: 'dust/truth/questions/entry'
         },
+        issues: {
+            create: 'dust/truth/issues/create',
+            index:  'dust/truth/issues/index',
+            entry:  'dust/truth/issues/entry'
+        },
+        opinions: {
+            create: 'dust/truth/opinions/create',
+            index:  'dust/truth/opinions/index',
+            entry:  'dust//truth/opinions/entry'
+        },
         outline: {
             create: 'dust/truth/outline/create',
             linkTo: 'dust/truth/outline/link-to'

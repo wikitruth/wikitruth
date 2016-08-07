@@ -14,19 +14,19 @@
     </div>
     {>"dust/truth/common/entry-options" /}
     {?topics}
-        <ul class="list-group top-list-items">
-            <li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp; Top Topics</li>
+        <ul class="list-group top-list-items wt-list">
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp; Topics</li>
             {#topics}
             <li class="list-group-item"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp;&nbsp;
                 <a href="{paths.truth.topics.entry}?topic={_id}">{title}</a> <span class="pull-right text-muted">
                     <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
             {/topics}
         </ul>
-        <div class="top-list-items-more"><a href="{paths.truth.index}?topic={topic._id}" role="button">View All &raquo;</a></div>
+        <div class="top-list-items-more"><a href="{paths.truth.index}?topic={topic._id}" role="button">view more &raquo;</a></div>
     {/topics}
     {?arguments}
-        <ul class="list-group top-list-items">
-            <li class="list-group-item highlight"><span class="glyphicon glyphicon-flash text-success" aria-hidden="true"></span> Top Arguments</li>
+        <ul class="list-group top-list-items wt-list">
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-flash text-success" aria-hidden="true"></span> Arguments</li>
             {#arguments}
             <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
                 <a href="{paths.truth.arguments.entry}?topic={topic._id}&amp;argument={_id}">{title}&nbsp;
@@ -35,18 +35,40 @@
             </li>
             {/arguments}
         </ul>
-        <div class="top-list-items-more"><a href="{paths.truth.arguments.index}?topic={topic._id}" role="button">View All &raquo;</a></div>
+        <div class="top-list-items-more"><a href="{paths.truth.arguments.index}?topic={topic._id}" role="button">view more &raquo;</a></div>
     {/arguments}
     {?questions}
-        <ul class="list-group top-list-items">
-            <li class="list-group-item highlight"><span class="glyphicon glyphicon-question-sign text-success" aria-hidden="true"></span> Top Questions</li>
+        <ul class="list-group top-list-items wt-list">
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-question-sign text-success" aria-hidden="true"></span> Questions</li>
             {#questions}
                 <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
                     <a href="{paths.truth.questions.entry}?topic={topic._id}&amp;question={_id}">{title}</a> <span class="pull-right text-muted">
                     <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
             {/questions}
         </ul>
-        <div class="top-list-items-more"><a href="{paths.truth.questions.index}?topic={topic._id}" role="button">View All &raquo;</a></div>
+        <div class="top-list-items-more"><a href="{paths.truth.questions.index}?topic={topic._id}" role="button">view more &raquo;</a></div>
     {/questions}
+    {?issues}
+        <ul class="list-group top-list-items wt-list">
+            <li class="list-group-item highlight"><span class="fa fa-exclamation-circle text-success" aria-hidden="true"></span> Issues</li>
+            {#issues}
+                <li class="list-group-item"><span class="fa fa-exclamation-circle text-success" aria-hidden="true"></span>&nbsp;
+                    <a href="{paths.truth.issues.entry}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;issue={_id}">{title}</a> <span class="pull-right text-muted">
+                    <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+            {/issues}
+        </ul>
+        <div class="top-list-items-more"><a href="{paths.truth.issues.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="button">view more &raquo;</a></div>
+    {/issues}
+    {?opinions}
+        <ul class="list-group top-list-items wt-list">
+            <li class="list-group-item highlight"><span class="fa fa-comments-o text-success" aria-hidden="true"></span> Opinions</li>
+            {#opinions}
+                <li class="list-group-item"><span class="fa fa-comments-o text-success" aria-hidden="true"></span>&nbsp;
+                    <a href="{paths.truth.opinions.entry}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;opinion={_id}">{title}</a> <span class="pull-right text-muted">
+                    <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+            {/opinions}
+        </ul>
+        <div class="top-list-items-more"><a href="{paths.truth.opinions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="button">view more &raquo;</a></div>
+    {/opinions}
     {>"dust/truth/common/entry-footer" /}
 {/body}

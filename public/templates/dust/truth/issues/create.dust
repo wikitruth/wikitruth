@@ -1,30 +1,26 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {?question}Edit{:else}New{/question} Question - {titleSlogan}
+    {?issue}Edit{:else}New{/issue} Issue - {titleSlogan}
 {/title}
 
 {<body}
     {>"dust/truth/common/breadcrumb" /}
     <h1 class="page-header">
-        {?question}Edit{:else}New{/question} Question
+        {?issue}Edit{:else}New{/issue} Issue
     </h1>
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
         <div class="form-group">
-            <label for="inputName">Question</label>
-            <textarea name="title" id="inputName" class="form-control" rows="1">{question.title}</textarea>
+            <label for="inputName">Issue</label>
+            <textarea name="title" id="inputName" class="form-control" rows="1">{issue.title}</textarea>
         </div>
         <div class="form-group">
             <label for="inputContent">Summary</label>
-            <textarea class="form-control" id="inputContent" name="content" rows="12">{question.content}</textarea>
-        </div>
-        <div class="form-group">
-            <label for="inputReferences">References</label>
-            <textarea class="form-control" id="inputReferences" name="references" rows="3">{question.references}</textarea>
+            <textarea class="form-control" id="inputContent" name="content" rows="12">{issue.content}</textarea>
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
-        <a class="btn btn-default" href="{?question}{paths.truth.questions.entry}{:else}{paths.truth.questions.index}{/question}{?topic}?topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="button">Cancel</a>
+        <a class="btn btn-default" href="{?issue}{paths.truth.issues.entry}{:else}{paths.truth.issues.index}{/issue}{?topic}?topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}{?issue}&amp;issue={issue._id}{/issue}" role="button">Cancel</a>
     </form>
 {/body}
 

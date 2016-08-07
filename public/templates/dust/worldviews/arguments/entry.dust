@@ -21,7 +21,7 @@
                     <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
             {/questions}
         </ul>
-        <div class="top-list-items-more"><a href="{paths.worldviews.questions.index}?worldview={worldview._id}{?topic}&amp;topic={topic._id}{/topic}&amp;argument={argument._id}" role="button">View All &raquo;</a></div>
+        <div class="top-list-items-more"><a href="{paths.worldviews.questions.index}?worldview={worldview._id}{?topic}&amp;topic={topic._id}{/topic}&amp;argument={argument._id}" role="button">view more &raquo;</a></div>
     {/questions}
     {?argument.references}
         <small class="text-muted">

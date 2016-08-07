@@ -26,7 +26,7 @@
                     <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
             {/topics}
         </ul>
-        <div class="top-list-items-more"><a href="{paths.worldviews.index}?worldview={worldview._id}&amp;topic={topic._id}" role="button">View All &raquo;</a></div>
+        <div class="top-list-items-more"><a href="{paths.worldviews.index}?worldview={worldview._id}&amp;topic={topic._id}" role="button">view more &raquo;</a></div>
     {/topics}
     {?arguments}
         <ul class="list-group top-list-items">
@@ -37,7 +37,7 @@
                     <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
             {/arguments}
         </ul>
-        <div class="top-list-items-more"><a href="{paths.worldviews.arguments.index}?worldview={worldview._id}&amp;topic={topic._id}" role="button">View All &raquo;</a></div>
+        <div class="top-list-items-more"><a href="{paths.worldviews.arguments.index}?worldview={worldview._id}&amp;topic={topic._id}" role="button">view more &raquo;</a></div>
     {/arguments}
     {?questions}
         <ul class="list-group top-list-items">
@@ -48,7 +48,7 @@
                     <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
             {/questions}
         </ul>
-        <div class="top-list-items-more"><a href="{paths.worldviews.questions.index}?worldview={worldview._id}&amp;topic={topic._id}" role="button">View All &raquo;</a></div>
+        <div class="top-list-items-more"><a href="{paths.worldviews.questions.index}?worldview={worldview._id}&amp;topic={topic._id}" role="button">view more &raquo;</a></div>
     {/questions}
     {?topic.references}
         <small class="text-muted">

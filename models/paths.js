@@ -39,6 +39,16 @@ module.exports = {
             index:  '/truth/questions',
             entry:  '/truth/questions/entry'
         },
+        issues: {
+            create: '/truth/issues/create',
+            index:  '/truth/issues',
+            entry:  '/truth/issues/entry'
+        },
+        opinions: {
+            create: '/truth/opinions/create',
+            index:  '/truth/opinions',
+            entry:  '/truth/opinions/entry'
+        },
         outline: {
             link: '/truth/outline/link'
         },

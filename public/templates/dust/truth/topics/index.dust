@@ -48,7 +48,7 @@
         <br/>
     {/categories}
     {?topics}
-        <ul class="list-group">
+        <ul class="list-group wt-list">
             <li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp;&nbsp;{?categories}Top {/categories}Topics</li>
             {#topics}
                 <li class="list-group-item"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp;&nbsp;
