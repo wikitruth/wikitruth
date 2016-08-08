@@ -14,7 +14,14 @@
         <ul class="list-group wt-list">
             <li class="list-group-item highlight"><span class="glyphicon glyphicon-flash text-success" aria-hidden="true"></span> {^topic}Top {/topic}Arguments</li>
             {#arguments}
-                <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> <a href="{paths.truth.arguments.entry}?topic={topic._id}&amp;argument={_id}">{title} {?parentId}{?pro}<span class="label label-success">pro</span>{:else}<span class="label label-danger">con</span>{/pro}{/parentId}{?isLink}<span class="label label-info"><i class="fa fa-link" aria-hidden="true"></i></span>{/isLink}</a> <span class="pull-right text-muted"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+                <li class="list-group-item">
+                    <span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>
+                    <div>
+                        <a href="{paths.truth.arguments.entry}?topic={topic._id}&amp;argument={_id}">{title} {?parentId}{?pro}<span class="label label-success">pro</span>{:else}<span class="label label-danger">con</span>{/pro}{/parentId}{?isLink}<span class="label label-info"><i class="fa fa-link" aria-hidden="true"></i></span>{/isLink}</a>
+                        <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
+                    </div>
+                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
+                </li>
             {/arguments}
             {!<li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Birds Prove Natural Selection is Naturally Wrong <span class="label label-danger">negative</span> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 10,456</span></li>!}
         </ul>

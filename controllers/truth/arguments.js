@@ -28,7 +28,7 @@ module.exports = function (router) {
                     }
                     db.Argument.find(query).sort({ title: 1 }).exec(function(err, results) {
                         results.forEach(function(result) {
-                            result.comments = utils.randomInt(0,999);
+                            flowUtils.appendEntryExtra(result);
                             if(utils.randomBool()) {
                                 result.isLink = true;
                             }
@@ -48,7 +48,7 @@ module.exports = function (router) {
                     result.topic = {
                         _id: result.ownerId
                     };
-                    result.comments = utils.randomInt(0,999);
+                    flowUtils.appendEntryExtra(result);
                 });
                 model.arguments = results;
                 res.render(templates.truth.arguments.index, model);
@@ -75,7 +75,7 @@ module.exports = function (router) {
                 };
                 db.Argument.find(query).limit(15).exec(function(err, results) {
                     results.forEach(function(result) {
-                        result.comments = utils.randomInt(0,999);
+                        flowUtils.appendEntryExtra(result);
                         if(utils.randomBool()) {
                             result.isLink = true;
                         }
@@ -92,7 +92,7 @@ module.exports = function (router) {
                 var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument, groupId: constants.CORE_GROUPS.truth };
                 db.Question.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
                     results.forEach(function(result) {
-                        result.comments = utils.randomInt(0,999);
+                        flowUtils.appendEntryExtra(result);
                     });
                     model.questions = results;
                     callback();

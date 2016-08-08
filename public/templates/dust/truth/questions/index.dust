@@ -14,8 +14,13 @@
         <ul class="list-group wt-list">
             <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> {^topic}Top {/topic}Questions</li>
             {#questions}
-                <li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>&nbsp;
-                    <a href="{paths.truth.questions.entry}?question={_id}{?topic}&amp;topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}">{title}</a> <span class="pull-right text-muted"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+                <li class="list-group-item">
+                    <span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>
+                    <div>
+                        <a href="{paths.truth.questions.entry}?question={_id}{?topic}&amp;topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}">{title}</a>
+                        <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
+                    </div>
+                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
             {/questions}
         </ul>
     {/questions}

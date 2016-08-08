@@ -4,6 +4,9 @@
 module.exports = {
     index: 'dust/index',
     help: 'dust/help-us',
+    admin: {
+        mongoBackup: 'dust/admin/db-backup'
+    },
     about: {
         index: 'dust/about/page'
     },

@@ -1,6 +1,7 @@
 'use strict';
 
 var db      = require('../app').db.models,
+    utils   = require('./utils'),
     async   = require('async');
 
 function isOwner(req, item, model) {
@@ -14,6 +15,15 @@ function appendOwnerFlag(req, item, model) {
     if(isOwner(req, item, model)) {
         model.isItemOwner = true;
     }
+}
+
+function appendEntryExtra(result) {
+    result.comments = utils.randomInt(0,999);
+    result.editUsername = 'root';
+    result.points = utils.randomInt(0,9999);
+
+    var editDateString = result.editDate.toUTCString();
+    result.editDateString = editDateString.substring(0, editDateString.length - 4);
 }
 
 function setWorldviewModel(req, model, callback) {
@@ -187,5 +197,6 @@ module.exports = {
     setTopicModels: setTopicModels,
     setQuestionModel: setQuestionModel,
     setIssueModel: setIssueModel,
-    setOpinionModel: setOpinionModel
+    setOpinionModel: setOpinionModel,
+    appendEntryExtra: appendEntryExtra
 };
