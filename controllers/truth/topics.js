@@ -23,7 +23,7 @@ module.exports = function (router) {
                 var query = { parentId: req.query.topic, groupId: constants.CORE_GROUPS.truth };
                 db.Topic.find(query).limit(15).exec(function(err, results) {
                     results.forEach(function(result) {
-                        result.comments = utils.randomInt(0,999);
+                        flowUtils.appendEntryExtra(result);
                     });
                     model.topics = results;
                     callback();
@@ -39,7 +39,7 @@ module.exports = function (router) {
                 };
                 db.Argument.find(query).limit(15).exec(function(err, results) {
                     results.forEach(function(result) {
-                        result.comments = utils.randomInt(0,999);
+                        flowUtils.appendEntryExtra(result);
                         if(utils.randomBool()) {
                             result.isLink = true;
                         }
@@ -53,7 +53,7 @@ module.exports = function (router) {
                 var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, groupId: constants.CORE_GROUPS.truth };
                 db.Question.find(query).limit(15).exec(function(err, results) {
                     results.forEach(function(result) {
-                        result.comments = utils.randomInt(0,999);
+                        flowUtils.appendEntryExtra(result);
                     });
                     model.questions = results;
                     callback();

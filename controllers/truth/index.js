@@ -20,7 +20,7 @@ module.exports = function (router) {
                 var query = req.query.topic ? { parentId: req.query.topic } : { groupId: constants.CORE_GROUPS.truth };
                 db.Topic.find(query).limit(req.query.topic ? 100 : 15).sort(req.query.topic ? { title: 1 } : {}).exec(function(err, results) {
                     results.forEach(function(result) {
-                        result.comments = utils.randomInt(0,999);
+                        flowUtils.appendEntryExtra(result);
                     });
                     model.topics = results;
                     callback();

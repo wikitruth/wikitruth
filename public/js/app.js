@@ -1,6 +1,6 @@
 var WT_CONSTANTS = {
     summernote: {
-        contentHeight: 350,
+        contentHeight: 250,
         contentToolbar: [
             ['style', ['style']],
             ['font', ['bold', 'underline', 'strikethrough', 'clear']],
@@ -11,7 +11,7 @@ var WT_CONSTANTS = {
             ['insert', ['link', 'picture', 'video']],
             ['view', ['fullscreen', 'codeview', 'help']]
         ],
-        referenceHeight: 150,
+        referenceHeight: 100,
         referenceToolbar: [
             ['font', ['bold', 'underline', 'strikethrough', 'clear']],
             ['para', ['ul', 'ol', 'paragraph']],

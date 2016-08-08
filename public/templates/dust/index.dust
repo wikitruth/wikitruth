@@ -64,10 +64,10 @@
                         <div>
                             {?subtopics}
                                 {#subtopics}
-                                    <div><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;<a href="{paths.truth.topics.entry}?topic={_id}">{title}</a></div>
+                                    <div><i class="fa fa-folder-open text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.truth.topics.entry}?topic={_id}">{title}</a></div>
                                 {/subtopics}
                             {/subtopics}
-                            <div><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;<a href="{paths.truth.index}?topic={_id}" role="button">more &raquo;</a></div>
+                            <div><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.truth.index}?topic={_id}" role="button">more</a></div>
                             {!<span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}!}
                         </div>
                     </div>
@@ -90,10 +90,10 @@
                         <div>
                             {?subworldviews}
                                 {#subworldviews}
-                                    <div><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;<a href="{paths.worldviews.entry}?worldview={_id}">{title}</a></div>
+                                    <div><i class="fa fa-folder-open text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.worldviews.entry}?worldview={_id}">{title}</a></div>
                                 {/subworldviews}
                             {/subworldviews}
-                            <div><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;<a href="{paths.worldviews.index}?worldview={_id}" role="button">more &raquo;</a></div>
+                            <div><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.worldviews.index}?worldview={_id}" role="button">more</a></div>
                             {!<span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}!}
                         </div>
                     </div>
@@ -116,10 +116,10 @@
                         <div>
                             {?subtopics}
                                 {#subtopics}
-                                    <div><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;<a href="{paths.morality.topics.entry}?topic={_id}">{title}</a></div>
+                                    <div><i class="fa fa-folder-open text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.morality.topics.entry}?topic={_id}">{title}</a></div>
                                 {/subtopics}
                             {/subtopics}
-                            <div><span class="glyphicon glyphicon-file" aria-hidden="true"></span>&nbsp;<a href="{paths.morality.index}?topic={_id}" role="button">more &raquo;</a></div>
+                            <div><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.morality.index}?topic={_id}" role="button">more</a></div>
                             {!<span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}!}
                         </div>
                     </div>

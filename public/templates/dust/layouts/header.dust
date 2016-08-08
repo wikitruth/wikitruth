@@ -68,7 +68,7 @@
                             <li role="separator" class="divider"></li>
                             <li class="dropdown-header">Account</li>
                             {?user.isAdmin}
-                                <li><a href="{paths.admin}">Admin Area</a></li>
+                                <li><a href="{paths.admin.index}">Admin Area</a></li>
                             {/user.isAdmin}
                             <li><a href="{paths.account.index}">My Account</a></li>
                             <li><a href="{paths.account.settings}">Settings</a></li>

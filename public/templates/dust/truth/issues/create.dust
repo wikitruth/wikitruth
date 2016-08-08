@@ -16,6 +16,45 @@
             <textarea name="title" id="inputName" class="form-control" rows="1">{issue.title}</textarea>
         </div>
         <div class="form-group">
+            <label for="inputReferences">Issue Type <a data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a></label>
+            <div class="radio">
+                <label class="text-danger">
+                    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1">
+                    Logical fallacy (<a href="https://yourlogicalfallacyis.com/" target="_blank">well-known logical fallacies</a>)
+                </label>
+            </div>
+            <div class="radio">
+                <label class="text-danger">
+                    <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+                    Terminology issue (word definition)
+                </label>
+            </div>
+            <div class="radio">
+                <label class="text-warning">
+                    <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+                    A moral argument (not epistemological)
+                </label>
+            </div>
+            <div class="radio">
+                <label class="text-warning">
+                    <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+                    Containing unsubstantiated assumption (need to add more support)
+                </label>
+            </div>
+            <div class="radio">
+                <label class="text-warning-x">
+                    <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+                    Confusing statement structure, too vague (grammatical issue)
+                </label>
+            </div>
+            <div class="radio">
+                <label class="text-warning-x">
+                    <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+                    Others
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
             <label for="inputContent">Summary</label>
             <textarea class="form-control" id="inputContent" name="content" rows="12">{issue.content}</textarea>
         </div>
