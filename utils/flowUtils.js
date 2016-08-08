@@ -20,10 +20,10 @@ function appendOwnerFlag(req, item, model) {
 function appendEntryExtra(result) {
     result.comments = utils.randomInt(0,999);
     result.editUsername = 'root';
-    result.points = utils.randomInt(0,9999);
+    result.points = utils.randomInt(0,9999) + ' points';
 
     //var editDateString = result.editDate.toUTCString();
-    result.editDateString = utils.timeSince(result.editDate); //editDateString.substring(0, editDateString.length - 4);
+    result.editDateString = utils.timeSince(result.editDate) + ' ago'; //editDateString.substring(0, editDateString.length - 4);
 }
 
 function setWorldviewModel(req, model, callback) {
