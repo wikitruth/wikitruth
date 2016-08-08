@@ -22,8 +22,8 @@ function appendEntryExtra(result) {
     result.editUsername = 'root';
     result.points = utils.randomInt(0,9999);
 
-    var editDateString = result.editDate.toUTCString();
-    result.editDateString = editDateString.substring(0, editDateString.length - 4);
+    //var editDateString = result.editDate.toUTCString();
+    result.editDateString = utils.timeSince(result.editDate); //editDateString.substring(0, editDateString.length - 4);
 }
 
 function setWorldviewModel(req, model, callback) {
