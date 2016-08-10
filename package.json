@@ -31,6 +31,7 @@
     "engine-munger": "^0.2.9",
     "express": "^4.14.0",
     "express-session": "^1.13.0",
+    "fs": "0.0.2",
     "handlebars": "^4.0.5",
     "helmet": "^2.1.1",
     "jade": "^1.x.x",
