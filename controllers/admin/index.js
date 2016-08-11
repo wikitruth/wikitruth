@@ -5,9 +5,7 @@ var templates   = require('../../models/templates'),
     config      = require('../../config/config'),
     flowUtils   = require('../../utils/flowUtils'),
     backup      = require('mongodb-backup'),
-    restore     = require('mongodb-restore'),
     db          = require('../../app').db.models,
-    mongoose    = require('mongoose'),
     fs          = require('fs'),
     async       = require('async');
 
@@ -50,9 +48,11 @@ module.exports = function (router) {
                                 var file = coldir + '/' + json;
                                 var obj = JSON.parse(fs.readFileSync(file, 'utf8'));
                                 collection.create(obj, function (err, newObj) {
-                                    if (err) console.error(err);
+                                    if (err) {
+                                        console.error(err);
+                                    }
                                     callback();
-                                })
+                                });
                             }, function (err) {
                                 callback();
                             });
