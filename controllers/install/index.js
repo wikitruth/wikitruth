@@ -16,7 +16,7 @@ module.exports = function (router) {
     router.get('/', function (req, res) {
         var model = {};
         model.dirname = flowUtils.getBackupDir();
-        res.render(templates.install.index, model);
+        res.render(templates.install, model);
     });
 
     router.post('/', function (req, res) {
@@ -53,7 +53,7 @@ module.exports = function (router) {
             }
         }, function (err) {
             model.done = true;
-            res.render(templates.install.index, model);
+            res.render(templates.install, model);
         });
     });
 };

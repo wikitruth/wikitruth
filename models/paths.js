@@ -11,6 +11,7 @@ module.exports = {
         index: '/admin',
         mongoBackup: '/db-backup'
     },
+    install: '/install',
     account: {
         index: '/account',
         settings: '/account/settings'

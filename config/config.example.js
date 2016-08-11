@@ -1,11 +1,13 @@
 'use strict';
 
-exports.port = process.env.PORT || 3000;
+exports.port = process.env.PORT || 8000;
 exports.mongodb = {
-  uri: process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost:27017/wikitruth'
+  uri: process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost:27017/wikitruth',
+  backupRoot: '~/config/mongodb'
 };
 exports.companyName = 'Acme, Inc.';
 exports.projectName = 'Wikitruth';
+exports.titleSlogan = 'Wikitruth, the truth in totality of human knowledge';
 exports.systemEmail = 'your@email.addy';
 exports.cryptoKey = 'abc123';
 exports.loginAttempts = {
