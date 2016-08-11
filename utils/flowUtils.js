@@ -2,7 +2,18 @@
 
 var db      = require('../app').db.models,
     utils   = require('./utils'),
+    config  = require('../config/config'),
     async   = require('async');
+
+function getBackupDir() {
+    if(config.mongodb.backupRoot) {
+        if(config.mongodb.backupRoot.startsWith('~')) {
+            return __dirname + '/..' + config.mongodb.backupRoot.substring(1);
+        }
+        return config.mongodb.backupRoot;
+    }
+    return __dirname + '/../config/mongodb';
+}
 
 function isOwner(req, item, model) {
     if(item && req.user && item.createUserId && req.user.id && item.createUserId.equals(req.user.id)) {
@@ -189,6 +200,7 @@ function setTopicModels(req, model, callback) {
 }
 
 module.exports = {
+    getBackupDir: getBackupDir,
     isOwner: isOwner,
     appendOwnerFlag: appendOwnerFlag,
     setWorldviewModel: setWorldviewModel,
