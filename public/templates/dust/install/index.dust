@@ -1,0 +1,18 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    Setup: MongoDB Restore - {titleSlogan}
+{/title}
+
+{<body}
+    <div class="page-header"><h1>Setup: MongoDB Restore</h1></div>
+    <h3>Backup Dir: {dirname}</h3>
+    <form method="post">
+        <input type="hidden" name="_csrf" value="{_csrf}">
+        <button type="submit" name="buttonAction" value="restore" class="btn btn-danger" onclick="return confirm('Are you sure you want to Restore the DB? This will clear all existing data in the target collections.')">Install</button>&nbsp;
+        {?done}
+            <br/>
+            <h1>Install done!</h1>
+        {/done}
+    </form>
+{/body}
