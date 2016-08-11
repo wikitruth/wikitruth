@@ -7,9 +7,7 @@ module.exports = {
     admin: {
         mongoBackup: 'dust/admin/db-backup'
     },
-    install: {
-        index: 'dust/install/index'
-    },
+    install: 'dust/install/index',
     about: {
         index: 'dust/about/page'
     },

@@ -2,6 +2,7 @@
 
 var utils       = require('../utils/utils'),
     templates   = require('../models/templates'),
+    paths       = require('../models/paths'),
     constants   = require('../models/constants'),
     db          = require('../app').db.models,
     async       = require('async');
@@ -54,7 +55,18 @@ module.exports = function (router) {
                 });
             }
         }, function (err, results) {
-            res.render(templates.index, model);
+            // Detect if the DB has no data, if yes, redirect the user to install/1st run page.
+            if(model.truth.lengh > 0) {
+                res.render(templates.index, model);
+            } else {
+                db.User.findOne({}, function(err, result) {
+                    if(!result) {
+                        res.redirect(paths.install);
+                    } else {
+                        res.render(templates.index, model);
+                    }
+                });
+            }
         });
     });
 };
