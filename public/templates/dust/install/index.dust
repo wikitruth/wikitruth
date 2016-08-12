@@ -7,16 +7,20 @@
 {<body}
     <div class="page-header"><h1>Install: MongoDB Restore</h1></div>
     <p>Welcome to 1st run setup. This page will help you setup the initial data on your mongodb database by restoring from the dev backup.</p>
-    <p>Once setup is done, you may login using the username/password: root/dev123</p>
-    <div class="alert alert-warning" role="alert">Clicking the Install button will clear all existing data in the target collections.</div>
-    <form method="post">
-        <input type="hidden" name="_csrf" value="{_csrf}">
-        <button type="submit" name="buttonAction" value="restore" class="btn btn-danger" onclick="return confirm('Are you sure you want to Restore the DB? This will clear all existing data in the target collections.')">Install</button>&nbsp;
-        <h4>Backup Dir: {dirname}</h4>
-        {?done}
-            <br/>
-            <h1>Install done!</h1>
-            <a class="btn btn-success" href="/">Continue</a>
-        {/done}
-    </form>
+    {?showRestore}
+        <p>Once setup is done, you may login using the username/password: <strong>root / dev123</strong></p>
+        <div class="alert alert-warning" role="alert">Clicking the Install button will clear all existing data in the target collections.</div>
+        <form method="post">
+            <input type="hidden" name="_csrf" value="{_csrf}">
+            <button type="submit" name="buttonAction" value="restore" class="btn btn-danger" onclick="return confirm('Are you sure you want to Restore the DB? This will clear all existing data in the target collections.')">Install</button>&nbsp;
+            <h4>Backup Dir: {dirname}</h4>
+            {?done}
+                <br/>
+                <h1>Install done!</h1>
+                <a class="btn btn-success" href="/">Continue</a>
+            {/done}
+        </form>
+    {:else}
+        <div class="alert alert-warning" role="alert">Sorry, your account has no permission to execute this operation. Please login using an admin account.</div>
+    {/showRestore}
 {/body}
