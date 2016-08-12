@@ -3,7 +3,51 @@
 exports.port = process.env.PORT || 8000;
 exports.mongodb = {
   uri: process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost:27017/wikitruth',
-  backupRoot: '~/config/mongodb'
+  backupRoot: '~/config/mongodb',
+  collections: {
+    backupList: [
+      'users',
+      'accountcategories',
+      'accounts',
+      'admingroups',
+      'admins',
+      'arguments',
+      'ideologies',
+      'issues',
+      'loginattempts',
+      'opinions',
+      'pages',
+      'questions',
+      'status',
+      'topics',
+      'words'
+    ],
+    modelMapping: {
+      accountcategories: 'AccountCategory',
+      accounts: 'Account',
+      admingroups: 'AdminGroup',
+      admin: 'Admin',
+      arguments: 'Argument',
+      categories: 'Category',
+      ideologies: 'Ideology',
+      issues: 'Issue',
+      loginattempts: 'LoginAttempt',
+      opinions: 'Opinion',
+      pages: 'Page',
+      questions: 'Question',
+      sessions: 'Session',
+      status: 'Status',
+      topics: 'Topic',
+      users: 'User',
+      words: 'Word'
+    }
+  },
+  gitBackup: {
+    signature: {
+      name: 'FirstName LastName',
+      email: 'email@somedomain.com'
+    }
+  }
 };
 exports.companyName = 'Acme, Inc.';
 exports.projectName = 'Wikitruth';

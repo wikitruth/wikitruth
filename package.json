@@ -44,6 +44,7 @@
     "mongodb-restore": "^1.5.4",
     "mongoose": "^4.5.2",
     "morgan": "^1.7.0",
+    "nodegit": "^0.14.1",
     "passport": "^0.2.x",
     "passport-facebook": "^2.1.1",
     "passport-github": "^0.1.x",
