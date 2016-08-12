@@ -11,6 +11,9 @@
         <input type="hidden" name="_csrf" value="{_csrf}">
         <button type="submit" name="buttonAction" value="backup" class="btn btn-primary" onclick="return confirm('Are you sure you want to Backup the DB?')">Backup</button>&nbsp;
         <button type="submit" name="buttonAction" value="restore" class="btn btn-danger" onclick="return confirm('Are you sure you want to Restore the DB?')">Restore</button>&nbsp;
+        {?gitBackup}
+            <button type="submit" name="buttonAction" value="push" class="btn btn-success" onclick="return confirm('Are you sure you want to Commit & Push the DB?')">Commit &amp; Push</button>&nbsp;
+        {/gitBackup}
         {?action}
             <br/>
             <h1>{action} done!</h1>

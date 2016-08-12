@@ -1,11 +1,13 @@
 'use strict';
 
 var templates   = require('../../models/templates'),
-    constants   = require('../../models/constants'),
+    config      = require('../../config/config'),
     flowUtils   = require('../../utils/flowUtils'),
     db          = require('../../app').db.models,
     fs          = require('fs'),
     async       = require('async');
+
+var cols = config.mongodb.collections;
 
 function requestLogin(req, res) {
     // redirect to login
@@ -24,9 +26,8 @@ module.exports = function (router) {
         if (req.isAuthenticated()) {
             if (req.user.canPlayRoleOf('admin')) {
                 model.showRestore = true;
-            } else {
-                // User won't be allowed.
             }
+            // else: User won't be allowed.
             res.render(templates.install, model);
         } else {
             db.Admin.findOne({}, function(err, result) {
@@ -47,15 +48,15 @@ module.exports = function (router) {
         var next = function () {
             model.dirname = flowUtils.getBackupDir();
             var dir = flowUtils.getBackupDir() + '/wikitruth';
-            //console.log(constants.DB.cols);
+            //console.log(cols.backupList);
 
-            async.eachSeries(constants.DB.cols, function (col, callback) {
+            async.eachSeries(cols.backupList, function (col, callback) {
                 var coldir = dir + '/' + col;
                 var jsons = fs.readdirSync(coldir);
                 //console.log('restore:', col);
                 //console.log(jsons);
-                if (constants.DB.colmaps[col]) {
-                    var collection = db[constants.DB.colmaps[col]];
+                if (cols.modelMapping[col]) {
+                    var collection = db[cols.modelMapping[col]];
                     if (collection) {
                         collection.remove({}, function (err) {
                             async.eachSeries(jsons, function (json, callback) {

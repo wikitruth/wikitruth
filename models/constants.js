@@ -24,44 +24,5 @@ module.exports = {
         truth: 100,
         worldviews: 101,
         morality: 102
-    },
-
-    DB: {
-        cols: [
-            'users',
-            'accountcategories',
-            'accounts',
-            'admingroups',
-            'admins',
-            'arguments',
-            'ideologies',
-            'issues',
-            'loginattempts',
-            'opinions',
-            'pages',
-            'questions',
-            'status',
-            'topics',
-            'words'
-        ],
-        colmaps: {
-            'accountcategories': 'AccountCategory',
-            'accounts': 'Account',
-            'admingroups': 'AdminGroup',
-            'admins': 'Admin',
-            'arguments': 'Argument',
-            'categories': 'Category',
-            'ideologies': 'Ideology',
-            'issues': 'Issue',
-            'loginattempts': 'LoginAttempt',
-            'opinions': 'Opinion',
-            'pages': 'Page',
-            'questions': 'Question',
-            'sessions': 'Session',
-            'status': 'Status',
-            'topics': 'Topic',
-            'users': 'User',
-            'words': 'Word'
-        }
     }
 };

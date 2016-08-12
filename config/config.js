@@ -3,13 +3,51 @@
 exports.port = process.env.PORT || 8000;
 exports.mongodb = {
   uri: process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost:27017/wikitruth',
-  backupRoot: '~/config/mongodb'
+  backupRoot: '~/config/mongodb',
+  collections: {
+    backupList: [
+      'users',
+      'accountcategories',
+      'accounts',
+      'admingroups',
+      'admins',
+      'arguments',
+      'ideologies',
+      'issues',
+      'loginattempts',
+      'opinions',
+      'pages',
+      'questions',
+      'status',
+      'topics',
+      'words'
+    ],
+    modelMapping: {
+      accountcategories: 'AccountCategory',
+      accounts: 'Account',
+      admingroups: 'AdminGroup',
+      admin: 'Admin',
+      arguments: 'Argument',
+      categories: 'Category',
+      ideologies: 'Ideology',
+      issues: 'Issue',
+      loginattempts: 'LoginAttempt',
+      opinions: 'Opinion',
+      pages: 'Page',
+      questions: 'Question',
+      sessions: 'Session',
+      status: 'Status',
+      topics: 'Topic',
+      users: 'User',
+      words: 'Word'
+    }
+  }
 };
 exports.companyName = 'Wikitruth Foundation';
 exports.projectName = 'Wikitruth';
-exports.systemEmail = 'your@email.addy';
-exports.cryptoKey = 'abc123';
 exports.titleSlogan = 'Wikitruth, the truth in totality of human knowledge';
+exports.systemEmail = 'your@email.com';
+exports.cryptoKey = 'abc123';
 exports.loginAttempts = {
   forIp: 50,
   forIpAndUser: 7,
@@ -18,11 +56,11 @@ exports.loginAttempts = {
 exports.requireAccountVerification = false;
 exports.smtp = {
   from: {
-    address: process.env.SMTP_FROM_ADDRESS || 'your@email.addy'
     name: process.env.SMTP_FROM_NAME || exports.projectName /* +' Website'*/,
+    address: process.env.SMTP_FROM_ADDRESS || 'your@email.com'
   },
   credentials: {
-    user: process.env.SMTP_USERNAME || 'your@email.addy',
+    user: process.env.SMTP_USERNAME || 'your@email.com',
     password: process.env.SMTP_PASSWORD || 'bl4rg!',
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     ssl: true
