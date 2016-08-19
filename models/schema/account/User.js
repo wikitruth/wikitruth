@@ -7,7 +7,8 @@ exports = module.exports = function(app, mongoose) {
     email: { type: String, unique: true },
     roles: {
       admin: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
-      account: { type: mongoose.Schema.Types.ObjectId, ref: 'Account' }
+      account: { type: mongoose.Schema.Types.ObjectId, ref: 'Account' },
+      reviewer: { type: Boolean }
     },
     isActive: String,
     timeCreated: { type: Date, default: Date.now },
@@ -24,8 +25,10 @@ exports = module.exports = function(app, mongoose) {
     if (role === 'admin' && this.roles.admin) {
       return true;
     }
-
     if (role === 'account' && this.roles.account) {
+      return true;
+    }
+    if (role === 'reviewer' && this.roles.reviewer) {
       return true;
     }
 

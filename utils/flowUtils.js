@@ -16,10 +16,7 @@ function getBackupDir() {
 }
 
 function isOwner(req, item, model) {
-    if(item && req.user && item.createUserId && req.user.id && item.createUserId.equals(req.user.id)) {
-        return true;
-    }
-    return false;
+    return item && req.user && item.createUserId && req.user.id && item.createUserId.equals(req.user.id);
 }
 
 function appendOwnerFlag(req, item, model) {
@@ -28,13 +25,49 @@ function appendOwnerFlag(req, item, model) {
     }
 }
 
-function appendEntryExtra(result) {
-    result.comments = utils.randomInt(0,999);
-    result.editUsername = 'root';
-    result.points = utils.randomInt(0,9999) + ' points';
+function appendEntryExtra(item) {
+    item.comments = utils.randomInt(0,999);
+    //item.editUsername = 'root';
+    item.points = utils.randomInt(0,9999) + ' points';
 
     //var editDateString = result.editDate.toUTCString();
-    result.editDateString = utils.timeSince(result.editDate) + ' ago'; //editDateString.substring(0, editDateString.length - 4);
+    item.editDateString = utils.timeSince(item.editDate)/* + ' ago'*/; //editDateString.substring(0, editDateString.length - 4);
+}
+
+function setEditorsUsername(items, callback) {
+    var seen = {};
+    var userIds = items
+        .filter(function (item) {
+            var id = item.editUserId ? item.editUserId.valueOf() : null;
+            if (!id || seen[id]) {
+                return;
+            }
+            seen[id] = true;
+            return item;
+            //return !!item.editUserId;
+        }).map(function (item) {
+            return item.editUserId;
+        }
+    );
+
+    var query = {
+        _id: {
+            $in: userIds
+        }
+    };
+
+    db.User.find(query, { username: 1}, function(err, results) {
+        var userNames = {};
+        results.forEach(function(result) {
+            userNames[result._id.valueOf()] = result.username;
+        });
+        items.forEach(function(item) {
+            if(item.editUserId) {
+                item.editUsername = userNames[item.editUserId.valueOf()];
+            }
+        });
+        callback ();
+    });
 }
 
 function setWorldviewModel(req, model, callback) {
@@ -210,5 +243,6 @@ module.exports = {
     setQuestionModel: setQuestionModel,
     setIssueModel: setIssueModel,
     setOpinionModel: setOpinionModel,
-    appendEntryExtra: appendEntryExtra
+    appendEntryExtra: appendEntryExtra,
+    setEditorsUsername: setEditorsUsername
 };

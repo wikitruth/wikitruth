@@ -22,25 +22,29 @@ module.exports = function (router) {
                         { ownerId: model.argument._id, ownerType: constants.OBJECT_TYPES.argument } :
                         { ownerId: model.topic._id, ownerType: constants.OBJECT_TYPES.topic };
                     db.Question.find(query).sort({ title: 1 }).exec(function(err, results) {
-                        results.forEach(function(result) {
-                            flowUtils.appendEntryExtra(result);
+                        flowUtils.setEditorsUsername(results, function() {
+                            results.forEach(function (result) {
+                                flowUtils.appendEntryExtra(result);
+                            });
+                            model.questions = results;
+                            res.render(templates.truth.questions.index, model);
                         });
-                        model.questions = results;
-                        res.render(templates.truth.questions.index, model);
                     });
                 });
             });
         } else {
             // Top Questions
             db.Question.find({ ownerType: constants.OBJECT_TYPES.topic, groupId: constants.CORE_GROUPS.truth }).limit(100).exec(function(err, results) {
-                results.forEach(function(result) {
-                    result.topic = {
-                        _id: result.ownerId
-                    };
-                    flowUtils.appendEntryExtra(result);
+                flowUtils.setEditorsUsername(results, function() {
+                    results.forEach(function (result) {
+                        result.topic = {
+                            _id: result.ownerId
+                        };
+                        flowUtils.appendEntryExtra(result);
+                    });
+                    model.questions = results;
+                    res.render(templates.truth.questions.index, model);
                 });
-                model.questions = results;
-                res.render(templates.truth.questions.index, model);
             });
         }
     });

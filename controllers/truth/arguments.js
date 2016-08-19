@@ -27,31 +27,35 @@ module.exports = function (router) {
                         query.ownerType = constants.OBJECT_TYPES.topic;
                     }
                     db.Argument.find(query).sort({ title: 1 }).exec(function(err, results) {
-                        results.forEach(function(result) {
-                            flowUtils.appendEntryExtra(result);
-                            if(utils.randomBool()) {
-                                result.isLink = true;
-                            }
-                            if(query.parentId && utils.randomBool()) {
-                                result.pro = true;
-                            }
+                        flowUtils.setEditorsUsername(results, function() {
+                            results.forEach(function (result) {
+                                flowUtils.appendEntryExtra(result);
+                                if (utils.randomBool()) {
+                                    result.isLink = true;
+                                }
+                                if (query.parentId && utils.randomBool()) {
+                                    result.pro = true;
+                                }
+                            });
+                            model.arguments = results;
+                            res.render(templates.truth.arguments.index, model);
                         });
-                        model.arguments = results;
-                        res.render(templates.truth.arguments.index, model);
                     });
                 });
             });
         } else {
             // Top Discussions
             db.Argument.find({ ownerType: constants.OBJECT_TYPES.topic, groupId: constants.CORE_GROUPS.truth }).limit(100).exec(function(err, results) {
-                results.forEach(function(result) {
-                    result.topic = {
-                        _id: result.ownerId
-                    };
-                    flowUtils.appendEntryExtra(result);
+                flowUtils.setEditorsUsername(results, function() {
+                    results.forEach(function (result) {
+                        result.topic = {
+                            _id: result.ownerId
+                        };
+                        flowUtils.appendEntryExtra(result);
+                    });
+                    model.arguments = results;
+                    res.render(templates.truth.arguments.index, model);
                 });
-                model.arguments = results;
-                res.render(templates.truth.arguments.index, model);
             });
         }
     });
@@ -74,28 +78,32 @@ module.exports = function (router) {
                     groupId: constants.CORE_GROUPS.truth
                 };
                 db.Argument.find(query).limit(15).exec(function(err, results) {
-                    results.forEach(function(result) {
-                        flowUtils.appendEntryExtra(result);
-                        if(utils.randomBool()) {
-                            result.isLink = true;
-                        }
-                        if(utils.randomBool()) {
-                            result.pro = true;
-                        }
+                    flowUtils.setEditorsUsername(results, function() {
+                        results.forEach(function (result) {
+                            flowUtils.appendEntryExtra(result);
+                            if (utils.randomBool()) {
+                                result.isLink = true;
+                            }
+                            if (utils.randomBool()) {
+                                result.pro = true;
+                            }
+                        });
+                        model.arguments = results;
+                        callback();
                     });
-                    model.arguments = results;
-                    callback();
                 });
             },
             questions: function (callback) {
                 // Top Questions
                 var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument, groupId: constants.CORE_GROUPS.truth };
                 db.Question.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
-                    results.forEach(function(result) {
-                        flowUtils.appendEntryExtra(result);
+                    flowUtils.setEditorsUsername(results, function() {
+                        results.forEach(function (result) {
+                            flowUtils.appendEntryExtra(result);
+                        });
+                        model.questions = results;
+                        callback();
                     });
-                    model.questions = results;
-                    callback();
                 });
             },
             issues: function (callback) {

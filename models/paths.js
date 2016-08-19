@@ -16,6 +16,12 @@ module.exports = {
         index: '/account',
         settings: '/account/settings'
     },
+    members: {
+        contributors: '/members/contributors',
+        reviewers: '/members/reviewers',
+        administrators: '/members/administrators',
+        profile: '/members/profile'
+    },
     pages: {
         index: '/pages',
         page: '/pages/page',

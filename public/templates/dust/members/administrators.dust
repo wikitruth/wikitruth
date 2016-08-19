@@ -1,0 +1,32 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    Administrators - {titleSlogan}
+{/title}
+
+{<body}
+    {>"dust/members/members-header" tab="administrators" /}
+    {?administrators}
+        <h3 class="page-header">Administrators</h3>
+        <div class="row">
+            {#administrators}
+                <div class="col-lg-4 col-md-6 col-sm-6">{! 73px !}
+                    <div class="media wt-category">
+                        <div class="media-left media-top">
+                            <a href="{paths.members.profile}?topic={_id}">
+                                <div class="photo-placeholder"></div>
+                            </a>
+                        </div>
+                        <div class="media-body">
+                            <h4 class="media-heading"><a href="{paths.members.profile}?username={username}">{username}</a></h4>
+                            <div>
+                                <div><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.members.profile}?username={username}" role="button">view profile</a></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {/administrators}
+        </div>
+        <br/>
+    {/administrators}
+{/body}
