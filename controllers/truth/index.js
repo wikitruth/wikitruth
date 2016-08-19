@@ -19,11 +19,13 @@ module.exports = function (router) {
                 // display 15 if top topics, 100 if has topic parameter
                 var query = req.query.topic ? { parentId: req.query.topic } : { groupId: constants.CORE_GROUPS.truth };
                 db.Topic.find(query).limit(req.query.topic ? 100 : 15).sort(req.query.topic ? { title: 1 } : {}).exec(function(err, results) {
-                    results.forEach(function(result) {
-                        flowUtils.appendEntryExtra(result);
+                    flowUtils.setEditorsUsername(results, function() {
+                        results.forEach(function(result) {
+                            flowUtils.appendEntryExtra(result);
+                        });
+                        model.topics = results;
+                        callback();
                     });
-                    model.topics = results;
-                    callback();
                 });
             },
             categories: function(callback) {

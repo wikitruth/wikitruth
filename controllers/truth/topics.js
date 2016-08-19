@@ -22,11 +22,13 @@ module.exports = function (router) {
                 // Top Subtopics
                 var query = { parentId: req.query.topic, groupId: constants.CORE_GROUPS.truth };
                 db.Topic.find(query).limit(15).exec(function(err, results) {
-                    results.forEach(function(result) {
-                        flowUtils.appendEntryExtra(result);
+                    flowUtils.setEditorsUsername(results, function() {
+                        results.forEach(function (result) {
+                            flowUtils.appendEntryExtra(result);
+                        });
+                        model.topics = results;
+                        callback();
                     });
-                    model.topics = results;
-                    callback();
                 });
             },
             arguments: function(callback) {
@@ -38,25 +40,29 @@ module.exports = function (router) {
                     groupId: constants.CORE_GROUPS.truth
                 };
                 db.Argument.find(query).limit(15).exec(function(err, results) {
-                    results.forEach(function(result) {
-                        flowUtils.appendEntryExtra(result);
-                        if(utils.randomBool()) {
-                            result.isLink = true;
-                        }
+                    flowUtils.setEditorsUsername(results, function() {
+                        results.forEach(function (result) {
+                            flowUtils.appendEntryExtra(result);
+                            if (utils.randomBool()) {
+                                result.isLink = true;
+                            }
+                        });
+                        model.arguments = results;
+                        callback();
                     });
-                    model.arguments = results;
-                    callback();
                 });
             },
             questions: function (callback) {
                 // Top Questions
                 var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, groupId: constants.CORE_GROUPS.truth };
                 db.Question.find(query).limit(15).exec(function(err, results) {
-                    results.forEach(function(result) {
-                        flowUtils.appendEntryExtra(result);
+                    flowUtils.setEditorsUsername(results, function() {
+                        results.forEach(function (result) {
+                            flowUtils.appendEntryExtra(result);
+                        });
+                        model.questions = results;
+                        callback();
                     });
-                    model.questions = results;
-                    callback();
                 });
             },
             issues: function (callback) {

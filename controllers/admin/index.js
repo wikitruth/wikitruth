@@ -29,6 +29,9 @@ module.exports = function (router) {
         var action = req.body.buttonAction;
         model.action = action;
         model.dirname = flowUtils.getBackupDir();
+        if(config.mongodb.gitBackup) {
+            model.gitBackup = true;
+        }
 
         if(action === 'backup') {
             backup({

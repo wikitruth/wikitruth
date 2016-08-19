@@ -1,0 +1,13 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {member.username}: Profile - {titleSlogan}
+{/title}
+
+{<body}
+    {>"dust/members/profile-header" tab="overview" /}
+
+    <p>Account Details</p>
+    <p>Reputation</p>
+    <p>Timeline / Activities</p>
+{/body}

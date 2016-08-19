@@ -11,6 +11,12 @@ module.exports = {
     about: {
         index: 'dust/about/page'
     },
+    members: {
+        contributors: 'dust/members/contributors',
+        reviewers: 'dust/members/reviewers',
+        administrators: 'dust/members/administrators',
+        profile: 'dust/members/profile'
+    },
     pages: {
         index: 'dust/pages/index',
         page: 'dust/pages/page',

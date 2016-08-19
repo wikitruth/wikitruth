@@ -34,11 +34,12 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-right">
                         <li class="dropdown-header">Members</li>
-                        <li><a href="#"><i class="fa fa-user"></i> Contributors</a></li>
-                        <li><a href="#"><i class="fa fa-user"></i> Reviewers</a></li>
-                        <li><a href="#"><i class="fa fa-user"></i> Administrators</a></li>
+                        <li><a href="{paths.members.contributors}"><i class="fa fa-user"></i> Contributors</a></li>
+                        <li><a href="{paths.members.reviewers}"><i class="fa fa-user"></i> Reviewers</a></li>
+                        <li><a href="{paths.members.administrators}"><i class="fa fa-user"></i> Administrators</a></li>
                         <li role="separator" class="divider"></li>
                         <li class="dropdown-header">more</li>
+                        <li><a href="#"><i class="fa fa-commenting" aria-hidden="true"></i> Debates</a></li>
                         <li><a href="#"><span class="glyphicon glyphicon-font" aria-hidden="true"></span> Dictionary</a></li>
                         <li><a href="#"><i class="fa fa-book"></i> Manuscripts</a></li>
                     </ul>

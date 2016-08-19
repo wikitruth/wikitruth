@@ -10,29 +10,29 @@ module.exports = {
     numberWithCommas: function numberWithCommas(x) {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     },
-    timeSince: function timeSince(date) {
+    timeSince: function timeSince(date, fullWord) {
         var seconds = Math.floor((new Date() - date) / 1000);
         var interval = Math.floor(seconds / 31536000);
 
         if (interval > 1) {
-            return interval + " years";
+            return interval + (fullWord ? " years ago" : 'y');
         }
         interval = Math.floor(seconds / 2592000);
         if (interval > 1) {
-            return interval + " months";
+            return interval + (fullWord ? " months" : 'mo');
         }
         interval = Math.floor(seconds / 86400);
         if (interval > 1) {
-            return interval + " days";
+            return interval + (fullWord ? " days" : 'd');
         }
         interval = Math.floor(seconds / 3600);
         if (interval > 1) {
-            return interval + " hours";
+            return interval + (fullWord ? " hours": 'h');
         }
         interval = Math.floor(seconds / 60);
         if (interval > 1) {
-            return interval + " minutes";
+            return interval + (fullWord ? " minutes" : 'm');
         }
-        return Math.floor(seconds) + " seconds";
+        return Math.floor(seconds) + (fullWord ? " seconds": 's');
     }
 };
