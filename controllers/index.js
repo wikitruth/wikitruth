@@ -69,4 +69,11 @@ module.exports = function (router) {
             }
         });
     });
+
+    router.get('/vash', function (req, res) {
+        var model = {
+            message: 'hello world!'
+        };
+        res.render('vash/test.vash', model);
+    });
 };

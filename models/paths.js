@@ -42,7 +42,8 @@ module.exports = {
         arguments: {
             index:  '/truth/arguments',
             entry:  '/truth/arguments/entry',
-            create: '/truth/arguments/create'
+            create: '/truth/arguments/create',
+            link: '/truth/arguments/link'
         },
         questions: {
             create: '/truth/questions/create',
@@ -65,7 +66,8 @@ module.exports = {
         verdict: {
             update: '/truth/verdict/update'
         },
-        related: '/truth/related'
+        related: '/truth/related',
+        clipboard: '/truth/clipboard'
     },
     worldviews: {
         index: '/worldviews',

@@ -16,7 +16,9 @@ exports = module.exports = function(app, mongoose) {
 
   // core
   require('./schema/core/Topic')(app, mongoose);
+  require('./schema/core/TopicLink')(app, mongoose);
   require('./schema/core/Argument')(app, mongoose);
+  require('./schema/core/ArgumentLink')(app, mongoose);
   require('./schema/core/Category')(app, mongoose);
   require('./schema/core/Question')(app, mongoose);
   require('./schema/core/Issue')(app, mongoose);

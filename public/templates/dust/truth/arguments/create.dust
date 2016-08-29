@@ -26,6 +26,12 @@
         <div class="form-group">
             <label for="inputParent">Parent</label>
             <textarea name="parent" id="inputParent" class="form-control" rows="1">{?argument}{argument.parentId}{:else}{parentArgument._id}{/argument}</textarea>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="supportsParent" value="1" {^argument.against}checked="checked"{/argument.against}>
+                    Supporting Argument (ignored when no parent)
+                </label>
+            </div>
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
         {?argument}

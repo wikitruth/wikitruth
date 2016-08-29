@@ -13,20 +13,26 @@
             <label for="inputReferences">Definitive <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a></label>
             <div class="radio">
                 <label class="text-success">
-                    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1">
-                    True
+                    <input type="radio" name="verdictStatus" id="radioVerdict1" value="1">
+                    TRUE
                 </label>
             </div>
             <div class="radio">
                 <label class="text-danger">
-                    <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
-                    False
+                    <input type="radio" name="verdictStatus" id="radioVerdict2" value="2">
+                    FALSE
                 </label>
             </div>
             <div class="radio">
                 <label class="text-warning">
-                    <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
-                    Claim (inconclusive, need more supporting arguments or evidences)
+                    <input type="radio" name="verdictStatus" id="radioVerdict0" value="0">
+                    CLAIM (Pending)
+                </label>
+            </div>
+            <div class="radio">
+                <label class="text-warning">
+                    <input type="radio" name="verdictStatus" id="radioVerdict3" value="3">
+                    CLAIM (inconclusive, need more supporting arguments or evidences)
                 </label>
             </div>
         </div>
@@ -34,25 +40,25 @@
             <label for="inputReferences">Positive Probabilistic <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a></label>
             <div class="radio">
                 <label class="text-success">
-                    <input type="radio" name="optionsRadios" id="optionsRadios3" value="option3">
+                    <input type="radio" name="verdictStatus" id="radioVerdict13" value="13">
                     Most Likely True
                 </label>
             </div>
             <div class="radio">
                 <label class="text-success">
-                    <input type="radio" name="optionsRadios" id="optionsRadios3" value="option3">
+                    <input type="radio" name="verdictStatus" id="radioVerdict12" value="12">
                     Very / Highly Likely
                 </label>
             </div>
             <div class="radio">
                 <label class="text-success">
-                    <input type="radio" name="optionsRadios" id="optionsRadios3" value="option3">
+                    <input type="radio" name="verdictStatus" id="radioVerdict11" value="11">
                     Likely / More likely than not
                 </label>
             </div>
             <div class="radio">
                 <label class="text-success">
-                    <input type="radio" name="optionsRadios" id="optionsRadios3" value="option3">
+                    <input type="radio" name="verdictStatus" id="radioVerdict10" value="10">
                     Makes Sense
                 </label>
             </div>
@@ -60,15 +66,27 @@
         <div class="form-group">
             <label for="inputReferences">Negative Probabilistic <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a></label>
             <div class="radio">
-                <label class="text-warning">
-                    <input type="radio" name="optionsRadios" id="optionsRadios3" value="option3">
+                <label class="text-danger">
+                    <input type="radio" name="verdictStatus" id="radioVerdict21" value="21">
                     Unlikely
                 </label>
             </div>
             <div class="radio">
-                <label class="text-warning">
-                    <input type="radio" name="optionsRadios" id="optionsRadios3" value="option3">
+                <label class="text-danger">
+                    <input type="radio" name="verdictStatus" id="radioVerdict22" value="22">
                     Very / Highly Unlikely
+                </label>
+            </div>
+            <div class="radio">
+                <label class="text-danger">
+                    <input type="radio" name="verdictStatus" id="radioVerdict23" value="23">
+                    Most Likely False
+                </label>
+            </div>
+            <div class="radio">
+                <label class="text-danger">
+                    <input type="radio" name="verdictStatus" id="radioVerdict24" value="24">
+                    Misleading (Invalid)
                 </label>
             </div>
         </div>
@@ -85,3 +103,12 @@
         {/topic}
     </form>
 {/body}
+
+{<footer}
+    <script>
+        $(function() {
+            var verdictStatus = '{verdictStatus}';
+            $('#radioVerdict' + verdictStatus).prop('checked', true);
+        });
+    </script>
+{/footer}

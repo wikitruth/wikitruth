@@ -10,6 +10,9 @@
             {:else}
                 {?argument}
                     {argument.title}
+                    {?argument.against}
+                        <span class="label label-danger" style="font-size: 10px; font-weight: normal; padding: .2em .6em .3em; letter-spacing: normal; margin-left: 8px">opposing</span>
+                    {/argument.against}
                 {:else}
                     {?topic}
                         {topic.title}
@@ -23,5 +26,8 @@
     {/eq}
     {@eq key=tab value="update-verdict"}
         :&nbsp;Verdict
+    {/eq}
+    {@eq key=tab value="clipboard"}
+        Clipboard
     {/eq}
 </h1>

@@ -1,0 +1,41 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {?argument}Edit{:else}New{/argument} Argument - {titleSlogan}
+{/title}
+
+{<body}
+    {>"dust/truth/common/breadcrumb" /}
+    <h1 class="page-header">
+        {argument.title}: Link
+    </h1>
+    <form method="post">
+        <input type="hidden" name="_csrf" value="{_csrf}">
+        <div class="form-group">
+            <label for="inputName">Title <span class="text-muted">(Contextual)</span></label>
+            <textarea name="title" id="inputName" class="form-control" rows="1">{link.title}</textarea>
+        </div>
+        <div class="form-group">
+            {!<label for="inputParent">Parent</label>
+            <textarea name="parent" id="inputParent" class="form-control" rows="1">{link.parentId}</textarea>!}
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="supportsParent" value="1" {^link.against}checked="checked"{/link.against}>
+                    Supporting Argument <span class="text-muted">(ignored when no parent)</span>
+                </label>
+            </div>
+        </div>
+        <button type="submit" name="action" value="submit" class="btn btn-primary">Submit</button>&nbsp;
+        <button type="submit" name="action" value="delete" class="btn btn-danger">Delete</button>&nbsp;
+        <a class="btn btn-default" href="{cancelUrl}" role="button">Cancel</a>
+    </form>
+{/body}
+
+{<footer}
+    <script src="/components/textarea-autosize/dist/jquery.textarea_autosize.min.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            $('#inputName').textareaAutoSize();
+        });
+    </script>
+{/footer}

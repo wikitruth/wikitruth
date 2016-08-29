@@ -18,7 +18,7 @@
             <li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp; Topics</li>
             {#topics}
                 <li class="list-group-item">
-                    <span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>
+                    <span class="glyphicon {?link}glyphicon-link{:else}glyphicon-folder-open{/link} text-success" aria-hidden="true"></span>
                     <div>
                         <a href="{paths.truth.topics.entry}?topic={_id}">{title}</a>
                         <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
@@ -34,10 +34,9 @@
             <li class="list-group-item highlight"><span class="glyphicon glyphicon-flash text-success" aria-hidden="true"></span> Arguments</li>
             {#arguments}
             <li class="list-group-item">
-                <span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>
+                <span class="glyphicon {?link}glyphicon-link{:else}glyphicon-file{/link} text-success" aria-hidden="true"></span>
                 <div>
-                    <a href="{paths.truth.arguments.entry}?topic={topic._id}&amp;argument={_id}">{title}&nbsp;
-                        {?isLink}<span class="label label-info"><i class="fa fa-link" aria-hidden="true"></i></span>{/isLink}</a>
+                    <a href="{paths.truth.arguments.entry}?topic={ownerId}&amp;argument={_id}">{title}</a>
                     <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
                 </div>
                 <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>

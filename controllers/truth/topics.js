@@ -21,14 +21,9 @@ module.exports = function (router) {
             topics: function(callback) {
                 // Top Subtopics
                 var query = { parentId: req.query.topic, groupId: constants.CORE_GROUPS.truth };
-                db.Topic.find(query).limit(15).exec(function(err, results) {
-                    flowUtils.setEditorsUsername(results, function() {
-                        results.forEach(function (result) {
-                            flowUtils.appendEntryExtra(result);
-                        });
-                        model.topics = results;
-                        callback();
-                    });
+                flowUtils.getTopics(query, 15, function (err, results) {
+                    model.topics = results;
+                    callback();
                 });
             },
             arguments: function(callback) {
@@ -36,20 +31,11 @@ module.exports = function (router) {
                 var query = {
                     parentId: null,
                     ownerId: req.query.topic,
-                    ownerType: constants.OBJECT_TYPES.topic,
-                    groupId: constants.CORE_GROUPS.truth
+                    ownerType: constants.OBJECT_TYPES.topic
                 };
-                db.Argument.find(query).limit(15).exec(function(err, results) {
-                    flowUtils.setEditorsUsername(results, function() {
-                        results.forEach(function (result) {
-                            flowUtils.appendEntryExtra(result);
-                            if (utils.randomBool()) {
-                                result.isLink = true;
-                            }
-                        });
-                        model.arguments = results;
-                        callback();
-                    });
+                flowUtils.getArguments(query, -1, function (err, results) {
+                    //model.arguments = results;
+                    callback(null, results);
                 });
             },
             questions: function (callback) {
@@ -88,7 +74,19 @@ module.exports = function (router) {
                 });
             }
         }, function (err, results) {
+            var verdict = model.topic.verdict && model.topic.verdict.status ? model.topic.verdict.status : constants.VERDICT_STATUS.pending;
+            model.verdict = {
+                label: constants.VERDICT_STATUS.getLabel(verdict),
+                color: constants.VERDICT_STATUS.getColor(verdict)
+            };
             model.entry = model.topic;
+            model.arguments = results.arguments.slice(0, 15);
+            model.entryType = constants.OBJECT_TYPES.topic;
+            if(model.isTopicOwner) {
+                model.isEntryOwner = true;
+            }
+            model.verdict.counts = flowUtils.getVerdictCount(results.arguments);
+            flowUtils.prepareClipboardOptions(req, model, constants.OBJECT_TYPES.topic);
             res.render(templates.truth.topics.entry, model);
         });
     });
