@@ -52,7 +52,7 @@
             <li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp;&nbsp;{?categories}Top {/categories}Topics</li>
             {#topics}
                 <li class="list-group-item">
-                    <span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>
+                    <span class="glyphicon {?link}glyphicon-link{:else}glyphicon-folder-open{/link} text-success" aria-hidden="true"></span>
                     <div>
                         <a href="{paths.truth.topics.entry}?topic={_id}">{title}</a>
                         <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>

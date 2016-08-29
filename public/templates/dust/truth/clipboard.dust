@@ -1,0 +1,51 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    Link To - {titleSlogan}
+{/title}
+
+{<body}
+    {>"dust/truth/common/breadcrumb" tab="clipboard" /}
+    {>"dust/truth/common/page-header" tab="clipboard" /}
+    <form method="post">
+        <input type="hidden" name="_csrf" value="{_csrf}">
+        {?topics}
+            <div class="form-group">
+                <label for="inputReferences">Marked Topics <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a>:</label>
+                {#topics}
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="topics" value="{_id}">
+                            {title}
+                        </label>
+                    </div>
+                {/topics}
+                <br/>
+            </div>
+        {/topics}
+        {?arguments}
+            <div class="form-group">
+                <label for="inputReferences">Marked Arguments <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a>:</label>
+                {#arguments}
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="arguments" value="{_id}">
+                            {title}
+                        </label>
+                    </div>
+                {/arguments}
+                <br/>
+            </div>
+        {/arguments}
+        <button type="submit" name="action" value="delete" class="btn btn-danger">Delete</button>&nbsp;
+        {?topic}
+            <a class="btn btn-default" href="{paths.truth.topics.entry}?topic={topic._id}" role="button">Cancel</a>
+        {:else}
+            {?parent}
+                <a class="btn btn-default" href="{paths.truth.topics.entry}?topic={parent._id}" role="button">Cancel</a>
+            {:else}
+                <a class="btn btn-default" href="{paths.truth.index}" role="button">Cancel</a>
+            {/parent}
+        {/topic}
+    </form>
+{/body}

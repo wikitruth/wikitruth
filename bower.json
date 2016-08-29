@@ -27,6 +27,7 @@
     "jquery.cookie": "^1.4.1",
     "respond": "^1.4.2",
     "summernote": "^0.8.1",
-    "textarea-autosize": "^0.4.2"
+    "textarea-autosize": "^0.4.2",
+    "jquery-timeago": "^1.5.3"
   }
 }

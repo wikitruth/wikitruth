@@ -1,9 +1,10 @@
 'use strict';
 
-var db      = require('../app').db.models,
-    utils   = require('./utils'),
-    config  = require('../config/config'),
-    async   = require('async');
+var db          = require('../app').db.models,
+    utils       = require('./utils'),
+    constants   = require('../models/constants'),
+    config      = require('../config/config'),
+    async       = require('async');
 
 function getBackupDir() {
     if(config.mongodb.backupRoot) {
@@ -35,39 +36,43 @@ function appendEntryExtra(item) {
 }
 
 function setEditorsUsername(items, callback) {
-    var seen = {};
-    var userIds = items
-        .filter(function (item) {
-            var id = item.editUserId ? item.editUserId.valueOf() : null;
-            if (!id || seen[id]) {
-                return;
+    if(items && items.length > 0) {
+        var seen = {};
+        var userIds = items
+            .filter(function (item) {
+                var id = item.editUserId ? item.editUserId.valueOf() : null;
+                if (!id || seen[id]) {
+                    return;
+                }
+                seen[id] = true;
+                return item;
+                //return !!item.editUserId;
+            }).map(function (item) {
+                return item.editUserId;
             }
-            seen[id] = true;
-            return item;
-            //return !!item.editUserId;
-        }).map(function (item) {
-            return item.editUserId;
-        }
-    );
+        );
 
-    var query = {
-        _id: {
-            $in: userIds
-        }
-    };
-
-    db.User.find(query, { username: 1}, function(err, results) {
-        var userNames = {};
-        results.forEach(function(result) {
-            userNames[result._id.valueOf()] = result.username;
-        });
-        items.forEach(function(item) {
-            if(item.editUserId) {
-                item.editUsername = userNames[item.editUserId.valueOf()];
+        var query = {
+            _id: {
+                $in: userIds
             }
+        };
+
+        db.User.find(query, {username: 1}, function (err, results) {
+            var userNames = {};
+            results.forEach(function (result) {
+                userNames[result._id.valueOf()] = result.username;
+            });
+            items.forEach(function (item) {
+                if (item.editUserId) {
+                    item.editUsername = userNames[item.editUserId.valueOf()];
+                }
+            });
+            callback();
         });
-        callback ();
-    });
+    } else {
+        callback();
+    }
 }
 
 function setWorldviewModel(req, model, callback) {
@@ -232,6 +237,209 @@ function setTopicModels(req, model, callback) {
     }
 }
 
+function prepareClipboardOptions(req, model, entryType) {
+    var clipboard = req.session.clipboard;
+    if(clipboard) {
+        var topics = clipboard['object' + constants.OBJECT_TYPES.topic];
+        var args = clipboard['object' + constants.OBJECT_TYPES.argument];
+        var count = topics.length + args.length;
+        if (count > 0) {
+            model.clipboard = {
+                count: count
+            };
+            var marked = false;
+            if ((entryType === constants.OBJECT_TYPES.topic && topics.indexOf(model.topic._id.toString()) > -1) ||
+                (entryType === constants.OBJECT_TYPES.argument && args.indexOf(model.argument._id.toString()) > -1)) {
+                model.clipboard.marked = true;
+                marked = true;
+            }
+            if(!(count === 1 && marked)) {
+                model.clipboard.canPaste = true;
+            }
+        }
+    }
+}
+
+function getTopics(query, limit, callback) {
+    async.parallel({
+        children: function (callback) {
+            db.Topic.find(query).limit(limit).sort({ title: 1 }).exec(function(err, results) {
+                setEditorsUsername(results, function() {
+                    results.forEach(function (result) {
+                        appendEntryExtra(result);
+                        //result.link = false;
+                    });
+                    callback(null, results);
+                });
+            });
+        },
+        links: function (callback) {
+            if(query.groupId) {
+                delete query.groupId;
+            }
+            db.TopicLink.find(query).limit(limit).exec(function(err, links) {
+                var ids = links.map(function (link) {
+                    return link.topicId;
+                });
+                var query = {
+                    _id: {
+                        $in: ids
+                    }
+                };
+                db.Topic.find(query).limit(limit).sort({ title: 1 }).exec(function(err, results) {
+                    setEditorsUsername(results, function() {
+                        results.forEach(function (result) {
+                            appendEntryExtra(result);
+                            var link = links.find(function (link) {
+                                return link.topicId.equals(result._id);
+                            });
+                            if(link) {
+                                result.link = link;
+                            }
+                        });
+                        callback(null, results);
+                    });
+                });
+            });
+        }
+    }, function (err, results) {
+        var topics = results.children.concat(results.links);
+        callback(null, topics);
+    });
+}
+
+function getArguments(query, limit, callback) {
+    async.parallel({
+        children: function (callback) {
+            db.Argument.find(query).limit(limit).sort({ title: 1 }).exec(function(err, results) {
+                setEditorsUsername(results, function() {
+                    results.forEach(function (result) {
+                        appendEntryExtra(result);
+                        //result.link = false;
+                        //result.against = false;
+                    });
+                    callback(null, results);
+                });
+            });
+        },
+        links: function (callback) {
+            if(query.groupId) {
+                delete query.groupId;
+            }
+            db.ArgumentLink.find(query).limit(limit).exec(function(err, links) {
+                var ids = links.map(function (link) {
+                    return link.argumentId;
+                });
+                var query = {
+                    _id: {
+                        $in: ids
+                    }
+                };
+                db.Argument.find(query).limit(limit).sort({ title: 1 }).exec(function(err, results) {
+                    setEditorsUsername(results, function() {
+                        results.forEach(function (result) {
+                            appendEntryExtra(result);
+                            var link = links.find(function (link) {
+                                return link.argumentId.equals(result._id);
+                            });
+                            if(link) {
+                                result.link = link;
+                                result.against = link.against;
+                            }
+                        });
+                        callback(null, results);
+                    });
+                });
+            });
+        }
+    }, function (err, results) {
+        var args = results.children.concat(results.links);
+        callback(null, args);
+    });
+}
+
+function syncChildren(parentIds, entryType, callback) {
+    if(entryType === constants.OBJECT_TYPES.topic) {
+        callback();
+    } else if(entryType === constants.OBJECT_TYPES.argument) {
+        var processArgumentsRecursive = function (parent, callback) {
+            db.Argument.find({parentId: parent._id}, function (err, children) {
+                if(children.length > 0) {
+                    async.each(children, function (child, callback) {
+                        child.ownerId = parent.ownerId;
+                        child.ownerType = parent.ownerType;
+                        child.threadId = parent.parentId ? parent.threadId : parent._id;
+                        db.Argument.update({_id: child._id}, child, {upsert: true}, function(err, writeResult) {
+                            processArgumentsRecursive(child, callback);
+                        });
+                    }, function (err) {
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
+            });
+        };
+
+        async.each(parentIds, function (parentId, callback) {
+            db.Argument.findOne({_id: parentId}, function (err, parent) {
+                processArgumentsRecursive(parent, callback);
+            });
+        }, function () {
+            callback();
+        });
+    }
+}
+
+function setVerdictModel(verdictModel, arg) {
+    var varg = arg.verdict && arg.verdict.status ? arg.verdict.status : constants.VERDICT_STATUS.pending;
+    var category = constants.VERDICT_STATUS.getCategory(varg);
+    switch (category) {
+        case constants.VERDICT_STATUS.categories.true:
+            verdictModel.true = true;
+            break;
+        case constants.VERDICT_STATUS.categories.false:
+            verdictModel.false = true;
+            break;
+        case constants.VERDICT_STATUS.categories.pending:
+            verdictModel.pending = true;
+            break;
+    }
+}
+
+function getVerdictCount(args) {
+    var verdictCount = {
+        true: 0,
+        false: 0,
+        pending: 0
+    };
+    args.forEach(function(arg) {
+        var varg = arg.verdict && arg.verdict.status ? arg.verdict.status : constants.VERDICT_STATUS.pending;
+        var category = constants.VERDICT_STATUS.getCategory(varg);
+        switch (category) {
+            case constants.VERDICT_STATUS.categories.true:
+                verdictCount.true++;
+                break;
+            case constants.VERDICT_STATUS.categories.false:
+                verdictCount.false++;
+                break;
+            case constants.VERDICT_STATUS.categories.pending:
+                verdictCount.pending++;
+                break;
+        }
+    });
+    if(verdictCount.true === 0) {
+        delete verdictCount.true;
+    }
+    if(verdictCount.false === 0) {
+        delete verdictCount.false;
+    }
+    if(verdictCount.pending === 0) {
+        delete verdictCount.pending;
+    }
+    return verdictCount;
+}
+
 module.exports = {
     getBackupDir: getBackupDir,
     isOwner: isOwner,
@@ -244,5 +452,12 @@ module.exports = {
     setIssueModel: setIssueModel,
     setOpinionModel: setOpinionModel,
     appendEntryExtra: appendEntryExtra,
-    setEditorsUsername: setEditorsUsername
+    setEditorsUsername: setEditorsUsername,
+    prepareClipboardOptions: prepareClipboardOptions,
+
+    getTopics: getTopics,
+    getArguments: getArguments,
+    syncChildren: syncChildren,
+    getVerdictCount: getVerdictCount,
+    setVerdictModel: setVerdictModel
 };

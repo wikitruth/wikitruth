@@ -34,7 +34,8 @@ module.exports = function (router) {
             });
         } else {
             // Top Questions
-            db.Question.find({ ownerType: constants.OBJECT_TYPES.topic, groupId: constants.CORE_GROUPS.truth }).limit(100).exec(function(err, results) {
+            var query = { ownerType: constants.OBJECT_TYPES.topic, groupId: constants.CORE_GROUPS.truth };
+            db.Question.aggregate([ {$match: query}, {$sample: { size: 100 } } ], function(err, results) {
                 flowUtils.setEditorsUsername(results, function() {
                     results.forEach(function (result) {
                         result.topic = {

@@ -123,7 +123,7 @@ module.exports = function (router) {
                 .then(function(parent) {
                     var author = Git.Signature.now(gitConfig.signature.name, gitConfig.signature.email);
                     var committer = author;
-                    return repo.createCommit("HEAD", author, committer, "db changes backup", oid, [parent]);
+                    return repo.createCommit("HEAD", author, committer, "db changes backup " + (new Date()).toISOString(), oid, [parent]);
                 })
                 .then(function(commitId) {
                     console.log("New Commit: ", commitId);

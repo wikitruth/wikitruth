@@ -27,9 +27,6 @@ exports = module.exports = function(app, mongoose) {
       }
     ]
   });
-  schema.methods.link = function() {
-    return false;
-  };
   schema.plugin(require('../plugins/pagedFind'));
   schema.index({ title: 1 });
   schema.set('autoIndex', (app.get('env') === 'development'));

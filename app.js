@@ -61,6 +61,8 @@ app.disable('x-powered-by');
 //app.set('views', path.join(__dirname, 'views'));
 //app.set('view engine', 'jade');
 app.engine('jade', cons.jade);
+app.engine('pug', cons.pug);
+app.engine('vash', cons.vash);
 app.engine('mst', cons.mustache);
 app.engine('hbs', cons.handlebars);
 

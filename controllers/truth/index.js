@@ -16,17 +16,24 @@ module.exports = function (router) {
                 flowUtils.setTopicModels(req, model, callback);
             },
             topics: function(callback) {
-                // display 15 if top topics, 100 if has topic parameter
-                var query = req.query.topic ? { parentId: req.query.topic } : { groupId: constants.CORE_GROUPS.truth };
-                db.Topic.find(query).limit(req.query.topic ? 100 : 15).sort(req.query.topic ? { title: 1 } : {}).exec(function(err, results) {
-                    flowUtils.setEditorsUsername(results, function() {
-                        results.forEach(function(result) {
-                            flowUtils.appendEntryExtra(result);
-                        });
+                // display 15 if top topics, 999 if has topic parameter
+                if(req.query.topic) { // include TopicLinks
+                    flowUtils.getTopics({ parentId: req.query.topic }, -1, function (err, results) {
                         model.topics = results;
                         callback();
                     });
-                });
+                } else {
+                    var query = { groupId: constants.CORE_GROUPS.truth, parentId: {$ne: null} };
+                    db.Topic.aggregate([ {$match: query}, {$sample: { size: 25 } } ], function(err, results) {
+                        flowUtils.setEditorsUsername(results, function() {
+                            results.forEach(function(result) {
+                                flowUtils.appendEntryExtra(result);
+                            });
+                            model.topics = results;
+                            callback();
+                        });
+                    });
+                }
             },
             categories: function(callback) {
                 if(!req.query.topic) {
@@ -49,6 +56,71 @@ module.exports = function (router) {
         }, function (err, results) {
             res.render(templates.truth.topics.index, model);
         });
+    });
+
+    router.get('/clipboard', function (req, res) {
+        var model = {};
+        var clipboard = req.session.clipboard || {};
+        var topicIds = clipboard['object' + constants.OBJECT_TYPES.topic];
+        var argumentIds = clipboard['object' + constants.OBJECT_TYPES.argument];
+        async.parallel({
+           topics: function (callback) {
+               if(topicIds && topicIds.length > 0) {
+                   var query = {
+                       _id: {
+                           $in: topicIds
+                       }
+                   };
+                   db.Topic.find(query, function(err, results) {
+                       model.topics = results;
+                       callback();
+                   });
+               } else {
+                   callback();
+               }
+           },
+            arguments: function (callback) {
+                if(argumentIds && argumentIds.length > 0) {
+                    var query = {
+                        _id: {
+                            $in: argumentIds
+                        }
+                    };
+                    db.Argument.find(query, function(err, results) {
+                        model.arguments = results;
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
+            }
+        }, function (err) {
+            res.render(templates.truth.clipboard, model);
+        });
+    });
+
+    router.post('/clipboard', function (req, res) {
+        var action = req.body.action;
+        if(action === 'delete') {
+            //var clipboard = req.session.clipboard;
+            var topics = req.body.topics;
+            var args = req.body.arguments;
+            if(topics) {
+                //var topicIds = clipboard['object' + constants.OBJECT_TYPES.topic];
+                if( typeof topics === 'string' ) {
+                    // single selection
+                    topics = [topics];
+                }
+            }
+            if(args) {
+                //var argumentIds = clipboard['object' + constants.OBJECT_TYPES.argument];
+                if( typeof args === 'string' ) {
+                    // single selection
+                    args = [args];
+                }
+            }
+            res.redirect(req.originalUrl);
+        }
     });
 
     /* Related */

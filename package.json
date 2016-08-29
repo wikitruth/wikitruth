@@ -53,10 +53,11 @@
     "passport-oauth": "^1.x.x",
     "passport-tumblr": "^0.1.x",
     "passport-twitter": "^1.0.4",
-    "pug": "^2.0.0-beta3",
+    "pug": "^2.0.0-beta5",
     "requirejs": "^2.2.0",
     "serve-static": "^1.11.1",
-    "underscore": "^1.x.x"
+    "underscore": "^1.x.x",
+    "vash": "^0.12.1"
   },
   "devDependencies": {
     "david": "^6.x.x",
