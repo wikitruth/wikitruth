@@ -33,7 +33,7 @@ module.exports = function (router) {
                     ownerId: req.query.topic,
                     ownerType: constants.OBJECT_TYPES.topic
                 };
-                flowUtils.getArguments(query, -1, function (err, results) {
+                flowUtils.getArguments(query, 999, function (err, results) {
                     //model.arguments = results;
                     callback(null, results);
                 });
