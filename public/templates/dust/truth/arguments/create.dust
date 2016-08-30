@@ -33,6 +33,10 @@
                 </label>
             </div>
         </div>
+        {!<div class="form-group{^user.isAdmin} hidden{/user.isAdmin}">
+            <label for="inputAuthor">Author</label>
+            <textarea name="author" id="inputAuthor" class="form-control" rows="1">{argument.createUserId}</textarea>
+        </div>!}
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
         {?argument}
             <a class="btn btn-default" href="{paths.truth.arguments.entry}?{?topic}topic={topic._id}&amp;{/topic}argument={argument._id}" role="button">Cancel</a>

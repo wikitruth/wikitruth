@@ -39,6 +39,9 @@
                         {/question}
                         <li><a href="{paths.truth.outline.link}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> Manage Links</a></li>
                         <li><a href="#" role="tab"><span class="glyphicon glyphicon-tags" aria-hidden="true"></span> Manage Tags</a></li>
+                        {?user.isAdmin}
+                            <li><a href="#" onclick="return entryTakeOwnership()"><i class="fa fa-hand-grab-o" aria-hidden="true"></i> Take Ownership</a></li>
+                        {/user.isAdmin}
                         {!<li><a href="#" role="tab"><span class="glyphicon glyphicon-move" aria-hidden="true"></span> Move...</a></li>!}
                         <li><a href="#" role="tab"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Details</a></li>
                     {/isIssueOwner}
@@ -51,7 +54,7 @@
             {/clipboard}
             {^clipboard.marked}
                 {?isEntryOwner}
-                    <li><a href="#" role="tab" onclick="return clipboardMarkEntry();"><i class="fa fa-check" aria-hidden="true"></i> Mark for Copy or Move</a></li>
+                    <li><a href="#" role="tab" onclick="return clipboardMarkEntry()"><i class="fa fa-check" aria-hidden="true"></i> Mark for Copy or Move</a></li>
                 {/isEntryOwner}
             {/clipboard.marked}
             {?clipboard}
@@ -61,11 +64,11 @@
                         <ul class="dropdown-menu">
                         </ul>
                     </li>!}
-                    <li><a href="#" role="tab" onclick="return clipboardPasteAsLink();"><i class="fa fa-link" aria-hidden="true"></i> Paste Here As Links</a></li>
+                    <li><a href="#" role="tab" onclick="return clipboardPasteAsLink()"><i class="fa fa-link" aria-hidden="true"></i> Paste Here As Links</a></li>
                     {!<li><a href="#" role="tab"><i class="fa fa-copy" aria-hidden="true"></i> Paste Here As Duplicates</a></li>!}
-                    <li><a href="#" role="tab" onclick="return clipboardMoveHere();"><i class="fa fa-cut" aria-hidden="true"></i> Move Here</a></li>
+                    <li><a href="#" role="tab" onclick="return clipboardMoveHere()"><i class="fa fa-cut" aria-hidden="true"></i> Move Here</a></li>
                 {/clipboard.canPaste}
-                <li><a href="#" role="tab" onclick="return clipboardClear();"><i class="fa fa-trash" aria-hidden="true"></i> Clear</a></li>
+                <li><a href="#" role="tab" onclick="return clipboardClear()"><i class="fa fa-trash" aria-hidden="true"></i> Clear</a></li>
             {/clipboard}
             <li role="separator" class="divider"></li>
             <li><a href="#" role="tab"><i class="fa fa-share" aria-hidden="true"></i> Share</a></li>
@@ -74,6 +77,23 @@
         </ul>
     </div>
     <script>
+        function entryTakeOwnership() {
+            var csrf = $('#entry-options').data('csrf');
+            var id = $('#entry-options').data('entry-id');
+            var type = $('#entry-options').data('entry-type');
+
+            $.ajax({
+                type: "POST",
+                url: "/ajax/entry/take-ownership",
+                data: JSON.stringify({ id: id, type: type, _csrf: csrf }),
+                contentType: 'application/json',
+                success: function (data) {
+                    location.reload();
+                }
+            });
+            return false;
+        }
+
         function clipboardMarkEntry() {
             var csrf = $('#entry-options').data('csrf');
             var id = $('#entry-options').data('entry-id');

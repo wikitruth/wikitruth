@@ -37,7 +37,8 @@ module.exports = {
         topics: {
             index:  '/truth/topics',
             entry:  '/truth/topics/entry',
-            create: '/truth/topics/create'
+            create: '/truth/topics/create',
+            link: '/truth/topics/link'
         },
         arguments: {
             index:  '/truth/arguments',

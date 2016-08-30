@@ -11,7 +11,8 @@
 </footer>!}
 
 <div class="footer">
-    <div class="container"><span class="copyright pull-right">&copy; {copyrightYear} <a href="https://github.com/wikitruth" target="_blank">Wikitruth <span class="hidden-xs">Foundation</span></a></span>
+    <div class="container">
+        <span class="copyright pull-right">&copy; {copyrightYear}&nbsp;<a href="https://github.com/wikitruth" target="_blank">Wikitruth <span class="hidden-xs">Foundation</span></a></span>
         <ul class="links">
             <li><a href="/">Home</a></li>
             <li><a href="https://www.facebook.com/wikitruth.co">Facebook</a></li>

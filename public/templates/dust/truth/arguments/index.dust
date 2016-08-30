@@ -16,12 +16,12 @@
             {#arguments}
                 <li class="list-group-item">
                     {?link}
-                        <a href="{paths.truth.arguments.link}?topic={ownerId}&amp;argument={link.parentId}&amp;id={link._id}&amp;source={paths.truth.arguments.index}" class="glyphicon glyphicon-link text-success"></a>
+                        <a href="{paths.truth.arguments.link}?topic={link.ownerId}&amp;argument={link.parentId}&amp;id={link._id}&amp;source={paths.truth.arguments.index}" class="glyphicon glyphicon-link text-success"></a>
                     {:else}
                         <span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>
                     {/link}
                     <div>
-                        <a href="{paths.truth.arguments.entry}?topic={ownerId}&amp;argument={_id}">{title}</a>
+                        <a href="{paths.truth.arguments.entry}?topic={ownerId}&amp;argument={_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a>
                         <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
@@ -36,12 +36,12 @@
             {#contraArguments}
                 <li class="list-group-item">
                     {?link}
-                        <a href="{paths.truth.arguments.link}?topic={ownerId}&amp;argument={link.parentId}&amp;id={link._id}&amp;source={paths.truth.arguments.index}" class="glyphicon glyphicon-link text-danger"></a>
+                        <a href="{paths.truth.arguments.link}?topic={link.ownerId}&amp;argument={link.parentId}&amp;id={link._id}&amp;source={paths.truth.arguments.index}" class="glyphicon glyphicon-link text-danger"></a>
                     {:else}
                         <span class="glyphicon glyphicon-file text-danger" aria-hidden="true"></span>
                     {/link}
                     <div>
-                        <a href="{paths.truth.arguments.entry}?topic={ownerId}&amp;argument={_id}">{title}</a>
+                        <a href="{paths.truth.arguments.entry}?topic={ownerId}&amp;argument={_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a>
                         <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
