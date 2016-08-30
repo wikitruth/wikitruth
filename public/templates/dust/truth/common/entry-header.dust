@@ -54,7 +54,6 @@
         </li>
     {/opinion}
 
-
     {!<li role="presentation"{@eq key=tab value="related"} class="active"{/eq}>
         <a href="{paths.truth.related}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
             <span class="glyphicon glyphicon-random" aria-hidden="true"></span> Related</a>

@@ -39,7 +39,7 @@ module.exports = function (router) {
                         query.ownerId = model.topic._id;
                         query.ownerType = constants.OBJECT_TYPES.topic;
                     }
-                    flowUtils.getArguments(query, 999, function (err, results) {
+                    flowUtils.getArguments(query, 0, function (err, results) {
                         var support = results.filter(function (arg) {
                             return !arg.against;
                         });
@@ -88,7 +88,7 @@ module.exports = function (router) {
                 var query = {
                     parentId: req.query.argument
                 };
-                flowUtils.getArguments(query, -1, function (err, results) {
+                flowUtils.getArguments(query, 0, function (err, results) {
                     results.forEach(function (result) {
                         if(!result.verdict || !result.verdict.status) {
                             result.verdict = {
@@ -144,7 +144,6 @@ module.exports = function (router) {
             if(model.isArgumentOwner) {
                 model.isEntryOwner = true;
             }
-            model.verdict.counts = flowUtils.getVerdictCount(results.arguments);
             var support = results.arguments.filter(function (arg) {
                 return !arg.against;
             });
@@ -152,9 +151,11 @@ module.exports = function (router) {
                 return arg.against;
             });
             if(support.length > 0) {
+                model.supportingArgumentCount = support.length;
                 model.arguments = support.slice(0, 15);
             }
             if(contra.length > 0) {
+                model.opposingArgumentCount = contra.length;
                 model.contraArguments = contra.slice(0, 15);
             }
             model.entry = model.argument;
