@@ -243,6 +243,9 @@ module.exports = function (router) {
                         entity.createDate = Date.now();
                         entity.groupId = constants.CORE_GROUPS.truth;
                     }
+                    /*} else if(req.user.isAdmin()) {
+                        entity.createUserId = req.body.author;
+                    }*/
                     db.Argument.update(query, entity, {upsert: true}, function(err, writeResult) {
                         callback();
                     });
@@ -274,7 +277,7 @@ module.exports = function (router) {
                     }
                 },
                 parentArgument: function (callback) {
-                    var query = { _id: req.query.argument ? req.query.argument : model.argument && model.argument.parentId ? model.argument.parentId : null };
+                    var query = { _id: req.query.argument ? req.query.argument : model.link && model.link.parentId ? model.link.parentId : null };
                     if(query._id) {
                         db.Argument.findOne(query, function (err, result) {
                             model.parentArgument = result;
@@ -294,7 +297,9 @@ module.exports = function (router) {
     router.post('/link', function (req, res) {
         var action = req.body.action;
         if(action === 'delete') {
-
+            db.ArgumentLink.findByIdAndRemove(req.query.id, function(err, link) {
+                res.redirect(createCancelUrl(req));
+            });
         } else if(action === 'submit') {
             var query = { _id: req.query.id };
             db.ArgumentLink.findOne(query, function (err, result) {

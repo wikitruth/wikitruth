@@ -52,9 +52,13 @@
             <li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp;&nbsp;{?categories}Top {/categories}Topics</li>
             {#topics}
                 <li class="list-group-item">
-                    <span class="glyphicon {?link}glyphicon-link{:else}glyphicon-folder-open{/link} text-success" aria-hidden="true"></span>
+                    {?link}
+                        <a href="{paths.truth.topics.link}?topic={topic._id}&amp;id={link._id}&amp;source={paths.truth.index}" class="glyphicon glyphicon-link text-success"></a>
+                    {:else}
+                        <span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>
+                    {/link}
                     <div>
-                        <a href="{paths.truth.topics.entry}?topic={_id}">{title}</a>
+                        <a href="{paths.truth.topics.entry}?topic={_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a>
                         <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
