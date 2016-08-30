@@ -10,17 +10,28 @@
         &nbsp;<a href="{paths.truth.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}" title="Edit Outline" class="no-underline"><span class="label label-primary"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit</span></a>
     {/isQuestionOwner}
 {/isContributor}!}
-<a href="{paths.truth.verdict.update}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" title="Update Verdict" class="no-underline">
+{?argument}
+    <a href="{paths.truth.verdict.update}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" title="Update Verdict" class="no-underline">
     <span class="label label-{?verdict.color}{verdict.color}{:else}warning{/verdict.color}" title="This content is not yet reviewed, please take caution.">
         <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> {verdict.label}</span></a>
-{?verdict.counts.true}
-    &nbsp;<span class="label label-success">{verdict.counts.true}</span>
-{/verdict.counts.true}
-{?verdict.counts.false}
-    &nbsp;<span class="label label-danger">{verdict.counts.false}</span>
-{/verdict.counts.false}
-{?verdict.counts.pending}
-    &nbsp;<span class="label label-warning">{verdict.counts.pending}</span>
-{/verdict.counts.pending}
+
+    {?supportingArgumentCount}
+        &nbsp;<span class="label label-success">{supportingArgumentCount}</span>
+    {/supportingArgumentCount}
+    {?opposingArgumentCount}
+        &nbsp;<span class="label label-danger">{opposingArgumentCount}</span>
+    {/opposingArgumentCount}
+{:else}
+    {! topic !}
+    {?verdict.counts.true}
+        &nbsp;<span class="label label-success">{verdict.counts.true}</span>
+    {/verdict.counts.true}
+    {?verdict.counts.false}
+        &nbsp;<span class="label label-danger">{verdict.counts.false}</span>
+    {/verdict.counts.false}
+    {?verdict.counts.pending}
+        &nbsp;<span class="label label-warning">{verdict.counts.pending}</span>
+    {/verdict.counts.pending}
+{/argument}
 {!<span class="label label-success">Verified</span> <span class="label label-danger">Issues</span>!}
 {!&nbsp;<span class="label label-primary"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Update Verdict</span>!}
