@@ -18,7 +18,7 @@ module.exports = function (router) {
             topics: function(callback) {
                 // display 15 if top topics, 999 if has topic parameter
                 if(req.query.topic) { // include TopicLinks
-                    flowUtils.getTopics({ parentId: req.query.topic }, -1, function (err, results) {
+                    flowUtils.getTopics({ parentId: req.query.topic }, 999, function (err, results) {
                         model.topics = results;
                         callback();
                     });
