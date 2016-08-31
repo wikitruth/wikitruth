@@ -39,6 +39,13 @@ module.exports = function (router) {
                     callback();
                 });
             },
+            links: function (callback) {
+                // Top Questions
+                var query = { topicId: req.query.topic };
+                db.TopicLink.find(query, function(err, results) {
+                    callback(null, results);
+                });
+            },
             arguments: function(callback) {
                 // Top Arguments
                 var query = {
@@ -99,6 +106,9 @@ module.exports = function (router) {
                 model.isEntryOwner = true;
             }
             model.verdict.counts = flowUtils.getVerdictCount(results.arguments);
+            if(results.links.length > 0) {
+                model.linkCount = results.links.length;
+            }
             flowUtils.prepareClipboardOptions(req, model, constants.OBJECT_TYPES.topic);
             res.render(templates.truth.topics.entry, model);
         });
@@ -145,6 +155,7 @@ module.exports = function (router) {
             entity.references = req.body.references;
             entity.editUserId = req.user.id;
             entity.editDate = Date.now();
+            entity.icon = req.body.icon;
             if(!result) {
                 entity.createUserId = req.user.id;
                 entity.createDate = Date.now();

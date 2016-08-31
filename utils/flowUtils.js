@@ -172,6 +172,9 @@ function setArgumentModels(req, model, callback) {
         async.series({
             argument: function (callback) {
                 db.Argument.findOne({_id: req.query.argument}, function (err, result) {
+                    if(err || !result) {
+                        return callback(err);
+                    }
                     if (isOwner(req, result, model)) {
                         model.isArgumentOwner = true;
                     }

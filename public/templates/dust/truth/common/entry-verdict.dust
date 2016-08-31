@@ -33,5 +33,8 @@
         &nbsp;<span class="label label-warning">{verdict.counts.pending}</span>
     {/verdict.counts.pending}
 {/argument}
+{?linkCount}
+    &nbsp;<span class="label label-info"><i class="fa fa-link"></i> {linkCount}</span>
+{/linkCount}
 {!<span class="label label-success">Verified</span> <span class="label label-danger">Issues</span>!}
 {!&nbsp;<span class="label label-primary"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Update Verdict</span>!}

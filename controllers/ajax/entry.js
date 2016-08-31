@@ -36,4 +36,25 @@ module.exports = function (router) {
             res.send({});
         }
     });
+
+    router.post('/delete', function (req, res) {
+        var id = req.body.id;
+        var type = req.body.type;
+
+        if(req.user.isAdmin()) {
+            if(type == constants.OBJECT_TYPES.topic) {
+                db.Topic.findByIdAndRemove(id, function(err, entry) {
+                    res.send({});
+                });
+            } else if(type == constants.OBJECT_TYPES.argument) {
+                db.Argument.findByIdAndRemove(id, function(err, entry) {
+                    res.send({});
+                });
+            } else {
+                res.send({});
+            }
+        } else {
+            res.send({});
+        }
+    });
 };

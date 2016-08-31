@@ -31,6 +31,10 @@
             <label for="inputParent">Parent</label>
             <textarea name="parent" id="inputParent" class="form-control" rows="1">{?topic}{topic.parentId}{:else}{parentTopic._id}{/topic}</textarea>
         </div>
+        <div class="form-group">
+            <label for="inputIcon">Icon</label>
+            <textarea name="icon" id="inputIcon" class="form-control" rows="1">{topic.icon}</textarea>
+        </div>
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
         {?topic}
             <a class="btn btn-default" href="{paths.truth.topics.entry}?topic={topic._id}" role="button">Cancel</a>
