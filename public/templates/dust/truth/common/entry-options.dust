@@ -41,9 +41,10 @@
                         <li><a href="#" role="tab"><span class="glyphicon glyphicon-tags" aria-hidden="true"></span> Manage Tags</a></li>
                         {?user.isAdmin}
                             <li><a href="#" onclick="return entryTakeOwnership()"><i class="fa fa-hand-grab-o" aria-hidden="true"></i> Take Ownership</a></li>
+                            <li><a href="#" onclick="return entryDelete()"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</a></li>
                         {/user.isAdmin}
                         {!<li><a href="#" role="tab"><span class="glyphicon glyphicon-move" aria-hidden="true"></span> Move...</a></li>!}
-                        <li><a href="#" role="tab"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Details</a></li>
+                        <li><a href="#" role="tab"><i class="fa fa-info-circle" aria-hidden="true"></i> Details</a></li>
                     {/isIssueOwner}
                 {/isOpinionOwner}
                 <li role="separator" class="divider"></li>
@@ -78,19 +79,41 @@
     </div>
     <script>
         function entryTakeOwnership() {
-            var csrf = $('#entry-options').data('csrf');
-            var id = $('#entry-options').data('entry-id');
-            var type = $('#entry-options').data('entry-type');
+            if(confirm('Are you sure you want to Take Ownership of this entry?')) {
+                var csrf = $('#entry-options').data('csrf');
+                var id = $('#entry-options').data('entry-id');
+                var type = $('#entry-options').data('entry-type');
 
-            $.ajax({
-                type: "POST",
-                url: "/ajax/entry/take-ownership",
-                data: JSON.stringify({ id: id, type: type, _csrf: csrf }),
-                contentType: 'application/json',
-                success: function (data) {
-                    location.reload();
-                }
-            });
+                $.ajax({
+                    type: "POST",
+                    url: "/ajax/entry/take-ownership",
+                    data: JSON.stringify({ id: id, type: type, _csrf: csrf }),
+                    contentType: 'application/json',
+                    success: function (data) {
+                        location.reload();
+                    }
+                });
+            }
+
+            return false;
+        }
+
+        function entryDelete() {
+            if(confirm('Are you sure you want to Delete this entry?')) {
+                var csrf = $('#entry-options').data('csrf');
+                var id = $('#entry-options').data('entry-id');
+                var type = $('#entry-options').data('entry-type');
+
+                $.ajax({
+                    type: "POST",
+                    url: "/ajax/entry/delete",
+                    data: JSON.stringify({ id: id, type: type, _csrf: csrf }),
+                    contentType: 'application/json',
+                    success: function (data) {
+                        location.href = '/';
+                    }
+                });
+            }
             return false;
         }
 
@@ -126,34 +149,38 @@
         }
 
         function clipboardMoveHere() {
-            var csrf = $('#entry-options').data('csrf');
-            var id = $('#entry-options').data('entry-id');
-            var type = $('#entry-options').data('entry-type');
-            $.ajax({
-                type: "POST",
-                url: "/ajax/clipboard/move",
-                data: JSON.stringify({ id: id, type: type, _csrf: csrf }),
-                contentType: 'application/json',
-                success: function (data) {
-                    location.reload();
-                }
-            });
+            if(confirm('Are you sure you want to Move the marked items here?')) {
+                var csrf = $('#entry-options').data('csrf');
+                var id = $('#entry-options').data('entry-id');
+                var type = $('#entry-options').data('entry-type');
+                $.ajax({
+                    type: "POST",
+                    url: "/ajax/clipboard/move",
+                    data: JSON.stringify({ id: id, type: type, _csrf: csrf }),
+                    contentType: 'application/json',
+                    success: function (data) {
+                        location.reload();
+                    }
+                });
+            }
             return false;
         }
 
         function clipboardPasteAsLink() {
-            var csrf = $('#entry-options').data('csrf');
-            var id = $('#entry-options').data('entry-id');
-            var type = $('#entry-options').data('entry-type');
-            $.ajax({
-                type: "POST",
-                url: "/ajax/clipboard/paste-link",
-                data: JSON.stringify({ id: id, type: type, _csrf: csrf }),
-                contentType: 'application/json',
-                success: function (data) {
-                    location.reload();
-                }
-            });
+            if(confirm('Are you sure you want to Paste As Links the marked items here?')) {
+                var csrf = $('#entry-options').data('csrf');
+                var id = $('#entry-options').data('entry-id');
+                var type = $('#entry-options').data('entry-type');
+                $.ajax({
+                    type: "POST",
+                    url: "/ajax/clipboard/paste-link",
+                    data: JSON.stringify({ id: id, type: type, _csrf: csrf }),
+                    contentType: 'application/json',
+                    success: function (data) {
+                        location.reload();
+                    }
+                });
+            }
             return false;
         }
     </script>

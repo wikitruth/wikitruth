@@ -13,6 +13,8 @@ exports = module.exports = function(app, mongoose) {
     ownerId: { type: mongoose.Schema.ObjectId, default: null }, // Required when owner is not a Topic. Useful for filtering
     ownerType: { type: Number, default: -1 }, // OBJECT_TYPES
     groupId: { type: Number, default: -1 },
+    icon: { type: String }, // ex: "fa fa-plane"
+    typeId: { type: Number }, // TOPIC_TYPES
     outline: [
       {
         listType: { type: Number }, // OBJECT_TYPES

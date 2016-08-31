@@ -12,7 +12,7 @@ exports = module.exports = function(app, mongoose) {
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     editDate: { type: Date, default: Date.now },
     editUserId: { type: mongoose.Schema.ObjectId, ref: 'User'},
-    type: { type: Number }, // ARGUMENT_TYPES // OR can this just be a boolean?
+    typeId: { type: Number }, // ARGUMENT_TYPES
     groupId: { type: Number, default: -1 },
     threadId: { type: mongoose.Schema.ObjectId, ref: 'Argument' },
     against: { type: Boolean, default: false }, // how it relates to parent Argument, default is in support

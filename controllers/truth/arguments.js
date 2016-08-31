@@ -100,6 +100,13 @@ module.exports = function (router) {
                     callback(null, results);
                 });
             },
+            links: function (callback) {
+                // Top Questions
+                var query = { argumentId: req.query.argument };
+                db.ArgumentLink.find(query, function(err, results) {
+                    callback(null, results);
+                });
+            },
             questions: function (callback) {
                 // Top Questions
                 var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument, groupId: constants.CORE_GROUPS.truth };
@@ -160,6 +167,9 @@ module.exports = function (router) {
             }
             model.entry = model.argument;
             model.entryType = constants.OBJECT_TYPES.argument;
+            if(results.links.length > 0) {
+                model.linkCount = results.links.length;
+            }
             flowUtils.prepareClipboardOptions(req, model, constants.OBJECT_TYPES.argument);
             res.render(templates.truth.arguments.entry, model);
         });
