@@ -39,10 +39,10 @@
         </div>!}
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
         {?argument}
-            <a class="btn btn-default" href="{paths.truth.arguments.entry}?{?topic}topic={topic._id}&amp;{/topic}argument={argument._id}" role="button">Cancel</a>
+            <a class="btn btn-default" href="{paths.truth.arguments.entry}?argument={argument._id}" role="button">Cancel</a>
         {:else}
             {?parentArgument}
-                <a class="btn btn-default" href="{paths.truth.arguments.entry}?{?topic}topic={topic._id}&amp;{/topic}argument={parentArgument._id}" role="button">Cancel</a>
+                <a class="btn btn-default" href="{paths.truth.arguments.entry}?argument={parentArgument._id}" role="button">Cancel</a>
             {:else}
                 <a class="btn btn-default" href="{paths.truth.index}" role="button">Cancel</a>
             {/parentArgument}

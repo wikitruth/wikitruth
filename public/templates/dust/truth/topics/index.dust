@@ -24,17 +24,18 @@
                 <div class="col-lg-4 col-md-6 col-sm-6">{! 73px !}
                     <div class="media wt-category">
                         <div class="media-left media-top">
-                            <a href="{paths.truth.topics.entry}?topic={_id}">
+                            <a href="{paths.truth.topics.entry}/{friendlyUrl}?topic={_id}">
                                 <div class="photo-placeholder"></div>
+                                {!<i style="font-size: 55px;width: 70px;height: 70px;text-align: center; vertical-align: middle;" class="fa fa-folder-open-o"></i>!}
                                 {!<img class="media-object" data-src="holder.js/64x64" alt="{firstName} {lastName}">!}
                             </a>
                         </div>
                         <div class="media-body">
-                            <h4 class="media-heading"><a href="{paths.truth.topics.entry}?topic={_id}">{title}</a></h4>
+                            <h4 class="media-heading"><a href="{paths.truth.topics.entry}/{friendlyUrl}?topic={_id}">{title}</a></h4>
                             <div>
                                 {?subtopics}
                                     {#subtopics}
-                                        <div><i class="fa fa-folder-open text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.truth.topics.entry}?topic={_id}">{title}</a></div>
+                                        <div><i class="fa fa-folder-open text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.truth.topics.entry}/{friendlyUrl}?topic={_id}">{title}</a></div>
                                     {/subtopics}
                                 {/subtopics}
                                 <div><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.truth.index}?topic={_id}" role="button">more</a></div>
@@ -58,7 +59,7 @@
                         <span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>
                     {/link}
                     <div>
-                        <a href="{paths.truth.topics.entry}?topic={_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a>
+                        <a href="{paths.truth.topics.entry}/{friendlyUrl}?topic={_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a>
                         <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>

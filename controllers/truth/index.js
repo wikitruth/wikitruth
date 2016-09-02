@@ -27,6 +27,7 @@ module.exports = function (router) {
                     db.Topic.aggregate([ {$match: query}, {$sample: { size: 25 } } ], function(err, results) {
                         flowUtils.setEditorsUsername(results, function() {
                             results.forEach(function(result) {
+                                result.friendlyUrl = utils.urlify(result.title);
                                 flowUtils.appendEntryExtra(result);
                             });
                             model.topics = results;
@@ -39,8 +40,12 @@ module.exports = function (router) {
                 if(!req.query.topic) {
                     db.Topic.find({parentId: null, groupId: constants.CORE_GROUPS.truth }).sort({title: 1}).exec(function (err, results) {
                         async.each(results, function(result, callback) {
+                            result.friendlyUrl = utils.urlify(result.title);
                             result.comments = utils.numberWithCommas(utils.randomInt(1, 100000));
                             db.Topic.find( { parentId: result._id } ).limit(2).sort({ title: 1 }).exec(function(err, subtopics) {
+                                subtopics.forEach(function(subtopic){
+                                    subtopic.friendlyUrl = utils.urlify(subtopic.title);
+                                });
                                 result.subtopics = subtopics;
                                 callback();
                             });

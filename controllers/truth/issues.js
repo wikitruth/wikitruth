@@ -31,6 +31,7 @@ module.exports = function (router) {
                         }
                         db.Issue.find(query).sort({title: 1}).exec(function (err, results) {
                             results.forEach(function (result) {
+                                result.friendlyUrl = utils.urlify(result.title);
                                 result.comments = utils.randomInt(0, 999);
                             });
                             model.issues = results;
@@ -43,6 +44,7 @@ module.exports = function (router) {
             // Top Issues
             db.Issue.find({ ownerType: constants.OBJECT_TYPES.topic, groupId: constants.CORE_GROUPS.truth }).limit(100).exec(function(err, results) {
                 results.forEach(function(result) {
+                    result.friendlyUrl = utils.urlify(result.title);
                     result.topic = {
                         _id: result.ownerId
                     };
@@ -54,7 +56,7 @@ module.exports = function (router) {
         }
     });
 
-    router.get('/entry', function (req, res) {
+    router.get('/entry(/:friendlyUrl)?', function (req, res) {
         var model = {};
         flowUtils.setTopicModels(req, model, function () {
             flowUtils.setArgumentModels(req, model, function () {

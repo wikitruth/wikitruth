@@ -119,6 +119,7 @@ function setWorldviewModels(req, model, callback) {
 function setQuestionModel(req, model, callback) {
     if(req.query.question) {
         db.Question.findOne({_id: req.query.question}, function (err, result) {
+            result.friendlyUrl = utils.urlify(result.title);
             if(isOwner(req, result, model)) {
                 model.isQuestionOwner = true;
             }
@@ -136,6 +137,7 @@ function setQuestionModel(req, model, callback) {
 function setIssueModel(req, model, callback) {
     if(req.query.issue) {
         db.Issue.findOne({_id: req.query.issue}, function (err, result) {
+            result.friendlyUrl = utils.urlify(result.title);
             if(isOwner(req, result, model)) {
                 model.isIssueOwner = true;
             }
@@ -153,6 +155,7 @@ function setIssueModel(req, model, callback) {
 function setOpinionModel(req, model, callback) {
     if(req.query.opinion) {
         db.Opinion.findOne({_id: req.query.opinion}, function (err, result) {
+            result.friendlyUrl = utils.urlify(result.title);
             if(isOwner(req, result, model)) {
                 model.isOpinionOwner = true;
             }
@@ -175,6 +178,7 @@ function setArgumentModels(req, model, callback) {
                     if(err || !result) {
                         return callback(err);
                     }
+                    result.friendlyUrl = utils.urlify(result.title);
                     if (isOwner(req, result, model)) {
                         model.isArgumentOwner = true;
                     }
@@ -189,6 +193,7 @@ function setArgumentModels(req, model, callback) {
                 if(model.argument && model.argument.parentId) {
                     db.Argument.findOne({_id: model.argument.parentId}, function (err, result) {
                         if (result) {
+                            result.friendlyUrl = utils.urlify(result.title);
                             model.parentArgument = result;
                         }
                         callback();
@@ -206,10 +211,12 @@ function setArgumentModels(req, model, callback) {
 }
 
 function setTopicModels(req, model, callback) {
-    if(req.query.topic) {
+    var query = { _id: model.argument ? model.argument.ownerId : req.query.topic ? req.query.topic : null };
+    if(query._id) {
         async.series({
             topic: function (callback) {
-                db.Topic.findOne({_id: req.query.topic}, function(err, result) {
+                db.Topic.findOne(query, function(err, result) {
+                    result.friendlyUrl = utils.urlify(result.title);
                     if(isOwner(req, result, model)) {
                         model.isTopicOwner = true;
                     }
@@ -224,6 +231,7 @@ function setTopicModels(req, model, callback) {
                 if(model.topic && model.topic.parentId) {
                     db.Topic.findOne({_id: model.topic.parentId}, function (err, result) {
                         if (result) {
+                            result.friendlyUrl = utils.urlify(result.title);
                             model.parentTopic = result;
                         }
                         callback();
@@ -269,6 +277,7 @@ function getTopics(query, limit, callback) {
             db.Topic.find(query).limit(limit).sort({ title: 1 }).exec(function(err, results) {
                 setEditorsUsername(results, function() {
                     results.forEach(function (result) {
+                        result.friendlyUrl = utils.urlify(result.title);
                         appendEntryExtra(result);
                         //result.link = false;
                     });
@@ -292,6 +301,7 @@ function getTopics(query, limit, callback) {
                 db.Topic.find(query).limit(limit).sort({ title: 1 }).exec(function(err, results) {
                     setEditorsUsername(results, function() {
                         results.forEach(function (result) {
+                            result.friendlyUrl = utils.urlify(result.title);
                             appendEntryExtra(result);
                             var link = links.find(function (link) {
                                 return link.topicId.equals(result._id);
@@ -317,6 +327,7 @@ function getArguments(query, limit, callback) {
             db.Argument.find(query).limit(limit).sort({ title: 1 }).exec(function(err, results) {
                 setEditorsUsername(results, function() {
                     results.forEach(function (result) {
+                        result.friendlyUrl = utils.urlify(result.title);
                         appendEntryExtra(result);
                         //result.link = false;
                         //result.against = false;
@@ -341,6 +352,7 @@ function getArguments(query, limit, callback) {
                 db.Argument.find(query).limit(limit).sort({ title: 1 }).exec(function(err, results) {
                     setEditorsUsername(results, function() {
                         results.forEach(function (result) {
+                            result.friendlyUrl = utils.urlify(result.title);
                             appendEntryExtra(result);
                             var link = links.find(function (link) {
                                 return link.argumentId.equals(result._id);

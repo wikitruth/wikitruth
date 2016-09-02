@@ -24,7 +24,7 @@ function createCancelUrl(req) {
 
 module.exports = function (router) {
 
-    router.get('/entry', function (req, res) {
+    router.get('/entry(/:friendlyUrl)?', function (req, res) {
         // Topic home: display top subtopics, top arguments
         var model = {};
         async.parallel({
@@ -54,7 +54,9 @@ module.exports = function (router) {
                     ownerType: constants.OBJECT_TYPES.topic
                 };
                 flowUtils.getArguments(query, 0, function (err, results) {
-                    //model.arguments = results;
+                    results.forEach(function (result) {
+                        result.friendlyUrl = utils.urlify(result.title);
+                    });
                     callback(null, results);
                 });
             },
@@ -64,6 +66,8 @@ module.exports = function (router) {
                 db.Question.find(query).limit(15).exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
+                            result.friendlyUrl = utils.urlify(result.title);
+                            result.friendlyUrl = utils.urlify(result.title);
                             flowUtils.appendEntryExtra(result);
                         });
                         model.questions = results;
@@ -76,6 +80,7 @@ module.exports = function (router) {
                 var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, groupId: constants.CORE_GROUPS.truth };
                 db.Issue.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
                     results.forEach(function(result) {
+                        result.friendlyUrl = utils.urlify(result.title);
                         result.comments = utils.randomInt(0,999);
                     });
                     model.issues = results;
@@ -87,6 +92,7 @@ module.exports = function (router) {
                 var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, groupId: constants.CORE_GROUPS.truth };
                 db.Opinion.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
                     results.forEach(function(result) {
+                        result.friendlyUrl = utils.urlify(result.title);
                         result.comments = utils.randomInt(0,999);
                     });
                     model.opinions = results;
@@ -123,6 +129,7 @@ module.exports = function (router) {
             topic: function(callback){
                 if(req.query.id) {
                     db.Topic.findOne({_id: req.query.id}, function (err, result) {
+                        result.friendlyUrl = utils.urlify(result.title);
                         model.topic = result;
                         callback();
                     });
@@ -134,6 +141,7 @@ module.exports = function (router) {
                 var query = { _id: req.query.topic ? req.query.topic : model.topic && model.topic.parentId ? model.topic.parentId : null };
                 if(query._id) {
                     db.Topic.findOne(query, function (err, result) {
+                        result.friendlyUrl = utils.urlify(result.title);
                         model.parentTopic = result;
                         callback();
                     });
@@ -178,8 +186,9 @@ module.exports = function (router) {
                 if(req.query.id) {
                     db.TopicLink.findOne({_id: req.query.id}, function(err, link) {
                         model.link = link;
-                        db.Topic.findOne({_id: link.topicId}, function(err, entry) {
-                            model.topic = entry;
+                        db.Topic.findOne({_id: link.topicId}, function(err, result) {
+                            result.friendlyUrl = utils.urlify(result.title);
+                            model.topic = result;
                             callback();
                         });
                     });
@@ -191,6 +200,7 @@ module.exports = function (router) {
                 var query = { _id: req.query.topic ? req.query.topic : model.topic && model.topic.parentId ? model.topic.parentId : null };
                 if(query._id) {
                     db.Topic.findOne(query, function (err, result) {
+                        result.friendlyUrl = utils.urlify(result.title);
                         model.parentTopic = result;
                         callback();
                     });

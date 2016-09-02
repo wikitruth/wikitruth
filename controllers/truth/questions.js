@@ -24,6 +24,7 @@ module.exports = function (router) {
                     db.Question.find(query).sort({ title: 1 }).exec(function(err, results) {
                         flowUtils.setEditorsUsername(results, function() {
                             results.forEach(function (result) {
+                                result.friendlyUrl = utils.urlify(result.title);
                                 flowUtils.appendEntryExtra(result);
                             });
                             model.questions = results;
@@ -38,6 +39,7 @@ module.exports = function (router) {
             db.Question.aggregate([ {$match: query}, {$sample: { size: 100 } } ], function(err, results) {
                 flowUtils.setEditorsUsername(results, function() {
                     results.forEach(function (result) {
+                        result.friendlyUrl = utils.urlify(result.title);
                         result.topic = {
                             _id: result.ownerId
                         };
@@ -50,7 +52,7 @@ module.exports = function (router) {
         }
     });
 
-    router.get('/entry', function (req, res) {
+    router.get('/entry(/:friendlyUrl)?', function (req, res) {
         var model = {};
         async.parallel({
             topic: function(callback){
@@ -67,6 +69,7 @@ module.exports = function (router) {
                 var query = { ownerId: req.query.question, ownerType: constants.OBJECT_TYPES.question, groupId: constants.CORE_GROUPS.truth };
                 db.Issue.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
                     results.forEach(function(result) {
+                        result.friendlyUrl = utils.urlify(result.title);
                         result.comments = utils.randomInt(0,999);
                     });
                     model.issues = results;
@@ -78,6 +81,7 @@ module.exports = function (router) {
                 var query = { ownerId: req.query.question, ownerType: constants.OBJECT_TYPES.question, groupId: constants.CORE_GROUPS.truth };
                 db.Opinion.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
                     results.forEach(function(result) {
+                        result.friendlyUrl = utils.urlify(result.title);
                         result.comments = utils.randomInt(0,999);
                     });
                     model.opinions = results;

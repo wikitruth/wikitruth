@@ -6,7 +6,7 @@
             {^question}
                 {^argument}
                     <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
-                        <a href="{paths.truth.topics.entry}?topic={topic._id}" role="tab">
+                        <a href="{paths.truth.topics.entry}/{topic.friendlyUrl}?topic={topic._id}" role="tab">
                             <span class="glyphicon glyphicon-home" aria-hidden="true"></span><span class="hidden-xxs"> Overview</span></a>
                     </li>
                     <li role="presentation"{@eq key=tab value="topics"} class="active"{/eq}>
@@ -15,7 +15,7 @@
                     </li>
                 {:else}
                     <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
-                        <a href="{paths.truth.arguments.entry}?topic={topic._id}&amp;argument={argument._id}" role="tab">
+                        <a href="{paths.truth.arguments.entry}/{argument.friendlyUrl}?argument={argument._id}" role="tab">
                             <span class="glyphicon glyphicon-home" aria-hidden="true"></span> Overview</a>
                     </li>
                 {/argument}
@@ -29,7 +29,7 @@
                 </li>
             {:else}
                 <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
-                    <a href="{paths.truth.questions.entry}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}" role="tab">
+                    <a href="{paths.truth.questions.entry}/{question.friendlyUrl}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}" role="tab">
                         <span class="glyphicon glyphicon-home" aria-hidden="true"></span> Overview</a>
                 </li>
             {/question}
@@ -43,13 +43,13 @@
             </li>
         {:else}
             <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
-                <a href="{paths.truth.issues.entry}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;issue={issue._id}" role="tab">
+                <a href="{paths.truth.issues.entry}/{issue.friendlyUrl}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;issue={issue._id}" role="tab">
                     <span class="glyphicon glyphicon-home" aria-hidden="true"></span> Overview</a>
             </li>
         {/issue}
     {:else}
         <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
-            <a href="{paths.truth.opinions.entry}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;opinion={opinion._id}" role="tab">
+            <a href="{paths.truth.opinions.entry}/{opinion.friendlyUrl}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;opinion={opinion._id}" role="tab">
                 <span class="glyphicon glyphicon-home" aria-hidden="true"></span> Overview</a>
         </li>
     {/opinion}
