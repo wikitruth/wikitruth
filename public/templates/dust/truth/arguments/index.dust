@@ -21,7 +21,7 @@
                         <span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>
                     {/link}
                     <div>
-                        <a href="{paths.truth.arguments.entry}?topic={ownerId}&amp;argument={_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a>
+                        <a href="{paths.truth.arguments.entry}/{friendlyUrl}?argument={_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a>
                         <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
@@ -41,7 +41,7 @@
                         <span class="glyphicon glyphicon-file text-danger" aria-hidden="true"></span>
                     {/link}
                     <div>
-                        <a href="{paths.truth.arguments.entry}?topic={ownerId}&amp;argument={_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a>
+                        <a href="{paths.truth.arguments.entry}/{friendlyUrl}?argument={_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a>
                         <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>

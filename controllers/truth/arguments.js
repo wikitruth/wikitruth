@@ -62,6 +62,7 @@ module.exports = function (router) {
             db.Argument.aggregate([ {$match: query}, {$sample: { size: 100 } } ], function(err, results) {
                 flowUtils.setEditorsUsername(results, function() {
                     results.forEach(function (result) {
+                        result.friendlyUrl = utils.urlify(result.title);
                         result.topic = {
                             _id: result.ownerId
                         };
@@ -74,104 +75,109 @@ module.exports = function (router) {
         }
     });
 
-    router.get('/entry', function (req, res) {
+    router.get('/entry(/:friendlyUrl)?', function (req, res) {
         var model = {};
-        async.parallel({
-            topic: function(callback){
-                flowUtils.setTopicModels(req, model, callback);
-            },
-            argument: function (callback) {
-                flowUtils.setArgumentModels(req, model, callback);
-            },
-            arguments: function(callback) {
-                // Top Arguments
-                var query = {
-                    parentId: req.query.argument
-                };
-                flowUtils.getArguments(query, 0, function (err, results) {
-                    results.forEach(function (result) {
-                        if(!result.verdict || !result.verdict.status) {
-                            result.verdict = {
-                                status: constants.VERDICT_STATUS.pending
-                            };
-                        }
-                        flowUtils.setVerdictModel(result.verdict, result);
-                    });
-                    callback(null, results);
-                });
-            },
-            links: function (callback) {
-                // Top Questions
-                var query = { argumentId: req.query.argument };
-                db.ArgumentLink.find(query, function(err, results) {
-                    callback(null, results);
-                });
-            },
-            questions: function (callback) {
-                // Top Questions
-                var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument, groupId: constants.CORE_GROUPS.truth };
-                db.Question.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
-                    flowUtils.setEditorsUsername(results, function() {
+        flowUtils.setArgumentModels(req, model, function (err) {
+            async.parallel({
+                /*argument: function (callback) {
+                 flowUtils.setArgumentModels(req, model, callback);
+                 },*/
+                topic: function(callback){
+                    flowUtils.setTopicModels(req, model, callback);
+                },
+                arguments: function(callback) {
+                    // Top Arguments
+                    var query = {
+                        parentId: req.query.argument
+                    };
+                    flowUtils.getArguments(query, 0, function (err, results) {
                         results.forEach(function (result) {
-                            flowUtils.appendEntryExtra(result);
+                            if(!result.verdict || !result.verdict.status) {
+                                result.verdict = {
+                                    status: constants.VERDICT_STATUS.pending
+                                };
+                            }
+                            flowUtils.setVerdictModel(result.verdict, result);
                         });
-                        model.questions = results;
+                        callback(null, results);
+                    });
+                },
+                links: function (callback) {
+                    // Top Questions
+                    var query = { argumentId: req.query.argument };
+                    db.ArgumentLink.find(query, function(err, results) {
+                        callback(null, results);
+                    });
+                },
+                questions: function (callback) {
+                    // Top Questions
+                    var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument, groupId: constants.CORE_GROUPS.truth };
+                    db.Question.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                        flowUtils.setEditorsUsername(results, function() {
+                            results.forEach(function (result) {
+                                result.friendlyUrl = utils.urlify(result.title);
+                                flowUtils.appendEntryExtra(result);
+                            });
+                            model.questions = results;
+                            callback();
+                        });
+                    });
+                },
+                issues: function (callback) {
+                    // Top Issues
+                    var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument, groupId: constants.CORE_GROUPS.truth };
+                    db.Issue.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                        results.forEach(function(result) {
+                            result.friendlyUrl = utils.urlify(result.title);
+                            result.comments = utils.randomInt(0,999);
+                        });
+                        model.issues = results;
                         callback();
                     });
-                });
-            },
-            issues: function (callback) {
-                // Top Issues
-                var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument, groupId: constants.CORE_GROUPS.truth };
-                db.Issue.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
-                    results.forEach(function(result) {
-                        result.comments = utils.randomInt(0,999);
+                },
+                opinions: function (callback) {
+                    // Top Opinions
+                    var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument, groupId: constants.CORE_GROUPS.truth };
+                    db.Opinion.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                        results.forEach(function(result) {
+                            result.friendlyUrl = utils.urlify(result.title);
+                            result.comments = utils.randomInt(0,999);
+                        });
+                        model.opinions = results;
+                        callback();
                     });
-                    model.issues = results;
-                    callback();
+                }
+            }, function (err, results) {
+                var verdict = model.argument.verdict && model.argument.verdict.status ? model.argument.verdict.status : constants.VERDICT_STATUS.pending;
+                model.verdict = {
+                    label: constants.VERDICT_STATUS.getLabel(verdict),
+                    color: constants.VERDICT_STATUS.getColor(verdict)
+                };
+                if(model.isArgumentOwner) {
+                    model.isEntryOwner = true;
+                }
+                var support = results.arguments.filter(function (arg) {
+                    return !arg.against;
                 });
-            },
-            opinions: function (callback) {
-                // Top Opinions
-                var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument, groupId: constants.CORE_GROUPS.truth };
-                db.Opinion.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
-                    results.forEach(function(result) {
-                        result.comments = utils.randomInt(0,999);
-                    });
-                    model.opinions = results;
-                    callback();
+                var contra = results.arguments.filter(function (arg) {
+                    return arg.against;
                 });
-            }
-        }, function (err, results) {
-            var verdict = model.argument.verdict && model.argument.verdict.status ? model.argument.verdict.status : constants.VERDICT_STATUS.pending;
-            model.verdict = {
-                label: constants.VERDICT_STATUS.getLabel(verdict),
-                color: constants.VERDICT_STATUS.getColor(verdict)
-            };
-            if(model.isArgumentOwner) {
-                model.isEntryOwner = true;
-            }
-            var support = results.arguments.filter(function (arg) {
-                return !arg.against;
+                if(support.length > 0) {
+                    model.supportingArgumentCount = support.length;
+                    model.arguments = support.slice(0, 15);
+                }
+                if(contra.length > 0) {
+                    model.opposingArgumentCount = contra.length;
+                    model.contraArguments = contra.slice(0, 15);
+                }
+                model.entry = model.argument;
+                model.entryType = constants.OBJECT_TYPES.argument;
+                if(results.links.length > 0) {
+                    model.linkCount = results.links.length;
+                }
+                flowUtils.prepareClipboardOptions(req, model, constants.OBJECT_TYPES.argument);
+                res.render(templates.truth.arguments.entry, model);
             });
-            var contra = results.arguments.filter(function (arg) {
-                return arg.against;
-            });
-            if(support.length > 0) {
-                model.supportingArgumentCount = support.length;
-                model.arguments = support.slice(0, 15);
-            }
-            if(contra.length > 0) {
-                model.opposingArgumentCount = contra.length;
-                model.contraArguments = contra.slice(0, 15);
-            }
-            model.entry = model.argument;
-            model.entryType = constants.OBJECT_TYPES.argument;
-            if(results.links.length > 0) {
-                model.linkCount = results.links.length;
-            }
-            flowUtils.prepareClipboardOptions(req, model, constants.OBJECT_TYPES.argument);
-            res.render(templates.truth.arguments.entry, model);
         });
     });
 
@@ -182,6 +188,7 @@ module.exports = function (router) {
                 argument: function (callback) {
                     if(req.query.id) {
                         db.Argument.findOne({_id: req.query.id}, function (err, result) {
+                            result.friendlyUrl = utils.urlify(result.title);
                             model.argument = result;
                             callback();
                         });
@@ -193,6 +200,7 @@ module.exports = function (router) {
                     var query = { _id: req.query.argument ? req.query.argument : model.argument && model.argument.parentId ? model.argument.parentId : null };
                     if(query._id) {
                         db.Argument.findOne(query, function (err, result) {
+                            result.friendlyUrl = utils.urlify(result.title);
                             model.parentArgument = result;
                             callback();
                         });
@@ -213,6 +221,7 @@ module.exports = function (router) {
             parent: function (callback) {
                 if(req.body.parent) {
                     db.Argument.findOne({_id: req.body.parent}, function (err, result) {
+                        result.friendlyUrl = utils.urlify(result.title);
                         parent = result;
                         callback(err);
                     });
@@ -277,8 +286,9 @@ module.exports = function (router) {
                     if(req.query.id) {
                         db.ArgumentLink.findOne({_id: req.query.id}, function(err, link) {
                             model.link = link;
-                            db.Argument.findOne({_id: link.argumentId}, function(err, arg) {
-                                model.argument = arg;
+                            db.Argument.findOne({_id: link.argumentId}, function(err, result) {
+                                result.friendlyUrl = utils.urlify(result.title);
+                                model.argument = result;
                                 callback();
                             });
                         });
@@ -290,6 +300,7 @@ module.exports = function (router) {
                     var query = { _id: req.query.argument ? req.query.argument : model.link && model.link.parentId ? model.link.parentId : null };
                     if(query._id) {
                         db.Argument.findOne(query, function (err, result) {
+                            result.friendlyUrl = utils.urlify(result.title);
                             model.parentArgument = result;
                             callback();
                         });

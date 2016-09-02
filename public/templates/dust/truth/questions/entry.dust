@@ -20,7 +20,7 @@
                 <li class="list-group-item">
                     <span class="fa fa-exclamation-circle text-success" aria-hidden="true"></span>
                     <div>
-                        <a href="{paths.truth.issues.entry}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;issue={_id}">{title}</a>
+                        <a href="{paths.truth.issues.entry}/{friendlyUrl}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;issue={_id}">{title}</a>
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
             {/issues}
@@ -34,7 +34,7 @@
                 <li class="list-group-item">
                     <span class="fa fa-comments-o text-success" aria-hidden="true"></span>
                     <div>
-                        <a href="{paths.truth.opinions.entry}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;opinion={_id}">{title}</a>
+                        <a href="{paths.truth.opinions.entry}/{friendlyUrl}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;opinion={_id}">{title}</a>
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
             {/opinions}

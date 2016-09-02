@@ -54,17 +54,17 @@
             {#truth}
                 <div class="media wt-category">
                     <div class="media-left media-top">
-                        <a href="{paths.truth.topics.entry}?topic={_id}">
+                        <a href="{paths.truth.topics.entry}/{friendlyUrl}?topic={_id}">
                             <div class="photo-placeholder"></div>
                             {!<img class="media-object" data-src="holder.js/64x64" alt="{firstName} {lastName}">!}
                         </a>
                     </div>
                     <div class="media-body">
-                        <h4 class="media-heading"><a href="{paths.truth.topics.entry}?topic={_id}">{title}</a></h4>
+                        <h4 class="media-heading"><a href="{paths.truth.topics.entry}/{friendlyUrl}?topic={_id}">{title}</a></h4>
                         <div>
                             {?subtopics}
                                 {#subtopics}
-                                    <div><i class="fa fa-folder-open text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.truth.topics.entry}?topic={_id}">{title}</a></div>
+                                    <div><i class="fa fa-folder-open text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.truth.topics.entry}/{friendlyUrl}?topic={_id}">{title}</a></div>
                                 {/subtopics}
                             {/subtopics}
                             <div><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.truth.index}?topic={_id}" role="button">more</a></div>

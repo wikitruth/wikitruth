@@ -34,5 +34,8 @@ module.exports = {
             return interval + (fullWord ? " minutes" : 'm');
         }
         return Math.floor(seconds) + (fullWord ? " seconds": 's');
+    },
+    urlify: function urlify(text){
+        return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "-").replace(/^-+|-+$/g, '');
     }
 };

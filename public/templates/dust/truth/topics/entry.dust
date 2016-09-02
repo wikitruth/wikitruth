@@ -24,7 +24,7 @@
                         <span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>
                     {/link}
                     <div>
-                        <a href="{paths.truth.topics.entry}?topic={_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a>
+                        <a href="{paths.truth.topics.entry}/{friendlyUrl}?topic={_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a>
                         <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
@@ -39,12 +39,12 @@
             {#arguments}
             <li class="list-group-item">
                 {?link}
-                    <a href="{paths.truth.arguments.link}?topic={link.ownerId}&amp;id={link._id}&amp;source={paths.truth.topics.entry}" class="glyphicon glyphicon-link text-success"></a>
+                    <a href="{paths.truth.arguments.link}?topic={link.ownerId}&amp;id={link._id}&amp;source={paths.truth.topics.entry}/{friendlyUrl}" class="glyphicon glyphicon-link text-success"></a>
                 {:else}
                     <span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>
                 {/link}
                 <div>
-                    <a href="{paths.truth.arguments.entry}?topic={ownerId}&amp;argument={_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a>
+                    <a href="{paths.truth.arguments.entry}/{friendlyUrl}?argument={_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a>
                     <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
                 </div>
                 <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
@@ -60,7 +60,7 @@
                 <li class="list-group-item">
                     <span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>
                     <div>
-                        <a href="{paths.truth.questions.entry}?topic={topic._id}&amp;question={_id}">{title}</a>
+                        <a href="{paths.truth.questions.entry}/{friendlyUrl}?topic={topic._id}&amp;question={_id}">{title}</a>
                         <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
@@ -75,7 +75,7 @@
                 <li class="list-group-item">
                     <span class="fa fa-exclamation-circle text-success" aria-hidden="true"></span>
                     <div>
-                        <a href="{paths.truth.issues.entry}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;issue={_id}">{title}</a>
+                        <a href="{paths.truth.issues.entry}/{friendlyUrl}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;issue={_id}">{title}</a>
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
             {/issues}
@@ -89,7 +89,7 @@
                 <li class="list-group-item">
                     <span class="fa fa-comments-o text-success" aria-hidden="true"></span>
                     <div>
-                        <a href="{paths.truth.opinions.entry}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;opinion={_id}">{title}</a>
+                        <a href="{paths.truth.opinions.entry}/{friendlyUrl}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;opinion={_id}">{title}</a>
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
             {/opinions}

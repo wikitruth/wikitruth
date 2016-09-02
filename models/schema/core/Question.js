@@ -15,6 +15,18 @@ exports = module.exports = function(app, mongoose) {
   });
   schema.plugin(require('../plugins/pagedFind'));
   schema.index({ title: 1 });
-  schema.set('autoIndex', (app.get('env') === 'development'));
+  schema.index({
+    title: "text",
+    content: "text",
+    references: "text"
+  }, {
+    weights: {
+      title: 10,
+      content: 8,
+      references: 6
+    },
+    name: "TextIndex"
+  });
+  schema.set('autoIndex', true);
   app.db.model('Question', schema);
 };
