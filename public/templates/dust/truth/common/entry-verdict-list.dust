@@ -1,0 +1,3 @@
+{?verdict.true}<span class="label label-success"><i class="fa fa-check-circle"></i></span>{/verdict.true}
+{?verdict.false}<span class="label label-danger"><i class="fa fa-times"></i></span>{/verdict.false}
+{?verdict.pending}<span class="label label-warning"><i class="fa fa-question-circle"></i></span>{/verdict.pending}

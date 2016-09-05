@@ -35,16 +35,16 @@
     {/topics}
     {?arguments}
         <ul class="list-group top-list-items wt-list">
-            <li class="list-group-item highlight"><span class="glyphicon glyphicon-flash text-success" aria-hidden="true"></span> Arguments</li>
+            <li class="list-group-item highlight text-primary"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments</li>
             {#arguments}
             <li class="list-group-item">
                 {?link}
-                    <a href="{paths.truth.arguments.link}?topic={link.ownerId}&amp;id={link._id}&amp;source={paths.truth.topics.entry}/{friendlyUrl}" class="glyphicon glyphicon-link text-success"></a>
+                    <a href="{paths.truth.arguments.link}?topic={link.ownerId}&amp;id={link._id}&amp;source={paths.truth.topics.entry}/{friendlyUrl}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
                 {:else}
-                    <span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>
+                    <span class="glyphicon glyphicon-file text-{verdict.theme}" aria-hidden="true"></span>
                 {/link}
                 <div>
-                    <a href="{paths.truth.arguments.entry}/{friendlyUrl}?argument={_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a>
+                    <a href="{paths.truth.arguments.entry}/{friendlyUrl}?argument={_id}">{?link.title}{link.title}{:else}{title}{/link.title} {?typeUX}<span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}</a>
                     <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
                 </div>
                 <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>

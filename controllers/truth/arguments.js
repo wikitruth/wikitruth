@@ -52,6 +52,9 @@ module.exports = function (router) {
                         if(contra.length > 0) {
                             model.contraArguments = contra;
                         }
+                        results.forEach(function (result) {
+                            flowUtils.setVerdictModel(result);
+                        });
                         res.render(templates.truth.arguments.index, model);
                     });
                 });
@@ -67,6 +70,7 @@ module.exports = function (router) {
                             _id: result.ownerId
                         };
                         flowUtils.appendEntryExtra(result);
+                        flowUtils.setVerdictModel(result);
                     });
                     model.arguments = results;
                     res.render(templates.truth.arguments.index, model);
@@ -92,12 +96,7 @@ module.exports = function (router) {
                     };
                     flowUtils.getArguments(query, 0, function (err, results) {
                         results.forEach(function (result) {
-                            if(!result.verdict || !result.verdict.status) {
-                                result.verdict = {
-                                    status: constants.VERDICT_STATUS.pending
-                                };
-                            }
-                            flowUtils.setVerdictModel(result.verdict, result);
+                            flowUtils.setVerdictModel(result);
                         });
                         callback(null, results);
                     });
@@ -148,11 +147,7 @@ module.exports = function (router) {
                     });
                 }
             }, function (err, results) {
-                var verdict = model.argument.verdict && model.argument.verdict.status ? model.argument.verdict.status : constants.VERDICT_STATUS.pending;
-                model.verdict = {
-                    label: constants.VERDICT_STATUS.getLabel(verdict),
-                    color: constants.VERDICT_STATUS.getColor(verdict)
-                };
+                flowUtils.setVerdictModel(model.argument);
                 if(model.isArgumentOwner) {
                     model.isEntryOwner = true;
                 }
@@ -182,7 +177,9 @@ module.exports = function (router) {
     });
 
     router.get('/create', function (req, res) {
-        var model = {};
+        var model = {
+            argumentTypes: constants.ARGUMENT_TYPES
+        };
         flowUtils.setTopicModels(req, model, function () {
             async.series({
                 argument: function (callback) {
@@ -239,6 +236,8 @@ module.exports = function (router) {
                     entity.references = req.body.references;
                     entity.editUserId = req.user.id;
                     entity.editDate = Date.now();
+                    entity.typeId = req.body.typeId;
+                    entity.ethicalStatus.hasValue = req.body.hasEthicalValue ? true : false;
                     if(parent) { // Parent is always an Argument
                         // A child argument.
                         entity.parentId = parent._id;
@@ -277,6 +276,7 @@ module.exports = function (router) {
         });
 
     });
+
 
     router.get('/link', function (req, res) {
         var model = {};

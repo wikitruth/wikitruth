@@ -3,7 +3,7 @@ var WT_CONSTANTS = {
         contentHeight: 250,
         contentToolbar: [
             ['style', ['style']],
-            ['font', ['bold', 'underline', 'strikethrough', 'clear']],
+            ['font', ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
             /*['fontname', ['fontname']],*/
             ['color', ['color']],
             ['para', ['ul', 'ol', 'paragraph']],

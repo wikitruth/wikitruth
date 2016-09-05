@@ -30,11 +30,23 @@
                 </label>
             </div>
             <div class="radio">
+                <label class="text-danger">
+                    <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+                    Incoherent or unrelated to parent entry
+                </label>
+            </div>
+            <div class="radio">
+                <label class="text-danger">
+                    <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+                    Argument too broad or contains multiple topics, please break down
+                </label>
+            </div>
+            {!<div class="radio">
                 <label class="text-warning">
                     <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
                     A moral argument (not epistemological)
                 </label>
-            </div>
+            </div>!}
             <div class="radio">
                 <label class="text-warning">
                     <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
@@ -44,7 +56,7 @@
             <div class="radio">
                 <label class="text-warning-x">
                     <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
-                    Confusing statement structure, too vague (grammatical issue)
+                    Confusing statement structure, too vague or grammatical issue
                 </label>
             </div>
             <div class="radio">
@@ -78,6 +90,8 @@
                 height: WT_CONSTANTS.summernote.referenceHeight,
                 toolbar: WT_CONSTANTS.summernote.referenceToolbar
             });
+
+            $('[data-toggle="popover"]').popover();
         });
     </script>
 {/footer}

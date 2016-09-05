@@ -12,6 +12,7 @@ exports.mongodb = {
       'admingroups',
       'admins',
       'arguments',
+      'argumentlinks',
       'ideologies',
       'issues',
       'loginattempts',
@@ -20,6 +21,7 @@ exports.mongodb = {
       'questions',
       'status',
       'topics',
+      'topiclinks',
       'words'
     ],
     modelMapping: {
@@ -28,6 +30,7 @@ exports.mongodb = {
       admingroups: 'AdminGroup',
       admin: 'Admin',
       arguments: 'Argument',
+      argumentlinks: 'ArgumentLink',
       categories: 'Category',
       ideologies: 'Ideology',
       issues: 'Issue',
@@ -35,9 +38,9 @@ exports.mongodb = {
       opinions: 'Opinion',
       pages: 'Page',
       questions: 'Question',
-      sessions: 'Session',
       status: 'Status',
       topics: 'Topic',
+      topiclinks: 'TopicLink',
       users: 'User',
       words: 'Word'
     }

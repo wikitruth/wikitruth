@@ -1,5 +1,7 @@
 'use strict';
 
+var constants   = require('../../constants');
+
 exports = module.exports = function(app, mongoose) {
   var schema = new mongoose.Schema({
     title: { type: String, default: '' },
@@ -12,16 +14,14 @@ exports = module.exports = function(app, mongoose) {
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     editDate: { type: Date, default: Date.now },
     editUserId: { type: mongoose.Schema.ObjectId, ref: 'User'},
-    typeId: { type: Number }, // ARGUMENT_TYPES
+    typeId: { type: Number, default: constants.ARGUMENT_TYPES.factual }, // ARGUMENT_TYPES
     groupId: { type: Number, default: -1 },
     threadId: { type: mongoose.Schema.ObjectId, ref: 'Argument' },
     against: { type: Boolean, default: false }, // how it relates to parent Argument, default is in support
-    linkedArguments: [
-      {
-        argumentId: { type: mongoose.Schema.ObjectId },
-        linkType: { type: Number } // ARGUMENT_LINK_TYPES
-      }
-    ],
+    ethicalStatus: {
+      hasValue: { type: Boolean, default: false },
+      status: { type: Number } // ETHICAL_STATUS
+    },
     verdict: {
       status: { type: Number },
       editDate: { type: Date },

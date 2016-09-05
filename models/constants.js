@@ -55,7 +55,7 @@ VERDICT_STATUS.getLabel = function (status) {
     }
 };
 
-VERDICT_STATUS.getColor = function (status) {
+VERDICT_STATUS.getTheme = function (status) {
     switch (status) {
         case VERDICT_STATUS.status_true:
         case VERDICT_STATUS.most_likely:
@@ -99,6 +99,39 @@ VERDICT_STATUS.getCategory = function (status) {
     }
 };
 
+var ARGUMENT_TYPES = {
+    // Types of arguments:
+    // * A moral or ethical argument (something that should or should not/ought/this becomes a voting then? E.g. ought or ought not)
+    // * A statement of a reality or phenomenon (current)
+    // * A prediction of a future event or phenomenon
+    // * A statement of a far previous reality (historical or something had happen a long time or lacks evidences)
+    ethical: 0,
+    factual: 1,
+    prediction: 2,
+    historical: 3
+};
+
+ARGUMENT_TYPES.getUXInfo = function (typeId) {
+    var label = "factual";
+    var theme = "info";
+    switch (typeId) {
+        case ARGUMENT_TYPES.ethical:
+            label = "ethical";
+            theme = "warning";
+            break;
+        case ARGUMENT_TYPES.historical:
+            label = "historical";
+            break;
+        case ARGUMENT_TYPES.prediction:
+            label = "prediction";
+    }
+
+    return {
+        label: label,
+        theme: theme
+    };
+};
+
 module.exports = {
     OBJECT_TYPES: {
         topic: 1,
@@ -111,19 +144,20 @@ module.exports = {
 
         worldview: 200
     },
-    ARGUMENT_LINK_TYPES: {
-        prove: 1,
-        disprove: 2
-    },
-    ARGUMENT_TYPES: {
-        positive: 1,
-        negative: 2
+    ARGUMENT_TYPES: ARGUMENT_TYPES,
+    ETHICAL_STATUS: {
+        very_good: 12,
+        good: 11,
+        encourage: 10,
+        pending: 0,
+        discourage: 20,
+        bad: 21,
+        dangerous: 22
     },
     CORE_GROUPS: {
         truth: 100,
         worldviews: 101,
         morality: 102
     },
-
     VERDICT_STATUS: VERDICT_STATUS
 };
