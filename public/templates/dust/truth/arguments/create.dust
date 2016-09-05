@@ -26,10 +26,59 @@
         <div class="form-group">
             <label for="inputParent">Parent</label>
             <textarea name="parent" id="inputParent" class="form-control" rows="1">{?argument}{argument.parentId}{:else}{parentArgument._id}{/argument}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="inputParent">Correlation to Parent</label>
+            <div class="radio">
+                <label class="text-success">
+                    <input type="radio" name="supportsParent" value="1" {^argument.against}checked="checked"{/argument.against}>
+                    Supporting Argument (for)
+                </label>
+            </div>
+            <div class="radio">
+                <label class="text-primary">
+                    <input type="radio" name="supportsParent" value="" {?argument.against}checked="checked"{/argument.against}>
+                    Opposing Argument (against)
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputParent">Morality and Ethics</label>
             <div class="checkbox">
+                <label class="text-primary">
+                    <input type="checkbox" name="hasEthicalValue" value="1" {?argument.ethicalStatus.hasValue}checked="checked"{/argument.ethicalStatus.hasValue}>
+                    Has moral or ethical value
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputParent">Argument Type</label>
+            <div class="radio">
                 <label>
-                    <input type="checkbox" name="supportsParent" value="1" {^argument.against}checked="checked"{/argument.against}>
-                    Supporting Argument (ignored when no parent)
+                    <input type="radio" id="radioTypeId{argumentTypes.factual}" name="typeId" value="{argumentTypes.factual}">
+                    <span class="text-info"><strong>Factual</strong></span><br/>
+                    A statement of a fact, reality or phenomenon (current)
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" id="radioTypeId{argumentTypes.prediction}" name="typeId" value="{argumentTypes.prediction}">
+                    <span class="text-info"><strong>Prediction</strong></span><br/>
+                    A prediction of a future event or phenomenon
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" id="radioTypeId{argumentTypes.historical}" name="typeId" value="{argumentTypes.historical}">
+                    <span class="text-info"><strong>Historical</strong></span><br/>
+                    A statement of a previous reality (historical or something had happen a long time that may lack evidences)
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" id="radioTypeId{argumentTypes.ethical}" name="typeId" value="{argumentTypes.ethical}">
+                    <span class="text-warning"><strong>Ethical</strong></span><br/>
+                    A moral or ethical value argument.
                 </label>
             </div>
         </div>
@@ -65,6 +114,11 @@
                 height: WT_CONSTANTS.summernote.referenceHeight,
                 toolbar: WT_CONSTANTS.summernote.referenceToolbar
             });
+
+            var typeId = '{argument.typeId}';
+            $('#radioTypeId' + typeId).prop('checked', true);
+
+            $('[data-toggle="popover"]').popover();
         });
     </script>
 {/footer}

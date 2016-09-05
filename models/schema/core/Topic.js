@@ -15,6 +15,10 @@ exports = module.exports = function(app, mongoose) {
     groupId: { type: Number, default: -1 },
     icon: { type: String }, // ex: "fa fa-plane"
     typeId: { type: Number }, // TOPIC_TYPES
+    ethicalStatus: {
+      hasValue: { type: Boolean, default: false },
+      status: { type: Number } // ETHICAL_STATUS
+    },
     outline: [
       {
         listType: { type: Number }, // OBJECT_TYPES

@@ -40,7 +40,7 @@ module.exports = function (router) {
                 });
             },
             links: function (callback) {
-                // Top Questions
+                // Top Linked Topics
                 var query = { topicId: req.query.topic };
                 db.TopicLink.find(query, function(err, results) {
                     callback(null, results);
@@ -56,6 +56,7 @@ module.exports = function (router) {
                 flowUtils.getArguments(query, 0, function (err, results) {
                     results.forEach(function (result) {
                         result.friendlyUrl = utils.urlify(result.title);
+                        flowUtils.setVerdictModel(result);
                     });
                     callback(null, results);
                 });
@@ -100,18 +101,20 @@ module.exports = function (router) {
                 });
             }
         }, function (err, results) {
-            var verdict = model.topic.verdict && model.topic.verdict.status ? model.topic.verdict.status : constants.VERDICT_STATUS.pending;
+            /*var verdict = model.topic.verdict && model.topic.verdict.status ? model.topic.verdict.status : constants.VERDICT_STATUS.pending;
             model.verdict = {
                 label: constants.VERDICT_STATUS.getLabel(verdict),
-                color: constants.VERDICT_STATUS.getColor(verdict)
-            };
+                color: constants.VERDICT_STATUS.getTheme(verdict)
+            };*/
             model.entry = model.topic;
             model.arguments = results.arguments.slice(0, 15);
             model.entryType = constants.OBJECT_TYPES.topic;
             if(model.isTopicOwner) {
                 model.isEntryOwner = true;
             }
-            model.verdict.counts = flowUtils.getVerdictCount(results.arguments);
+            model.verdict = {
+                counts: flowUtils.getVerdictCount(results.arguments)
+            };
             if(results.links.length > 0) {
                 model.linkCount = results.links.length;
             }
