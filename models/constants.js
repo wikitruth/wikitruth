@@ -124,6 +124,7 @@ ARGUMENT_TYPES.getUXInfo = function (typeId) {
             break;
         case ARGUMENT_TYPES.prediction:
             label = "prediction";
+            break;
     }
 
     return {

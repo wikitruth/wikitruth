@@ -429,7 +429,7 @@ function setVerdictModel(result) {
     result.verdict.label = constants.VERDICT_STATUS.getLabel(status);
     result.verdict.theme = constants.VERDICT_STATUS.getTheme(status);
 
-    if(result.typeId !== constants.ARGUMENT_TYPES.factual) {
+    if( typeof result.typeId !== 'undefined' && result.typeId !== constants.ARGUMENT_TYPES.factual) {
         result.typeUX = constants.ARGUMENT_TYPES.getUXInfo(result.typeId);
     }
 }
