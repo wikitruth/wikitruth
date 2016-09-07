@@ -141,9 +141,7 @@ module.exports = {
         comment: 4,
         definition: 5,
         issue: 10,
-        opinion: 11,
-
-        worldview: 200
+        opinion: 11
     },
     ARGUMENT_TYPES: ARGUMENT_TYPES,
     ETHICAL_STATUS: {
@@ -154,11 +152,6 @@ module.exports = {
         discourage: 20,
         bad: 21,
         dangerous: 22
-    },
-    CORE_GROUPS: {
-        truth: 100,
-        worldviews: 101,
-        morality: 102
     },
     VERDICT_STATUS: VERDICT_STATUS
 };

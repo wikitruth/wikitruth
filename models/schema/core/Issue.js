@@ -10,7 +10,6 @@ exports = module.exports = function(app, mongoose) {
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     editDate: { type: Date, default: Date.now },
     editUserId: { type: mongoose.Schema.ObjectId, ref: 'User'},
-    groupId: { type: Number, default: -1 },
     isCritical: { type: Boolean }
   });
   schema.plugin(require('../plugins/pagedFind'));

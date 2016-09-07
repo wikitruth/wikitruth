@@ -33,84 +33,41 @@ module.exports = {
         topic: '/discuss/category/topic'
     },
     truth: {
-        index: '/truth',
+        index: '/explore',
         topics: {
-            index:  '/truth/topics',
-            entry:  '/truth/topics/entry',
-            create: '/truth/topics/create',
-            link: '/truth/topics/link'
+            index:  '/topics',
+            entry:  '/topics/entry',
+            create: '/topics/create',
+            link: '/topics/link'
         },
         arguments: {
-            index:  '/truth/arguments',
-            entry:  '/truth/arguments/entry',
-            create: '/truth/arguments/create',
-            link: '/truth/arguments/link'
+            index:  '/arguments',
+            entry:  '/arguments/entry',
+            create: '/arguments/create',
+            link: '/arguments/link'
         },
         questions: {
-            create: '/truth/questions/create',
-            index:  '/truth/questions',
-            entry:  '/truth/questions/entry'
+            create: '/questions/create',
+            index:  '/questions',
+            entry:  '/questions/entry'
         },
         issues: {
-            create: '/truth/issues/create',
-            index:  '/truth/issues',
-            entry:  '/truth/issues/entry'
+            create: '/issues/create',
+            index:  '/issues',
+            entry:  '/issues/entry'
         },
         opinions: {
-            create: '/truth/opinions/create',
-            index:  '/truth/opinions',
-            entry:  '/truth/opinions/entry'
+            create: '/opinions/create',
+            index:  '/opinions',
+            entry:  '/opinions/entry'
         },
         outline: {
-            link: '/truth/outline/link'
+            link: '/outline/link'
         },
         verdict: {
-            update: '/truth/verdict/update'
+            update: '/verdict/update'
         },
-        related: '/truth/related',
-        clipboard: '/truth/clipboard'
-    },
-    worldviews: {
-        index: '/worldviews',
-        entry: '/worldviews/entry',
-        create: '/worldviews/create',
-        topics: {
-            index: '/worldviews/topics',
-            entry: '/worldviews/topics/entry',
-            create: '/worldviews/topics/create'
-        },
-        arguments: {
-            index: '/worldviews/arguments',
-            entry: '/worldviews/arguments/entry',
-            create: '/worldviews/arguments/create'
-        },
-        questions: {
-            index: '/worldviews/questions',
-            create: '/worldviews/questions/create',
-            entry:  '/worldviews/questions/entry'
-        },
-        related: '/worldviews/related'
-    },
-    morality: {
-        index: '/morality',
-        topics: {
-            index: '/morality/topics',
-            entry: '/morality/topics/entry',
-            create: '/morality/topics/create'
-        },
-        arguments: {
-            index: '/morality/arguments',
-            entry: '/morality/arguments/entry',
-            create: '/morality/arguments/create'
-        },
-        questions: {
-            create: '/morality/questions/create',
-            index: '/morality/questions',
-            entry: '/morality/questions/entry'
-        },
-        outline: {
-            link: '/morality/outline/link'
-        },
-        related: '/morality/related'
+        related: '/related',
+        clipboard: '/clipboard'
     }
 };

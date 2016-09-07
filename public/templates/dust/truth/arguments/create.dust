@@ -115,7 +115,7 @@
                 toolbar: WT_CONSTANTS.summernote.referenceToolbar
             });
 
-            var typeId = '{argument.typeId}';
+            var typeId = '{?argument}{argument.typeId}{:else}{argumentTypes.factual}{/argument}';
             $('#radioTypeId' + typeId).prop('checked', true);
 
             $('[data-toggle="popover"]').popover();

@@ -12,7 +12,6 @@ exports = module.exports = function(app, mongoose) {
     editUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     ownerId: { type: mongoose.Schema.ObjectId, default: null }, // Required when owner is not a Topic. Useful for filtering
     ownerType: { type: Number, default: -1 }, // OBJECT_TYPES
-    groupId: { type: Number, default: -1 },
     icon: { type: String }, // ex: "fa fa-plane"
     typeId: { type: Number }, // TOPIC_TYPES
     ethicalStatus: {

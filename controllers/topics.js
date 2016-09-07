@@ -4,12 +4,12 @@ var mongoose    = require('mongoose'),
     async       = require('async'),
     url         = require('url'),
     querystring = require('querystring'),
-    paths       = require('../../models/paths'),
-    templates   = require('../../models/templates'),
-    utils       = require('../../utils/utils'),
-    flowUtils   = require('../../utils/flowUtils'),
-    constants   = require('../../models/constants'),
-    db          = require('../../app').db.models;
+    paths       = require('../models/paths'),
+    templates   = require('../models/templates'),
+    utils       = require('../utils/utils'),
+    flowUtils   = require('../utils/flowUtils'),
+    constants   = require('../models/constants'),
+    db          = require('../app').db.models;
 
 function createCancelUrl(req) {
     var nextUrl = url.parse(req.originalUrl);
@@ -33,7 +33,7 @@ module.exports = function (router) {
             },
             topics: function(callback) {
                 // Top Subtopics
-                var query = { parentId: req.query.topic, groupId: constants.CORE_GROUPS.truth };
+                var query = { parentId: req.query.topic };
                 flowUtils.getTopics(query, 15, function (err, results) {
                     model.topics = results;
                     callback();
@@ -63,7 +63,7 @@ module.exports = function (router) {
             },
             questions: function (callback) {
                 // Top Questions
-                var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, groupId: constants.CORE_GROUPS.truth };
+                var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic };
                 db.Question.find(query).limit(15).exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
@@ -78,7 +78,7 @@ module.exports = function (router) {
             },
             issues: function (callback) {
                 // Top Issues
-                var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, groupId: constants.CORE_GROUPS.truth };
+                var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic };
                 db.Issue.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
                     results.forEach(function(result) {
                         result.friendlyUrl = utils.urlify(result.title);
@@ -90,7 +90,7 @@ module.exports = function (router) {
             },
             opinions: function (callback) {
                 // Top Opinions
-                var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, groupId: constants.CORE_GROUPS.truth };
+                var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic };
                 db.Opinion.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
                     results.forEach(function(result) {
                         result.friendlyUrl = utils.urlify(result.title);
@@ -167,10 +167,13 @@ module.exports = function (router) {
             entity.editUserId = req.user.id;
             entity.editDate = Date.now();
             entity.icon = req.body.icon;
+            if(!entity.ethicalStatus) {
+                entity.ethicalStatus = {};
+            }
+            entity.ethicalStatus.hasValue = req.body.hasEthicalValue ? true : false;
             if(!result) {
                 entity.createUserId = req.user.id;
                 entity.createDate = Date.now();
-                entity.groupId = constants.CORE_GROUPS.truth;
             }
             entity.parentId = req.body.parent ? req.body.parent : null;
             db.Topic.update(query, entity, {upsert: true}, function(err, writeResult) {

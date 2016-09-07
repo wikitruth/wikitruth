@@ -15,7 +15,6 @@ exports = module.exports = function(app, mongoose) {
     editDate: { type: Date, default: Date.now },
     editUserId: { type: mongoose.Schema.ObjectId, ref: 'User'},
     typeId: { type: Number, default: constants.ARGUMENT_TYPES.factual }, // ARGUMENT_TYPES
-    groupId: { type: Number, default: -1 },
     threadId: { type: mongoose.Schema.ObjectId, ref: 'Argument' },
     against: { type: Boolean, default: false }, // how it relates to parent Argument, default is in support
     ethicalStatus: {

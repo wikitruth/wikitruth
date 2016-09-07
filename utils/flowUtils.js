@@ -75,47 +75,6 @@ function setEditorsUsername(items, callback) {
     }
 }
 
-function setWorldviewModel(req, model, callback) {
-    if(req.query.worldview) {
-        db.Ideology.findOne({_id: req.query.worldview}, function (err, result) {
-            appendOwnerFlag(req, result, model);
-            db.User.findOne({_id: result.editUserId}, function (err, user) {
-                result.editUsername = user.username;
-                model.worldview = result;
-                callback(err);
-            });
-        });
-    } else {
-        callback();
-    }
-}
-
-function setWorldviewModels(req, model, callback) {
-    if(req.query.worldview) {
-        async.series({
-            worldview: function (callback) {
-                setWorldviewModel(req, model, callback);
-            },
-            parentWorldview: function (callback) {
-                if(model.worldview && model.worldview.parentId) {
-                    db.Ideology.findOne({_id: model.worldview.parentId}, function (err, result) {
-                        if (result) {
-                            model.parentWorldview = result;
-                        }
-                        callback();
-                    });
-                } else {
-                    callback();
-                }
-            }
-        }, function (err, results) {
-            callback();
-        });
-    } else {
-        callback();
-    }
-}
-
 function setQuestionModel(req, model, callback) {
     if(req.query.question) {
         db.Question.findOne({_id: req.query.question}, function (err, result) {
@@ -286,9 +245,6 @@ function getTopics(query, limit, callback) {
             });
         },
         links: function (callback) {
-            if(query.groupId) {
-                delete query.groupId;
-            }
             db.TopicLink.find(query).limit(limit).exec(function(err, links) {
                 var ids = links.map(function (link) {
                     return link.topicId;
@@ -337,9 +293,6 @@ function getArguments(query, limit, callback) {
             });
         },
         links: function (callback) {
-            if(query.groupId) {
-                delete query.groupId;
-            }
             db.ArgumentLink.find(query).limit(limit).exec(function(err, links) {
                 var ids = links.map(function (link) {
                     return link.argumentId;
@@ -471,8 +424,6 @@ module.exports = {
     getBackupDir: getBackupDir,
     isOwner: isOwner,
     appendOwnerFlag: appendOwnerFlag,
-    setWorldviewModel: setWorldviewModel,
-    setWorldviewModels: setWorldviewModels,
     setArgumentModels: setArgumentModels,
     setTopicModels: setTopicModels,
     setQuestionModel: setQuestionModel,

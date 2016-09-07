@@ -2,14 +2,14 @@
 
 var mongoose    = require('mongoose'),
     async       = require('async'),
-    utils       = require('../../utils/utils'),
-    flowUtils   = require('../../utils/flowUtils'),
-    paths       = require('../../models/paths'),
-    templates   = require('../../models/templates'),
-    constants   = require('../../models/constants'),
+    utils       = require('../utils/utils'),
+    flowUtils   = require('../utils/flowUtils'),
+    paths       = require('../models/paths'),
+    templates   = require('../models/templates'),
+    constants   = require('../models/constants'),
     url         = require('url'),
     querystring = require('querystring'),
-    db          = require('../../app').db.models;
+    db          = require('../app').db.models;
 
 function createCancelUrl(req) {
     var nextUrl = url.parse(req.originalUrl);
@@ -61,7 +61,7 @@ module.exports = function (router) {
             });
         } else {
             // Top Discussions
-            var query = { ownerType: constants.OBJECT_TYPES.topic, groupId: constants.CORE_GROUPS.truth };
+            var query = { ownerType: constants.OBJECT_TYPES.topic };
             db.Argument.aggregate([ {$match: query}, {$sample: { size: 100 } } ], function(err, results) {
                 flowUtils.setEditorsUsername(results, function() {
                     results.forEach(function (result) {
@@ -110,7 +110,7 @@ module.exports = function (router) {
                 },
                 questions: function (callback) {
                     // Top Questions
-                    var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument, groupId: constants.CORE_GROUPS.truth };
+                    var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument };
                     db.Question.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
                         flowUtils.setEditorsUsername(results, function() {
                             results.forEach(function (result) {
@@ -124,7 +124,7 @@ module.exports = function (router) {
                 },
                 issues: function (callback) {
                     // Top Issues
-                    var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument, groupId: constants.CORE_GROUPS.truth };
+                    var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument };
                     db.Issue.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
                         results.forEach(function(result) {
                             result.friendlyUrl = utils.urlify(result.title);
@@ -136,7 +136,7 @@ module.exports = function (router) {
                 },
                 opinions: function (callback) {
                     // Top Opinions
-                    var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument, groupId: constants.CORE_GROUPS.truth };
+                    var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument };
                     db.Opinion.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
                         results.forEach(function(result) {
                             result.friendlyUrl = utils.urlify(result.title);
@@ -237,6 +237,9 @@ module.exports = function (router) {
                     entity.editUserId = req.user.id;
                     entity.editDate = Date.now();
                     entity.typeId = req.body.typeId;
+                    if(!entity.ethicalStatus) {
+                        entity.ethicalStatus = {};
+                    }
                     entity.ethicalStatus.hasValue = req.body.hasEthicalValue ? true : false;
                     if(parent) { // Parent is always an Argument
                         // A child argument.
@@ -259,7 +262,6 @@ module.exports = function (router) {
                     if(!result) {
                         entity.createUserId = req.user.id;
                         entity.createDate = Date.now();
-                        entity.groupId = constants.CORE_GROUPS.truth;
                     }
                     /*} else if(req.user.isAdmin()) {
                         entity.createUserId = req.body.author;
