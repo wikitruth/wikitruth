@@ -70,51 +70,5 @@ module.exports = {
         },
         related: 'dust/truth/related',
         clipboard: 'dust/truth/clipboard'
-    },
-    worldviews: {
-        create: 'dust/worldviews/create',
-        entry: 'dust/worldviews/entry',
-        index: 'dust/worldviews/index',
-        topics: {
-            index: 'dust/worldviews/topics/index',
-            create: 'dust/worldviews/topics/create',
-            entry: 'dust/worldviews/topics/entry'
-        },
-        arguments: {
-            index: 'dust/worldviews/arguments/index',
-            create: 'dust/worldviews/arguments/create',
-            entry: 'dust/worldviews/arguments/entry'
-        },
-        questions: {
-            index: 'dust/worldviews/questions/index',
-            create: 'dust/worldviews/questions/create',
-            entry: 'dust/worldviews/questions/entry'
-        },
-        related: 'dust/worldviews/related'
-    },
-    morality: {
-        index: 'dust/morality/index',
-        indexHeader: 'dust/morality/index-header',
-        entryHeader: 'dust/morality/entry-header',
-        topics: {
-            index: 'dust/morality/topics/index',
-            create: 'dust/morality/topics/create',
-            entry: 'dust/morality/topics/entry'
-        },
-        arguments: {
-            index: 'dust/morality/arguments/index',
-            create: 'dust/morality/arguments/create',
-            entry: 'dust/morality/arguments/entry'
-        },
-        questions: {
-            index: 'dust/morality/questions/index',
-            create: 'dust/morality/questions/create',
-            entry: 'dust/morality/questions/entry'
-        },
-        outline: {
-            create: 'dust/morality/outline/create',
-            linkTo: 'dust/morality/outline/link-to'
-        },
-        related: 'dust/morality/related'
     }
 };

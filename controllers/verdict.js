@@ -1,10 +1,10 @@
 'use strict';
 
-var flowUtils   = require('../../utils/flowUtils'),
-    constants   = require('../../models/constants'),
-    templates   = require('../../models/templates'),
-    paths       = require('../../models/paths'),
-    db          = require('../../app').db.models;
+var flowUtils   = require('../utils/flowUtils'),
+    constants   = require('../models/constants'),
+    templates   = require('../models/templates'),
+    paths       = require('../models/paths'),
+    db          = require('../app').db.models;
 
 module.exports = function (router) {
 

@@ -1,7 +1,7 @@
 'use strict';
 
-var flowUtils   = require('../../utils/flowUtils'),
-    templates   = require('../../models/templates');
+var flowUtils   = require('../utils/flowUtils'),
+    templates   = require('../models/templates');
 
 module.exports = function (router) {
 
@@ -20,7 +20,7 @@ module.exports = function (router) {
 
                 }*/
 
-                res.render(templates.morality.outline.linkTo, model);
+                res.render(templates.truth.outline.linkTo, model);
             });
         });
     });
@@ -29,7 +29,7 @@ module.exports = function (router) {
         var model = {};
         flowUtils.setTopicModels(req, model, function () {
             flowUtils.setArgumentModels(req, model, function () {
-                res.render(templates.morality.outline.create, model);
+                res.render(templates.truth.outline.create, model);
             });
         });
     });

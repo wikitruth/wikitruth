@@ -32,6 +32,15 @@
             <textarea name="parent" id="inputParent" class="form-control" rows="1">{?topic}{topic.parentId}{:else}{parentTopic._id}{/topic}</textarea>
         </div>
         <div class="form-group">
+            <label for="inputParent">Morality and Ethics</label>
+            <div class="checkbox">
+                <label class="text-primary">
+                    <input type="checkbox" name="hasEthicalValue" value="1" {?topic.ethicalStatus.hasValue}checked="checked"{/topic.ethicalStatus.hasValue}>
+                    Has moral or ethical value
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
             <label for="inputIcon">Icon</label>
             <textarea name="icon" id="inputIcon" class="form-control" rows="1">{topic.icon}</textarea>
         </div>

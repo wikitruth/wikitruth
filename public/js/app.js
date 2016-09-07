@@ -26,8 +26,6 @@ var WT_CONSTANTS = {
         comment: 4,
         definition: 5,
         issue: 10,
-        opinion: 11,
-
-        worldview: 200
+        opinion: 11
     }
 };

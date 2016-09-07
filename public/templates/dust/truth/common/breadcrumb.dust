@@ -1,6 +1,6 @@
 <br/>
 <ol class="breadcrumb">
-    <li><i class="fa fa-globe text-muted"></i> <a href="{paths.truth.index}">Truth</a></li>
+    <li><a href="{paths.truth.index}"><i class="fa fa-globe text-muted"></i> Explore</a></li>
     {?parentTopic}
         {?parentTopic.parentId}
             <li><a href="{paths.truth.topics.entry}?topic={parentTopic.parentId}">..</a></li>

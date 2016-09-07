@@ -25,7 +25,4 @@ exports = module.exports = function(app, mongoose) {
   require('./schema/core/Opinion')(app, mongoose);
   require('./schema/core/Page')(app, mongoose);
   require('./schema/core/Word')(app, mongoose);
-
-  // ideology
-  require('./schema/worldviews/Ideology')(app, mongoose);
 };

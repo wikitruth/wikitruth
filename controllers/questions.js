@@ -2,12 +2,12 @@
 
 var mongoose    = require('mongoose'),
     async       = require('async'),
-    utils       = require('../../utils/utils'),
-    flowUtils   = require('../../utils/flowUtils'),
-    paths       = require('../../models/paths'),
-    templates   = require('../../models/templates'),
-    constants   = require('../../models/constants'),
-    db          = require('../../app').db.models;
+    utils       = require('../utils/utils'),
+    flowUtils   = require('../utils/flowUtils'),
+    paths       = require('../models/paths'),
+    templates   = require('../models/templates'),
+    constants   = require('../models/constants'),
+    db          = require('../app').db.models;
 
 module.exports = function (router) {
 
@@ -35,7 +35,7 @@ module.exports = function (router) {
             });
         } else {
             // Top Questions
-            var query = { ownerType: constants.OBJECT_TYPES.topic, groupId: constants.CORE_GROUPS.truth };
+            var query = { ownerType: constants.OBJECT_TYPES.topic };
             db.Question.aggregate([ {$match: query}, {$sample: { size: 100 } } ], function(err, results) {
                 flowUtils.setEditorsUsername(results, function() {
                     results.forEach(function (result) {
@@ -66,7 +66,7 @@ module.exports = function (router) {
             },
             issues: function (callback) {
                 // Top Issues
-                var query = { ownerId: req.query.question, ownerType: constants.OBJECT_TYPES.question, groupId: constants.CORE_GROUPS.truth };
+                var query = { ownerId: req.query.question, ownerType: constants.OBJECT_TYPES.question };
                 db.Issue.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
                     results.forEach(function(result) {
                         result.friendlyUrl = utils.urlify(result.title);
@@ -78,7 +78,7 @@ module.exports = function (router) {
             },
             opinions: function (callback) {
                 // Top Opinions
-                var query = { ownerId: req.query.question, ownerType: constants.OBJECT_TYPES.question, groupId: constants.CORE_GROUPS.truth };
+                var query = { ownerId: req.query.question, ownerType: constants.OBJECT_TYPES.question };
                 db.Opinion.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
                     results.forEach(function(result) {
                         result.friendlyUrl = utils.urlify(result.title);
@@ -117,7 +117,6 @@ module.exports = function (router) {
             if(!result) {
                 entity.createUserId = req.user.id;
                 entity.createDate = Date.now();
-                entity.groupId = constants.CORE_GROUPS.truth;
             }
             if(!entity.ownerId) {
                 if(req.query.argument) {
