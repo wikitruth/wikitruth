@@ -18,17 +18,14 @@
             <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span><span class="hidden-xxs"> Questions</span>
         </a>
     </li>
-    {?isContributor}
-        <li role="presentation" class="dropdown"><a href="#" id="wtTabMore" class="dropdown-toggle" data-toggle="dropdown" aria-controls="wtTabMore-contents" aria-expanded="false">
-            <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span> {!<span class="caret"></span>!}</a>
-        <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="wtTabMore" id="wtTabMore-contents">
-            <li role="tab"><a href="{paths.truth.topics.create}">
-                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Topic</a></li>
-            {!<li role="separator" class="visible-xs divider"></li>
-            <li class="visible-xs"><a href="#"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments</a></li>
-            <li class="visible-xs"><a href="#"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions</a></li>!}
-        </ul>
-    {/isContributor}
+    {!{?isContributor}!}
+    <li role="presentation" class="dropdown"><a href="#" id="wtTabMore" class="dropdown-toggle" data-toggle="dropdown" aria-controls="wtTabMore-contents" aria-expanded="false">
+        <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span> {!<span class="caret"></span>!}</a>
+    <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="wtTabMore" id="wtTabMore-contents">
+        <li role="tab"><a href="{paths.truth.topics.create}">
+            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Topic</a></li>
+        {!<li role="separator" class="visible-xs divider"></li>
+        <li class="visible-xs"><a href="#"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments</a></li>
+        <li class="visible-xs"><a href="#"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions</a></li>!}
+    </ul>
 </ul>
-{!<h4 class="text-muted" style="line-height: 30px;">Top popular topics
-</h4>!}

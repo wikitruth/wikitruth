@@ -13,7 +13,8 @@
                 <li class="list-group-item">
                     <span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>
                     <div>
-                        <a href="{paths.truth.issues.entry}/{friendlyUrl}?issue={_id}{?topic}&amp;topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}">{title}</a>
+                        <a href="{paths.truth.issues.entry}/{friendlyUrl}/{_id}">{title}</a>
+                        <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
             {/issues}

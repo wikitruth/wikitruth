@@ -24,9 +24,12 @@ function createCancelUrl(req) {
 
 module.exports = function (router) {
 
-    router.get('/entry(/:friendlyUrl)?', function (req, res) {
+    router.get('/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
         // Topic home: display top subtopics, top arguments
         var model = {};
+        if(req.params.id && !req.query.topic) {
+            req.query.topic = req.params.id;
+        }
         async.parallel({
             topic: function(callback){
                 flowUtils.setTopicModels(req, model, callback);
@@ -68,7 +71,6 @@ module.exports = function (router) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
                             result.friendlyUrl = utils.urlify(result.title);
-                            result.friendlyUrl = utils.urlify(result.title);
                             flowUtils.appendEntryExtra(result);
                         });
                         model.questions = results;
@@ -80,24 +82,28 @@ module.exports = function (router) {
                 // Top Issues
                 var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic };
                 db.Issue.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
-                    results.forEach(function(result) {
-                        result.friendlyUrl = utils.urlify(result.title);
-                        result.comments = utils.randomInt(0,999);
+                    flowUtils.setEditorsUsername(results, function() {
+                        results.forEach(function (result) {
+                            result.friendlyUrl = utils.urlify(result.title);
+                            flowUtils.appendEntryExtra(result);
+                        });
+                        model.issues = results;
+                        callback();
                     });
-                    model.issues = results;
-                    callback();
                 });
             },
             opinions: function (callback) {
                 // Top Opinions
                 var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic };
                 db.Opinion.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
-                    results.forEach(function(result) {
-                        result.friendlyUrl = utils.urlify(result.title);
-                        result.comments = utils.randomInt(0,999);
+                    flowUtils.setEditorsUsername(results, function() {
+                        results.forEach(function (result) {
+                            result.friendlyUrl = utils.urlify(result.title);
+                            flowUtils.appendEntryExtra(result);
+                        });
+                        model.opinions = results;
+                        callback();
                     });
-                    model.opinions = results;
-                    callback();
                 });
             }
         }, function (err, results) {

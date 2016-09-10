@@ -201,6 +201,156 @@ module.exports = function (router) {
         }
     });
 
+
+    router.get('/search', function (req, res) {
+        var keyword = req.query.q;
+        var tab = req.query.tab ? req.query.tab : 'all';
+        var model = {
+            tab: tab,
+            keyword: keyword,
+            results: tab !== 'all'
+        };
+        if(!keyword) {
+            return res.render(templates.search, model);
+        }
+        async.parallel({
+            topics: function(callback) {
+                if(tab !== 'all' && tab !== 'topics') {
+                    return callback();
+                }
+                db.Topic
+                    .find({ $text : { $search : keyword }},{ score: { $meta: "textScore" } })
+                    .sort({ score: { $meta: "textScore" } })
+                    .limit(tab === 'all' ? 15 : 0)
+                    .lean()
+                    .exec(function(err, results) {
+                        if(err || !results) {
+                            callback(err);
+                        }
+                        flowUtils.setEditorsUsername(results, function() {
+                            results.forEach(function (result) {
+                                result.friendlyUrl = utils.urlify(result.title);
+                                flowUtils.appendEntryExtra(result);
+                                //result.link = false;
+                            });
+                            model.topics = results;
+                            if(results.length > 0) {
+                                if(results.length === 15) {
+                                    model.topicsMore = true;
+                                }
+                                model.results = true;
+                            }
+                            callback();
+                        });
+                });
+            },
+            arguments: function(callback) {
+                if(tab !== 'all' && tab !== 'arguments') {
+                    return callback();
+                }
+                db.Argument
+                    .find({ $text : { $search : keyword }},{ score: { $meta: "textScore" } })
+                    .sort({ score: { $meta: "textScore" } })
+                    .limit(tab === 'all' ? 15 : 0)
+                    .lean()
+                    .exec(function(err, results) {
+                        flowUtils.setEditorsUsername(results, function() {
+                            results.forEach(function (result) {
+                                result.friendlyUrl = utils.urlify(result.title);
+                                flowUtils.appendEntryExtra(result);
+                                flowUtils.setVerdictModel(result);
+                            });
+                            model.arguments = results;
+                            if (results.length > 0) {
+                                if(results.length === 15) {
+                                    model.argumentsMore = true;
+                                }
+                                model.results = true;
+                            }
+                            callback();
+                        });
+                });
+            },
+            questions: function (callback) {
+                if(tab !== 'all' && tab !== 'questions') {
+                    return callback();
+                }
+                db.Question
+                    .find({ $text : { $search : keyword }},{ score: { $meta: "textScore" } })
+                    .sort({ score: { $meta: "textScore" } })
+                    .limit(tab === 'all' ? 15 : 0)
+                    .exec(function(err, results) {
+                    flowUtils.setEditorsUsername(results, function() {
+                        results.forEach(function (result) {
+                            result.friendlyUrl = utils.urlify(result.title);
+                            result.friendlyUrl = utils.urlify(result.title);
+                            flowUtils.appendEntryExtra(result);
+                        });
+                        model.questions = results;
+                        if(results.length > 0) {
+                            model.results = true;
+                        }
+                        callback();
+                    });
+                });
+            },
+            issues: function (callback) {
+                if(tab !== 'all' && tab !== 'issues') {
+                    return callback();
+                }
+                db.Issue
+                    .find({ $text : { $search : keyword }},{ score: { $meta: "textScore" } })
+                    .sort({ score: { $meta: "textScore" } })
+                    .limit(tab === 'all' ? 15 : 0)
+                    .lean()
+                    .exec(function(err, results) {
+                        flowUtils.setEditorsUsername(results, function() {
+                            results.forEach(function (result) {
+                                result.friendlyUrl = utils.urlify(result.title);
+                                flowUtils.appendEntryExtra(result);
+                            });
+                            model.issues = results;
+                            if (results.length > 0) {
+                                if(results.length === 15) {
+                                    model.issuesMore = true;
+                                }
+                                model.results = true;
+                            }
+                            callback();
+                        });
+                });
+            },
+            opinions: function (callback) {
+                if(tab !== 'all' && tab !== 'opinions') {
+                    return callback();
+                }
+                db.Opinion
+                    .find({ $text : { $search : keyword }},{ score: { $meta: "textScore" } })
+                    .sort({ score: { $meta: "textScore" } })
+                    .limit(tab === 'all' ? 15 : 0)
+                    .lean()
+                    .exec(function(err, results) {
+                        flowUtils.setEditorsUsername(results, function() {
+                            results.forEach(function (result) {
+                                result.friendlyUrl = utils.urlify(result.title);
+                                flowUtils.appendEntryExtra(result);
+                            });
+                            model.opinions = results;
+                            if (results.length > 0) {
+                                if(results.length === 15) {
+                                    model.opinionsMore = true;
+                                }
+                                model.results = true;
+                            }
+                            callback();
+                        });
+                });
+            }
+        }, function (err, results) {
+            res.render(templates.search, model);
+        });
+    });
+
     /* Related */
 
     router.get('/related', function (req, res) {

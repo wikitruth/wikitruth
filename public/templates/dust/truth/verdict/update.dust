@@ -26,13 +26,13 @@
             <div class="radio">
                 <label class="text-warning">
                     <input type="radio" name="verdictStatus" id="radioVerdict0" value="0">
-                    CLAIM (Pending)
+                    Claim (Unverified)
                 </label>
             </div>
             <div class="radio">
                 <label class="text-warning">
                     <input type="radio" name="verdictStatus" id="radioVerdict3" value="3">
-                    CLAIM (inconclusive, need more supporting arguments or evidences)
+                    Claim (Inconclusive, need more supporting arguments or evidences)
                 </label>
             </div>
         </div>
@@ -105,15 +105,7 @@
             </div>
         {/user}
 
-        {?topic}
-            <a class="btn btn-default" href="{paths.truth.topics.entry}?topic={topic._id}" role="button">Cancel</a>
-        {:else}
-            {?parent}
-                <a class="btn btn-default" href="{paths.truth.topics.entry}?topic={parent._id}" role="button">Cancel</a>
-            {:else}
-                <a class="btn btn-default" href="{paths.truth.index}" role="button">Cancel</a>
-            {/parent}
-        {/topic}
+        <a class="btn btn-default" href="{cancelUrl}" role="button">Cancel</a>
     </form>
 {/body}
 

@@ -1,10 +1,15 @@
 'use strict';
 
 var flowUtils   = require('../utils/flowUtils'),
+    utils       = require('../utils/utils'),
     constants   = require('../models/constants'),
     templates   = require('../models/templates'),
     paths       = require('../models/paths'),
     db          = require('../app').db.models;
+
+function createReturnUrl(req, model) {
+    return paths.truth.arguments.entry + '/' + utils.urlify(model.argument.title) + '?argument=' + req.query.argument;
+}
 
 module.exports = function (router) {
 
@@ -25,6 +30,7 @@ module.exports = function (router) {
                 if(model.argument && model.argument.verdict && model.argument.verdict.status) {
                     model.verdictStatus = model.argument.verdict.status;
                 }
+                model.cancelUrl = createReturnUrl(req, model);
                 res.render(templates.truth.verdict.update, model);
             });
         });
@@ -44,9 +50,7 @@ module.exports = function (router) {
                         }
                     }
                 }, function (err, num) {
-                    res.redirect((req.query.argument ? paths.truth.arguments.entry : paths.truth.topics.entry)
-                        + '?topic=' + req.query.topic + (req.query.argument ? '&argument=' + req.query.argument : '')
-                    );
+                    res.redirect(createReturnUrl(req, model));
                 });
             });
         });
