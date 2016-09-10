@@ -7,6 +7,7 @@ module.exports = {
     signup: '/signup',
     login: '/login',
     logout: '/logout',
+    search: '/search',
     admin: {
         index: '/admin',
         mongoBackup: '/db-backup'

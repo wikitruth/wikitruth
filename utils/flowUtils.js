@@ -169,6 +169,33 @@ function setArgumentModels(req, model, callback) {
     }
 }
 
+function setEntryModels(query, req, model, callback) {
+    if(query.ownerType === constants.OBJECT_TYPES.topic) {
+        req.query.topic = query.ownerId;
+        setTopicModels(req, model, callback);
+    } else if(query.ownerType === constants.OBJECT_TYPES.argument) {
+        req.query.argument = query.ownerId;
+        setArgumentModels(req, model, function () {
+            setTopicModels(req, model, callback);
+        });
+    } else if(query.ownerType === constants.OBJECT_TYPES.question) {
+        req.query.question = query.ownerId;
+        setQuestionModel(req, model, function () {
+            setEntryModels(model.question, req, model, callback);
+        });
+    } else if(query.ownerType === constants.OBJECT_TYPES.issue) {
+        req.query.issue = query.ownerId;
+        setIssueModel(req, model, function () {
+            setEntryModels(model.issue, req, model, callback);
+        });
+    } else if(query.ownerType === constants.OBJECT_TYPES.opinion) {
+        req.query.opinion = query.ownerId;
+        setOpinionModel(req, model, function () {
+            setEntryModels(model.opinion, req, model, callback);
+        });
+    }
+}
+
 function setTopicModels(req, model, callback) {
     var query = { _id: model.argument ? model.argument.ownerId : req.query.topic ? req.query.topic : null };
     if(query._id) {
@@ -420,6 +447,66 @@ function getVerdictCount(args) {
     return verdictCount;
 }
 
+function createOwnerQueryFromQuery(req) {
+    if(req.query.issue) {
+        return {
+            ownerType: constants.OBJECT_TYPES.issue,
+            ownerId: req.query.issue
+        };
+    } else if(req.query.opinion) {
+        return {
+            ownerType: constants.OBJECT_TYPES.opinion,
+            ownerId: req.query.opinion
+        };
+    } else if(req.query.question) {
+        return {
+            ownerType: constants.OBJECT_TYPES.question,
+            ownerId: req.query.question
+        };
+    } else if(req.query.argument) {
+        return {
+            ownerType: constants.OBJECT_TYPES.argument,
+            ownerId: req.query.argument
+        };
+    } else if(req.query.topic) {
+        return {
+            ownerType: constants.OBJECT_TYPES.topic,
+            ownerId: req.query.topic
+        };
+    }
+    return {};
+}
+
+function createOwnerQueryFromModel(model) {
+    if(model.issue) {
+        return {
+            ownerType: constants.OBJECT_TYPES.issue,
+            ownerId: model.issue._id
+        };
+    } else if(model.opinion) {
+        return {
+            ownerType: constants.OBJECT_TYPES.opinion,
+            ownerId: model.opinion._id
+        };
+    } else if(model.question) {
+        return {
+            ownerType: constants.OBJECT_TYPES.question,
+            ownerId: model.question._id
+        };
+    } else if(model.argument) {
+        return {
+            ownerType: constants.OBJECT_TYPES.argument,
+            ownerId: model.argument._id
+        };
+    } else if(model.topic) {
+        return {
+            ownerType: constants.OBJECT_TYPES.topic,
+            ownerId: model.topic._id
+        };
+    }
+    return {};
+}
+
 module.exports = {
     getBackupDir: getBackupDir,
     isOwner: isOwner,
@@ -429,6 +516,7 @@ module.exports = {
     setQuestionModel: setQuestionModel,
     setIssueModel: setIssueModel,
     setOpinionModel: setOpinionModel,
+    setEntryModels: setEntryModels,
     appendEntryExtra: appendEntryExtra,
     setEditorsUsername: setEditorsUsername,
     prepareClipboardOptions: prepareClipboardOptions,
@@ -437,5 +525,7 @@ module.exports = {
     getArguments: getArguments,
     syncChildren: syncChildren,
     getVerdictCount: getVerdictCount,
-    setVerdictModel: setVerdictModel
+    setVerdictModel: setVerdictModel,
+    createOwnerQueryFromQuery: createOwnerQueryFromQuery,
+    createOwnerQueryFromModel: createOwnerQueryFromModel
 };

@@ -24,7 +24,7 @@
                         <span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>
                     {/link}
                     <div>
-                        <a href="{paths.truth.topics.entry}/{friendlyUrl}?topic={_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a>
+                        <a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a>
                         <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
@@ -44,7 +44,7 @@
                     <span class="glyphicon glyphicon-file text-{verdict.theme}" aria-hidden="true"></span>
                 {/link}
                 <div>
-                    <a href="{paths.truth.arguments.entry}/{friendlyUrl}?argument={_id}">{?link.title}{link.title}{:else}{title}{/link.title} {?typeUX}<span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}</a>
+                    <a href="{paths.truth.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title} {?typeUX}<span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}</a>
                     <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
                 </div>
                 <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
@@ -60,7 +60,7 @@
                 <li class="list-group-item">
                     <span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>
                     <div>
-                        <a href="{paths.truth.questions.entry}/{friendlyUrl}?topic={topic._id}&amp;question={_id}">{title}</a>
+                        <a href="{paths.truth.questions.entry}/{friendlyUrl}/{_id}">{title}</a>
                         <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
@@ -75,12 +75,13 @@
                 <li class="list-group-item">
                     <span class="fa fa-exclamation-circle text-success" aria-hidden="true"></span>
                     <div>
-                        <a href="{paths.truth.issues.entry}/{friendlyUrl}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;issue={_id}">{title}</a>
+                        <a href="{paths.truth.issues.entry}/{friendlyUrl}/{_id}">{title}</a>
+                        <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
             {/issues}
         </ul>
-        <div class="top-list-items-more"><a href="{paths.truth.issues.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+        <div class="top-list-items-more"><a href="{paths.truth.issues.index}?topic={topic._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
     {/issues}
     {?opinions}
         <ul class="list-group top-list-items wt-list">
@@ -89,12 +90,13 @@
                 <li class="list-group-item">
                     <span class="fa fa-comments-o text-success" aria-hidden="true"></span>
                     <div>
-                        <a href="{paths.truth.opinions.entry}/{friendlyUrl}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;opinion={_id}">{title}</a>
+                        <a href="{paths.truth.opinions.entry}/{friendlyUrl}/{_id}">{title}</a>
+                        <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
             {/opinions}
         </ul>
-        <div class="top-list-items-more"><a href="{paths.truth.opinions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+        <div class="top-list-items-more"><a href="{paths.truth.opinions.index}?topic={topic._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
     {/opinions}
     {>"dust/truth/common/entry-footer" /}
 {/body}

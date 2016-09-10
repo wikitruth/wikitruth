@@ -77,7 +77,7 @@ module.exports = function (router) {
         }
     });
 
-    router.get('/page', function (req, res) {
+    router.get('/page(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
         var model = {};
         async.parallel({
             parent: function(callback){

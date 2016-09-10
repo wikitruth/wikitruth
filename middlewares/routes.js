@@ -1,6 +1,7 @@
 'use strict';
 
-var tmplRoot = '../public/templates/jade';
+var tmplRoot = '../public/templates/jade',
+    paths     = require('../models/paths');
 
 function _require(code) {
   return require(tmplRoot + code);
@@ -35,6 +36,13 @@ function ensureAccount(req, res, next) {
 }
 
 exports = module.exports = function(app, passport) {
+
+  app.get(paths.truth.topics.create, ensureAuthenticated);
+  app.get(paths.truth.arguments.create, ensureAuthenticated);
+  app.get(paths.truth.questions.create, ensureAuthenticated);
+  app.get(paths.truth.issues.create, ensureAuthenticated);
+  app.get(paths.truth.opinions.create, ensureAuthenticated);
+
   //front end
   app.get('/home/', _require('/index').init);
   app.get('/about/', _require('/about/index').init);

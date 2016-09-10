@@ -14,72 +14,53 @@ module.exports = function (router) {
 
     router.get('/', function (req, res) {
         var model = {};
-        if(req.query.topic) {
-            flowUtils.setTopicModels(req, model, function () {
-                flowUtils.setArgumentModels(req, model, function () {
-                    flowUtils.setQuestionModel(req, model, function () {
-                        var query = {};
-                        if(req.query.question) {
-                            query.ownerId = model.question._id;
-                            query.ownerType = constants.OBJECT_TYPES.question;
-                        } else if(req.query.argument) {
-                            query.ownerId = model.argument._id;
-                            query.ownerType = constants.OBJECT_TYPES.argument;
-                        } else {
-                            query.ownerId = model.topic._id;
-                            query.ownerType = constants.OBJECT_TYPES.topic;
-                        }
-                        db.Issue.find(query).sort({title: 1}).exec(function (err, results) {
-                            results.forEach(function (result) {
-                                result.friendlyUrl = utils.urlify(result.title);
-                                result.comments = utils.randomInt(0, 999);
-                            });
-                            model.issues = results;
-                            res.render(templates.truth.issues.index, model);
+        var query = flowUtils.createOwnerQueryFromQuery(req);
+        if(query.ownerId) {
+            flowUtils.setEntryModels(query, req, model, function (err) {
+                db.Issue.find(flowUtils.createOwnerQueryFromModel(model)).sort({title: 1}).exec(function (err, results) {
+                    flowUtils.setEditorsUsername(results, function() {
+                        results.forEach(function (result) {
+                            result.friendlyUrl = utils.urlify(result.title);
+                            flowUtils.appendEntryExtra(result);
                         });
+                        model.issues = results;
+                        res.render(templates.truth.issues.index, model);
                     });
                 });
             });
         } else {
             // Top Issues
             db.Issue.find({ ownerType: constants.OBJECT_TYPES.topic }).limit(100).exec(function(err, results) {
-                results.forEach(function(result) {
-                    result.friendlyUrl = utils.urlify(result.title);
-                    result.topic = {
-                        _id: result.ownerId
-                    };
-                    result.comments = utils.randomInt(0,999);
+                flowUtils.setEditorsUsername(results, function() {
+                    results.forEach(function (result) {
+                        result.friendlyUrl = utils.urlify(result.title);
+                        result.topic = {
+                            _id: result.ownerId
+                        };
+                        flowUtils.appendEntryExtra(result);
+                    });
+                    model.issues = results;
+                    res.render(templates.truth.issues.index, model);
                 });
-                model.issues = results;
-                res.render(templates.truth.issues.index, model);
             });
         }
     });
 
-    router.get('/entry(/:friendlyUrl)?', function (req, res) {
+    router.get('/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
         var model = {};
-        flowUtils.setTopicModels(req, model, function () {
-            flowUtils.setArgumentModels(req, model, function () {
-                flowUtils.setQuestionModel(req, model, function () {
-                    flowUtils.setIssueModel(req, model, function () {
-                        model.entry = model.issue;
-                        res.render(templates.truth.issues.entry, model);
-                    });
-                });
-            });
+        if(req.params.id && !req.query.issue) {
+            req.query.issue = req.params.id;
+        }
+        flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
+            model.entry = model.issue;
+            res.render(templates.truth.issues.entry, model);
         });
     });
 
     router.get('/create', function (req, res) {
         var model = {};
-        flowUtils.setTopicModels(req, model, function () {
-            flowUtils.setArgumentModels(req, model, function () {
-                flowUtils.setQuestionModel(req, model, function () {
-                    flowUtils.setIssueModel(req, model, function () {
-                        res.render(templates.truth.issues.create, model);
-                    });
-                });
-            });
+        flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
+            res.render(templates.truth.issues.create, model);
         });
     });
 

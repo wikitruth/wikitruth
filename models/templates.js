@@ -11,6 +11,7 @@ module.exports = {
     about: {
         index: 'dust/about/page'
     },
+    search: 'dust/search',
     members: {
         contributors: 'dust/members/contributors',
         reviewers: 'dust/members/reviewers',

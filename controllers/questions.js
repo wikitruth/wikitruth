@@ -52,56 +52,51 @@ module.exports = function (router) {
         }
     });
 
-    router.get('/entry(/:friendlyUrl)?', function (req, res) {
+    router.get('/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
         var model = {};
-        async.parallel({
-            topic: function(callback){
-                flowUtils.setTopicModels(req, model, callback);
-            },
-            argument: function (callback) {
-                flowUtils.setArgumentModels(req, model, callback);
-            },
-            question: function (callback) {
-                flowUtils.setQuestionModel(req, model, callback);
-            },
-            issues: function (callback) {
-                // Top Issues
-                var query = { ownerId: req.query.question, ownerType: constants.OBJECT_TYPES.question };
-                db.Issue.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
-                    results.forEach(function(result) {
-                        result.friendlyUrl = utils.urlify(result.title);
-                        result.comments = utils.randomInt(0,999);
+        if(req.params.id && !req.query.question) {
+            req.query.question = req.params.id;
+        }
+        var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
+        flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
+            async.parallel({
+                issues: function (callback) {
+                    // Top Issues
+                    db.Issue.find(ownerQuery).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                        flowUtils.setEditorsUsername(results, function() {
+                            results.forEach(function (result) {
+                                result.friendlyUrl = utils.urlify(result.title);
+                                flowUtils.appendEntryExtra(result);
+                            });
+                            model.issues = results;
+                            callback();
+                        });
                     });
-                    model.issues = results;
-                    callback();
-                });
-            },
-            opinions: function (callback) {
-                // Top Opinions
-                var query = { ownerId: req.query.question, ownerType: constants.OBJECT_TYPES.question };
-                db.Opinion.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
-                    results.forEach(function(result) {
-                        result.friendlyUrl = utils.urlify(result.title);
-                        result.comments = utils.randomInt(0,999);
+                },
+                opinions: function (callback) {
+                    // Top Opinions
+                    db.Opinion.find(ownerQuery).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                        flowUtils.setEditorsUsername(results, function() {
+                            results.forEach(function (result) {
+                                result.friendlyUrl = utils.urlify(result.title);
+                                flowUtils.appendEntryExtra(result);
+                            });
+                            model.opinions = results;
+                            callback();
+                        });
                     });
-                    model.opinions = results;
-                    callback();
-                });
-            }
-        }, function (err, results) {
-            model.entry = model.question;
-            res.render(templates.truth.questions.entry, model);
+                }
+            }, function (err, results) {
+                model.entry = model.question;
+                res.render(templates.truth.questions.entry, model);
+            });
         });
     });
 
     router.get('/create', function (req, res) {
         var model = {};
-        flowUtils.setTopicModels(req, model, function () {
-            flowUtils.setArgumentModels(req, model, function () {
-                flowUtils.setQuestionModel(req, model, function () {
-                    res.render(templates.truth.questions.create, model);
-                });
-            });
+        flowUtils.setOpinionModel(flowUtils.createOwnerQueryFromQuery(req), req, model, function () {
+            res.render(templates.truth.questions.create, model);
         });
     });
 

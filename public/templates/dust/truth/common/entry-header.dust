@@ -6,7 +6,7 @@
             {^question}
                 {^argument}
                     <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
-                        <a href="{paths.truth.topics.entry}/{topic.friendlyUrl}?topic={topic._id}" role="tab">
+                        <a href="{paths.truth.topics.entry}/{topic.friendlyUrl}/{topic._id}" role="tab">
                             <span class="glyphicon glyphicon-home" aria-hidden="true"></span><span class="hidden-xxs"> Overview</span></a>
                     </li>
                     <li role="presentation"{@eq key=tab value="topics"} class="active"{/eq}>
@@ -15,7 +15,7 @@
                     </li>
                 {:else}
                     <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
-                        <a href="{paths.truth.arguments.entry}/{argument.friendlyUrl}?argument={argument._id}" role="tab">
+                        <a href="{paths.truth.arguments.entry}/{argument.friendlyUrl}/{argument._id}" role="tab">
                             <span class="glyphicon glyphicon-home" aria-hidden="true"></span> Overview</a>
                     </li>
                 {/argument}
@@ -29,7 +29,7 @@
                 </li>
             {:else}
                 <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
-                    <a href="{paths.truth.questions.entry}/{question.friendlyUrl}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}" role="tab">
+                    <a href="{paths.truth.questions.entry}/{question.friendlyUrl}/{question._id}" role="tab">
                         <span class="glyphicon glyphicon-home" aria-hidden="true"></span> Overview</a>
                 </li>
             {/question}
@@ -43,13 +43,13 @@
             </li>
         {:else}
             <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
-                <a href="{paths.truth.issues.entry}/{issue.friendlyUrl}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;issue={issue._id}" role="tab">
+                <a href="{paths.truth.issues.entry}/{issue.friendlyUrl}/{issue._id}" role="tab">
                     <span class="glyphicon glyphicon-home" aria-hidden="true"></span> Overview</a>
             </li>
         {/issue}
     {:else}
         <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
-            <a href="{paths.truth.opinions.entry}/{opinion.friendlyUrl}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;opinion={opinion._id}" role="tab">
+            <a href="{paths.truth.opinions.entry}/{opinion.friendlyUrl}/{opinion._id}" role="tab">
                 <span class="glyphicon glyphicon-home" aria-hidden="true"></span> Overview</a>
         </li>
     {/opinion}
@@ -57,47 +57,46 @@
     {!<li role="presentation"{@eq key=tab value="related"} class="active"{/eq}>
         <a href="{paths.truth.related}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
             <span class="glyphicon glyphicon-random" aria-hidden="true"></span> Related</a>
-    </li>!}
-    {?isContributor}
-        <li role="presentation" class="dropdown"><a href="#" id="wtTabMore" class="dropdown-toggle" data-toggle="dropdown" aria-controls="wtTabMore-contents" aria-expanded="false">
-            <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span> {!<span class="caret"></span>!}</a>
-            <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="wtTabMore" id="wtTabMore-contents">
-                    {^question}
-                        {^argument}
-                            {!{?isTopicOwner}
-                                <li><a href="{paths.truth.outline.link}?topic={topic._id}" role="tab"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> Manage Links</a></li>
-                                <li><a href="{paths.truth.topics.create}?id={topic._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Topic</a></li>
-                            {/isTopicOwner}!}
-                            <li><a href="{paths.truth.topics.create}?topic={topic._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Topic</a></li>
-                            {!<li><a href="#"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit References</a></li>!}
-                        {:else}
-                            {!{?isArgumentOwner}
-                                <li><a href="{paths.truth.outline.link}?topic={topic._id}&amp;argument={argument._id}" role="tab"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> Manage Links</a></li>
-                                <li><a href="{paths.truth.arguments.create}?topic={topic._id}&amp;argument={argument._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Argument</a></li>
-                            {/isArgumentOwner}!}
-                        {/argument}
-                        <li><a href="{paths.truth.arguments.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> New Argument</a></li>
-                    {:else}
-                        {!{?isQuestionOwner}
-                            <li><a href="{paths.truth.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Question</a></li>
-                        {/isQuestionOwner}!}
-                    {/question}
-                    <li><a href="{paths.truth.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
-                        <span class="fa fa-question-circle" aria-hidden="true"></span> New Question</a></li>
-                <li role="separator" class="divider"></li>
-                <li><a href="{paths.truth.issues.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
-                    <span class="fa fa-exclamation-circle" aria-hidden="true"></span> New Issue</a></li>
-                <li><a href="{paths.truth.opinions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
-                    <span class="fa fa-comments-o" aria-hidden="true"></span> New Opinion</a></li>
-                    {!<li role="separator" class="divider"></li>!}
-                {!<li>
-                    <a href="{paths.truth.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
-                        <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions</a></li>
-                <li>
-                    <a href="{paths.truth.related}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}">
-                        <span class="glyphicon glyphicon-random" aria-hidden="true"></span> Related</a></li>!}
-                {!<li><a href="#" role="tab"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Details</a></li>!}
-            </ul>
-        </li>
-    {/isContributor}
+    </li>
+    {?isContributor}!}
+    <li role="presentation" class="dropdown"><a href="#" id="wtTabMore" class="dropdown-toggle" data-toggle="dropdown" aria-controls="wtTabMore-contents" aria-expanded="false">
+        <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span> {!<span class="caret"></span>!}</a>
+        <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="wtTabMore" id="wtTabMore-contents">
+            {^question}
+                {^argument}
+                    {!{?isTopicOwner}
+                        <li><a href="{paths.truth.outline.link}?topic={topic._id}" role="tab"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> Manage Links</a></li>
+                        <li><a href="{paths.truth.topics.create}?id={topic._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Topic</a></li>
+                    {/isTopicOwner}!}
+                    <li><a href="{paths.truth.topics.create}?topic={topic._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Topic</a></li>
+                    {!<li><a href="#"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit References</a></li>!}
+                {:else}
+                    {!{?isArgumentOwner}
+                        <li><a href="{paths.truth.outline.link}?topic={topic._id}&amp;argument={argument._id}" role="tab"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> Manage Links</a></li>
+                        <li><a href="{paths.truth.arguments.create}?topic={topic._id}&amp;argument={argument._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Argument</a></li>
+                    {/isArgumentOwner}!}
+                {/argument}
+                <li><a href="{paths.truth.arguments.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> New Argument</a></li>
+            {:else}
+                {!{?isQuestionOwner}
+                    <li><a href="{paths.truth.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Question</a></li>
+                {/isQuestionOwner}!}
+            {/question}
+            <li><a href="{paths.truth.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
+                <span class="fa fa-question-circle" aria-hidden="true"></span> New Question</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="{paths.truth.issues.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
+                <span class="fa fa-exclamation-circle" aria-hidden="true"></span> New Issue</a></li>
+            <li><a href="{paths.truth.opinions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
+                <span class="fa fa-comments-o" aria-hidden="true"></span> New Opinion</a></li>
+                {!<li role="separator" class="divider"></li>!}
+            {!<li>
+                <a href="{paths.truth.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
+                    <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions</a></li>
+            <li>
+                <a href="{paths.truth.related}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}">
+                    <span class="glyphicon glyphicon-random" aria-hidden="true"></span> Related</a></li>!}
+            {!<li><a href="#" role="tab"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Details</a></li>!}
+        </ul>
+    </li>
 </ul>

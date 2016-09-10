@@ -1,0 +1,161 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {?keyword}Search for {keyword}{:else}Search{/keyword} - {titleSlogan}
+{/title}
+
+{<body}
+    <h1 class="page-header wt-header"><i class="fa fa-search"></i> Search</h1>
+    <form method="get">
+        <div class="row">
+            <div class="col-lg-6 col-md-8 col-sm-8">
+                <div class="input-group">
+                    <input type="text" id="search" autofocus="autofocus" name="q" class="form-control" placeholder="Search for..." value="{keyword}">
+                    <span class="input-group-btn">
+                        <button type="submit" class="btn btn-default">Search</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </form>
+    <br/>
+    {?keyword}
+        {^results}
+            <h4 style="font-weight: normal" class="text-muted-x">No results found for <strong>{keyword}</strong>.
+                <br/><br/>
+                <p>Suggestions:</p>
+                <ul>
+                    <li>Make sure all words are spelled correctly.</li>
+                    <li>Try different keywords.</li>
+                    <li>Try more general keywords.</li>
+                    <li>Try fewer keywords.</li>
+                </ul>
+            </h4>
+        {:else}
+            <ul class="nav nav-tabs wt-tabs" role="tablist">
+                <li role="presentation"{@eq key=tab value="all"} class="active"{/eq}>
+                    <a href="{paths.search}?q={keyword}" role="tab">
+                        <i class="glyphicon glyphicon-globe" aria-hidden="true"></i> Everything
+                    </a>
+                </li>
+                <li role="presentation"{@eq key=tab value="topics"} class="active"{/eq}>
+                    <a href="{paths.search}?q={keyword}&amp;tab=topics" role="tab">
+                        <i class="fa fa-folder-open" aria-hidden="true"></i> <span class="hidden-xxs">Topics</span>
+                    </a>
+                </li>
+                <li role="presentation"{@eq key=tab value="arguments"} class="active"{/eq}>
+                    <a href="{paths.search}?q={keyword}&amp;tab=arguments" role="tab">
+                        <i class="fa fa-flash" aria-hidden="true"></i> <span class="hidden-xs">Arguments</span>
+                    </a>
+                </li>
+                <li role="presentation"{@eq key=tab value="questions"} class="active"{/eq}>
+                    <a href="{paths.search}?q={keyword}&amp;tab=questions" role="tab">
+                        <i class="fa fa-question-circle" aria-hidden="true"></i><span class="hidden-xs"> Questions</span>
+                    </a>
+                </li>
+                <li role="presentation"{@eq key=tab value="issues"} class="active"{/eq}>
+                    <a href="{paths.search}?q={keyword}&amp;tab=issues" role="tab">
+                        <i class="fa fa-exclamation-circle" aria-hidden="true"></i><span class="hidden-xs"> Issues</span>
+                    </a>
+                </li>
+                <li role="presentation"{@eq key=tab value="opinions"} class="active"{/eq}>
+                    <a href="{paths.search}?q={keyword}&amp;tab=opinions" role="tab">
+                        <i class="fa fa-comments-o" aria-hidden="true"></i><span class="hidden-xs"> Opinions</span>
+                    </a>
+                </li>
+            </ul>
+            {?topics}
+                <h3 class="page-header-x">Topics</h3>
+                <ul class="list-group top-list-items wt-list">
+                    {!<li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp; Topics</li>!}
+                    {#topics}
+                        <li class="list-group-item">
+                            <span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>
+                            <div>
+                                <a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{title}</a>
+                                <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
+                            </div>
+                            <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
+                        </li>
+                    {/topics}
+                </ul>
+                {?topicsMore}
+                    <div class="top-list-items-more"><a href="{paths.search}?q={keyword}&amp;tab=topics" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+                {/topicsMore}
+            {/topics}
+            {?arguments}
+                <h3 class="page-header-x">Arguments</h3>
+                <ul class="list-group top-list-items wt-list">
+                    {!<li class="list-group-item highlight text-primary"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments</li>!}
+                    {#arguments}
+                        <li class="list-group-item">
+                            <span class="glyphicon glyphicon-file text-{verdict.theme}" aria-hidden="true"></span>
+                            <div>
+                                <a href="{paths.truth.arguments.entry}/{friendlyUrl}/{_id}">{title} {?typeUX}<span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}</a>
+                                <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
+                            </div>
+                            <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
+                        </li>
+                    {/arguments}
+                </ul>
+                {?argumentsMore}
+                    <div class="top-list-items-more"><a href="{paths.search}?q={keyword}&amp;tab=arguments" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+                {/argumentsMore}
+            {/arguments}
+            {?questions}
+                <h3 class="page-header-x">Questions</h3>
+                <ul class="list-group top-list-items wt-list">
+                    {!<li class="list-group-item highlight"><span class="glyphicon glyphicon-question-sign text-success" aria-hidden="true"></span> Questions</li>!}
+                    {#questions}
+                        <li class="list-group-item">
+                            <span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>
+                            <div>
+                                <a href="{paths.truth.questions.entry}/{friendlyUrl}/{_id}">{title}</a>
+                                <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
+                            </div>
+                            <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+                    {/questions}
+                </ul>
+                {?questionsMore}
+                    <div class="top-list-items-more"><a href="{paths.search}?q={keyword}&amp;tab=questions" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+                {/questionsMore}
+            {/questions}
+            {?issues}
+                <h3 class="page-header-x">Issues</h3>
+                <ul class="list-group top-list-items wt-list">
+                    {!<li class="list-group-item highlight"><span class="fa fa-exclamation-circle text-success" aria-hidden="true"></span> Issues</li>!}
+                    {#issues}
+                        <li class="list-group-item">
+                            <span class="fa fa-exclamation-circle text-success" aria-hidden="true"></span>
+                            <div>
+                                <a href="{paths.truth.issues.entry}/{friendlyUrl}/{_id}">{title}</a>
+                                <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
+                            </div>
+                            <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+                    {/issues}
+                </ul>
+                {?issuesMore}
+                    <div class="top-list-items-more"><a href="{paths.search}?q={keyword}&amp;tab=issues" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+                {/issuesMore}
+            {/issues}
+            {?opinions}
+                <h3 class="page-header-x">Opinions</h3>
+                <ul class="list-group top-list-items wt-list">
+                    {!<li class="list-group-item highlight"><span class="fa fa-comments-o text-success" aria-hidden="true"></span> Opinions</li>!}
+                    {#opinions}
+                        <li class="list-group-item">
+                            <span class="fa fa-comments-o text-success" aria-hidden="true"></span>
+                            <div>
+                                <a href="{paths.truth.opinions.entry}/{friendlyUrl}/{_id}">{title}</a>
+                                <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
+                            </div>
+                            <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+                    {/opinions}
+                </ul>
+                {?opinionsMore}
+                    <div class="top-list-items-more"><a href="{paths.search}?q={keyword}&amp;tab=opinions" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+                {/opinionsMore}
+            {/opinions}
+        {/results}
+    {/keyword}
+{/body}

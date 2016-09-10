@@ -30,7 +30,7 @@ VERDICT_STATUS.getLabel = function (status) {
         case VERDICT_STATUS.status_false:
             return 'FALSE';
         case VERDICT_STATUS.claim:
-            return 'CLAIM (Inconclusive)';
+            return 'Claim (Inconclusive)';
 
         case VERDICT_STATUS.most_likely:
             return 'Most Like True';
@@ -51,7 +51,7 @@ VERDICT_STATUS.getLabel = function (status) {
             return 'Misleading (Invalid)';
 
         case VERDICT_STATUS.pending:
-            return 'CLAIM (Pending)';
+            return 'Claim (Unverified)';
     }
 };
 

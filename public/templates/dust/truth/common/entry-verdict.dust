@@ -11,69 +11,73 @@
     {/isQuestionOwner}
 {/isContributor}!}
 {?argument}
-    <a href="{paths.truth.verdict.update}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" title="Update Verdict" class="no-underline">
-    <span class="label label-{argument.verdict.theme}" title="This content is not yet reviewed, please take caution.">
-        <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> {argument.verdict.label}</span></a>
-    {?supportingArgumentCount}
-        &nbsp;<span class="label label-primary pull-right-x"><i class="fa fa-thumbs-up"></i> {supportingArgumentCount}</span>
-    {/supportingArgumentCount}
-    {?opposingArgumentCount}
-        &nbsp;<span class="label label-primary pull-right-x"><i class="fa fa-thumbs-down"></i> {opposingArgumentCount}</span>
-    {/opposingArgumentCount}
-
-    {!&nbsp;<span class="label label-primary"><i class="fa fa-flash"></i>
+    {?argument.verdict.label}
+        <a href="{paths.truth.verdict.update}?{?argument}argument={argument._id}{/argument}{?question}topic={topic._id}&amp;question={question._id}{/question}" title="Update Verdict" class="no-underline">
+        <span class="label label-{argument.verdict.theme}" title="This content is not yet reviewed, please take caution.">
+            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> {argument.verdict.label}</span></a>
         {?supportingArgumentCount}
-            &nbsp;<i class="fa fa-thumbs-up"></i>{supportingArgumentCount}
+            &nbsp;<span class="label label-primary pull-right-x"><i class="fa fa-thumbs-up"></i> {supportingArgumentCount}</span>
         {/supportingArgumentCount}
         {?opposingArgumentCount}
-            &nbsp;<i class="fa fa-thumbs-down"></i>{opposingArgumentCount}
+            &nbsp;<span class="label label-primary pull-right-x"><i class="fa fa-thumbs-down"></i> {opposingArgumentCount}</span>
         {/opposingArgumentCount}
-    </span>!}
 
-    {?argument.typeUX}
-        &nbsp;<span class="label label-{argument.typeUX.theme}"><i class="fa fa-bolt"></i> {argument.typeUX.label}</span>
-    {/argument.typeUX}
+        {!&nbsp;<span class="label label-primary"><i class="fa fa-flash"></i>
+            {?supportingArgumentCount}
+                &nbsp;<i class="fa fa-thumbs-up"></i>{supportingArgumentCount}
+            {/supportingArgumentCount}
+            {?opposingArgumentCount}
+                &nbsp;<i class="fa fa-thumbs-down"></i>{opposingArgumentCount}
+            {/opposingArgumentCount}
+        </span>!}
 
-    {!&nbsp;
-    <div style="display: inline-block; border-bottom: solid 1px #337ab7; padding-bottom: 1px; border-radius: 3px">
-        <span class="label label-primary"><i class="fa fa-thumbs-up"></i> PRO</span>
-        &nbsp;<span class="label label-success"><i class="fa fa-check-circle text-success-x"></i> 5</span>
-        &nbsp;<span class="label label-warning"><i class="fa fa-question text-warning-x"></i> 12</span>
-        &nbsp;<span class="label label-danger"><i class="fa fa-close text-danger-x"></i> 2</span>
-    </div>
+        {?argument.typeUX}
+            &nbsp;<span class="label label-{argument.typeUX.theme}"><i class="fa fa-bolt"></i> {argument.typeUX.label}</span>
+        {/argument.typeUX}
 
-    &nbsp;
-    &nbsp;
-    <div style="display: inline-block; border-bottom: solid 1px #777; padding-bottom: 1px; border-radius: 3px">
-        <span class="label label-default"><i class="fa fa-thumbs-down"></i> CON</span>
-        &nbsp;<span class="label label-success"><i class="fa fa-check-circle text-success-x"></i> 15</span>
-        &nbsp;<span class="label label-warning"><i class="fa fa-question text-warning-x"></i> 1</span>
-        &nbsp;<span class="label label-danger"><i class="fa fa-close text-danger-x"></i> 7</span>
-    </div>!}
+        {!&nbsp;
+        <div style="display: inline-block; border-bottom: solid 1px #337ab7; padding-bottom: 1px; border-radius: 3px">
+            <span class="label label-primary"><i class="fa fa-thumbs-up"></i> PRO</span>
+            &nbsp;<span class="label label-success"><i class="fa fa-check-circle text-success-x"></i> 5</span>
+            &nbsp;<span class="label label-warning"><i class="fa fa-question text-warning-x"></i> 12</span>
+            &nbsp;<span class="label label-danger"><i class="fa fa-close text-danger-x"></i> 2</span>
+        </div>
 
-    {!&nbsp;
-    <span class="label label-primary"><i class="fa fa-thumbs-up"></i> PRO:
-    &nbsp;<i class="fa fa-check-circle text-success-x"></i> 5 |
-    &nbsp;<i class="fa fa-question text-warning-x"></i> 12 |
-    &nbsp;<i class="fa fa-close text-danger-x"></i> 2</span>
+        &nbsp;
+        &nbsp;
+        <div style="display: inline-block; border-bottom: solid 1px #777; padding-bottom: 1px; border-radius: 3px">
+            <span class="label label-default"><i class="fa fa-thumbs-down"></i> CON</span>
+            &nbsp;<span class="label label-success"><i class="fa fa-check-circle text-success-x"></i> 15</span>
+            &nbsp;<span class="label label-warning"><i class="fa fa-question text-warning-x"></i> 1</span>
+            &nbsp;<span class="label label-danger"><i class="fa fa-close text-danger-x"></i> 7</span>
+        </div>!}
 
-    &nbsp;
-    &nbsp;
-    <span class="label label-default"><i class="fa fa-thumbs-down"></i> CON:
-    &nbsp;<i class="fa fa-check-circle text-success-x"></i> 15 |
-    &nbsp;<i class="fa fa-question text-warning-x"></i> 1 |
-    &nbsp;<i class="fa fa-close text-danger-x"></i> 7</span>!}
+        {!&nbsp;
+        <span class="label label-primary"><i class="fa fa-thumbs-up"></i> PRO:
+        &nbsp;<i class="fa fa-check-circle text-success-x"></i> 5 |
+        &nbsp;<i class="fa fa-question text-warning-x"></i> 12 |
+        &nbsp;<i class="fa fa-close text-danger-x"></i> 2</span>
+
+        &nbsp;
+        &nbsp;
+        <span class="label label-default"><i class="fa fa-thumbs-down"></i> CON:
+        &nbsp;<i class="fa fa-check-circle text-success-x"></i> 15 |
+        &nbsp;<i class="fa fa-question text-warning-x"></i> 1 |
+        &nbsp;<i class="fa fa-close text-danger-x"></i> 7</span>!}
+    {/argument.verdict.label}
 {:else}
+    {?verdict}
     {! Topic !}
-    {?verdict.counts.true}
-        &nbsp;<span class="label label-success"><i class="fa fa-check-circle"></i> {verdict.counts.true}</span>
-    {/verdict.counts.true}
-    {?verdict.counts.pending}
-        &nbsp;<span class="label label-warning"><i class="fa fa-question-circle"></i> {verdict.counts.pending}</span>
-    {/verdict.counts.pending}
-    {?verdict.counts.false}
-        &nbsp;<span class="label label-danger"><i class="fa fa-close"></i> {verdict.counts.false}</span>
-    {/verdict.counts.false}
+        {?verdict.counts.true}
+            &nbsp;<span class="label label-success"><i class="fa fa-check-circle"></i> {verdict.counts.true}</span>
+        {/verdict.counts.true}
+        {?verdict.counts.pending}
+            &nbsp;<span class="label label-warning"><i class="fa fa-question-circle"></i> {verdict.counts.pending}</span>
+        {/verdict.counts.pending}
+        {?verdict.counts.false}
+            &nbsp;<span class="label label-danger"><i class="fa fa-close"></i> {verdict.counts.false}</span>
+        {/verdict.counts.false}
+    {/verdict}
 {/argument}
 {?linkCount}
     &nbsp;<span class="label label-info pull-right-x"><i class="fa fa-link"></i> {linkCount}</span>

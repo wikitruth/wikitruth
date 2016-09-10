@@ -1,14 +1,14 @@
 <br/>
 <ol class="breadcrumb">
-    <li><a href="{paths.truth.index}"><i class="fa fa-globe text-muted"></i> Explore</a></li>
+    <li><i class="fa fa-globe text-muted"></i> <a href="{paths.truth.index}">Explore</a></li>
     {?parentTopic}
         {?parentTopic.parentId}
             <li><a href="{paths.truth.topics.entry}?topic={parentTopic.parentId}">..</a></li>
         {/parentTopic.parentId}
-        <li><a href="{paths.truth.topics.entry}/{parentTopic.friendlyUrl}?topic={parentTopic._id}">{parentTopic.title}</a></li>
+        <li><a href="{paths.truth.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}">{parentTopic.title}</a></li>
     {/parentTopic}
     {?topic}
-        <li><a href="{paths.truth.topics.entry}/{topic.friendlyUrl}?topic={topic._id}">{topic.title}</a></li>
+        <li><a href="{paths.truth.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a></li>
     {/topic}
     {?parentArgument}
         {?parentArgument.parentId}
@@ -16,26 +16,26 @@
         {!{:else}
             <li><a href="{paths.truth.arguments.index}?topic={topic._id}">Arguments</a></li>!}
         {/parentArgument.parentId}
-        <li>{^parentArgument.parentId}<i class="fa fa-flash text-muted"></i> {/parentArgument.parentId}<a href="{paths.truth.arguments.entry}/{parentArgument.friendlyUrl}?argument={parentArgument._id}">{parentArgument.title}</a></li>
+        <li>{^parentArgument.parentId}<i class="fa fa-flash text-muted"></i> {/parentArgument.parentId}<a href="{paths.truth.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a></li>
     {!{:else}
         {?argument}
             <li><a href="{paths.truth.arguments.index}?topic={topic._id}">Arguments</a></li>
         {/argument}!}
     {/parentArgument}
     {?argument}
-        <li>{^parentArgument}<i class="fa fa-flash text-muted"></i> {/parentArgument}<a href="{paths.truth.arguments.entry}/{argument.friendlyUrl}?argument={argument._id}">{argument.title}</a></li>
+        <li>{^parentArgument}<i class="fa fa-flash text-muted"></i> {/parentArgument}<a href="{paths.truth.arguments.entry}/{argument.friendlyUrl}/{argument._id}">{argument.title}</a></li>
     {/argument}
     {?question}
         {!<li><a href="{paths.truth.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">Questions</a></li>!}
-        <li><i class="fa fa-question-circle-o text-muted"></i> <a href="{paths.truth.questions.entry}/{question.friendlyUrl}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}">{question.title}</a></li>
+        <li><i class="fa fa-question-circle-o text-muted"></i> <a href="{paths.truth.questions.entry}/{question.friendlyUrl}/{question._id}">{question.title}</a></li>
     {/question}
     {?issue}
         {!<li><a href="{paths.truth.issues.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}">Issues</a></li>!}
-        <li><i class="fa fa-exclamation-circle text-muted"></i> <a href="{paths.truth.issues.entry}/{issue.friendlyUrl}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;issue={issue._id}">{issue.title}</a></li>
+        <li><i class="fa fa-exclamation-circle text-muted"></i> <a href="{paths.truth.issues.entry}/{issue.friendlyUrl}/{issue._id}">{issue.title}</a></li>
     {/issue}
     {?opinion}
         {!<li><a href="{paths.truth.opinions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}">Opinions</a></li>!}
-        <li><i class="fa fa-comments-o text-muted"></i> <a href="{paths.truth.opinions.entry}/{opinion.friendlyUrl}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;opinion={opinion._id}">{opinion.title}</a></li>
+        <li><i class="fa fa-comments-o text-muted"></i> <a href="{paths.truth.opinions.entry}/{opinion.friendlyUrl}/{opinion._id}">{opinion.title}</a></li>
     {/opinion}
     {@eq key=tab value="link-to"}
         <li class="active">Links</li>
