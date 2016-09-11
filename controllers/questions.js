@@ -95,7 +95,7 @@ module.exports = function (router) {
 
     router.get('/create', function (req, res) {
         var model = {};
-        flowUtils.setOpinionModel(flowUtils.createOwnerQueryFromQuery(req), req, model, function () {
+        flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function () {
             res.render(templates.truth.questions.create, model);
         });
     });
