@@ -1,56 +1,14 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {?topic}{topic.title}: Topics{:else}Explore{/topic} - {titleSlogan}
+    {topic.title}: Topics - {titleSlogan}
 {/title}
 
 {<body}
-    {?topic}
-        {>"dust/truth/common/entry-header" tab="topics" /}
-    {:else}
-        {>"dust/truth/common/index-header" tab="categories" /}
-    {/topic}
-    {?categories}
-        {!<ul class="list-group">
-            <li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp;&nbsp;CATEGORIES</li>
-            {#categories}
-                <li class="list-group-item"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp;&nbsp;
-                    <a href="{paths.truth.topics.entry}?topic={_id}">{title}</a> <span class="pull-right text-muted hide"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
-            {/categories}
-        </ul>!}
-        <h3 class="page-header">Categories</h3>
-        <div class="row">
-            {#categories}
-                <div class="col-lg-4 col-md-6 col-sm-6">{! 73px !}
-                    <div class="media wt-category">
-                        <div class="media-left media-top">
-                            <a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">
-                                <div class="photo-placeholder"></div>
-                                {!<i style="font-size: 55px;width: 70px;height: 70px;text-align: center; vertical-align: middle;" class="fa fa-folder-open-o"></i>!}
-                                {!<img class="media-object" data-src="holder.js/64x64" alt="{firstName} {lastName}">!}
-                            </a>
-                        </div>
-                        <div class="media-body">
-                            <h4 class="media-heading"><a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{title}</a></h4>
-                            <div>
-                                {?subtopics}
-                                    {#subtopics}
-                                        <div><i class="fa fa-folder-open text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{title}</a></div>
-                                    {/subtopics}
-                                {/subtopics}
-                                <div><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.truth.index}?topic={_id}" role="button">more</a></div>
-                                {!<span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}!}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {/categories}
-        </div>
-        <br/>
-    {/categories}
+    {>"dust/truth/common/entry-header" tab="topics" /}
     {?topics}
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp;&nbsp;{?categories}Top {/categories}Topics</li>
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp;&nbsp;Topics</li>
             {#topics}
                 <li class="list-group-item">
                     {?link}
@@ -59,7 +17,7 @@
                         <span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>
                     {/link}
                     <div>
-                        <a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a>
+                        <a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{?contextTitle}{contextTitle}{:else}{title}{/contextTitle}{/link.title}</a>
                         <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>

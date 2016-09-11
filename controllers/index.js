@@ -85,54 +85,39 @@ module.exports = function (router) {
     router.get('/explore', function (req, res) {
         var model = {};
         async.parallel({
-            topic: function(callback){
-                flowUtils.setTopicModels(req, model, callback);
-            },
             topics: function(callback) {
-                // display 15 if top topics, all if has topic parameter
-                if(req.query.topic) { // include TopicLinks
-                    flowUtils.getTopics({ parentId: req.query.topic }, 0, function (err, results) {
+                var query = { parentId: {$ne: null} };
+                db.Topic.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
+                    flowUtils.setEditorsUsername(results, function() {
+                        results.forEach(function(result) {
+                            result.friendlyUrl = utils.urlify(result.title);
+                            flowUtils.appendEntryExtra(result);
+                        });
                         model.topics = results;
                         callback();
                     });
-                } else {
-                    var query = { parentId: {$ne: null} };
-                    db.Topic.aggregate([ {$match: query}, {$sample: { size: 25 } } ], function(err, results) {
-                        flowUtils.setEditorsUsername(results, function() {
-                            results.forEach(function(result) {
-                                result.friendlyUrl = utils.urlify(result.title);
-                                flowUtils.appendEntryExtra(result);
-                            });
-                            model.topics = results;
-                            callback();
-                        });
-                    });
-                }
+                });
             },
             categories: function(callback) {
-                if(!req.query.topic) {
-                    db.Topic.find({parentId: null }).sort({title: 1}).exec(function (err, results) {
-                        async.each(results, function(result, callback) {
-                            result.friendlyUrl = utils.urlify(result.title);
-                            result.comments = utils.numberWithCommas(utils.randomInt(1, 100000));
-                            db.Topic.find( { parentId: result._id } ).limit(2).sort({ title: 1 }).exec(function(err, subtopics) {
-                                subtopics.forEach(function(subtopic){
-                                    subtopic.friendlyUrl = utils.urlify(subtopic.title);
-                                });
-                                result.subtopics = subtopics;
-                                callback();
+                db.Topic.find({parentId: null }).sort({title: 1}).exec(function (err, results) {
+                    async.each(results, function(result, callback) {
+                        result.friendlyUrl = utils.urlify(result.title);
+                        result.comments = utils.numberWithCommas(utils.randomInt(1, 100000));
+                        db.Topic.find( { parentId: result._id } ).limit(2).sort({ title: 1 }).exec(function(err, subtopics) {
+                            subtopics.forEach(function(subtopic){
+                                subtopic.friendlyUrl = utils.urlify(subtopic.title);
                             });
-                        }, function(err) {
-                            model.categories = results;
+                            result.subtopics = subtopics;
                             callback();
                         });
+                    }, function(err) {
+                        model.categories = results;
+                        callback();
                     });
-                } else {
-                    callback();
-                }
+                });
             }
         }, function (err, results) {
-            res.render(templates.truth.topics.index, model);
+            res.render(templates.truth.index, model);
         });
     });
 

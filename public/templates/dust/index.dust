@@ -7,7 +7,7 @@
     <div class="jumbotron">
         <h1>The Wikitruth Project</h1>
         <p class="lead">A systematic way of discussion and knowledge contribution (with similarities to Wikipedia and Quora) using dialectics and a vetting mechanism to verify truth from lies, facts from trash.</p>
-        <p><a class="btn btn-lg btn-success" style="width: 200px" href="{paths.truth.index}" role="button">Explore &raquo;</a></p>
+        <p><a class="btn btn-lg btn-success" style="width: 200px" href="{paths.truth.index}" role="button">Explore{! &raquo;!}</a></p>
     </div>
 
     {!<div class="article-heading js-article-heading js-geopattern" style="background-image: url();">

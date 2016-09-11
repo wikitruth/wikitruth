@@ -5,10 +5,10 @@
         {?parentTopic.parentId}
             <li><a href="{paths.truth.topics.entry}?topic={parentTopic.parentId}">..</a></li>
         {/parentTopic.parentId}
-        <li><a href="{paths.truth.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}">{parentTopic.title}</a></li>
+        <li><a href="{paths.truth.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}">{?parentTopic.contextTitle}{parentTopic.contextTitle}{:else}{parentTopic.title}{/parentTopic.contextTitle}</a></li>
     {/parentTopic}
     {?topic}
-        <li><a href="{paths.truth.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a></li>
+        <li><a href="{paths.truth.topics.entry}/{topic.friendlyUrl}/{topic._id}">{?topic.contextTitle}{topic.contextTitle}{:else}{topic.title}{/topic.contextTitle}</a></li>
     {/topic}
     {?parentArgument}
         {?parentArgument.parentId}

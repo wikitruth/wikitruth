@@ -16,7 +16,7 @@
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
         <div class="form-group">
-            <label for="inputName">Topic</label>
+            <label for="inputName">Title</label>
             <textarea name="title" id="inputName" class="form-control" rows="1">{topic.title}</textarea>
         </div>
         <div class="form-group">
@@ -30,6 +30,10 @@
         <div class="form-group">
             <label for="inputParent">Parent</label>
             <textarea name="parent" id="inputParent" class="form-control" rows="1">{?topic}{topic.parentId}{:else}{parentTopic._id}{/topic}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="inputName">Title <span class="text-muted">(Contextual)</span></label>
+            <textarea name="contextTitle" id="contextTitle" class="form-control" rows="1">{topic.contextTitle}</textarea>
         </div>
         <div class="form-group">
             <label for="inputParent">Morality and Ethics</label>
@@ -46,10 +50,10 @@
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
         {?topic}
-            <a class="btn btn-default" href="{paths.truth.topics.entry}?topic={topic._id}" role="button">Cancel</a>
+            <a class="btn btn-default" href="{paths.truth.topics.entry}/{topic.friendlyUrl}/{topic._id}" role="button">Cancel</a>
         {:else}
             {?parentTopic}
-                <a class="btn btn-default" href="{paths.truth.topics.entry}?topic={parentTopic._id}" role="button">Cancel</a>
+                <a class="btn btn-default" href="{paths.truth.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}" role="button">Cancel</a>
             {:else}
                 <a class="btn btn-default" href="{paths.truth.index}" role="button">Cancel</a>
             {/parentTopic}
@@ -63,7 +67,7 @@
     <script src="/components/summernote/dist/summernote.min.js"></script>
     <script type="text/javascript">
         $(function() {
-            $('#inputName,#inputParent').textareaAutoSize();
+            $('#inputName,#inputParent,#contextTitle').textareaAutoSize();
             $('#inputContent').summernote({
                 height: WT_CONSTANTS.summernote.contentHeight,
                 toolbar: WT_CONSTANTS.summernote.contentToolbar
