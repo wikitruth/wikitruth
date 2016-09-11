@@ -32,7 +32,7 @@ module.exports = {
         topic: 'dust/discuss/topic'
     },
     truth: {
-        index: 'dust/truth/index',
+        index: 'dust/truth/explore',
         indexHeader: 'dust/truth/index-header',
         entryHeader: 'dust/truth/entry-header',
         topics: {

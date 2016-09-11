@@ -12,7 +12,7 @@
     {/topic}
     {?arguments}
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight text-primary"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> {^topic}Top Arguments{:else}{?argument}Supporting Arguments{:else}Arguments{/argument}{/topic}</li>
+            <li class="list-group-item highlight text-primary"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> {^topic}Latest Arguments{:else}{?argument}Supporting Arguments{:else}Arguments{/argument}{/topic}</li>
             {#arguments}
                 <li class="list-group-item">
                     {?link}

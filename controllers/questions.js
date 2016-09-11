@@ -36,7 +36,7 @@ module.exports = function (router) {
         } else {
             // Top Questions
             var query = { ownerType: constants.OBJECT_TYPES.topic };
-            db.Question.aggregate([ {$match: query}, {$sample: { size: 100 } } ], function(err, results) {
+            db.Question.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
                 flowUtils.setEditorsUsername(results, function() {
                     results.forEach(function (result) {
                         result.friendlyUrl = utils.urlify(result.title);

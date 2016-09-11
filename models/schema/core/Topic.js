@@ -3,6 +3,7 @@
 exports = module.exports = function(app, mongoose) {
   var schema = new mongoose.Schema({
     title: { type: String, default: '' },
+    contextTitle: { type: String },
     content: { type: String, default: '' },
     references: { type: String, default: '' },
     parentId: { type: mongoose.Schema.ObjectId, default: null }, // Used when the parent is also a topic

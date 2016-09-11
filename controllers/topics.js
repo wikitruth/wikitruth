@@ -24,6 +24,24 @@ function createCancelUrl(req) {
 
 module.exports = function (router) {
 
+    router.get('/', function (req, res) {
+        var model = {};
+        async.parallel({
+            topic: function(callback){
+                flowUtils.setTopicModels(req, model, callback);
+            },
+            topics: function(callback) {
+                // display 15 if top topics, all if has topic parameter
+                flowUtils.getTopics({ parentId: req.query.topic }, 0, function (err, results) {
+                    model.topics = results;
+                    callback();
+                });
+            }
+        }, function (err, results) {
+            res.render(templates.truth.topics.index, model);
+        });
+    });
+
     router.get('/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
         // Topic home: display top subtopics, top arguments
         var model = {};
@@ -39,6 +57,9 @@ module.exports = function (router) {
                 var query = { parentId: req.query.topic };
                 flowUtils.getTopics(query, 15, function (err, results) {
                     model.topics = results;
+                    if(results.length >= 15) {
+                        model.topicsMore = true;
+                    }
                     callback();
                 });
             },
@@ -74,6 +95,9 @@ module.exports = function (router) {
                             flowUtils.appendEntryExtra(result);
                         });
                         model.questions = results;
+                        if(results.length >= 15) {
+                            model.questionsMore = true;
+                        }
                         callback();
                     });
                 });
@@ -88,6 +112,9 @@ module.exports = function (router) {
                             flowUtils.appendEntryExtra(result);
                         });
                         model.issues = results;
+                        if(results.length >= 15) {
+                            model.issuesMore = true;
+                        }
                         callback();
                     });
                 });
@@ -102,6 +129,9 @@ module.exports = function (router) {
                             flowUtils.appendEntryExtra(result);
                         });
                         model.opinions = results;
+                        if(results.length >= 15) {
+                            model.opinionsMore = true;
+                        }
                         callback();
                     });
                 });
@@ -114,6 +144,9 @@ module.exports = function (router) {
             };*/
             model.entry = model.topic;
             model.arguments = results.arguments.slice(0, 15);
+            if(model.arguments.length >= 15) {
+                model.argumentsMore = true;
+            }
             model.entryType = constants.OBJECT_TYPES.topic;
             if(model.isTopicOwner) {
                 model.isEntryOwner = true;
@@ -169,6 +202,7 @@ module.exports = function (router) {
             var entity = result ? result : {};
             entity.content = req.body.content;
             entity.title = req.body.title;
+            entity.contextTitle = req.body.contextTitle;
             entity.references = req.body.references;
             entity.editUserId = req.user.id;
             entity.editDate = Date.now();

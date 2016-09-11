@@ -62,7 +62,7 @@ module.exports = function (router) {
         } else {
             // Top Discussions
             var query = { ownerType: constants.OBJECT_TYPES.topic };
-            db.Argument.aggregate([ {$match: query}, {$sample: { size: 100 } } ], function(err, results) {
+            db.Argument.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
                 flowUtils.setEditorsUsername(results, function() {
                     results.forEach(function (result) {
                         result.friendlyUrl = utils.urlify(result.title);
@@ -116,6 +116,9 @@ module.exports = function (router) {
                                 flowUtils.appendEntryExtra(result);
                             });
                             model.questions = results;
+                            if(results.length >= 15) {
+                                model.questionsMore = true;
+                            }
                             callback();
                         });
                     });
@@ -129,8 +132,10 @@ module.exports = function (router) {
                                 result.friendlyUrl = utils.urlify(result.title);
                                 flowUtils.appendEntryExtra(result);
                             });
-
                             model.issues = results;
+                            if(results.length >= 15) {
+                                model.issuesMore = true;
+                            }
                             callback();
                         });
                     });
@@ -145,6 +150,9 @@ module.exports = function (router) {
                                 flowUtils.appendEntryExtra(result);
                             });
                             model.opinions = results;
+                            if(results.length >= 15) {
+                                model.opinionsMore = true;
+                            }
                             callback();
                         });
                     });
@@ -167,6 +175,9 @@ module.exports = function (router) {
                 if(contra.length > 0) {
                     model.opposingArgumentCount = contra.length;
                     model.contraArguments = contra.slice(0, 15);
+                }
+                if(results.arguments.length >= 15) {
+                    model.argumentsMore = true;
                 }
                 model.entry = model.argument;
                 model.entryType = constants.OBJECT_TYPES.argument;

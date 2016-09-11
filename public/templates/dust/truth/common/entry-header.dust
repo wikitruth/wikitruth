@@ -10,7 +10,7 @@
                             <span class="glyphicon glyphicon-home" aria-hidden="true"></span><span class="hidden-xxs"> Overview</span></a>
                     </li>
                     <li role="presentation"{@eq key=tab value="topics"} class="active"{/eq}>
-                        <a href="{paths.truth.index}?topic={topic._id}" role="tab">
+                        <a href="{paths.truth.topics.index}?topic={topic._id}" role="tab">
                             <span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span><span class="hidden-xs"> Topics</span></a>
                     </li>
                 {:else}
