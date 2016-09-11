@@ -1,9 +1,10 @@
+<br/>
 {?entry.references}
     <small class="text-muted">
-        <span class="text-uppercase">References</span>
+        <i class="fa fa-bookmark"></i> <span class="text-uppercase">References</span>
         <p>{entry.references|s}</p>
     </small>
 {/entry.references}
 <small class="text-muted">
-    Last modified by {entry.editUsername} on {entry.editDate}.
+    <i class="fa fa-clock-o"></i> PUBLISHED {entry.createDate} | UPDATED {entry.editDate} BY <a class="text-muted" href="{paths.members.profile}?username={entry.editUsername}">{entry.editUsername}</a>
 </small>
