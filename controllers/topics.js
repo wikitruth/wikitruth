@@ -217,9 +217,16 @@ module.exports = function (router) {
             }
             entity.parentId = req.body.parent ? req.body.parent : null;
             db.Topic.update(query, entity, {upsert: true}, function(err, writeResult) {
-                res.redirect((result ? paths.truth.topics.entry : paths.truth.index) +
-                    (result ? '?topic=' + result._id : req.query.topic ? '?topic=' + req.query.topic : '')
-                );
+                var url = "";
+                var query = "";
+                if(result) {
+                    url = paths.truth.topics.entry;
+                    query = '?topic=' + result._id;
+                } else {
+                    url = req.query.topic ? paths.truth.topics.index : paths.truth.index;
+                    query = req.query.topic ? '?topic=' + req.query.topic : '';
+                }
+                res.redirect(url + query);
             });
         });
     });
