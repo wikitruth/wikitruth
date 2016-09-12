@@ -14,6 +14,9 @@ exports.init = function(req, res){
     res.redirect(getReturnUrl(req));
   }
   else {
+    if(!req.session.returnUrl){
+      req.session.returnUrl = req.header('Referer');
+    }
     res.render('jade/login/index.jade', {
       oauthMessage: '',
       oauthTwitter: !!req.app.config.oauth.twitter.key,
