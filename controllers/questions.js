@@ -36,7 +36,13 @@ module.exports = function (router) {
         } else {
             // Top Questions
             var query = { ownerType: constants.OBJECT_TYPES.topic };
-            db.Question.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
+            //db.Question.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
+            db.Question
+                .find(query)
+                .sort({editDate: -1})
+                .limit(25)
+                .lean()
+                .exec(function (err, results) {
                 flowUtils.setEditorsUsername(results, function() {
                     results.forEach(function (result) {
                         result.friendlyUrl = utils.urlify(result.title);
@@ -54,8 +60,12 @@ module.exports = function (router) {
 
     router.get('/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
         var model = {};
-        if(req.params.id && !req.query.question) {
-            req.query.question = req.params.id;
+        if(!req.query.question) {
+            if(req.params.id) {
+                req.query.question = req.params.id;
+            } else {
+                req.query.question = req.params.friendlyUrl;
+            }
         }
         var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
         flowUtils.setEntryModels(ownerQuery, req, model, function (err) {

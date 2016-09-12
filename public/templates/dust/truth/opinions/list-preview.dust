@@ -1,0 +1,15 @@
+{?opinions}
+    <ul class="list-group top-list-items wt-list">
+        <li class="list-group-item highlight"><span class="fa fa-comments-o text-success" aria-hidden="true"></span> Opinions{?opinionsCount} <span class="wt-label label label-default">{opinionsCount}</span>{/opinionsCount}</li>
+        {#opinions}
+            <li class="list-group-item">
+                <span class="fa fa-comments-o text-success" aria-hidden="true"></span>
+                <div>
+                    <a href="{paths.truth.opinions.entry}/{friendlyUrl}/{_id}">{title}</a>
+                    <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
+                </div>
+                <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+        {/opinions}
+    </ul>
+    <div class="top-list-items-more"><a href="{paths.truth.opinions.index}?topic={topic._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+{/opinions}

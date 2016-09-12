@@ -87,7 +87,13 @@ module.exports = function (router) {
         async.parallel({
             topics: function(callback) {
                 var query = { parentId: {$ne: null} };
-                db.Topic.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
+                //db.Topic.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
+                db.Topic
+                    .find(query)
+                    .sort({editDate: -1})
+                    .limit(25)
+                    .lean()
+                    .exec(function (err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function(result) {
                             result.friendlyUrl = utils.urlify(result.title);
@@ -99,7 +105,11 @@ module.exports = function (router) {
                 });
             },
             categories: function(callback) {
-                db.Topic.find({parentId: null }).sort({title: 1}).exec(function (err, results) {
+                db.Topic
+                    .find({parentId: null })
+                    .sort({title: 1})
+                    .lean()
+                    .exec(function (err, results) {
                     async.each(results, function(result, callback) {
                         result.friendlyUrl = utils.urlify(result.title);
                         result.comments = utils.numberWithCommas(utils.randomInt(1, 100000));

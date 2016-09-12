@@ -14,12 +14,12 @@
     {?argument.verdict.label}
         <a href="{paths.truth.verdict.update}?{?argument}argument={argument._id}{/argument}{?question}topic={topic._id}&amp;question={question._id}{/question}" title="Update Verdict" class="no-underline">
         <span class="label label-{argument.verdict.theme}" title="This content is not yet reviewed, please take caution.">
-            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> {argument.verdict.label}</span></a>
+            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> {argument.verdict.label}</span></a>&nbsp;
         {?supportingArgumentCount}
-            &nbsp;<span class="label label-primary pull-right-x"><i class="fa fa-thumbs-up"></i> {supportingArgumentCount}</span>
+            <span class="label label-primary pull-right-x"><i class="fa fa-thumbs-up"></i> {supportingArgumentCount}</span>&nbsp;
         {/supportingArgumentCount}
         {?opposingArgumentCount}
-            &nbsp;<span class="label label-primary pull-right-x"><i class="fa fa-thumbs-down"></i> {opposingArgumentCount}</span>
+            <span class="label label-primary pull-right-x"><i class="fa fa-thumbs-down"></i> {opposingArgumentCount}</span>&nbsp;
         {/opposingArgumentCount}
 
         {!&nbsp;<span class="label label-primary"><i class="fa fa-flash"></i>
@@ -32,7 +32,7 @@
         </span>!}
 
         {?argument.typeUX}
-            &nbsp;<span class="label label-{argument.typeUX.theme}"><i class="fa fa-bolt"></i> {argument.typeUX.label}</span>
+            <span class="label label-{argument.typeUX.theme}"><i class="fa fa-bolt"></i> {argument.typeUX.label}</span>&nbsp;
         {/argument.typeUX}
 
         {!&nbsp;
@@ -69,18 +69,18 @@
     {?verdict}
     {! Topic !}
         {?verdict.counts.true}
-            &nbsp;<span class="label label-success"><i class="fa fa-check-circle"></i> {verdict.counts.true}</span>
+            <span class="label label-success"><i class="fa fa-check-circle"></i> {verdict.counts.true}</span>&nbsp;
         {/verdict.counts.true}
         {?verdict.counts.pending}
-            &nbsp;<span class="label label-warning"><i class="fa fa-question-circle"></i> {verdict.counts.pending}</span>
+            <span class="label label-warning"><i class="fa fa-question-circle"></i> {verdict.counts.pending}</span>&nbsp;
         {/verdict.counts.pending}
         {?verdict.counts.false}
-            &nbsp;<span class="label label-danger"><i class="fa fa-close"></i> {verdict.counts.false}</span>
+            <span class="label label-danger"><i class="fa fa-close"></i> {verdict.counts.false}</span>&nbsp;
         {/verdict.counts.false}
     {/verdict}
 {/argument}
 {?linkCount}
-    &nbsp;<span class="label label-info pull-right-x"><i class="fa fa-link"></i> {linkCount}</span>
+    <span class="label label-info pull-right-x"><i class="fa fa-link"></i> {linkCount}</span>&nbsp;
 {/linkCount}
 {!<span class="label label-success">Verified</span> <span class="label label-danger">Issues</span>!}
 {!&nbsp;<span class="label label-primary"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Update Verdict</span>!}

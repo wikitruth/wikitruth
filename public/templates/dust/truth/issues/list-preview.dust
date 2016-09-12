@@ -1,0 +1,16 @@
+{?issues}
+    <ul class="list-group top-list-items wt-list">
+        <li class="list-group-item highlight"><span class="fa fa-exclamation-circle text-success" aria-hidden="true"></span> Issues{?issuesCount} <span class="wt-label label label-default">{issuesCount}</span>{/issuesCount}</li>
+        {#issues}
+            <li class="list-group-item">
+                <span class="fa fa-exclamation-circle text-success" aria-hidden="true"></span>
+                <div>
+                    <a href="{paths.truth.issues.entry}/{friendlyUrl}/{_id}">{title}</a>
+                    <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
+                </div>
+                <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
+            </li>
+        {/issues}
+    </ul>
+    <div class="top-list-items-more"><a href="{paths.truth.issues.index}?topic={topic._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+{/issues}

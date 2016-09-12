@@ -260,7 +260,12 @@ function prepareClipboardOptions(req, model, entryType) {
 function getTopics(query, limit, callback) {
     async.parallel({
         children: function (callback) {
-            db.Topic.find(query).limit(limit).sort({ title: 1 }).exec(function(err, results) {
+            db.Topic
+                .find(query)
+                .limit(limit)
+                .sort({ title: 1 })
+                .lean()
+                .exec(function(err, results) {
                 setEditorsUsername(results, function() {
                     results.forEach(function (result) {
                         result.friendlyUrl = utils.urlify(result.title);
@@ -272,30 +277,43 @@ function getTopics(query, limit, callback) {
             });
         },
         links: function (callback) {
-            db.TopicLink.find(query).limit(limit).exec(function(err, links) {
-                var ids = links.map(function (link) {
-                    return link.topicId;
-                });
-                var query = {
-                    _id: {
-                        $in: ids
-                    }
-                };
-                db.Topic.find(query).limit(limit).sort({ title: 1 }).exec(function(err, results) {
-                    setEditorsUsername(results, function() {
-                        results.forEach(function (result) {
-                            result.friendlyUrl = utils.urlify(result.title);
-                            appendEntryExtra(result);
-                            var link = links.find(function (link) {
-                                return link.topicId.equals(result._id);
-                            });
-                            if(link) {
-                                result.link = link;
-                            }
+            db.TopicLink
+                .find(query)
+                .limit(limit)
+                .lean()
+                .exec(function(err, links) {
+                    if(links.length > 0) {
+                        var ids = links.map(function (link) {
+                            return link.topicId;
                         });
-                        callback(null, results);
-                    });
-                });
+                        var query = {
+                            _id: {
+                                $in: ids
+                            }
+                        };
+                        db.Topic
+                            .find(query)
+                            .limit(limit)
+                            .sort({title: 1})
+                            .lean()
+                            .exec(function (err, results) {
+                                setEditorsUsername(results, function () {
+                                    results.forEach(function (result) {
+                                        result.friendlyUrl = utils.urlify(result.title);
+                                        appendEntryExtra(result);
+                                        var link = links.find(function (link) {
+                                            return link.topicId.equals(result._id);
+                                        });
+                                        if (link) {
+                                            result.link = link;
+                                        }
+                                    });
+                                    callback(null, results);
+                                });
+                            });
+                    } else {
+                        callback(null, []);
+                    }
             });
         }
     }, function (err, results) {
@@ -307,7 +325,12 @@ function getTopics(query, limit, callback) {
 function getArguments(query, limit, callback) {
     async.parallel({
         children: function (callback) {
-            db.Argument.find(query).limit(limit).sort({ title: 1 }).exec(function(err, results) {
+            db.Argument
+                .find(query)
+                .limit(limit)
+                .sort({ title: 1 })
+                .lean()
+                .exec(function(err, results) {
                 setEditorsUsername(results, function() {
                     results.forEach(function (result) {
                         result.friendlyUrl = utils.urlify(result.title);
@@ -320,31 +343,44 @@ function getArguments(query, limit, callback) {
             });
         },
         links: function (callback) {
-            db.ArgumentLink.find(query).limit(limit).exec(function(err, links) {
-                var ids = links.map(function (link) {
-                    return link.argumentId;
-                });
-                var query = {
-                    _id: {
-                        $in: ids
-                    }
-                };
-                db.Argument.find(query).limit(limit).sort({ title: 1 }).exec(function(err, results) {
-                    setEditorsUsername(results, function() {
-                        results.forEach(function (result) {
-                            result.friendlyUrl = utils.urlify(result.title);
-                            appendEntryExtra(result);
-                            var link = links.find(function (link) {
-                                return link.argumentId.equals(result._id);
-                            });
-                            if(link) {
-                                result.link = link;
-                                result.against = link.against;
-                            }
+            db.ArgumentLink
+                .find(query)
+                .limit(limit)
+                .lean()
+                .exec(function(err, links) {
+                    if(links.length > 0) {
+                        var ids = links.map(function (link) {
+                            return link.argumentId;
                         });
-                        callback(null, results);
-                    });
-                });
+                        var query = {
+                            _id: {
+                                $in: ids
+                            }
+                        };
+                        db.Argument
+                            .find(query)
+                            .limit(limit)
+                            .sort({title: 1})
+                            .lean()
+                            .exec(function (err, results) {
+                                setEditorsUsername(results, function () {
+                                    results.forEach(function (result) {
+                                        result.friendlyUrl = utils.urlify(result.title);
+                                        appendEntryExtra(result);
+                                        var link = links.find(function (link) {
+                                            return link.argumentId.equals(result._id);
+                                        });
+                                        if (link) {
+                                            result.link = link;
+                                            result.against = link.against;
+                                        }
+                                    });
+                                    callback(null, results);
+                                });
+                            });
+                    } else {
+                        callback(null, []);
+                    }
             });
         }
     }, function (err, results) {
