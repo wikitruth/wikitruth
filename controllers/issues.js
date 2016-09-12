@@ -48,8 +48,12 @@ module.exports = function (router) {
 
     router.get('/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
         var model = {};
-        if(req.params.id && !req.query.issue) {
-            req.query.issue = req.params.id;
+        if(!req.query.issue) {
+            if(req.params.id) {
+                req.query.issue = req.params.id;
+            } else {
+                req.query.issue = req.params.friendlyUrl;
+            }
         }
         flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
             model.entry = model.issue;

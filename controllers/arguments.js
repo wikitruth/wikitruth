@@ -60,9 +60,15 @@ module.exports = function (router) {
                 });
             });
         } else {
-            // Top Discussions
+            // Top Arguments
             var query = { ownerType: constants.OBJECT_TYPES.topic };
-            db.Argument.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
+            //db.Argument.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
+            db.Argument
+                .find(query)
+                .sort({editDate: -1})
+                .limit(25)
+                .lean()
+                .exec(function (err, results) {
                 flowUtils.setEditorsUsername(results, function() {
                     results.forEach(function (result) {
                         result.friendlyUrl = utils.urlify(result.title);
@@ -81,8 +87,12 @@ module.exports = function (router) {
 
     router.get('/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
         var model = {};
-        if(req.params.id && !req.query.argument) {
-            req.query.argument = req.params.id;
+        if(!req.query.argument) {
+            if(req.params.id) {
+                req.query.argument = req.params.id;
+            } else {
+                req.query.argument = req.params.friendlyUrl;
+            }
         }
         var ownerQuery = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument };
         flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
@@ -102,8 +112,37 @@ module.exports = function (router) {
                 links: function (callback) {
                     // Top Questions
                     var query = { argumentId: req.query.argument };
-                    db.ArgumentLink.find(query, function(err, results) {
-                        callback(null, results);
+                    db.ArgumentLink.find(query, function(err, links) {
+                        if(links.length > 0) {
+                            model.linkCount = links.length;
+                            var ids = links
+                                .filter(function (link) {
+                                    return link.ownerType === constants.OBJECT_TYPES.topic;
+                                })
+                                .map(function (link) {
+                                    return link.ownerId;
+                                });
+                            var query = {
+                                _id: {
+                                    $in: ids
+                                }
+                            };
+                            db.Topic
+                                .find(query)
+                                .sort({title: 1})
+                                .lean()
+                                .exec(function (err, results) {
+                                    if (results.length > 0) {
+                                        model.topicLinks = results;
+                                        results.forEach(function (result) {
+                                            result.friendlyUrl = utils.urlify(result.title);
+                                        });
+                                    }
+                                    callback();
+                                });
+                        } else {
+                            callback();
+                        }
                     });
                 },
                 questions: function (callback) {
@@ -181,9 +220,6 @@ module.exports = function (router) {
                 }
                 model.entry = model.argument;
                 model.entryType = constants.OBJECT_TYPES.argument;
-                if(results.links.length > 0) {
-                    model.linkCount = results.links.length;
-                }
                 flowUtils.prepareClipboardOptions(req, model, constants.OBJECT_TYPES.argument);
                 res.render(templates.truth.arguments.entry, model);
             });
@@ -286,8 +322,8 @@ module.exports = function (router) {
                 });
             }
         }, function (err, results) {
-            res.redirect((entry ? paths.truth.arguments.entry : paths.truth.arguments.index)
-                + '?topic=' + req.query.topic + (entry ? '&argument=' + entry._id : '')
+            res.redirect((entry || parent ? paths.truth.arguments.entry : paths.truth.topics.entry)
+                + '?topic=' + req.query.topic + (entry ? '&argument=' + entry._id : parent ? '&argument=' + parent._id : '')
             );
         });
 

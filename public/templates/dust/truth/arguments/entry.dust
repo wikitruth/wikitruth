@@ -10,8 +10,25 @@
         {>"dust/truth/common/entry-verdict" /}
     </div>
     <div class="text-body">
+        <p style="font-style: italic; margin: 10px 0 10px 0; font-size: smaller;">
+            {?parentArgument}
+                {?argument.against}An argument against{:else}A supporting argument for{/argument.against} <a href="{paths.truth.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
+            {:else}
+                {!An argument under the topic <a href="{paths.truth.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>!}
+            {/parentArgument}
+        </p>
         <p>{argument.content|s}</p>
     </div>
+    {?topic}
+        <div style="margin-bottom: 15px">
+            {!<hr style="border: 0; margin: 0 0 0.375rem; border-top: 0.0625rem dotted #dcdcdc;"/>!}
+            <span style="font-size: 75%; font-weight: bold; color: #767676">Topics</span>&nbsp;
+            <a href="{paths.truth.topics.entry}/{topic.friendlyUrl}/{topic._id}"><span class="wt-label label label-default">{topic.title}</span></a>&nbsp;
+            {#topicLinks}
+                <a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}"><span class="wt-label label label-default">{title}</span></a>&nbsp;
+            {/topicLinks}
+        </div>
+    {/topic}
     {>"dust/truth/common/entry-options" /}
     {?arguments}
         <ul class="list-group top-list-items wt-list">
@@ -56,50 +73,8 @@
             <div class="top-list-items-more"><a href="{paths.truth.arguments.index}?topic={topic._id}&amp;argument={argument._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
         {/arguments}
     {/contraArguments}
-    {?questions}
-        <ul class="list-group top-list-items wt-list">
-            <li class="list-group-item highlight"><span class="glyphicon glyphicon-question-sign text-success" aria-hidden="true"></span> Questions</li>
-            {#questions}
-                <li class="list-group-item">
-                    <span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>
-                    <div>
-                        <a href="{paths.truth.questions.entry}/{friendlyUrl}/{_id}">{title}</a>
-                        <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
-                    </div>
-                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
-            {/questions}
-        </ul>
-        <div class="top-list-items-more"><a href="{paths.truth.questions.index}?topic={topic._id}&amp;argument={argument._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
-    {/questions}
-    {?issues}
-        <ul class="list-group top-list-items wt-list">
-            <li class="list-group-item highlight"><span class="fa fa-exclamation-circle text-success" aria-hidden="true"></span> Issues</li>
-            {#issues}
-                <li class="list-group-item">
-                    <span class="fa fa-exclamation-circle text-success" aria-hidden="true"></span>
-                    <div>
-                        <a href="{paths.truth.issues.entry}/{friendlyUrl}/{_id}">{title}</a>
-                        <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
-                    </div>
-                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
-            {/issues}
-        </ul>
-        <div class="top-list-items-more"><a href="{paths.truth.issues.index}?argument={argument._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
-    {/issues}
-    {?opinions}
-        <ul class="list-group top-list-items wt-list">
-            <li class="list-group-item highlight"><span class="fa fa-comments-o text-success" aria-hidden="true"></span> Opinions</li>
-            {#opinions}
-                <li class="list-group-item">
-                    <span class="fa fa-comments-o text-success" aria-hidden="true"></span>
-                    <div>
-                        <a href="{paths.truth.opinions.entry}/{friendlyUrl}/{_id}">{title}</a>
-                        <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
-                    </div>
-                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
-            {/opinions}
-        </ul>
-        <div class="top-list-items-more"><a href="{paths.truth.opinions.index}?argument={argument._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
-    {/opinions}
+    {>"dust/truth/questions/list-preview" /}
+    {>"dust/truth/issues/list-preview" /}
+    {>"dust/truth/opinions/list-preview" /}
     {>"dust/truth/common/entry-footer" /}
 {/body}

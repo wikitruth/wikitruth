@@ -1,4 +1,4 @@
-<h1 class="page-header wt-header">
+<h2 class="page-header wt-header">
     {?opinion}
         {opinion.title}
     {:else}
@@ -30,4 +30,4 @@
     {@eq key=tab value="clipboard"}
         Clipboard
     {/eq}
-</h1>
+</h2>

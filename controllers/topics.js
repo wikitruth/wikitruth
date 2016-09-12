@@ -45,8 +45,12 @@ module.exports = function (router) {
     router.get('/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
         // Topic home: display top subtopics, top arguments
         var model = {};
-        if(req.params.id && !req.query.topic) {
-            req.query.topic = req.params.id;
+        if(!req.query.topic) {
+            if(req.params.id) {
+                req.query.topic = req.params.id;
+            } else {
+                req.query.topic = req.params.friendlyUrl;
+            }
         }
         async.parallel({
             topic: function(callback){
@@ -55,20 +59,60 @@ module.exports = function (router) {
             topics: function(callback) {
                 // Top Subtopics
                 var query = { parentId: req.query.topic };
-                flowUtils.getTopics(query, 15, function (err, results) {
-                    model.topics = results;
-                    if(results.length >= 15) {
-                        model.topicsMore = true;
+                flowUtils.getTopics(query, 0, function (err, results) {
+                    if(results.length > 0) {
+                        model.topicsCount = results.length;
+                        if(results.length > 15) {
+                            model.topicsMore = true;
+                        }
                     }
+                    model.topics = results.length > 15 ? results.slice(0,15) : results;
                     callback();
                 });
             },
             links: function (callback) {
                 // Top Linked Topics
                 var query = { topicId: req.query.topic };
-                db.TopicLink.find(query, function(err, results) {
+                /*db.TopicLink.find(query, function(err, results) {
                     callback(null, results);
-                });
+                });*/
+                db.TopicLink
+                    .find(query)
+                    .lean()
+                    .exec(function(err, links) {
+                        if(links.length > 0) {
+                            model.linkCount = links.length;
+                            var ids = links.map(function (link) {
+                                return link.parentId;
+                            });
+                            var query = {
+                                _id: {
+                                    $in: ids
+                                }
+                            };
+                            db.Topic
+                                .find(query)
+                                .sort({title: 1})
+                                .lean()
+                                .exec(function (err, results) {
+                                    if (results.length > 0) {
+                                        model.topicLinks = results;
+                                        results.forEach(function (result) {
+                                            result.friendlyUrl = utils.urlify(result.title);
+                                            var link = links.find(function (link) {
+                                                return link.topicId.equals(result._id);
+                                            });
+                                            if (link) {
+                                                result.link = link;
+                                            }
+                                        });
+                                    }
+                                    callback();
+                                });
+                        } else {
+                            callback();
+                        }
+                    });
             },
             arguments: function(callback) {
                 // Top Arguments
@@ -94,10 +138,13 @@ module.exports = function (router) {
                             result.friendlyUrl = utils.urlify(result.title);
                             flowUtils.appendEntryExtra(result);
                         });
-                        model.questions = results;
-                        if(results.length >= 15) {
-                            model.questionsMore = true;
+                        if(results.length > 0) {
+                            model.questionsCount = results.length;
+                            if(results.length > 15) {
+                                model.questionsMore = true;
+                            }
                         }
+                        model.questions = results.length > 15 ? results.slice(0,15) : results;
                         callback();
                     });
                 });
@@ -111,10 +158,13 @@ module.exports = function (router) {
                             result.friendlyUrl = utils.urlify(result.title);
                             flowUtils.appendEntryExtra(result);
                         });
-                        model.issues = results;
-                        if(results.length >= 15) {
-                            model.issuesMore = true;
+                        if(results.length > 0) {
+                            model.issuesCount = results.length;
+                            if(results.length > 15) {
+                                model.issuesMore = true;
+                            }
                         }
+                        model.issues = results.length > 15 ? results.slice(0,15) : results;
                         callback();
                     });
                 });
@@ -128,10 +178,13 @@ module.exports = function (router) {
                             result.friendlyUrl = utils.urlify(result.title);
                             flowUtils.appendEntryExtra(result);
                         });
-                        model.opinions = results;
-                        if(results.length >= 15) {
-                            model.opinionsMore = true;
+                        if(results.length > 0) {
+                            model.opinionsCount = results.length;
+                            if(results.length > 15) {
+                                model.opinionsMore = true;
+                            }
                         }
+                        model.opinions = results.length > 15 ? results.slice(0,15) : results;
                         callback();
                     });
                 });
@@ -144,8 +197,11 @@ module.exports = function (router) {
             };*/
             model.entry = model.topic;
             model.arguments = results.arguments.slice(0, 15);
-            if(model.arguments.length >= 15) {
-                model.argumentsMore = true;
+            if(results.arguments.length > 0) {
+                model.argumentsCount = results.arguments.length;
+                if(model.arguments.length >= 15) {
+                    model.argumentsMore = true;
+                }
             }
             model.entryType = constants.OBJECT_TYPES.topic;
             if(model.isTopicOwner) {
@@ -154,9 +210,6 @@ module.exports = function (router) {
             model.verdict = {
                 counts: flowUtils.getVerdictCount(results.arguments)
             };
-            if(results.links.length > 0) {
-                model.linkCount = results.links.length;
-            }
             flowUtils.prepareClipboardOptions(req, model, constants.OBJECT_TYPES.topic);
             res.render(templates.truth.topics.entry, model);
         });

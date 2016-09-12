@@ -15,13 +15,26 @@
             <label for="inputName">Title <span class="text-muted">(Contextual)</span></label>
             <textarea name="title" id="inputName" class="form-control" rows="1">{link.title}</textarea>
         </div>
-        <div class="form-group">
-            {!<label for="inputParent">Parent</label>
-            <textarea name="parent" id="inputParent" class="form-control" rows="1">{link.parentId}</textarea>!}
+        {!<div class="form-group">
             <div class="checkbox">
                 <label>
                     <input type="checkbox" name="supportsParent" value="1" {^link.against}checked="checked"{/link.against}>
                     Supporting Argument <span class="text-muted">(ignored when no parent)</span>
+                </label>
+            </div>
+        </div>!}
+        <div class="form-group">
+            <label for="inputParent">Correlation to Parent</label>
+            <div class="radio">
+                <label class="text-success">
+                    <input type="radio" name="supportsParent" value="1" {^argument.against}checked="checked"{/argument.against}>
+                    Supporting Argument (for)
+                </label>
+            </div>
+            <div class="radio">
+                <label class="text-primary">
+                    <input type="radio" name="supportsParent" value="" {?argument.against}checked="checked"{/argument.against}>
+                    Opposing Argument (against)
                 </label>
             </div>
         </div>
