@@ -1,5 +1,5 @@
 <br/>
-<ol class="breadcrumb">
+<ol class="breadcrumb wt-bc">
     <li><i class="fa fa-globe text-muted"></i> <a href="{paths.truth.index}">Explore</a></li>
     {?parentTopic}
         {?parentTopic.parentId}
