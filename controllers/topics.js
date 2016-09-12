@@ -274,10 +274,10 @@ module.exports = function (router) {
                 var query = "";
                 if(result) {
                     url = paths.truth.topics.entry;
-                    query = '?topic=' + result._id;
+                    query = '/' + result._id;
                 } else {
-                    url = req.query.topic ? paths.truth.topics.index : paths.truth.index;
-                    query = req.query.topic ? '?topic=' + req.query.topic : '';
+                    url = req.query.topic ? paths.truth.topics.entry : paths.truth.index;
+                    query = req.query.topic ? '/' + req.query.topic : '';
                 }
                 res.redirect(url + query);
             });
