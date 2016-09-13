@@ -81,7 +81,7 @@ module.exports = function (router) {
                     .lean()
                     .exec(function(err, links) {
                         if(links.length > 0) {
-                            model.linkCount = links.length;
+                            model.linkCount = links.length + 1;
                             var ids = links.map(function (link) {
                                 return link.parentId;
                             });
