@@ -20,9 +20,7 @@
                 <div class="media wt-category">
                     <div class="media-left media-top">
                         <a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">
-                            <div class="photo-placeholder"></div>
-                            {!<i style="font-size: 55px;width: 70px;height: 70px;text-align: center; vertical-align: middle;" class="fa fa-folder-open-o"></i>!}
-                            {!<img class="media-object" data-src="holder.js/64x64" alt="{firstName} {lastName}">!}
+                            <div class="wt-category-icon" data-title="{title}"></div>
                         </a>
                     </div>
                     <div class="media-body">
@@ -33,7 +31,7 @@
                                     <div><i class="fa fa-folder-open text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{title}</a></div>
                                 {/subtopics}
                             {/subtopics}
-                            <div><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.truth.index}?topic={_id}" role="button">more</a></div>
+                            <div><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.truth.topics.index}?topic={_id}" role="button">more</a></div>
                             {!<span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}!}
                         </div>
                     </div>
@@ -58,3 +56,16 @@
         </ul>
     {/topics}
 {/body}
+
+{<footer}
+    <script src="/components/geopattern/js/geopattern.min.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            $(".wt-category-icon").each(function() {
+                var title = $( this ).data("title");
+                var pattern = GeoPattern.generate(title);
+                $(this).css("background-image", pattern.toDataUrl());
+            });
+        });
+    </script>
+{/footer}

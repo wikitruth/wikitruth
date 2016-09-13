@@ -11,9 +11,9 @@
                 {:else}
                     {?argument}
                         {argument.title}
-                        {?argument.against}
+                        {!{?argument.against}
                             <span class="label label-primary" style="font-size: 10px; font-weight: normal; padding: .2em .6em .3em; letter-spacing: normal; margin-left: 8px">opposing</span>
-                        {/argument.against}
+                        {/argument.against}!}
                     {:else}
                         {?topic}
                             {topic.title}
@@ -35,7 +35,7 @@
     <hr style="border: 0; margin: 0.7rem 0 0.7rem; border-top: 0.0625rem dotted #dcdcdc;"/>
     <div style="font-style-x: italic; font-size: smaller;" class="text-muted">
         {?opinion}
-            An opinion on&nbsp;
+            <span class="fa fa-comments-o"></span> An opinion on&nbsp;
             {?question}
                 <a href="{paths.truth.questions.entry}/{question.friendlyUrl}/{question._id}">{question.title}</a>
             {:else}
@@ -47,7 +47,7 @@
             {/question}
         {:else}
             {?issue}
-                An issue on&nbsp;
+                <span class="fa fa-exclamation-circle"></span> An issue on&nbsp;
                 {?question}
                     <a href="{paths.truth.questions.entry}/{question.friendlyUrl}/{question._id}">{question.title}</a>
                 {:else}
@@ -59,7 +59,7 @@
                 {/question}
             {:else}
                 {?question}
-                    A question on&nbsp;
+                    <span class="fa fa-question-circle-o"></span> A question on&nbsp;
                     {?argument}
                         <a href="{paths.truth.arguments.entry}/{argument.friendlyUrl}/{argument._id}">{argument.title}</a>
                     {:else}
@@ -68,19 +68,16 @@
                 {:else}
                     {?argument}
                         {?parentArgument}
-                            A sub-argument {?argument.against}against{:else}in support for{/argument.against} <a href="{paths.truth.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
+                            <span class="fa fa-bolt"></span> A sub-argument {?argument.against}against{:else}in support for{/argument.against} <a href="{paths.truth.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
                         {:else}
-                            An argument under the topic <a href="{paths.truth.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
+                            <span class="fa fa-bolt"></span> An argument under the topic <a href="{paths.truth.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
                         {/parentArgument}
-                        {?argument.against}
-                            <span class="label label-primary" style="font-size: 10px; font-weight: normal; padding: .2em .6em .3em; letter-spacing: normal; margin-left: 8px">opposing</span>
-                        {/argument.against}
                     {:else}
                         {?topic}
                             {?parentTopic}
-                                A sub-topic under <a href="{paths.truth.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}">{parentTopic.title}</a>
+                                <span class="fa fa-folder-open"></span> A sub-topic under <a href="{paths.truth.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}">{parentTopic.title}</a>
                             {:else}
-                                A topic category
+                                <span class="fa fa-folder-open"></span> A topic category
                             {/parentTopic}
                         {/topic}
                     {/argument}

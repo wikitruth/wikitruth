@@ -7,6 +7,7 @@ exports = module.exports = function(app, mongoose) {
     title: { type: String, default: '' },
     content: { type: String, default: '' },
     references: { type: String, default: '' },
+    screeningStatus: { type: Number }, // SCREENING_STATUS
     parentId: { type: mongoose.Schema.ObjectId, default: null }, // always an Argument
     ownerId: { type: mongoose.Schema.ObjectId }, // usually a Topic but can be a different object
     ownerType: { type: Number }, // OBJECT_TYPES
@@ -15,6 +16,7 @@ exports = module.exports = function(app, mongoose) {
     editDate: { type: Date, default: Date.now },
     editUserId: { type: mongoose.Schema.ObjectId, ref: 'User'},
     typeId: { type: Number, default: constants.ARGUMENT_TYPES.factual }, // ARGUMENT_TYPES
+    tags: [ { type: Number } ], // OBJECT_TAGS
     threadId: { type: mongoose.Schema.ObjectId, ref: 'Argument' },
     against: { type: Boolean, default: false }, // how it relates to parent Argument, default is in support
     ethicalStatus: {

@@ -5,6 +5,7 @@ exports = module.exports = function(app, mongoose) {
     title: { type: String, default: '' },
     content: { type: String, default: '' },
     references: { type: String, default: '' },
+    screeningStatus: { type: Number }, // SCREENING_STATUS
     ownerId: { type: mongoose.Schema.ObjectId },
     ownerType: { type: Number }, // MODEL_TYPES
     createDate: { type: Date, default: Date.now },

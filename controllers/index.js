@@ -113,7 +113,7 @@ module.exports = function (router) {
                     async.each(results, function(result, callback) {
                         result.friendlyUrl = utils.urlify(result.title);
                         result.comments = utils.numberWithCommas(utils.randomInt(1, 100000));
-                        db.Topic.find( { parentId: result._id } ).limit(2).sort({ title: 1 }).exec(function(err, subtopics) {
+                        db.Topic.find( { parentId: result._id } ).limit(3).sort({ title: 1 }).exec(function(err, subtopics) {
                             subtopics.forEach(function(subtopic){
                                 subtopic.friendlyUrl = utils.urlify(subtopic.title);
                             });
