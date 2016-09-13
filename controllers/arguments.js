@@ -114,7 +114,7 @@ module.exports = function (router) {
                     var query = { argumentId: req.query.argument };
                     db.ArgumentLink.find(query, function(err, links) {
                         if(links.length > 0) {
-                            model.linkCount = links.length;
+                            model.linkCount = links.length + 1;
                             var ids = links
                                 .filter(function (link) {
                                     return link.ownerType === constants.OBJECT_TYPES.topic;

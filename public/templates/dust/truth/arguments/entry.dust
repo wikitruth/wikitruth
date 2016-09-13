@@ -10,13 +10,13 @@
         {>"dust/truth/common/entry-verdict" /}
     </div>
     <div class="text-body">
-        <p style="font-style: italic; margin: 10px 0 10px 0; font-size: smaller;">
+        {!<p style="font-style: italic; margin: 10px 0 10px 0; font-size: smaller;">
             {?parentArgument}
                 {?argument.against}An argument against{:else}A supporting argument for{/argument.against} <a href="{paths.truth.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
             {:else}
-                {!An argument under the topic <a href="{paths.truth.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>!}
+                An argument under the topic <a href="{paths.truth.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
             {/parentArgument}
-        </p>
+        </p>!}
         <p>{argument.content|s}</p>
     </div>
     {?topic}
