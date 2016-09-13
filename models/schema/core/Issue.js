@@ -6,6 +6,7 @@ exports = module.exports = function(app, mongoose) {
     content: { type: String, default: '' },
     ownerId: { type: mongoose.Schema.ObjectId },
     ownerType: { type: Number }, // OBJECT_TYPES
+    screeningStatus: { type: Number }, // SCREENING_STATUS
     createDate: { type: Date, default: Date.now },
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     editDate: { type: Date, default: Date.now },

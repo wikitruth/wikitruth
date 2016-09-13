@@ -15,6 +15,8 @@ exports = module.exports = function(app, mongoose) {
     ownerType: { type: Number, default: -1 }, // OBJECT_TYPES
     icon: { type: String }, // ex: "fa fa-plane"
     typeId: { type: Number }, // TOPIC_TYPES
+    tags: [ { type: Number } ], // OBJECT_TAGS
+    screeningStatus: { type: Number }, // SCREENING_STATUS
     ethicalStatus: {
       hasValue: { type: Boolean, default: false },
       status: { type: Number } // ETHICAL_STATUS
