@@ -7,7 +7,7 @@
 {<body}
     {>"dust/truth/common/breadcrumb" /}
     <h1 class="page-header">
-        {?issue}Edit{:else}New{/issue} Issue
+        <i class="fa fa-exclamation-circle"></i> {?issue}Edit{:else}New{/issue} Issue
     </h1>
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
