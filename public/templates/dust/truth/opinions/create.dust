@@ -7,7 +7,7 @@
 {<body}
     {>"dust/truth/common/breadcrumb" /}
     <h1 class="page-header">
-        {?opinion}Edit{:else}New{/opinion} Opinion
+        <i class="fa fa-comments-o"></i> {?opinion}Edit{:else}New{/opinion} Opinion
     </h1>
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">

@@ -7,7 +7,7 @@
 {<body}
     {>"dust/truth/common/breadcrumb" /}
     <h1 class="page-header">
-        {?question}Edit{:else}New{/question} Question
+        <i class="fa fa-question-circle-o"></i> {?question}Edit{:else}New{/question} Question
     </h1>
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">

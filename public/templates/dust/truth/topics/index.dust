@@ -17,7 +17,7 @@
                         <span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>
                     {/link}
                     <div>
-                        <a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{?contextTitle}{contextTitle}{:else}{title}{/contextTitle}{/link.title}</a>
+                        <a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{?link}{?link.title}{link.title}{:else}{title}{/link.title}{:else}{?contextTitle}{contextTitle}{:else}{title}{/contextTitle}{/link}</a>
                         <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>

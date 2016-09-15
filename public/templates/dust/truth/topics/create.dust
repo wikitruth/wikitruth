@@ -7,11 +7,7 @@
 {<body}
     {>"dust/truth/common/breadcrumb" /}
     <h1 class="page-header">
-        {?topic}
-            Edit Topic
-        {:else}
-            New Topic
-        {/topic}
+        <i class="fa fa-folder-open"></i> {?topic}Edit{:else}New{/topic} Topic
     </h1>
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
