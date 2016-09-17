@@ -46,5 +46,17 @@ module.exports = {
             return 1;
         }
         return 0;
+    },
+    getShortText: function getShortText(text, size) {
+        if(!size) {
+            size = 60;
+        }
+        if(text && text.length > size) {
+            var spaceToCut = text.indexOf(" ", size);
+            if(spaceToCut >= size) {
+                return text.substring(0, spaceToCut) + "...";
+            }
+        }
+        return text;
     }
 };
