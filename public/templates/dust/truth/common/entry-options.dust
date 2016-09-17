@@ -1,6 +1,24 @@
 <div style="margin-bottom: 15px" class="clearfix" id="entry-options" data-entry-id="{entry._id}" data-entry-type="{entryType}" data-csrf="{_csrf}">
+    <div class="dropdown pull-left entry-options">
+        <a href="#" class="text-muted no-underline dropdown-toggle" title="Reply" data-toggle="dropdown" aria-controls="wtDropdownReply" aria-haspopup="true" aria-expanded="false"><i class="fa fa-reply" aria-hidden="true"></i> Reply</a>
+        <ul class="dropdown-menu dropdown-menu-right-x" aria-labelledby="wtTabMore" id="wtDropdownReply">
+            <li class="dropdown-header">Reply With...</li>
+            {^question}
+                {^argument}
+                    <li><a href="{paths.truth.topics.create}?topic={topic._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Topic</a></li>
+                {/argument}
+                <li><a href="{paths.truth.arguments.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> New Argument</a></li>
+            {/question}
+            <li><a href="{paths.truth.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
+                <span class="fa fa-question-circle" aria-hidden="true"></span> New Question</a></li>
+            <li role="separator" class="divider"></li>
+            <li><a href="{paths.truth.issues.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
+                <span class="fa fa-exclamation-circle" aria-hidden="true"></span> New Issue</a></li>
+            <li><a href="{paths.truth.opinions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
+                <span class="fa fa-comments-o" aria-hidden="true"></span> New Opinion</a></li>
+        </ul>
+    </div>
     <div class="pull-left entry-options">
-        <a href="#" class="text-muted no-underline" title="Reply"><i class="fa fa-reply" aria-hidden="true"></i> Reply</a>
         <a href="#" class="text-muted no-underline" title="Upvote"><i class="fa fa-arrow-circle-o-up" aria-hidden="true"></i></a>
         <a href="#" class="text-muted no-underline" title="Downvote" style-x="margin-right: 45px"><i class="fa fa-arrow-circle-o-down" aria-hidden="true"></i></a>
         {!<a href="#" class="text-muted no-underline" title="Timeline"><i class="fa fa-home" aria-hidden="true"></i><span class="hidden-xxs"> Timeline</span></a>!}
@@ -66,7 +84,13 @@
                             <ul class="dropdown-menu">
                             </ul>
                         </li>!}
-                        <li><a href="#" role="tab" onclick="return clipboardPasteAsLink()"><i class="fa fa-link" aria-hidden="true"></i> Paste Here As Links</a></li>
+                        {^issue}
+                            {^opinion}
+                                {^question}
+                                    <li><a href="#" role="tab" onclick="return clipboardPasteAsLink()"><i class="fa fa-link" aria-hidden="true"></i> Paste Here As Links</a></li>
+                                {/question}
+                            {/opinion}
+                        {/issue}
                         {!<li><a href="#" role="tab"><i class="fa fa-copy" aria-hidden="true"></i> Paste Here As Duplicates</a></li>!}
                         <li><a href="#" role="tab" onclick="return clipboardMoveHere()"><i class="fa fa-cut" aria-hidden="true"></i> Move Here</a></li>
                     {/clipboard.canPaste}

@@ -79,6 +79,7 @@ function setQuestionModel(req, model, callback) {
     if(req.query.question) {
         db.Question.findOne({_id: req.query.question}, function (err, result) {
             result.friendlyUrl = utils.urlify(result.title);
+            result.shortTitle = utils.getShortText(result.title);
             if(isOwner(req, result, model)) {
                 model.isQuestionOwner = true;
             }
@@ -97,6 +98,7 @@ function setIssueModel(req, model, callback) {
     if(req.query.issue) {
         db.Issue.findOne({_id: req.query.issue}, function (err, result) {
             result.friendlyUrl = utils.urlify(result.title);
+            result.shortTitle = utils.getShortText(result.title);
             if(isOwner(req, result, model)) {
                 model.isIssueOwner = true;
             }
@@ -115,6 +117,7 @@ function setOpinionModel(req, model, callback) {
     if(req.query.opinion) {
         db.Opinion.findOne({_id: req.query.opinion}, function (err, result) {
             result.friendlyUrl = utils.urlify(result.title);
+            result.shortTitle = utils.getShortText(result.title);
             if(isOwner(req, result, model)) {
                 model.isOpinionOwner = true;
             }
@@ -138,6 +141,7 @@ function setArgumentModels(req, model, callback) {
                         return callback(err);
                     }
                     result.friendlyUrl = utils.urlify(result.title);
+                    result.shortTitle = utils.getShortText(result.title);
                     if (isOwner(req, result, model)) {
                         model.isArgumentOwner = true;
                     }
@@ -153,7 +157,22 @@ function setArgumentModels(req, model, callback) {
                     db.Argument.findOne({_id: model.argument.parentId}, function (err, result) {
                         if (result) {
                             result.friendlyUrl = utils.urlify(result.title);
+                            result.shortTitle = utils.getShortText(result.title);
                             model.parentArgument = result;
+                        }
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
+            },
+            grandParentArgument: function (callback) {
+                if(model.parentArgument && model.parentArgument.parentId) {
+                    db.Argument.findOne({_id: model.parentArgument.parentId}, function (err, result) {
+                        if (result) {
+                            result.friendlyUrl = utils.urlify(result.title);
+                            result.shortTitle = utils.getShortText(result.title);
+                            model.grandParentArgument = result;
                         }
                         callback();
                     });
@@ -203,6 +222,7 @@ function setTopicModels(req, model, callback) {
             topic: function (callback) {
                 db.Topic.findOne(query, function(err, result) {
                     result.friendlyUrl = utils.urlify(result.title);
+                    result.shortTitle = utils.getShortText(result.title);
                     if(isOwner(req, result, model)) {
                         model.isTopicOwner = true;
                     }
@@ -218,7 +238,22 @@ function setTopicModels(req, model, callback) {
                     db.Topic.findOne({_id: model.topic.parentId}, function (err, result) {
                         if (result) {
                             result.friendlyUrl = utils.urlify(result.title);
+                            result.shortTitle = utils.getShortText(result.title);
                             model.parentTopic = result;
+                        }
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
+            },
+            grandParentTopic: function (callback) {
+                if(model.parentTopic && model.parentTopic.parentId) {
+                    db.Topic.findOne({_id: model.parentTopic.parentId}, function (err, result) {
+                        if (result) {
+                            result.friendlyUrl = utils.urlify(result.title);
+                            result.shortTitle = utils.getShortText(result.title);
+                            model.grandParentTopic = result;
                         }
                         callback();
                     });

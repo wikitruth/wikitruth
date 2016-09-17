@@ -6,5 +6,5 @@
     </small>
 {/entry.references}
 <small class="text-muted">
-    <i class="fa fa-clock-o"></i> PUBLISHED {entry.createDate} | UPDATED {entry.editDate} BY <a class="text-muted" href="{paths.members.profile}?username={entry.editUsername}">{entry.editUsername}</a>
+    <i class="fa fa-clock-o"></i> PUBLISHED {entry.createDate} BY <a class="text-muted" href="{paths.members.profile}?username={entry.editUsername}">{entry.editUsername}</a> | <i class="fa fa-clock-o"></i> UPDATED {entry.editDate} BY <a class="text-muted" href="{paths.members.profile}?username={entry.editUsername}">{entry.editUsername}</a>
 </small>

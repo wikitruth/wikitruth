@@ -225,6 +225,7 @@ module.exports = function (router) {
                 if(req.query.id) {
                     db.Topic.findOne({_id: req.query.id}, function (err, result) {
                         result.friendlyUrl = utils.urlify(result.title);
+                        result.shortTitle = utils.getShortText(result.title);
                         model.topic = result;
                         callback();
                     });
@@ -237,6 +238,7 @@ module.exports = function (router) {
                 if(query._id) {
                     db.Topic.findOne(query, function (err, result) {
                         result.friendlyUrl = utils.urlify(result.title);
+                        result.shortTitle = utils.getShortText(result.title);
                         model.parentTopic = result;
                         callback();
                     });
@@ -294,6 +296,7 @@ module.exports = function (router) {
                         model.link = link;
                         db.Topic.findOne({_id: link.topicId}, function(err, result) {
                             result.friendlyUrl = utils.urlify(result.title);
+                            result.shortTitle = utils.getShortText(result.title);
                             model.topic = result;
                             callback();
                         });
@@ -307,6 +310,7 @@ module.exports = function (router) {
                 if(query._id) {
                     db.Topic.findOne(query, function (err, result) {
                         result.friendlyUrl = utils.urlify(result.title);
+                        result.shortTitle = utils.getShortText(result.title);
                         model.parentTopic = result;
                         callback();
                     });
