@@ -9,7 +9,7 @@
     <div class="entry-header">
         {>"dust/truth/common/entry-verdict" /}
     </div>
-    <div class="text-body">
+    <div class="text-body collapsable">
         {!<p style="font-style: italic; margin: 10px 0 10px 0; font-size: smaller;">
             {?parentArgument}
                 {?argument.against}An argument against{:else}A supporting argument for{/argument.against} <a href="{paths.truth.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
