@@ -9,7 +9,7 @@
     <div class="entry-header">
         {>"dust/truth/common/entry-verdict" /}
     </div>
-    <div class="text-body">
+    <div class="text-body collapsable">
         <p>{topic.content|s}</p>
     </div>
     <a href="#" class="text-body-see-more hidden" onclick="return contentSeeMore()">See more</a>
