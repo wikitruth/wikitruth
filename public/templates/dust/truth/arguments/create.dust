@@ -88,7 +88,7 @@
                 <label>
                     <input type="radio" id="radioTypeId{argumentTypes.historical}" name="typeId" value="{argumentTypes.historical}">
                     <span class="text-info"><strong>Historical</strong></span><br/>
-                    A statement of a previous reality (historical or something had happen a long time that may lack evidences)
+                    A statement of a previous reality (historical or something had happen a long time that may lack evidence)
                 </label>
             </div>
             <div class="radio">
