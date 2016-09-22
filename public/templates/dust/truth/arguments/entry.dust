@@ -92,7 +92,7 @@
         }
 
         $(function() {
-            if($('.text-body').css('height') == '450px') {
+            if($('.text-body').css('height') === $('.text-body').css('max-height')) {
                 $('.content-see-more').removeClass('hidden');
             }
         });

@@ -323,9 +323,10 @@ a.wt-link-focus {
 
   .content-see-more-gradient {
     height: 60px;
-    /* "transparent" only works here because == rgba(0,0,0,0) */
-    background-image: -moz-linear-gradient(top, transparent, #fff);
-    background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, transparent),color-stop(1, #fff));
+    background: -webkit-linear-gradient(rgba(255,255,255,0), #fff); /* For Safari 5.1 to 6.0 */
+    background: -o-linear-gradient(rgba(255,255,255,0), #fff); /* For Opera 11.1 to 12.0 */
+    background: -moz-linear-gradient(rgba(255,255,255,0), #fff); /* For Firefox 3.6 to 15 */
+    background: linear-gradient(rgba(255,255,255,0), #fff); /* Standard syntax */
   }
 
   .content-see-more-text {
