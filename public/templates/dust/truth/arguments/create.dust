@@ -80,15 +80,15 @@
             <div class="radio">
                 <label>
                     <input type="radio" id="radioTypeId{argumentTypes.prediction}" name="typeId" value="{argumentTypes.prediction}">
-                    <span class="text-info"><strong>Prediction</strong></span><br/>
-                    A prediction of a future event or phenomenon
+                    <span class="text-info"><strong>Extrapolation</strong></span><br/>
+                    A prediction of a future event or phenomenon, a peculation, an assumption.
                 </label>
             </div>
             <div class="radio">
                 <label>
                     <input type="radio" id="radioTypeId{argumentTypes.historical}" name="typeId" value="{argumentTypes.historical}">
                     <span class="text-info"><strong>Historical</strong></span><br/>
-                    A statement of a previous reality (historical or something had happen a long time that may lack evidence)
+                    A statement of a previous and remote reality (historical or something had happen a long time that may lack evidence)
                 </label>
             </div>
             <div class="radio">

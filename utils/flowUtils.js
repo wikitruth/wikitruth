@@ -221,6 +221,9 @@ function setTopicModels(req, model, callback) {
         async.series({
             topic: function (callback) {
                 db.Topic.findOne(query, function(err, result) {
+                    if(err || !result) {
+                        return callback(err);
+                    }
                     result.friendlyUrl = utils.urlify(result.title);
                     result.shortTitle = utils.getShortText(result.title);
                     if(isOwner(req, result, model)) {
@@ -280,8 +283,8 @@ function prepareClipboardOptions(req, model, entryType) {
                 count: count
             };
             var marked = false;
-            if ((entryType === constants.OBJECT_TYPES.topic && topics.indexOf(model.topic._id.toString()) > -1) ||
-                (entryType === constants.OBJECT_TYPES.argument && args.indexOf(model.argument._id.toString()) > -1)) {
+            if ((entryType === constants.OBJECT_TYPES.topic && model.topic && topics.indexOf(model.topic._id.toString()) > -1) ||
+                (entryType === constants.OBJECT_TYPES.argument && model.argument && args.indexOf(model.argument._id.toString()) > -1)) {
                 model.clipboard.marked = true;
                 marked = true;
             }

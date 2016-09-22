@@ -2,7 +2,7 @@
 
 
 module.exports = {
-    about: '/about',
+    about: '/topics/entry/the-wikitruth-project/57e170a7e667695b74f8295d',
     contact: '/contact',
     signup: '/signup',
     login: '/login',
