@@ -82,7 +82,7 @@
         }
 
         $(function() {
-            if($('.text-body').css('height') == '400px') {
+            if($('.text-body').css('height') == '450px') {
                 $('.content-see-more').removeClass('hidden');
             }
         });
