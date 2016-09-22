@@ -312,12 +312,27 @@ a.wt-link-focus {
 
 .text-body.collapsable {
   max-height: 400px;
+  position: relative;
   overflow: hidden;
 }
 
-.text-body-see-more {
-  margin-bottom: 10px;
-  display: inline-block;
+.content-see-more {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+
+  .content-see-more-gradient {
+    height: 60px;
+    /* "transparent" only works here because == rgba(0,0,0,0) */
+    background-image: -moz-linear-gradient(top, transparent, #fff);
+    background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, transparent),color-stop(1, #fff));
+  }
+
+  .content-see-more-text {
+    width: 100%;
+    height: 30px;
+    background-color: #fff;
+  }
 }
 
 div pre {

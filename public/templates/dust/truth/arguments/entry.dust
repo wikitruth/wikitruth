@@ -18,8 +18,11 @@
             {/parentArgument}
         </p>!}
         <p>{argument.content|s}</p>
+        <a href="#" onclick="return contentSeeMore()" class="content-see-more hidden">
+            <div class="content-see-more-gradient"></div>
+            <div class="content-see-more-text">See more</div>
+        </a>
     </div>
-    <a href="#" class="text-body-see-more hidden" onclick="return contentSeeMore()">See more</a>
     {?topic}
         <div style="margin-bottom: 15px">
             {!<hr style="border: 0; margin: 0 0 0.375rem; border-top: 0.0625rem dotted #dcdcdc;"/>!}
@@ -84,12 +87,13 @@
     <script>
         function contentSeeMore() {
             $('.text-body').css('max-height', 'none');
-            $('.text-body-see-more').css('display', 'none');
+            $('.content-see-more').css('display', 'none');
             return false;
         }
+
         $(function() {
             if($('.text-body').css('height') == '400px') {
-                $('.text-body-see-more').removeClass('hidden');
+                $('.content-see-more').removeClass('hidden');
             }
         });
     </script>
