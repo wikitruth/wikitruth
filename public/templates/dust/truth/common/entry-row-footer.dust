@@ -1,0 +1,7 @@
+<div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}
+    {@gt key=childrenCount.topics value="0"} &bull; <i class="fa fa-folder-open-o" aria-hidden="true"></i> {childrenCount.topics}{/gt}
+    {@gt key=childrenCount.arguments value="0"} &bull; <i class="fa fa-flash" aria-hidden="true"></i> {childrenCount.arguments}{/gt}
+    {@gt key=childrenCount.questions value="0"} &bull; <i class="fa fa-question-circle-o" aria-hidden="true"></i> {childrenCount.questions}{/gt}
+    {@gt key=childrenCount.issues value="0"} &bull; <i class="fa fa-exclamation-circle" aria-hidden="true"></i> {childrenCount.issues}{/gt}
+    {@gt key=childrenCount.opinions value="0"} &bull; <i class="fa fa-comments-o" aria-hidden="true"></i> {childrenCount.opinions}{/gt}
+</div>
