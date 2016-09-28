@@ -29,7 +29,7 @@ function appendOwnerFlag(req, item, model) {
 function appendEntryExtra(item) {
     item.comments = utils.randomInt(0,999);
     //item.editUsername = 'root';
-    item.points = utils.randomInt(0,9999) + ' points';
+    item.points = utils.randomInt(0,9999);
 
     //var editDateString = result.editDate.toUTCString();
     item.editDateString = utils.timeSince(item.editDate)/* + ' ago'*/; //editDateString.substring(0, editDateString.length - 4);
