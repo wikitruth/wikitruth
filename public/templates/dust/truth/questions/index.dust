@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {?argument}{argument.title}{:else}{topic.title}{/argument}: Questions - {titleSlogan}
+    {?entry}{entry.title}: {:else}Top {/entry}Questions - {titleSlogan}
 {/title}
 
 {<body}
@@ -12,10 +12,10 @@
     {/topic}
     {?questions}
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> {^topic}Latest {/topic}Questions</li>
+            <li class="list-group-item highlight"><i class="fa fa-question-circle text-success-x" aria-hidden="true"></i> {^topic}Latest {/topic}Questions</li>
             {#questions}
                 <li class="list-group-item">
-                    <span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>
+                    <i class="fa fa-question-circle text-success" aria-hidden="true"></i>
                     <div>
                         <a href="{paths.truth.questions.entry}/{friendlyUrl}/{_id}">{title}</a>
                         <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>

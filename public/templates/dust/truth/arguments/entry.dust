@@ -36,13 +36,13 @@
     {>"dust/truth/common/entry-options" /}
     {?arguments}
         <ul class="list-group top-list-items wt-list">
-            <li class="list-group-item highlight text-primary"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Supporting Arguments</li>
+            <li class="list-group-item highlight text-primary"><i class="glyphicon glyphicon-flash" aria-hidden="true"></i> Supporting Arguments <span class="wt-label label label-default">{supportingArgumentCount}</span></li>
             {#arguments}
             <li class="list-group-item">
                 {?link}
                     <a href="{paths.truth.arguments.link}?topic={ownerId}&amp;argument={link.parentId}&amp;id={link._id}&amp;source={paths.truth.arguments.entry}/{friendlyUrl}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
                 {:else}
-                    <span class="glyphicon glyphicon-file text-{verdict.theme}" aria-hidden="true"></span>
+                    <i class="glyphicon glyphicon-flash text-{verdict.theme}" aria-hidden="true"></i>
                 {/link}
                 <div>
                     <a href="{paths.truth.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title} {?typeUX}<span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}</a>
@@ -55,13 +55,13 @@
     {/arguments}
     {?contraArguments}
         <ul class="list-group top-list-items wt-list">
-            <li class="list-group-item highlight text-primary"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Opposing Arguments</li>
+            <li class="list-group-item highlight text-primary"><i class="glyphicon glyphicon-flash" aria-hidden="true"></i> Opposing Arguments <span class="wt-label label label-default">{opposingArgumentCount}</span></li>
             {#contraArguments}
                 <li class="list-group-item">
                     {?link}
                         <a href="{paths.truth.arguments.link}?topic={ownerId}&amp;argument={link.parentId}&amp;id={link._id}&amp;source={paths.truth.arguments.entry}/{friendlyUrl}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
                     {:else}
-                        <span class="glyphicon glyphicon-file text-{verdict.theme}" aria-hidden="true"></span>
+                        <i class="glyphicon glyphicon-flash text-{verdict.theme}" aria-hidden="true"></i>
                     {/link}
                     <div>
                         <a href="{paths.truth.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title} {?typeUX}<span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}</a>
@@ -71,11 +71,13 @@
                 </li>
             {/contraArguments}
         </ul>
-        <div class="top-list-items-more"><a href="{paths.truth.arguments.index}?topic={topic._id}&amp;argument={argument._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+        {@gt key=opposingArgumentCount value="15"}
+            <div class="top-list-items-more"><a href="{paths.truth.arguments.index}?topic={topic._id}&amp;argument={argument._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{opposingArgumentCount}</span></a></div>
+        {/gt}
     {:else}
-        {?arguments}
-            <div class="top-list-items-more"><a href="{paths.truth.arguments.index}?topic={topic._id}&amp;argument={argument._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
-        {/arguments}
+        {@gt key=supportingArgumentCount value="15"}
+            <div class="top-list-items-more"><a href="{paths.truth.arguments.index}?topic={topic._id}&amp;argument={argument._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{supportingArgumentCount}</span></a></div>
+        {/gt}
     {/contraArguments}
     {>"dust/truth/questions/list-preview" /}
     {>"dust/truth/issues/list-preview" /}

@@ -124,7 +124,7 @@ body {
 
 .top-list-items-more {
   /*text-align: right;*/
-  margin-bottom: 25px;
+  /*margin-bottom: 25px;*/
 
   > a {
     background: #fff;/*f8f8f8*/
@@ -209,7 +209,16 @@ a.no-underline:hover {
   background-color: #f8f8f8;
 }
 
-.list-group.wt-list {
+.wt-list {
+  margin-bottom: 25px;
+}
+
+.list-group.wt-list, .wt-list .list-group {
+
+  .highlight {
+    color: #555;
+  }
+
   .text-success {
     color: #55a532;
   }
@@ -224,9 +233,20 @@ a.no-underline:hover {
 
   .list-group-item {
     border-color: #eee;
+    margin-bottom: 0;
+
+    >.pull-right {
+      display: none;
+    }
+  }
+
+  .list-group-item:last-child:not(.highlight) {
+    border-bottom-width: 1px;
   }
 
   .list-group-item:not(.highlight) {
+    border-top-width: 0;
+    border-bottom-width: 0;
 
     > .glyphicon, > .fa {
       position: absolute;
@@ -310,10 +330,14 @@ a.wt-link-focus {
   font-size: 16px;
 }
 
-.text-body.collapsable {
-  max-height: 450px;
-  position: relative;
-  overflow: hidden;
+.text-body {
+  margin-bottom: 10px;
+
+  &.collapsable {
+    max-height: 450px;
+    position: relative;
+    overflow: hidden;
+  }
 }
 
 .content-see-more {

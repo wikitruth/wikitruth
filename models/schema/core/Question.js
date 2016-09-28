@@ -11,7 +11,11 @@ exports = module.exports = function(app, mongoose) {
     createDate: { type: Date, default: Date.now },
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     editDate: { type: Date, default: Date.now },
-    editUserId: { type: mongoose.Schema.ObjectId, ref: 'User' }
+    editUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
+    childrenCount: {
+      issues: { type: Number },
+      opinions: { type: Number }
+    }
   });
   schema.plugin(require('../plugins/pagedFind'));
   schema.index({ title: 1 });

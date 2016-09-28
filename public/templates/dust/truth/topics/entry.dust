@@ -28,44 +28,52 @@
     {/parentTopic}
     {>"dust/truth/common/entry-options" /}
     {?topics}
-        <ul class="list-group top-list-items wt-list">
-            <li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp; Topics{?topicsCount} <span class="wt-label label label-default">{topicsCount}</span>{/topicsCount}</li>
-            {#topics}
+        <div class="wt-list">
+            <ul class="list-group top-list-items">
+                <li class="list-group-item highlight text-muted-x"><i class="fa fa-folder-open text-success-x" aria-hidden="true"></i>&nbsp; Topics <span class="wt-label label label-default">{entry.childrenCount.topics}</span></li>
+                {#topics}
+                    <li class="list-group-item">
+                        {?link}
+                            <a href="{paths.truth.topics.link}?topic={topic._id}&amp;id={link._id}&amp;source={paths.truth.topics.entry}" class="glyphicon glyphicon-link text-success"></a>
+                        {:else}
+                            <i class="fa fa-folder-open text-success" aria-hidden="true"></i>
+                        {/link}
+                        <div>
+                            <a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{?link}{?link.title}{link.title}{:else}{title}{/link.title}{:else}{?contextTitle}{contextTitle}{:else}{title}{/contextTitle}{/link}</a>
+                            <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
+                        </div>
+                        <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
+                    </li>
+                {/topics}
+            </ul>
+            {@gt key=entry.childrenCount.topics value="15"}
+                <div class="top-list-items-more"><a href="{paths.truth.topics.index}?topic={topic._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{entry.childrenCount.topics}</span></a></div>
+            {/gt}
+        </div>
+    {/topics}
+    {?arguments}
+        <div class="wt-list">
+            <ul class="list-group top-list-items">
+                <li class="list-group-item highlight text-primary-x text-muted-x"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments <span class="wt-label label label-default">{entry.childrenCount.arguments}</span></li>
+                {#arguments}
                 <li class="list-group-item">
                     {?link}
-                        <a href="{paths.truth.topics.link}?topic={topic._id}&amp;id={link._id}&amp;source={paths.truth.topics.entry}" class="glyphicon glyphicon-link text-success"></a>
+                        <a href="{paths.truth.arguments.link}?topic={link.ownerId}&amp;id={link._id}&amp;source={paths.truth.topics.entry}/{friendlyUrl}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
                     {:else}
-                        <span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>
+                        <span class="glyphicon glyphicon-flash text-{verdict.theme}" aria-hidden="true"></span>
                     {/link}
                     <div>
-                        <a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{?link}{?link.title}{link.title}{:else}{title}{/link.title}{:else}{?contextTitle}{contextTitle}{:else}{title}{/contextTitle}{/link}</a>
+                        <a href="{paths.truth.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title} {?typeUX}<span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}</a>
                         <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
                 </li>
-            {/topics}
-        </ul>
-        <div class="top-list-items-more"><a href="{paths.truth.topics.index}?topic={topic._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
-    {/topics}
-    {?arguments}
-        <ul class="list-group top-list-items wt-list">
-            <li class="list-group-item highlight text-primary"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments{?argumentsCount} <span class="wt-label label label-default">{argumentsCount}</span>{/argumentsCount}</li>
-            {#arguments}
-            <li class="list-group-item">
-                {?link}
-                    <a href="{paths.truth.arguments.link}?topic={link.ownerId}&amp;id={link._id}&amp;source={paths.truth.topics.entry}/{friendlyUrl}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
-                {:else}
-                    <span class="glyphicon glyphicon-file text-{verdict.theme}" aria-hidden="true"></span>
-                {/link}
-                <div>
-                    <a href="{paths.truth.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title} {?typeUX}<span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}</a>
-                    <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
-                </div>
-                <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
-            </li>
-            {/arguments}
-        </ul>
-        <div class="top-list-items-more"><a href="{paths.truth.arguments.index}?topic={topic._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+                {/arguments}
+            </ul>
+            {@gt key=entry.childrenCount.arguments value="15"}
+                <div class="top-list-items-more"><a href="{paths.truth.arguments.index}?topic={topic._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{entry.childrenCount.arguments}</span></a></div>
+            {/gt}
+        </div>
     {/arguments}
     {>"dust/truth/questions/list-preview" /}
     {>"dust/truth/issues/list-preview" /}

@@ -38,6 +38,7 @@ module.exports = function (router) {
                 });
             }
         }, function (err, results) {
+            model.entry = model.topic;
             res.render(templates.truth.topics.index, model);
         });
     });
@@ -59,14 +60,8 @@ module.exports = function (router) {
             topics: function(callback) {
                 // Top Subtopics
                 var query = { parentId: req.query.topic };
-                flowUtils.getTopics(query, 0, function (err, results) {
-                    if(results.length > 0) {
-                        model.topicsCount = results.length;
-                        if(results.length > 15) {
-                            model.topicsMore = true;
-                        }
-                    }
-                    model.topics = results.length > 15 ? results.slice(0,15) : results;
+                flowUtils.getTopics(query, 15, function (err, results) {
+                    model.topics = results;
                     callback();
                 });
             },
@@ -138,13 +133,7 @@ module.exports = function (router) {
                             result.friendlyUrl = utils.urlify(result.title);
                             flowUtils.appendEntryExtra(result);
                         });
-                        if(results.length > 0) {
-                            model.questionsCount = results.length;
-                            if(results.length > 15) {
-                                model.questionsMore = true;
-                            }
-                        }
-                        model.questions = results.length > 15 ? results.slice(0,15) : results;
+                        model.questions = results;
                         callback();
                     });
                 });
@@ -152,19 +141,18 @@ module.exports = function (router) {
             issues: function (callback) {
                 // Top Issues
                 var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic };
-                db.Issue.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                db.Issue
+                    .find(query)
+                    .limit(15)
+                    .sort({ title: 1 })
+                    .lean()
+                    .exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
                             result.friendlyUrl = utils.urlify(result.title);
                             flowUtils.appendEntryExtra(result);
                         });
-                        if(results.length > 0) {
-                            model.issuesCount = results.length;
-                            if(results.length > 15) {
-                                model.issuesMore = true;
-                            }
-                        }
-                        model.issues = results.length > 15 ? results.slice(0,15) : results;
+                        model.issues = results;
                         callback();
                     });
                 });
@@ -172,41 +160,29 @@ module.exports = function (router) {
             opinions: function (callback) {
                 // Top Opinions
                 var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic };
-                db.Opinion.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                db.Opinion
+                    .find(query)
+                    .limit(15)
+                    .sort({ title: 1 })
+                    .lean()
+                    .exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
                             result.friendlyUrl = utils.urlify(result.title);
                             flowUtils.appendEntryExtra(result);
                         });
-                        if(results.length > 0) {
-                            model.opinionsCount = results.length;
-                            if(results.length > 15) {
-                                model.opinionsMore = true;
-                            }
-                        }
-                        model.opinions = results.length > 15 ? results.slice(0,15) : results;
+                        model.opinions = results;
                         callback();
                     });
                 });
             }
         }, function (err, results) {
-            /*var verdict = model.topic.verdict && model.topic.verdict.status ? model.topic.verdict.status : constants.VERDICT_STATUS.pending;
-            model.verdict = {
-                label: constants.VERDICT_STATUS.getLabel(verdict),
-                color: constants.VERDICT_STATUS.getTheme(verdict)
-            };*/
             model.entry = model.topic;
-            model.arguments = results.arguments.slice(0, 15);
-            if(results.arguments.length > 0) {
-                model.argumentsCount = results.arguments.length;
-                if(model.arguments.length >= 15) {
-                    model.argumentsMore = true;
-                }
-            }
             model.entryType = constants.OBJECT_TYPES.topic;
             if(model.isTopicOwner) {
                 model.isEntryOwner = true;
             }
+            model.arguments = results.arguments.slice(0, 15);
             model.verdict = {
                 counts: flowUtils.getVerdictCount(results.arguments)
             };
@@ -272,16 +248,26 @@ module.exports = function (router) {
             }
             entity.parentId = req.body.parent ? req.body.parent : null;
             db.Topic.update(query, entity, {upsert: true}, function(err, writeResult) {
-                var url = "";
-                var query = "";
-                if(result) {
-                    url = paths.truth.topics.entry;
-                    query = '/' + result._id;
+                var updateRedirect = function () {
+                    var url = "";
+                    var query = "";
+                    if(result) {
+                        url = paths.truth.topics.entry;
+                        query = '/' + result._id;
+                    } else {
+                        url = req.query.topic ? paths.truth.topics.entry : paths.truth.index;
+                        query = req.query.topic ? '/' + req.query.topic : '';
+                    }
+                    res.redirect(url + query);
+                };
+
+                if(entity.parentId && !result) { // update parent count on create only
+                    flowUtils.updateChildrenCount(entity.parentId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, function () {
+                        updateRedirect();
+                    });
                 } else {
-                    url = req.query.topic ? paths.truth.topics.entry : paths.truth.index;
-                    query = req.query.topic ? '/' + req.query.topic : '';
+                    updateRedirect();
                 }
-                res.redirect(url + query);
             });
         });
     });
@@ -328,7 +314,9 @@ module.exports = function (router) {
         var action = req.body.action;
         if(action === 'delete') {
             db.TopicLink.findByIdAndRemove(req.query.id, function(err, link) {
-                res.redirect(createCancelUrl(req));
+                flowUtils.updateChildrenCount(link.parentId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, function () {
+                    res.redirect(createCancelUrl(req));
+                });
             });
         } else if(action === 'submit') {
             var query = { _id: req.query.id };

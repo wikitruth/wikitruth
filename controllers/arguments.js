@@ -40,6 +40,7 @@ module.exports = function (router) {
                         query.ownerType = constants.OBJECT_TYPES.topic;
                     }
                     flowUtils.getArguments(query, 0, function (err, results) {
+                        flowUtils.setModelOwnerEntry(model);
                         var support = results.filter(function (arg) {
                             return !arg.against;
                         });
@@ -215,9 +216,6 @@ module.exports = function (router) {
                     model.opposingArgumentCount = contra.length;
                     model.contraArguments = contra.slice(0, 15);
                 }
-                if(results.arguments.length >= 15) {
-                    model.argumentsMore = true;
-                }
                 model.entry = model.argument;
                 model.entryType = constants.OBJECT_TYPES.argument;
                 flowUtils.prepareClipboardOptions(req, model, constants.OBJECT_TYPES.argument);
@@ -266,6 +264,7 @@ module.exports = function (router) {
     router.post('/create', function (req, res) {
         var parent = null;
         var entry = null;
+        var entity = null;
         async.series({
             parent: function (callback) {
                 if(req.body.parent) {
@@ -282,7 +281,7 @@ module.exports = function (router) {
                 var query = { _id: req.query.id || new mongoose.Types.ObjectId() };
                 db.Argument.findOne(query, function(err, result) {
                     entry = result;
-                    var entity = result ? result : {};
+                    entity = result ? result : {};
                     entity.content = req.body.content;
                     entity.title = req.body.title;
                     entity.references = req.body.references;
@@ -324,9 +323,24 @@ module.exports = function (router) {
                 });
             }
         }, function (err, results) {
-            res.redirect((entry || parent ? paths.truth.arguments.entry : paths.truth.topics.entry)
-                + '?topic=' + req.query.topic + (entry ? '&argument=' + entry._id : parent ? '&argument=' + parent._id : '')
-            );
+            var updateRedirect = function () {
+                res.redirect((entry || parent ? paths.truth.arguments.entry : paths.truth.topics.entry)
+                    + '?topic=' + req.query.topic + (entry ? '&argument=' + entry._id : parent ? '&argument=' + parent._id : '')
+                );
+            };
+            if(!entry) { // update parent count on create only
+                if(entity.parentId) {
+                    flowUtils.updateChildrenCount(entity.parentId, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.argument, function () {
+                        updateRedirect();
+                    });
+                } else {
+                    flowUtils.updateChildrenCount(entity.ownerId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.argument, function () {
+                        updateRedirect();
+                    });
+                }
+            } else {
+                updateRedirect();
+            }
         });
 
     });
@@ -375,7 +389,15 @@ module.exports = function (router) {
         var action = req.body.action;
         if(action === 'delete') {
             db.ArgumentLink.findByIdAndRemove(req.query.id, function(err, link) {
-                res.redirect(createCancelUrl(req));
+                if(link.parentId) {
+                    flowUtils.updateChildrenCount(link.parentId, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.argument, function () {
+                        res.redirect(createCancelUrl(req));
+                    });
+                } else {
+                    flowUtils.updateChildrenCount(link.ownerId, link.ownerType, constants.OBJECT_TYPES.argument, function () {
+                        res.redirect(createCancelUrl(req));
+                    });
+                }
             });
         } else if(action === 'submit') {
             var query = { _id: req.query.id };

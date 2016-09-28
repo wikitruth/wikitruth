@@ -33,7 +33,14 @@ exports = module.exports = function(app, mongoose) {
           isPro: { type: Boolean }
         }]
       }
-    ]
+    ],
+    childrenCount: {
+      topics: { type: Number },
+      arguments: { type: Number },
+      questions: { type: Number },
+      issues: { type: Number },
+      opinions: { type: Number }
+    }
   });
   schema.plugin(require('../plugins/pagedFind'));
   schema.index({ title: 1 });

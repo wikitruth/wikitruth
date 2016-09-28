@@ -24,6 +24,7 @@ module.exports = function (router) {
                             flowUtils.appendEntryExtra(result);
                         });
                         model.opinions = results;
+                        flowUtils.setModelOwnerEntry(model);
                         res.render(templates.truth.opinions.index, model);
                     });
                 });
@@ -57,6 +58,7 @@ module.exports = function (router) {
         }
         flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
             model.entry = model.opinion;
+            model.entryType = constants.OBJECT_TYPES.opinion;
             res.render(templates.truth.opinions.entry, model);
         });
     });
@@ -93,10 +95,20 @@ module.exports = function (router) {
                 }
             }
             db.Opinion.update(query, entity, {upsert: true}, function(err, writeResult) {
-                res.redirect((result ? paths.truth.opinions.entry : paths.truth.opinions.index) +
-                    '?topic=' + req.query.topic +
-                    (req.query.argument ? '&argument=' + req.query.argument : '') +
-                    (result ? '&opinion=' + req.query.opinion : ''));
+                var updateRedirect = function () {
+                    res.redirect((result ? paths.truth.opinions.entry : paths.truth.opinions.index) +
+                        '?topic=' + req.query.topic +
+                        (req.query.argument ? '&argument=' + req.query.argument : '') +
+                        (result ? '&opinion=' + req.query.opinion : '')
+                    );
+                };
+                if(!result) {
+                    flowUtils.updateChildrenCount(entity.ownerId, entity.ownerType, constants.OBJECT_TYPES.opinion, function () {
+                        updateRedirect();
+                    });
+                } else {
+                    updateRedirect();
+                }
             });
         });
     });

@@ -28,6 +28,7 @@ module.exports = function (router) {
                                 flowUtils.appendEntryExtra(result);
                             });
                             model.questions = results;
+                            flowUtils.setModelOwnerEntry(model);
                             res.render(templates.truth.questions.index, model);
                         });
                     });
@@ -98,6 +99,7 @@ module.exports = function (router) {
                 }
             }, function (err, results) {
                 model.entry = model.question;
+                model.entryType = constants.OBJECT_TYPES.question;
                 res.render(templates.truth.questions.entry, model);
             });
         });
@@ -133,10 +135,20 @@ module.exports = function (router) {
                 }
             }
             db.Question.update(query, entity, {upsert: true}, function(err, writeResult) {
-                res.redirect((result ? paths.truth.questions.entry : paths.truth.questions.index) +
-                    '?topic=' + req.query.topic +
-                    (req.query.argument ? '&argument=' + req.query.argument : '') +
-                    (result ? '&question=' + req.query.question : ''));
+                var updateRedirect = function () {
+                    res.redirect((result ? paths.truth.questions.entry : paths.truth.questions.index) +
+                        '?topic=' + req.query.topic +
+                        (req.query.argument ? '&argument=' + req.query.argument : '') +
+                        (result ? '&question=' + req.query.question : '')
+                    );
+                };
+                if(!result) {
+                    flowUtils.updateChildrenCount(entity.ownerId, entity.ownerType, constants.OBJECT_TYPES.question, function () {
+                        updateRedirect();
+                    });
+                } else {
+                    updateRedirect();
+                }
             });
         });
     });

@@ -99,7 +99,9 @@ module.exports = function (router) {
                         });
                     }
                 }, function () {
-                    res.send({});
+                    flowUtils.updateChildrenCount(parent._id, constants.OBJECT_TYPES.topic, null, function () {
+                        res.send({});
+                    });
                 });
             });
         } else if(type == constants.OBJECT_TYPES.argument) {
@@ -124,7 +126,9 @@ module.exports = function (router) {
                         callback();
                     });
                 }, function () {
-                    res.send({});
+                    flowUtils.updateChildrenCount(parent._id, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.argument, function () {
+                        res.send({});
+                    });
                 });
             });
         } else {
@@ -147,16 +151,74 @@ module.exports = function (router) {
                         return callback();
                     }
                     var ids = createNewArrayExcludeId(topics, id);
-                    db.Topic.update({_id: {$in: ids}}, {$set: {parentId: id}}, {multi: true}, function (err, num) {
-                        callback();
+                    db.Topic
+                        .find({_id: {$in: ids}})
+                        .lean()
+                        .exec(function (err, results) {
+                            // Update each moved entry and their parent count
+                            async.each(results, function(result, callback){
+                                var parentId = result.parentId;
+                                // Update entry
+                                result.parentId = id;
+                                db.Topic.update({_id: result._id}, result, {upsert: true}, function(err, writeResult) {
+                                    if(parentId) {
+                                        flowUtils.updateChildrenCount(parentId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, callback);
+                                    } else {
+                                        callback();
+                                    }
+                                });
+                            }, function () {
+                                flowUtils.updateChildrenCount(id, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, function () {
+                                    callback();
+                                });
+                            });
                     });
+                    /*db.Topic.update({_id: {$in: ids}}, {$set: {parentId: id}}, {multi: true}, function (err, num) {
+                        // FIXME: update the old parents count
+                        flowUtils.updateChildrenCount(id, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, function () {
+                            callback();
+                        });
+                    });*/
                 },
                 arguments: function (callback) {
                     if (args.length === 0) {
                         return callback();
                     }
                     var ids = createNewArrayExcludeId(args, id);
-                    db.Argument.update({_id: {$in: ids}}, {
+                    db.Argument
+                        .find({_id: {$in: ids}})
+                        .lean()
+                        .exec(function (err, results) {
+                            // Update each moved entry and their parent count
+                            async.each(results, function(result, callback){
+                                var parentId = result.parentId;
+                                var ownerId = result.ownerId;
+                                // Update entry
+                                result.parentId = null;
+                                result.ownerId = id; // TODO: how about children ???
+                                result.ownerType = constants.OBJECT_TYPES.topic;
+                                result.threadId = null; // TODO: should set to self._id ???
+                                db.Argument.update({_id: result._id}, result, {upsert: true}, function(err, writeResult) {
+                                    if(parentId) {
+                                        flowUtils.updateChildrenCount(parentId, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.argument, callback);
+                                    } else {
+                                        flowUtils.updateChildrenCount(ownerId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.argument, callback);
+                                    }
+                                });
+                            }, function () {
+                                async.parallel([
+                                    function (callback) {
+                                        flowUtils.syncChildren(ids, constants.OBJECT_TYPES.argument, callback);
+                                    },
+                                    function (callback) {
+                                        flowUtils.updateChildrenCount(id, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.argument, callback);
+                                    }
+                                ], function () {
+                                    callback();
+                                });
+                            });
+                    });
+                    /*db.Argument.update({_id: {$in: ids}}, {
                         $set: {
                             parentId: null,
                             ownerId: id, // TODO: how about children ???
@@ -164,19 +226,51 @@ module.exports = function (router) {
                             threadId: null // TODO: should set to self._id ???
                         }
                     }, {multi: true}, function (err, num) {
-                        flowUtils.syncChildren(ids, constants.OBJECT_TYPES.argument, callback);
-                    });
+                    });*/
                 }
-            }, function (err, results) {
+            }, function () {
                 res.send({});
             });
         } else if(type == constants.OBJECT_TYPES.argument) {
             if (args.length === 0) {
                 return res.send({});
             }
-            db.Argument.findOne({_id: id}, function(err, result) {
+            db.Argument.findOne({_id: id}, function(err, parent) {
                 var ids = createNewArrayExcludeId(args, id);
-                db.Argument.update({_id: {$in: ids}}, {
+                db.Argument
+                    .find({_id: {$in: ids}})
+                    .lean()
+                    .exec(function (err, results) {
+                        // Update each and their parent count
+                        async.each(results, function(result, callback){
+                            var parentId = result.parentId;
+                            var ownerId = result.ownerId;
+                            // Update entry
+                            result.parentId = id;
+                            result.ownerId = parent.parentId; // TODO: how about children ???
+                            result.ownerType = parent.ownerType;
+                            result.threadId = parent.threadId ? parent.threadId : id;
+                            db.Argument.update({_id: result._id}, result, {upsert: true}, function(err, writeResult) {
+                                if(parentId) {
+                                    flowUtils.updateChildrenCount(parentId, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.argument, callback);
+                                } else {
+                                    flowUtils.updateChildrenCount(ownerId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.argument, callback);
+                                }
+                            });
+                        }, function () {
+                            async.parallel([
+                                function (callback) {
+                                    flowUtils.syncChildren(ids, constants.OBJECT_TYPES.argument, callback);
+                                },
+                                function (callback) {
+                                    flowUtils.updateChildrenCount(id, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.argument, callback);
+                                }
+                            ], function () {
+                                res.send({});
+                            });
+                        });
+                });
+                /*db.Argument.update({_id: {$in: ids}}, {
                     $set: {
                         parentId: id,
                         ownerId: result.ownerId, // TODO: how about children ???
@@ -184,10 +278,18 @@ module.exports = function (router) {
                         threadId: result.threadId ? result.threadId : id
                     }
                 }, {multi: true}, function (err, num) {
-                    flowUtils.syncChildren(ids, constants.OBJECT_TYPES.argument, function () {
+                    async.parallel([
+                        function (callback) {
+                            flowUtils.syncChildren(ids, constants.OBJECT_TYPES.argument, callback);
+                        },
+                        function (callback) {
+                            // FIXME: update the old parents count
+                            flowUtils.updateChildrenCount(id, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.argument, callback);
+                        }
+                    ], function () {
                         res.send({});
                     });
-                });
+                });*/
             });
         } else {
             res.send({});

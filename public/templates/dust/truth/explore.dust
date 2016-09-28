@@ -28,7 +28,7 @@
                         <div>
                             {?subtopics}
                                 {#subtopics}
-                                    <div><i class="fa fa-folder-open text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{title}</a></div>
+                                    <div><i class="fa fa-folder-open text-muted text-success-x" aria-hidden="true"></i>&nbsp;<a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{title}</a></div>
                                 {/subtopics}
                             {/subtopics}
                             <div><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.truth.topics.index}?topic={_id}" role="button">more</a></div>
@@ -42,10 +42,10 @@
     <br/>
     {?topics}
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp;&nbsp;Latest Topics</li>
+            <li class="list-group-item highlight"><i class="fa fa-folder-open text-success-x text-muted-x" aria-hidden="true"></i>&nbsp;&nbsp;Latest Topics</li>
             {#topics}
                 <li class="list-group-item">
-                    <span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>
+                    <i class="fa fa-folder-open text-success text-muted-x" aria-hidden="true"></i>
                     <div>
                         <a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{title}</a>
                         <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
