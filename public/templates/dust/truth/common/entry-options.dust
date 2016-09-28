@@ -1,4 +1,4 @@
-<div style="margin-bottom: 15px" class="clearfix" id="entry-options" data-entry-id="{entry._id}" data-entry-type="{entryType}" data-csrf="{_csrf}">
+<div style="margin-bottom-x: 15px" class="clearfix" id="entry-options" data-entry-id="{entry._id}" data-entry-type="{entryType}" data-csrf="{_csrf}">
     <div class="dropdown pull-left entry-options">
         <a href="#" class="text-muted no-underline dropdown-toggle" title="Reply" data-toggle="dropdown" aria-controls="wtDropdownReply" aria-haspopup="true" aria-expanded="false"><i class="fa fa-reply" aria-hidden="true"></i> Reply</a>
         <ul class="dropdown-menu dropdown-menu-right-x" aria-labelledby="wtTabMore" id="wtDropdownReply">
@@ -57,13 +57,13 @@
                         {/question}
                         {!<li><a href="{paths.truth.outline.link}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> Manage Links</a></li>!}
                         <li><a href="#" role="tab"><span class="glyphicon glyphicon-tags" aria-hidden="true"></span> Manage Tags</a></li>
-                        {?user.isAdmin}
-                            <li><a href="#" onclick="return entryTakeOwnership()"><i class="fa fa-hand-grab-o" aria-hidden="true"></i> Take Ownership</a></li>
-                            <li><a href="#" onclick="return entryDelete()"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</a></li>
-                        {/user.isAdmin}
-                        {!<li><a href="#" role="tab"><span class="glyphicon glyphicon-move" aria-hidden="true"></span> Move...</a></li>!}
                     {/isIssueOwner}
                 {/isOpinionOwner}
+                {?user.isAdmin}
+                    <li><a href="#" onclick="return entryTakeOwnership()"><i class="fa fa-hand-grab-o" aria-hidden="true"></i> Take Ownership</a></li>
+                    <li><a href="#" onclick="return entryDelete()"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</a></li>
+                {/user.isAdmin}
+            {!<li><a href="#" role="tab"><span class="glyphicon glyphicon-move" aria-hidden="true"></span> Move...</a></li>!}
             {/isContributor}
             <li><a href="#" role="tab"><i class="fa fa-info-circle" aria-hidden="true"></i> Details</a></li>
             {?isContributor}
@@ -211,6 +211,7 @@
         }
     </script>
 </div>
+<hr style="border: 0; margin: 0.7rem 0 0.7rem; border-top: 0.0625rem dotted #dcdcdc; margin-bottom: 15px"/>
 {!
 <ul class="nav nav-tabs wt-tabs-l2" role="tablist">
     {!<li role="presentation" class="active"><a href="#" role="tab"><span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a></li>!

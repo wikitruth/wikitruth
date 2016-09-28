@@ -27,6 +27,12 @@ exports = module.exports = function(app, mongoose) {
       status: { type: Number },
       editDate: { type: Date },
       editUserId: { type: mongoose.Schema.ObjectId, ref: 'User'}
+    },
+    childrenCount: {
+      arguments: { type: Number },
+      questions: { type: Number },
+      issues: { type: Number },
+      opinions: { type: Number }
     }
   });
   schema.plugin(require('../plugins/pagedFind'));

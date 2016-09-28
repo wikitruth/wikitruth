@@ -75,9 +75,9 @@
                     {:else}
                         {?topic}
                             {?parentTopic}
-                                <i class="fa fa-folder-open"></i> A sub-topic under <a href="{paths.truth.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}">{parentTopic.title}</a>
+                                <i class="fa fa-folder-open-o"></i> A sub-topic under <a href="{paths.truth.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}">{parentTopic.title}</a>
                             {:else}
-                                <i class="fa fa-folder-open"></i> A topic category
+                                <i class="fa fa-folder-open-o"></i> A topic category
                             {/parentTopic}
                         {/topic}
                     {/argument}

@@ -1,6 +1,7 @@
 'use strict';
 
 var constants   = require('../../models/constants'),
+    flowUtils   = require('../../utils/flowUtils'),
     db          = require('../../app').db.models;
 
 module.exports = function (router) {
@@ -44,11 +45,43 @@ module.exports = function (router) {
         if(req.user.isAdmin()) {
             if(type == constants.OBJECT_TYPES.topic) {
                 db.Topic.findByIdAndRemove(id, function(err, entry) {
-                    res.send({});
+                    if(entry.parentId) {
+                        flowUtils.updateChildrenCount(entry.parentId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, function () {
+                            res.send({});
+                        });
+                    } else {
+                        res.send({});
+                    }
                 });
             } else if(type == constants.OBJECT_TYPES.argument) {
                 db.Argument.findByIdAndRemove(id, function(err, entry) {
-                    res.send({});
+                    if(entry.parentId) {
+                        flowUtils.updateChildrenCount(entry.parentId, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.argument, function () {
+                            res.send({});
+                        });
+                    } else {
+                        flowUtils.updateChildrenCount(entry.ownerId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.argument, function () {
+                            res.send({});
+                        });
+                    }
+                });
+            } else if(type == constants.OBJECT_TYPES.question) {
+                db.Question.findByIdAndRemove(id, function(err, entry) {
+                    flowUtils.updateChildrenCount(entry.ownerId, entry.ownerType, constants.OBJECT_TYPES.question, function () {
+                        res.send({});
+                    });
+                });
+            } else if(type == constants.OBJECT_TYPES.issue) {
+                db.Issue.findByIdAndRemove(id, function(err, entry) {
+                    flowUtils.updateChildrenCount(entry.ownerId, entry.ownerType, constants.OBJECT_TYPES.issue, function () {
+                        res.send({});
+                    });
+                });
+            } else if(type == constants.OBJECT_TYPES.opinion) {
+                db.Opinion.findByIdAndRemove(id, function(err, entry) {
+                    flowUtils.updateChildrenCount(entry.ownerId, entry.ownerType, constants.OBJECT_TYPES.opinion, function () {
+                        res.send({});
+                    });
                 });
             } else {
                 res.send({});

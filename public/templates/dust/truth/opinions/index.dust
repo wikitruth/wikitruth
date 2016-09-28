@@ -8,10 +8,10 @@
     {>"dust/truth/common/entry-header" tab="opinions" /}
     {?opinions}
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Opinions</li>
+            <li class="list-group-item highlight"><i class="fa fa-comments-o text-success-x" aria-hidden="true"></i> Opinions</li>
             {#opinions}
                 <li class="list-group-item">
-                    <span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>
+                    <i class="fa fa-comments-o text-success" aria-hidden="true"></i>
                     <div>
                         <a href="{paths.truth.opinions.entry}/{friendlyUrl}/{_id}">{title}</a>
                         <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>

@@ -427,6 +427,156 @@ function getArguments(query, limit, callback) {
     });
 }
 
+function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
+    var childrenCount = {};
+    if(entryType === constants.OBJECT_TYPES.topic) {
+        async.parallel({
+            topics: function (callback) {
+                if(!specificEntryType || specificEntryType === constants.OBJECT_TYPES.topic) {
+                    db.Topic.count({parentId: entryId}, function (err, count) {
+                        db.TopicLink.count({parentId: entryId}, function (err, linkCount) {
+                            childrenCount['childrenCount.topics'] = count + linkCount;
+                            callback();
+                        });
+                    });
+                } else {
+                    callback();
+                }
+            },
+            arguments: function (callback) {
+                if(!specificEntryType || specificEntryType === constants.OBJECT_TYPES.argument) {
+                    db.Argument.count({ownerId: entryId, parentId: null}, function (err, count) {
+                        db.ArgumentLink.count({ownerId: entryId, parentId: null}, function (err, linkCount) {
+                            childrenCount['childrenCount.arguments'] = count + linkCount;
+                            callback();
+                        });
+                    });
+                } else {
+                    callback();
+                }
+            },
+            questions: function (callback) {
+                if(!specificEntryType || specificEntryType === constants.OBJECT_TYPES.question) {
+                    db.Question.count({ownerId: entryId}, function (err, count) {
+                        childrenCount['childrenCount.questions'] = count;
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
+            },
+            issues: function (callback) {
+                if(!specificEntryType || specificEntryType === constants.OBJECT_TYPES.issue) {
+                    db.Issue.count({ownerId: entryId}, function (err, count) {
+                        childrenCount['childrenCount.issues'] = count;
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
+            },
+            opinions: function (callback) {
+                if(!specificEntryType || specificEntryType === constants.OBJECT_TYPES.opinion) {
+                    db.Opinion.count({ownerId: entryId}, function (err, count) {
+                        childrenCount['childrenCount.opinions'] = count;
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
+            }
+        }, function (err, results) {
+            db.Topic.update({_id: entryId}, {
+                $set: childrenCount
+            }, function (err, num) {
+                callback();
+            });
+        });
+    } else if(entryType === constants.OBJECT_TYPES.argument) {
+        async.parallel({
+            arguments: function (callback) {
+                if(!specificEntryType || specificEntryType === constants.OBJECT_TYPES.argument) {
+                    db.Argument.count({parentId: entryId}, function (err, count) {
+                        db.ArgumentLink.count({parentId: entryId}, function (err, linkCount) {
+                            childrenCount['childrenCount.arguments'] = count + linkCount;
+                            callback();
+                        });
+                    });
+                } else {
+                    callback();
+                }
+            },
+            questions: function (callback) {
+                if(!specificEntryType || specificEntryType === constants.OBJECT_TYPES.question) {
+                    db.Question.count({ownerId: entryId}, function (err, count) {
+                        childrenCount['childrenCount.questions'] = count;
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
+            },
+            issues: function (callback) {
+                if(!specificEntryType || specificEntryType === constants.OBJECT_TYPES.issue) {
+                    db.Issue.count({ownerId: entryId}, function (err, count) {
+                        childrenCount['childrenCount.issues'] = count;
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
+            },
+            opinions: function (callback) {
+                if(!specificEntryType || specificEntryType === constants.OBJECT_TYPES.opinion) {
+                    db.Opinion.count({ownerId: entryId}, function (err, count) {
+                        childrenCount['childrenCount.opinions'] = count;
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
+            }
+        }, function (err, results) {
+            db.Argument.update({_id: entryId}, {
+                $set: childrenCount
+            }, function (err, num) {
+                callback();
+            });
+        });
+    } else if(entryType === constants.OBJECT_TYPES.question) {
+        async.parallel({
+            issues: function (callback) {
+                if(!specificEntryType || specificEntryType === constants.OBJECT_TYPES.issue) {
+                    db.Issue.count({ownerId: entryId}, function (err, count) {
+                        childrenCount['childrenCount.issues'] = count;
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
+            },
+            opinions: function (callback) {
+                if(!specificEntryType || specificEntryType === constants.OBJECT_TYPES.opinion) {
+                    db.Opinion.count({ownerId: entryId}, function (err, count) {
+                        childrenCount['childrenCount.opinions'] = count;
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
+            }
+        }, function (err, results) {
+            db.Question.update({_id: entryId}, {
+                $set: childrenCount
+            }, function (err, num) {
+                callback();
+            });
+        });
+    } else {
+        callback();
+    }
+}
+
 function syncChildren(parentIds, entryType, callback) {
     if(entryType === constants.OBJECT_TYPES.topic) {
         callback();
@@ -457,6 +607,8 @@ function syncChildren(parentIds, entryType, callback) {
         }, function () {
             callback();
         });
+    } else {
+        callback();
     }
 }
 
@@ -551,6 +703,16 @@ function createOwnerQueryFromQuery(req) {
     return {};
 }
 
+function setModelOwnerEntry(model) {
+    if(model.question) {
+        model.entry = model.question;
+    } else if(model.argument) {
+        model.entry = model.argument;
+    } else if(model.topic) {
+        model.entry = model.topic;
+    }
+}
+
 function createOwnerQueryFromModel(model) {
     if(model.issue) {
         return {
@@ -597,7 +759,9 @@ module.exports = {
 
     getTopics: getTopics,
     getArguments: getArguments,
+    updateChildrenCount: updateChildrenCount,
     syncChildren: syncChildren,
+    setModelOwnerEntry: setModelOwnerEntry,
     getVerdictCount: getVerdictCount,
     setVerdictModel: setVerdictModel,
     createOwnerQueryFromQuery: createOwnerQueryFromQuery,

@@ -1,15 +1,19 @@
 {?questions}
-    <ul class="list-group top-list-items wt-list">
-        <li class="list-group-item highlight"><span class="glyphicon glyphicon-question-sign text-success" aria-hidden="true"></span> Questions{?questionsCount} <span class="wt-label label label-default">{questionsCount}</span>{/questionsCount}</li>
-        {#questions}
-            <li class="list-group-item">
-                <span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>
-                <div>
-                    <a href="{paths.truth.questions.entry}/{friendlyUrl}/{_id}">{title}</a>
-                    <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
-                </div>
-                <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
-        {/questions}
-    </ul>
-    <div class="top-list-items-more"><a href="{paths.truth.questions.index}?topic={topic._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+    <div class="wt-list">
+        <ul class="list-group top-list-items">
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-question-sign text-success-x" aria-hidden="true"></span> Questions <span class="wt-label label label-default">{entry.childrenCount.questions}</span></li>
+            {#questions}
+                <li class="list-group-item">
+                    <span class="glyphicon glyphicon-question-sign text-success text-muted-x" aria-hidden="true"></span>
+                    <div>
+                        <a href="{paths.truth.questions.entry}/{friendlyUrl}/{_id}">{title}</a>
+                        <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
+                    </div>
+                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+            {/questions}
+        </ul>
+        {@gt key=entry.childrenCount.questions value="15"}
+            <div class="top-list-items-more"><a href="{paths.truth.questions.index}?topic={topic._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{entry.childrenCount.questions}</span></a></div>
+        {/gt}
+    </div>
 {/questions}

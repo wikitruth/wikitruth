@@ -24,6 +24,7 @@ module.exports = function (router) {
                             flowUtils.appendEntryExtra(result);
                         });
                         model.issues = results;
+                        flowUtils.setModelOwnerEntry(model);
                         res.render(templates.truth.issues.index, model);
                     });
                 });
@@ -57,6 +58,7 @@ module.exports = function (router) {
         }
         flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
             model.entry = model.issue;
+            model.entryType = constants.OBJECT_TYPES.issue;
             res.render(templates.truth.issues.entry, model);
         });
     });
@@ -93,10 +95,20 @@ module.exports = function (router) {
                 }
             }
             db.Issue.update(query, entity, {upsert: true}, function(err, writeResult) {
-                res.redirect((result ? paths.truth.issues.entry : paths.truth.issues.index) +
-                    '?topic=' + req.query.topic +
-                    (req.query.argument ? '&argument=' + req.query.argument : '') +
-                    (result ? '&issue=' + req.query.issue : ''));
+                var updateRedirect = function () {
+                    res.redirect((result ? paths.truth.issues.entry : paths.truth.issues.index) +
+                        '?topic=' + req.query.topic +
+                        (req.query.argument ? '&argument=' + req.query.argument : '') +
+                        (result ? '&issue=' + req.query.issue : '')
+                    );
+                };
+                if(!result) {
+                    flowUtils.updateChildrenCount(entity.ownerId, entity.ownerType, constants.OBJECT_TYPES.issue, function () {
+                        updateRedirect();
+                    });
+                } else {
+                    updateRedirect();
+                }
             });
         });
     });

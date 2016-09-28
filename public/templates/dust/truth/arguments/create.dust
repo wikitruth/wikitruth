@@ -81,7 +81,7 @@
                 <label>
                     <input type="radio" id="radioTypeId{argumentTypes.prediction}" name="typeId" value="{argumentTypes.prediction}">
                     <span class="text-info"><strong>Extrapolation</strong></span><br/>
-                    A prediction of a future event or phenomenon, a peculation, an assumption.
+                    A speculation, an assumption, a prediction of a future event or phenomenon.
                 </label>
             </div>
             <div class="radio">

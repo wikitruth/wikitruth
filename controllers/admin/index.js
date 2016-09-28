@@ -3,6 +3,7 @@
 var templates   = require('../../models/templates'),
     config      = require('../../config/config'),
     flowUtils   = require('../../utils/flowUtils'),
+    constants   = require('../../models/constants'),
     backup      = require('mongodb-backup'),
     db          = require('../../app').db.models,
     fs          = require('fs'),
@@ -41,6 +42,38 @@ module.exports = function (router) {
                 parser: 'json'
             });
             res.render(templates.admin.mongoBackup, model);
+        } else if(action === 'fix') {
+            async.parallel({
+                topics: function (callback) {
+                    db.Topic.find({}).exec(function(err, results) {
+                        async.eachSeries(results, function (result, callback) {
+                            flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.topic, null, callback);
+                        }, function (err) {
+                            callback();
+                        });
+                    });
+                },
+                arguments: function (callback) {
+                    db.Argument.find({}).exec(function(err, results) {
+                        async.eachSeries(results, function (result, callback) {
+                            flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.argument, null, callback);
+                        }, function (err) {
+                            callback();
+                        });
+                    });
+                },
+                questions: function (callback) {
+                    db.Question.find({}).exec(function(err, results) {
+                        async.eachSeries(results, function (result, callback) {
+                            flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.question, null, callback);
+                        }, function (err) {
+                            callback();
+                        });
+                    });
+                }
+            }, function (err, results) {
+                res.render(templates.admin.mongoBackup, model);
+            });
         } else if(action === 'restore') {
             var dir = flowUtils.getBackupDir() + '/wikitruth';
             console.log(cols.backupList);
