@@ -7,7 +7,7 @@
                     <span class="fa fa-comments-o text-success" aria-hidden="true"></span>
                     <div>
                         <a href="{paths.truth.opinions.entry}/{friendlyUrl}/{_id}">{title}</a>
-                        <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
+                        {>"dust/truth/common/entry-row-footer" /}
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
             {/opinions}

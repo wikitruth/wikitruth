@@ -7,7 +7,7 @@
                     <i class="fa fa-exclamation-circle text-success" aria-hidden="true"></i>
                     <div>
                         <a href="{paths.truth.issues.entry}/{friendlyUrl}/{_id}">{title}</a>
-                        <div class="text-muted">{editUsername} &bull; {editDateString} &bull; {points}</div>
+                        {>"dust/truth/common/entry-row-footer" /}
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
                 </li>
