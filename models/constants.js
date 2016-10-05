@@ -133,6 +133,41 @@ ARGUMENT_TYPES.getUXInfo = function (typeId) {
     };
 };
 
+var ISSUE_TYPES = {
+    type10: {
+        code: 10,
+        text: "Logical fallacy"
+    },
+    type20: {
+        code: 20,
+        text: "Biased or flawed reasoning"
+    },
+    type30: {
+        code: 30,
+        text: "Terminology issue"
+    },
+    type40: {
+        code: 40,
+        text: "Unwelcome content"
+    },
+    type50: {
+        code: 50,
+        text: "Incoherent or unrelated"
+    },
+    type60: {
+        code: 60,
+        text: "Too broad or multiple topics"
+    },
+    type70: {
+        code: 70,
+        text: "Unsubstantiated claim"
+    },
+    type100: {
+        code: 100,
+        text: "Other issue"
+    }
+};
+
 module.exports = {
     OBJECT_TYPES: {
         topic: 1,
@@ -144,6 +179,7 @@ module.exports = {
         opinion: 11
     },
     ARGUMENT_TYPES: ARGUMENT_TYPES,
+    ISSUE_TYPES: ISSUE_TYPES,
     ETHICAL_STATUS: {
         very_good: 12,
         good: 11,

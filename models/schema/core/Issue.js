@@ -4,6 +4,7 @@ exports = module.exports = function(app, mongoose) {
   var schema = new mongoose.Schema({
     title: { type: String, default: '' },
     content: { type: String, default: '' },
+    issueType: { type: Number },
     ownerId: { type: mongoose.Schema.ObjectId },
     ownerType: { type: Number }, // OBJECT_TYPES
     screeningStatus: { type: Number }, // SCREENING_STATUS

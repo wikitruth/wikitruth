@@ -12,33 +12,61 @@
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
         <div class="form-group">
-            <label for="inputName">Issue</label>
+            <label for="inputName">Title</label>
             <textarea name="title" id="inputName" class="form-control" rows="1">{issue.title}</textarea>
         </div>
         <div class="form-group">
-            <label for="inputReferences">Issue Type <a data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a></label>
+            <label for="inputReferences">Issue Type <a data-toggle="popover" data-content="Select the most appropriate type of issue"><span class="glyphicon glyphicon-question-sign"></span></a></label>
             <div class="radio">
-                <label class="text-danger">
-                    <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1">
-                    Logical fallacy (<a href="https://yourlogicalfallacyis.com/" target="_blank">well-known logical fallacies</a>)
+                <label>
+                    <input type="radio" id="radioType10" name="issueType" value="10">
+                    <span class="text-danger"><strong>{ISSUE_TYPES.type10.text}</strong></span><br/>
+                    An issue on the logic of the argument or conclusion (not about the truthfulness of the claims)
                 </label>
             </div>
             <div class="radio">
-                <label class="text-danger">
-                    <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
-                    Terminology issue (word definition)
+                <label>
+                    <input type="radio" id="radioType20" name="issueType" value="20">
+                    <span class="text-danger"><strong>Biased or flawed reasoning</strong></span><br/>
+                    Prejudice in favor of or against one thing, person, or group compared with another that results to flawed reasoning.
                 </label>
             </div>
             <div class="radio">
-                <label class="text-danger">
-                    <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
-                    Incoherent or unrelated to parent entry
+                <label>
+                    <input type="radio" id="radioType30" name="issueType" value="30">
+                    <span class="text-danger"><strong>Terminology issue</strong></span><br/>
+                    An issue or confusion arising due to the ambiguity or definition of the word used.
                 </label>
             </div>
             <div class="radio">
-                <label class="text-danger">
-                    <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
-                    Argument too broad or contains multiple topics, please break down
+                <label>
+                    <input type="radio" id="radioType40" name="issueType" value="40">
+                    <span class="text-danger"><strong>Unwelcome content</strong></span><br/>
+                    Content is prohibited if it
+                    <ul>
+                        <li>Is illegal</li>
+                        <li>Is involuntary pornography</li>
+                        <li>Encourages or incites violence</li>
+                        <li>Threatens, harasses, or bullies or encourages others to do so</li>
+                        <li>Is personal and confidential information</li>
+                        <li>Impersonates someone in a misleading or deceptive manner</li>
+                        <li>Is spam</li>
+                        <li>Exhibiting malicious intent</li>
+                    </ul>
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" id="radioType50" name="issueType" value="50">
+                    <span class="text-warning"><strong>Incoherent or unrelated</strong></span><br/>
+                    The entry is incoherent or unrelated to the parent entry. If this is a placement issue, consider moving to the more appropriate location.
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" id="radioType60" name="issueType" value="60">
+                    <span class="text-warning"><strong>Too broad or multiple topics</strong></span><br/>
+                    Consider breaking down the entry into multiple entries.
                 </label>
             </div>
             {!<div class="radio">
@@ -48,21 +76,17 @@
                 </label>
             </div>!}
             <div class="radio">
-                <label class="text-warning">
-                    <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
-                    Containing unsubstantiated assumption (need to add more support)
+                <label>
+                    <input type="radio" id="radioType70" name="issueType" value="70">
+                    <span class="text-warning"><strong>Unsubstantiated claim</strong></span><br/>
+                    Containing unsubstantiated assumptions or claims, consider adding more sources or supporting arguments.
                 </label>
             </div>
             <div class="radio">
-                <label class="text-warning-x">
-                    <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
-                    Confusing statement structure, too vague or grammatical issue
-                </label>
-            </div>
-            <div class="radio">
-                <label class="text-warning-x">
-                    <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
-                    Others
+                <label>
+                    <input type="radio" id="radioType100" name="issueType" value="100">
+                    <span class="text-warning"><strong>Other issue</strong></span><br/>
+                    Grammar or spelling issue, unorganized content, confusing statement, or any other issue.
                 </label>
             </div>
         </div>
@@ -91,6 +115,8 @@
                 toolbar: WT_CONSTANTS.summernote.referenceToolbar
             });
 
+            var issueType = '{?issue}{issue.issueType}{:else}100{/issue}';
+            $('#radioType' + issueType).prop('checked', true);
             $('[data-toggle="popover"]').popover();
         });
     </script>

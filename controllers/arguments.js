@@ -47,11 +47,12 @@ module.exports = function (router) {
                         var contra = results.filter(function (arg) {
                             return arg.against;
                         });
+                        model.arguments = results;
                         if(support.length > 0) {
-                            model.arguments = support;
+                            model.proArguments = support;
                         }
                         if(contra.length > 0) {
-                            model.contraArguments = contra;
+                            model.conArguments = contra;
                         }
                         results.forEach(function (result) {
                             flowUtils.setVerdictModel(result);
@@ -208,13 +209,14 @@ module.exports = function (router) {
                 var contra = results.arguments.filter(function (arg) {
                     return arg.against;
                 });
+                model.arguments = results.arguments;
                 if(support.length > 0) {
-                    model.supportingArgumentCount = support.length;
-                    model.arguments = support.slice(0, 15);
+                    model.proArgumentCount = support.length;
+                    model.proArguments = support.slice(0, 15);
                 }
                 if(contra.length > 0) {
-                    model.opposingArgumentCount = contra.length;
-                    model.contraArguments = contra.slice(0, 15);
+                    model.conArgumentCount = contra.length;
+                    model.conArguments = contra.slice(0, 15);
                 }
                 model.entry = model.argument;
                 model.entryType = constants.OBJECT_TYPES.argument;
