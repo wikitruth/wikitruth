@@ -35,28 +35,11 @@
     {/topic}
     {>"dust/truth/common/entry-options" /}
     {?arguments}
-        <ul class="list-group top-list-items wt-list">
-            <li class="list-group-item highlight text-primary"><i class="glyphicon glyphicon-flash" aria-hidden="true"></i> Supporting Arguments <span class="wt-label label label-default">{supportingArgumentCount}</span></li>
-            {#arguments}
-            <li class="list-group-item">
-                {?link}
-                    <a href="{paths.truth.arguments.link}?topic={ownerId}&amp;argument={link.parentId}&amp;id={link._id}&amp;source={paths.truth.arguments.entry}/{friendlyUrl}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
-                {:else}
-                    <i class="glyphicon glyphicon-flash text-{verdict.theme}" aria-hidden="true"></i>
-                {/link}
-                <div>
-                    <a href="{paths.truth.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title} {?typeUX}<span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}</a>
-                    {>"dust/truth/common/entry-row-footer" /}
-                </div>
-                <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
-            </li>
-            {/arguments}
-        </ul>
-    {/arguments}
-    {?contraArguments}
-        <ul class="list-group top-list-items wt-list">
-            <li class="list-group-item highlight text-primary"><i class="glyphicon glyphicon-flash" aria-hidden="true"></i> Opposing Arguments <span class="wt-label label label-default">{opposingArgumentCount}</span></li>
-            {#contraArguments}
+        <div class="wt-list">
+            {?proArguments}
+            <ul class="list-group top-list-items">
+                <li class="list-group-item highlight text-primary"><i class="glyphicon glyphicon-flash" aria-hidden="true"></i> Supporting Arguments <span class="wt-label label label-default">{proArgumentCount}</span></li>
+                {#proArguments}
                 <li class="list-group-item">
                     {?link}
                         <a href="{paths.truth.arguments.link}?topic={ownerId}&amp;argument={link.parentId}&amp;id={link._id}&amp;source={paths.truth.arguments.entry}/{friendlyUrl}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
@@ -69,16 +52,37 @@
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
                 </li>
-            {/contraArguments}
-        </ul>
-        {@gt key=opposingArgumentCount value="15"}
-            <div class="top-list-items-more"><a href="{paths.truth.arguments.index}?topic={topic._id}&amp;argument={argument._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{opposingArgumentCount}</span></a></div>
-        {/gt}
-    {:else}
-        {@gt key=supportingArgumentCount value="15"}
-            <div class="top-list-items-more"><a href="{paths.truth.arguments.index}?topic={topic._id}&amp;argument={argument._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{supportingArgumentCount}</span></a></div>
-        {/gt}
-    {/contraArguments}
+                {/proArguments}
+            </ul>
+            {/proArguments}
+            {?conArguments}
+                <ul class="list-group top-list-items">
+                    <li class="list-group-item highlight text-primary"><i class="glyphicon glyphicon-flash" aria-hidden="true"></i> Opposing Arguments <span class="wt-label label label-default">{conArgumentCount}</span></li>
+                    {#conArguments}
+                        <li class="list-group-item">
+                            {?link}
+                                <a href="{paths.truth.arguments.link}?topic={ownerId}&amp;argument={link.parentId}&amp;id={link._id}&amp;source={paths.truth.arguments.entry}/{friendlyUrl}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
+                            {:else}
+                                <i class="glyphicon glyphicon-flash text-{verdict.theme}" aria-hidden="true"></i>
+                            {/link}
+                            <div>
+                                <a href="{paths.truth.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title} {?typeUX}<span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}</a>
+                                {>"dust/truth/common/entry-row-footer" /}
+                            </div>
+                            <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
+                        </li>
+                    {/conArguments}
+                </ul>
+                {@gt key=conArgumentCount value="15"}
+                    <div class="top-list-items-more"><a href="{paths.truth.arguments.index}?topic={topic._id}&amp;argument={argument._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{conArgumentCount}</span></a></div>
+                {/gt}
+            {:else}
+                {@gt key=proArgumentCount value="15"}
+                    <div class="top-list-items-more"><a href="{paths.truth.arguments.index}?topic={topic._id}&amp;argument={argument._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{proArgumentCount}</span></a></div>
+                {/gt}
+            {/conArguments}
+        </div>
+    {/arguments}
     {>"dust/truth/questions/list-preview" /}
     {>"dust/truth/issues/list-preview" /}
     {>"dust/truth/opinions/list-preview" /}

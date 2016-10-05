@@ -10,10 +10,10 @@
     {:else}
         {>"dust/truth/common/index-header" tab="top-arguments" /}
     {/topic}
-    {?arguments}
+    {?proArguments}
         <ul class="list-group wt-list">
             <li class="list-group-item highlight text-primary-x"><i class="glyphicon glyphicon-flash" aria-hidden="true"></i> {^topic}Latest Arguments{:else}{?argument}Supporting Arguments{:else}Arguments{/argument}{/topic}</li>
-            {#arguments}
+            {#proArguments}
                 <li class="list-group-item">
                     {?link}
                         <a href="{paths.truth.arguments.link}?topic={link.ownerId}&amp;argument={link.parentId}&amp;id={link._id}&amp;source={paths.truth.arguments.index}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
@@ -26,14 +26,14 @@
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
                 </li>
-            {/arguments}
+            {/proArguments}
             {!<li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Birds Prove Natural Selection is Naturally Wrong <span class="label label-danger">negative</span> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 10,456</span></li>!}
         </ul>
-    {/arguments}
-    {?contraArguments}
+    {/proArguments}
+    {?conArguments}
         <ul class="list-group wt-list">
             <li class="list-group-item highlight text-primary-x"><i class="fa fa-flash" aria-hidden="true"></i> Opposing Arguments</li>
-            {#contraArguments}
+            {#conArguments}
                 <li class="list-group-item">
                     {?link}
                         <a href="{paths.truth.arguments.link}?topic={link.ownerId}&amp;argument={link.parentId}&amp;id={link._id}&amp;source={paths.truth.arguments.index}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
@@ -46,8 +46,8 @@
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
                 </li>
-            {/contraArguments}
+            {/conArguments}
             {!<li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Birds Prove Natural Selection is Naturally Wrong <span class="label label-danger">negative</span> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 10,456</span></li>!}
         </ul>
-    {/contraArguments}
+    {/conArguments}
 {/body}

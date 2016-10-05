@@ -58,6 +58,7 @@ module.exports = function (router) {
         }
         flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
             model.entry = model.issue;
+            model.issueType = constants.ISSUE_TYPES['type' + model.issue.issueType].text;
             model.entryType = constants.OBJECT_TYPES.issue;
             res.render(templates.truth.issues.entry, model);
         });
@@ -66,6 +67,7 @@ module.exports = function (router) {
     router.get('/create', function (req, res) {
         var model = {};
         flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
+            model.ISSUE_TYPES = constants.ISSUE_TYPES;
             res.render(templates.truth.issues.create, model);
         });
     });
@@ -76,6 +78,7 @@ module.exports = function (router) {
             var entity = result ? result : {};
             entity.title = req.body.title;
             entity.content = req.body.content;
+            entity.issueType = req.body.issueType;
             entity.editUserId = req.user.id;
             entity.editDate = Date.now();
             if(!result) {

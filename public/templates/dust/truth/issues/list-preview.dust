@@ -4,7 +4,7 @@
             <li class="list-group-item highlight"><i class="fa fa-exclamation-circle text-success-x" aria-hidden="true"></i> Issues <span class="wt-label label label-default">{entry.childrenCount.issues}</span></li>
             {#issues}
                 <li class="list-group-item">
-                    <i class="fa fa-exclamation-circle text-success" aria-hidden="true"></i>
+                    <i class="fa fa-exclamation-circle text-danger" aria-hidden="true"></i>
                     <div>
                         <a href="{paths.truth.issues.entry}/{friendlyUrl}/{_id}">{title}</a>
                         {>"dust/truth/common/entry-row-footer" /}
