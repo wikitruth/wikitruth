@@ -11,8 +11,8 @@
                     <li><a href="{paths.truth.arguments.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> New Argument</a></li>
                     <li><a href="{paths.truth.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
                         <span class="fa fa-question-circle" aria-hidden="true"></span> New Question</a></li>
+                    <li role="separator" class="divider"></li>
                 {/question}
-                <li role="separator" class="divider"></li>
                 <li><a href="{paths.truth.issues.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
                     <span class="fa fa-exclamation-circle" aria-hidden="true"></span> New Issue</a></li>
             {/issue}
