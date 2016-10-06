@@ -81,6 +81,7 @@ module.exports = function (router) {
                         flowUtils.setVerdictModel(result);
                     });
                     model.arguments = results;
+                    model.proArguments = results;
                     res.render(templates.truth.arguments.index, model);
                 });
             });
