@@ -86,9 +86,9 @@
             </div>
             <div class="radio">
                 <label>
-                    <input type="radio" id="radioTypeId{argumentTypes.historical}" name="typeId" value="{argumentTypes.historical}">
-                    <span class="text-info"><strong>Historical</strong></span><br/>
-                    A statement of a previous and remote reality (historical or something had happen a long time that may lack evidence)
+                    <input type="radio" id="radioTypeId{argumentTypes.artifact}" name="typeId" value="{argumentTypes.artifact}">
+                    <span class="text-info"><strong>Artifact</strong></span><br/>
+                    A public material (a popular claim) or a reference material (source)
                 </label>
             </div>
             <div class="radio">
