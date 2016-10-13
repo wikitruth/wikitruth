@@ -104,11 +104,11 @@ var ARGUMENT_TYPES = {
     // * A moral or ethical argument (something that should or should not/ought/this becomes a voting then? E.g. ought or ought not)
     // * A statement of a reality or phenomenon (current)
     // * A prediction of a future event or phenomenon
-    // * A statement of a far previous reality (historical or something had happen a long time or lacks evidences)
+    // * A public material (a popular claim) or a reference material (source)
     ethical: 0,
     factual: 1,
     prediction: 2,
-    historical: 3
+    artifact: 3
 };
 
 ARGUMENT_TYPES.getUXInfo = function (typeId) {
@@ -119,8 +119,8 @@ ARGUMENT_TYPES.getUXInfo = function (typeId) {
             label = "ethical";
             theme = "warning";
             break;
-        case ARGUMENT_TYPES.historical:
-            label = "historical";
+        case ARGUMENT_TYPES.artifact:
+            label = "artifact";
             break;
         case ARGUMENT_TYPES.prediction:
             label = "prediction";

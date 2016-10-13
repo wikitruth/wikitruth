@@ -10,7 +10,7 @@
         {>"dust/truth/common/entry-verdict" /}
     </div>
     <div class="text-body collapsable">
-        <p>{topic.content|s}</p>
+        {topic.content|s}
         <a href="#" onclick="return contentSeeMore()" class="content-see-more hidden">
             <div class="content-see-more-gradient"></div>
             <div class="content-see-more-text">See more</div>

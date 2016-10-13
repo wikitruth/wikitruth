@@ -115,7 +115,7 @@
                 toolbar: WT_CONSTANTS.summernote.referenceToolbar
             });
 
-            var issueType = '{?issue}{issue.issueType}{:else}100{/issue}';
+            var issueType = '{?issue}{issue.issueType}{:else}{ISSUE_TYPES.type100.code}{/issue}';
             $('#radioType' + issueType).prop('checked', true);
             $('[data-toggle="popover"]').popover();
         });

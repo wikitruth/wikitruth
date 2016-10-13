@@ -17,7 +17,7 @@
                 An argument under the topic <a href="{paths.truth.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
             {/parentArgument}
         </p>!}
-        <p>{argument.content|s}</p>
+        {argument.content|s}
         <a href="#" onclick="return contentSeeMore()" class="content-see-more hidden">
             <div class="content-see-more-gradient"></div>
             <div class="content-see-more-text">See more</div>
