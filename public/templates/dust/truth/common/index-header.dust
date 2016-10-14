@@ -20,7 +20,7 @@
     </li>
     {!{?isContributor}!}
     <li role="presentation" class="dropdown"><a href="#" id="wtTabMore" class="dropdown-toggle" data-toggle="dropdown" aria-controls="wtTabMore-contents" aria-expanded="false">
-        <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span> {!<span class="caret"></span>!}</a>
+        <i class="fa fa-chevron-down"></i>{!<span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span>!}{!<span class="caret"></span>!}</a>
     <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="wtTabMore" id="wtTabMore-contents">
         <li role="tab"><a href="{paths.truth.topics.create}">
             <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Topic</a></li>

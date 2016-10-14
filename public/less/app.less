@@ -173,13 +173,21 @@ a.no-underline:hover, .wt-list a:hover {
 
 .nav.nav-tabs.wt-tabs {
   margin-bottom: 20px;
+  border-bottom: none;
 
   a {
     color: #555;
   }
 
   >li>a {
-    border-top-width: 2px;
+    border-radius: 0;
+    border-width: 0 0 2px 0;
+  }
+
+  >li>a:hover, >li>a:focus {
+    background-color: #fff;
+    border-color: #999;
+    color: #333;
   }
 
   >li>a.dropdown-toggle {
@@ -187,8 +195,9 @@ a.no-underline:hover, .wt-list a:hover {
   }
 
   >li.active>a {
-    border-color: #d26911 #e5e5e5 transparent;
-    border-top-width: 2px;
+    border-color: #d26911;
+    border-width: 0 0 2px 0;
+    color: #333;
   }
 }
 
