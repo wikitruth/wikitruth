@@ -22,41 +22,31 @@ function createCancelUrl(req) {
     return url.format(nextUrl);
 }
 
-module.exports = function (router) {
-
-    router.get('/', function (req, res) {
-        var model = {};
-        async.parallel({
-            topic: function(callback){
-                flowUtils.setTopicModels(req, model, callback);
-            },
-            topics: function(callback) {
-                // display 15 if top topics, all if has topic parameter
-                flowUtils.getTopics({ parentId: req.query.topic }, 0, function (err, results) {
-                    model.topics = results;
-                    callback();
-                });
-            }
-        }, function (err, results) {
-            model.entry = model.topic;
-            res.render(templates.truth.topics.index, model);
-        });
-    });
-
-    router.get('/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
-        // Topic home: display top subtopics, top arguments
-        var model = {};
-        if(!req.query.topic) {
-            if(req.params.id) {
-                req.query.topic = req.params.id;
-            } else {
-                req.query.topic = req.params.friendlyUrl;
+function getEntry(req, res) {
+    // Topic home: display top subtopics, top arguments
+    var model = {};
+    if(!req.query.topic) {
+        if(req.params.id) {
+            req.query.topic = req.params.id;
+        } else {
+            var friendlyId = req.params.friendlyUrl;
+            if(friendlyId) {
+                if(utils.isObjectIdString(friendlyId)) {
+                    req.query.topic = friendlyId;
+                } else {
+                    req.query.friendlyUrl = friendlyId;
+                }
             }
         }
+    }
+    flowUtils.setTopicModels(req, model, function () {
+        if(!model.topic) {
+            return res.redirect('/');
+        }
+        if(!req.query.topic) {
+            req.query.topic = model.topic._id;
+        }
         async.parallel({
-            topic: function(callback){
-                flowUtils.setTopicModels(req, model, callback);
-            },
             topics: function(callback) {
                 // Top Subtopics
                 var query = { parentId: req.query.topic };
@@ -69,8 +59,8 @@ module.exports = function (router) {
                 // Top Linked Topics
                 var query = { topicId: req.query.topic };
                 /*db.TopicLink.find(query, function(err, results) {
-                    callback(null, results);
-                });*/
+                 callback(null, results);
+                 });*/
                 db.TopicLink
                     .find(query)
                     .lean()
@@ -147,15 +137,15 @@ module.exports = function (router) {
                     .sort({ title: 1 })
                     .lean()
                     .exec(function(err, results) {
-                    flowUtils.setEditorsUsername(results, function() {
-                        results.forEach(function (result) {
-                            result.friendlyUrl = utils.urlify(result.title);
-                            flowUtils.appendEntryExtra(result);
+                        flowUtils.setEditorsUsername(results, function() {
+                            results.forEach(function (result) {
+                                result.friendlyUrl = utils.urlify(result.title);
+                                flowUtils.appendEntryExtra(result);
+                            });
+                            model.issues = results;
+                            callback();
                         });
-                        model.issues = results;
-                        callback();
                     });
-                });
             },
             opinions: function (callback) {
                 // Top Opinions
@@ -166,15 +156,15 @@ module.exports = function (router) {
                     .sort({ title: 1 })
                     .lean()
                     .exec(function(err, results) {
-                    flowUtils.setEditorsUsername(results, function() {
-                        results.forEach(function (result) {
-                            result.friendlyUrl = utils.urlify(result.title);
-                            flowUtils.appendEntryExtra(result);
+                        flowUtils.setEditorsUsername(results, function() {
+                            results.forEach(function (result) {
+                                result.friendlyUrl = utils.urlify(result.title);
+                                flowUtils.appendEntryExtra(result);
+                            });
+                            model.opinions = results;
+                            callback();
                         });
-                        model.opinions = results;
-                        callback();
                     });
-                });
             }
         }, function (err, results) {
             model.entry = model.topic;
@@ -189,6 +179,32 @@ module.exports = function (router) {
             flowUtils.prepareClipboardOptions(req, model, constants.OBJECT_TYPES.topic);
             res.render(templates.truth.topics.entry, model);
         });
+    });
+}
+
+module.exports = function (router) {
+
+    router.get('/', function (req, res) {
+        var model = {};
+        async.parallel({
+            topic: function(callback){
+                flowUtils.setTopicModels(req, model, callback);
+            },
+            topics: function(callback) {
+                // display 15 if top topics, all if has topic parameter
+                flowUtils.getTopics({ parentId: req.query.topic }, 0, function (err, results) {
+                    model.topics = results;
+                    callback();
+                });
+            }
+        }, function (err, results) {
+            model.entry = model.topic;
+            res.render(templates.truth.topics.index, model);
+        });
+    });
+
+    router.get('/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        getEntry(req, res);
     });
 
     /**
@@ -235,6 +251,7 @@ module.exports = function (router) {
             entity.title = req.body.title;
             entity.contextTitle = req.body.contextTitle;
             entity.references = req.body.references;
+            entity.friendlyUrl = utils.urlify(req.body.title);
             entity.editUserId = req.user.id;
             entity.editDate = Date.now();
             entity.icon = req.body.icon;
@@ -332,3 +349,5 @@ module.exports = function (router) {
         }
     });
 };
+
+module.exports.getEntry = getEntry;

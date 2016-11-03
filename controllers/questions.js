@@ -9,6 +9,52 @@ var mongoose    = require('mongoose'),
     constants   = require('../models/constants'),
     db          = require('../app').db.models;
 
+function getEntry(req, res) {
+    var model = {};
+    if(!req.query.question) {
+        if(req.params.id) {
+            req.query.question = req.params.id;
+        } else {
+            req.query.question = req.params.friendlyUrl;
+        }
+    }
+    var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
+    flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
+        async.parallel({
+            issues: function (callback) {
+                // Top Issues
+                db.Issue.find(ownerQuery).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                    flowUtils.setEditorsUsername(results, function() {
+                        results.forEach(function (result) {
+                            result.friendlyUrl = utils.urlify(result.title);
+                            flowUtils.appendEntryExtra(result);
+                        });
+                        model.issues = results;
+                        callback();
+                    });
+                });
+            },
+            opinions: function (callback) {
+                // Top Opinions
+                db.Opinion.find(ownerQuery).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                    flowUtils.setEditorsUsername(results, function() {
+                        results.forEach(function (result) {
+                            result.friendlyUrl = utils.urlify(result.title);
+                            flowUtils.appendEntryExtra(result);
+                        });
+                        model.opinions = results;
+                        callback();
+                    });
+                });
+            }
+        }, function (err, results) {
+            model.entry = model.question;
+            model.entryType = constants.OBJECT_TYPES.question;
+            res.render(templates.truth.questions.entry, model);
+        });
+    });
+}
+
 module.exports = function (router) {
 
     /* Questions */
@@ -60,49 +106,7 @@ module.exports = function (router) {
     });
 
     router.get('/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
-        var model = {};
-        if(!req.query.question) {
-            if(req.params.id) {
-                req.query.question = req.params.id;
-            } else {
-                req.query.question = req.params.friendlyUrl;
-            }
-        }
-        var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
-        flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
-            async.parallel({
-                issues: function (callback) {
-                    // Top Issues
-                    db.Issue.find(ownerQuery).limit(15).sort({ title: 1 }).exec(function(err, results) {
-                        flowUtils.setEditorsUsername(results, function() {
-                            results.forEach(function (result) {
-                                result.friendlyUrl = utils.urlify(result.title);
-                                flowUtils.appendEntryExtra(result);
-                            });
-                            model.issues = results;
-                            callback();
-                        });
-                    });
-                },
-                opinions: function (callback) {
-                    // Top Opinions
-                    db.Opinion.find(ownerQuery).limit(15).sort({ title: 1 }).exec(function(err, results) {
-                        flowUtils.setEditorsUsername(results, function() {
-                            results.forEach(function (result) {
-                                result.friendlyUrl = utils.urlify(result.title);
-                                flowUtils.appendEntryExtra(result);
-                            });
-                            model.opinions = results;
-                            callback();
-                        });
-                    });
-                }
-            }, function (err, results) {
-                model.entry = model.question;
-                model.entryType = constants.OBJECT_TYPES.question;
-                res.render(templates.truth.questions.entry, model);
-            });
-        });
+        getEntry(req, res);
     });
 
     router.get('/create', function (req, res) {
@@ -153,3 +157,5 @@ module.exports = function (router) {
         });
     });
 };
+
+module.exports.getEntry = getEntry;

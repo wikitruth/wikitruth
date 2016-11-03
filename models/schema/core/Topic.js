@@ -5,6 +5,8 @@ exports = module.exports = function(app, mongoose) {
     title: { type: String, default: '' },
     contextTitle: { type: String },
     content: { type: String, default: '' },
+    friendlyUrl: { type: String },
+    referenceDate: { type: Date }, // If the entry is time/date sensitive or may become obsolete in the future, add a ref date
     references: { type: String, default: '' },
     parentId: { type: mongoose.Schema.ObjectId, default: null }, // Used when the parent is also a topic
     createDate: { type: Date, default: Date.now },

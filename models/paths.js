@@ -2,7 +2,7 @@
 
 
 module.exports = {
-    about: '/topics/entry/the-wikitruth-project/57e170a7e667695b74f8295d',
+    about: '/topic/the-wikitruth-project',
     contact: '/contact',
     signup: '/signup',
     login: '/login',
@@ -37,30 +37,30 @@ module.exports = {
         index: '/explore',
         topics: {
             index:  '/topics',
-            entry:  '/topics/entry',
+            entry:  '/topic',
             create: '/topics/create',
             link: '/topics/link'
         },
         arguments: {
             index:  '/arguments',
-            entry:  '/arguments/entry',
+            entry:  '/argument',
             create: '/arguments/create',
             link: '/arguments/link'
         },
         questions: {
             create: '/questions/create',
             index:  '/questions',
-            entry:  '/questions/entry'
+            entry:  '/question'
         },
         issues: {
             create: '/issues/create',
             index:  '/issues',
-            entry:  '/issues/entry'
+            entry:  '/issue'
         },
         opinions: {
             create: '/opinions/create',
             index:  '/opinions',
-            entry:  '/opinions/entry'
+            entry:  '/opinion'
         },
         outline: {
             link: '/outline/link'

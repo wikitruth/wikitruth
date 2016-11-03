@@ -1,14 +1,14 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {?argument}{argument.title}{:else}{topic.title}{/argument}: Opinions - {titleSlogan}
+    {?argument}{argument.title}{:else}{topic.title}{/argument}: Comments - {titleSlogan}
 {/title}
 
 {<body}
     {>"dust/truth/common/entry-header" tab="opinions" /}
     {?opinions}
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight"><i class="fa fa-comments-o text-success-x" aria-hidden="true"></i> Opinions</li>
+            <li class="list-group-item highlight"><i class="fa fa-comments-o text-success-x" aria-hidden="true"></i> Comments</li>
             {#opinions}
                 <li class="list-group-item">
                     <i class="fa fa-comments-o text-success" aria-hidden="true"></i>
