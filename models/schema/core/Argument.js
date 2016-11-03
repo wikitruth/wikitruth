@@ -6,6 +6,7 @@ exports = module.exports = function(app, mongoose) {
   var schema = new mongoose.Schema({
     title: { type: String, default: '' },
     content: { type: String, default: '' },
+    referenceDate: { type: Date }, // If the entry is time/date sensitive or may become obsolete in the future, add a ref date
     references: { type: String, default: '' },
     screeningStatus: { type: Number }, // SCREENING_STATUS
     parentId: { type: mongoose.Schema.ObjectId, default: null }, // always an Argument

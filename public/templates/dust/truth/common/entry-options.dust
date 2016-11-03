@@ -17,12 +17,12 @@
                     <span class="fa fa-exclamation-circle" aria-hidden="true"></span> New Issue</a></li>
             {/issue}
             <li><a href="{paths.truth.opinions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
-                <span class="fa fa-comments-o" aria-hidden="true"></span> New Opinion</a></li>
+                <span class="fa fa-comments-o" aria-hidden="true"></span> New Comment</a></li>
         </ul>
     </div>
     <div class="pull-left entry-options">
-        <a href="#" class="text-muted no-underline" title="Upvote"><i class="fa fa-arrow-circle-o-up" aria-hidden="true"></i></a>
-        <a href="#" class="text-muted no-underline" title="Downvote" style-x="margin-right: 45px"><i class="fa fa-arrow-circle-o-down" aria-hidden="true"></i></a>
+        <a href="#" class="text-muted no-underline" title="Expose - this entry is important"><i class="fa fa-arrow-circle-o-up" aria-hidden="true"></i> Expose</a>
+        <a href="#" class="text-muted no-underline" title="Bury - this entry is NOT important" style-x="margin-right: 45px"><i class="fa fa-arrow-circle-o-down" aria-hidden="true"></i> Bury</a>
         {!<a href="#" class="text-muted no-underline" title="Timeline"><i class="fa fa-home" aria-hidden="true"></i><span class="hidden-xxs"> Timeline</span></a>!}
         {!<a href="#" class="text-muted no-underline"><i class="fa fa-comments" aria-hidden="true"></i><span class="hidden-xxs"> Discussions</span></a>
         <a href="#" class="text-muted no-underline"><i class="fa fa-exclamation-circle" aria-hidden="true"></i><span class="hidden-xxs"> Issues</span></a>
@@ -35,7 +35,7 @@
         <ul class="dropdown-menu dropdown-menu-right-x" aria-labelledby="wtTabEntryMore" id="wtTabEntryMore-contents">
             {?isContributor}
                 {?isOpinionOwner}
-                    <li><a href="{paths.truth.opinions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;opinion={opinion._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Opinion</a></li>
+                    <li><a href="{paths.truth.opinions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;opinion={opinion._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Comment</a></li>
                 {:else}
                     {?isIssueOwner}
                         <li><a href="{paths.truth.issues.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;issue={issue._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Issue</a></li>

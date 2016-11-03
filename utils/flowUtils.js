@@ -217,7 +217,11 @@ function setEntryModels(query, req, model, callback) {
 
 function setTopicModels(req, model, callback) {
     var query = { _id: model.argument ? model.argument.ownerId : req.query.topic ? req.query.topic : null };
-    if(query._id) {
+    if(!query._id && req.query.friendlyUrl) {
+        delete query._id;
+        query.friendlyUrl = req.query.friendlyUrl;
+    }
+    if(query._id || query.friendlyUrl) {
         async.series({
             topic: function (callback) {
                 db.Topic.findOne(query, function(err, result) {

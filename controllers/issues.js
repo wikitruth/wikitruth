@@ -8,6 +8,23 @@ var mongoose    = require('mongoose'),
     constants   = require('../models/constants'),
     db          = require('../app').db.models;
 
+function getEntry(req, res) {
+    var model = {};
+    if(!req.query.issue) {
+        if(req.params.id) {
+            req.query.issue = req.params.id;
+        } else {
+            req.query.issue = req.params.friendlyUrl;
+        }
+    }
+    flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
+        model.entry = model.issue;
+        model.issueType = constants.ISSUE_TYPES['type' + model.issue.issueType].text;
+        model.entryType = constants.OBJECT_TYPES.issue;
+        res.render(templates.truth.issues.entry, model);
+    });
+}
+
 module.exports = function (router) {
 
     /* Issues */
@@ -48,20 +65,7 @@ module.exports = function (router) {
     });
 
     router.get('/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
-        var model = {};
-        if(!req.query.issue) {
-            if(req.params.id) {
-                req.query.issue = req.params.id;
-            } else {
-                req.query.issue = req.params.friendlyUrl;
-            }
-        }
-        flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
-            model.entry = model.issue;
-            model.issueType = constants.ISSUE_TYPES['type' + model.issue.issueType].text;
-            model.entryType = constants.OBJECT_TYPES.issue;
-            res.render(templates.truth.issues.entry, model);
-        });
+        getEntry(req, res);
     });
 
     router.get('/create', function (req, res) {
@@ -116,3 +120,5 @@ module.exports = function (router) {
         });
     });
 };
+
+module.exports.getEntry = getEntry;

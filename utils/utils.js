@@ -38,6 +38,9 @@ module.exports = {
     urlify: function urlify(text){
         return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "-").replace(/^-+|-+$/g, '');
     },
+    isObjectIdString: function (id) {
+        return id && id.length === 24 && id.indexOf("-") === -1;
+    },
     titleCompare: function titleCompare(a,b) {
         if (a.title < b.title) {
             return -1;

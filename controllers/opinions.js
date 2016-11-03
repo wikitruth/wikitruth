@@ -8,6 +8,22 @@ var mongoose    = require('mongoose'),
     constants   = require('../models/constants'),
     db          = require('../app').db.models;
 
+function getEntry(req, res) {
+    var model = {};
+    if(!req.query.opinion) {
+        if(req.params.id) {
+            req.query.opinion = req.params.id;
+        } else {
+            req.query.opinion = req.params.friendlyUrl;
+        }
+    }
+    flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
+        model.entry = model.opinion;
+        model.entryType = constants.OBJECT_TYPES.opinion;
+        res.render(templates.truth.opinions.entry, model);
+    });
+}
+
 module.exports = function (router) {
 
     /* Opinions */
@@ -48,19 +64,7 @@ module.exports = function (router) {
     });
 
     router.get('/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
-        var model = {};
-        if(!req.query.opinion) {
-            if(req.params.id) {
-                req.query.opinion = req.params.id;
-            } else {
-                req.query.opinion = req.params.friendlyUrl;
-            }
-        }
-        flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
-            model.entry = model.opinion;
-            model.entryType = constants.OBJECT_TYPES.opinion;
-            res.render(templates.truth.opinions.entry, model);
-        });
+        getEntry(req, res);
     });
 
     router.get('/create', function (req, res) {
@@ -113,3 +117,5 @@ module.exports = function (router) {
         });
     });
 };
+
+module.exports.getEntry = getEntry;

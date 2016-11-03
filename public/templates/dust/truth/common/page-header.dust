@@ -35,7 +35,7 @@
     <hr style="border: 0; margin: 0.7rem 0 0.7rem; border-top: 0.0625rem dotted #dcdcdc;"/>
     <div style="font-style-x: italic; font-size: smaller;" class="text-muted">
         {?opinion}
-            <i class="fa fa-comments-o"></i> An opinion on&nbsp;
+            <i class="fa fa-comments-o"></i> A comment on&nbsp;
             {?question}
                 <a href="{paths.truth.questions.entry}/{question.friendlyUrl}/{question._id}">{question.title}</a>
             {:else}

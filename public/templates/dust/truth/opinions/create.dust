@@ -1,18 +1,18 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {?opinion}Edit{:else}New{/opinion} Opinion - {titleSlogan}
+    {?opinion}Edit{:else}New{/opinion} Comment - {titleSlogan}
 {/title}
 
 {<body}
     {>"dust/truth/common/breadcrumb" /}
     <h1 class="page-header">
-        <i class="fa fa-comments-o"></i> {?opinion}Edit{:else}New{/opinion} Opinion
+        <i class="fa fa-comments-o"></i> {?opinion}Edit{:else}New{/opinion} Comment
     </h1>
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
         <div class="form-group">
-            <label for="inputName">Opinion</label>
+            <label for="inputName">Title</label>
             <textarea name="title" id="inputName" class="form-control" rows="1">{opinion.title}</textarea>
         </div>
         <div class="form-group">

@@ -100,7 +100,7 @@
                     <span class="fa fa-exclamation-circle" aria-hidden="true"></span> New Issue</a></li>
             {/issue}
             <li><a href="{paths.truth.opinions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
-                <span class="fa fa-comments-o" aria-hidden="true"></span> New Opinion</a></li>
+                <span class="fa fa-comments-o" aria-hidden="true"></span> New Comment</a></li>
                 {!<li role="separator" class="divider"></li>!}
             {!<li>
                 <a href="{paths.truth.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">

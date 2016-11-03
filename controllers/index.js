@@ -8,6 +8,12 @@ var utils       = require('../utils/utils'),
     flowUtils   = require('../utils/flowUtils'),
     async       = require('async');
 
+var argumentController  = require('./arguments'),
+    topicController     = require('./topics'),
+    opinionController     = require('./opinions'),
+    questionController     = require('./questions'),
+    issueController     = require('./issues');
+
 module.exports = function (router) {
 
     router.get('/', function (req, res) {
@@ -344,6 +350,28 @@ module.exports = function (router) {
         }, function (err, results) {
             res.render(templates.search, model);
         });
+    });
+
+    /* Entry routes mapping */
+
+    router.get('/topic(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        topicController.getEntry(req, res);
+    });
+
+    router.get('/argument(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        argumentController.getEntry(req, res);
+    });
+
+    router.get('/question(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        questionController.getEntry(req, res);
+    });
+
+    router.get('/opinion(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        opinionController.getEntry(req, res);
+    });
+
+    router.get('/issue(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        issueController.getEntry(req, res);
     });
 
     /* Related */

@@ -61,7 +61,7 @@
                 </li>
                 <li role="presentation"{@eq key=tab value="opinions"} class="active"{/eq}>
                     <a href="{paths.search}?q={keyword}&amp;tab=opinions" role="tab">
-                        <i class="fa fa-comments-o" aria-hidden="true"></i><span class="hidden-xs"> Opinions</span>
+                        <i class="fa fa-comments-o" aria-hidden="true"></i><span class="hidden-xs"> Comments</span>
                     </a>
                 </li>
             </ul>
@@ -140,7 +140,7 @@
                 {/issuesMore}
             {/issues}
             {?opinions}
-                <h3 class="page-header-x">Opinions</h3>
+                <h3 class="page-header-x">Comments</h3>
                 <ul class="list-group top-list-items wt-list">
                     {!<li class="list-group-item highlight"><span class="fa fa-comments-o text-success" aria-hidden="true"></span> Opinions</li>!}
                     {#opinions}
