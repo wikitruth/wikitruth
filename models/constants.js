@@ -222,7 +222,7 @@ var TOPIC_TAGS = {
     },
     tag520: {
         code: 520,
-        text: "Primary"
+        text: "Main"
     },
     tag530: {
         code: 530,
