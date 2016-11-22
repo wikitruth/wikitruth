@@ -153,6 +153,20 @@ function getEntry(req, res) {
                 model.conArgumentCount = contra.length;
                 model.conArguments = contra.slice(0, 15);
             }
+
+            // Argument Tags
+            var tags = model.argument.tags;
+            if(tags && tags.length > 0) {
+                var tagLabels = [];
+                if(model.argument.ethicalStatus.hasValue) {
+                    tagLabels.push(constants.ARGUMENT_TAGS.tag10);
+                }
+                tags.forEach(function (tag) {
+                    tagLabels.push(constants.ARGUMENT_TAGS['tag' + tag]);
+                });
+                model.tagLabels = tagLabels;
+            }
+
             model.entry = model.argument;
             model.entryType = constants.OBJECT_TYPES.argument;
             flowUtils.prepareClipboardOptions(req, model, constants.OBJECT_TYPES.argument);
@@ -263,6 +277,7 @@ module.exports = function (router) {
                     }
                 }
             }, function (err, results) {
+                model.ARGUMENT_TAGS = constants.ARGUMENT_TAGS;
                 res.render(templates.truth.arguments.create, model);
             });
         });
@@ -287,6 +302,7 @@ module.exports = function (router) {
             update: function (callback) {
                 var query = { _id: req.query.id || new mongoose.Types.ObjectId() };
                 db.Argument.findOne(query, function(err, result) {
+                    var tags = req.body.argumentTags;
                     entry = result;
                     entity = result ? result : {};
                     entity.content = req.body.content;
@@ -296,6 +312,7 @@ module.exports = function (router) {
                     entity.editDate = Date.now();
                     entity.typeId = req.body.typeId;
                     entity.against = !req.body.supportsParent;
+                    entity.tags = tags ? tags : [];
                     if(!entity.ethicalStatus) {
                         entity.ethicalStatus = {};
                     }

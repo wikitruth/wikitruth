@@ -108,7 +108,8 @@ var ARGUMENT_TYPES = {
     ethical: 0,
     factual: 1,
     prediction: 2,
-    artifact: 3
+    artifact: 3,
+    experience: 4
 };
 
 ARGUMENT_TYPES.getUXInfo = function (typeId) {
@@ -121,6 +122,9 @@ ARGUMENT_TYPES.getUXInfo = function (typeId) {
             break;
         case ARGUMENT_TYPES.artifact:
             label = "artifact";
+            break;
+        case ARGUMENT_TYPES.experience:
+            label = "experience";
             break;
         case ARGUMENT_TYPES.prediction:
             label = "prediction";
@@ -168,6 +172,80 @@ var ISSUE_TYPES = {
     }
 };
 
+var ARGUMENT_TAGS = {
+    tag10: {
+        code: 10,
+        text: "Value"
+    },
+    tag20: {
+        code: 20,
+        text: "Primary"
+    },
+    tag30: {
+        code: 30,
+        text: "Extrapolation"
+    },
+    tag40: {
+        code: 40,
+        text: "Conjecture"
+    },
+    tag50: {
+        code: 50,
+        text: "Hypothetical"
+    },
+    tag60: {
+        code: 60,
+        text: "Generalization"
+    },
+    tag70: {
+        code: 70,
+        text: "Conceptual"
+    },
+    tag80: {
+        code: 80,
+        text: "Figurative"
+    }
+};
+
+var TOPIC_TAGS = {
+    tag10: {
+        code: 10,
+        text: "Value"
+    },
+    tag20: {
+        code: 20,
+        text: "Primary"
+    },
+    tag510: {
+        code: 510,
+        text: "Category"
+    },
+    tag520: {
+        code: 520,
+        text: "Primary"
+    },
+    tag530: {
+        code: 530,
+        text: "Person"
+    },
+    tag540: {
+        code: 540,
+        text: "Territory"
+    },
+    tag550: {
+        code: 550,
+        text: "Event"
+    },
+    tag560: {
+        code: 560,
+        text: "Organization"
+    },
+    tag570: {
+        code: 570,
+        text: "Artifact"
+    }
+};
+
 module.exports = {
     OBJECT_TYPES: {
         topic: 1,
@@ -180,6 +258,8 @@ module.exports = {
     },
     ARGUMENT_TYPES: ARGUMENT_TYPES,
     ISSUE_TYPES: ISSUE_TYPES,
+    ARGUMENT_TAGS: ARGUMENT_TAGS,
+    TOPIC_TAGS: TOPIC_TAGS,
     ETHICAL_STATUS: {
         very_good: 12,
         good: 11,

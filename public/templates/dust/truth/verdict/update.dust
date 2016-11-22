@@ -47,7 +47,7 @@
             <div class="radio">
                 <label class="text-success">
                     <input type="radio" name="verdictStatus" id="radioVerdict12" value="12">
-                    Very / Highly Likely
+                    Very Likely
                 </label>
             </div>
             <div class="radio">
@@ -74,7 +74,7 @@
             <div class="radio">
                 <label class="text-danger">
                     <input type="radio" name="verdictStatus" id="radioVerdict22" value="22">
-                    Very / Highly Unlikely
+                    Very Unlikely
                 </label>
             </div>
             <div class="radio">

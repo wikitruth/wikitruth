@@ -79,6 +79,9 @@
         {/verdict.counts.false}
     {/verdict}
 {/argument}
+{#tagLabels}
+    <span class="label label-info"><i class="fa fa-tag"></i> {text}</span>&nbsp;
+{/tagLabels}
 {?linkCount}
     <span class="label label-info pull-right-x"><i class="fa fa-link"></i> {linkCount}</span>&nbsp;
 {/linkCount}
