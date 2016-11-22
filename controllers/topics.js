@@ -176,6 +176,20 @@ function getEntry(req, res) {
             model.verdict = {
                 counts: flowUtils.getVerdictCount(results.arguments)
             };
+
+            // Topic Tags
+            var tags = model.topic.tags;
+            if(tags && tags.length > 0) {
+                var tagLabels = [];
+                if(model.topic.ethicalStatus.hasValue) {
+                    tagLabels.push(constants.TOPIC_TAGS.tag10);
+                }
+                tags.forEach(function (tag) {
+                    tagLabels.push(constants.TOPIC_TAGS['tag' + tag]);
+                });
+                model.tagLabels = tagLabels;
+            }
+
             flowUtils.prepareClipboardOptions(req, model, constants.OBJECT_TYPES.topic);
             res.render(templates.truth.topics.entry, model);
         });
@@ -247,6 +261,7 @@ module.exports = function (router) {
         var query = { _id: req.query.id || new mongoose.Types.ObjectId() };
         db.Topic.findOne(query, function(err, result) {
             var entity = result ? result : {};
+            var tags = req.body.topicTags;
             entity.content = req.body.content;
             entity.title = req.body.title;
             entity.contextTitle = req.body.contextTitle;
@@ -254,6 +269,7 @@ module.exports = function (router) {
             entity.friendlyUrl = utils.urlify(req.body.title);
             entity.editUserId = req.user.id;
             entity.editDate = Date.now();
+            entity.tags = tags ? tags : [];
             entity.icon = req.body.icon;
             if(!entity.ethicalStatus) {
                 entity.ethicalStatus = {};

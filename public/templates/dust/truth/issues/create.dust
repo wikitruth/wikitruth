@@ -117,6 +117,7 @@
 
             var issueType = '{?issue}{issue.issueType}{:else}{ISSUE_TYPES.type100.code}{/issue}';
             $('#radioType' + issueType).prop('checked', true);
+
             $('[data-toggle="popover"]').popover();
         });
     </script>

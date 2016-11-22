@@ -60,15 +60,6 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="inputParent">Morality and Ethics</label>
-            <div class="checkbox">
-                <label class="text-primary">
-                    <input type="checkbox" name="hasEthicalValue" value="1" {?argument.ethicalStatus.hasValue}checked="checked"{/argument.ethicalStatus.hasValue}>
-                    Has moral or ethical value
-                </label>
-            </div>
-        </div>
-        <div class="form-group">
             <label for="inputParent">Argument Type</label>
             <div class="radio">
                 <label>
@@ -77,13 +68,13 @@
                     A statement of a fact, reality or phenomenon (current)
                 </label>
             </div>
-            <div class="radio">
+            {!<div class="radio">
                 <label>
                     <input type="radio" id="radioTypeId{argumentTypes.prediction}" name="typeId" value="{argumentTypes.prediction}">
                     <span class="text-info"><strong>Extrapolation</strong></span><br/>
                     A speculation, an assumption, a prediction of a future event or phenomenon.
                 </label>
-            </div>
+            </div>!}
             <div class="radio">
                 <label>
                     <input type="radio" id="radioTypeId{argumentTypes.artifact}" name="typeId" value="{argumentTypes.artifact}">
@@ -93,10 +84,97 @@
             </div>
             <div class="radio">
                 <label>
-                    <input type="radio" id="radioTypeId{argumentTypes.ethical}" name="typeId" value="{argumentTypes.ethical}">
-                    <span class="text-warning"><strong>Ethical</strong></span><br/>
-                    A moral or ethical value argument.
+                    <input type="radio" id="radioTypeId{argumentTypes.experience}" name="typeId" value="{argumentTypes.experience}">
+                    <span class="text-info"><strong>Experience</strong></span><br/>
+                    A personal experience of an event perceived through the senses, a testimony
                 </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" id="radioTypeId{argumentTypes.ethical}" name="typeId" value="{argumentTypes.ethical}">
+                    <span class="text-warning"><strong>Value</strong></span><br/>
+                    An argument on value, morality, ethics, goodness, or aesthetics (beauty)
+                </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputParent">Tags</label>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" class="argumentTag" name="argumentTags" value="20">
+                            <span class="text-info"><strong>Primary</strong></span><br/>
+                            A primary, crucial, core or vital part of the parent entry.
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="hasEthicalValue" value="1" {?argument.ethicalStatus.hasValue}checked="checked"{/argument.ethicalStatus.hasValue}>
+                            <span class="text-warning"><strong>Value</strong></span><br/>
+                            A argument on truth but containing moral, ethical, or aesthetic value
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <hr style="border: 0; margin: 0.7rem 0 0.7rem; border-top: 0.0625rem dotted #dcdcdc;"/>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" class="argumentTag" name="argumentTags" value="30">
+                            <span class="text-info"><strong>Extrapolation</strong></span><br/>
+                            to make an estimate or conclusion about something from known facts
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" class="argumentTag" name="argumentTags" value="60">
+                            <span class="text-warning"><strong>Generalization | Simplification</strong></span><br/>
+                            a general statement or concept obtained by inference from specific cases; made simpler or easier to understand
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" class="argumentTag" name="argumentTags" value="70">
+                            <span class="text-warning"><strong>Conceptual | Idealistic</strong></span><br/>
+                            relating to or based on mental concepts, representation in ideal or idealized form
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" class="argumentTag" name="argumentTags" value="80">
+                            <span class="text-warning"><strong>Figurative</strong></span><br/>
+                            departing from a literal use of words; metaphorical
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" class="argumentTag" name="argumentTags" value="50">
+                            <span class="text-danger"><strong>Hypothetical</strong></span><br/>
+                            a supposition or proposed explanation made on the basis of limited evidence as a starting point for further investigation
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" class="argumentTag" name="argumentTags" value="40">
+                            <span class="text-danger"><strong>Conjecture</strong></span><br/>
+                            A speculation, an assumption, a prediction of a future event or phenomenon, or a retrodiction.
+                        </label>
+                    </div>
+                </div>
             </div>
         </div>
         {!<div class="form-group{^user.isAdmin} hidden{/user.isAdmin}">
@@ -134,6 +212,13 @@
 
             var typeId = '{?argument}{argument.typeId}{:else}{argumentTypes.factual}{/argument}';
             $('#radioTypeId' + typeId).prop('checked', true);
+
+            var argumentTags = [{?argument.tags}{argument.tags}{/argument.tags}];
+            if(argumentTags.length > 0) {
+                argumentTags.forEach(function (item) {
+                    $(".argumentTag[value='" + item + "'").prop('checked', true);
+                });
+            }
 
             $('[data-toggle="popover"]').popover();
         });
