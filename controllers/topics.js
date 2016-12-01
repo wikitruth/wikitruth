@@ -46,7 +46,50 @@ function getEntry(req, res) {
         if(!req.query.topic) {
             req.query.topic = model.topic._id;
         }
+
+        // Topic Tags
+        var tags = model.topic.tags;
+        if(tags && tags.length > 0) {
+            var tagLabels = [];
+            if(model.topic.ethicalStatus.hasValue) {
+                tagLabels.push(constants.TOPIC_TAGS.tag10);
+            }
+            tags.forEach(function (tag) {
+                tagLabels.push(constants.TOPIC_TAGS['tag' + tag]);
+                if(tag === constants.TOPIC_TAGS.tag520.code) {
+                    model.mainTopic = true;
+                }
+            });
+            model.tagLabels = tagLabels;
+        }
+
         async.parallel({
+            categories: function(callback) {
+                if(model.mainTopic) {
+                db.Topic
+                    .find({parentId: model.topic._id })
+                    .sort({title: 1})
+                    .lean()
+                    .exec(function (err, results) {
+                        async.each(results, function(result, callback) {
+                            result.friendlyUrl = utils.urlify(result.title);
+                            result.comments = utils.numberWithCommas(utils.randomInt(1, 100000));
+                            db.Topic.find( { parentId: result._id } ).limit(3).sort({ title: 1 }).exec(function(err, subtopics) {
+                                subtopics.forEach(function(subtopic){
+                                    subtopic.friendlyUrl = utils.urlify(subtopic.title);
+                                });
+                                result.subtopics = subtopics;
+                                callback();
+                            });
+                        }, function(err) {
+                            model.categories = results;
+                            callback();
+                        });
+                    });
+                } else {
+                    callback();
+                }
+            },
             topics: function(callback) {
                 // Top Subtopics
                 var query = { parentId: req.query.topic };
@@ -177,19 +220,6 @@ function getEntry(req, res) {
                 counts: flowUtils.getVerdictCount(results.arguments)
             };
 
-            // Topic Tags
-            var tags = model.topic.tags;
-            if(tags && tags.length > 0) {
-                var tagLabels = [];
-                if(model.topic.ethicalStatus.hasValue) {
-                    tagLabels.push(constants.TOPIC_TAGS.tag10);
-                }
-                tags.forEach(function (tag) {
-                    tagLabels.push(constants.TOPIC_TAGS['tag' + tag]);
-                });
-                model.tagLabels = tagLabels;
-            }
-
             flowUtils.prepareClipboardOptions(req, model, constants.OBJECT_TYPES.topic);
             res.render(templates.truth.topics.entry, model);
         });
@@ -253,6 +283,7 @@ module.exports = function (router) {
                 }
             }
         }, function (err, results) {
+            model.TOPIC_TAGS = constants.TOPIC_TAGS;
             res.render(templates.truth.topics.create, model);
         });
     });

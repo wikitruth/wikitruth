@@ -117,7 +117,7 @@ ARGUMENT_TYPES.getUXInfo = function (typeId) {
     var theme = "info";
     switch (typeId) {
         case ARGUMENT_TYPES.ethical:
-            label = "ethical";
+            label = "value";
             theme = "warning";
             break;
         case ARGUMENT_TYPES.artifact:
@@ -179,7 +179,7 @@ var ARGUMENT_TAGS = {
     },
     tag20: {
         code: 20,
-        text: "Primary"
+        text: "Key Argument"
     },
     tag30: {
         code: 30,
@@ -214,7 +214,7 @@ var TOPIC_TAGS = {
     },
     tag20: {
         code: 20,
-        text: "Primary"
+        text: "Key Topic"
     },
     tag510: {
         code: 510,

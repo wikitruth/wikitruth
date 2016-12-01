@@ -27,6 +27,33 @@
         </div>
     {/parentTopic}
     {>"dust/truth/common/entry-options" /}
+    {?mainTopic}
+        <div class="row" style="margin-top: 30px">
+            {#categories}
+                <div class="col-lg-4 col-md-6 col-sm-6">{! 73px !}
+                    <div class="media wt-category">
+                        <div class="media-left media-top">
+                            <a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">
+                                <div class="wt-category-icon" data-title="{title}"></div>
+                            </a>
+                        </div>
+                        <div class="media-body">
+                            <h4 class="media-heading"><a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{title}</a></h4>
+                            <div>
+                                {?subtopics}
+                                    {#subtopics}
+                                        <div><i class="fa fa-folder-open text-muted text-success-x" aria-hidden="true"></i>&nbsp;<a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{title}</a></div>
+                                    {/subtopics}
+                                {/subtopics}
+                                <div><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.truth.topics.index}?topic={_id}" role="button">more</a></div>
+                                {!<span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}!}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {/categories}
+        </div>
+    {/mainTopic}
     {?topics}
         <div class="wt-list">
             <ul class="list-group top-list-items">
@@ -95,4 +122,17 @@
             }
         });
     </script>
+
+    {?mainTopic}
+        <script src="/components/geopattern/js/geopattern.min.js"></script>
+        <script type="text/javascript">
+            $(function() {
+                $(".wt-category-icon").each(function() {
+                    var title = $( this ).data("title");
+                    var pattern = GeoPattern.generate(title);
+                    $(this).css("background-image", pattern.toDataUrl());
+                });
+            });
+        </script>
+    {/mainTopic}
 {/footer}
