@@ -42,7 +42,7 @@
                             <div>
                                 {?subtopics}
                                     {#subtopics}
-                                        <div><i class="fa fa-folder-open text-muted text-success-x" aria-hidden="true"></i>&nbsp;<a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{title}</a></div>
+                                        <div><i class="fa fa-folder-open text-muted text-success-x" aria-hidden="true"></i>&nbsp;<a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{shortTitle}</a></div>
                                     {/subtopics}
                                 {/subtopics}
                                 <div><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.truth.topics.index}?topic={_id}" role="button">more</a></div>
