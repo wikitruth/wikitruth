@@ -104,7 +104,7 @@
                     <div class="checkbox">
                         <label>
                             <input type="checkbox" class="argumentTag" name="argumentTags" value="20">
-                            <span class="text-info"><strong>Primary</strong></span><br/>
+                            <span class="text-info"><strong>{ARGUMENT_TAGS.tag20.text}</strong></span><br/>
                             A primary, crucial, core or vital part of the parent entry.
                         </label>
                     </div>
@@ -113,7 +113,7 @@
                     <div class="checkbox">
                         <label>
                             <input type="checkbox" name="hasEthicalValue" value="1" {?argument.ethicalStatus.hasValue}checked="checked"{/argument.ethicalStatus.hasValue}>
-                            <span class="text-warning"><strong>Value</strong></span><br/>
+                            <span class="text-warning"><strong>{ARGUMENT_TAGS.tag10.text}</strong></span><br/>
                             A argument on truth but containing moral, ethical, or aesthetic value
                         </label>
                     </div>
