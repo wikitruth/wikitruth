@@ -24,7 +24,7 @@
                         </a>
                     </div>
                     <div class="media-body">
-                        <h4 class="media-heading"><a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{title}</a></h4>
+                        <h4 class="media-heading"><a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{?contextTitle}{contextTitle}{:else}{title}{/contextTitle}</a></h4>
                         <div>
                             {?subtopics}
                                 {#subtopics}
