@@ -77,6 +77,7 @@ function getEntry(req, res) {
                             db.Topic.find( { parentId: result._id } ).limit(3).sort({ title: 1 }).exec(function(err, subtopics) {
                                 subtopics.forEach(function(subtopic){
                                     subtopic.friendlyUrl = utils.urlify(subtopic.title);
+                                    subtopic.shortTitle = utils.getShortText(subtopic.title, 38);
                                 });
                                 result.subtopics = subtopics;
                                 callback();
