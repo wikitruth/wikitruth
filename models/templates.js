@@ -16,20 +16,16 @@ module.exports = {
         contributors: 'dust/members/contributors',
         reviewers: 'dust/members/reviewers',
         administrators: 'dust/members/administrators',
-        profile: 'dust/members/profile'
+        profile: {
+            index: 'dust/members/profile/profile',
+            topics: 'dust/members/profile/topics',
+            contributions: 'dust/members/profile/contributions'
+        }
     },
     pages: {
         index: 'dust/pages/index',
         page: 'dust/pages/page',
         create: 'dust/pages/create'
-    },
-    answers: {
-        index: 'dust/answers/index'
-    },
-    discuss: {
-        index: 'dust/discuss/index',
-        category: 'dust/discuss/category',
-        topic: 'dust/discuss/topic'
     },
     truth: {
         index: 'dust/truth/explore',

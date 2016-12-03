@@ -254,7 +254,8 @@ module.exports = {
         comment: 4,
         definition: 5,
         issue: 10,
-        opinion: 11
+        opinion: 11,
+        user: 21
     },
     ARGUMENT_TYPES: ARGUMENT_TYPES,
     ISSUE_TYPES: ISSUE_TYPES,

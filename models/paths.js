@@ -18,20 +18,18 @@ module.exports = {
         settings: '/account/settings'
     },
     members: {
-        contributors: '/members/contributors',
+        index: '/members',
         reviewers: '/members/reviewers',
         administrators: '/members/administrators',
-        profile: '/members/profile'
+        profile: {
+            index: '/members/profile',
+            topics: '/members/profile/topics'
+        }
     },
     pages: {
         index: '/pages',
         page: '/pages/page',
         create: '/pages/create'
-    },
-    discuss: {
-        index: '/discuss',
-        category: '/discuss/category',
-        topic: '/discuss/category/topic'
     },
     truth: {
         index: '/explore',

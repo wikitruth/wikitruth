@@ -1,0 +1,11 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {user.username}: Contributions - {titleSlogan}
+{/title}
+
+{<body}
+    {>"dust/members/profile/profile-header" tab="contributions" /}
+
+    <p>List user contributions here</p>
+{/body}

@@ -17,17 +17,17 @@ module.exports = function clean(grunt) {
                 'public/views/**/*.min.js.map'
             ]
         },
-        css: 'public/css',
-        /*css: {
+        css: {
             src: [
-                'public/layouts/**|*.min.css',
-                'public/views/**|*.min.css',
-                'public/css/**|*.min.css'
+                'public/css',
+                'public/layouts/**/*.min.css',
+                'public/views/**/*.min.css'
             ]
-        },*/
-        components: 'public/components'
-        /*components: {
-            src: ['public/components/**']
-        }*/
+        },
+        components: {
+            src: [
+                'public/components'
+            ]
+        }
     };
 };
