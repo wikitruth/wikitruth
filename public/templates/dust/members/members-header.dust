@@ -1,7 +1,7 @@
 <h1 class="page-header wt-header"><i class="fa fa-user"></i> Members</h1>
 <ul class="nav nav-tabs wt-tabs" role="tablist">
     <li role="presentation"{@eq key=tab value="contributors"} class="active"{/eq}>
-        <a href="{paths.members.contributors}" role="tab">
+        <a href="{paths.members.index}" role="tab">
             <i class="fa fa-user"></i> Contributors
         </a>
     </li>

@@ -29,6 +29,7 @@
     "summernote": "^0.8.1",
     "textarea-autosize": "^0.4.2",
     "jquery-timeago": "^1.5.3",
-    "geopattern": "^1.2.3"
+    "geopattern": "^1.2.3",
+    "font-awesome": "^4.7.0"
   }
 }

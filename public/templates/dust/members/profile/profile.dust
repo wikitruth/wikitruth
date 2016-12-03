@@ -1,0 +1,62 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {user.username}: Profile - {titleSlogan}
+{/title}
+
+{<header}
+    <link rel="stylesheet" href="/views/account/index.min.css?#{cacheBreaker}"/>
+{/header}
+
+{<body}
+    {>"dust/members/profile/profile-header" tab="overview" /}
+
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="well stat">
+                        <div class="stat-value day-of-year">337</div>
+                        <div class="stat-label">Topics</div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="well stat">
+                        <div class="stat-value day-of-month">2</div>
+                        <div class="stat-label">Arguments</div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="well stat">
+                        <div class="stat-value week-of-year">49</div>
+                        <div class="stat-label">Questions</div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="well stat">
+                        <div class="stat-value day-of-week">5</div>
+                        <div class="stat-label">Comments</div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="well stat">
+                        <div class="stat-value week-year">16</div>
+                        <div class="stat-label">Issues</div>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="well stat">
+                        <div class="stat-value hour-of-day">17</div>
+                        <div class="stat-label">Upvotes</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <p><i class="fa fa-pencil"></i> <a href="/account/settings">Edit Profile</a></p>
+    <p>Account Details</p>
+    <p>Reputation</p>
+    <p>Timeline &amp; Activities</p>
+{/body}

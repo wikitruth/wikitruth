@@ -4,7 +4,7 @@ module.exports = function (grunt) {
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        copy: {
+        /*copy: {
           components: {
             files: [
               {
@@ -13,7 +13,7 @@ module.exports = function (grunt) {
               }
             ]
           }
-        },
+        },*/
         concurrent: {
           dev: {
             tasks: ['nodemon', 'watch'],

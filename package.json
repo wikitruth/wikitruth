@@ -62,7 +62,6 @@
   "devDependencies": {
     "david": "^6.x.x",
     "grunt": "^0.4.5",
-    "font-awesome": "^4.6.3",
     "grunt-cli": "^1.2.0",
     "grunt-concurrent": "^2.x.x",
     "grunt-config-dir": "^0.3.2",
