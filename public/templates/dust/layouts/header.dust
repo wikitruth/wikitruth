@@ -18,14 +18,14 @@
         <div class="navbar-header">
             <a href="/" class="navbar-brand">
                 <img src="/img/logo-64x64.png" alt="Logo" class="navbar-logo">
-                    <span class="navbar-brand-label"><span class="hidden-xxs-x">{projectName}</span></span></a>
+                    <span class="navbar-brand-label"><span class="hidden-xxxxs">{projectName}</span></span></a>
             {!<button data-toggle="collapse" data-target=".my-navbar-collapse" class="navbar-toggle collapsed">
                 <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>!}
         </div>
         <div class="navbar-collapse my-navbar-collapse collapse">
             <ul class="nav navbar-nav">
                 <!--<li class="hidden-xs"><a href="/">Home</a></li>-->
-                <li><a href="{paths.truth.index}" title="Explore"><i class="fa fa-globe"></i><span class="hidden-xxs-x"> Explore</span></a></li>
+                <li><a href="{paths.truth.index}" title="Explore"><i class="fa fa-globe"></i><span class="hidden-xxxs"> Explore</span></a></li>
                 <li><a href="{paths.search}" title="Search"><i class="fa fa-search"></i><span class="hidden-xxs"> Search</span></a></li>
                 {!<li><a href="{paths.worldviews.index}" title="Religion & Worldviews"><i class="fa fa-book"></i><span class="hidden-xs"> Religion</span></a></li>
                 <li><a href="{paths.morality.index}" title="Morality & Ethics"><i class="fa fa-balance-scale"></i><span class="hidden-xs"> Morality</span></a></li>!}
@@ -39,7 +39,7 @@
                         <li><a href="{paths.members.administrators}"><i class="fa fa-user"></i> Administrators</a></li>
                         <li role="separator" class="divider"></li>!}
                         <li class="dropdown-header">more</li>
-                        <li><a href="{paths.members.index}"><i class="fa fa-user"></i> Contributors</a></li>
+                        <li><a href="{paths.members.index}"><i class="fa fa-user-circle"></i> Contributors</a></li>
                         <li><a href="#"><i class="fa fa-commenting" aria-hidden="true"></i> Debates</a></li>
                         <li><a href="#"><span class="glyphicon glyphicon-font" aria-hidden="true"></span> Dictionary</a></li>
                         <li><a href="#"><i class="fa fa-book"></i> Manuscripts</a></li>
@@ -51,7 +51,7 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                         {?user.username}
-                            <span class="hidden-xxs"><i class="fa fa-user"></i> {user.username} <span class="caret"></span></span>
+                            <span class="hidden-xxs"><i class="fa fa-user-circle"></i> {user.username} <span class="caret"></span></span>
                             <i class="fa fa-navicon visible-xxs"></i>
                         {:else}
                             <i class="fa fa-navicon"></i>
