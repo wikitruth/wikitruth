@@ -18,6 +18,91 @@
 // Source: http://timkadlec.com/2013/01/windows-phone-8-and-device-width/
 // Source: http://timkadlec.com/2012/10/ie10-snap-mode-and-responsive-design/
 
+/* xxxxs */
+@screen-xxxxs-max: (@screen-xxxs-min - 1);
+
+.visible-xxxxs {
+  .responsive-invisibility();
+}
+
+.visible-xxxxs-block,
+.visible-xxxxs-inline,
+.visible-xxxxs-inline-block {
+  display: none !important;
+}
+
+.visible-xxxxs {
+  @media (max-width: @screen-xxxxs-max) {
+    .responsive-visibility();
+  }
+}
+.visible-xxxxs-block {
+  @media (max-width: @screen-xxxxs-max) {
+    display: block !important;
+  }
+}
+.visible-xxxxs-inline {
+  @media (max-width: @screen-xxxxs-max) {
+    display: inline !important;
+  }
+}
+.visible-xxxxs-inline-block {
+  @media (max-width: @screen-xxxxs-max) {
+    display: inline-block !important;
+  }
+}
+
+.hidden-xxxxs {
+  @media (max-width: @screen-xxxxs-max) {
+    .responsive-invisibility();
+  }
+}
+
+
+/* xxxs */
+@screen-xxxs-min: 360px; /* Galaxy S5 */
+@screen-xxxs-max: (@screen-xxs-min - 1);
+
+.visible-xxxs {
+  .responsive-invisibility();
+}
+
+.visible-xxxs-block,
+.visible-xxxs-inline,
+.visible-xxxs-inline-block {
+  display: none !important;
+}
+
+.visible-xxxs {
+  @media (max-width: @screen-xxxs-max) {
+    .responsive-visibility();
+  }
+}
+.visible-xxxs-block {
+  @media (max-width: @screen-xxxs-max) {
+    display: block !important;
+  }
+}
+.visible-xxxs-inline {
+  @media (max-width: @screen-xxxs-max) {
+    display: inline !important;
+  }
+}
+.visible-xxxs-inline-block {
+  @media (max-width: @screen-xxxs-max) {
+    display: inline-block !important;
+  }
+}
+
+.hidden-xxxs {
+  @media (max-width: @screen-xxxs-max) {
+    .responsive-invisibility();
+  }
+}
+
+
+/* xxs */
+@screen-xxs-min: 414px; /* iPhone 6 Plus */
 @screen-xxs-max: (@screen-xs-min - 1);
 
 // Visibility utilities

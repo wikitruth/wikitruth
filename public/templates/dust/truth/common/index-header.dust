@@ -10,7 +10,7 @@
     </li>
     <li role="presentation"{@eq key=tab value="top-arguments"} class="active"{/eq}>
         <a href="{paths.truth.arguments.index}" role="tab">
-            <span class="glyphicon glyphicon-flash text-muted-x" aria-hidden="true"></span> Arguments
+            <span class="glyphicon glyphicon-flash text-muted-x" aria-hidden="true"></span><span class="hidden-xxxxs"> Arguments</span>
         </a>
     </li>
     <li role="presentation"{@eq key=tab value="top-questions"} class="active"{/eq}>

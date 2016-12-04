@@ -34,28 +34,34 @@ module.exports = function (router) {
 
     router.get('/:username', function (req, res) {
         var model = {};
-        if(req.query.params) {
-            db.User.findOne({'username': req.params.username}, function (err, result) {
-                model.user = result;
-                res.render(templates.members.profile.index, model);
-            });
-        } else {
-            model.user = req.user;
-            res.render(templates.members.profile.index, model);
+        if(req.params.username) {
+            if(req.user && req.user.username === req.params.username) {
+                model.user = req.user;
+                model.loggedIn = true;
+            } else {
+                return db.User.findOne({'username': req.params.username}, function (err, result) {
+                    model.user = result;
+                    res.render(templates.members.profile.index, model);
+                });
+            }
         }
+        res.render(templates.members.profile.index, model);
     });
 
     router.get('/:username/contributions', function (req, res) {
         var model = {};
-        if(req.query.params) {
-            db.User.findOne({'username': req.params.username}, function (err, result) {
-                model.user = result;
-                res.render(templates.members.profile.contributions, model);
-            });
-        } else {
-            model.user = req.user;
-            res.render(templates.members.profile.contributions, model);
+        if(req.params.username) {
+            if(req.user && req.user.username === req.params.username) {
+                model.user = req.user;
+                model.loggedIn = true;
+            } else {
+                return db.User.findOne({'username': req.params.username}, function (err, result) {
+                    model.user = result;
+                    res.render(templates.members.profile.contributions, model);
+                });
+            }
         }
+        res.render(templates.members.profile.contributions, model);
     });
 
     router.get('/:username/topics', function (req, res) {
@@ -63,14 +69,17 @@ module.exports = function (router) {
         async.series({
             user: function(callback){
                 if(req.params.username) {
-                    db.User.findOne({ username: req.params.username }, function (err, result) {
-                        model.user = result;
-                        callback();
-                    });
-                } else {
-                    model.user = req.user;
-                    callback();
+                    if (req.user && req.user.username === req.params.username) {
+                        model.user = req.user;
+                        model.loggedIn = true;
+                    } else {
+                        return db.User.findOne({username: req.params.username}, function (err, result) {
+                            model.user = result;
+                            callback();
+                        });
+                    }
                 }
+                callback();
             },
             topics: function(callback) {
                 // display 15 if top topics, all if has topic parameter

@@ -1,18 +1,18 @@
-<h1 class="page-header wt-header"><i class="fa fa-user"></i> Members</h1>
+<h1 class="page-header wt-header"><i class="fa fa-user-circle"></i> Members</h1>
 <ul class="nav nav-tabs wt-tabs" role="tablist">
     <li role="presentation"{@eq key=tab value="contributors"} class="active"{/eq}>
         <a href="{paths.members.index}" role="tab">
-            <i class="fa fa-user"></i> Contributors
+            <i class="fa fa-user-circle"></i> Contributors
         </a>
     </li>
     <li role="presentation"{@eq key=tab value="reviewers"} class="active"{/eq}>
         <a href="{paths.members.reviewers}" role="tab">
-            <i class="fa fa-user"></i> Reviewers
+            <i class="fa fa-user-circle"></i> Reviewers
         </a>
     </li>
     <li role="presentation"{@eq key=tab value="administrators"} class="active"{/eq}>
         <a href="{paths.members.administrators}" role="tab">
-            <i class="fa fa-user"></i> Administrators
+            <i class="fa fa-user-circle"></i> Administrators
         </a>
     </li>
 </ul>

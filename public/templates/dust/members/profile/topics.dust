@@ -6,7 +6,7 @@
 
 {<body}
     {>"dust/members/profile/profile-header" tab="topics" /}
-    <a class="btn btn-success" href="/" role="button">Create Topic</a>
+    <a class="btn btn-default" href="/topics/create" role="button">Create Topic</a>
     {?topics}
         <ul class="list-group wt-list">
             <li class="list-group-item highlight"><i class="fa fa-folder-open text-success-x" aria-hidden="true"></i>&nbsp;&nbsp;Topics</li>
@@ -26,6 +26,7 @@
             {/topics}
         </ul>
     {:else}
+        <br/>
         <br/>
     {/topics}
 {/body}
