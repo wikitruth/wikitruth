@@ -1,23 +1,23 @@
-<h1 class="page-header wt-header"><i class="fa fa-user-circle"></i> {user.username}</h1>
+<h1 class="page-header wt-header"><i class="fa fa-user-circle"></i> {member.username}</h1>
 <ul class="nav nav-tabs wt-tabs" role="tablist">
-    <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
-        <a href="{paths.members.index}/{user.username}" role="tab">
+    <li role="presentation"{@eq key=profileTab value="overview"} class="active"{/eq}>
+        <a href="{paths.members.index}/{member.username}" role="tab">
             <i class="fa fa-user-circle"></i> Overview
         </a>
     </li>
-    <li role="presentation"{@eq key=tab value="contributions"} class="active"{/eq}>
-        <a href="{paths.members.index}/{user.username}/contributions" role="tab">
+    <li role="presentation"{@eq key=profileTab value="contributions"} class="active"{/eq}>
+        <a href="{paths.members.index}/{member.username}/contributions" role="tab">
             <i class="fa fa-folder-open"></i> Contributions
         </a>
     </li>
     {?loggedIn}
-    <li role="presentation"{@eq key=tab value="topics"} class="active"{/eq}>
-        <a href="{paths.members.index}/{user.username}/topics" role="tab">
+    <li role="presentation"{@eq key=profileTab value="topics"} class="active"{/eq}>
+        <a href="{paths.members.index}/{member.username}/topics" role="tab">
             <i class="fa fa-folder-open"></i> My Topics
         </a>
     </li>
     {/loggedIn}
-    <li role="presentation"{@eq key=tab value="pages"} class="active"{/eq}>
+    <li role="presentation"{@eq key=profileTab value="pages"} class="active"{/eq}>
         <a href="/pages" role="tab">
             <i class="fa fa-book"></i> {?loggedIn}My {/loggedIn}Pages
         </a>

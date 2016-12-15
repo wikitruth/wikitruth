@@ -1,14 +1,22 @@
 li.dropdown
     a.dropdown-toggle(href='#', data-toggle='dropdown')
-        i.fa.fa-user
+        i.fa.fa-user-circle
         span.hidden-xxs
             |  #{user.username}
         |&nbsp;
         span.caret
     ul.dropdown-menu.dropdown-menu-right
+        li: a(href='/members/#{user.username}')
+            i.fa.fa-user-circle
+            = ' '
+            | My Account
         if user && user.isAdmin
-            li: a(href='/admin') Admin Area
-        li: a(href='/account') My Account
-        li: a(href='/account/settings/') Settings
+            li: a(href='/admin')
+                i.fa.fa-gear
+                = ' '
+                | Admin Area
         li.divider
-        li: a(href='/logout/') Sign Out
+        li: a(href='/logout/')
+            i.fa.fa-sign-out
+            = ' '
+            | Sign Out

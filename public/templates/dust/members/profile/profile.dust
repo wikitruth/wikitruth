@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {user.username}: Profile - {titleSlogan}
+    {member.username}: Profile - {titleSlogan}
 {/title}
 
 {<header}
@@ -9,53 +9,67 @@
 {/header}
 
 {<body}
-    {>"dust/members/profile/profile-header" tab="overview" /}
+    {>"dust/members/profile/profile-header" profileTab="overview" /}
 
     <div class="row">
         <div class="col-sm-6">
             <div class="row">
-                <div class="col-sm-4">
-                    <div class="well stat">
-                        <div class="stat-value day-of-year">337</div>
-                        <div class="stat-label">Topics</div>
+                <a href="{url}">
+                    <div class="col-sm-4">
+                        <div class="well stat">
+                            <div class="stat-value">{contributions}</div>
+                            <div class="stat-label">Contributions</div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-sm-4">
-                    <div class="well stat">
-                        <div class="stat-value day-of-month">2</div>
-                        <div class="stat-label">Arguments</div>
+                </a>
+                <a href="{url}?tab=topics">
+                    <div class="col-sm-4">
+                        <div class="well stat">
+                            <div class="stat-value day-of-year">{topics}</div>
+                            <div class="stat-label">Topics</div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-sm-4">
-                    <div class="well stat">
-                        <div class="stat-value week-of-year">49</div>
-                        <div class="stat-label">Questions</div>
+                </a>
+                <a href="{url}?tab=arguments">
+                    <div class="col-sm-4">
+                        <div class="well stat">
+                            <div class="stat-value">{arguments}</div>
+                            <div class="stat-label">Arguments</div>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
             <div class="row">
-                <div class="col-sm-4">
-                    <div class="well stat">
-                        <div class="stat-value day-of-week">5</div>
-                        <div class="stat-label">Comments</div>
+                <a href="{url}?tab=questions">
+                    <div class="col-sm-4">
+                        <div class="well stat">
+                            <div class="stat-value week-of-year">{questions}</div>
+                            <div class="stat-label">Questions</div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-sm-4">
-                    <div class="well stat">
-                        <div class="stat-value week-year">16</div>
-                        <div class="stat-label">Issues</div>
+                </a>
+                <a href="{url}?tab=issues">
+                    <div class="col-sm-4">
+                        <div class="well stat">
+                            <div class="stat-value week-year">{issues}</div>
+                            <div class="stat-label">Issues</div>
+                        </div>
                     </div>
-                </div>
-                <div class="col-sm-4">
-                    <div class="well stat">
-                        <div class="stat-value hour-of-day">17</div>
-                        <div class="stat-label">Upvotes</div>
+                </a>
+                <a href="{url}?tab=opinions">
+                    <div class="col-sm-4">
+                        <div class="well stat">
+                            <div class="stat-value day-of-week">{opinions}</div>
+                            <div class="stat-label">Comments</div>
+                        </div>
                     </div>
-                </div>
+                </a>
             </div>
         </div>
     </div>
-    <p><i class="fa fa-pencil"></i> <a href="/account/settings">Edit Profile</a></p>
+    {?loggedIn}
+        <p><i class="fa fa-pencil-square-o"></i> <a href="/account/settings">Edit Profile</a></p>
+    {/loggedIn}
     <p>Account Details</p>
     <p>Reputation</p>
     <p>Timeline &amp; Activities</p>

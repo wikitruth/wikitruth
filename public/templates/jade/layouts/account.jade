@@ -21,8 +21,16 @@ html
         div.navbar-collapse.my-navbar-collapse.collapse
           ul.nav.navbar-nav
             //li: a(href='/') Home
-            li: a(href='/account/') Home
-            li: a(href='/pages/') My Pages
+            li: a(href='/explore')
+              i.fa.fa-globe
+              = ' '
+              span.hidden-xxxs
+                | Explore
+            li: a(href='/search')
+              i.fa.fa-search
+              = ' '
+              span.hidden-xxs
+                | Search
             //li: a(href='/account/settings/') Settings
           ul.nav.navbar-nav.navbar-right
             include account-nav.jade
