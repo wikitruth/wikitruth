@@ -1,11 +1,11 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {user.username}: Topics - {titleSlogan}
+    {member.username}: Topics - {titleSlogan}
 {/title}
 
 {<body}
-    {>"dust/members/profile/profile-header" tab="topics" /}
+    {>"dust/members/profile/profile-header" profileTab="topics" /}
     <a class="btn btn-default" href="/topics/create" role="button">Create Topic</a>
     {?topics}
         <ul class="list-group wt-list">
