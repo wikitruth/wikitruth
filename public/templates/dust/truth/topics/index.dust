@@ -6,18 +6,25 @@
 
 {<body}
     {>"dust/truth/common/entry-header" tab="topics" /}
+    <ul class="nav nav-pills">
+        <li role="presentation" class="active"><a href="#">All <span class="badge">{entry.childrenCount.topics}</span></a></li>
+        <li role="presentation"><a href="#">Screened <span class="badge">{entry.childrenCount.topics}</span></a></li>
+        <li role="presentation"><a href="#">Pending <span class="badge">345</span></a></li>
+        <li role="presentation"><a href="#">Rejected <span class="badge">67</span></a></li>
+    </ul>
+    <br/>
     {?topics}
         <ul class="list-group wt-list">
             <li class="list-group-item highlight"><i class="fa fa-folder-open text-success-x" aria-hidden="true"></i>&nbsp;&nbsp;Topics</li>
             {#topics}
                 <li class="list-group-item">
                     {?link}
-                        <a href="{paths.truth.topics.link}?topic={topic._id}&amp;id={link._id}&amp;source={paths.truth.index}" class="glyphicon glyphicon-link text-success"></a>
+                        <a href="{wikiBaseUrl}{paths.truth.topics.link}?topic={topic._id}&amp;id={link._id}&amp;source={paths.truth.index}" class="glyphicon glyphicon-link text-success"></a>
                     {:else}
                         <i class="fa fa-folder-open text-success" aria-hidden="true"></i>
                     {/link}
                     <div>
-                        <a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{?link}{?link.title}{link.title}{:else}{title}{/link.title}{:else}{?contextTitle}{contextTitle}{:else}{title}{/contextTitle}{/link}</a>
+                        <a href="{wikiBaseUrl}{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{?link}{?link.title}{link.title}{:else}{title}{/link.title}{:else}{?contextTitle}{contextTitle}{:else}{title}{/contextTitle}{/link}</a>
                         {>"dust/truth/common/entry-row-footer" /}
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>

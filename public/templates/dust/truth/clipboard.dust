@@ -39,12 +39,16 @@
         {/arguments}
         <button type="submit" name="action" value="delete" class="btn btn-danger">Delete</button>&nbsp;
         {?topic}
-            <a class="btn btn-default" href="{paths.truth.topics.entry}?topic={topic._id}" role="button">Cancel</a>
+            <a class="btn btn-default" href="{wikiBaseUrl}{paths.truth.topics.entry}?topic={topic._id}" role="button">Cancel</a>
         {:else}
             {?parent}
-                <a class="btn btn-default" href="{paths.truth.topics.entry}?topic={parent._id}" role="button">Cancel</a>
+                <a class="btn btn-default" href="{wikiBaseUrl}{paths.truth.topics.entry}?topic={parent._id}" role="button">Cancel</a>
             {:else}
-                <a class="btn btn-default" href="{paths.truth.index}" role="button">Cancel</a>
+                {?username}
+                    <a class="btn btn-default" href="{wikiBaseUrl}" role="button">Cancel</a>
+                {:else}
+                    <a class="btn btn-default" href="{paths.truth.index}" role="button">Cancel</a>
+                {/username}
             {/parent}
         {/topic}
     </form>

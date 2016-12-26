@@ -1,7 +1,7 @@
 'use strict';
 
-var templates   = require('../../models/templates'),
-    db          = require('../../app').db.models;
+var templates   = require('../models/templates'),
+    db          = require('../app').db.models;
 
 module.exports = function (router) {
 

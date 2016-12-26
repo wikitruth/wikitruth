@@ -22,7 +22,27 @@ function createCancelUrl(req) {
     return url.format(nextUrl);
 }
 
-function getEntry(req, res) {
+function GET_index(req, res) {
+    var model = {};
+    async.parallel({
+        topic: function(callback){
+            flowUtils.setTopicModels(req, model, callback);
+        },
+        topics: function(callback) {
+            // display 15 if top topics, all if has topic parameter
+            flowUtils.getTopics({ parentId: req.query.topic }, 0, function (err, results) {
+                model.topics = results;
+                callback();
+            });
+        }
+    }, function (err, results) {
+        model.entry = model.topic;
+        flowUtils.setModelContext(req, model);
+        res.render(templates.truth.topics.index, model);
+    });
+}
+
+function GET_entry(req, res) {
     // Topic home: display top subtopics, top arguments
     var model = {};
     if(!req.query.topic) {
@@ -221,8 +241,100 @@ function getEntry(req, res) {
                 counts: flowUtils.getVerdictCount(results.arguments)
             };
 
+            flowUtils.setModelContext(req, model);
             flowUtils.prepareClipboardOptions(req, model, constants.OBJECT_TYPES.topic);
             res.render(templates.truth.topics.entry, model);
+        });
+    });
+}
+
+function GET_create(req, res) {
+    var model = {};
+
+    async.series({
+        topic: function(callback){
+            if(req.query.id) {
+                db.Topic.findOne({_id: req.query.id}, function (err, result) {
+                    result.friendlyUrl = utils.urlify(result.title);
+                    result.shortTitle = utils.getShortText(result.title);
+                    model.topic = result;
+                    callback();
+                });
+            } else {
+                callback();
+            }
+        },
+        parentTopic: function(callback) {
+            var query = { _id: req.query.topic ? req.query.topic : model.topic && model.topic.parentId ? model.topic.parentId : null };
+            if(query._id) {
+                db.Topic.findOne(query, function (err, result) {
+                    result.friendlyUrl = utils.urlify(result.title);
+                    result.shortTitle = utils.getShortText(result.title);
+                    model.parentTopic = result;
+                    callback();
+                });
+            } else {
+                callback();
+            }
+        }
+    }, function (err, results) {
+        flowUtils.setModelContext(req, model);
+        if(!model.topic && !model.parentTopic && !req.params.username && !req.user.isAdmin()) {
+            // A public create on root topics but not an admin
+            return res.redirect(model.wikiBaseUrl);
+        }
+        model.TOPIC_TAGS = constants.TOPIC_TAGS;
+        model.cancelUrl = flowUtils.buildCancelUrl(model, model.wikiBaseUrl + paths.truth.topics.entry, model.topic, model.parentTopic);
+        res.render(templates.truth.topics.create, model);
+    });
+}
+
+function POST_create(req, res) {
+    var query = { _id: req.query.id || new mongoose.Types.ObjectId() };
+    db.Topic.findOne(query, function(err, result) {
+        var entity = result ? result : {};
+        var tags = req.body.topicTags;
+        entity.content = req.body.content;
+        entity.title = req.body.title;
+        entity.contextTitle = req.body.contextTitle;
+        entity.references = req.body.references;
+        entity.friendlyUrl = utils.urlify(req.body.title);
+        entity.editUserId = req.user.id;
+        entity.editDate = Date.now();
+        entity.tags = tags ? tags : [];
+        entity.icon = req.body.icon;
+        if(!entity.ethicalStatus) {
+            entity.ethicalStatus = {};
+        }
+        entity.ethicalStatus.hasValue = req.body.hasEthicalValue ? true : false;
+        entity.parentId = req.body.parent ? req.body.parent : null;
+        if(!result) {
+            entity.createUserId = req.user.id;
+            entity.createDate = Date.now();
+        }
+        if(req.params.username) {
+            entity.private = true;
+            entity.ownerType = constants.OBJECT_TYPES.user;
+            entity.ownerId = req.user.id;
+        } else if(!entity.parentId && !req.user.isAdmin()) {
+            // root topic & not admin & not private
+            return res.redirect('/');
+        }
+        db.Topic.findOneAndUpdate(query, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function(err, updatedEntity) {
+            var updateRedirect = function () {
+                var model = {};
+                flowUtils.setModelContext(req, model);
+                var url = model.wikiBaseUrl + paths.truth.topics.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
+                res.redirect(url);
+            };
+
+            if(entity.parentId && !result) { // update parent count on create only
+                flowUtils.updateChildrenCount(updatedEntity.parentId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, function () {
+                    updateRedirect();
+                });
+            } else {
+                updateRedirect();
+            }
         });
     });
 }
@@ -230,111 +342,22 @@ function getEntry(req, res) {
 module.exports = function (router) {
 
     router.get('/', function (req, res) {
-        var model = {};
-        async.parallel({
-            topic: function(callback){
-                flowUtils.setTopicModels(req, model, callback);
-            },
-            topics: function(callback) {
-                // display 15 if top topics, all if has topic parameter
-                flowUtils.getTopics({ parentId: req.query.topic }, 0, function (err, results) {
-                    model.topics = results;
-                    callback();
-                });
-            }
-        }, function (err, results) {
-            model.entry = model.topic;
-            res.render(templates.truth.topics.index, model);
-        });
+        GET_index(req, res);
     });
 
     router.get('/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
-        getEntry(req, res);
+        GET_entry(req, res);
     });
 
     /**
      * basic rule: id is the entry, query.topic or topic.parentId is the parent.
      */
     router.get('/create', function (req, res) {
-        var model = {};
-        async.series({
-            topic: function(callback){
-                if(req.query.id) {
-                    db.Topic.findOne({_id: req.query.id}, function (err, result) {
-                        result.friendlyUrl = utils.urlify(result.title);
-                        result.shortTitle = utils.getShortText(result.title);
-                        model.topic = result;
-                        callback();
-                    });
-                } else {
-                    callback();
-                }
-            },
-            parentTopic: function(callback) {
-                var query = { _id: req.query.topic ? req.query.topic : model.topic && model.topic.parentId ? model.topic.parentId : null };
-                if(query._id) {
-                    db.Topic.findOne(query, function (err, result) {
-                        result.friendlyUrl = utils.urlify(result.title);
-                        result.shortTitle = utils.getShortText(result.title);
-                        model.parentTopic = result;
-                        callback();
-                    });
-                } else {
-                    callback();
-                }
-            }
-        }, function (err, results) {
-            model.TOPIC_TAGS = constants.TOPIC_TAGS;
-            res.render(templates.truth.topics.create, model);
-        });
+        GET_create(req, res);
     });
 
     router.post('/create', function (req, res) {
-        var query = { _id: req.query.id || new mongoose.Types.ObjectId() };
-        db.Topic.findOne(query, function(err, result) {
-            var entity = result ? result : {};
-            var tags = req.body.topicTags;
-            entity.content = req.body.content;
-            entity.title = req.body.title;
-            entity.contextTitle = req.body.contextTitle;
-            entity.references = req.body.references;
-            entity.friendlyUrl = utils.urlify(req.body.title);
-            entity.editUserId = req.user.id;
-            entity.editDate = Date.now();
-            entity.tags = tags ? tags : [];
-            entity.icon = req.body.icon;
-            if(!entity.ethicalStatus) {
-                entity.ethicalStatus = {};
-            }
-            entity.ethicalStatus.hasValue = req.body.hasEthicalValue ? true : false;
-            if(!result) {
-                entity.createUserId = req.user.id;
-                entity.createDate = Date.now();
-            }
-            entity.parentId = req.body.parent ? req.body.parent : null;
-            db.Topic.update(query, entity, {upsert: true}, function(err, writeResult) {
-                var updateRedirect = function () {
-                    var url = "";
-                    var query = "";
-                    if(result) {
-                        url = paths.truth.topics.entry;
-                        query = '/' + result._id;
-                    } else {
-                        url = req.query.topic ? paths.truth.topics.entry : paths.truth.index;
-                        query = req.query.topic ? '/' + req.query.topic : '';
-                    }
-                    res.redirect(url + query);
-                };
-
-                if(entity.parentId && !result) { // update parent count on create only
-                    flowUtils.updateChildrenCount(entity.parentId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, function () {
-                        updateRedirect();
-                    });
-                } else {
-                    updateRedirect();
-                }
-            });
-        });
+        POST_create(req, res);
     });
 
 
@@ -370,6 +393,7 @@ module.exports = function (router) {
                 }
             }
         }, function (err, results) {
+            flowUtils.setModelContext(req, model);
             model.cancelUrl = createCancelUrl(req);
             res.render(templates.truth.topics.link, model);
         });
@@ -390,7 +414,7 @@ module.exports = function (router) {
                 entity.title = req.body.title;
                 entity.editUserId = req.user.id;
                 entity.editDate = Date.now();
-                db.TopicLink.update(query, entity, {upsert: true}, function (err, writeResult) {
+                db.TopicLink.findOneAndUpdate(query, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function (err, updatedEntity) {
                     res.redirect(createCancelUrl(req));
                 });
             });
@@ -398,4 +422,7 @@ module.exports = function (router) {
     });
 };
 
-module.exports.getEntry = getEntry;
+module.exports.GET_index = GET_index;
+module.exports.GET_entry = GET_entry;
+module.exports.GET_create = GET_create;
+module.exports.POST_create = POST_create;

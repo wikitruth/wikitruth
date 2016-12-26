@@ -1,11 +1,17 @@
 'use strict';
 
-var templates   = require('../../models/templates'),
+var templates   = require('../models/templates'),
     async       = require('async'),
-    flowUtils   = require('../../utils/flowUtils'),
-    utils       = require('../../utils/utils'),
-    constants   = require('../../models/constants'),
-    db          = require('../../app').db.models;
+    flowUtils   = require('../utils/flowUtils'),
+    utils       = require('../utils/utils'),
+    constants   = require('../models/constants'),
+    db          = require('../app').db.models;
+
+var topicController     = require('./topics'),
+    argumentController  = require('./arguments'),
+    questionController  = require('./questions'),
+    issueController  = require('./issues'),
+    opinionController  = require('./opinions');
 
 function setMemberModel(model, req, callback) {
     if(req.params.username) {
@@ -55,7 +61,7 @@ module.exports = function (router) {
             async.parallel({
                 topics: function(callback) {
                     db.Topic
-                        .find({ createUserId: model.member._id })
+                        .find({ createUserId: model.member._id, $or: [ { private: { $exists: false } }, { private: false } ] })
                         .count(function(err, count) {
                             model.topics = count;
                             callback();
@@ -63,7 +69,7 @@ module.exports = function (router) {
                 },
                 arguments: function(callback) {
                     db.Argument
-                        .find({ createUserId: model.member._id })
+                        .find({ createUserId: model.member._id, $or: [ { private: { $exists: false } }, { private: false } ] })
                         .count(function(err, count) {
                             model.arguments = count;
                             callback();
@@ -71,7 +77,7 @@ module.exports = function (router) {
                 },
                 questions: function (callback) {
                     db.Question
-                        .find({ createUserId: model.member._id })
+                        .find({ createUserId: model.member._id, $or: [ { private: { $exists: false } }, { private: false } ] })
                         .count(function(err, count) {
                             model.questions = count;
                             callback();
@@ -79,7 +85,7 @@ module.exports = function (router) {
                 },
                 issues: function (callback) {
                     db.Issue
-                        .find({ createUserId: model.member._id })
+                        .find({ createUserId: model.member._id, $or: [ { private: { $exists: false } }, { private: false } ] })
                         .count(function(err, count) {
                             model.issues = count;
                             callback();
@@ -87,7 +93,7 @@ module.exports = function (router) {
                 },
                 opinions: function (callback) {
                     db.Opinion
-                        .find({ createUserId: model.member._id })
+                        .find({ createUserId: model.member._id, $or: [ { private: { $exists: false } }, { private: false } ] })
                         .count(function(err, count) {
                             model.opinions = count;
                             callback();
@@ -245,7 +251,10 @@ module.exports = function (router) {
         });
     });
 
-    router.get('/:username/topics', function (req, res) {
+
+    /* Diary Topics */
+
+    router.get('/:username/diary', function (req, res) {
         var model = {};
         async.series({
             user: function(callback){
@@ -261,5 +270,105 @@ module.exports = function (router) {
         }, function (err, results) {
             res.render(templates.members.profile.topics, model);
         });
+    });
+
+    router.get('/:username/diary/topics', function (req, res) {
+        topicController.GET_index(req, res);
+    });
+
+    router.get('/:username/diary/topic(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        topicController.GET_entry(req, res);
+    });
+
+    router.get('/:username/diary/topics/create', function (req, res) {
+        topicController.GET_create(req, res);
+    });
+
+    router.post('/:username/diary/topics/create', function (req, res) {
+        topicController.POST_create(req, res);
+    });
+
+
+    /* Diary Arguments */
+
+    router.get('/:username/diary/arguments', function (req, res) {
+        argumentController.GET_index(req, res);
+    });
+
+    router.get('/:username/diary/argument(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        argumentController.GET_entry(req, res);
+    });
+
+    router.get('/:username/diary/arguments/create', function (req, res) {
+        argumentController.GET_create(req, res);
+    });
+
+    router.post('/:username/diary/arguments/create', function (req, res) {
+        argumentController.POST_create(req, res);
+    });
+
+    router.get('/:username/diary/arguments/link', function (req, res) {
+        argumentController.GET_link(req, res);
+    });
+
+    router.post('/:username/diary/arguments/link', function (req, res) {
+        argumentController.POST_link(req, res);
+    });
+
+
+    /* Diary Questions */
+
+    router.get('/:username/diary/questions', function (req, res) {
+        questionController.GET_index(req, res);
+    });
+
+    router.get('/:username/diary/question(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        questionController.GET_entry(req, res);
+    });
+
+    router.get('/:username/diary/questions/create', function (req, res) {
+        questionController.GET_create(req, res);
+    });
+
+    router.post('/:username/diary/questions/create', function (req, res) {
+        questionController.POST_create(req, res);
+    });
+
+
+    /* Diary Issues */
+
+    router.get('/:username/diary/issues', function (req, res) {
+        issueController.GET_index(req, res);
+    });
+
+    router.get('/:username/diary/issue(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        issueController.GET_entry(req, res);
+    });
+
+    router.get('/:username/diary/issues/create', function (req, res) {
+        issueController.GET_create(req, res);
+    });
+
+    router.post('/:username/diary/issues/create', function (req, res) {
+        issueController.POST_create(req, res);
+    });
+
+
+    /* Diary Opinions */
+
+    router.get('/:username/diary/opinions', function (req, res) {
+        opinionController.GET_index(req, res);
+    });
+
+    router.get('/:username/diary/opinion(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        opinionController.GET_entry(req, res);
+    });
+
+    router.get('/:username/diary/opinions/create', function (req, res) {
+        opinionController.GET_create(req, res);
+    });
+
+    router.post('/:username/diary/opinions/create', function (req, res) {
+        opinionController.POST_create(req, res);
     });
 };

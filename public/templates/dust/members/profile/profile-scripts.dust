@@ -1,0 +1,10 @@
+<script src="/components/geopattern/js/geopattern.min.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $(".wt-profile-background").each(function() {
+            var title = $( this ).data("username");
+            var pattern = GeoPattern.generate(title);
+            $(this).css("background-image", pattern.toDataUrl());
+        });
+    });
+</script>

@@ -16,16 +16,17 @@
                 {!<i class="fa fa-bolt"></i> Editing <a href="{paths.truth.arguments.entry}/{argument.friendlyUrl}/{argument._id}">{argument.title}</a>!}
             {:else}
                 {?parentArgument}
-                    ...for or against <a href="{paths.truth.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
+                    ...for or against <a href="{wikiBaseUrl}{paths.truth.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
                 {:else}
                     {?topic}
-                        ...under the topic <a href="{paths.truth.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
+                        ...under the topic <a href="{wikiBaseUrl}{paths.truth.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
                     {/topic}
                 {/parentArgument}
 
             {/argument}
         </div>
     </div>
+    <div class="alert alert-success" role="alert">An argument can be a claim, a statement of fact, an assertion, a conclusion, etc. Create arguments to break-down a topic into small, easy to understand statements. Arguments can be re-used on other topics by creating a link.</div>
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
         <div class="form-group">
@@ -183,10 +184,10 @@
         </div>!}
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
         {?argument}
-            <a class="btn btn-default" href="{paths.truth.arguments.entry}?argument={argument._id}" role="button">Cancel</a>
+            <a class="btn btn-default" href="{wikiBaseUrl}{paths.truth.arguments.entry}?argument={argument._id}" role="button">Cancel</a>
         {:else}
             {?parentArgument}
-                <a class="btn btn-default" href="{paths.truth.arguments.entry}?argument={parentArgument._id}" role="button">Cancel</a>
+                <a class="btn btn-default" href="{wikiBaseUrl}{paths.truth.arguments.entry}?argument={parentArgument._id}" role="button">Cancel</a>
             {:else}
                 <a class="btn btn-default" href="{paths.truth.index}" role="button">Cancel</a>
             {/parentArgument}

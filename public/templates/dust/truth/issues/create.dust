@@ -6,9 +6,24 @@
 
 {<body}
     {>"dust/truth/common/breadcrumb" /}
-    <h1 class="page-header">
-        <i class="fa fa-exclamation-circle"></i> {?issue}Edit{:else}New{/issue} Issue
-    </h1>
+    <div style="margin-bottom: 20px">
+        <h1 class="page-header wt-header" style="margin-bottom: 0; padding-bottom: 0">
+            <i class="fa fa-exclamation-circle"></i> {?argument}Edit{:else}New{/argument} Issue
+        </h1>
+        <hr style="border: 0; margin: 0.7rem 0 0.7rem; border-top: 0.0625rem dotted #dcdcdc;"/>
+        <div style="font-style-x: italic; font-size: smaller;" class="text-muted">
+            {?question}
+                ...under the question <a href="{wikiBaseUrl}{paths.truth.questions.entry}/{question.friendlyUrl}/{question._id}">{question.title}</a>
+            {:else}
+                {?argument}
+                    ...under the argument <a href="{wikiBaseUrl}{paths.truth.arguments.entry}/{argument.friendlyUrl}/{argument._id}">{argument.title}</a>
+                {:else}
+                    ...under the topic <a href="{wikiBaseUrl}{paths.truth.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
+                {/argument}
+            {/question}
+        </div>
+    </div>
+    <div class="alert alert-success" role="alert">An issue is a problem found in a topic, argument, or question. An issue helps to keep track of a problem found by a reviewer and it helps determine the quality of an entry.</div>
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
         <div class="form-group">
@@ -95,7 +110,7 @@
             <textarea class="form-control" id="inputContent" name="content" rows="12">{issue.content}</textarea>
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
-        <a class="btn btn-default" href="{?issue}{paths.truth.issues.entry}{:else}{paths.truth.issues.index}{/issue}{?topic}?topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}{?issue}&amp;issue={issue._id}{/issue}" role="button">Cancel</a>
+        <a class="btn btn-default" href="{?issue}{wikiBaseUrl}{paths.truth.issues.entry}{:else}{wikiBaseUrl}{paths.truth.issues.index}{/issue}{?topic}?topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}{?issue}&amp;issue={issue._id}{/issue}" role="button">Cancel</a>
     </form>
 {/body}
 

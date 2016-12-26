@@ -2,10 +2,10 @@
 
 var mongoose    = require('mongoose'),
     async       = require('async'),
-    flowUtils   = require('../../utils/flowUtils'),
-    paths       = require('../../models/paths'),
-    templates   = require('../../models/templates'),
-    db          = require('../../app').db.models;
+    flowUtils   = require('../utils/flowUtils'),
+    paths       = require('../models/paths'),
+    templates   = require('../models/templates'),
+    db          = require('../app').db.models;
 
 module.exports = function (router) {
 

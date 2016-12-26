@@ -33,6 +33,7 @@ function appendEntryExtra(item) {
 
     //var editDateString = result.editDate.toUTCString();
     item.editDateString = utils.timeSince(item.editDate)/* + ' ago'*/; //editDateString.substring(0, editDateString.length - 4);
+    item.createDateString = utils.timeSince(item.createDate);
 }
 
 function setEditorsUsername(items, callback) {
@@ -75,19 +76,42 @@ function setEditorsUsername(items, callback) {
     }
 }
 
+function setCreateUsername(item, callback) {
+    db.User.findOne({_id: item.createUserId}, function (err, user) {
+        item.createUsername = user.username;
+        callback(err);
+    });
+}
+
+function setEditUsername(item, callback) {
+    db.User.findOne({_id: item.editUserId}, function (err, user) {
+        item.editUsername = user.username;
+        callback(err);
+    });
+}
+
+function setUsername(item, callback) {
+    setCreateUsername(item, function (err) {
+        if(item.createUserId === item.editUserId) {
+            item.editUsername = item.createUsername;
+            callback(err);
+        } else {
+            setEditUsername(item, callback);
+        }
+    });
+}
+
 function setQuestionModel(req, model, callback) {
     if(req.query.question) {
         db.Question.findOne({_id: req.query.question}, function (err, result) {
+            model.question = result;
             result.friendlyUrl = utils.urlify(result.title);
             result.shortTitle = utils.getShortText(result.title);
+            appendEntryExtra(result);
             if(isOwner(req, result, model)) {
                 model.isQuestionOwner = true;
             }
-            db.User.findOne({_id: result.editUserId}, function (err, user) {
-                result.editUsername = user.username;
-                model.question = result;
-                callback(err);
-            });
+            setUsername(result, callback);
         });
     } else {
         callback();
@@ -97,16 +121,14 @@ function setQuestionModel(req, model, callback) {
 function setIssueModel(req, model, callback) {
     if(req.query.issue) {
         db.Issue.findOne({_id: req.query.issue}, function (err, result) {
+            model.issue = result;
             result.friendlyUrl = utils.urlify(result.title);
             result.shortTitle = utils.getShortText(result.title);
+            appendEntryExtra(result);
             if(isOwner(req, result, model)) {
                 model.isIssueOwner = true;
             }
-            db.User.findOne({_id: result.editUserId}, function (err, user) {
-                result.editUsername = user.username;
-                model.issue = result;
-                callback(err);
-            });
+            setUsername(result, callback);
         });
     } else {
         callback();
@@ -116,16 +138,14 @@ function setIssueModel(req, model, callback) {
 function setOpinionModel(req, model, callback) {
     if(req.query.opinion) {
         db.Opinion.findOne({_id: req.query.opinion}, function (err, result) {
+            model.opinion = result;
             result.friendlyUrl = utils.urlify(result.title);
             result.shortTitle = utils.getShortText(result.title);
+            appendEntryExtra(result);
             if(isOwner(req, result, model)) {
                 model.isOpinionOwner = true;
             }
-            db.User.findOne({_id: result.editUserId}, function (err, user) {
-                result.editUsername = user.username;
-                model.opinion = result;
-                callback(err);
-            });
+            setUsername(result, callback);
         });
     } else {
         callback();
@@ -140,16 +160,14 @@ function setArgumentModels(req, model, callback) {
                     if(err || !result) {
                         return callback(err);
                     }
+                    model.argument = result;
                     result.friendlyUrl = utils.urlify(result.title);
                     result.shortTitle = utils.getShortText(result.title);
+                    appendEntryExtra(result);
                     if (isOwner(req, result, model)) {
                         model.isArgumentOwner = true;
                     }
-                    db.User.findOne({_id: result.editUserId}, function (err, user) {
-                        result.editUsername = user.username;
-                        model.argument = result;
-                        callback(err);
-                    });
+                    setUsername(result, callback);
                 });
             },
             parentArgument: function (callback) {
@@ -158,6 +176,7 @@ function setArgumentModels(req, model, callback) {
                         if (result) {
                             result.friendlyUrl = utils.urlify(result.title);
                             result.shortTitle = utils.getShortText(result.title);
+                            appendEntryExtra(result);
                             model.parentArgument = result;
                         }
                         callback();
@@ -172,6 +191,7 @@ function setArgumentModels(req, model, callback) {
                         if (result) {
                             result.friendlyUrl = utils.urlify(result.title);
                             result.shortTitle = utils.getShortText(result.title);
+                            appendEntryExtra(result);
                             model.grandParentArgument = result;
                         }
                         callback();
@@ -228,16 +248,14 @@ function setTopicModels(req, model, callback) {
                     if(err || !result) {
                         return callback(err);
                     }
+                    model.topic = result;
                     result.friendlyUrl = utils.urlify(result.title);
                     result.shortTitle = utils.getShortText(result.title);
+                    appendEntryExtra(result);
                     if(isOwner(req, result, model)) {
                         model.isTopicOwner = true;
                     }
-                    db.User.findOne({_id: result.editUserId}, function (err, user) {
-                        result.editUsername = user.username;
-                        model.topic = result;
-                        callback(err);
-                    });
+                    setUsername(result, callback);
                 });
             },
             parentTopic: function (callback) {
@@ -246,6 +264,7 @@ function setTopicModels(req, model, callback) {
                         if (result) {
                             result.friendlyUrl = utils.urlify(result.title);
                             result.shortTitle = utils.getShortText(result.title);
+                            appendEntryExtra(result);
                             model.parentTopic = result;
                         }
                         callback();
@@ -260,6 +279,7 @@ function setTopicModels(req, model, callback) {
                         if (result) {
                             result.friendlyUrl = utils.urlify(result.title);
                             result.shortTitle = utils.getShortText(result.title);
+                            appendEntryExtra(result);
                             model.grandParentTopic = result;
                         }
                         callback();
@@ -747,6 +767,27 @@ function createOwnerQueryFromModel(model) {
     return {};
 }
 
+function setModelContext(req, model) {
+    if(req.params.username) {
+        model.username = req.params.username;
+        model.wikiBaseUrl = "/members/" + model.username + "/diary";
+    } else {
+        model.username = "";
+        model.wikiBaseUrl = "";
+    }
+}
+
+function buildEntryUrl(baseUrl, entry) {
+    return baseUrl + '/' + entry.friendlyUrl + '/' + entry._id;
+}
+
+function buildCancelUrl(model, cancelBaseUrl, entry, parent) {
+    var cancelUrl = entry ? buildEntryUrl(cancelBaseUrl, entry) :
+        parent ? buildEntryUrl(cancelBaseUrl, parent) :
+            model.username ? model.wikiBaseUrl : '/';
+    return cancelUrl;
+}
+
 module.exports = {
     getBackupDir: getBackupDir,
     isOwner: isOwner,
@@ -769,5 +810,9 @@ module.exports = {
     getVerdictCount: getVerdictCount,
     setVerdictModel: setVerdictModel,
     createOwnerQueryFromQuery: createOwnerQueryFromQuery,
-    createOwnerQueryFromModel: createOwnerQueryFromModel
+    createOwnerQueryFromModel: createOwnerQueryFromModel,
+
+    setModelContext: setModelContext,
+    buildEntryUrl: buildEntryUrl,
+    buildCancelUrl: buildCancelUrl
 };

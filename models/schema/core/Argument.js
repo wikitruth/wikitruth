@@ -20,6 +20,7 @@ exports = module.exports = function(app, mongoose) {
     tags: [ { type: Number } ], // OBJECT_TAGS
     threadId: { type: mongoose.Schema.ObjectId, ref: 'Argument' },
     against: { type: Boolean, default: false }, // how it relates to parent Argument, default is in support
+    private: { type: Boolean, default: false }, // if true, should be restricted to group/user owners and not included in public backup
     ethicalStatus: {
       hasValue: { type: Boolean, default: false },
       status: { type: Number } // ETHICAL_STATUS

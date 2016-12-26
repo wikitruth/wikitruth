@@ -6,60 +6,60 @@
             {^question}
                 {^argument}
                     <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
-                        <a href="{paths.truth.topics.entry}/{topic.friendlyUrl}/{topic._id}" role="tab">
+                        <a href="{wikiBaseUrl}{paths.truth.topics.entry}/{topic.friendlyUrl}/{topic._id}" role="tab">
                             <span class="glyphicon glyphicon-home text-muted-x" aria-hidden="true"></span><span class="hidden-xxs"> Overview</span></a>
                     </li>
                     {@gt key=entry.childrenCount.topics value="0"}
                         <li role="presentation"{@eq key=tab value="topics"} class="active"{/eq}>
-                            <a href="{paths.truth.topics.index}?topic={topic._id}" role="tab">
+                            <a href="{wikiBaseUrl}{paths.truth.topics.index}?topic={topic._id}" role="tab">
                                 <i class="fa fa-folder-open text-muted-x" aria-hidden="true"></i><span class="hidden-xs"> Topics</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.topics}</span></a>
                         </li>
                     {/gt}
                 {:else}
                     <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
-                        <a href="{paths.truth.arguments.entry}/{argument.friendlyUrl}/{argument._id}" role="tab">
+                        <a href="{wikiBaseUrl}{paths.truth.arguments.entry}/{argument.friendlyUrl}/{argument._id}" role="tab">
                             <span class="glyphicon glyphicon-home text-muted-x" aria-hidden="true"></span> Overview</a>
                     </li>
                 {/argument}
                 <li role="presentation"{@eq key=tab value="arguments"} class="active"{/eq}>
                     {@gt key=entry.childrenCount.arguments value="0"}
-                        <a href="{paths.truth.arguments.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" aria-controls="home" role="tab">
+                        <a href="{wikiBaseUrl}{paths.truth.arguments.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" aria-controls="home" role="tab">
                             <span class="glyphicon glyphicon-flash text-muted-x" aria-hidden="true"></span><span class="hidden-xs"> Arguments</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.arguments}</span></a>
                     {/gt}
                 </li>
                 <li role="presentation"{@eq key=tab value="questions"} class="active"{/eq}>
                     {@gt key=entry.childrenCount.questions value="0"}
-                        <a href="{paths.truth.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
+                        <a href="{wikiBaseUrl}{paths.truth.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
                             <span class="glyphicon glyphicon-question-sign text-muted-x" aria-hidden="true"></span><span class="hidden-xs"> Questions</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.questions}</span></a>
                     {/gt}
                 </li>
             {:else}
                 <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
-                    <a href="{paths.truth.questions.entry}/{question.friendlyUrl}/{question._id}" role="tab">
+                    <a href="{wikiBaseUrl}{paths.truth.questions.entry}/{question.friendlyUrl}/{question._id}" role="tab">
                         <span class="glyphicon glyphicon-home text-muted-x" aria-hidden="true"></span> Overview</a>
                 </li>
             {/question}
             <li role="presentation"{@eq key=tab value="issues"} class="active"{/eq}>
                 {@gt key=entry.childrenCount.issues value="0"}
-                    <a href="{paths.truth.issues.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
+                    <a href="{wikiBaseUrl}{paths.truth.issues.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
                         <i class="fa fa-exclamation-circle text-muted-x" aria-hidden="true"></i><span class="hidden-xs"> Issues</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.issues}</span></a>
                 {/gt}
             </li>
             <li role="presentation"{@eq key=tab value="opinions"} class="active"{/eq}>
                 {@gt key=entry.childrenCount.opinions value="0"}
-                    <a href="{paths.truth.opinions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
-                        <i class="fa fa-comments-o text-muted-x" aria-hidden="true"></i><span class="hidden-xs"> Opinions</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.opinions}</span></a>
+                    <a href="{wikiBaseUrl}{paths.truth.opinions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
+                        <i class="fa fa-comments-o text-muted-x" aria-hidden="true"></i><span class="hidden-xs"> Comments</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.opinions}</span></a>
                 {/gt}
             </li>
         {:else}
             <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
-                <a href="{paths.truth.issues.entry}/{issue.friendlyUrl}/{issue._id}" role="tab">
+                <a href="{wikiBaseUrl}{paths.truth.issues.entry}/{issue.friendlyUrl}/{issue._id}" role="tab">
                     <span class="glyphicon glyphicon-home" aria-hidden="true"></span> Overview</a>
             </li>
         {/issue}
     {:else}
         <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
-            <a href="{paths.truth.opinions.entry}/{opinion.friendlyUrl}/{opinion._id}" role="tab">
+            <a href="{wikiBaseUrl}{paths.truth.opinions.entry}/{opinion.friendlyUrl}/{opinion._id}" role="tab">
                 <span class="glyphicon glyphicon-home" aria-hidden="true"></span> Overview</a>
         </li>
     {/opinion}
@@ -79,7 +79,7 @@
                             <li><a href="{paths.truth.outline.link}?topic={topic._id}" role="tab"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> Manage Links</a></li>
                             <li><a href="{paths.truth.topics.create}?id={topic._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Topic</a></li>
                         {/isTopicOwner}!}
-                        <li><a href="{paths.truth.topics.create}?topic={topic._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Topic</a></li>
+                        <li><a href="{wikiBaseUrl}{paths.truth.topics.create}?topic={topic._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Topic</a></li>
                         {!<li><a href="#"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit References</a></li>!}
                     {:else}
                         {!{?isArgumentOwner}
@@ -87,8 +87,8 @@
                             <li><a href="{paths.truth.arguments.create}?topic={topic._id}&amp;argument={argument._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Argument</a></li>
                         {/isArgumentOwner}!}
                     {/argument}
-                    <li><a href="{paths.truth.arguments.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> New Argument</a></li>
-                    <li><a href="{paths.truth.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
+                    <li><a href="{wikiBaseUrl}{paths.truth.arguments.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> New Argument</a></li>
+                    <li><a href="{wikiBaseUrl}{paths.truth.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
                         <span class="fa fa-question-circle" aria-hidden="true"></span> New Question</a></li>
                     <li role="separator" class="divider"></li>
                 {:else}
@@ -96,10 +96,10 @@
                         <li><a href="{paths.truth.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Question</a></li>
                     {/isQuestionOwner}!}
                 {/question}
-                <li><a href="{paths.truth.issues.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
+                <li><a href="{wikiBaseUrl}{paths.truth.issues.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
                     <span class="fa fa-exclamation-circle" aria-hidden="true"></span> New Issue</a></li>
             {/issue}
-            <li><a href="{paths.truth.opinions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
+            <li><a href="{wikiBaseUrl}{paths.truth.opinions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
                 <span class="fa fa-comments-o" aria-hidden="true"></span> New Comment</a></li>
                 {!<li role="separator" class="divider"></li>!}
             {!<li>

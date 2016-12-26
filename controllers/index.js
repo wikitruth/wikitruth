@@ -92,7 +92,7 @@ module.exports = function (router) {
         var model = {};
         async.parallel({
             topics: function(callback) {
-                var query = { parentId: {$ne: null} };
+                var query = { parentId: {$ne: null}, private: false };
                 //db.Topic.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
                 db.Topic
                     .find(query)
@@ -112,7 +112,7 @@ module.exports = function (router) {
             },
             categories: function(callback) {
                 db.Topic
-                    .find({parentId: null })
+                    .find({parentId: null, $or: [ { private: { $exists: false } }, { private: false } ] })
                     .sort({title: 1})
                     .lean()
                     .exec(function (err, results) {
@@ -221,7 +221,7 @@ module.exports = function (router) {
                     return callback();
                 }
                 db.Topic
-                    .find({ $text : { $search : keyword }},{ score: { $meta: "textScore" } })
+                    .find({ $text : { $search : keyword }, $or: [ { private: { $exists: false } }, { private: false } ] },{ score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
                     .limit(tab === 'all' ? 15 : 0)
                     .lean()
@@ -251,7 +251,7 @@ module.exports = function (router) {
                     return callback();
                 }
                 db.Argument
-                    .find({ $text : { $search : keyword }},{ score: { $meta: "textScore" } })
+                    .find({ $text : { $search : keyword }, $or: [ { private: { $exists: false } }, { private: false } ] },{ score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
                     .limit(tab === 'all' ? 15 : 0)
                     .lean()
@@ -278,7 +278,7 @@ module.exports = function (router) {
                     return callback();
                 }
                 db.Question
-                    .find({ $text : { $search : keyword }},{ score: { $meta: "textScore" } })
+                    .find({ $text : { $search : keyword }, $or: [ { private: { $exists: false } }, { private: false } ] },{ score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
                     .limit(tab === 'all' ? 15 : 0)
                     .exec(function(err, results) {
@@ -301,7 +301,7 @@ module.exports = function (router) {
                     return callback();
                 }
                 db.Issue
-                    .find({ $text : { $search : keyword }},{ score: { $meta: "textScore" } })
+                    .find({ $text : { $search : keyword }, $or: [ { private: { $exists: false } }, { private: false } ] },{ score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
                     .limit(tab === 'all' ? 15 : 0)
                     .lean()
@@ -327,7 +327,7 @@ module.exports = function (router) {
                     return callback();
                 }
                 db.Opinion
-                    .find({ $text : { $search : keyword }},{ score: { $meta: "textScore" } })
+                    .find({ $text : { $search : keyword }, $or: [ { private: { $exists: false } }, { private: false } ] },{ score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
                     .limit(tab === 'all' ? 15 : 0)
                     .lean()
@@ -356,23 +356,23 @@ module.exports = function (router) {
     /* Entry routes mapping */
 
     router.get('/topic(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
-        topicController.getEntry(req, res);
+        topicController.GET_entry(req, res);
     });
 
     router.get('/argument(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
-        argumentController.getEntry(req, res);
+        argumentController.GET_entry(req, res);
     });
 
     router.get('/question(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
-        questionController.getEntry(req, res);
+        questionController.GET_entry(req, res);
     });
 
     router.get('/opinion(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
-        opinionController.getEntry(req, res);
+        opinionController.GET_entry(req, res);
     });
 
     router.get('/issue(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
-        issueController.getEntry(req, res);
+        issueController.GET_entry(req, res);
     });
 
     /* Related */

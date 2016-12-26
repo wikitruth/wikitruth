@@ -22,8 +22,7 @@ module.exports = {
         reviewers: '/members/reviewers',
         administrators: '/members/administrators',
         profile: {
-            index: '/members/profile',
-            topics: '/members/profile/topics'
+            index: '/members/profile'
         }
     },
     pages: {

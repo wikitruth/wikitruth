@@ -12,6 +12,7 @@ exports = module.exports = function(app, mongoose) {
     editDate: { type: Date, default: Date.now },
     editUserId: { type: mongoose.Schema.ObjectId, ref: 'User'},
     threadId: { type: mongoose.Schema.ObjectId, ref: 'Argument' },
+    private: { type: Boolean, default: false }, // if true, should be restricted to group/user owners and not included in public backup
     negative: { type: Boolean, default: false }, // a negative or positive statement
     against: { type: Boolean, default: false } // how it relates to parent Argument, default is in support
   });

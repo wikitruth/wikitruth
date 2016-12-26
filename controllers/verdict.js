@@ -30,6 +30,7 @@ module.exports = function (router) {
                 if(model.argument && model.argument.verdict && model.argument.verdict.status) {
                     model.verdictStatus = model.argument.verdict.status;
                 }
+                flowUtils.setModelContext(req, model);
                 model.cancelUrl = createReturnUrl(req, model);
                 res.render(templates.truth.verdict.update, model);
             });

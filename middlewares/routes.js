@@ -35,6 +35,13 @@ function ensureAccount(req, res, next) {
   res.redirect('/');
 }
 
+function ensureAccountOwner(req, res, next) {
+  if(req.user.username === req.params.username) {
+    return next();
+  }
+  res.redirect('/');
+}
+
 exports = module.exports = function(app, passport) {
 
   app.get(paths.truth.topics.create, ensureAuthenticated);
@@ -42,6 +49,10 @@ exports = module.exports = function(app, passport) {
   app.get(paths.truth.questions.create, ensureAuthenticated);
   app.get(paths.truth.issues.create, ensureAuthenticated);
   app.get(paths.truth.opinions.create, ensureAuthenticated);
+
+  // member diary
+  app.all('/members/:username/diary*', ensureAuthenticated);
+  app.all('/members/:username/diary*', ensureAccountOwner);
 
   //front end
   app.get('/home/', _require('/index').init);
