@@ -1,15 +1,14 @@
 'use strict';
 
-var templates   = require('../../models/templates'),
-    config      = require('../../config/config'),
-    flowUtils   = require('../../utils/flowUtils'),
-    constants   = require('../../models/constants'),
-    backup      = require('mongodb-backup'),
-    db          = require('../../app').db.models,
+var backup      = require('mongodb-backup'),
     fs          = require('fs'),
     path        = require("path"),
     async       = require('async'),
-    Git         = require("nodegit");
+    Git         = require("nodegit"),
+    templates   = require('../models/templates'),
+    config      = require('../config/config'),
+    flowUtils   = require('../utils/flowUtils'),
+    db          = require('../app').db.models;
 
 var cols = config.mongodb.collections;
 
@@ -39,11 +38,12 @@ module.exports = function (router) {
                 uri: config.mongodb.uri, // mongodb://<dbuser>:<dbpassword>@<dbdomain>.mongolab.com:<dbport>/<dbdatabase>
                 root: flowUtils.getBackupDir(), // write files into this dir
                 collections: cols.backupList, // save this collection only
-                parser: 'json'
+                parser: 'json',
+                query: { $or: [ { private: { $exists: false } }, { private: false } ] }
             });
             res.render(templates.admin.mongoBackup, model);
         } else if(action === 'fix') {
-            async.parallel({
+            /*async.parallel({
                 topics: function (callback) {
                     db.Topic.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
@@ -73,7 +73,7 @@ module.exports = function (router) {
                 }
             }, function (err, results) {
                 res.render(templates.admin.mongoBackup, model);
-            });
+            });*/
         } else if(action === 'restore') {
             var dir = flowUtils.getBackupDir() + '/wikitruth';
             console.log(cols.backupList);

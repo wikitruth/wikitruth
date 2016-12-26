@@ -7,6 +7,7 @@ exports = module.exports = function(app, mongoose) {
     parentId: { type: mongoose.Schema.ObjectId, default: null },
     ownerId: { type: mongoose.Schema.ObjectId },
     ownerType: { type: Number }, // OBJECT_TYPES
+    private: { type: Boolean, default: false }, // if true, should be restricted to group/user owners and not included in public backup
     createDate: { type: Date, default: Date.now },
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     editDate: { type: Date, default: Date.now },

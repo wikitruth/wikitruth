@@ -14,6 +14,7 @@ exports = module.exports = function(app, mongoose) {
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     editDate: { type: Date, default: Date.now },
     editUserId: { type: mongoose.Schema.ObjectId, ref: 'User'},
+    private: { type: Boolean, default: false }, // if true, should be restricted to group/user owners and not included in public backup
     isCritical: { type: Boolean }
   });
   schema.plugin(require('../plugins/pagedFind'));

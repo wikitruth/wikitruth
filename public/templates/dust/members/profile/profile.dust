@@ -68,9 +68,14 @@
         </div>
     </div>
     {?loggedIn}
-        <p><i class="fa fa-pencil-square-o"></i> <a href="/account/settings">Edit Profile</a></p>
+        <p><a href="/account/settings" class="no-underline"><i class="fa fa-pencil-square-o"></i> Edit Profile</a></p>
     {/loggedIn}
+    <p><a href="#" class="no-underline"><i class="fa fa-rss" aria-hidden="true"></i> Follow</a></p>
     <p>Account Details</p>
     <p>Reputation</p>
     <p>Timeline &amp; Activities</p>
 {/body}
+
+{<footer}
+    {>"dust/members/profile/profile-scripts" /}
+{/footer}

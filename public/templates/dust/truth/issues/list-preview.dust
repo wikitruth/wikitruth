@@ -6,7 +6,7 @@
                 <li class="list-group-item">
                     <i class="fa fa-exclamation-circle text-danger" aria-hidden="true"></i>
                     <div>
-                        <a href="{paths.truth.issues.entry}/{friendlyUrl}/{_id}">{title}</a>
+                        <a href="{wikiBaseUrl}{paths.truth.issues.entry}/{friendlyUrl}/{_id}">{title}</a>
                         {>"dust/truth/common/entry-row-footer" /}
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
@@ -14,7 +14,7 @@
             {/issues}
         </ul>
         {@gt key=entry.childrenCount.issues value="15"}
-            <div class="top-list-items-more"><a href="{paths.truth.issues.index}?topic={topic._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{entry.childrenCount.issues}</span></a></div>
+            <div class="top-list-items-more"><a href="{wikiBaseUrl}{paths.truth.issues.index}?topic={topic._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{entry.childrenCount.issues}</span></a></div>
         {/gt}
     </div>
 {/issues}

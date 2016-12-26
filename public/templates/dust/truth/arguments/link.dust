@@ -37,6 +37,12 @@
                     Opposing Argument (against)
                 </label>
             </div>
+            <div class="radio" style="margin-top: 10px">
+                <label class="text-info">
+                    <input type="radio" name="supportsParent" value="" {?argument.ref}checked="checked"{/argument.ref}>
+                    Source, Reference
+                </label>
+            </div>
         </div>
         <button type="submit" name="action" value="submit" class="btn btn-primary">Submit</button>&nbsp;
         <button type="submit" name="action" value="delete" class="btn btn-danger">Delete</button>&nbsp;

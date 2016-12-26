@@ -138,3 +138,7 @@
         </div>
     {/results}
 {/body}
+
+{<footer}
+    {>"dust/members/profile/profile-scripts" /}
+{/footer}

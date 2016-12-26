@@ -3,7 +3,7 @@
 exports = module.exports = function(app, mongoose) {
   var schema = new mongoose.Schema({
     title: { type: String, default: '' },
-    contextTitle: { type: String },
+    contextTitle: { type: String }, // A title alias for current context
     content: { type: String, default: '' },
     friendlyUrl: { type: String },
     referenceDate: { type: Date }, // If the entry is time/date sensitive or may become obsolete in the future, add a ref date
@@ -19,6 +19,7 @@ exports = module.exports = function(app, mongoose) {
     typeId: { type: Number }, // TOPIC_TYPES
     tags: [ { type: Number } ], // OBJECT_TAGS
     screeningStatus: { type: Number }, // SCREENING_STATUS
+    private: { type: Boolean, default: false }, // if true, should be restricted to group/user owners and not included in public backup
     ethicalStatus: {
       hasValue: { type: Boolean, default: false },
       status: { type: Number } // ETHICAL_STATUS

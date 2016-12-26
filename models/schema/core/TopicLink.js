@@ -9,6 +9,7 @@ exports = module.exports = function(app, mongoose) {
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     editDate: { type: Date, default: Date.now },
     editUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
+    private: { type: Boolean, default: false }, // if true, should be restricted to group/user owners and not included in public backup
     ownerId: { type: mongoose.Schema.ObjectId, default: null }, // Required when owner is not a Topic. Useful for filtering
     ownerType: { type: Number, default: -1 } // OBJECT_TYPES
   });

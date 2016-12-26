@@ -27,9 +27,9 @@
         <div style="margin-bottom: 15px">
             {!<hr style="border: 0; margin: 0 0 0.375rem; border-top: 0.0625rem dotted #dcdcdc;"/>!}
             <span style="font-size: 75%; font-weight: bold; color: #767676">Topics</span>&nbsp;
-            <a href="{paths.truth.topics.entry}/{topic.friendlyUrl}/{topic._id}"><span class="wt-label label label-default">{topic.title}</span></a>&nbsp;
+            <a href="{wikiBaseUrl}{paths.truth.topics.entry}/{topic.friendlyUrl}/{topic._id}"><span class="wt-label label label-default">{topic.title}</span></a>&nbsp;
             {#topicLinks}
-                <a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}"><span class="wt-label label label-default">{title}</span></a>&nbsp;
+                <a href="{wikiBaseUrl}{paths.truth.topics.entry}/{friendlyUrl}/{_id}"><span class="wt-label label label-default">{title}</span></a>&nbsp;
             {/topicLinks}
         </div>
     {/topic}
@@ -42,12 +42,12 @@
                 {#proArguments}
                 <li class="list-group-item">
                     {?link}
-                        <a href="{paths.truth.arguments.link}?topic={ownerId}&amp;argument={link.parentId}&amp;id={link._id}&amp;source={paths.truth.arguments.entry}/{friendlyUrl}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
+                        <a href="{wikiBaseUrl}{paths.truth.arguments.link}?topic={ownerId}&amp;argument={link.parentId}&amp;id={link._id}&amp;source={paths.truth.arguments.entry}/{friendlyUrl}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
                     {:else}
                         <i class="glyphicon glyphicon-flash text-{verdict.theme}" aria-hidden="true"></i>
                     {/link}
                     <div>
-                        <a href="{paths.truth.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title} {?typeUX}<span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}</a>
+                        <a href="{wikiBaseUrl}{paths.truth.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title} {?typeUX}<span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}</a>
                         {>"dust/truth/common/entry-row-footer" /}
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
@@ -61,12 +61,12 @@
                     {#conArguments}
                         <li class="list-group-item">
                             {?link}
-                                <a href="{paths.truth.arguments.link}?topic={ownerId}&amp;argument={link.parentId}&amp;id={link._id}&amp;source={paths.truth.arguments.entry}/{friendlyUrl}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
+                                <a href="{wikiBaseUrl}{paths.truth.arguments.link}?topic={ownerId}&amp;argument={link.parentId}&amp;id={link._id}&amp;source={paths.truth.arguments.entry}/{friendlyUrl}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
                             {:else}
                                 <i class="glyphicon glyphicon-flash text-{verdict.theme}" aria-hidden="true"></i>
                             {/link}
                             <div>
-                                <a href="{paths.truth.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title} {?typeUX}<span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}</a>
+                                <a href="{wikiBaseUrl}{paths.truth.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title} {?typeUX}<span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}</a>
                                 {>"dust/truth/common/entry-row-footer" /}
                             </div>
                             <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
@@ -74,11 +74,11 @@
                     {/conArguments}
                 </ul>
                 {@gt key=conArgumentCount value="15"}
-                    <div class="top-list-items-more"><a href="{paths.truth.arguments.index}?topic={topic._id}&amp;argument={argument._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{conArgumentCount}</span></a></div>
+                    <div class="top-list-items-more"><a href="{wikiBaseUrl}{paths.truth.arguments.index}?topic={topic._id}&amp;argument={argument._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{conArgumentCount}</span></a></div>
                 {/gt}
             {:else}
                 {@gt key=proArgumentCount value="15"}
-                    <div class="top-list-items-more"><a href="{paths.truth.arguments.index}?topic={topic._id}&amp;argument={argument._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{proArgumentCount}</span></a></div>
+                    <div class="top-list-items-more"><a href="{wikiBaseUrl}{paths.truth.arguments.index}?topic={topic._id}&amp;argument={argument._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{proArgumentCount}</span></a></div>
                 {/gt}
             {/conArguments}
         </div>

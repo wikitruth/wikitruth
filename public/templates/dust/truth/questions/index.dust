@@ -17,7 +17,7 @@
                 <li class="list-group-item">
                     <i class="fa fa-question-circle text-success" aria-hidden="true"></i>
                     <div>
-                        <a href="{paths.truth.questions.entry}/{friendlyUrl}/{_id}">{title}</a>
+                        <a href="{wikiBaseUrl}{paths.truth.questions.entry}/{friendlyUrl}/{_id}">{title}</a>
                         {>"dust/truth/common/entry-row-footer" /}
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>

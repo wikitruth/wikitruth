@@ -1,9 +1,9 @@
 'use strict';
 
-var templates   = require('../../models/templates'),
-    config      = require('../../config/config'),
-    flowUtils   = require('../../utils/flowUtils'),
-    db          = require('../../app').db.models,
+var templates   = require('../models/templates'),
+    config      = require('../config/config'),
+    flowUtils   = require('../utils/flowUtils'),
+    db          = require('../app').db.models,
     fs          = require('fs'),
     async       = require('async');
 

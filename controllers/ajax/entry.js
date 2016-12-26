@@ -30,6 +30,24 @@ module.exports = function (router) {
                         res.send({});
                     });
                 });
+            } else if(type == constants.OBJECT_TYPES.question) {
+                db.Question.findOne(query, function(err, entry) {
+                    entry.createUserId = req.user.id;
+                    entry.editUserId = req.user.id;
+                    entry.editDate = Date.now();
+                    db.Question.update(query, entry, {upsert: true}, function(err, writeResult) {
+                        res.send({});
+                    });
+                });
+            } else if(type == constants.OBJECT_TYPES.issue) {
+                db.Issue.findOne(query, function(err, entry) {
+                    entry.createUserId = req.user.id;
+                    entry.editUserId = req.user.id;
+                    entry.editDate = Date.now();
+                    db.Issue.update(query, entry, {upsert: true}, function(err, writeResult) {
+                        res.send({});
+                    });
+                });
             } else {
                 res.send({});
             }

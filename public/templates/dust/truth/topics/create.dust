@@ -104,15 +104,7 @@
             <textarea name="icon" id="inputIcon" class="form-control" rows="1">{topic.icon}</textarea>
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
-        {?topic}
-            <a class="btn btn-default" href="{paths.truth.topics.entry}/{topic.friendlyUrl}/{topic._id}" role="button">Cancel</a>
-        {:else}
-            {?parentTopic}
-                <a class="btn btn-default" href="{paths.truth.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}" role="button">Cancel</a>
-            {:else}
-                <a class="btn btn-default" href="{paths.truth.index}" role="button">Cancel</a>
-            {/parentTopic}
-        {/topic}
+        <a class="btn btn-default" href="{cancelUrl}" role="button">Cancel</a>
     </form>
 {/body}
 
