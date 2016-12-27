@@ -34,6 +34,11 @@ function appendEntryExtra(item) {
     //var editDateString = result.editDate.toUTCString();
     item.editDateString = utils.timeSince(item.editDate)/* + ' ago'*/; //editDateString.substring(0, editDateString.length - 4);
     item.createDateString = utils.timeSince(item.createDate);
+
+    if(item.referenceDate) {
+        item.referenceDateString = item.referenceDate.toLocaleString();
+        item.referenceDateUTC = item.referenceDate.toUTCString();
+    }
 }
 
 function setEditorsUsername(items, callback) {

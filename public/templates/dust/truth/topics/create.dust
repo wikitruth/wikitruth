@@ -32,6 +32,16 @@
             <textarea name="parent" id="inputParent" class="form-control" rows="1">{?topic}{topic.parentId}{:else}{parentTopic._id}{/topic}</textarea>
         </div>
         <div class="form-group">
+            <label for="inputParent">Reference Date</label>
+            <div class='input-group date' id='inputRefDatePicker'>
+                <input type="text" name="referenceDate" id="inputReferenceDate" class="form-control" value="{topic.referenceDateString}" />
+                {!<input type="hidden" name="referenceDateUTC" id="inputReferenceDateUTC" value="" />!}
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+            </div>
+        </div>
+        <div class="form-group">
             <label>Tags</label>
             <div class="checkbox">
                 <label>
@@ -109,9 +119,14 @@
 {/body}
 
 {<footer}
-    <link rel="stylesheet" href="/components/summernote/dist/summernote.css">
     <script src="/components/textarea-autosize/dist/jquery.textarea_autosize.min.js"></script>
+    <!-- summernote -->
+    <link rel="stylesheet" href="/components/summernote/dist/summernote.css">
     <script src="/components/summernote/dist/summernote.min.js"></script>
+    <!-- datetimepicker -->
+    <script type="text/javascript" src="/components/moment/min/moment.min.js"></script>
+    <script type="text/javascript" src="/components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+    <link rel="stylesheet" href="/components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" />
     <script type="text/javascript">
         $(function() {
             $('#inputName,#inputParent,#contextTitle').textareaAutoSize();
@@ -130,6 +145,13 @@
                     $(".topicTag[value='" + item + "'").prop('checked', true);
                 });
             }
+
+            $('#inputRefDatePicker').datetimepicker({
+                sideBySide: false
+            });
+            /*$('#inputRefDatePicker').on('dp.change', function(e){
+                $('#inputReferenceDateUTC').val((new Date($('#inputReferenceDate').val())).toUTCString());
+            });*/
         });
     </script>
 {/footer}

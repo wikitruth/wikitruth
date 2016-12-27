@@ -30,6 +30,7 @@
     "textarea-autosize": "^0.4.2",
     "jquery-timeago": "^1.5.3",
     "geopattern": "^1.2.3",
-    "font-awesome": "^4.7.0"
+    "font-awesome": "^4.7.0",
+    "eonasdan-bootstrap-datetimepicker": "^4.17.43"
   }
 }

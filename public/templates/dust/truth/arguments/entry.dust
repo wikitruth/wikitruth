@@ -9,7 +9,7 @@
     <div class="entry-header">
         {>"dust/truth/common/entry-verdict" /}
     </div>
-    <div class="text-body collapsable">
+    <div class="text-body collapsible">
         {!<p style="font-style: italic; margin: 10px 0 10px 0; font-size: smaller;">
             {?parentArgument}
                 {?argument.against}An argument against{:else}A supporting argument for{/argument.against} <a href="{paths.truth.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
@@ -17,6 +17,9 @@
                 An argument under the topic <a href="{paths.truth.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
             {/parentArgument}
         </p>!}
+        {?argument.referenceDate}
+            <p><small class="text-muted">Reference Date: {argument.referenceDateUTC}</small></p>
+        {/argument.referenceDate}
         {argument.content|s}
         <a href="#" onclick="return contentSeeMore()" class="content-see-more hidden">
             <div class="content-see-more-gradient"></div>

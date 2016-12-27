@@ -257,6 +257,7 @@ function GET_create(req, res) {
                 db.Topic.findOne({_id: req.query.id}, function (err, result) {
                     result.friendlyUrl = utils.urlify(result.title);
                     result.shortTitle = utils.getShortText(result.title);
+                    flowUtils.appendEntryExtra(result);
                     model.topic = result;
                     callback();
                 });
@@ -301,6 +302,7 @@ function POST_create(req, res) {
         entity.friendlyUrl = utils.urlify(req.body.title);
         entity.editUserId = req.user.id;
         entity.editDate = Date.now();
+        entity.referenceDate = req.body.referenceDate ? new Date(req.body.referenceDate) : null;
         entity.tags = tags ? tags : [];
         entity.icon = req.body.icon;
         if(!entity.ethicalStatus) {

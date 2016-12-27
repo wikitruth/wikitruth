@@ -251,6 +251,7 @@ function GET_create(req, res) {
                     db.Argument.findOne({_id: req.query.id}, function (err, result) {
                         result.friendlyUrl = utils.urlify(result.title);
                         result.shortTitle = utils.getShortText(result.title);
+                        flowUtils.appendEntryExtra(result);
                         model.argument = result;
                         callback();
                     });
@@ -302,6 +303,7 @@ function POST_create(req, res) {
                 entity.content = req.body.content;
                 entity.title = req.body.title;
                 entity.references = req.body.references;
+                entity.referenceDate = req.body.referenceDate ? new Date(req.body.referenceDate) : null;
                 entity.editUserId = req.user.id;
                 entity.editDate = Date.now();
                 entity.typeId = req.body.typeId;
