@@ -1,11 +1,13 @@
 'use strict';
 
+var constants   = require('../../constants');
+
 exports = module.exports = function(app, mongoose) {
   var schema = new mongoose.Schema({
     title: { type: String, default: '' },
     content: { type: String, default: '' },
     references: { type: String, default: '' },
-    screeningStatus: { type: Number }, // SCREENING_STATUS
+    screeningStatus: { type: Number, default: constants.SCREENING_STATUS.status0.code }, // SCREENING_STATUS
     ownerId: { type: mongoose.Schema.ObjectId },
     ownerType: { type: Number }, // MODEL_TYPES
     createDate: { type: Date, default: Date.now },

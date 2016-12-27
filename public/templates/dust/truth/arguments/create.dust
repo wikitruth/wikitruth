@@ -46,6 +46,15 @@
             <textarea name="parent" id="inputParent" class="form-control" rows="1">{?argument}{argument.parentId}{:else}{parentArgument._id}{/argument}</textarea>
         </div>
         <div class="form-group">
+            <label for="inputParent">Reference Date</label>
+            <div class='input-group date' id='inputRefDatePicker'>
+                <input type="text" name="referenceDate" id="inputReferenceDate" class="form-control" value="{argument.referenceDateString}" />
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+            </div>
+        </div>
+        <div class="form-group">
             <label for="inputParent">Correlation to Parent</label>
             <div class="radio">
                 <label class="text-success">
@@ -196,9 +205,14 @@
 {/body}
 
 {<footer}
-    <link rel="stylesheet" href="/components/summernote/dist/summernote.css">
     <script src="/components/textarea-autosize/dist/jquery.textarea_autosize.min.js"></script>
+    <!-- summernote -->
+    <link rel="stylesheet" href="/components/summernote/dist/summernote.css">
     <script src="/components/summernote/dist/summernote.min.js"></script>
+    <!-- datetimepicker -->
+    <script type="text/javascript" src="/components/moment/min/moment.min.js"></script>
+    <script type="text/javascript" src="/components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+    <link rel="stylesheet" href="/components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" />
     <script type="text/javascript">
         $(function() {
             $('#inputName,#inputParent').textareaAutoSize();
@@ -222,6 +236,9 @@
             }
 
             $('[data-toggle="popover"]').popover();
+            $('#inputRefDatePicker').datetimepicker({
+                sideBySide: false
+            });
         });
     </script>
 {/footer}

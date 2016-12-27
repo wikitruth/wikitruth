@@ -137,6 +137,21 @@ ARGUMENT_TYPES.getUXInfo = function (typeId) {
     };
 };
 
+var SCREENING_STATUS = {
+    status0: {
+        code: 0,
+        text: "Pending"
+    },
+    status1: {
+        code: 1,
+        text: "Approved"
+    },
+    status2: {
+        code: 2,
+        text: "Rejected"
+    }
+};
+
 var ISSUE_TYPES = {
     type10: {
         code: 10,
@@ -270,5 +285,6 @@ module.exports = {
         bad: 21,
         dangerous: 22
     },
+    SCREENING_STATUS: SCREENING_STATUS,
     VERDICT_STATUS: VERDICT_STATUS
 };
