@@ -1,6 +1,8 @@
 'use strict';
 
-var templates   = require('../models/templates'),
+var mongoose    = require('mongoose'),
+    templates   = require('../models/templates'),
+    paths       = require('../models/paths'),
     async       = require('async'),
     flowUtils   = require('../utils/flowUtils'),
     utils       = require('../utils/utils'),
@@ -57,7 +59,6 @@ module.exports = function (router) {
     router.get('/:username', function (req, res) {
         var model = {};
         setMemberModel(model, req, function() {
-            model.url = '/members/' + model.member.username + '/contributions';
             async.parallel({
                 topics: function(callback) {
                     db.Topic
@@ -100,6 +101,8 @@ module.exports = function (router) {
                         });
                 }
             }, function (err, results) {
+                flowUtils.setModelContext(req, model);
+                model.url = model.profileBaseUrl + '/contributions';
                 model.contributions = model.topics + model.arguments + model.questions + model.issues + model.opinions;
                 res.render(templates.members.profile.index, model);
             });
@@ -129,7 +132,6 @@ module.exports = function (router) {
                             }
                             flowUtils.setEditorsUsername(results, function() {
                                 results.forEach(function (result) {
-                                    result.friendlyUrl = utils.urlify(result.title);
                                     flowUtils.appendEntryExtra(result);
                                 });
                                 model.topics = results;
@@ -155,7 +157,6 @@ module.exports = function (router) {
                         .exec(function(err, results) {
                             flowUtils.setEditorsUsername(results, function() {
                                 results.forEach(function (result) {
-                                    result.friendlyUrl = utils.urlify(result.title);
                                     flowUtils.appendEntryExtra(result);
                                     flowUtils.setVerdictModel(result);
                                 });
@@ -181,8 +182,6 @@ module.exports = function (router) {
                         .exec(function(err, results) {
                             flowUtils.setEditorsUsername(results, function() {
                                 results.forEach(function (result) {
-                                    result.friendlyUrl = utils.urlify(result.title);
-                                    result.friendlyUrl = utils.urlify(result.title);
                                     flowUtils.appendEntryExtra(result);
                                 });
                                 model.questions = results;
@@ -205,7 +204,6 @@ module.exports = function (router) {
                         .exec(function(err, results) {
                             flowUtils.setEditorsUsername(results, function() {
                                 results.forEach(function (result) {
-                                    result.friendlyUrl = utils.urlify(result.title);
                                     flowUtils.appendEntryExtra(result);
                                 });
                                 model.issues = results;
@@ -231,7 +229,6 @@ module.exports = function (router) {
                         .exec(function(err, results) {
                             flowUtils.setEditorsUsername(results, function() {
                                 results.forEach(function (result) {
-                                    result.friendlyUrl = utils.urlify(result.title);
                                     flowUtils.appendEntryExtra(result);
                                 });
                                 model.opinions = results;
@@ -246,7 +243,183 @@ module.exports = function (router) {
                         });
                 }
             }, function (err, results) {
+                flowUtils.setModelContext(req, model);
                 res.render(templates.members.profile.contributions, model);
+            });
+        });
+    });
+
+    /* Member Pages */
+
+    router.get('/:username/pages', function (req, res) {
+        var model = {};
+        flowUtils.setModelContext(req, model);
+        setMemberModel(model, req, function() {
+            async.parallel({
+                parent: function (callback) {
+                    if (req.query.parent) {
+                        db.Page.findOne({_id: req.query.parent}, function (err, result) {
+                            model.page = result;
+                            flowUtils.appendOwnerFlag(req, result, model);
+                            callback();
+                        });
+                    } else {
+                        callback();
+                    }
+                },
+                pages: function (callback) {
+                    var query = req.query.parent ? {
+                        createUserId: model.member._id,
+                        parentId: req.query.parent
+                    } : {createUserId: model.member._id};
+                    db.Page.find(query).sort({title: 1}).exec(function (err, results) {
+                        if (req.query.parent) {
+                            model.pages = results;
+                        } else {
+                            // Return pages with hierarchy
+                            var nodes = [];
+                            // Build parent pages
+                            results.forEach(function (page) {
+                                if (!page.parentId) {
+                                    nodes.push(page);
+                                }
+                            });
+                            results.forEach(function (page) {
+                                if (page.parentId) {
+                                    var parents = nodes.filter(function (p) {
+                                        return p._id.equals(page.parentId);
+                                    });
+                                    var parent = parents.length > 0 ? parents[0] : null;
+                                    if (parent) {
+                                        if (!parent.children) {
+                                            parent.children = [];
+                                        }
+                                        parent.children.push(page);
+                                    } else {
+                                        // parent not found, add as orphan
+                                        nodes.push(page);
+                                    }
+                                } else {
+                                    // no parent, if not existing, add as orphan
+                                    var orphans = nodes.filter(function (p) {
+                                        return p._id.equals(page._id);
+                                    });
+                                    var orphan = orphans.length > 0 ? orphans[0] : null;
+                                    if (!orphan) {
+                                        nodes.push(page);
+                                    }
+                                }
+                            });
+                            model.pageNodes = nodes;
+                        }
+                        callback();
+                    });
+                }
+            }, function (err, results) {
+                if(!req.query.parent) {
+                    model.pagesRoot = true;
+                }
+                res.render(templates.members.profile.pages.index, model);
+            });
+        });
+    });
+
+    router.get('/:username/pages/create', function (req, res) {
+        var model = {};
+        flowUtils.setModelContext(req, model);
+        setMemberModel(model, req, function() {
+            if (req.user && req.user.id) {
+                async.parallel({
+                    parent: function (callback) {
+                        if (req.query.parent) {
+                            db.Page.findOne({_id: req.query.parent}, function (err, result) {
+                                model.parent = result;
+                                //flowUtils.appendOwnerFlag(req, result, model);
+                                callback();
+                            });
+                        } else {
+                            callback();
+                        }
+                    },
+                    page: function (callback) {
+                        if (req.query.id) {
+                            db.Page.findOne({createUserId: req.user.id, _id: req.query.id}, function (err, result) {
+                                model.page = result;
+                                callback();
+                            });
+                        } else {
+                            callback();
+                        }
+                    }
+                }, function (err, results) {
+                    res.render(templates.members.profile.pages.create, model);
+                });
+            } else {
+                res.render(templates.members.profile.pages.create, model);
+            }
+        });
+    });
+
+    router.get('/:username/pages(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        var model = {};
+        setMemberModel(model, req, function() {
+            async.parallel({
+                parent: function (callback) {
+                    if (req.query.parent) {
+                        db.Page.findOne({_id: req.query.parent}, function (err, result) {
+                            model.parent = result;
+                            callback();
+                        });
+                    } else {
+                        callback();
+                    }
+                },
+                page: function (callback) {
+                    db.Page.findOne({_id: req.params.id}, function (err, result) {
+                        model.page = result;
+                        flowUtils.appendOwnerFlag(req, result, model);
+                        callback();
+                    });
+                }
+            }, function (err, results) {
+                flowUtils.setModelContext(req, model);
+                res.render(templates.members.profile.pages.page, model);
+            });
+        });
+    });
+
+    router.post('/:username/pages/create', function (req, res) {
+        var query = {
+            _id: req.query.id ? req.query.id : new mongoose.Types.ObjectId()
+        };
+        db.Page.findOne(query, function(err, result) {
+            var entity = result ? result : {};
+            entity.content = req.body.content;
+            entity.title = req.body.title;
+            entity.friendlyUrl = utils.urlify(req.body.title);
+            entity.editUserId = req.user.id;
+            entity.editDate = Date.now();
+            if(!result) {
+                entity.createUserId = req.user.id;
+                entity.createDate = Date.now();
+            }
+            if(req.query.parent) {
+                entity.parentId = req.query.parent;
+            } else if(entity.parentId) {
+                entity.parentId = null;
+            }
+
+            db.Page.findOneAndUpdate(query, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function(err, updatedEntity) {
+                if (err) {
+                    throw err;
+                }
+                var model = {};
+                flowUtils.setModelContext(req, model);
+                if(result) {
+                    res.redirect(model.profileBaseUrl + paths.members.profile.pages.index + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id + (req.query.parent ? '?parent=' + req.query.parent : ''));
+                } else {
+                    res.redirect(model.profileBaseUrl + paths.members.profile.pages.index);
+                }
             });
         });
     });
@@ -260,6 +433,29 @@ module.exports = function (router) {
             user: function(callback){
                 setMemberModel(model, req, callback);
             },
+            categories: function(callback) {
+                db.Topic
+                    .find({ parentId: null, ownerType: constants.OBJECT_TYPES.user, ownerId: model.member._id })
+                    .sort({title: 1})
+                    .lean()
+                    .exec(function (err, results) {
+                        async.each(results, function(result, callback) {
+                            result.friendlyUrl = utils.urlify(result.title);
+                            result.comments = utils.numberWithCommas(utils.randomInt(1, 100000));
+                            db.Topic.find( { parentId: result._id } ).limit(3).sort({ title: 1 }).exec(function(err, subtopics) {
+                                subtopics.forEach(function(subtopic){
+                                    subtopic.friendlyUrl = utils.urlify(subtopic.title);
+                                    subtopic.shortTitle = utils.getShortText(subtopic.contextTitle ? subtopic.contextTitle : subtopic.title, 38);
+                                });
+                                result.subtopics = subtopics;
+                                callback();
+                            });
+                        }, function(err) {
+                            model.categories = results;
+                            callback();
+                        });
+                    });
+            },
             topics: function(callback) {
                 // display 15 if top topics, all if has topic parameter
                 flowUtils.getTopics({ parentId: null, ownerType: constants.OBJECT_TYPES.user, ownerId: model.member._id }, 0, function (err, results) {
@@ -268,6 +464,7 @@ module.exports = function (router) {
                 });
             }
         }, function (err, results) {
+            flowUtils.setModelContext(req, model);
             res.render(templates.members.profile.topics, model);
         });
     });

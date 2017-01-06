@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {question.title} - {titleSlogan}
+    {answer.title} - {titleSlogan}
 {/title}
 
 {<body}
@@ -10,10 +10,9 @@
         {>"dust/truth/common/entry-verdict" /}
     </div>
     <div class="text-body">
-        <p>{question.content|s}</p>
+        <p>{answer.content|s}</p>
     </div>
     {>"dust/truth/common/entry-options" /}
-    {>"dust/truth/answers/list-preview" /}
     {>"dust/truth/issues/list-preview" /}
     {>"dust/truth/opinions/list-preview" /}
     {>"dust/truth/common/entry-footer" /}

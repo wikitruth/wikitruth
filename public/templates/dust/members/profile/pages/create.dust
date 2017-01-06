@@ -5,8 +5,10 @@
 {/title}
 
 {<body}
+    {>"dust/members/profile/pages/header" tab="create" /}
     <h1 class="page-header text-primary">
-        <span class="text-muted"><i class="fa fa-book"></i> <a href="{paths.pages.index}">Pages</a> / {?parent}<a href="{paths.pages.page}?id={parent._id}">{parent.title}</a> /{/parent} {?page}<a href="{paths.pages.page}?id={page._id}">{page.title}</a> / Edit{:else}New Page{/page}</span></h1>
+        <span class="text-muted"><i class="fa fa-book"></i> {!<a href="{profileBaseUrl}{paths.members.profile.pages.index}">Pages</a> / {?parent}<a href="{profileBaseUrl}{paths.members.profile.pages.page}?id={parent._id}">{parent.title}</a> /{/parent}!}
+            {?page}<a href="{profileBaseUrl}{paths.members.profile.pages.page}?id={page._id}">{page.title}</a> / Edit{:else}New Page{/page}</span></h1>
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
         <div class="form-group">
@@ -17,19 +19,19 @@
             <label for="inputContent">Content</label>
             <textarea class="form-control" id="inputContent" name="content" rows="12">{page.content}</textarea>
         </div>
-        <div class="form-group">
+        {!<div class="form-group">
             <label for="inputId">ID</label>
             <textarea name="id" id="inputId" class="form-control" rows="1">{page.id}</textarea>
-        </div>
+        </div>!}
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
         {?parent}
             {?page}
-                <a class="btn btn-default" href="{paths.pages.page}?parent={parent._id}&amp;id={page._id}" role="button">Cancel</a>
+                <a class="btn btn-default" href="{profileBaseUrl}{paths.members.profile.pages.page}?parent={parent._id}&amp;id={page._id}" role="button">Cancel</a>
             {:else}
-                <a class="btn btn-default" href="{paths.pages.page}?id={parent._id}" role="button">Cancel</a>
+                <a class="btn btn-default" href="{profileBaseUrl}{paths.members.profile.pages.page}?id={parent._id}" role="button">Cancel</a>
             {/page}
         {:else}
-            <a class="btn btn-default" href="{?page}{paths.pages.page}?id={page._id}{:else}{paths.pages.index}{/page}" role="button">Cancel</a>
+            <a class="btn btn-default" href="{profileBaseUrl}{?page}{paths.members.profile.pages.page}?id={page._id}{:else}{paths.members.profile.pages.index}{/page}" role="button">Cancel</a>
         {/parent}
     </form>
 {/body}

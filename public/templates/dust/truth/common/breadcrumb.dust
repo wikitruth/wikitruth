@@ -50,6 +50,10 @@
         {!<li><a href="{paths.truth.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">Questions</a></li>!}
         <li><i class="fa fa-question-circle-o text-muted"></i> <a href="{wikiBaseUrl}{paths.truth.questions.entry}/{question.friendlyUrl}/{question._id}">{question.shortTitle}</a></li>
     {/question}
+    {?answer}
+    {!<li><a href="{paths.truth.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">Questions</a></li>!}
+        <li><i class="fa fa-question-circle-o text-muted"></i> <a href="{wikiBaseUrl}{paths.truth.answers.entry}/{answer.friendlyUrl}/{answer._id}">{answer.shortTitle}</a></li>
+    {/answer}
     {?issue}
         {!<li><a href="{paths.truth.issues.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}">Issues</a></li>!}
         <li><i class="fa fa-exclamation-circle text-muted"></i> <a href="{wikiBaseUrl}{paths.truth.issues.entry}/{issue.friendlyUrl}/{issue._id}">{issue.shortTitle}</a></li>

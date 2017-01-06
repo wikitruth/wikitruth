@@ -6,7 +6,7 @@
 
 {<body}
     {>"dust/truth/common/entry-header" tab="topics" /}
-    <ul class="nav nav-pills">
+    <ul class="wt-nav-pills nav nav-pills">
         <li role="presentation" class="active"><a href="#">All <span class="badge">{entry.childrenCount.topics}</span></a></li>
         <li role="presentation"><a href="#">Screened <span class="badge">{entry.childrenCount.topics}</span></a></li>
         <li role="presentation"><a href="#">Pending <span class="badge">345</span></a></li>

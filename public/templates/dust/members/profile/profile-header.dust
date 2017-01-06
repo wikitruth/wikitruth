@@ -28,7 +28,7 @@
     </li>
     {/loggedIn}
     <li role="presentation"{@eq key=profileTab value="pages"} class="active"{/eq}>
-        <a href="/pages" role="tab">
+        <a href="{profileBaseUrl}{paths.members.profile.pages.index}" role="tab">
             <i class="fa fa-book"></i> {?loggedIn}My {/loggedIn}Pages
         </a>
     </li>

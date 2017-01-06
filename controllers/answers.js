@@ -11,41 +11,19 @@ var mongoose    = require('mongoose'),
 
 function GET_entry(req, res) {
     var model = {};
-    if(!req.query.question) {
+    if(!req.query.answer) {
         if(req.params.id) {
-            req.query.question = req.params.id;
+            req.query.answer = req.params.id;
         } else {
-            req.query.question = req.params.friendlyUrl;
+            req.query.answer = req.params.friendlyUrl;
         }
     }
     var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
     flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
         async.parallel({
-            answers: function (callback) {
-                // Top Issues
-                db.Answer
-                    .find({ questionId: model.question._id })
-                    .limit(15)
-                    .lean()
-                    .sort({ title: 1 })
-                    .exec(function(err, results) {
-                    flowUtils.setEditorsUsername(results, function() {
-                        results.forEach(function (result) {
-                            flowUtils.appendEntryExtra(result);
-                        });
-                        model.answers = results;
-                        callback();
-                    });
-                });
-            },
             issues: function (callback) {
                 // Top Issues
-                db.Issue
-                    .find(ownerQuery)
-                    .limit(15)
-                    .lean()
-                    .sort({ title: 1 })
-                    .exec(function(err, results) {
+                db.Issue.find(ownerQuery).limit(15).sort({ title: 1 }).exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
                             flowUtils.appendEntryExtra(result);
@@ -57,12 +35,7 @@ function GET_entry(req, res) {
             },
             opinions: function (callback) {
                 // Top Opinions
-                db.Opinion
-                    .find(ownerQuery)
-                    .limit(15)
-                    .lean()
-                    .sort({ title: 1 })
-                    .exec(function(err, results) {
+                db.Opinion.find(ownerQuery).limit(15).sort({ title: 1 }).exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
                             flowUtils.appendEntryExtra(result);
@@ -73,40 +46,40 @@ function GET_entry(req, res) {
                 });
             }
         }, function (err, results) {
-            model.entry = model.question;
-            model.entryType = constants.OBJECT_TYPES.question;
+            model.entry = model.answer;
+            model.entryType = constants.OBJECT_TYPES.answer;
             flowUtils.setModelContext(req, model);
-            res.render(templates.truth.questions.entry, model);
+            res.render(templates.truth.answers.entry, model);
         });
     });
 }
 
 function GET_index(req, res) {
     var model = {};
-    if(req.query.topic) {
-        flowUtils.setTopicModels(req, model, function () {
-            flowUtils.setArgumentModels(req, model, function () {
-                var query = req.query.argument ?
-                { ownerId: model.argument._id, ownerType: constants.OBJECT_TYPES.argument } :
-                { ownerId: model.topic._id, ownerType: constants.OBJECT_TYPES.topic };
-                db.Question.find(query).sort({ title: 1 }).exec(function(err, results) {
-                    flowUtils.setEditorsUsername(results, function() {
-                        results.forEach(function (result) {
-                            flowUtils.appendEntryExtra(result);
+    var query = flowUtils.createOwnerQueryFromQuery(req);
+    if(query.ownerId) {
+            flowUtils.setEntryModels(query, req, model, function (err) {
+                db.Answer
+                    .find({ questionId: model.question._id })
+                    .sort({title: 1})
+                    .lean()
+                    .exec(function (err, results) {
+                        flowUtils.setEditorsUsername(results, function() {
+                            results.forEach(function (result) {
+                                flowUtils.appendEntryExtra(result);
+                            });
+                            model.answers = results;
+                            flowUtils.setModelOwnerEntry(model);
+                            flowUtils.setModelContext(req, model);
+                            res.render(templates.truth.answers.index, model);
                         });
-                        model.questions = results;
-                        flowUtils.setModelOwnerEntry(model);
-                        flowUtils.setModelContext(req, model);
-                        res.render(templates.truth.questions.index, model);
-                    });
                 });
             });
-        });
     } else {
-        // Top Questions
-        var query = { ownerType: constants.OBJECT_TYPES.topic, $or: [ { private: { $exists: false } }, { private: false } ] };
-        //db.Question.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
-        db.Question
+        // Top Answers
+        query = { ownerType: constants.OBJECT_TYPES.topic, $or: [ { private: { $exists: false } }, { private: false } ] };
+        //db.Answer.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
+        db.Answer
             .find(query)
             .sort({editDate: -1})
             .limit(25)
@@ -119,9 +92,9 @@ function GET_index(req, res) {
                         };
                         flowUtils.appendEntryExtra(result);
                     });
-                    model.questions = results;
+                    model.answers = results;
                     flowUtils.setModelContext(req, model);
-                    res.render(templates.truth.questions.index, model);
+                    res.render(templates.truth.answers.index, model);
                 });
             });
     }
@@ -131,13 +104,13 @@ function GET_create(req, res) {
     var model = {};
     flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function () {
         flowUtils.setModelContext(req, model);
-        res.render(templates.truth.questions.create, model);
+        res.render(templates.truth.answers.create, model);
     });
 }
 
 function POST_create(req, res) {
-    var query = { _id: req.query.question || new mongoose.Types.ObjectId() };
-    db.Question.findOne(query, function(err, result) {
+    var query = { _id: req.query.answer || new mongoose.Types.ObjectId() };
+    db.Answer.findOne(query, function(err, result) {
         var entity = result ? result : {};
         entity.title = req.body.title;
         entity.content = req.body.content;
@@ -148,31 +121,23 @@ function POST_create(req, res) {
         if(!result) {
             entity.createUserId = req.user.id;
             entity.createDate = Date.now();
+            entity.questionId = req.query.question;
         }
         entity.private = req.params.username ? true : false;
-        if(!entity.ownerId) {
-            if(req.query.argument) {
-                entity.ownerId = req.query.argument;
-                entity.ownerType = constants.OBJECT_TYPES.argument;
-            } else if(req.query.topic) { // parent is a topic
-                entity.ownerId = req.query.topic;
-                entity.ownerType = constants.OBJECT_TYPES.topic;
-            }
-        }
-        db.Question.findOneAndUpdate(query, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function (err, updatedEntity) {
+        db.Answer.findOneAndUpdate(query, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function (err, updatedEntity) {
             var updateRedirect = function () {
                 var model = {};
                 flowUtils.setModelContext(req, model);
-                var url = model.wikiBaseUrl + paths.truth.questions.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
+                var url = model.wikiBaseUrl + paths.truth.answers.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
                 res.redirect(url);
-                /*res.redirect((result ? paths.truth.questions.entry : paths.truth.questions.index) +
+                /*res.redirect((result ? paths.truth.answers.entry : paths.truth.answers.index) +
                  '?topic=' + req.query.topic +
                  (req.query.argument ? '&argument=' + req.query.argument : '') +
-                 (result ? '&question=' + req.query.question : '')
+                 (result ? '&answer=' + req.query.answer : '')
                  );*/
             };
             if(!result) { // if new entry, update parent children count
-                flowUtils.updateChildrenCount(entity.ownerId, entity.ownerType, constants.OBJECT_TYPES.question, function () {
+                flowUtils.updateChildrenCount(updatedEntity.questionId, constants.OBJECT_TYPES.question, constants.OBJECT_TYPES.answer, function () {
                     updateRedirect();
                 });
             } else {
@@ -184,7 +149,7 @@ function POST_create(req, res) {
 
 module.exports = function (router) {
 
-    /* Questions */
+    /* Answers */
 
     router.get('/', function (req, res) {
         GET_index(req, res);

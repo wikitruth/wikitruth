@@ -5,7 +5,7 @@
 {/title}
 
 {<body}
-    {>"dust/pages/header" tab="-pages" /}
+    {>"dust/members/profile/pages/header" tab="page" /}
     <div id="lipsum">
         <p>{page.content|s}</p>
         {!<p>

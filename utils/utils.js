@@ -15,7 +15,7 @@ module.exports = {
         var interval = Math.floor(seconds / 31536000);
 
         if (interval > 1) {
-            return interval + (fullWord ? " years ago" : 'y');
+            return interval + (fullWord ? " years" : 'y');
         }
         interval = Math.floor(seconds / 2592000);
         if (interval > 1) {

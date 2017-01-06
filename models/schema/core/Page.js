@@ -2,9 +2,9 @@
 
 exports = module.exports = function(app, mongoose) {
   var schema = new mongoose.Schema({
-    id: { type: String },
     title: { type: String, default: '' },
     content: { type: String, default: '' },
+    friendlyUrl: { type: String },
     parentId: { type: mongoose.Schema.ObjectId },
     createDate: { type: Date, default: Date.now },
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },

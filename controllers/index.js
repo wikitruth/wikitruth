@@ -12,6 +12,7 @@ var argumentController  = require('./arguments'),
     topicController     = require('./topics'),
     opinionController     = require('./opinions'),
     questionController     = require('./questions'),
+    answerController     = require('./answers'),
     issueController     = require('./issues');
 
 module.exports = function (router) {
@@ -102,7 +103,6 @@ module.exports = function (router) {
                     .exec(function (err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function(result) {
-                            result.friendlyUrl = utils.urlify(result.title);
                             flowUtils.appendEntryExtra(result);
                         });
                         model.topics = results;
@@ -231,7 +231,6 @@ module.exports = function (router) {
                         }
                         flowUtils.setEditorsUsername(results, function() {
                             results.forEach(function (result) {
-                                result.friendlyUrl = utils.urlify(result.title);
                                 flowUtils.appendEntryExtra(result);
                                 //result.link = false;
                             });
@@ -258,7 +257,6 @@ module.exports = function (router) {
                     .exec(function(err, results) {
                         flowUtils.setEditorsUsername(results, function() {
                             results.forEach(function (result) {
-                                result.friendlyUrl = utils.urlify(result.title);
                                 flowUtils.appendEntryExtra(result);
                                 flowUtils.setVerdictModel(result);
                             });
@@ -284,8 +282,6 @@ module.exports = function (router) {
                     .exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
-                            result.friendlyUrl = utils.urlify(result.title);
-                            result.friendlyUrl = utils.urlify(result.title);
                             flowUtils.appendEntryExtra(result);
                         });
                         model.questions = results;
@@ -308,7 +304,6 @@ module.exports = function (router) {
                     .exec(function(err, results) {
                         flowUtils.setEditorsUsername(results, function() {
                             results.forEach(function (result) {
-                                result.friendlyUrl = utils.urlify(result.title);
                                 flowUtils.appendEntryExtra(result);
                             });
                             model.issues = results;
@@ -334,7 +329,6 @@ module.exports = function (router) {
                     .exec(function(err, results) {
                         flowUtils.setEditorsUsername(results, function() {
                             results.forEach(function (result) {
-                                result.friendlyUrl = utils.urlify(result.title);
                                 flowUtils.appendEntryExtra(result);
                             });
                             model.opinions = results;
@@ -365,6 +359,10 @@ module.exports = function (router) {
 
     router.get('/question(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
         questionController.GET_entry(req, res);
+    });
+
+    router.get('/answer(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        answerController.GET_entry(req, res);
     });
 
     router.get('/opinion(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {

@@ -40,23 +40,27 @@
                     {?isIssueOwner}
                         <li><a href="{wikiBaseUrl}{paths.truth.issues.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;issue={issue._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Issue</a></li>
                     {:else}
-                        {?question}
-                            {?isQuestionOwner}
-                                <li><a href="{wikiBaseUrl}{paths.truth.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Question</a></li>
-                            {/isQuestionOwner}
+                        {?isAnswerOwner}
+                            <li><a href="{wikiBaseUrl}{paths.truth.answers.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}&amp;answer={answer._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Answer</a></li>
                         {:else}
-                            {?argument}
-                                {?isArgumentOwner}
-                                    <li><a href="{wikiBaseUrl}{paths.truth.arguments.create}?topic={topic._id}&amp;id={argument._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Argument</a></li>
-                                {/isArgumentOwner}
+                            {?question}
+                                {?isQuestionOwner}
+                                    <li><a href="{wikiBaseUrl}{paths.truth.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Question</a></li>
+                                {/isQuestionOwner}
                             {:else}
-                                {?topic}
-                                    {?isTopicOwner}
-                                        <li><a href="{wikiBaseUrl}{paths.truth.topics.create}?id={topic._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Topic</a></li>
-                                    {/isTopicOwner}
-                                {/topic}
-                            {/argument}
-                        {/question}
+                                {?argument}
+                                    {?isArgumentOwner}
+                                        <li><a href="{wikiBaseUrl}{paths.truth.arguments.create}?topic={topic._id}&amp;id={argument._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Argument</a></li>
+                                    {/isArgumentOwner}
+                                {:else}
+                                    {?topic}
+                                        {?isTopicOwner}
+                                            <li><a href="{wikiBaseUrl}{paths.truth.topics.create}?id={topic._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Topic</a></li>
+                                        {/isTopicOwner}
+                                    {/topic}
+                                {/argument}
+                            {/question}
+                        {/isAnswerOwner}
                         {!<li><a href="{paths.truth.outline.link}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> Manage Links</a></li>!}
                         {!<li><a href="#" role="tab"><span class="glyphicon glyphicon-tags" aria-hidden="true"></span> Manage Tags</a></li>!}
                     {/isIssueOwner}

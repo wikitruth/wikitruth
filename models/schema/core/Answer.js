@@ -9,15 +9,13 @@ exports = module.exports = function(app, mongoose) {
     references: { type: String, default: '' },
     friendlyUrl: { type: String },
     screeningStatus: { type: Number, default: constants.SCREENING_STATUS.status0.code }, // SCREENING_STATUS
-    ownerId: { type: mongoose.Schema.ObjectId },
-    ownerType: { type: Number }, // MODEL_TYPES
+    questionId: { type: mongoose.Schema.ObjectId },
     createDate: { type: Date, default: Date.now },
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     editDate: { type: Date, default: Date.now },
     editUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     private: { type: Boolean, default: false }, // if true, should be restricted to group/user owners and not included in public backup
     childrenCount: {
-      answers: { type: Number },
       issues: { type: Number },
       opinions: { type: Number }
     }
@@ -37,5 +35,5 @@ exports = module.exports = function(app, mongoose) {
     name: "TextIndex"
   });
   schema.set('autoIndex', true);
-  app.db.model('Question', schema);
+  app.db.model('Answer', schema);
 };

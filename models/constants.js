@@ -270,6 +270,7 @@ module.exports = {
         definition: 5,
         issue: 10,
         opinion: 11,
+        answer: 12,
         user: 21
     },
     ARGUMENT_TYPES: ARGUMENT_TYPES,

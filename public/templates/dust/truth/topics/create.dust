@@ -109,10 +109,11 @@
                 </label>
             </div>
         </div>
-        <div class="form-group">
+        {!<div class="form-group">
             <label for="inputIcon">Icon</label>
             <textarea name="icon" id="inputIcon" class="form-control" rows="1">{topic.icon}</textarea>
-        </div>
+        </div>!}
+        <br/>
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
         <a class="btn btn-default" href="{cancelUrl}" role="button">Cancel</a>
     </form>

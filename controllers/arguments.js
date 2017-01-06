@@ -88,7 +88,6 @@ function GET_entry(req, res) {
                 db.Question.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
-                            result.friendlyUrl = utils.urlify(result.title);
                             flowUtils.appendEntryExtra(result);
                         });
                         model.questions = results;
@@ -105,7 +104,6 @@ function GET_entry(req, res) {
                 db.Issue.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
-                            result.friendlyUrl = utils.urlify(result.title);
                             flowUtils.appendEntryExtra(result);
                         });
                         model.issues = results;
@@ -122,7 +120,6 @@ function GET_entry(req, res) {
                 db.Opinion.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
-                            result.friendlyUrl = utils.urlify(result.title);
                             flowUtils.appendEntryExtra(result);
                         });
                         model.opinions = results;
@@ -224,7 +221,6 @@ function GET_index(req, res) {
             .exec(function (err, results) {
                 flowUtils.setEditorsUsername(results, function() {
                     results.forEach(function (result) {
-                        result.friendlyUrl = utils.urlify(result.title);
                         result.topic = {
                             _id: result.ownerId
                         };
@@ -249,8 +245,6 @@ function GET_create(req, res) {
             argument: function (callback) {
                 if(req.query.id) {
                     db.Argument.findOne({_id: req.query.id}, function (err, result) {
-                        result.friendlyUrl = utils.urlify(result.title);
-                        result.shortTitle = utils.getShortText(result.title);
                         flowUtils.appendEntryExtra(result);
                         model.argument = result;
                         callback();
@@ -263,8 +257,6 @@ function GET_create(req, res) {
                 var query = { _id: req.query.argument ? req.query.argument : model.argument && model.argument.parentId ? model.argument.parentId : null };
                 if(query._id) {
                     db.Argument.findOne(query, function (err, result) {
-                        result.friendlyUrl = utils.urlify(result.title);
-                        result.shortTitle = utils.getShortText(result.title);
                         model.parentArgument = result;
                         callback();
                     });
@@ -303,6 +295,7 @@ function POST_create(req, res) {
                 entity.content = req.body.content;
                 entity.title = req.body.title;
                 entity.references = req.body.references;
+                entity.friendlyUrl = utils.urlify(req.body.title);
                 entity.referenceDate = req.body.referenceDate ? new Date(req.body.referenceDate) : null;
                 entity.editUserId = req.user.id;
                 entity.editDate = Date.now();

@@ -19,13 +19,13 @@ module.exports = {
         profile: {
             index: 'dust/members/profile/profile',
             topics: 'dust/members/profile/topics',
-            contributions: 'dust/members/profile/contributions'
+            contributions: 'dust/members/profile/contributions',
+            pages: {
+                index: 'dust/members/profile/pages/index',
+                page: 'dust/members/profile/pages/page',
+                create: 'dust/members/profile/pages/create'
+            }
         }
-    },
-    pages: {
-        index: 'dust/pages/index',
-        page: 'dust/pages/page',
-        create: 'dust/pages/create'
     },
     truth: {
         index: 'dust/truth/explore',
@@ -47,6 +47,11 @@ module.exports = {
             index: 'dust/truth/questions/index',
             create: 'dust/truth/questions/create',
             entry: 'dust/truth/questions/entry'
+        },
+        answers: {
+            index: 'dust/truth/answers/index',
+            create: 'dust/truth/answers/create',
+            entry: 'dust/truth/answers/entry'
         },
         issues: {
             create: 'dust/truth/issues/create',

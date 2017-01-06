@@ -27,13 +27,15 @@ function appendOwnerFlag(req, item, model) {
 }
 
 function appendEntryExtra(item) {
+    item.friendlyUrl = utils.urlify(item.title);
+    item.shortTitle = utils.getShortText(item.title);
     item.comments = utils.randomInt(0,999);
     //item.editUsername = 'root';
     item.points = utils.randomInt(0,9999);
 
     //var editDateString = result.editDate.toUTCString();
-    item.editDateString = utils.timeSince(item.editDate)/* + ' ago'*/; //editDateString.substring(0, editDateString.length - 4);
-    item.createDateString = utils.timeSince(item.createDate);
+    item.editDateString = utils.timeSince(item.editDate, true) + ' ago';
+    item.createDateString = utils.timeSince(item.createDate, true) + ' ago';
 
     if(item.referenceDate) {
         item.referenceDateString = item.referenceDate.toLocaleString();
@@ -110,11 +112,24 @@ function setQuestionModel(req, model, callback) {
     if(req.query.question) {
         db.Question.findOne({_id: req.query.question}, function (err, result) {
             model.question = result;
-            result.friendlyUrl = utils.urlify(result.title);
-            result.shortTitle = utils.getShortText(result.title);
             appendEntryExtra(result);
             if(isOwner(req, result, model)) {
                 model.isQuestionOwner = true;
+            }
+            setUsername(result, callback);
+        });
+    } else {
+        callback();
+    }
+}
+
+function setAnswerModel(req, model, callback) {
+    if(req.query.answer) {
+        db.Answer.findOne({_id: req.query.answer}, function (err, result) {
+            model.answer = result;
+            appendEntryExtra(result);
+            if(isOwner(req, result, model)) {
+                model.isAnswerOwner = true;
             }
             setUsername(result, callback);
         });
@@ -127,8 +142,6 @@ function setIssueModel(req, model, callback) {
     if(req.query.issue) {
         db.Issue.findOne({_id: req.query.issue}, function (err, result) {
             model.issue = result;
-            result.friendlyUrl = utils.urlify(result.title);
-            result.shortTitle = utils.getShortText(result.title);
             appendEntryExtra(result);
             if(isOwner(req, result, model)) {
                 model.isIssueOwner = true;
@@ -144,8 +157,6 @@ function setOpinionModel(req, model, callback) {
     if(req.query.opinion) {
         db.Opinion.findOne({_id: req.query.opinion}, function (err, result) {
             model.opinion = result;
-            result.friendlyUrl = utils.urlify(result.title);
-            result.shortTitle = utils.getShortText(result.title);
             appendEntryExtra(result);
             if(isOwner(req, result, model)) {
                 model.isOpinionOwner = true;
@@ -166,8 +177,6 @@ function setArgumentModels(req, model, callback) {
                         return callback(err);
                     }
                     model.argument = result;
-                    result.friendlyUrl = utils.urlify(result.title);
-                    result.shortTitle = utils.getShortText(result.title);
                     appendEntryExtra(result);
                     if (isOwner(req, result, model)) {
                         model.isArgumentOwner = true;
@@ -179,8 +188,6 @@ function setArgumentModels(req, model, callback) {
                 if(model.argument && model.argument.parentId) {
                     db.Argument.findOne({_id: model.argument.parentId}, function (err, result) {
                         if (result) {
-                            result.friendlyUrl = utils.urlify(result.title);
-                            result.shortTitle = utils.getShortText(result.title);
                             appendEntryExtra(result);
                             model.parentArgument = result;
                         }
@@ -194,8 +201,6 @@ function setArgumentModels(req, model, callback) {
                 if(model.parentArgument && model.parentArgument.parentId) {
                     db.Argument.findOne({_id: model.parentArgument.parentId}, function (err, result) {
                         if (result) {
-                            result.friendlyUrl = utils.urlify(result.title);
-                            result.shortTitle = utils.getShortText(result.title);
                             appendEntryExtra(result);
                             model.grandParentArgument = result;
                         }
@@ -214,6 +219,10 @@ function setArgumentModels(req, model, callback) {
 }
 
 function setEntryModels(query, req, model, callback) {
+    if(!query.ownerType) { // if the query or entry does not follow owner id/type concept.
+        return callback();
+    }
+
     if(query.ownerType === constants.OBJECT_TYPES.topic) {
         req.query.topic = query.ownerId;
         setTopicModels(req, model, callback);
@@ -226,6 +235,15 @@ function setEntryModels(query, req, model, callback) {
         req.query.question = query.ownerId;
         setQuestionModel(req, model, function () {
             setEntryModels(model.question, req, model, callback);
+        });
+    } else if(query.ownerType === constants.OBJECT_TYPES.answer) {
+        req.query.answer = query.ownerId;
+        setAnswerModel(req, model, function () {
+            var q = {
+                ownerType: constants.OBJECT_TYPES.question,
+                ownerId: model.answer.questionId
+            };
+            setEntryModels(q, req, model, callback);
         });
     } else if(query.ownerType === constants.OBJECT_TYPES.issue) {
         req.query.issue = query.ownerId;
@@ -254,8 +272,6 @@ function setTopicModels(req, model, callback) {
                         return callback(err);
                     }
                     model.topic = result;
-                    result.friendlyUrl = utils.urlify(result.title);
-                    result.shortTitle = utils.getShortText(result.title);
                     appendEntryExtra(result);
                     if(isOwner(req, result, model)) {
                         model.isTopicOwner = true;
@@ -267,8 +283,6 @@ function setTopicModels(req, model, callback) {
                 if(model.topic && model.topic.parentId) {
                     db.Topic.findOne({_id: model.topic.parentId}, function (err, result) {
                         if (result) {
-                            result.friendlyUrl = utils.urlify(result.title);
-                            result.shortTitle = utils.getShortText(result.title);
                             appendEntryExtra(result);
                             model.parentTopic = result;
                         }
@@ -282,8 +296,6 @@ function setTopicModels(req, model, callback) {
                 if(model.parentTopic && model.parentTopic.parentId) {
                     db.Topic.findOne({_id: model.parentTopic.parentId}, function (err, result) {
                         if (result) {
-                            result.friendlyUrl = utils.urlify(result.title);
-                            result.shortTitle = utils.getShortText(result.title);
                             appendEntryExtra(result);
                             model.grandParentTopic = result;
                         }
@@ -335,7 +347,6 @@ function getTopics(query, limit, callback) {
                 .exec(function(err, results) {
                 setEditorsUsername(results, function() {
                     results.forEach(function (result) {
-                        result.friendlyUrl = utils.urlify(result.title);
                         appendEntryExtra(result);
                         //result.link = false;
                     });
@@ -366,7 +377,6 @@ function getTopics(query, limit, callback) {
                             .exec(function (err, results) {
                                 setEditorsUsername(results, function () {
                                     results.forEach(function (result) {
-                                        result.friendlyUrl = utils.urlify(result.title);
                                         appendEntryExtra(result);
                                         var link = links.find(function (link) {
                                             return link.topicId.equals(result._id);
@@ -400,7 +410,6 @@ function getArguments(query, limit, callback) {
                 .exec(function(err, results) {
                 setEditorsUsername(results, function() {
                     results.forEach(function (result) {
-                        result.friendlyUrl = utils.urlify(result.title);
                         appendEntryExtra(result);
                         //result.link = false;
                         //result.against = false;
@@ -432,7 +441,6 @@ function getArguments(query, limit, callback) {
                             .exec(function (err, results) {
                                 setEditorsUsername(results, function () {
                                     results.forEach(function (result) {
-                                        result.friendlyUrl = utils.urlify(result.title);
                                         appendEntryExtra(result);
                                         var link = links.find(function (link) {
                                             return link.argumentId.equals(result._id);
@@ -574,6 +582,16 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
         });
     } else if(entryType === constants.OBJECT_TYPES.question) {
         async.parallel({
+            answers: function (callback) {
+                if(!specificEntryType || specificEntryType === constants.OBJECT_TYPES.answer) {
+                    db.Answer.count({questionId: entryId}, function (err, count) {
+                        childrenCount['childrenCount.answers'] = count;
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
+            },
             issues: function (callback) {
                 if(!specificEntryType || specificEntryType === constants.OBJECT_TYPES.issue) {
                     db.Issue.count({ownerId: entryId}, function (err, count) {
@@ -596,6 +614,35 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
             }
         }, function (err, results) {
             db.Question.update({_id: entryId}, {
+                $set: childrenCount
+            }, function (err, num) {
+                callback();
+            });
+        });
+    } else if(entryType === constants.OBJECT_TYPES.answer) {
+        async.parallel({
+            issues: function (callback) {
+                if(!specificEntryType || specificEntryType === constants.OBJECT_TYPES.issue) {
+                    db.Issue.count({ownerId: entryId}, function (err, count) {
+                        childrenCount['childrenCount.issues'] = count;
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
+            },
+            opinions: function (callback) {
+                if(!specificEntryType || specificEntryType === constants.OBJECT_TYPES.opinion) {
+                    db.Opinion.count({ownerId: entryId}, function (err, count) {
+                        childrenCount['childrenCount.opinions'] = count;
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
+            }
+        }, function (err, results) {
+            db.Answer.update({_id: entryId}, {
                 $set: childrenCount
             }, function (err, num) {
                 callback();
@@ -713,6 +760,11 @@ function createOwnerQueryFromQuery(req) {
             ownerType: constants.OBJECT_TYPES.opinion,
             ownerId: req.query.opinion
         };
+    } else if(req.query.answer) {
+        return {
+            ownerType: constants.OBJECT_TYPES.answer,
+            ownerId: req.query.answer
+        };
     } else if(req.query.question) {
         return {
             ownerType: constants.OBJECT_TYPES.question,
@@ -733,7 +785,9 @@ function createOwnerQueryFromQuery(req) {
 }
 
 function setModelOwnerEntry(model) {
-    if(model.question) {
+    if(model.answer) {
+        model.entry = model.answer;
+    } else if(model.question) {
         model.entry = model.question;
     } else if(model.argument) {
         model.entry = model.argument;
@@ -775,9 +829,11 @@ function createOwnerQueryFromModel(model) {
 function setModelContext(req, model) {
     if(req.params.username) {
         model.username = req.params.username;
-        model.wikiBaseUrl = "/members/" + model.username + "/diary";
+        model.profileBaseUrl = "/members/" + model.username;
+        model.wikiBaseUrl = model.profileBaseUrl + "/diary";
     } else {
         model.username = "";
+        model.profileBaseUrl = "";
         model.wikiBaseUrl = "";
     }
 }

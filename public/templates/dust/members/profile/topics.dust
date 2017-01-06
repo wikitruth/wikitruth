@@ -6,30 +6,65 @@
 
 {<body}
     {>"dust/members/profile/profile-header" profileTab="topics" /}
-    <a class="btn btn-default" href="/members/{member.username}/diary/topics/create" role="button">Create Topic</a>
-    <br/>
-    <br/>
+    <a class="btn btn-default" href="{wikiBaseUrl}{paths.truth.topics.create}" role="button">Create Topic</a>
     {?topics}
+        <div class="row" style="margin-top: 30px">
+            {#categories}
+                <div class="col-lg-4 col-md-6 col-sm-6">{! 73px !}
+                    <div class="media wt-category">
+                        <div class="media-left media-top">
+                            <a href="{wikiBaseUrl}{paths.truth.topics.entry}/{friendlyUrl}/{_id}">
+                                <div class="wt-category-icon" data-title="{title}"></div>
+                            </a>
+                        </div>
+                        <div class="media-body">
+                            <h4 class="media-heading"><a href="{wikiBaseUrl}{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{?contextTitle}{contextTitle}{:else}{title}{/contextTitle}</a></h4>
+                            <div>
+                                {?subtopics}
+                                    {#subtopics}
+                                        <div><i class="fa fa-folder-open text-muted text-success-x" aria-hidden="true"></i>&nbsp;<a href="{wikiBaseUrl}{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{shortTitle}</a></div>
+                                    {/subtopics}
+                                    <div><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a href="{wikiBaseUrl}{paths.truth.topics.index}?topic={_id}" role="button">more</a></div>
+                                    {!<span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}!}
+                                {/subtopics}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {/categories}
+        </div>
         <ul class="list-group wt-list">
             <li class="list-group-item highlight"><i class="fa fa-folder-open text-success-x" aria-hidden="true"></i>&nbsp;&nbsp;Topics</li>
             {#topics}
                 <li class="list-group-item">
                     {?link}
-                        <a href="/members/{member.username}/diary/topics/link?topic={topic._id}&amp;id={link._id}&amp;source=/members/{member.username}/topics" class="glyphicon glyphicon-link text-success"></a>
+                        <a href="{wikiBaseUrl}{paths.truth.topics.link}?topic={topic._id}&amp;id={link._id}&amp;source={wikiBaseUrl}" class="glyphicon glyphicon-link text-success"></a>
                     {:else}
                         <i class="fa fa-folder-open text-success" aria-hidden="true"></i>
                     {/link}
                     <div>
-                        <a href="/members/{member.username}/diary/topic/{friendlyUrl}/{_id}">{?link}{?link.title}{link.title}{:else}{title}{/link.title}{:else}{?contextTitle}{contextTitle}{:else}{title}{/contextTitle}{/link}</a>
+                        <a href="{wikiBaseUrl}{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{?link}{?link.title}{link.title}{:else}{title}{/link.title}{:else}{?contextTitle}{contextTitle}{:else}{title}{/contextTitle}{/link}</a>
                         {>"dust/truth/common/entry-row-footer" /}
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
                 </li>
             {/topics}
         </ul>
+    {:else}
+        <br/>
+        <br/>
     {/topics}
 {/body}
 
 {<footer}
     {>"dust/members/profile/profile-scripts" /}
+    <script type="text/javascript">
+        $(function() {
+            $(".wt-category-icon").each(function() {
+                var title = $( this ).data("title");
+                var pattern = GeoPattern.generate(title);
+                $(this).css("background-image", pattern.toDataUrl());
+            });
+        });
+    </script>
 {/footer}
