@@ -22,13 +22,13 @@ module.exports = {
         reviewers: '/members/reviewers',
         administrators: '/members/administrators',
         profile: {
-            index: '/members/profile'
+            index: '/members/profile',
+            pages: {
+                index: '/pages',
+                page: '/pages/page',
+                create: '/pages/create'
+            }
         }
-    },
-    pages: {
-        index: '/pages',
-        page: '/pages/page',
-        create: '/pages/create'
     },
     truth: {
         index: '/explore',
@@ -48,6 +48,11 @@ module.exports = {
             create: '/questions/create',
             index:  '/questions',
             entry:  '/question'
+        },
+        answers: {
+            create: '/answers/create',
+            index:  '/answers',
+            entry:  '/answer'
         },
         issues: {
             create: '/issues/create',

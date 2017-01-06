@@ -1,0 +1,27 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {?entry}{entry.title}: {:else}Top {/entry}Answers - {titleSlogan}
+{/title}
+
+{<body}
+    {?topic}
+        {>"dust/truth/common/entry-header" tab="answers" /}
+    {:else}
+        {>"dust/truth/common/index-header" tab="top-answers" /}
+    {/topic}
+    {?answers}
+        <ul class="list-group wt-list">
+            <li class="list-group-item highlight"><i class="fa fa-answer-circle text-success-x" aria-hidden="true"></i> {^topic}Latest {/topic}Answers</li>
+            {#answers}
+                <li class="list-group-item">
+                    <i class="fa fa-check-circle-o text-success" aria-hidden="true"></i>
+                    <div>
+                        <a href="{wikiBaseUrl}{paths.truth.answers.entry}/{friendlyUrl}/{_id}">{title}</a>
+                        {>"dust/truth/common/entry-row-footer" /}
+                    </div>
+                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+            {/answers}
+        </ul>
+    {/answers}
+{/body}

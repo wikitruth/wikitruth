@@ -184,7 +184,6 @@ function GET_entry(req, res) {
                 db.Question.find(query).limit(15).exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
-                            result.friendlyUrl = utils.urlify(result.title);
                             flowUtils.appendEntryExtra(result);
                         });
                         model.questions = results;
@@ -203,7 +202,6 @@ function GET_entry(req, res) {
                     .exec(function(err, results) {
                         flowUtils.setEditorsUsername(results, function() {
                             results.forEach(function (result) {
-                                result.friendlyUrl = utils.urlify(result.title);
                                 flowUtils.appendEntryExtra(result);
                             });
                             model.issues = results;
@@ -222,7 +220,6 @@ function GET_entry(req, res) {
                     .exec(function(err, results) {
                         flowUtils.setEditorsUsername(results, function() {
                             results.forEach(function (result) {
-                                result.friendlyUrl = utils.urlify(result.title);
                                 flowUtils.appendEntryExtra(result);
                             });
                             model.opinions = results;
@@ -255,8 +252,6 @@ function GET_create(req, res) {
         topic: function(callback){
             if(req.query.id) {
                 db.Topic.findOne({_id: req.query.id}, function (err, result) {
-                    result.friendlyUrl = utils.urlify(result.title);
-                    result.shortTitle = utils.getShortText(result.title);
                     flowUtils.appendEntryExtra(result);
                     model.topic = result;
                     callback();
@@ -269,8 +264,7 @@ function GET_create(req, res) {
             var query = { _id: req.query.topic ? req.query.topic : model.topic && model.topic.parentId ? model.topic.parentId : null };
             if(query._id) {
                 db.Topic.findOne(query, function (err, result) {
-                    result.friendlyUrl = utils.urlify(result.title);
-                    result.shortTitle = utils.getShortText(result.title);
+                    flowUtils.appendEntryExtra(result);
                     model.parentTopic = result;
                     callback();
                 });

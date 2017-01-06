@@ -33,7 +33,6 @@ function GET_index(req, res) {
             db.Opinion.find(flowUtils.createOwnerQueryFromModel(model)).sort({title: 1}).exec(function (err, results) {
                 flowUtils.setEditorsUsername(results, function() {
                     results.forEach(function (result) {
-                        result.friendlyUrl = utils.urlify(result.title);
                         flowUtils.appendEntryExtra(result);
                     });
                     model.opinions = results;
@@ -48,7 +47,6 @@ function GET_index(req, res) {
         db.Opinion.find({ ownerType: constants.OBJECT_TYPES.topic }).limit(100).exec(function(err, results) {
             flowUtils.setEditorsUsername(results, function() {
                 results.forEach(function (result) {
-                    result.friendlyUrl = utils.urlify(result.title);
                     result.topic = {
                         _id: result.ownerId
                     };
@@ -76,6 +74,7 @@ function POST_create(req, res) {
         var entity = result ? result : {};
         entity.title = req.body.title;
         entity.content = req.body.content;
+        entity.friendlyUrl = utils.urlify(req.body.title);
         entity.editUserId = req.user.id;
         entity.editDate = Date.now();
         if(!result) {

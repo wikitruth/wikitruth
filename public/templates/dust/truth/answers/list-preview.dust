@@ -1,0 +1,19 @@
+{?answers}
+    <div class="wt-list">
+        <ul class="list-group top-list-items">
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-answer-sign text-success-x" aria-hidden="true"></span> Answers <span class="wt-label label label-default">{entry.childrenCount.answers}</span></li>
+            {#answers}
+                <li class="list-group-item">
+                    <i class="fa fa-check-circle-o text-success text-muted-x" aria-hidden="true"></i>
+                    <div>
+                        <a href="{wikiBaseUrl}{paths.truth.answers.entry}/{friendlyUrl}/{_id}">{title}</a>
+                        {>"dust/truth/common/entry-row-footer" /}
+                    </div>
+                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+            {/answers}
+        </ul>
+        {@gt key=entry.childrenCount.answers value="15"}
+            <div class="top-list-items-more"><a href="{wikiBaseUrl}{paths.truth.answers.index}?topic={topic._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{entry.childrenCount.answers}</span></a></div>
+        {/gt}
+    </div>
+{/answers}

@@ -1,27 +1,11 @@
 <div style="margin-bottom: 20px">
     <h2 class="page-header wt-header" style="margin-bottom: 0; padding-bottom: 0">
-        {?opinion}
-            {opinion.title}
-        {:else}
-            {?issue}
-                {issue.title}
-            {:else}
-                {?question}
-                    {question.title}
-                {:else}
-                    {?argument}
-                        {argument.title}
-                        {!{?argument.against}
-                            <span class="label label-primary" style="font-size: 10px; font-weight: normal; padding: .2em .6em .3em; letter-spacing: normal; margin-left: 8px">opposing</span>
-                        {/argument.against}!}
-                    {:else}
-                        {?topic}
-                            {topic.title}
-                        {/topic}
-                    {/argument}
-                {/question}
-            {/issue}
-        {/opinion}
+        {?entry}
+            {entry.title}
+            {!{?argument.against}
+                <span class="label label-primary" style="font-size: 10px; font-weight: normal; padding: .2em .6em .3em; letter-spacing: normal; margin-left: 8px">opposing</span>
+            {/argument.against}!}
+        {/entry}
         {@eq key=tab value="link-to"}
             :&nbsp;Links
         {/eq}
@@ -58,30 +42,35 @@
                     {/argument}
                 {/question}
             {:else}
-                {?question}
-                    <i class="fa fa-question-circle-o"></i> A question on&nbsp;
-                    {?argument}
-                        <a href="{wikiBaseUrl}{paths.truth.arguments.entry}/{argument.friendlyUrl}/{argument._id}">{argument.title}</a>
-                    {:else}
-                        <a href="{wikiBaseUrl}{paths.truth.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
-                    {/argument}
+                {?answer}
+                    <i class="fa fa-question-circle-o"></i> An answer on <a href="{wikiBaseUrl}{paths.truth.questions.entry}/{question.friendlyUrl}/{question._id}">{question.title}</a>
                 {:else}
-                    {?argument}
-                        {?parentArgument}
-                            <i class="fa fa-bolt"></i> A sub-argument {?argument.against}against{:else}in support for{/argument.against} <a href="{wikiBaseUrl}{paths.truth.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
+                    {?question}
+                        <i class="fa fa-question-circle-o"></i> A question on&nbsp;
+                        {?argument}
+                            <a href="{wikiBaseUrl}{paths.truth.arguments.entry}/{argument.friendlyUrl}/{argument._id}">{argument.title}</a>
                         {:else}
-                            <i class="fa fa-bolt"></i> An argument under the topic <a href="{wikiBaseUrl}{paths.truth.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
-                        {/parentArgument}
+                            <a href="{wikiBaseUrl}{paths.truth.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
+                        {/argument}
                     {:else}
-                        {?topic}
-                            {?parentTopic}
-                                <i class="fa fa-folder-open-o"></i> A sub-topic under <a href="{wikiBaseUrl}{paths.truth.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}">{parentTopic.title}</a>
+                        {?argument}
+                            {?parentArgument}
+                                <i class="fa fa-bolt"></i> A sub-argument {?argument.against}against{:else}in support for{/argument.against} <a href="{wikiBaseUrl}{paths.truth.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
                             {:else}
-                                <i class="fa fa-folder-open-o"></i> A topic category
-                            {/parentTopic}
-                        {/topic}
-                    {/argument}
-                {/question}
+                                <i class="fa fa-bolt"></i> An argument under the topic <a href="{wikiBaseUrl}{paths.truth.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
+                            {/parentArgument}
+                        {:else}
+                            {?topic}
+                                {?parentTopic}
+                                    <i class="fa fa-folder-open-o"></i> A sub-topic under <a href="{wikiBaseUrl}{paths.truth.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}">{parentTopic.title}</a>
+                                {:else}
+                                    <i class="fa fa-folder-open-o"></i> A topic category
+                                {/parentTopic}
+                            {/topic}
+                        {/argument}
+                    {/question}
+                {/answer}
+
             {/issue}
         {/opinion}
     </div>

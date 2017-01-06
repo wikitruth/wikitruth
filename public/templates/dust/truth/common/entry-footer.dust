@@ -6,5 +6,5 @@
     </small>
 {/entry.references}
 <small class="text-muted">
-    <i class="fa fa-clock-o"></i> PUBLISHED <span title="{entry.createDate}">{entry.createDateString}</span> ago by <i class="fa fa-user-circle-o"></i> <a class="text-muted" href="/members/{entry.createUsername}">{entry.createUsername}</a> | <i class="fa fa-clock-o"></i> UPDATED <span title="{entry.editDate}">{entry.editDateString}</span> ago by <i class="fa fa-user-circle-o"></i> <a class="text-muted" href="/members/{entry.editUsername}">{entry.editUsername}</a>
+    <i class="fa fa-clock-o"></i> Posted <span title="{entry.createDate}">{entry.createDateString}</span> by <i class="fa fa-user-circle-o hidden"></i> <a class="text-muted" href="/members/{entry.createUsername}">{entry.createUsername}</a> | <i class="fa fa-clock-o"></i> Edited <span title="{entry.editDate}">{entry.editDateString}</span> by <i class="fa fa-user-circle-o hidden"></i> <a class="text-muted" href="/members/{entry.editUsername}">{entry.editUsername}</a>
 </small>

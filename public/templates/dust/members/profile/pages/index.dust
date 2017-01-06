@@ -1,0 +1,60 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {member.username}: {?loggedIn}My {/loggedIn}Pages - {titleSlogan}
+{/title}
+
+{<body}
+    {^page}
+        {>"dust/members/profile/profile-header" profileTab="pages" /}
+    {/page}
+
+    {>"dust/members/profile/pages/header" tab="children" /}
+
+    {?pages}
+        <ul class="list-group wt-list">
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Pages</li>
+        {#pages}
+            <li class="list-group-item">
+                <span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>
+                <div>
+                    <a href="{profileBaseUrl}{paths.members.profile.pages.index}/{friendlyUrl}/{_id}{?parentId}?parent={parentId}{/parentId}">{title}</a>
+                </div>
+            </li>
+        {/pages}
+        </ul>
+    {:else}
+        {?pageNodes}
+            <ul class="list-group wt-list">
+                <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> {?page}Child Pages{:else}Pages{/page}</li>
+                {#pageNodes}
+                    <li class="list-group-item">
+                        <span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>
+                        <div>
+                            <a href="{profileBaseUrl}{paths.members.profile.pages.index}/{friendlyUrl}/{_id}{?parentId}?parent={parentId}{/parentId}">{title}</a>
+                        </div>
+                    </li>
+                    {?children}
+                    <li class="list-group-item">
+                        <ul>
+                            {#children}
+                            <li style="list-style-type: none;">
+                                <span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> <a href="{profileBaseUrl}{paths.members.profile.pages.index}/{friendlyUrl}/{_id}{?parentId}?parent={parentId}{/parentId}">{title}</a>
+                                <br/>
+                                <br/>
+                            </li>
+                            {/children}
+                        </ul>
+                    </li>
+                    {/children}
+                {/pageNodes}
+            </ul>
+        {:else}
+            <p style="font-weight: normal" class="text-muted-x">No pages found</p>
+        {/pageNodes}
+    {/pages}
+{/body}
+
+{<footer}
+    {>"dust/members/profile/profile-scripts" /}
+{/footer}

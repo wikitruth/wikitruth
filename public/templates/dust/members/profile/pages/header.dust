@@ -1,0 +1,54 @@
+{^pagesRoot}
+    <br/>
+    <ol class="breadcrumb wt-bc">
+        <li><i class="fa fa-user-circle text-muted"></i> <a href="{paths.members.index}">Members</a></li>
+        <li><i class="fa fa-user-circle text-muted"></i> <a href="{profileBaseUrl}">{member.username}</a></li>
+        <li><i class="fa fa-book text-muted"></i> <a href="{profileBaseUrl}{paths.members.profile.pages.index}">Pages</a></li>
+        {?parent}
+            <li><a href="{profileBaseUrl}{paths.members.profile.pages.index}/{parent.friendlyUrl}/{parent._id}">{parent.title}</a></li>
+        {/parent}
+        {?page}
+            <li><a href="{profileBaseUrl}{paths.members.profile.pages.index}/{page.friendlyUrl}/{page._id}{?parent}?parent={parent._id}{/parent}">{page.title}</a></li>
+        {/page}
+    </ol>
+{/pagesRoot}
+{@ne key=tab value="create"}
+    {?page}
+        <h1 class="page-header text-primary">
+        <span class="text-muted">
+            <i class="fa fa-book"></i> {page.title}
+        </span>
+        </h1>
+    {/page}
+
+    {?loggedIn}
+        <div class="btn-group entry-tabs" role="group" aria-label="">
+        {?pagesRoot}
+            <a class="btn btn-{@eq key=tab value="page"}primary{:else}default{/eq}" href="{profileBaseUrl}{paths.members.profile.pages.index}">
+                <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Pages
+            </a>
+        {:else}
+            <a class="btn btn-{@eq key=tab value="page"}primary{:else}default{/eq}" href="{profileBaseUrl}{paths.members.profile.pages.index}/{page.friendlyUrl}/{page._id}">
+                <span class="glyphicon glyphicon-file" aria-hidden="true"></span> View
+            </a>
+        {/pagesRoot}
+            {?page}
+                <a class="btn btn-{@eq key=tab value="children"}primary{:else}default{/eq}" href="{profileBaseUrl}{paths.members.profile.pages.index}?parent={?parent}{parent._id}{:else}{page._id}{/parent}">
+                    <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Child Pages
+                </a>
+            {/page}
+            <a class="btn btn-default dropdown-toggle" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+                {?isContributor}
+                    {?page}
+                        <li><a href="{profileBaseUrl}{paths.members.profile.pages.create}?id={page._id}{?parent}&amp;parent={parent._id}{/parent}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Page</a></li>
+                        <li role="separator" class="divider"></li>
+                    {/page}
+                    <li><a href="{profileBaseUrl}{paths.members.profile.pages.create}{?page}?parent={?parent}{parent._id}{:else}{page._id}{/parent}{/page}"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Page</a></li>
+                {/isContributor}
+            </ul>
+        </div>
+    {/loggedIn}
+{/ne}

@@ -11,7 +11,7 @@
     </div>
     <div class="text-body collapsible">
         {?topic.referenceDate}
-            <p><small class="text-muted">Reference Date: {topic.referenceDateUTC}</small></p>
+            <p><small class="text-muted" title="Reference Date"><i class="fa fa-clock-o"></i> {topic.referenceDateUTC}</small></p>
         {/topic.referenceDate}
         {topic.content|s}
         <a href="#" onclick="return contentSeeMore()" class="content-see-more hidden">
@@ -47,9 +47,9 @@
                                     {#subtopics}
                                         <div><i class="fa fa-folder-open text-muted text-success-x" aria-hidden="true"></i>&nbsp;<a href="{wikiBaseUrl}{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{shortTitle}</a></div>
                                     {/subtopics}
+                                    <div><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a href="{wikiBaseUrl}{paths.truth.topics.index}?topic={_id}" role="button">more</a></div>
+                                    {!<span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}!}
                                 {/subtopics}
-                                <div><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a href="{wikiBaseUrl}{paths.truth.topics.index}?topic={_id}" role="button">more</a></div>
-                                {!<span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}!}
                             </div>
                         </div>
                     </div>
