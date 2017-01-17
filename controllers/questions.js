@@ -104,7 +104,7 @@ function GET_index(req, res) {
         });
     } else {
         // Top Questions
-        var query = { ownerType: constants.OBJECT_TYPES.topic, $or: [ { private: { $exists: false } }, { private: false } ] };
+        var query = { ownerType: constants.OBJECT_TYPES.topic, private: false };
         //db.Question.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
         db.Question
             .find(query)

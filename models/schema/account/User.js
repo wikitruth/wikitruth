@@ -8,7 +8,8 @@ exports = module.exports = function(app, mongoose) {
     roles: {
       admin: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
       account: { type: mongoose.Schema.Types.ObjectId, ref: 'Account' },
-      reviewer: { type: Boolean }
+      screener: { type: Boolean, default: false },
+      reviewer: { type: Boolean, default: false }
     },
     isActive: String,
     timeCreated: { type: Date, default: Date.now },

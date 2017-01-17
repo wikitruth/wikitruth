@@ -65,6 +65,7 @@ module.exports = function (router) {
                             entity.parentId = parent._id;
                             entity.ownerId = parent.ownerId;
                             entity.ownerType = parent.ownerType;
+                            entity.private = parent.private;
                             entity.createUserId = req.user.id;
                             entity.createDate = Date.now();
                             db.TopicLink.update({topicId: topicId, parentId: parent._id}, entity, {upsert: true}, function() {
@@ -88,6 +89,7 @@ module.exports = function (router) {
                             entity.parentId = null;
                             entity.ownerId = parent._id;
                             entity.ownerType = constants.OBJECT_TYPES.topic;
+                            entity.private = parent.private;
                             entity.threadId = null; // TODO: set to self._id
                             entity.createUserId = req.user.id;
                             entity.createDate = Date.now();
@@ -120,6 +122,7 @@ module.exports = function (router) {
                     entity.ownerId = parent.ownerId;
                     entity.ownerType = parent.ownerType;
                     entity.threadId = parent.threadId ? parent.threadId : parent._id;
+                    entity.private = parent.private;
                     entity.createUserId = req.user.id;
                     entity.createDate = Date.now();
                     db.ArgumentLink.update({argumentId: argumentId, parentId: parent._id}, entity, {upsert: true}, function(err, writeResult) {

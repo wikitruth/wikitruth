@@ -39,15 +39,19 @@ module.exports = function (router) {
                 root: flowUtils.getBackupDir(), // write files into this dir
                 collections: cols.backupList, // save this collection only
                 parser: 'json',
-                query: { $or: [ { private: { $exists: false } }, { private: false } ] }
+                query: { private: false }
             });
             res.render(templates.admin.mongoBackup, model);
         } else if(action === 'fix') {
-            /*async.parallel({
+            // this will set the default values in every doc
+            async.parallel({
                 topics: function (callback) {
                     db.Topic.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
-                            flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.topic, null, callback);
+                            db.Topic.update({ _id: result._id }, result, {}, function () {
+                                callback();
+                            });
+                            //flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.topic, null, callback);
                         }, function (err) {
                             callback();
                         });
@@ -56,7 +60,10 @@ module.exports = function (router) {
                 arguments: function (callback) {
                     db.Argument.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
-                            flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.argument, null, callback);
+                            db.Argument.update({ _id: result._id }, result, {}, function () {
+                                callback();
+                            });
+                            //flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.argument, null, callback);
                         }, function (err) {
                             callback();
                         });
@@ -65,7 +72,43 @@ module.exports = function (router) {
                 questions: function (callback) {
                     db.Question.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
-                            flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.question, null, callback);
+                            db.Question.update({ _id: result._id }, result, {}, function () {
+                                callback();
+                            });
+                            //flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.question, null, callback);
+                        }, function (err) {
+                            callback();
+                        });
+                    });
+                },
+                answers: function (callback) {
+                    db.Answer.find({}).exec(function(err, results) {
+                        async.eachSeries(results, function (result, callback) {
+                            db.Answer.update({ _id: result._id }, result, {}, function () {
+                                callback();
+                            });
+                        }, function (err) {
+                            callback();
+                        });
+                    });
+                },
+                issues: function (callback) {
+                    db.Issue.find({}).exec(function(err, results) {
+                        async.eachSeries(results, function (result, callback) {
+                            db.Issue.update({ _id: result._id }, result, {}, function () {
+                                callback();
+                            });
+                        }, function (err) {
+                            callback();
+                        });
+                    });
+                },
+                opinions: function (callback) {
+                    db.Opinion.find({}).exec(function(err, results) {
+                        async.eachSeries(results, function (result, callback) {
+                            db.Opinion.update({ _id: result._id }, result, {}, function () {
+                                callback();
+                            });
                         }, function (err) {
                             callback();
                         });
@@ -73,7 +116,7 @@ module.exports = function (router) {
                 }
             }, function (err, results) {
                 res.render(templates.admin.mongoBackup, model);
-            });*/
+            });
         } else if(action === 'restore') {
             var dir = flowUtils.getBackupDir() + '/wikitruth';
             console.log(cols.backupList);

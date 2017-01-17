@@ -335,6 +335,66 @@ function POST_create(req, res) {
     });
 }
 
+function GET_link(req, res) {
+    var model = {};
+    async.series({
+        entry: function (callback) {
+            if(req.query.id) {
+                db.TopicLink.findOne({_id: req.query.id}, function(err, link) {
+                    model.link = link;
+                    db.Topic.findOne({_id: link.topicId}, function(err, result) {
+                        result.friendlyUrl = utils.urlify(result.title);
+                        result.shortTitle = utils.getShortText(result.title);
+                        model.topic = result;
+                        callback();
+                    });
+                });
+            } else {
+                callback();
+            }
+        },
+        parentEntry: function (callback) {
+            var query = { _id: req.query.topic ? req.query.topic : model.topic && model.topic.parentId ? model.topic.parentId : null };
+            if(query._id) {
+                db.Topic.findOne(query, function (err, result) {
+                    result.friendlyUrl = utils.urlify(result.title);
+                    result.shortTitle = utils.getShortText(result.title);
+                    model.parentTopic = result;
+                    callback();
+                });
+            } else {
+                callback();
+            }
+        }
+    }, function (err, results) {
+        flowUtils.setModelContext(req, model);
+        model.cancelUrl = createCancelUrl(req);
+        res.render(templates.truth.topics.link, model);
+    });
+}
+
+function POST_link(req, res) {
+    var action = req.body.action;
+    if(action === 'delete') {
+        db.TopicLink.findByIdAndRemove(req.query.id, function(err, link) {
+            flowUtils.updateChildrenCount(link.parentId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, function () {
+                res.redirect(createCancelUrl(req));
+            });
+        });
+    } else if(action === 'submit') {
+        var query = { _id: req.query.id };
+        db.TopicLink.findOne(query, function (err, result) {
+            var entity = result;
+            entity.title = req.body.title;
+            entity.editUserId = req.user.id;
+            entity.editDate = Date.now();
+            db.TopicLink.findOneAndUpdate(query, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function (err, updatedEntity) {
+                res.redirect(createCancelUrl(req));
+            });
+        });
+    }
+}
+
 module.exports = function (router) {
 
     router.get('/', function (req, res) {
@@ -358,63 +418,11 @@ module.exports = function (router) {
 
 
     router.get('/link', function (req, res) {
-        var model = {};
-        async.series({
-            entry: function (callback) {
-                if(req.query.id) {
-                    db.TopicLink.findOne({_id: req.query.id}, function(err, link) {
-                        model.link = link;
-                        db.Topic.findOne({_id: link.topicId}, function(err, result) {
-                            result.friendlyUrl = utils.urlify(result.title);
-                            result.shortTitle = utils.getShortText(result.title);
-                            model.topic = result;
-                            callback();
-                        });
-                    });
-                } else {
-                    callback();
-                }
-            },
-            parentEntry: function (callback) {
-                var query = { _id: req.query.topic ? req.query.topic : model.topic && model.topic.parentId ? model.topic.parentId : null };
-                if(query._id) {
-                    db.Topic.findOne(query, function (err, result) {
-                        result.friendlyUrl = utils.urlify(result.title);
-                        result.shortTitle = utils.getShortText(result.title);
-                        model.parentTopic = result;
-                        callback();
-                    });
-                } else {
-                    callback();
-                }
-            }
-        }, function (err, results) {
-            flowUtils.setModelContext(req, model);
-            model.cancelUrl = createCancelUrl(req);
-            res.render(templates.truth.topics.link, model);
-        });
+        GET_link(req, res);
     });
 
     router.post('/link', function (req, res) {
-        var action = req.body.action;
-        if(action === 'delete') {
-            db.TopicLink.findByIdAndRemove(req.query.id, function(err, link) {
-                flowUtils.updateChildrenCount(link.parentId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, function () {
-                    res.redirect(createCancelUrl(req));
-                });
-            });
-        } else if(action === 'submit') {
-            var query = { _id: req.query.id };
-            db.TopicLink.findOne(query, function (err, result) {
-                var entity = result;
-                entity.title = req.body.title;
-                entity.editUserId = req.user.id;
-                entity.editDate = Date.now();
-                db.TopicLink.findOneAndUpdate(query, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function (err, updatedEntity) {
-                    res.redirect(createCancelUrl(req));
-                });
-            });
-        }
+        POST_link(req, res);
     });
 };
 
@@ -422,3 +430,5 @@ module.exports.GET_index = GET_index;
 module.exports.GET_entry = GET_entry;
 module.exports.GET_create = GET_create;
 module.exports.POST_create = POST_create;
+module.exports.GET_link = GET_link;
+module.exports.POST_link = POST_link;
