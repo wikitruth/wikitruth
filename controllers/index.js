@@ -112,7 +112,7 @@ module.exports = function (router) {
             },
             categories: function(callback) {
                 db.Topic
-                    .find({parentId: null, $or: [ { private: { $exists: false } }, { private: false } ] })
+                    .find({parentId: null, private: false })
                     .sort({title: 1})
                     .lean()
                     .exec(function (err, results) {
@@ -221,7 +221,7 @@ module.exports = function (router) {
                     return callback();
                 }
                 db.Topic
-                    .find({ $text : { $search : keyword }, $or: [ { private: { $exists: false } }, { private: false } ] },{ score: { $meta: "textScore" } })
+                    .find({ $text : { $search : keyword }, private: false }, { score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
                     .limit(tab === 'all' ? 15 : 0)
                     .lean()
@@ -250,7 +250,7 @@ module.exports = function (router) {
                     return callback();
                 }
                 db.Argument
-                    .find({ $text : { $search : keyword }, $or: [ { private: { $exists: false } }, { private: false } ] },{ score: { $meta: "textScore" } })
+                    .find({ $text : { $search : keyword }, private: false }, { score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
                     .limit(tab === 'all' ? 15 : 0)
                     .lean()
@@ -276,7 +276,7 @@ module.exports = function (router) {
                     return callback();
                 }
                 db.Question
-                    .find({ $text : { $search : keyword }, $or: [ { private: { $exists: false } }, { private: false } ] },{ score: { $meta: "textScore" } })
+                    .find({ $text : { $search : keyword }, private: false }, { score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
                     .limit(tab === 'all' ? 15 : 0)
                     .exec(function(err, results) {
@@ -297,7 +297,7 @@ module.exports = function (router) {
                     return callback();
                 }
                 db.Issue
-                    .find({ $text : { $search : keyword }, $or: [ { private: { $exists: false } }, { private: false } ] },{ score: { $meta: "textScore" } })
+                    .find({ $text : { $search : keyword }, private: false }, { score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
                     .limit(tab === 'all' ? 15 : 0)
                     .lean()
@@ -322,7 +322,7 @@ module.exports = function (router) {
                     return callback();
                 }
                 db.Opinion
-                    .find({ $text : { $search : keyword }, $or: [ { private: { $exists: false } }, { private: false } ] },{ score: { $meta: "textScore" } })
+                    .find({ $text : { $search : keyword }, private: false }, { score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
                     .limit(tab === 'all' ? 15 : 0)
                     .lean()

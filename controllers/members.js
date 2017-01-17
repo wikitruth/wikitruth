@@ -62,7 +62,7 @@ module.exports = function (router) {
             async.parallel({
                 topics: function(callback) {
                     db.Topic
-                        .find({ createUserId: model.member._id, $or: [ { private: { $exists: false } }, { private: false } ] })
+                        .find({ createUserId: model.member._id, private: false })
                         .count(function(err, count) {
                             model.topics = count;
                             callback();
@@ -70,7 +70,7 @@ module.exports = function (router) {
                 },
                 arguments: function(callback) {
                     db.Argument
-                        .find({ createUserId: model.member._id, $or: [ { private: { $exists: false } }, { private: false } ] })
+                        .find({ createUserId: model.member._id, private: false })
                         .count(function(err, count) {
                             model.arguments = count;
                             callback();
@@ -78,7 +78,7 @@ module.exports = function (router) {
                 },
                 questions: function (callback) {
                     db.Question
-                        .find({ createUserId: model.member._id, $or: [ { private: { $exists: false } }, { private: false } ] })
+                        .find({ createUserId: model.member._id, private: false })
                         .count(function(err, count) {
                             model.questions = count;
                             callback();
@@ -86,7 +86,7 @@ module.exports = function (router) {
                 },
                 issues: function (callback) {
                     db.Issue
-                        .find({ createUserId: model.member._id, $or: [ { private: { $exists: false } }, { private: false } ] })
+                        .find({ createUserId: model.member._id, private: false })
                         .count(function(err, count) {
                             model.issues = count;
                             callback();
@@ -94,7 +94,7 @@ module.exports = function (router) {
                 },
                 opinions: function (callback) {
                     db.Opinion
-                        .find({ createUserId: model.member._id, $or: [ { private: { $exists: false } }, { private: false } ] })
+                        .find({ createUserId: model.member._id, private: false })
                         .count(function(err, count) {
                             model.opinions = count;
                             callback();
@@ -483,6 +483,14 @@ module.exports = function (router) {
 
     router.post('/:username/diary/topics/create', function (req, res) {
         topicController.POST_create(req, res);
+    });
+
+    router.get('/:username/diary/topics/link', function (req, res) {
+        topicController.GET_link(req, res);
+    });
+
+    router.post('/:username/diary/topics/link', function (req, res) {
+        topicController.POST_link(req, res);
     });
 
 

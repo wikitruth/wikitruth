@@ -77,7 +77,7 @@ function GET_index(req, res) {
             });
     } else {
         // Top Answers
-        query = { ownerType: constants.OBJECT_TYPES.topic, $or: [ { private: { $exists: false } }, { private: false } ] };
+        query = { ownerType: constants.OBJECT_TYPES.topic, private: false };
         //db.Answer.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
         db.Answer
             .find(query)
