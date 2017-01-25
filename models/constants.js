@@ -4,22 +4,25 @@ var VERDICT_STATUS = {
     pending: 0,
     status_true: 1,
     status_false: 2,
+
     claim: 3,
 
+    // positive
     most_likely: 13,
     very_likely: 12,
     likely: 11,
     makes_sense: 10,
 
+    // negative
     unlikely: 21,
     very_unlikely: 22,
     most_likely_false: 23,
     misleading_invalid: 24,
 
     categories: {
-        true: 1,
-        false:  0,
-        pending: 2
+        true: 2,
+        pending: 1,
+        false:  0
     }
 };
 

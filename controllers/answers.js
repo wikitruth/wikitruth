@@ -112,15 +112,16 @@ function POST_create(req, res) {
     var query = { _id: req.query.answer || new mongoose.Types.ObjectId() };
     db.Answer.findOne(query, function(err, result) {
         var entity = result ? result : {};
+        var dateNow = Date.now();
         entity.title = req.body.title;
         entity.content = req.body.content;
         entity.references = req.body.references;
         entity.friendlyUrl = utils.urlify(req.body.title);
         entity.editUserId = req.user.id;
-        entity.editDate = Date.now();
+        entity.editDate = dateNow;
         if(!result) {
             entity.createUserId = req.user.id;
-            entity.createDate = Date.now();
+            entity.createDate = dateNow;
             entity.questionId = req.query.question;
         }
         entity.private = req.params.username ? true : false;

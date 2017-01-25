@@ -45,6 +45,7 @@ module.exports = function (router) {
         var id = req.body.id;
         var type = req.body.type;
 
+        var dateNow = Date.now();
         var clipboard = setupClipboard(req);
         var topics = clipboard['object' + constants.OBJECT_TYPES.topic];
         var args = clipboard['object' + constants.OBJECT_TYPES.argument];
@@ -59,7 +60,7 @@ module.exports = function (router) {
                         async.each(ids, function(topicId, callback){
                             var entity = {};
                             entity.editUserId = req.user.id;
-                            entity.editDate = Date.now();
+                            entity.editDate = dateNow;
                             // A child topic.
                             entity.topicId = topicId;
                             entity.parentId = parent._id;
@@ -67,7 +68,7 @@ module.exports = function (router) {
                             entity.ownerType = parent.ownerType;
                             entity.private = parent.private;
                             entity.createUserId = req.user.id;
-                            entity.createDate = Date.now();
+                            entity.createDate = dateNow;
                             db.TopicLink.update({topicId: topicId, parentId: parent._id}, entity, {upsert: true}, function() {
                                 callback();
                             });
@@ -83,7 +84,7 @@ module.exports = function (router) {
                         async.each(ids, function(argumentId, callback){
                             var entity = {};
                             entity.editUserId = req.user.id;
-                            entity.editDate = Date.now();
+                            entity.editDate = dateNow;
                             // A child argument.
                             entity.argumentId = argumentId;
                             entity.parentId = null;
@@ -92,7 +93,7 @@ module.exports = function (router) {
                             entity.private = parent.private;
                             entity.threadId = null; // TODO: set to self._id
                             entity.createUserId = req.user.id;
-                            entity.createDate = Date.now();
+                            entity.createDate = dateNow;
                             db.ArgumentLink.update({argumentId: argumentId, parentId: null, ownerId: parent._id}, entity, {upsert: true}, function(err, writeResult) {
                                 callback();
                             });
@@ -115,7 +116,7 @@ module.exports = function (router) {
                 async.each(ids, function(argumentId, callback){
                     var entity = {};
                     entity.editUserId = req.user.id;
-                    entity.editDate = Date.now();
+                    entity.editDate = dateNow;
                     // A child argument.
                     entity.argumentId = argumentId;
                     entity.parentId = parent._id;
@@ -124,7 +125,7 @@ module.exports = function (router) {
                     entity.threadId = parent.threadId ? parent.threadId : parent._id;
                     entity.private = parent.private;
                     entity.createUserId = req.user.id;
-                    entity.createDate = Date.now();
+                    entity.createDate = dateNow;
                     db.ArgumentLink.update({argumentId: argumentId, parentId: parent._id}, entity, {upsert: true}, function(err, writeResult) {
                         callback();
                     });

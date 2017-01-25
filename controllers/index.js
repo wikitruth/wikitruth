@@ -260,6 +260,7 @@ module.exports = function (router) {
                                 flowUtils.appendEntryExtra(result);
                                 flowUtils.setVerdictModel(result);
                             });
+                            flowUtils.sortArguments(results);
                             model.arguments = results;
                             if (results.length > 0) {
                                 if(results.length === 15) {
@@ -279,6 +280,7 @@ module.exports = function (router) {
                     .find({ $text : { $search : keyword }, private: false }, { score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
                     .limit(tab === 'all' ? 15 : 0)
+                    .lean()
                     .exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {

@@ -160,6 +160,7 @@ module.exports = function (router) {
                                     flowUtils.appendEntryExtra(result);
                                     flowUtils.setVerdictModel(result);
                                 });
+                                flowUtils.sortArguments(results);
                                 model.arguments = results;
                                 if (results.length > 0) {
                                     if(results.length === 15) {
@@ -179,6 +180,7 @@ module.exports = function (router) {
                         .find({ createUserId: model.member._id })
                         .sort({ title: 1 })
                         .limit(tab === 'all' ? 15 : 0)
+                        .lean()
                         .exec(function(err, results) {
                             flowUtils.setEditorsUsername(results, function() {
                                 results.forEach(function (result) {
@@ -393,15 +395,16 @@ module.exports = function (router) {
             _id: req.query.id ? req.query.id : new mongoose.Types.ObjectId()
         };
         db.Page.findOne(query, function(err, result) {
+            var dateNow = Date.now();
             var entity = result ? result : {};
             entity.content = req.body.content;
             entity.title = req.body.title;
             entity.friendlyUrl = utils.urlify(req.body.title);
             entity.editUserId = req.user.id;
-            entity.editDate = Date.now();
+            entity.editDate = dateNow;
             if(!result) {
                 entity.createUserId = req.user.id;
-                entity.createDate = Date.now();
+                entity.createDate = dateNow;
             }
             if(req.query.parent) {
                 entity.parentId = req.query.parent;

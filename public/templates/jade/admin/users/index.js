@@ -15,13 +15,19 @@ exports.find = function(req, res, next){
     filters.isActive = req.query.isActive;
   }
 
-  if (req.query.roles && req.query.roles === 'admin') {
-    filters['roles.admin'] = { $exists: true };
+  if (req.query.roles) {
+    if(req.query.roles === 'admin') {
+      filters['roles.admin'] = {$exists: true};
+    } else if(req.query.roles === 'account') {
+      filters['roles.account'] = { $exists: true };
+    } else if(req.query.roles === 'reviewer') {
+      filters['roles.reviewer'] = true;
+    } else if(req.query.roles === 'screener') {
+      filters['roles.screener'] = true;
+    }
   }
 
-  if (req.query.roles && req.query.roles === 'account') {
-    filters['roles.account'] = { $exists: true };
-  }
+  //console.log(filters);
 
   req.app.db.models.User.pagedFind({
     filters: filters,
@@ -461,6 +467,43 @@ exports.unlinkAdmin = function(req, res, next){
   });
 
   workflow.emit('validate');
+};
+
+exports.updateRoles = function(req, res, next) {
+  var workflow = req.app.utility.workflow(req, res);
+
+  //console.log('update roles');
+
+  workflow.on('patchUser', function(callback) {
+    //console.log(req.params.id);
+    req.app.db.models.User.findById(req.params.id).exec(function(err, user) {
+      if (err) {
+        //console.log(err);
+        return workflow.emit('exception', err);
+      }
+
+      user.roles.reviewer = req.body.reviewer;
+      user.roles.screener = req.body.screener;
+      user.save(function(err, user) {
+        if (err) {
+          //console.log(err);
+          return workflow.emit('exception', err);
+        }
+
+        // this is needed to populate dependent values
+        user.populate('roles.admin roles.account', 'name.full', function(err, user) {
+          if (err) {
+            return workflow.emit('exception', err);
+          }
+
+          workflow.outcome.user = user;
+          workflow.emit('response');
+        });
+      });
+    });
+  });
+
+  workflow.emit('patchUser');
 };
 
 exports.linkAccount = function(req, res, next){

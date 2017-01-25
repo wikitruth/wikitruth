@@ -707,13 +707,23 @@ function setVerdictModel(result) {
             result.verdict.pending = true;
             break;
     }
-
+    result.verdict.category = category;
     result.verdict.label = constants.VERDICT_STATUS.getLabel(status);
     result.verdict.theme = constants.VERDICT_STATUS.getTheme(status);
 
     if( typeof result.typeId !== 'undefined' && result.typeId !== constants.ARGUMENT_TYPES.factual) {
         result.typeUX = constants.ARGUMENT_TYPES.getUXInfo(result.typeId);
     }
+}
+
+function sortArguments(results) {
+    results.sort(function (a, b) {
+        if(a.verdict.category > b.verdict.category) return -1;
+        if(a.verdict.category < b.verdict.category) return 1;
+        if(a.title > b.title) return 1;
+        if(a.title < b.title) return -1;
+        return 0;
+    });
 }
 
 function getVerdictCount(args) {
@@ -865,6 +875,7 @@ module.exports = {
 
     getTopics: getTopics,
     getArguments: getArguments,
+    sortArguments: sortArguments,
     updateChildrenCount: updateChildrenCount,
     syncChildren: syncChildren,
     setModelOwnerEntry: setModelOwnerEntry,
