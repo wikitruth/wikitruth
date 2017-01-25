@@ -718,10 +718,10 @@ function setVerdictModel(result) {
 
 function sortArguments(results) {
     results.sort(function (a, b) {
-        if(a.verdict.category > b.verdict.category) return -1;
-        if(a.verdict.category < b.verdict.category) return 1;
-        if(a.title > b.title) return 1;
-        if(a.title < b.title) return -1;
+        if(a.verdict.category > b.verdict.category) { return -1; }
+        if(a.verdict.category < b.verdict.category) { return 1; }
+        if(a.title > b.title) { return 1; }
+        if(a.title < b.title) { return -1;}
         return 0;
     });
 }
