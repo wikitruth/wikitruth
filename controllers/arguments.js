@@ -43,6 +43,7 @@ function GET_entry(req, res) {
                     results.forEach(function (result) {
                         flowUtils.setVerdictModel(result);
                     });
+                    flowUtils.sortArguments(results);
                     callback(null, results);
                 });
             },
@@ -194,6 +195,7 @@ function GET_index(req, res) {
                     var contra = results.filter(function (arg) {
                         return arg.against;
                     });
+                    flowUtils.sortArguments(results);
                     model.arguments = results;
                     if(support.length > 0) {
                         model.proArguments = support;
@@ -227,6 +229,7 @@ function GET_index(req, res) {
                         flowUtils.appendEntryExtra(result);
                         flowUtils.setVerdictModel(result);
                     });
+                    //flowUtils.sortArguments(results);
                     model.arguments = results;
                     model.proArguments = results;
                     flowUtils.setModelContext(req, model);
@@ -290,6 +293,7 @@ function POST_create(req, res) {
             var query = { _id: req.query.id || new mongoose.Types.ObjectId() };
             db.Argument.findOne(query, function(err, result) {
                 var tags = req.body.argumentTags;
+                var dateNow = Date.now();
                 entry = result;
                 entity = result ? result : {};
                 entity.content = req.body.content;
@@ -298,7 +302,7 @@ function POST_create(req, res) {
                 entity.friendlyUrl = utils.urlify(req.body.title);
                 entity.referenceDate = req.body.referenceDate ? new Date(req.body.referenceDate) : null;
                 entity.editUserId = req.user.id;
-                entity.editDate = Date.now();
+                entity.editDate = dateNow;
                 entity.typeId = req.body.typeId;
                 entity.against = !req.body.supportsParent;
                 entity.tags = tags ? tags : [];
@@ -326,7 +330,7 @@ function POST_create(req, res) {
                 }
                 if(!result) {
                     entity.createUserId = req.user.id;
-                    entity.createDate = Date.now();
+                    entity.createDate = dateNow;
                 }
                 /*} else if(req.user.isAdmin()) {
                  entity.createUserId = req.body.author;

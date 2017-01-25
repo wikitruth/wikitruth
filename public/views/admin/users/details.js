@@ -153,7 +153,8 @@
       'click .btn-admin-unlink': 'adminUnlink',
       'click .btn-account-open': 'accountOpen',
       'click .btn-account-link': 'accountLink',
-      'click .btn-account-unlink': 'accountUnlink'
+      'click .btn-account-unlink': 'accountUnlink',
+      'click .btn-update-roles': 'rolesUpdate'
     },
     initialize: function() {
       this.model = new app.Roles();
@@ -175,6 +176,14 @@
         if (this.model.attributes.hasOwnProperty(key)) {
           this.$el.find('[name="'+ key +'"]').val(this.model.attributes[key]);
         }
+      }
+
+      var roles = this.model.get('roles');
+      if(roles.reviewer) {
+        $('#role-reviewer').prop( "checked", true );
+      }
+      if(roles.screener) {
+        $('#role-screener').prop( "checked", true );
       }
     },
     adminOpen: function() {
@@ -226,6 +235,15 @@
           }
         });
       }
+    },
+    rolesUpdate: function() {
+      //console.log('rolesUpdate');
+      this.model.save({
+        reviewer: $('#role-reviewer').prop( "checked" ),
+        screener: $('#role-screener').prop( "checked" )
+      },{
+        url: this.model.url() +'roles/'
+      });
     }
   });
 

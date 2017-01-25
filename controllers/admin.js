@@ -113,6 +113,17 @@ module.exports = function (router) {
                             callback();
                         });
                     });
+                },
+                users: function (callback) {
+                    db.User.find({}).exec(function(err, results) {
+                        async.eachSeries(results, function (result, callback) {
+                            db.User.update({ _id: result._id }, result, {}, function () {
+                                callback();
+                            });
+                        }, function (err) {
+                            callback();
+                        });
+                    });
                 }
             }, function (err, results) {
                 res.render(templates.admin.mongoBackup, model);

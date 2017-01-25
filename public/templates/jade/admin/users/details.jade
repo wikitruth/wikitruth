@@ -90,6 +90,17 @@ block body
             button.btn.btn-success.btn-account-link(type='button') Link
           |<% } %>
         span.help-block <%- errfor.newAccountId %>
+      div.form-group
+        label Additional Roles
+        div.checkbox
+          label
+            input(type='checkbox', name='rolesCheckbox', value='reviewer', id='role-reviewer')
+            | Reviewer &nbsp;&nbsp;
+          label
+            input(type='checkbox', name='rolesCheckbox', value='reviewer', id='role-screener')
+            | Screener
+      div.form-group
+        button.btn.btn-primary.btn-update-roles(type='button') Update
 
   script(type='text/template', id='tmpl-password')
     fieldset

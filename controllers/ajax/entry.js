@@ -11,12 +11,13 @@ module.exports = function (router) {
         var type = req.body.type;
 
         if(req.user.isAdmin()) {
+            var dateNow = Date.now();
             var query = {_id: id};
             if(type == constants.OBJECT_TYPES.topic) {
                 db.Topic.findOne(query, function(err, entry) {
                     entry.createUserId = req.user.id;
                     entry.editUserId = req.user.id;
-                    entry.editDate = Date.now();
+                    entry.editDate = dateNow;
                     db.Topic.update(query, entry, {upsert: true}, function(err, writeResult) {
                         res.send({});
                     });
@@ -25,7 +26,7 @@ module.exports = function (router) {
                 db.Argument.findOne(query, function(err, entry) {
                     entry.createUserId = req.user.id;
                     entry.editUserId = req.user.id;
-                    entry.editDate = Date.now();
+                    entry.editDate = dateNow;
                     db.Argument.update(query, entry, {upsert: true}, function(err, writeResult) {
                         res.send({});
                     });
@@ -34,7 +35,7 @@ module.exports = function (router) {
                 db.Question.findOne(query, function(err, entry) {
                     entry.createUserId = req.user.id;
                     entry.editUserId = req.user.id;
-                    entry.editDate = Date.now();
+                    entry.editDate = dateNow;
                     db.Question.update(query, entry, {upsert: true}, function(err, writeResult) {
                         res.send({});
                     });
@@ -43,7 +44,7 @@ module.exports = function (router) {
                 db.Issue.findOne(query, function(err, entry) {
                     entry.createUserId = req.user.id;
                     entry.editUserId = req.user.id;
-                    entry.editDate = Date.now();
+                    entry.editDate = dateNow;
                     db.Issue.update(query, entry, {upsert: true}, function(err, writeResult) {
                         res.send({});
                     });

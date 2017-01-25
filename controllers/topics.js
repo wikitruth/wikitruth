@@ -172,9 +172,9 @@ function GET_entry(req, res) {
                 };
                 flowUtils.getArguments(query, 0, function (err, results) {
                     results.forEach(function (result) {
-                        result.friendlyUrl = utils.urlify(result.title);
                         flowUtils.setVerdictModel(result);
                     });
+                    flowUtils.sortArguments(results);
                     callback(null, results);
                 });
             },
@@ -289,13 +289,14 @@ function POST_create(req, res) {
     db.Topic.findOne(query, function(err, result) {
         var entity = result ? result : {};
         var tags = req.body.topicTags;
+        var dateNow = Date.now();
         entity.content = req.body.content;
         entity.title = req.body.title;
         entity.contextTitle = req.body.contextTitle;
         entity.references = req.body.references;
         entity.friendlyUrl = utils.urlify(req.body.title);
         entity.editUserId = req.user.id;
-        entity.editDate = Date.now();
+        entity.editDate = dateNow;
         entity.referenceDate = req.body.referenceDate ? new Date(req.body.referenceDate) : null;
         entity.tags = tags ? tags : [];
         entity.icon = req.body.icon;
@@ -306,7 +307,7 @@ function POST_create(req, res) {
         entity.parentId = req.body.parent ? req.body.parent : null;
         if(!result) {
             entity.createUserId = req.user.id;
-            entity.createDate = Date.now();
+            entity.createDate = dateNow;
         }
         if(req.params.username) {
             entity.private = true;

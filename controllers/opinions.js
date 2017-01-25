@@ -71,15 +71,16 @@ function GET_create(req, res) {
 function POST_create(req, res) {
     var query = { _id: req.query.opinion || new mongoose.Types.ObjectId() };
     db.Opinion.findOne(query, function(err, result) {
+        var dateNow = Date.now();
         var entity = result ? result : {};
         entity.title = req.body.title;
         entity.content = req.body.content;
         entity.friendlyUrl = utils.urlify(req.body.title);
         entity.editUserId = req.user.id;
-        entity.editDate = Date.now();
+        entity.editDate = dateNow;
         if(!result) {
             entity.createUserId = req.user.id;
-            entity.createDate = Date.now();
+            entity.createDate = dateNow;
         }
         entity.private = req.params.username ? true : false;
         if(!entity.ownerId) {
