@@ -144,9 +144,9 @@ module.exports = function (router) {
         if(config.mongodb.gitBackup) {
             model.gitBackup = true;
         }
-        privateBackupDir += '/' + privateDirName;
 
         if(action === 'backup') {
+            privateBackupDir += '/' + privateDirName;
             async.series({
                 createPublicDir: function (callback) {
                     makeDir(backupDir, function () { callback(); });
@@ -317,6 +317,7 @@ module.exports = function (router) {
             });
         } else if(action === 'restore') {
             var dir = backupDir + '/' + config.mongodb.dbname;
+            privateBackupDir += '/' + privateDirName;
             //console.log(cols.backupList);
             async.series({
                 restorePublicData: function (callback) {
