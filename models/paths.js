@@ -19,6 +19,7 @@ module.exports = {
     },
     members: {
         index: '/members',
+        screeners: '/members/screeners',
         reviewers: '/members/reviewers',
         administrators: '/members/administrators',
         profile: {

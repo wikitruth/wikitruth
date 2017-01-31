@@ -3,7 +3,9 @@
 exports.port = process.env.PORT || 8000;
 exports.mongodb = {
   uri: process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost:27017/wikitruth',
+  dbname: 'wikitruth',
   backupRoot: '~/config/mongodb',
+  privateBackupRootX: '~/config/mongodb',
   collections: {
     backupList: [
       'users',
@@ -11,19 +13,23 @@ exports.mongodb = {
       'accounts',
       'admingroups',
       'admins',
+      'loginattempts',
+      'pages',
+      'status',
+      'words'
+    ],
+    privateBackupList: [
+      'answers',
       'arguments',
       'argumentlinks',
       'issues',
-      'loginattempts',
       'opinions',
-      'pages',
       'questions',
-      'status',
       'topics',
-      'topiclinks',
-      'words'
+      'topiclinks'
     ],
     modelMapping: {
+      answers: 'Answer',
       accountcategories: 'AccountCategory',
       accounts: 'Account',
       admingroups: 'AdminGroup',
@@ -41,6 +47,18 @@ exports.mongodb = {
       topiclinks: 'TopicLink',
       users: 'User',
       words: 'Word'
+    }
+  },
+  gitBackupX: {
+    signature: {
+      name: 'FirstName LastName',
+      email: 'email@somedomain.com'
+    }
+  },
+  privateGitBackupX: {
+    signature: {
+      name: 'FirstName LastName',
+      email: 'email@somedomain.com'
     }
   }
 };

@@ -24,13 +24,17 @@ function createCancelUrl(req) {
 
 function GET_index(req, res) {
     var model = {};
+    flowUtils.setScreeningModel(req, model);
+    if(!req.query.topic && req.params.id) {
+        req.query.topic = req.params.id;
+    }
     async.parallel({
         topic: function(callback){
             flowUtils.setTopicModels(req, model, callback);
         },
         topics: function(callback) {
             // display 15 if top topics, all if has topic parameter
-            flowUtils.getTopics({ parentId: req.query.topic }, 0, function (err, results) {
+            flowUtils.getTopics({ parentId: req.query.topic, 'screening.status': model.screeningStatus }, 0, function (err, results) {
                 model.topics = results;
                 callback();
             });
@@ -94,7 +98,12 @@ function GET_entry(req, res) {
                         async.each(results, function(result, callback) {
                             result.friendlyUrl = utils.urlify(result.title);
                             result.comments = utils.numberWithCommas(utils.randomInt(1, 100000));
-                            db.Topic.find( { parentId: result._id } ).limit(3).sort({ title: 1 }).exec(function(err, subtopics) {
+                            db.Topic
+                                .find( { parentId: result._id } )
+                                .limit(3)
+                                .sort({ title: 1 })
+                                .lean()
+                                .exec(function(err, subtopics) {
                                 subtopics.forEach(function(subtopic){
                                     subtopic.friendlyUrl = utils.urlify(subtopic.title);
                                     subtopic.shortTitle = utils.getShortText(subtopic.contextTitle ? subtopic.contextTitle : subtopic.title, 38);
@@ -234,6 +243,9 @@ function GET_entry(req, res) {
                 model.isEntryOwner = true;
             }
             model.arguments = results.arguments.slice(0, 15);
+            model.keyArguments = results.arguments.filter(function (result) {
+                return result.tags.indexOf(constants.ARGUMENT_TAGS.tag20.code) >= 0;
+            });
             model.verdict = {
                 counts: flowUtils.getVerdictCount(results.arguments)
             };
@@ -399,6 +411,10 @@ function POST_link(req, res) {
 module.exports = function (router) {
 
     router.get('/', function (req, res) {
+        GET_index(req, res);
+    });
+
+    router.get('/:friendlyUrl/:id', function (req, res) {
         GET_index(req, res);
     });
 

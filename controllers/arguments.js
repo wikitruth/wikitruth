@@ -195,7 +195,6 @@ function GET_index(req, res) {
                     var contra = results.filter(function (arg) {
                         return arg.against;
                     });
-                    flowUtils.sortArguments(results);
                     model.arguments = results;
                     if(support.length > 0) {
                         model.proArguments = support;
@@ -206,6 +205,7 @@ function GET_index(req, res) {
                     results.forEach(function (result) {
                         flowUtils.setVerdictModel(result);
                     });
+                    flowUtils.sortArguments(results);
                     flowUtils.setModelContext(req, model);
                     res.render(templates.truth.arguments.index, model);
                 });

@@ -6,7 +6,8 @@
 
 {<body}
     <div class="page-header"><h1>MongoDB Backup & Restore</h1></div>
-    <h3>Backup Dir: {dirname}</h3>
+    <h4>Backup Dir:<br/>{dirname}<br/><br/>Private Backup Dir:<br/>{privateDirname}</h4>
+    <br/>
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
         <button type="submit" name="buttonAction" value="backup" class="btn btn-primary" onclick="return confirm('Are you sure you want to Backup the DB?')">Backup</button>&nbsp;

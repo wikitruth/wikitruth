@@ -93,7 +93,7 @@ module.exports = function (router) {
         var model = {};
         async.parallel({
             topics: function(callback) {
-                var query = { parentId: {$ne: null}, private: false };
+                var query = { parentId: {$ne: null}, private: false, 'screening.status': constants.SCREENING_STATUS.status1.code };
                 //db.Topic.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
                 db.Topic
                     .find(query)
@@ -112,7 +112,7 @@ module.exports = function (router) {
             },
             categories: function(callback) {
                 db.Topic
-                    .find({parentId: null, private: false })
+                    .find({parentId: null, private: false, 'screening.status': constants.SCREENING_STATUS.status1.code })
                     .sort({title: 1})
                     .lean()
                     .exec(function (err, results) {

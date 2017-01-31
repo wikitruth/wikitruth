@@ -3,11 +3,21 @@
     <li><i class="fa fa-user-circle text-muted"></i> <a href="{paths.members.index}">Members</a></li>
     <li><i class="fa fa-user-circle text-muted"></i> <a href="{paths.members.index}/{member.username}">{member.username}</a></li>
 </ol>!}
-<h1 class="page-header wt-header wt-profile-background" data-username="{member.username}" style="padding-bottom: 60px;
-    padding-top: 60px;text-align: center;
+<h1 class="page-header wt-header wt-profile-background" data-username="{member.username}" style="padding-bottom: 50px;
+    padding-top: 50px;text-align: center;
     background-image: linear-gradient(-110deg, #48227d 0%, #2f569c 100%);
     color: #fff;font-weight: normal;
-    border: 1px solid #e5e5e5;"><i class="fa fa-user-circle fa-2x"></i><br/>{member.username}</h1>
+    border: 1px solid #e5e5e5;">
+    <i class="fa fa-user-circle fa-2x"></i><br/>{member.username}
+    <div style="font-size: 13px; font-weight: normal; margin-top: 10px; letter-spacing: 0; line-height: 1;">
+    Contributor
+    {#member.roles}
+        {?screener} &bull; Screener{/screener}
+        {?admin} &bull; Administrator{/admin}
+        {?reviewer} &bull; Reviewer{/reviewer}
+    {/member.roles}
+    </div>
+</h1>
 
 <ul class="nav nav-tabs wt-tabs" role="tablist">
     <li role="presentation"{@eq key=profileTab value="overview"} class="active"{/eq}>

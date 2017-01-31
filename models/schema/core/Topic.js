@@ -20,7 +20,14 @@ exports = module.exports = function(app, mongoose) {
     icon: { type: String }, // ex: "fa fa-plane"
     typeId: { type: Number }, // TOPIC_TYPES
     tags: [ { type: Number } ], // OBJECT_TAGS
-    screeningStatus: { type: Number, default: constants.SCREENING_STATUS.status0.code }, // SCREENING_STATUS
+    screening: {
+      status: { type: Number, default: constants.SCREENING_STATUS.status0.code}, // SCREENING_STATUS
+      history: [{
+        userId: { type: mongoose.Schema.ObjectId, ref: 'User' },
+        date: { type: Date, default: Date.now },
+        status: { type: Number } // SCREENING_STATUS
+      }]
+    },
     private: { type: Boolean, default: false }, // if true, should be restricted to group/user owners and not included in public backup
     ethicalStatus: {
       hasValue: { type: Boolean, default: false },

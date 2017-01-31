@@ -40,7 +40,7 @@
                     {?link}
                         <a href="{wikiBaseUrl}{paths.truth.topics.link}?topic={topic._id}&amp;id={link._id}&amp;source={wikiBaseUrl}" class="glyphicon glyphicon-link text-success"></a>
                     {:else}
-                        <i class="fa fa-folder-open text-success" aria-hidden="true"></i>
+                        <i class="fa fa-folder-open text-color-3" aria-hidden="true"></i>
                     {/link}
                     <div>
                         <a href="{wikiBaseUrl}{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{?link}{?link.title}{link.title}{:else}{title}{/link.title}{:else}{?contextTitle}{contextTitle}{:else}{title}{/contextTitle}{/link}</a>

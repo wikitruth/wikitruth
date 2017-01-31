@@ -49,7 +49,7 @@
                     {!<li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp; Topics</li>!}
                     {#topics}
                         <li class="list-group-item">
-                            <i class="fa fa-folder-open text-success" aria-hidden="true"></i>
+                            <i class="fa fa-folder-open text-color-3" aria-hidden="true"></i>
                             <div>
                                 <a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{title}</a>
                                 {>"dust/truth/common/entry-row-footer" /}
@@ -87,7 +87,7 @@
                     {!<li class="list-group-item highlight"><span class="glyphicon glyphicon-question-sign text-success" aria-hidden="true"></span> Questions</li>!}
                     {#questions}
                         <li class="list-group-item">
-                            <i class="fa fa-question-circle text-success" aria-hidden="true"></i>
+                            <i class="fa fa-question-circle text-color-1" aria-hidden="true"></i>
                             <div>
                                 <a href="{paths.truth.questions.entry}/{friendlyUrl}/{_id}">{title}</a>
                                 {>"dust/truth/common/entry-row-footer" /}
@@ -105,7 +105,7 @@
                     {!<li class="list-group-item highlight"><span class="fa fa-exclamation-circle text-success" aria-hidden="true"></span> Issues</li>!}
                     {#issues}
                         <li class="list-group-item">
-                            <span class="fa fa-exclamation-circle text-success" aria-hidden="true"></span>
+                            <span class="fa fa-exclamation-circle text-danger" aria-hidden="true"></span>
                             <div>
                                 <a href="{paths.truth.issues.entry}/{friendlyUrl}/{_id}">{title}</a>
                                 {>"dust/truth/common/entry-row-footer" /}
@@ -123,7 +123,7 @@
                     {!<li class="list-group-item highlight"><span class="fa fa-comments-o text-success" aria-hidden="true"></span> Opinions</li>!}
                     {#opinions}
                         <li class="list-group-item">
-                            <span class="fa fa-comments-o text-success" aria-hidden="true"></span>
+                            <span class="fa fa-comments-o text-primary" aria-hidden="true"></span>
                             <div>
                                 <a href="{paths.truth.opinions.entry}/{friendlyUrl}/{_id}">{title}</a>
                                 {>"dust/truth/common/entry-row-footer" /}

@@ -18,6 +18,19 @@
             <div class="content-see-more-gradient"></div>
             <div class="content-see-more-text">See more</div>
         </a>
+        {?keyArguments}
+            <div style="margin-top: 10px; margin-bottom: 10px;">
+                <div style="font-size: 12px;" class="text-muted">KEY ARGUMENTS</div>
+                {#keyArguments}
+                    <div class="text-muted">&bull; <a class="text-muted" href="{wikiBaseUrl}{paths.truth.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a></div>
+                {/keyArguments}
+                {!<ul>
+                    {#keyArguments}
+                        <li><a href="{wikiBaseUrl}{paths.truth.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a></li>
+                    {/keyArguments}
+                </ul>!}
+            </div>
+        {/keyArguments}
     </div>
     {?parentTopic}
         <div style="margin-bottom: 15px; margin-top: 0px">
@@ -60,13 +73,13 @@
     {?topics}
         <div class="wt-list">
             <ul class="list-group top-list-items">
-                <li class="list-group-item highlight text-muted-x"><i class="fa fa-folder-open text-success-x" aria-hidden="true"></i>&nbsp; Topics <span class="wt-label label label-default">{entry.childrenCount.topics}</span></li>
+                <li class="list-group-item highlight text-muted"><i class="fa fa-folder-open text-success-x" aria-hidden="true"></i>&nbsp; Topics <span class="wt-label label label-default">{entry.childrenCount.topics}</span></li>
                 {#topics}
                     <li class="list-group-item">
                         {?link}
-                            <a href="{wikiBaseUrl}{paths.truth.topics.link}?topic={topic._id}&amp;id={link._id}&amp;source={paths.truth.topics.entry}" class="glyphicon glyphicon-link text-success"></a>
+                            <a href="{wikiBaseUrl}{paths.truth.topics.link}?topic={topic._id}&amp;id={link._id}&amp;source={paths.truth.topics.entry}" class="glyphicon glyphicon-link text-color-3"></a>
                         {:else}
-                            <i class="fa fa-folder-open text-success" aria-hidden="true"></i>
+                            <i class="fa fa-folder-open text-color-3" aria-hidden="true"></i>
                         {/link}
                         <div>
                             <a href="{wikiBaseUrl}{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{?link}{?link.title}{link.title}{:else}{title}{/link.title}{:else}{?contextTitle}{contextTitle}{:else}{title}{/contextTitle}{/link}</a>
@@ -77,7 +90,7 @@
                 {/topics}
             </ul>
             {@gt key=entry.childrenCount.topics value="15"}
-                <div class="top-list-items-more"><a href="{wikiBaseUrl}{paths.truth.topics.index}?topic={topic._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{entry.childrenCount.topics}</span></a></div>
+                <div class="top-list-items-more"><a href="{wikiBaseUrl}{paths.truth.topics.index}/{topic.friendlyUrl}/{topic._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{entry.childrenCount.topics}</span></a></div>
             {/gt}
         </div>
     {/topics}

@@ -42,10 +42,10 @@
     <br/>
     {?topics}
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight"><i class="fa fa-folder-open text-success-x text-muted-x" aria-hidden="true"></i>&nbsp;&nbsp;Latest Topics</li>
+            <li class="list-group-item highlight"><i class="fa fa-folder-open text-muted" aria-hidden="true"></i>&nbsp;&nbsp;Latest Topics</li>
             {#topics}
                 <li class="list-group-item">
-                    <i class="fa fa-folder-open text-success text-muted-x" aria-hidden="true"></i>
+                    <i class="fa fa-folder-open text-color-3" aria-hidden="true"></i>
                     <div>
                         <a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{title}</a>
                         {>"dust/truth/common/entry-row-footer" /}

@@ -9,7 +9,14 @@ exports = module.exports = function(app, mongoose) {
     referenceDate: { type: Date }, // If the entry is time/date sensitive or may become obsolete in the future, add a ref date
     references: { type: String, default: '' },
     friendlyUrl: { type: String },
-    screeningStatus: { type: Number, default: constants.SCREENING_STATUS.status0.code }, // SCREENING_STATUS
+    screening: {
+      status: { type: Number, default: constants.SCREENING_STATUS.status0.code}, // SCREENING_STATUS
+      history: [{
+        userId: { type: mongoose.Schema.ObjectId, ref: 'User' },
+        date: { type: Date, default: Date.now },
+        status: { type: Number } // SCREENING_STATUS
+      }]
+    },
     parentId: { type: mongoose.Schema.ObjectId, default: null }, // always an Argument
     ownerId: { type: mongoose.Schema.ObjectId }, // usually a Topic but can be a different object
     ownerType: { type: Number }, // OBJECT_TYPES

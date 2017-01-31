@@ -3,7 +3,9 @@
 exports.port = process.env.PORT || 8000;
 exports.mongodb = {
   uri: process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost:27017/wikitruth',
+  dbname: 'wikitruth',
   backupRoot: '~/config/mongodb',
+  privateBackupRoot: '~/config/mongodb/users',
   collections: {
     backupList: [
       'users',
@@ -41,6 +43,12 @@ exports.mongodb = {
     }
   },
   gitBackup: {
+    signature: {
+      name: 'FirstName LastName',
+      email: 'email@somedomain.com'
+    }
+  },
+  privateGitBackup: {
     signature: {
       name: 'FirstName LastName',
       email: 'email@somedomain.com'

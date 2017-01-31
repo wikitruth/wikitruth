@@ -8,7 +8,14 @@ exports = module.exports = function(app, mongoose) {
     content: { type: String, default: '' },
     references: { type: String, default: '' },
     friendlyUrl: { type: String },
-    screeningStatus: { type: Number, default: constants.SCREENING_STATUS.status0.code }, // SCREENING_STATUS
+    screening: {
+      status: { type: Number, default: constants.SCREENING_STATUS.status0.code}, // SCREENING_STATUS
+      history: [{
+        userId: { type: mongoose.Schema.ObjectId, ref: 'User' },
+        date: { type: Date, default: Date.now },
+        status: { type: Number } // SCREENING_STATUS
+      }]
+    },
     questionId: { type: mongoose.Schema.ObjectId },
     createDate: { type: Date, default: Date.now },
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },

@@ -61,6 +61,8 @@ Install nodejs
 $ git clone git@github.com:wikitruth/wikitruth.git && cd ./wikitruth
 $ npm install -g yo generator-kraken bower grunt-cli
 $ npm install
+$ bower install
+$ grunt build
 ```
 
 ## Setup
@@ -119,7 +121,7 @@ Now just use the reset password feature to set a password.
  - `http://localhost:8000/login/reset/:email/:token/`
  - Set a new password.
 
-Login. Customize. Enjoy.
+Login, customize, and enjoy!
 
 ## Connect and discuss
 

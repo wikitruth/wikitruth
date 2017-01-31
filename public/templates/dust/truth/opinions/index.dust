@@ -8,10 +8,10 @@
     {>"dust/truth/common/entry-header" tab="opinions" /}
     {?opinions}
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight"><i class="fa fa-comments-o text-success-x" aria-hidden="true"></i> Comments</li>
+            <li class="list-group-item highlight"><i class="fa fa-comments-o text-muted" aria-hidden="true"></i> Comments</li>
             {#opinions}
                 <li class="list-group-item">
-                    <i class="fa fa-comments-o text-success" aria-hidden="true"></i>
+                    <i class="fa fa-comments-o text-primary" aria-hidden="true"></i>
                     <div>
                         <a href="{wikiBaseUrl}{paths.truth.opinions.entry}/{friendlyUrl}/{_id}">{title}</a>
                         {>"dust/truth/common/entry-row-footer" /}

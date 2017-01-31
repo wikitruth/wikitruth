@@ -1,10 +1,10 @@
 {?questions}
     <div class="wt-list">
         <ul class="list-group top-list-items">
-            <li class="list-group-item highlight"><span class="glyphicon glyphicon-question-sign text-success-x" aria-hidden="true"></span> Questions <span class="wt-label label label-default">{entry.childrenCount.questions}</span></li>
+            <li class="list-group-item highlight"><span class="glyphicon glyphicon-question-sign text-muted" aria-hidden="true"></span> Questions <span class="wt-label label label-default">{entry.childrenCount.questions}</span></li>
             {#questions}
                 <li class="list-group-item">
-                    <span class="glyphicon glyphicon-question-sign text-success text-muted-x" aria-hidden="true"></span>
+                    <span class="glyphicon glyphicon-question-sign text-color-1" aria-hidden="true"></span>
                     <div>
                         <a href="{wikiBaseUrl}{paths.truth.questions.entry}/{friendlyUrl}/{_id}">{title}</a>
                         {>"dust/truth/common/entry-row-footer" /}

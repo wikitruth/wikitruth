@@ -12,10 +12,10 @@
     {/topic}
     {?questions}
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight"><i class="fa fa-question-circle text-success-x" aria-hidden="true"></i> {^topic}Latest {/topic}Questions</li>
+            <li class="list-group-item highlight"><i class="fa fa-question-circle text-muted" aria-hidden="true"></i> {^topic}Latest {/topic}Questions</li>
             {#questions}
                 <li class="list-group-item">
-                    <i class="fa fa-question-circle text-success" aria-hidden="true"></i>
+                    <i class="fa fa-question-circle text-color-1" aria-hidden="true"></i>
                     <div>
                         <a href="{wikiBaseUrl}{paths.truth.questions.entry}/{friendlyUrl}/{_id}">{title}</a>
                         {>"dust/truth/common/entry-row-footer" /}
