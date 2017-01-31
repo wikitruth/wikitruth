@@ -320,6 +320,7 @@ function POST_create(req, res) {
         if(!result) {
             entity.createUserId = req.user.id;
             entity.createDate = dateNow;
+            flowUtils.initScreeningStatus(req, entity);
         }
         if(req.params.username) {
             entity.private = true;
@@ -397,10 +398,13 @@ function POST_link(req, res) {
     } else if(action === 'submit') {
         var query = { _id: req.query.id };
         db.TopicLink.findOne(query, function (err, result) {
-            var entity = result;
+            var entity = result ? result : {};
             entity.title = req.body.title;
             entity.editUserId = req.user.id;
             entity.editDate = Date.now();
+            if(!result) {
+                flowUtils.initScreeningStatus(req, entity);
+            }
             db.TopicLink.findOneAndUpdate(query, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function (err, updatedEntity) {
                 res.redirect(createCancelUrl(req));
             });

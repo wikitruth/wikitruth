@@ -149,6 +149,7 @@ function POST_create(req, res) {
         if(!result) {
             entity.createUserId = req.user.id;
             entity.createDate = dateNow;
+            flowUtils.initScreeningStatus(req, entity);
         }
         entity.private = req.params.username ? true : false;
         if(!entity.ownerId) {

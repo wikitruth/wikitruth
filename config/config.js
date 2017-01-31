@@ -5,7 +5,7 @@ exports.mongodb = {
   uri: process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost:27017/wikitruth',
   dbname: 'wikitruth',
   backupRoot: '~/config/mongodb',
-  privateBackupRootX: '~/config/mongodb',
+  privateBackupRootX: '~/config/mongodb', // private data will still be persisted to disk if this is not present
   collections: {
     backupList: [
       'users',
@@ -55,7 +55,7 @@ exports.mongodb = {
       email: 'email@somedomain.com'
     }
   },
-  privateGitBackupX: {
+  privateGitBackupX: { // private data won't be committed if this is not present
     signature: {
       name: 'FirstName LastName',
       email: 'email@somedomain.com'

@@ -877,6 +877,15 @@ function setScreeningModel(req, model) {
     model.screeningStatus = constants.SCREENING_STATUS.status1.code;
 }
 
+function initScreeningStatus(req, entity) {
+    if(req.user.roles.reviewer) {
+        entity.screening = {
+            status: constants.SCREENING_STATUS.status1.code,
+            history: []
+        }
+    }
+}
+
 module.exports = {
     getBackupDir: getBackupDir,
     isOwner: isOwner,
@@ -905,5 +914,6 @@ module.exports = {
     setModelContext: setModelContext,
     buildEntryUrl: buildEntryUrl,
     buildCancelUrl: buildCancelUrl,
-    setScreeningModel: setScreeningModel
+    setScreeningModel: setScreeningModel,
+    initScreeningStatus: initScreeningStatus
 };
