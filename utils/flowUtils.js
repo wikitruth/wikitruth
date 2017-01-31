@@ -882,7 +882,7 @@ function initScreeningStatus(req, entity) {
         entity.screening = {
             status: constants.SCREENING_STATUS.status1.code,
             history: []
-        }
+        };
     }
 }
 
