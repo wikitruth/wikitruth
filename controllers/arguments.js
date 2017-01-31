@@ -331,6 +331,7 @@ function POST_create(req, res) {
                 if(!result) {
                     entity.createUserId = req.user.id;
                     entity.createDate = dateNow;
+                    flowUtils.initScreeningStatus(req, entity);
                 }
                 /*} else if(req.user.isAdmin()) {
                  entity.createUserId = req.body.author;
@@ -424,11 +425,14 @@ function POST_link(req, res) {
     } else if(action === 'submit') {
         var query = { _id: req.query.id };
         db.ArgumentLink.findOne(query, function (err, result) {
-            var entity = result;
+            var entity = result ? result : {};
             entity.title = req.body.title;
             entity.editUserId = req.user.id;
             entity.editDate = Date.now();
             entity.against = !req.body.supportsParent;
+            if(!result) {
+                flowUtils.initScreeningStatus(req, entity);
+            }
             db.ArgumentLink.findOneAndUpdate(query, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function (err, updatedEntity) {
                 res.redirect(createCancelUrl(req));
             });

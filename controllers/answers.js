@@ -123,6 +123,7 @@ function POST_create(req, res) {
             entity.createUserId = req.user.id;
             entity.createDate = dateNow;
             entity.questionId = req.query.question;
+            flowUtils.initScreeningStatus(req, entity);
         }
         entity.private = req.params.username ? true : false;
         db.Answer.findOneAndUpdate(query, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function (err, updatedEntity) {
