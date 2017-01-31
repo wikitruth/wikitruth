@@ -5,6 +5,11 @@
             <i class="fa fa-user-circle"></i> Contributors
         </a>
     </li>
+    <li role="presentation"{@eq key=tab value="screeners"} class="active"{/eq}>
+        <a href="{paths.members.screeners}" role="tab">
+            <i class="fa fa-user-circle"></i> Screeners
+        </a>
+    </li>
     <li role="presentation"{@eq key=tab value="reviewers"} class="active"{/eq}>
         <a href="{paths.members.reviewers}" role="tab">
             <i class="fa fa-user-circle"></i> Reviewers

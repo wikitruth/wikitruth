@@ -1,10 +1,10 @@
 {?opinions}
     <div class="wt-list">
         <ul class="list-group top-list-items">
-            <li class="list-group-item highlight"><span class="fa fa-comments-o text-success-x" aria-hidden="true"></span> Comments <span class="wt-label label label-default">{entry.childrenCount.opinions}</span></li>
+            <li class="list-group-item highlight"><span class="fa fa-comments-o text-muted" aria-hidden="true"></span> Comments <span class="wt-label label label-default">{entry.childrenCount.opinions}</span></li>
             {#opinions}
                 <li class="list-group-item">
-                    <span class="fa fa-comments-o text-success" aria-hidden="true"></span>
+                    <span class="fa fa-comments-o text-primary" aria-hidden="true"></span>
                     <div>
                         <a href="{wikiBaseUrl}{paths.truth.opinions.entry}/{friendlyUrl}/{_id}">{title}</a>
                         {>"dust/truth/common/entry-row-footer" /}

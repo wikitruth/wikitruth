@@ -6,14 +6,15 @@ var db          = require('../app').db.models,
     config      = require('../config/config'),
     async       = require('async');
 
-function getBackupDir() {
-    if(config.mongodb.backupRoot) {
-        if(config.mongodb.backupRoot.startsWith('~')) {
-            return __dirname + '/..' + config.mongodb.backupRoot.substring(1);
+function getBackupDir(isPrivate) {
+    var backupRoot = isPrivate && config.mongodb.privateBackupRoot ? config.mongodb.privateBackupRoot : config.mongodb.backupRoot;
+    if(backupRoot) {
+        if(backupRoot.startsWith('~')) {
+            return __dirname + '/..' + backupRoot.substring(1);
         }
-        return config.mongodb.backupRoot;
+        return backupRoot;
     }
-    return __dirname + '/../config/mongodb';
+    return __dirname + '/../config/mongodb' + (isPrivate ? '/users' : '');
 }
 
 function isOwner(req, item, model) {
@@ -345,13 +346,13 @@ function getTopics(query, limit, callback) {
                 .sort({ title: 1 })
                 .lean()
                 .exec(function(err, results) {
-                setEditorsUsername(results, function() {
-                    results.forEach(function (result) {
-                        appendEntryExtra(result);
-                        //result.link = false;
+                    setEditorsUsername(results, function() {
+                        results.forEach(function (result) {
+                            appendEntryExtra(result);
+                            //result.link = false;
+                        });
+                        callback(null, results);
                     });
-                    callback(null, results);
-                });
             });
         },
         links: function (callback) {
@@ -859,6 +860,23 @@ function buildCancelUrl(model, cancelBaseUrl, entry, parent) {
     return cancelUrl;
 }
 
+function setScreeningModel(req, model) {
+    if(req.query.screening) {
+        if(req.query.screening === 'pending'){
+            model.screeningPending = true;
+            model.screeningStatus = constants.SCREENING_STATUS.status0.code;
+            return;
+        } else if (req.query.screening === 'rejected') {
+            model.screeningRejected = true;
+            model.screeningStatus = constants.SCREENING_STATUS.status2.code;
+            return;
+        }
+    }
+
+    model.screeningApproved = true;
+    model.screeningStatus = constants.SCREENING_STATUS.status1.code;
+}
+
 module.exports = {
     getBackupDir: getBackupDir,
     isOwner: isOwner,
@@ -886,5 +904,6 @@ module.exports = {
 
     setModelContext: setModelContext,
     buildEntryUrl: buildEntryUrl,
-    buildCancelUrl: buildCancelUrl
+    buildCancelUrl: buildCancelUrl,
+    setScreeningModel: setScreeningModel
 };

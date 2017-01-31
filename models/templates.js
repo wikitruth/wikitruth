@@ -14,6 +14,7 @@ module.exports = {
     search: 'dust/search',
     members: {
         contributors: 'dust/members/contributors',
+        screeners: 'dust/members/screeners',
         reviewers: 'dust/members/reviewers',
         administrators: 'dust/members/administrators',
         profile: {

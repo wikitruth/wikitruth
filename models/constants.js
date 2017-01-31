@@ -141,6 +141,9 @@ ARGUMENT_TYPES.getUXInfo = function (typeId) {
 };
 
 var SCREENING_STATUS = {
+    /***
+     * Pending
+     */
     status0: {
         code: 0,
         text: "Pending"

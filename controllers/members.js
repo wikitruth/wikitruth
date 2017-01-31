@@ -34,15 +34,35 @@ module.exports = function (router) {
 
     router.get('/', function (req, res) {
         var model = {};
-        db.User.find({}).sort({title: 1}).exec(function (err, results) {
+        db.User
+            .find({})
+            .sort({title: 1})
+            .lean()
+            .exec(function (err, results) {
             model.contributors = results;
             res.render(templates.members.contributors, model);
         });
     });
 
+    router.get('/screeners', function (req, res) {
+        var model = {};
+        db.User
+            .find({ 'roles.screener': true})
+            .sort({title: 1})
+            .lean()
+            .exec(function (err, results) {
+            model.screeners = results;
+            res.render(templates.members.screeners, model);
+        });
+    });
+
     router.get('/reviewers', function (req, res) {
         var model = {};
-        db.User.find({ 'roles.reviewer': true}).sort({title: 1}).exec(function (err, results) {
+        db.User
+            .find({ 'roles.reviewer': true})
+            .sort({title: 1})
+            .lean()
+            .exec(function (err, results) {
             model.reviewers = results;
             res.render(templates.members.reviewers, model);
         });
@@ -50,7 +70,11 @@ module.exports = function (router) {
 
     router.get('/administrators', function (req, res) {
         var model = {};
-        db.User.find({ 'roles.admin': {$exists: true}}).sort({title: 1}).exec(function (err, results) {
+        db.User
+            .find({ 'roles.admin': {$exists: true}})
+            .sort({title: 1})
+            .lean()
+            .exec(function (err, results) {
             model.administrators = results;
             res.render(templates.members.administrators, model);
         });
@@ -473,6 +497,10 @@ module.exports = function (router) {
     });
 
     router.get('/:username/diary/topics', function (req, res) {
+        topicController.GET_index(req, res);
+    });
+
+    router.get('/:username/diary/topics/:friendlyUrl/:id', function (req, res) {
         topicController.GET_index(req, res);
     });
 
