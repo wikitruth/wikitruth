@@ -19,6 +19,12 @@
         {?action}
             <br/>
             <h1>{action} done!</h1>
+            {?gitBackup.nothingToPush}
+                <h4>No new public data</h4>
+            {/gitBackup.nothingToPush}
+            {?privateGitBackup.nothingToPush}
+                <h4>No new public data</h4>
+            {/privateGitBackup.nothingToPush}
         {/action}
     </form>
 {/body}

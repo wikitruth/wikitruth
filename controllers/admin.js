@@ -43,9 +43,17 @@ function makeDir(path, next) {
 
 function performGitBackup(backupDir, pathspec, gitConfig) {
     var pathToRepo = path.resolve(backupDir);
-    var repo;
-    var index;
-    var oid;
+    var repo, index, oid;
+    var result = {
+        nothingToPush: false
+    };
+
+    if(!gitConfig.branch) {
+        gitConfig.branch = 'master';
+    }
+    if(!gitConfig.remote) {
+        gitConfig.remote = 'origin';
+    }
 
     Git.Repository.open(pathToRepo)
         .then(function (repoResult) {
@@ -59,9 +67,37 @@ function performGitBackup(backupDir, pathspec, gitConfig) {
             index = indexResult;
         })
         .then(function() {
-            // this file is in the root of the directory and doesn't need a full path
-            //return index.addByPath(fileName);
-            return index.addAll(pathspec);
+            return Git.Diff.indexToWorkdir(repo, null, { flags: Git.Diff.OPTION.SHOW_UNTRACKED_CONTENT | Git.Diff.OPTION.RECURSE_UNTRACKED_DIRS, pathspec: pathspec })
+                .then(function (diff) {
+                    return diff.patches()
+                        .then((patches) => {
+                            //console.log('diff.patches(): ' + patches.length);
+                            if(patches.length > 0) {
+                                // this file is in the root of the directory and doesn't need a full path
+                                //return index.addByPath(fileName);
+                                return index.addAll(pathspec);
+                            } else {
+                                result.nothingToPush = true;
+                                // Abort the operation
+                                throw new Error("Nothing new to commit and push.");
+                            }
+
+                            /*patches.forEach((patch) => {
+                                patch.hunks().then((hunks) => {
+                                    console.log('diff.hunks(): ' + hunks.length);
+                                    hunks.forEach((hunk) => {
+                                        hunk.lines().then((lines) => {
+                                            console.log("diff", patch.oldFile().path(), patch.newFile().path());
+                                            console.log(hunk.header().trim());
+                                            lines.forEach((line) => {
+                                                console.log(String.fromCharCode(line.origin()) + line.content().trim());
+                                            });
+                                        });
+                                    });
+                                });
+                            });*/
+                        });
+                });
         })
         .then(function() {
             // this will write both files to the index
@@ -84,13 +120,13 @@ function performGitBackup(backupDir, pathspec, gitConfig) {
         })
         .then(function(commitId) {
             console.log("New Commit: ", commitId);
-            return Git.Remote.lookup(repo, 'origin');
+            return Git.Remote.lookup(repo, gitConfig.remote);
         })
         .then(function(remote) {
             // Use remote
             //var firstPass = true;
             return remote.push(
-                ["refs/heads/master:refs/heads/master"], {
+                ["refs/heads/" + gitConfig.branch + ":refs/heads/" + gitConfig.branch], {
                     callbacks: {
                         credentials: function(url, userName) {
                             /*if (firstPass) {
@@ -111,9 +147,17 @@ function performGitBackup(backupDir, pathspec, gitConfig) {
                 }
             );
         })
+        .catch(function (err) {
+            // failure is handled here
+            console.log('Promise catch: ' + err);
+            result.err = err;
+        })
         .done(function() {
             console.log('Git push done!');
         });
+
+    return result;
+
     /*.catch(function (reasonForFailure) {
      // failure is handled here
      console.error("Git error: ", reasonForFailure);
@@ -405,9 +449,9 @@ module.exports = function (router) {
                 drop: true
             });*/
         } else if(action === 'push') {
-            performGitBackup(backupDir, config.mongodb.dbname, config.mongodb.gitBackup);
+            model.gitBackup = performGitBackup(backupDir, config.mongodb.dbname, config.mongodb.gitBackup);
             if(config.mongodb.privateGitBackup) {
-                performGitBackup(privateBackupDir, privateDirName, config.mongodb.privateGitBackup);
+                model.privateGitBackup = performGitBackup(privateBackupDir, privateDirName, config.mongodb.privateGitBackup);
             }
             res.render(templates.admin.mongoBackup, model);
         }
