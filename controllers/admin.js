@@ -70,7 +70,7 @@ function performGitBackup(backupDir, pathspec, gitConfig) {
             return Git.Diff.indexToWorkdir(repo, null, { flags: Git.Diff.OPTION.SHOW_UNTRACKED_CONTENT | Git.Diff.OPTION.RECURSE_UNTRACKED_DIRS, pathspec: pathspec })
                 .then(function (diff) {
                     return diff.patches()
-                        .then((patches) => {
+                        .then(function(patches) {
                             //console.log('diff.patches(): ' + patches.length);
                             if(patches.length > 0) {
                                 // this file is in the root of the directory and doesn't need a full path
