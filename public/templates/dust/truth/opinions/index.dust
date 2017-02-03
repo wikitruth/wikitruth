@@ -6,6 +6,7 @@
 
 {<body}
     {>"dust/truth/common/entry-header" tab="opinions" /}
+    {>"dust/truth/common/screening-selector" /}
     {?opinions}
         <ul class="list-group wt-list">
             <li class="list-group-item highlight"><i class="fa fa-comments-o text-muted" aria-hidden="true"></i> Comments</li>

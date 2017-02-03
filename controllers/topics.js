@@ -34,13 +34,19 @@ function GET_index(req, res) {
         },
         topics: function(callback) {
             // display 15 if top topics, all if has topic parameter
-            flowUtils.getTopics({ parentId: req.query.topic, 'screening.status': model.screeningStatus }, 0, function (err, results) {
+            flowUtils.getTopics({ parentId: req.query.topic, 'screening.status': model.screening.status }, 0, function (err, results) {
                 model.topics = results;
                 callback();
             });
         }
     }, function (err, results) {
-        model.entry = model.topic;
+        model.childrenCount = model.topic.childrenCount.topics;
+        if(model.childrenCount.pending === 0 && model.childrenCount.rejected === 0) {
+            model.screening.hidden = true;
+        }
+        //console.log('model.childrenCount: ' + JSON.stringify(model.childrenCount));
+        //console.log('model.screening.hidden: ' + model.screening.hidden);
+        flowUtils.setModelOwnerEntry(model);
         flowUtils.setModelContext(req, model);
         res.render(templates.truth.topics.index, model);
     });
@@ -91,7 +97,7 @@ function GET_entry(req, res) {
             categories: function(callback) {
                 if(model.mainTopic) {
                 db.Topic
-                    .find({parentId: model.topic._id })
+                    .find({parentId: model.topic._id, 'screening.status': constants.SCREENING_STATUS.status1.code })
                     .sort({title: 1})
                     .lean()
                     .exec(function (err, results) {
@@ -122,7 +128,7 @@ function GET_entry(req, res) {
             },
             topics: function(callback) {
                 // Top Subtopics
-                var query = { parentId: req.query.topic };
+                var query = { parentId: req.query.topic, 'screening.status': constants.SCREENING_STATUS.status1.code };
                 flowUtils.getTopics(query, 15, function (err, results) {
                     model.topics = results;
                     callback();
@@ -130,7 +136,7 @@ function GET_entry(req, res) {
             },
             links: function (callback) {
                 // Top Linked Topics
-                var query = { topicId: req.query.topic };
+                var query = { topicId: req.query.topic, 'screening.status': constants.SCREENING_STATUS.status1.code };
                 /*db.TopicLink.find(query, function(err, results) {
                  callback(null, results);
                  });*/
@@ -177,7 +183,8 @@ function GET_entry(req, res) {
                 var query = {
                     parentId: null,
                     ownerId: req.query.topic,
-                    ownerType: constants.OBJECT_TYPES.topic
+                    ownerType: constants.OBJECT_TYPES.topic,
+                    'screening.status': constants.SCREENING_STATUS.status1.code
                 };
                 flowUtils.getArguments(query, 0, function (err, results) {
                     results.forEach(function (result) {
@@ -189,7 +196,7 @@ function GET_entry(req, res) {
             },
             questions: function (callback) {
                 // Top Questions
-                var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic };
+                var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, 'screening.status': constants.SCREENING_STATUS.status1.code };
                 db.Question.find(query).limit(15).exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
@@ -202,7 +209,7 @@ function GET_entry(req, res) {
             },
             issues: function (callback) {
                 // Top Issues
-                var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic };
+                var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, 'screening.status': constants.SCREENING_STATUS.status1.code };
                 db.Issue
                     .find(query)
                     .limit(15)
@@ -220,7 +227,7 @@ function GET_entry(req, res) {
             },
             opinions: function (callback) {
                 // Top Opinions
-                var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic };
+                var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, 'screening.status': constants.SCREENING_STATUS.status1.code };
                 db.Opinion
                     .find(query)
                     .limit(15)
@@ -237,8 +244,6 @@ function GET_entry(req, res) {
                     });
             }
         }, function (err, results) {
-            model.entry = model.topic;
-            model.entryType = constants.OBJECT_TYPES.topic;
             if(model.isTopicOwner) {
                 model.isEntryOwner = true;
             }
@@ -249,9 +254,9 @@ function GET_entry(req, res) {
             model.verdict = {
                 counts: flowUtils.getVerdictCount(results.arguments)
             };
-
+            flowUtils.setModelOwnerEntry(model);
             flowUtils.setModelContext(req, model);
-            flowUtils.prepareClipboardOptions(req, model, constants.OBJECT_TYPES.topic);
+            flowUtils.setClipboardModel(req, model, constants.OBJECT_TYPES.topic);
             res.render(templates.truth.topics.entry, model);
         });
     });

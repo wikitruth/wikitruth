@@ -18,9 +18,8 @@ function GET_entry(req, res) {
         }
     }
     flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
-        model.entry = model.issue;
         model.issueType = constants.ISSUE_TYPES['type' + model.issue.issueType].text;
-        model.entryType = constants.OBJECT_TYPES.issue;
+        flowUtils.setModelOwnerEntry(model);
         flowUtils.setModelContext(req, model);
         res.render(templates.truth.issues.entry, model);
     });
@@ -31,7 +30,13 @@ function GET_index(req, res) {
     var query = flowUtils.createOwnerQueryFromQuery(req);
     if(query.ownerId) {
         flowUtils.setEntryModels(query, req, model, function (err) {
-            db.Issue.find(flowUtils.createOwnerQueryFromModel(model)).sort({title: 1}).exec(function (err, results) {
+            query = flowUtils.createOwnerQueryFromModel(model);
+            query['screening.status'] = constants.SCREENING_STATUS.status1.code;
+            db.Issue
+                .find(query)
+                .sort({title: 1})
+                .lean()
+                .exec(function (err, results) {
                 flowUtils.setEditorsUsername(results, function() {
                     results.forEach(function (result) {
                         flowUtils.appendEntryExtra(result);
@@ -45,7 +50,11 @@ function GET_index(req, res) {
         });
     } else {
         // Top Issues
-        db.Issue.find({ ownerType: constants.OBJECT_TYPES.topic }).limit(100).exec(function(err, results) {
+        db.Issue
+            .find({ ownerType: constants.OBJECT_TYPES.topic, 'screening.status': constants.SCREENING_STATUS.status1.code })
+            .limit(100)
+            .lean()
+            .exec(function(err, results) {
             flowUtils.setEditorsUsername(results, function() {
                 results.forEach(function (result) {
                     result.topic = {

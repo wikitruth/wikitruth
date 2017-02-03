@@ -20,11 +20,12 @@ function GET_entry(req, res) {
     }
     var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
     flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
+        ownerQuery['screening.status'] = constants.SCREENING_STATUS.status1.code;
         async.parallel({
             answers: function (callback) {
                 // Top Issues
                 db.Answer
-                    .find({ questionId: model.question._id })
+                    .find({ questionId: model.question._id, 'screening.status': constants.SCREENING_STATUS.status1.code })
                     .limit(15)
                     .lean()
                     .sort({ title: 1 })
@@ -73,8 +74,7 @@ function GET_entry(req, res) {
                 });
             }
         }, function (err, results) {
-            model.entry = model.question;
-            model.entryType = constants.OBJECT_TYPES.question;
+            flowUtils.setModelOwnerEntry(model);
             flowUtils.setModelContext(req, model);
             res.render(templates.truth.questions.entry, model);
         });
@@ -84,12 +84,14 @@ function GET_entry(req, res) {
 function GET_index(req, res) {
     var model = {};
     if(req.query.topic) {
+        flowUtils.setScreeningModel(req, model);
         flowUtils.setTopicModels(req, model, function () {
             flowUtils.setArgumentModels(req, model, function () {
                 var query = req.query.argument ?
-                { ownerId: model.argument._id, ownerType: constants.OBJECT_TYPES.argument } :
-                { ownerId: model.topic._id, ownerType: constants.OBJECT_TYPES.topic };
-                db.Question.find(query).sort({ title: 1 }).exec(function(err, results) {
+                    { ownerId: model.argument._id, ownerType: constants.OBJECT_TYPES.argument } :
+                    { ownerId: model.topic._id, ownerType: constants.OBJECT_TYPES.topic };
+                query['screening.status'] = constants.SCREENING_STATUS.status1.code;
+                db.Question.find(query).sort({ title: 1 }).lean().exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
                             flowUtils.appendEntryExtra(result);
@@ -97,6 +99,10 @@ function GET_index(req, res) {
                         model.questions = results;
                         flowUtils.setModelOwnerEntry(model);
                         flowUtils.setModelContext(req, model);
+                        model.childrenCount = model.entry.childrenCount.questions;
+                        if(model.childrenCount.pending === 0 && model.childrenCount.rejected === 0) {
+                            model.screening.hidden = true;
+                        }
                         res.render(templates.truth.questions.index, model);
                     });
                 });
@@ -104,7 +110,7 @@ function GET_index(req, res) {
         });
     } else {
         // Top Questions
-        var query = { ownerType: constants.OBJECT_TYPES.topic, private: false };
+        var query = { ownerType: constants.OBJECT_TYPES.topic, private: false, 'screening.status': constants.SCREENING_STATUS.status1.code };
         //db.Question.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
         db.Question
             .find(query)
@@ -167,11 +173,6 @@ function POST_create(req, res) {
                 flowUtils.setModelContext(req, model);
                 var url = model.wikiBaseUrl + paths.truth.questions.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
                 res.redirect(url);
-                /*res.redirect((result ? paths.truth.questions.entry : paths.truth.questions.index) +
-                 '?topic=' + req.query.topic +
-                 (req.query.argument ? '&argument=' + req.query.argument : '') +
-                 (result ? '&question=' + req.query.question : '')
-                 );*/
             };
             if(!result) { // if new entry, update parent children count
                 flowUtils.updateChildrenCount(entity.ownerId, entity.ownerType, constants.OBJECT_TYPES.question, function () {

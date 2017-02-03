@@ -1,7 +1,7 @@
 {?opinions}
     <div class="wt-list">
         <ul class="list-group top-list-items">
-            <li class="list-group-item highlight"><span class="fa fa-comments-o text-muted" aria-hidden="true"></span> Comments <span class="wt-label label label-default">{entry.childrenCount.opinions}</span></li>
+            <li class="list-group-item highlight"><span class="fa fa-comments-o text-muted" aria-hidden="true"></span> Comments <span class="wt-label label label-default">{entry.childrenCount.opinions.accepted}</span></li>
             {#opinions}
                 <li class="list-group-item">
                     <span class="fa fa-comments-o text-primary" aria-hidden="true"></span>
@@ -12,8 +12,8 @@
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
             {/opinions}
         </ul>
-        {@gt key=entry.childrenCount.opinions value="15"}
-            <div class="top-list-items-more"><a href="{wikiBaseUrl}{paths.truth.opinions.index}?topic={topic._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{entry.childrenCount.opinions}</span></a></div>
+        {@gt key=entry.childrenCount.opinions.accepted value="15"}
+            <div class="top-list-items-more"><a href="{wikiBaseUrl}{paths.truth.opinions.index}?topic={topic._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{entry.childrenCount.opinions.accepted}</span></a></div>
         {/gt}
     </div>
 {/opinions}

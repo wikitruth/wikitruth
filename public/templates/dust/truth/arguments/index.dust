@@ -10,6 +10,7 @@
     {:else}
         {>"dust/truth/common/index-header" tab="top-arguments" /}
     {/topic}
+    {>"dust/truth/common/screening-selector" /}
     {?proArguments}
         <ul class="list-group wt-list">
             <li class="list-group-item highlight text-primary-x"><i class="glyphicon glyphicon-flash" aria-hidden="true"></i> {^topic}Latest Arguments{:else}{?argument}Supporting Arguments{:else}Arguments{/argument}{/topic}</li>

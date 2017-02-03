@@ -39,10 +39,26 @@ exports = module.exports = function(app, mongoose) {
       editUserId: { type: mongoose.Schema.ObjectId, ref: 'User'}
     },
     childrenCount: {
-      arguments: { type: Number },
-      questions: { type: Number },
-      issues: { type: Number },
-      opinions: { type: Number }
+      arguments: {
+        accepted: { type: Number, default: 0 },
+        pending: { type: Number, default: 0 },
+        rejected: { type: Number, default: 0 }
+      },
+      questions: {
+        accepted: { type: Number, default: 0 },
+        pending: { type: Number, default: 0 },
+        rejected: { type: Number, default: 0 }
+      },
+      issues: {
+        accepted: { type: Number, default: 0 },
+        pending: { type: Number, default: 0 },
+        rejected: { type: Number, default: 0 }
+      },
+      opinions: {
+        accepted: { type: Number, default: 0 },
+        pending: { type: Number, default: 0 },
+        rejected: { type: Number, default: 0 }
+      }
     }
   });
   schema.plugin(require('../plugins/pagedFind'));

@@ -20,10 +20,11 @@ function GET_entry(req, res) {
     }
     var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
     flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
+        ownerQuery['screening.status'] = constants.SCREENING_STATUS.status1.code;
         async.parallel({
             issues: function (callback) {
                 // Top Issues
-                db.Issue.find(ownerQuery).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                db.Issue.find(ownerQuery).limit(15).sort({ title: 1 }).lean().exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
                             flowUtils.appendEntryExtra(result);
@@ -35,7 +36,7 @@ function GET_entry(req, res) {
             },
             opinions: function (callback) {
                 // Top Opinions
-                db.Opinion.find(ownerQuery).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                db.Opinion.find(ownerQuery).limit(15).sort({ title: 1 }).lean().exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
                             flowUtils.appendEntryExtra(result);
@@ -46,8 +47,7 @@ function GET_entry(req, res) {
                 });
             }
         }, function (err, results) {
-            model.entry = model.answer;
-            model.entryType = constants.OBJECT_TYPES.answer;
+            flowUtils.setModelOwnerEntry(model);
             flowUtils.setModelContext(req, model);
             res.render(templates.truth.answers.entry, model);
         });
@@ -58,26 +58,27 @@ function GET_index(req, res) {
     var model = {};
     var query = flowUtils.createOwnerQueryFromQuery(req);
     if(query.ownerId) {
-            flowUtils.setEntryModels(query, req, model, function (err) {
-                db.Answer
-                    .find({ questionId: model.question._id })
-                    .sort({title: 1})
-                    .lean()
-                    .exec(function (err, results) {
-                        flowUtils.setEditorsUsername(results, function() {
-                            results.forEach(function (result) {
-                                flowUtils.appendEntryExtra(result);
-                            });
-                            model.answers = results;
-                            flowUtils.setModelOwnerEntry(model);
-                            flowUtils.setModelContext(req, model);
-                            res.render(templates.truth.answers.index, model);
+        query['screening.status'] = constants.SCREENING_STATUS.status1.code;
+        flowUtils.setEntryModels(query, req, model, function (err) {
+            db.Answer
+                .find({questionId: model.question._id})
+                .sort({title: 1})
+                .lean()
+                .exec(function (err, results) {
+                    flowUtils.setEditorsUsername(results, function () {
+                        results.forEach(function (result) {
+                            flowUtils.appendEntryExtra(result);
                         });
+                        model.answers = results;
+                        flowUtils.setModelOwnerEntry(model);
+                        flowUtils.setModelContext(req, model);
+                        res.render(templates.truth.answers.index, model);
+                    });
                 });
-            });
+        });
     } else {
         // Top Answers
-        query = { ownerType: constants.OBJECT_TYPES.topic, private: false };
+        query = { ownerType: constants.OBJECT_TYPES.topic, private: false, 'screening.status': constants.SCREENING_STATUS.status1.code };
         //db.Answer.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
         db.Answer
             .find(query)
@@ -85,7 +86,7 @@ function GET_index(req, res) {
             .limit(25)
             .lean()
             .exec(function (err, results) {
-                flowUtils.setEditorsUsername(results, function() {
+                flowUtils.setEditorsUsername(results, function () {
                     results.forEach(function (result) {
                         result.topic = {
                             _id: result.ownerId

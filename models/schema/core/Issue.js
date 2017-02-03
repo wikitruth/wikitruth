@@ -18,6 +18,13 @@ exports = module.exports = function(app, mongoose) {
         status: { type: Number } // SCREENING_STATUS
       }]
     },
+    childrenCount: {
+      opinions: {
+        accepted: { type: Number, default: 0 },
+        pending: { type: Number, default: 0 },
+        rejected: { type: Number, default: 0 }
+      }
+    },
     createDate: { type: Date, default: Date.now },
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     editDate: { type: Date, default: Date.now },

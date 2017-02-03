@@ -150,7 +150,7 @@ var SCREENING_STATUS = {
     },
     status1: {
         code: 1,
-        text: "Approved"
+        text: "Accepted"
     },
     status2: {
         code: 2,
