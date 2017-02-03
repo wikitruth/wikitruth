@@ -24,9 +24,21 @@ exports = module.exports = function(app, mongoose) {
     editUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     private: { type: Boolean, default: false }, // if true, should be restricted to group/user owners and not included in public backup
     childrenCount: {
-      answers: { type: Number },
-      issues: { type: Number },
-      opinions: { type: Number }
+      answers: {
+        accepted: { type: Number, default: 0 },
+        pending: { type: Number, default: 0 },
+        rejected: { type: Number, default: 0 }
+      },
+      issues: {
+        accepted: { type: Number, default: 0 },
+        pending: { type: Number, default: 0 },
+        rejected: { type: Number, default: 0 }
+      },
+      opinions: {
+        accepted: { type: Number, default: 0 },
+        pending: { type: Number, default: 0 },
+        rejected: { type: Number, default: 0 }
+      }
     }
   });
   schema.plugin(require('../plugins/pagedFind'));

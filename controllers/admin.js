@@ -41,13 +41,12 @@ function makeDir(path, next) {
     });
 }
 
-function performGitBackup(backupDir, pathspec, gitConfig) {
+function performGitBackup(backupDir, pathspec, gitConfig, callback) {
     var pathToRepo = path.resolve(backupDir);
     var repo, index, oid;
     var result = {
         nothingToPush: false
     };
-
     if(!gitConfig.branch) {
         gitConfig.branch = 'master';
     }
@@ -130,17 +129,16 @@ function performGitBackup(backupDir, pathspec, gitConfig) {
                     callbacks: {
                         credentials: function(url, userName) {
                             /*if (firstPass) {
-                             firstPass = false;
-                             if (url.indexOf("https") === -1) {
-                             return Git.Cred.sshKeyFromAgent('XYZ');
-                             } else {
-                             return Git.Cred.userpassPlaintextNew('XYZ', "XYZ");
-                             }
-                             } else {
-                             return Git.Cred.defaultNew();
-                             }
-                             return Git.Cred.sshKeyFromAgent(userName);
-                             */
+                                firstPass = false;
+                                if (url.indexOf("https") === -1) {
+                                    return Git.Cred.sshKeyFromAgent('XYZ');
+                                } else {
+                                    return Git.Cred.userpassPlaintextNew('XYZ', "XYZ");
+                                }
+                            } else {
+                                return Git.Cred.defaultNew();
+                            }
+                            return Git.Cred.sshKeyFromAgent(userName);*/
                             console.log('Git is asking for username/password:', url, userName);
                         }
                     }
@@ -154,14 +152,8 @@ function performGitBackup(backupDir, pathspec, gitConfig) {
         })
         .done(function() {
             console.log('Git push done!');
+            callback(null, result);
         });
-
-    return result;
-
-    /*.catch(function (reasonForFailure) {
-     // failure is handled here
-     console.error("Git error: ", reasonForFailure);
-     });*/
 }
 
 module.exports = function (router) {
@@ -247,13 +239,12 @@ module.exports = function (router) {
             // this will set the default values in every doc
             async.parallel({
                 topics: function (callback) {
-                    db.Topic.find({}).exec(function(err, results) {
+                    db.Topic.find({}).exec((err, results) => {
                         async.eachSeries(results, function (result, callback) {
                             result.screening.status = constants.SCREENING_STATUS.status1.code;
                             db.Topic.update({ _id: result._id }, result, {}, function () {
-                                callback();
+                                flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.topic, null, callback);
                             });
-                            //flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.topic, null, callback);
                         }, function (err) {
                             callback();
                         });
@@ -263,9 +254,7 @@ module.exports = function (router) {
                     db.TopicLink.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
                             result.screening.status = constants.SCREENING_STATUS.status1.code;
-                            db.TopicLink.update({ _id: result._id }, result, {}, function () {
-                                callback();
-                            });
+                            db.TopicLink.update({ _id: result._id }, result, {}, callback);
                         }, function (err) {
                             callback();
                         });
@@ -276,9 +265,8 @@ module.exports = function (router) {
                         async.eachSeries(results, function (result, callback) {
                             result.screening.status = constants.SCREENING_STATUS.status1.code;
                             db.Argument.update({ _id: result._id }, result, {}, function () {
-                                callback();
+                                flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.argument, null, callback);
                             });
-                            //flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.argument, null, callback);
                         }, function (err) {
                             callback();
                         });
@@ -288,9 +276,7 @@ module.exports = function (router) {
                     db.ArgumentLink.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
                             result.screening.status = constants.SCREENING_STATUS.status1.code;
-                            db.ArgumentLink.update({ _id: result._id }, result, {}, function () {
-                                callback();
-                            });
+                            db.ArgumentLink.update({ _id: result._id }, result, {}, callback);
                         }, function (err) {
                             callback();
                         });
@@ -301,9 +287,8 @@ module.exports = function (router) {
                         async.eachSeries(results, function (result, callback) {
                             result.screening.status = constants.SCREENING_STATUS.status1.code;
                             db.Question.update({ _id: result._id }, result, {}, function () {
-                                callback();
+                                flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.question, null, callback);
                             });
-                            //flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.question, null, callback);
                         }, function (err) {
                             callback();
                         });
@@ -314,7 +299,7 @@ module.exports = function (router) {
                         async.eachSeries(results, function (result, callback) {
                             result.screening.status = constants.SCREENING_STATUS.status1.code;
                             db.Answer.update({ _id: result._id }, result, {}, function () {
-                                callback();
+                                flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.answer, null, callback);
                             });
                         }, function (err) {
                             callback();
@@ -326,7 +311,7 @@ module.exports = function (router) {
                         async.eachSeries(results, function (result, callback) {
                             result.screening.status = constants.SCREENING_STATUS.status1.code;
                             db.Issue.update({ _id: result._id }, result, {}, function () {
-                                callback();
+                                flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.issue, null, callback);
                             });
                         }, function (err) {
                             callback();
@@ -338,7 +323,7 @@ module.exports = function (router) {
                         async.eachSeries(results, function (result, callback) {
                             result.screening.status = constants.SCREENING_STATUS.status1.code;
                             db.Opinion.update({ _id: result._id }, result, {}, function () {
-                                callback();
+                                flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.opinion, null, callback);
                             });
                         }, function (err) {
                             callback();
@@ -348,9 +333,7 @@ module.exports = function (router) {
                 users: function (callback) {
                     db.User.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
-                            db.User.update({ _id: result._id }, result, {}, function () {
-                                callback();
-                            });
+                            db.User.update({ _id: result._id }, result, {}, callback);
                         }, function (err) {
                             callback();
                         });
@@ -449,11 +432,21 @@ module.exports = function (router) {
                 drop: true
             });*/
         } else if(action === 'push') {
-            model.gitBackup = performGitBackup(backupDir, config.mongodb.dbname, config.mongodb.gitBackup);
-            if(config.mongodb.privateGitBackup) {
-                model.privateGitBackup = performGitBackup(privateBackupDir, privateDirName, config.mongodb.privateGitBackup);
-            }
-            res.render(templates.admin.mongoBackup, model);
+            // FIXME: results are not returned on time
+            var render = function () {
+                res.render(templates.admin.mongoBackup, model);
+            };
+            performGitBackup(backupDir, config.mongodb.dbname, config.mongodb.gitBackup, function (err, result) {
+                model.gitBackup = result;
+                if(config.mongodb.privateGitBackup) {
+                    performGitBackup(privateBackupDir, privateDirName, config.mongodb.privateGitBackup, function (err, result) {
+                        model.privateGitBackup = result;
+                        render();
+                    });
+                } else {
+                    render();
+                }
+            });
         }
     });
 };

@@ -18,8 +18,7 @@ function GET_entry(req, res) {
         }
     }
     flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
-        model.entry = model.opinion;
-        model.entryType = constants.OBJECT_TYPES.opinion;
+        flowUtils.setModelOwnerEntry(model);
         flowUtils.setModelContext(req, model);
         res.render(templates.truth.opinions.entry, model);
     });
@@ -29,22 +28,37 @@ function GET_index(req, res) {
     var model = {};
     var query = flowUtils.createOwnerQueryFromQuery(req);
     if(query.ownerId) {
+        flowUtils.setScreeningModel(req, model);
         flowUtils.setEntryModels(query, req, model, function (err) {
-            db.Opinion.find(flowUtils.createOwnerQueryFromModel(model)).sort({title: 1}).exec(function (err, results) {
+            query = flowUtils.createOwnerQueryFromModel(model);
+            query['screening.status'] = model.screening.status;
+            db.Opinion
+                .find(query)
+                .sort({title: 1})
+                .lean()
+                .exec(function (err, results) {
                 flowUtils.setEditorsUsername(results, function() {
                     results.forEach(function (result) {
                         flowUtils.appendEntryExtra(result);
                     });
-                    model.opinions = results;
                     flowUtils.setModelOwnerEntry(model);
                     flowUtils.setModelContext(req, model);
+                    model.opinions = results;
+                    model.childrenCount = model.entry.childrenCount.opinions;
+                    if(model.childrenCount.pending === 0 && model.childrenCount.rejected === 0) {
+                        model.screening.hidden = true;
+                    }
                     res.render(templates.truth.opinions.index, model);
                 });
             });
         });
     } else {
         // Top Opinions
-        db.Opinion.find({ ownerType: constants.OBJECT_TYPES.topic }).limit(100).exec(function(err, results) {
+        db.Opinion
+            .find({ ownerType: constants.OBJECT_TYPES.topic, 'screening.status': constants.SCREENING_STATUS.status1.code })
+            .limit(100)
+            .lean()
+            .exec(function(err, results) {
             flowUtils.setEditorsUsername(results, function() {
                 results.forEach(function (result) {
                     result.topic = {

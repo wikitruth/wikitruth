@@ -10,6 +10,7 @@
     {:else}
         {>"dust/truth/common/index-header" tab="top-questions" /}
     {/topic}
+    {>"dust/truth/common/screening-selector" /}
     {?questions}
         <ul class="list-group wt-list">
             <li class="list-group-item highlight"><i class="fa fa-question-circle text-muted" aria-hidden="true"></i> {^topic}Latest {/topic}Questions</li>

@@ -47,11 +47,31 @@ exports = module.exports = function(app, mongoose) {
       }
     ],
     childrenCount: {
-      topics: { type: Number },
-      arguments: { type: Number },
-      questions: { type: Number },
-      issues: { type: Number },
-      opinions: { type: Number }
+      topics: {
+        accepted: { type: Number, default: 0 },
+        pending: { type: Number, default: 0 },
+        rejected: { type: Number, default: 0 }
+      },
+      arguments: {
+        accepted: { type: Number, default: 0 },
+        pending: { type: Number, default: 0 },
+        rejected: { type: Number, default: 0 }
+      },
+      questions: {
+        accepted: { type: Number, default: 0 },
+        pending: { type: Number, default: 0 },
+        rejected: { type: Number, default: 0 }
+      },
+      issues: {
+        accepted: { type: Number, default: 0 },
+        pending: { type: Number, default: 0 },
+        rejected: { type: Number, default: 0 }
+      },
+      opinions: {
+        accepted: { type: Number, default: 0 },
+        pending: { type: Number, default: 0 },
+        rejected: { type: Number, default: 0 }
+      }
     }
   });
   schema.plugin(require('../plugins/pagedFind'));

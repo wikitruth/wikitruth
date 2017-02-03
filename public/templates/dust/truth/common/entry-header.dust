@@ -9,10 +9,10 @@
                         <a href="{wikiBaseUrl}{paths.truth.topics.entry}/{topic.friendlyUrl}/{topic._id}" role="tab">
                             <span class="glyphicon glyphicon-home text-muted-x" aria-hidden="true"></span><span class="hidden-xxs"> Overview</span></a>
                     </li>
-                    {@gt key=entry.childrenCount.topics value="0"}
+                    {@gt key=entry.childrenCount.topics.accepted value="0"}
                         <li role="presentation"{@eq key=tab value="topics"} class="active"{/eq}>
                             <a href="{wikiBaseUrl}{paths.truth.topics.index}/{topic.friendlyUrl}/{topic._id}" role="tab">
-                                <i class="fa fa-folder-open text-muted-x" aria-hidden="true"></i><span class="hidden-xs"> Topics</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.topics}</span></a>
+                                <i class="fa fa-folder-open text-muted-x" aria-hidden="true"></i><span class="hidden-xs"> Topics</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.topics.accepted}</span></a>
                         </li>
                     {/gt}
                 {:else}
@@ -22,15 +22,15 @@
                     </li>
                 {/argument}
                 <li role="presentation"{@eq key=tab value="arguments"} class="active"{/eq}>
-                    {@gt key=entry.childrenCount.arguments value="0"}
+                    {@gt key=entry.childrenCount.arguments.accepted value="0"}
                         <a href="{wikiBaseUrl}{paths.truth.arguments.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" aria-controls="home" role="tab">
-                            <span class="glyphicon glyphicon-flash text-muted-x" aria-hidden="true"></span><span class="hidden-xs"> Arguments</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.arguments}</span></a>
+                            <span class="glyphicon glyphicon-flash text-muted-x" aria-hidden="true"></span><span class="hidden-xs"> Arguments</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.arguments.accepted}</span></a>
                     {/gt}
                 </li>
                 <li role="presentation"{@eq key=tab value="questions"} class="active"{/eq}>
-                    {@gt key=entry.childrenCount.questions value="0"}
+                    {@gt key=entry.childrenCount.questions.accepted value="0"}
                         <a href="{wikiBaseUrl}{paths.truth.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
-                            <span class="glyphicon glyphicon-question-sign text-muted-x" aria-hidden="true"></span><span class="hidden-xs"> Questions</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.questions}</span></a>
+                            <span class="glyphicon glyphicon-question-sign text-muted-x" aria-hidden="true"></span><span class="hidden-xs"> Questions</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.questions.accepted}</span></a>
                     {/gt}
                 </li>
             {:else}
@@ -40,9 +40,9 @@
                             <span class="glyphicon glyphicon-home text-muted-x" aria-hidden="true"></span> Overview</a>
                     </li>
                     <li role="presentation"{@eq key=tab value="answers"} class="active"{/eq}>
-                        {@gt key=entry.childrenCount.answers value="0"}
+                        {@gt key=entry.childrenCount.answers.accepted value="0"}
                             <a href="{wikiBaseUrl}{paths.truth.answers.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}" role="tab">
-                                <span class="glyphicon glyphicon-question-sign text-muted-x" aria-hidden="true"></span><span class="hidden-xs"> Answers</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.answers}</span></a>
+                                <span class="glyphicon glyphicon-question-sign text-muted-x" aria-hidden="true"></span><span class="hidden-xs"> Answers</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.answers.accepted}</span></a>
                         {/gt}
                     </li>
                 {:else}
@@ -53,15 +53,15 @@
                 {/answer}
             {/question}
             <li role="presentation"{@eq key=tab value="issues"} class="active"{/eq}>
-                {@gt key=entry.childrenCount.issues value="0"}
+                {@gt key=entry.childrenCount.issues.accepted value="0"}
                     <a href="{wikiBaseUrl}{paths.truth.issues.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
-                        <i class="fa fa-exclamation-circle text-muted-x" aria-hidden="true"></i><span class="hidden-xs"> Issues</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.issues}</span></a>
+                        <i class="fa fa-exclamation-circle text-muted-x" aria-hidden="true"></i><span class="hidden-xs"> Issues</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.issues.accepted}</span></a>
                 {/gt}
             </li>
             <li role="presentation"{@eq key=tab value="opinions"} class="active"{/eq}>
-                {@gt key=entry.childrenCount.opinions value="0"}
+                {@gt key=entry.childrenCount.opinions.accepted value="0"}
                     <a href="{wikiBaseUrl}{paths.truth.opinions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
-                        <i class="fa fa-comments-o text-muted-x" aria-hidden="true"></i><span class="hidden-xs"> Comments</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.opinions}</span></a>
+                        <i class="fa fa-comments-o text-muted-x" aria-hidden="true"></i><span class="hidden-xs"> Comments</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.opinions.accepted}</span></a>
                 {/gt}
             </li>
         {:else}

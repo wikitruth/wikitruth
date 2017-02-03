@@ -37,7 +37,8 @@ function GET_entry(req, res) {
             arguments: function(callback) {
                 // Top Arguments
                 var query = {
-                    parentId: req.query.argument
+                    parentId: req.query.argument,
+                    'screening.status': constants.SCREENING_STATUS.status1.code
                 };
                 flowUtils.getArguments(query, 0, function (err, results) {
                     results.forEach(function (result) {
@@ -49,7 +50,7 @@ function GET_entry(req, res) {
             },
             links: function (callback) {
                 // Top Questions
-                var query = { argumentId: req.query.argument };
+                var query = { argumentId: req.query.argument, 'screening.status': constants.SCREENING_STATUS.status1.code };
                 db.ArgumentLink.find(query, function(err, links) {
                     if(links.length > 0) {
                         model.linkCount = links.length + 1;
@@ -85,8 +86,8 @@ function GET_entry(req, res) {
             },
             questions: function (callback) {
                 // Top Questions
-                var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument };
-                db.Question.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument, 'screening.status': constants.SCREENING_STATUS.status1.code };
+                db.Question.find(query).limit(15).sort({ title: 1 }).lean().exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
                             flowUtils.appendEntryExtra(result);
@@ -101,8 +102,8 @@ function GET_entry(req, res) {
             },
             issues: function (callback) {
                 // Top Issues
-                var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument };
-                db.Issue.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument, 'screening.status': constants.SCREENING_STATUS.status1.code };
+                db.Issue.find(query).limit(15).sort({ title: 1 }).lean().exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
                             flowUtils.appendEntryExtra(result);
@@ -117,8 +118,8 @@ function GET_entry(req, res) {
             },
             opinions: function (callback) {
                 // Top Opinions
-                var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument };
-                db.Opinion.find(query).limit(15).sort({ title: 1 }).exec(function(err, results) {
+                var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument, 'screening.status': constants.SCREENING_STATUS.status1.code };
+                db.Opinion.find(query).limit(15).sort({ title: 1 }).lean().exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
                             flowUtils.appendEntryExtra(result);
@@ -164,11 +165,9 @@ function GET_entry(req, res) {
                 });
                 model.tagLabels = tagLabels;
             }
-
-            model.entry = model.argument;
-            model.entryType = constants.OBJECT_TYPES.argument;
+            flowUtils.setModelOwnerEntry(model);
             flowUtils.setModelContext(req, model);
-            flowUtils.prepareClipboardOptions(req, model, constants.OBJECT_TYPES.argument);
+            flowUtils.setClipboardModel(req, model, constants.OBJECT_TYPES.argument);
             res.render(templates.truth.arguments.entry, model);
         });
     });
@@ -178,8 +177,9 @@ function GET_index(req, res) {
     var model = {};
     if(req.query.topic) {
         flowUtils.setTopicModels(req, model, function () {
+            flowUtils.setScreeningModel(req, model);
             flowUtils.setArgumentModels(req, model, function () {
-                var query = {};
+                var query = { 'screening.status': constants.SCREENING_STATUS.status1.code };
                 if(req.query.argument) {
                     query.parentId = model.argument._id;
                 } else {
@@ -189,6 +189,10 @@ function GET_index(req, res) {
                 }
                 flowUtils.getArguments(query, 0, function (err, results) {
                     flowUtils.setModelOwnerEntry(model);
+                    model.childrenCount = model.entry.childrenCount['arguments'];
+                    if(model.childrenCount.pending === 0 && model.childrenCount.rejected === 0) {
+                        model.screening.hidden = true;
+                    }
                     var support = results.filter(function (arg) {
                         return !arg.against;
                     });
@@ -213,7 +217,11 @@ function GET_index(req, res) {
         });
     } else {
         // Top Arguments
-        var query = { ownerType: constants.OBJECT_TYPES.topic, private: false };
+        var query = {
+            ownerType: constants.OBJECT_TYPES.topic,
+            private: false,
+            'screening.status': constants.SCREENING_STATUS.status1.code
+        };
         //db.Argument.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
         db.Argument
             .find(query)

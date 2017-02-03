@@ -6,13 +6,7 @@
 
 {<body}
     {>"dust/truth/common/entry-header" tab="topics" /}
-    <ul class="wt-nav-pills nav nav-pills">
-        {!<li role="presentation" class="active"><a href="#">All <span class="badge">{entry.childrenCount.topics}</span></a></li>!}
-        <li role="presentation"{?screeningApproved} class="active"{/screeningApproved}><a href="?screening=approved">Accepted <span class="badge">{entry.childrenCount.topics}</span></a></li>
-        <li role="presentation"{?screeningPending} class="active"{/screeningPending}><a href="?screening=pending">Pending <span class="badge">345</span></a></li>
-        <li role="presentation"{?screeningRejected} class="active"{/screeningRejected}><a href="?screening=rejected">Rejected <span class="badge">67</span></a></li>
-    </ul>
-    <br/>
+    {>"dust/truth/common/screening-selector" /}
     {?topics}
         <ul class="list-group wt-list">
             <li class="list-group-item highlight"><i class="fa fa-folder-open text-success-x" aria-hidden="true"></i>&nbsp;&nbsp;Topics</li>
