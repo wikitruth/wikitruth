@@ -2,7 +2,7 @@
 <script type="text/javascript">
     $(function() {
         $(".wt-profile-background").each(function() {
-            var title = $( this ).data("username");
+            var title = $( this ).attr("title");
             var pattern = GeoPattern.generate(title);
             $(this).css("background-image", pattern.toDataUrl());
         });

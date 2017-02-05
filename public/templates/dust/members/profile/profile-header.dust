@@ -3,7 +3,7 @@
     <li><i class="fa fa-user-circle text-muted"></i> <a href="{paths.members.index}">Members</a></li>
     <li><i class="fa fa-user-circle text-muted"></i> <a href="{paths.members.index}/{member.username}">{member.username}</a></li>
 </ol>!}
-<h1 class="page-header wt-header wt-profile-background" data-username="{member.username}" style="padding-bottom: 50px;
+<h1 class="page-header wt-header wt-profile-background" title="{member.username}" style="padding-bottom: 50px;
     padding-top: 50px;text-align: center;
     background-image: linear-gradient(-110deg, #48227d 0%, #2f569c 100%);
     color: #fff;font-weight: normal;
