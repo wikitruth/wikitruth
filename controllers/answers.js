@@ -58,11 +58,11 @@ function GET_index(req, res) {
     var model = {};
     var query = flowUtils.createOwnerQueryFromQuery(req);
     if(query.ownerId) {
-        query['screening.status'] = constants.SCREENING_STATUS.status1.code;
+        flowUtils.setScreeningModel(req, model);
         flowUtils.setEntryModels(query, req, model, function (err) {
             db.Answer
-                .find({questionId: model.question._id})
-                .sort({title: 1})
+                .find({ questionId: model.question._id, 'screening.status': model.screening.status })
+                .sort({ title: 1 })
                 .lean()
                 .exec(function (err, results) {
                     flowUtils.setEditorsUsername(results, function () {
@@ -72,6 +72,12 @@ function GET_index(req, res) {
                         model.answers = results;
                         flowUtils.setModelOwnerEntry(model);
                         flowUtils.setModelContext(req, model);
+
+                        // screening and children count
+                        model.childrenCount = model.entry.childrenCount.answers;
+                        if(model.childrenCount.pending === 0 && model.childrenCount.rejected === 0) {
+                            model.screening.hidden = true;
+                        }
                         res.render(templates.truth.answers.index, model);
                     });
                 });

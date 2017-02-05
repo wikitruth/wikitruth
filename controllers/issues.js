@@ -29,9 +29,10 @@ function GET_index(req, res) {
     var model = {};
     var query = flowUtils.createOwnerQueryFromQuery(req);
     if(query.ownerId) {
+        flowUtils.setScreeningModel(req, model);
         flowUtils.setEntryModels(query, req, model, function (err) {
             query = flowUtils.createOwnerQueryFromModel(model);
-            query['screening.status'] = constants.SCREENING_STATUS.status1.code;
+            query['screening.status'] = model.screening.status;
             db.Issue
                 .find(query)
                 .sort({title: 1})
@@ -44,6 +45,12 @@ function GET_index(req, res) {
                     model.issues = results;
                     flowUtils.setModelOwnerEntry(model);
                     flowUtils.setModelContext(req, model);
+
+                    // screening and children count
+                    model.childrenCount = model.entry.childrenCount.issues;
+                    if(model.childrenCount.pending === 0 && model.childrenCount.rejected === 0) {
+                        model.screening.hidden = true;
+                    }
                     res.render(templates.truth.issues.index, model);
                 });
             });

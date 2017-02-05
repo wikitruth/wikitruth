@@ -4,6 +4,8 @@ var db          = require('../app').db.models,
     utils       = require('./utils'),
     constants   = require('../models/constants'),
     config      = require('../config/config'),
+    url         = require('url'),
+    querystring = require('querystring'),
     async       = require('async');
 
 function getBackupDir(isPrivate) {
@@ -470,11 +472,12 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
 
     var updateTopics = function (callback) {
         if(!specificEntryType || specificEntryType === constants.OBJECT_TYPES.topic) {
+            var topics = countNode.childrenCount.topics;
             async.parallel({
                 accepted: function(callback) {
                     db.Topic.count({parentId: entryId, 'screening.status': constants.SCREENING_STATUS.status1.code }, function (err, count) {
                         db.TopicLink.count({parentId: entryId, 'screening.status': constants.SCREENING_STATUS.status1.code }, function (err, linkCount) {
-                            countNode.childrenCount.topics.accepted = count + linkCount;
+                            topics.accepted = count + linkCount;
                             callback();
                         });
                     });
@@ -482,7 +485,7 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
                 pending: function(callback) {
                     db.Topic.count({parentId: entryId, 'screening.status': constants.SCREENING_STATUS.status0.code }, function (err, count) {
                         db.TopicLink.count({parentId: entryId, 'screening.status': constants.SCREENING_STATUS.status0.code }, function (err, linkCount) {
-                            countNode.childrenCount.topics.pending = count + linkCount;
+                            topics.pending = count + linkCount;
                             callback();
                         });
                     });
@@ -490,12 +493,13 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
                 rejected: function(callback) {
                     db.Topic.count({parentId: entryId, 'screening.status': constants.SCREENING_STATUS.status2.code }, function (err, count) {
                         db.TopicLink.count({parentId: entryId, 'screening.status': constants.SCREENING_STATUS.status2.code }, function (err, linkCount) {
-                            countNode.childrenCount.topics.rejected = count + linkCount;
+                            topics.rejected = count + linkCount;
                             callback();
                         });
                     });
                 }
             }, function (err, results) {
+                topics.total = topics.accepted + topics.pending + topics.rejected;
                 callback();
             });
         } else {
@@ -504,11 +508,12 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
     };
     var updateArguments = function (callback) {
         if(!specificEntryType || specificEntryType === constants.OBJECT_TYPES.argument) {
+            var args = countNode.childrenCount['arguments'];
             async.parallel({
                 accepted: function(callback) {
                     db.Argument.count({ ownerId: entryId, parentId: null, 'screening.status': constants.SCREENING_STATUS.status1.code }, function (err, count) {
                         db.ArgumentLink.count({ ownerId: entryId, parentId: null, 'screening.status': constants.SCREENING_STATUS.status1.code }, function (err, linkCount) {
-                            countNode.childrenCount['arguments'].accepted = count + linkCount;
+                            args.accepted = count + linkCount;
                             callback();
                         });
                     });
@@ -516,7 +521,7 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
                 pending: function(callback) {
                     db.Argument.count({ ownerId: entryId, parentId: null, 'screening.status': constants.SCREENING_STATUS.status0.code }, function (err, count) {
                         db.ArgumentLink.count({ ownerId: entryId, parentId: null, 'screening.status': constants.SCREENING_STATUS.status0.code }, function (err, linkCount) {
-                            countNode.childrenCount['arguments'].pending = count + linkCount;
+                            args.pending = count + linkCount;
                             callback();
                         });
                     });
@@ -524,12 +529,13 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
                 rejected: function(callback) {
                     db.Argument.count({ ownerId: entryId, parentId: null, 'screening.status': constants.SCREENING_STATUS.status2.code }, function (err, count) {
                         db.ArgumentLink.count({ ownerId: entryId, parentId: null, 'screening.status': constants.SCREENING_STATUS.status2.code }, function (err, linkCount) {
-                            countNode.childrenCount['arguments'].rejected = count + linkCount;
+                            args.rejected = count + linkCount;
                             callback();
                         });
                     });
                 }
             }, function (err, results) {
+                args.total = args.accepted + args.pending + args.rejected;
                 callback();
             });
         } else {
@@ -538,26 +544,28 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
     };
     var updateQuestions = function (callback) {
         if(!specificEntryType || specificEntryType === constants.OBJECT_TYPES.question) {
+            var questions = countNode.childrenCount.questions;
             async.parallel({
                 accepted: function(callback) {
                     db.Question.count({ ownerId: entryId, 'screening.status': constants.SCREENING_STATUS.status1.code }, function (err, count) {
-                        countNode.childrenCount.questions.accepted = count;
+                        questions.accepted = count;
                         callback();
                     });
                 },
                 pending: function(callback) {
                     db.Question.count({ ownerId: entryId, 'screening.status': constants.SCREENING_STATUS.status0.code }, function (err, count) {
-                        countNode.childrenCount.questions.pending = count;
+                        questions.pending = count;
                         callback();
                     });
                 },
                 rejected: function(callback) {
                     db.Question.count({ ownerId: entryId, 'screening.status': constants.SCREENING_STATUS.status2.code }, function (err, count) {
-                        countNode.childrenCount.questions.rejected = count;
+                        questions.rejected = count;
                         callback();
                     });
                 }
             }, function (err, results) {
+                questions.total = questions.accepted + questions.pending + questions.rejected;
                 callback();
             });
         } else {
@@ -566,26 +574,28 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
     };
     var updateAnswers = function (callback) {
         if(!specificEntryType || specificEntryType === constants.OBJECT_TYPES.answer) {
+            var answers = countNode.childrenCount.answers;
             async.parallel({
                 accepted: function(callback) {
                     db.Answer.count({ questionId: entryId, 'screening.status': constants.SCREENING_STATUS.status1.code }, function (err, count) {
-                        countNode.childrenCount.answers.accepted = count;
+                        answers.accepted = count;
                         callback();
                     });
                 },
                 pending: function(callback) {
                     db.Answer.count({ questionId: entryId, 'screening.status': constants.SCREENING_STATUS.status0.code }, function (err, count) {
-                        countNode.childrenCount.answers.pending = count;
+                        answers.pending = count;
                         callback();
                     });
                 },
                 rejected: function(callback) {
                     db.Answer.count({ questionId: entryId, 'screening.status': constants.SCREENING_STATUS.status2.code }, function (err, count) {
-                        countNode.childrenCount.answers.rejected = count;
+                        answers.rejected = count;
                         callback();
                     });
                 }
             }, function (err, results) {
+                answers.total = answers.accepted + answers.pending + answers.rejected;
                 callback();
             });
         } else {
@@ -594,26 +604,28 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
     };
     var updateIssues = function (callback) {
         if(!specificEntryType || specificEntryType === constants.OBJECT_TYPES.issue) {
+            var issues = countNode.childrenCount.issues;
             async.parallel({
                 accepted: function(callback) {
                     db.Issue.count({ ownerId: entryId, 'screening.status': constants.SCREENING_STATUS.status1.code }, function (err, count) {
-                        countNode.childrenCount.issues.accepted = count;
+                        issues.accepted = count;
                         callback();
                     });
                 },
                 pending: function(callback) {
                     db.Issue.count({ ownerId: entryId, 'screening.status': constants.SCREENING_STATUS.status0.code }, function (err, count) {
-                        countNode.childrenCount.issues.pending = count;
+                        issues.pending = count;
                         callback();
                     });
                 },
                 rejected: function(callback) {
                     db.Issue.count({ ownerId: entryId, 'screening.status': constants.SCREENING_STATUS.status2.code }, function (err, count) {
-                        countNode.childrenCount.issues.rejected = count;
+                        issues.rejected = count;
                         callback();
                     });
                 }
             }, function (err, results) {
+                issues.total = issues.accepted + issues.pending + issues.rejected;
                 callback();
             });
         } else {
@@ -622,26 +634,28 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
     };
     var updateOpinions = function (callback) {
         if(!specificEntryType || specificEntryType === constants.OBJECT_TYPES.opinion) {
+            var opinions = countNode.childrenCount.opinions;
             async.parallel({
                 accepted: function(callback) {
                     db.Opinion.count({ ownerId: entryId, 'screening.status': constants.SCREENING_STATUS.status1.code }, function (err, count) {
-                        countNode.childrenCount.opinions.accepted = count;
+                        opinions.accepted = count;
                         callback();
                     });
                 },
                 pending: function(callback) {
                     db.Opinion.count({ ownerId: entryId, 'screening.status': constants.SCREENING_STATUS.status0.code }, function (err, count) {
-                        countNode.childrenCount.opinions.pending = count;
+                        opinions.pending = count;
                         callback();
                     });
                 },
                 rejected: function(callback) {
                     db.Opinion.count({ ownerId: entryId, 'screening.status': constants.SCREENING_STATUS.status2.code }, function (err, count) {
-                        countNode.childrenCount.opinions.rejected = count;
+                        opinions.rejected = count;
                         callback();
                     });
                 }
             }, function (err, results) {
+                opinions.total = opinions.accepted + opinions.pending + opinions.rejected;
                 callback();
             });
         } else {
@@ -981,6 +995,24 @@ function setScreeningModel(req, model) {
     if(!model.screening) {
         model.screening = {};
     }
+
+
+    var baseUrl = url.parse(req.originalUrl);
+    var newQuery = querystring.parse(baseUrl.query);
+    baseUrl.search = null; // important, ensures new 'query' to take effect
+
+    newQuery.screening = 'pending';
+    baseUrl.query = newQuery;
+    model.screening.pendingUrl = url.format(baseUrl);
+
+    newQuery.screening = 'approved';
+    baseUrl.query = newQuery;
+    model.screening.approvedUrl = url.format(baseUrl);
+
+    newQuery.screening = 'rejected';
+    baseUrl.query = newQuery;
+    model.screening.rejectedUrl = url.format(baseUrl);
+
     if(req.query.screening) {
         if(req.query.screening === 'pending'){
             model.screening.pending = true;

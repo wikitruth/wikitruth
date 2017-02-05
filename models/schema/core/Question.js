@@ -25,16 +25,19 @@ exports = module.exports = function(app, mongoose) {
     private: { type: Boolean, default: false }, // if true, should be restricted to group/user owners and not included in public backup
     childrenCount: {
       answers: {
+        total: { type: Number, default: 0 },
         accepted: { type: Number, default: 0 },
         pending: { type: Number, default: 0 },
         rejected: { type: Number, default: 0 }
       },
       issues: {
+        total: { type: Number, default: 0 },
         accepted: { type: Number, default: 0 },
         pending: { type: Number, default: 0 },
         rejected: { type: Number, default: 0 }
       },
       opinions: {
+        total: { type: Number, default: 0 },
         accepted: { type: Number, default: 0 },
         pending: { type: Number, default: 0 },
         rejected: { type: Number, default: 0 }

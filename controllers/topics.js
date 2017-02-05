@@ -18,7 +18,7 @@ function createCancelUrl(req) {
     delete nextQuery.id;
     delete nextQuery.source;
     nextUrl.query = nextQuery;
-    nextUrl.search = null;
+    nextUrl.search = null; // important, ensures new 'query' to take effect
     return url.format(nextUrl);
 }
 

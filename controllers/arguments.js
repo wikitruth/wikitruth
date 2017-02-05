@@ -179,7 +179,7 @@ function GET_index(req, res) {
         flowUtils.setTopicModels(req, model, function () {
             flowUtils.setScreeningModel(req, model);
             flowUtils.setArgumentModels(req, model, function () {
-                var query = { 'screening.status': constants.SCREENING_STATUS.status1.code };
+                var query = { 'screening.status': model.screening.status };
                 if(req.query.argument) {
                     query.parentId = model.argument._id;
                 } else {
@@ -188,11 +188,6 @@ function GET_index(req, res) {
                     query.ownerType = constants.OBJECT_TYPES.topic;
                 }
                 flowUtils.getArguments(query, 0, function (err, results) {
-                    flowUtils.setModelOwnerEntry(model);
-                    model.childrenCount = model.entry.childrenCount['arguments'];
-                    if(model.childrenCount.pending === 0 && model.childrenCount.rejected === 0) {
-                        model.screening.hidden = true;
-                    }
                     var support = results.filter(function (arg) {
                         return !arg.against;
                     });
@@ -211,6 +206,13 @@ function GET_index(req, res) {
                     });
                     flowUtils.sortArguments(results);
                     flowUtils.setModelContext(req, model);
+                    flowUtils.setModelOwnerEntry(model);
+
+                    // screening and children count
+                    model.childrenCount = model.entry.childrenCount['arguments'];
+                    if(model.childrenCount.pending === 0 && model.childrenCount.rejected === 0) {
+                        model.screening.hidden = true;
+                    }
                     res.render(templates.truth.arguments.index, model);
                 });
             });
