@@ -20,6 +20,7 @@ exports = module.exports = function(app, mongoose) {
     },
     childrenCount: {
       opinions: {
+        total: { type: Number, default: 0 },
         accepted: { type: Number, default: 0 },
         pending: { type: Number, default: 0 },
         rejected: { type: Number, default: 0 }

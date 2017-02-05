@@ -44,6 +44,8 @@ function GET_index(req, res) {
                     flowUtils.setModelOwnerEntry(model);
                     flowUtils.setModelContext(req, model);
                     model.opinions = results;
+
+                    // screening and children count
                     model.childrenCount = model.entry.childrenCount.opinions;
                     if(model.childrenCount.pending === 0 && model.childrenCount.rejected === 0) {
                         model.screening.hidden = true;

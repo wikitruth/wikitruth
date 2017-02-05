@@ -85,5 +85,16 @@
 {?linkCount}
     <span class="label label-info pull-right-x"><i class="fa fa-link"></i> {linkCount}</span>&nbsp;
 {/linkCount}
+{?entry.screening.status}
+    {@eq key=entry.screening.status value=0}
+        <span class="label label-warning"><i class="fa fa-question-circle"></i> Pending</span>&nbsp;
+    {/eq}
+    {@eq key=entry.screening.status value=1}
+        <span class="label label-success"><i class="fa fa-check-circle"></i> Accepted</span>&nbsp;
+    {/eq}
+    {@eq key=entry.screening.status value=2}
+        <span class="label label-danger"><i class="fa fa-close"></i> Rejected</span>&nbsp;
+    {/eq}
+{/entry.screening.status}
 {!<span class="label label-success">Verified</span> <span class="label label-danger">Issues</span>!}
 {!&nbsp;<span class="label label-primary"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Update Verdict</span>!}

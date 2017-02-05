@@ -90,7 +90,7 @@ function GET_index(req, res) {
                 var query = req.query.argument ?
                     { ownerId: model.argument._id, ownerType: constants.OBJECT_TYPES.argument } :
                     { ownerId: model.topic._id, ownerType: constants.OBJECT_TYPES.topic };
-                query['screening.status'] = constants.SCREENING_STATUS.status1.code;
+                query['screening.status'] = model.screening.status;
                 db.Question.find(query).sort({ title: 1 }).lean().exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
@@ -99,6 +99,8 @@ function GET_index(req, res) {
                         model.questions = results;
                         flowUtils.setModelOwnerEntry(model);
                         flowUtils.setModelContext(req, model);
+
+                        // screening and children count
                         model.childrenCount = model.entry.childrenCount.questions;
                         if(model.childrenCount.pending === 0 && model.childrenCount.rejected === 0) {
                             model.screening.hidden = true;

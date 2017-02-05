@@ -40,21 +40,25 @@ exports = module.exports = function(app, mongoose) {
     },
     childrenCount: {
       arguments: {
+        total: { type: Number, default: 0 },
         accepted: { type: Number, default: 0 },
         pending: { type: Number, default: 0 },
         rejected: { type: Number, default: 0 }
       },
       questions: {
+        total: { type: Number, default: 0 },
         accepted: { type: Number, default: 0 },
         pending: { type: Number, default: 0 },
         rejected: { type: Number, default: 0 }
       },
       issues: {
+        total: { type: Number, default: 0 },
         accepted: { type: Number, default: 0 },
         pending: { type: Number, default: 0 },
         rejected: { type: Number, default: 0 }
       },
       opinions: {
+        total: { type: Number, default: 0 },
         accepted: { type: Number, default: 0 },
         pending: { type: Number, default: 0 },
         rejected: { type: Number, default: 0 }
