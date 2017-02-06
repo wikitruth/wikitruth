@@ -191,6 +191,13 @@ function GET_entry(req, res) {
                         flowUtils.setVerdictModel(result);
                     });
                     flowUtils.sortArguments(results);
+                    model.arguments = results.slice(0, 15);
+                    model.keyArguments = results.filter(function (result) {
+                        return result.tags.indexOf(constants.ARGUMENT_TAGS.tag20.code) >= 0;
+                    });
+                    model.verdict = {
+                        counts: flowUtils.getVerdictCount(results)
+                    };
                     callback(null, results);
                 });
             },
@@ -247,13 +254,6 @@ function GET_entry(req, res) {
             if(model.isTopicOwner) {
                 model.isEntryOwner = true;
             }
-            model.arguments = results.arguments.slice(0, 15);
-            model.keyArguments = results.arguments.filter(function (result) {
-                return result.tags.indexOf(constants.ARGUMENT_TAGS.tag20.code) >= 0;
-            });
-            model.verdict = {
-                counts: flowUtils.getVerdictCount(results.arguments)
-            };
             flowUtils.setModelOwnerEntry(model);
             flowUtils.setModelContext(req, model);
             flowUtils.setClipboardModel(req, model, constants.OBJECT_TYPES.topic);

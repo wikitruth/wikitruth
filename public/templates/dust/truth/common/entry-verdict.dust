@@ -15,20 +15,20 @@
         <a href="{paths.truth.verdict.update}?{?argument}argument={argument._id}{/argument}{?question}topic={topic._id}&amp;question={question._id}{/question}" title="Update Verdict" class="no-underline">
         <span class="label label-{argument.verdict.theme}" title="This content is not yet reviewed, please take caution.">
             <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> {argument.verdict.label}</span></a>&nbsp;
-        {?supportingArgumentCount}
-            <span class="label label-primary pull-right-x"><i class="fa fa-thumbs-up"></i> {supportingArgumentCount}</span>&nbsp;
-        {/supportingArgumentCount}
-        {?opposingArgumentCount}
-            <span class="label label-primary pull-right-x"><i class="fa fa-thumbs-down"></i> {opposingArgumentCount}</span>&nbsp;
-        {/opposingArgumentCount}
+        {?proArgumentCount}
+            <span class="label label-primary pull-right-x" title="The number of supporting arguments."><i class="fa fa-thumbs-up"></i> {proArgumentCount}</span>&nbsp;
+        {/proArgumentCount}
+        {?conArgumentCount}
+            <span class="label label-primary pull-right-x" title="The number of opposing arguments."><i class="fa fa-thumbs-down"></i> {conArgumentCount}</span>&nbsp;
+        {/conArgumentCount}
 
         {!&nbsp;<span class="label label-primary"><i class="fa fa-flash"></i>
-            {?supportingArgumentCount}
-                &nbsp;<i class="fa fa-thumbs-up"></i>{supportingArgumentCount}
-            {/supportingArgumentCount}
-            {?opposingArgumentCount}
-                &nbsp;<i class="fa fa-thumbs-down"></i>{opposingArgumentCount}
-            {/opposingArgumentCount}
+            {?proArgumentCount}
+                &nbsp;<i class="fa fa-thumbs-up"></i>{proArgumentCount}
+            {/proArgumentCount}
+            {?conArgumentCount}
+                &nbsp;<i class="fa fa-thumbs-down"></i>{conArgumentCount}
+            {/conArgumentCount}
         </span>!}
 
         {?argument.typeUX}
@@ -85,16 +85,18 @@
 {?linkCount}
     <span class="label label-info pull-right-x"><i class="fa fa-link"></i> {linkCount}</span>&nbsp;
 {/linkCount}
-{?entry.screening.status}
-    {@eq key=entry.screening.status value=0}
-        <span class="label label-warning"><i class="fa fa-question-circle"></i> Pending</span>&nbsp;
-    {/eq}
-    {@eq key=entry.screening.status value=1}
-        <span class="label label-success"><i class="fa fa-check-circle"></i> Accepted</span>&nbsp;
-    {/eq}
-    {@eq key=entry.screening.status value=2}
-        <span class="label label-danger"><i class="fa fa-close"></i> Rejected</span>&nbsp;
-    {/eq}
-{/entry.screening.status}
+{^username}
+    {?entry.screening.status}
+        {@eq key=entry.screening.status value=0}
+            <span class="label label-warning"><i class="fa fa-question-circle"></i> Pending</span>&nbsp;
+        {/eq}
+        {@eq key=entry.screening.status value=1}
+            <span class="label label-success-x label-primary"><i class="fa fa-check-circle"></i> Accepted</span>&nbsp;
+        {/eq}
+        {@eq key=entry.screening.status value=2}
+            <span class="label label-danger"><i class="fa fa-close"></i> Rejected</span>&nbsp;
+        {/eq}
+    {/entry.screening.status}
+{/username}
 {!<span class="label label-success">Verified</span> <span class="label label-danger">Issues</span>!}
 {!&nbsp;<span class="label label-primary"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Update Verdict</span>!}

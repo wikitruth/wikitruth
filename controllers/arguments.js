@@ -45,6 +45,21 @@ function GET_entry(req, res) {
                         flowUtils.setVerdictModel(result);
                     });
                     flowUtils.sortArguments(results);
+                    var support = results.filter(function (arg) {
+                        return !arg.against;
+                    });
+                    var contra = results.filter(function (arg) {
+                        return arg.against;
+                    });
+                    model.arguments = results;
+                    if(support.length > 0) {
+                        model.proArgumentCount = support.length;
+                        model.proArguments = support.slice(0, 15);
+                    }
+                    if(contra.length > 0) {
+                        model.conArgumentCount = contra.length;
+                        model.conArguments = contra.slice(0, 15);
+                    }
                     callback(null, results);
                 });
             },
@@ -136,21 +151,6 @@ function GET_entry(req, res) {
             flowUtils.setVerdictModel(model.argument);
             if(model.isArgumentOwner) {
                 model.isEntryOwner = true;
-            }
-            var support = results.arguments.filter(function (arg) {
-                return !arg.against;
-            });
-            var contra = results.arguments.filter(function (arg) {
-                return arg.against;
-            });
-            model.arguments = results.arguments;
-            if(support.length > 0) {
-                model.proArgumentCount = support.length;
-                model.proArguments = support.slice(0, 15);
-            }
-            if(contra.length > 0) {
-                model.conArgumentCount = contra.length;
-                model.conArguments = contra.slice(0, 15);
             }
 
             // Argument Tags
