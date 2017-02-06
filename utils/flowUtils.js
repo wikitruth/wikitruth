@@ -1029,7 +1029,7 @@ function setScreeningModel(req, model) {
 }
 
 function initScreeningStatus(req, entity) {
-    if(req.user.roles.reviewer) {
+    if(req.user.roles.reviewer || req.params.username) {
         entity.screening = {
             status: constants.SCREENING_STATUS.status1.code,
             history: []

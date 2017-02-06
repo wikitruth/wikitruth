@@ -38,35 +38,48 @@
             <textarea class="form-control" id="inputContent" name="content" rows="12">{argument.content}</textarea>
         </div>
         <div class="form-group">
-            <label for="inputReferences">References</label>
-            <textarea class="form-control" id="inputReferences" name="references" rows="3">{argument.references}</textarea>
-        </div>
-        <div class="form-group">
-            <label for="inputParent">Parent</label>
-            <textarea name="parent" id="inputParent" class="form-control" rows="1">{?argument}{argument.parentId}{:else}{parentArgument._id}{/argument}</textarea>
-        </div>
-        <div class="form-group">
-            <label for="inputParent">Reference Date</label>
-            <div class='input-group date' id='inputRefDatePicker'>
-                <input type="text" name="referenceDate" id="inputReferenceDate" class="form-control" value="{argument.referenceDateString}" />
-                <span class="input-group-addon">
-                    <span class="glyphicon glyphicon-calendar"></span>
-                </span>
+            <label for="inputReferences">
+                <a role="button" data-toggle="collapse" href="#collapseReferences" aria-expanded="false" aria-controls="collapseReferences" class="wt-collapse-toggle{^argument.references} collapsed{/argument.references}">References</a>
+            </label>
+            <div class="collapse{?argument.references} in{/argument.references}" id="collapseReferences">
+                <textarea class="form-control" id="inputReferences" name="references" rows="3">{argument.references}</textarea>
             </div>
         </div>
         <div class="form-group">
-            <label for="inputParent">Correlation to Parent</label>
-            <div class="radio">
-                <label class="text-success">
-                    <input type="radio" name="supportsParent" value="1" {^argument.against}checked="checked"{/argument.against}>
-                    Supporting Argument (for)
-                </label>
+            <label for="inputParent"><a role="button" data-toggle="collapse" href="#collapseParent" aria-expanded="false" aria-controls="collapseParent" class="wt-collapse-toggle collapsed">Parent</a></label>
+            <div class="collapse" id="collapseParent">
+                <textarea name="parent" id="inputParent" class="form-control" rows="1">{?argument}{argument.parentId}{:else}{parentArgument._id}{/argument}</textarea>
             </div>
-            <div class="radio">
-                <label class="text-primary">
-                    <input type="radio" name="supportsParent" value="" {?argument.against}checked="checked"{/argument.against}>
-                    Opposing Argument (against)
-                </label>
+        </div>
+        <div class="form-group">
+            <label for="inputParent">
+                <a role="button" data-toggle="collapse" href="#collapseReferenceDate" aria-expanded="false" aria-controls="collapseReferenceDate" class="wt-collapse-toggle{^argument.referenceDateString} collapsed{/argument.referenceDateString}">Reference Date</a>
+            </label>
+            <div class="collapse{?argument.referenceDateString} in{/argument.referenceDateString}" id="collapseReferenceDate">
+                <div class='input-group date' id='inputRefDatePicker'>
+                    <input type="text" name="referenceDate" id="inputReferenceDate" class="form-control" value="{argument.referenceDateString}" />
+                    {!<input type="hidden" name="referenceDateUTC" id="inputReferenceDateUTC" value="" />!}
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputParent"><a role="button" data-toggle="collapse" href="#collapseParentCorrelation" aria-expanded="false" aria-controls="collapseParentCorrelation" class="wt-collapse-toggle{^argument.against} collapsed{/argument.against}">Correlation to Parent</a></label>
+            <div class="collapse{?argument.against} in{/argument.against}" id="collapseParentCorrelation">
+                <div class="radio">
+                    <label class="text-success">
+                        <input type="radio" name="supportsParent" value="1" {^argument.against}checked="checked"{/argument.against}>
+                        Supporting Argument (for)
+                    </label>
+                </div>
+                <div class="radio">
+                    <label class="text-primary">
+                        <input type="radio" name="supportsParent" value="" {?argument.against}checked="checked"{/argument.against}>
+                        Opposing Argument (against)
+                    </label>
+                </div>
             </div>
         </div>
         <div class="form-group">
@@ -108,81 +121,85 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="inputParent">Tags</label>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" class="argumentTag" name="argumentTags" value="20">
-                            <span class="text-info"><strong>{ARGUMENT_TAGS.tag20.text}</strong></span><br/>
-                            A primary, crucial, core or vital part of the parent entry.
-                        </label>
+            <label>
+                <a role="button" data-toggle="collapse" href="#collapseTags" aria-expanded="false" aria-controls="collapseTags" class="wt-collapse-toggle{^argument.tags} collapsed{/argument.tags}">Tags</a>
+            </label>
+            <div class="collapse{?argument.tags} in{/argument.tags}" id="collapseTags">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" class="argumentTag" name="argumentTags" value="20">
+                                <span class="text-info"><strong>{ARGUMENT_TAGS.tag20.text}</strong></span><br/>
+                                A primary, crucial, core or vital part of the parent entry.
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="hasEthicalValue" value="1" {?argument.ethicalStatus.hasValue}checked="checked"{/argument.ethicalStatus.hasValue}>
+                                <span class="text-warning"><strong>{ARGUMENT_TAGS.tag10.text}</strong></span><br/>
+                                A argument on truth but containing moral, ethical, or aesthetic value
+                            </label>
+                        </div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" name="hasEthicalValue" value="1" {?argument.ethicalStatus.hasValue}checked="checked"{/argument.ethicalStatus.hasValue}>
-                            <span class="text-warning"><strong>{ARGUMENT_TAGS.tag10.text}</strong></span><br/>
-                            A argument on truth but containing moral, ethical, or aesthetic value
-                        </label>
+                <hr style="border: 0; margin: 0.7rem 0 0.7rem; border-top: 0.0625rem dotted #dcdcdc;"/>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" class="argumentTag" name="argumentTags" value="30">
+                                <span class="text-info"><strong>Extrapolation</strong></span><br/>
+                                to make an estimate or conclusion about something from known facts
+                            </label>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <hr style="border: 0; margin: 0.7rem 0 0.7rem; border-top: 0.0625rem dotted #dcdcdc;"/>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" class="argumentTag" name="argumentTags" value="30">
-                            <span class="text-info"><strong>Extrapolation</strong></span><br/>
-                            to make an estimate or conclusion about something from known facts
-                        </label>
+                    <div class="col-md-6">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" class="argumentTag" name="argumentTags" value="60">
+                                <span class="text-warning"><strong>Generalization | Simplification</strong></span><br/>
+                                a general statement or concept obtained by inference from specific cases; made simpler or easier to understand
+                            </label>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" class="argumentTag" name="argumentTags" value="60">
-                            <span class="text-warning"><strong>Generalization | Simplification</strong></span><br/>
-                            a general statement or concept obtained by inference from specific cases; made simpler or easier to understand
-                        </label>
+                    <div class="col-md-6">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" class="argumentTag" name="argumentTags" value="70">
+                                <span class="text-warning"><strong>Conceptual | Idealistic</strong></span><br/>
+                                relating to or based on mental concepts, representation in ideal or idealized form
+                            </label>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" class="argumentTag" name="argumentTags" value="70">
-                            <span class="text-warning"><strong>Conceptual | Idealistic</strong></span><br/>
-                            relating to or based on mental concepts, representation in ideal or idealized form
-                        </label>
+                    <div class="col-md-6">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" class="argumentTag" name="argumentTags" value="80">
+                                <span class="text-warning"><strong>Figurative</strong></span><br/>
+                                departing from a literal use of words; metaphorical
+                            </label>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" class="argumentTag" name="argumentTags" value="80">
-                            <span class="text-warning"><strong>Figurative</strong></span><br/>
-                            departing from a literal use of words; metaphorical
-                        </label>
+                    <div class="col-md-6">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" class="argumentTag" name="argumentTags" value="50">
+                                <span class="text-danger"><strong>Hypothetical</strong></span><br/>
+                                a supposition or proposed explanation made on the basis of limited evidence as a starting point for further investigation
+                            </label>
+                        </div>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" class="argumentTag" name="argumentTags" value="50">
-                            <span class="text-danger"><strong>Hypothetical</strong></span><br/>
-                            a supposition or proposed explanation made on the basis of limited evidence as a starting point for further investigation
-                        </label>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" class="argumentTag" name="argumentTags" value="40">
-                            <span class="text-danger"><strong>Conjecture</strong></span><br/>
-                            A speculation, an assumption, a prediction of a future event or phenomenon, or a retrodiction.
-                        </label>
+                    <div class="col-md-6">
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" class="argumentTag" name="argumentTags" value="40">
+                                <span class="text-danger"><strong>Conjecture</strong></span><br/>
+                                A speculation, an assumption, a prediction of a future event or phenomenon, or a retrodiction.
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>

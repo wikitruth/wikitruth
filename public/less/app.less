@@ -365,6 +365,27 @@ a.wt-link-focus {
   }
 }
 
+.wt-collapse-toggle {
+  color: #333;
+
+  &:hover, &:focus {
+    text-decoration: none;
+  }
+
+  &:after {
+    /* symbol for "opening" panels */
+    font-family: 'Glyphicons Halflings';  /* essential for enabling glyphicon */
+    content: "\00a0\e114";    /* adjust as needed, taken from bootstrap.css */
+    float: right;        /* adjust as needed */
+    margin-left: -5px;
+  }
+
+  &.collapsed:after {
+    /* symbol for "collapsed" panels */
+    content: "\00a0\e080";    /* adjust as needed, taken from bootstrap.css */
+  }
+}
+
 .btn.btn-info.btn-fb {
   background: #3b5998;
   border-color: #3b5998;

@@ -8,9 +8,10 @@
     {>"dust/truth/common/entry-header" tab="overview" /}
     <div class="entry-header">
         {>"dust/truth/common/entry-verdict" /}
+        <span class="label label-danger">{issueType}</span>&nbsp;
     </div>
     <div class="text-body">
-        <p><span class="label label-danger">{issueType}</span></p>
+        {!<p><span class="label label-danger">{issueType}</span></p>!}
         <p>{entry.content|s}</p>
     </div>
     {>"dust/truth/common/entry-options" /}
