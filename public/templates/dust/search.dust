@@ -79,6 +79,9 @@
                             <i class="fa fa-folder-open text-color-3" aria-hidden="true"></i>
                             <div>
                                 <a href="{?private}{wikiBaseUrl}{/private}{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{title}{?private} <span class="label label-default">private</span>{/private}</a>
+                                {?contentPreview}
+                                    <div>{contentPreview}</div>
+                                {/contentPreview}
                                 {>"dust/truth/common/entry-row-footer" /}
                             </div>
                             <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
@@ -98,6 +101,9 @@
                             <span class="glyphicon glyphicon-flash text-{verdict.theme}" aria-hidden="true"></span>
                             <div>
                                 <a href="{?private}{wikiBaseUrl}{/private}{paths.truth.arguments.entry}/{friendlyUrl}/{_id}">{title}{?typeUX} <span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}{?private} <span class="label label-default">private</span>{/private}</a>
+                                {?contentPreview}
+                                    <div>{contentPreview}</div>
+                                {/contentPreview}
                                 {>"dust/truth/common/entry-row-footer" /}
                             </div>
                             <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
@@ -117,6 +123,9 @@
                             <i class="fa fa-question-circle text-color-1" aria-hidden="true"></i>
                             <div>
                                 <a href="{?private}{wikiBaseUrl}{/private}{paths.truth.questions.entry}/{friendlyUrl}/{_id}">{title}{?private} <span class="label label-default">private</span>{/private}</a>
+                                {?contentPreview}
+                                    <div>{contentPreview}</div>
+                                {/contentPreview}
                                 {>"dust/truth/common/entry-row-footer" /}
                             </div>
                             <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
@@ -134,6 +143,9 @@
                             <i class="fa fa-check-circle text-color-1" aria-hidden="true"></i>
                             <div>
                                 <a href="{?private}{wikiBaseUrl}{/private}{paths.truth.answers.entry}/{friendlyUrl}/{_id}">{title}{?private} <span class="label label-default">private</span>{/private}</a>
+                                {?contentPreview}
+                                    <div>{contentPreview}</div>
+                                {/contentPreview}
                                 {>"dust/truth/common/entry-row-footer" /}
                             </div>
                             <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
@@ -152,6 +164,9 @@
                             <span class="fa fa-exclamation-circle text-danger" aria-hidden="true"></span>
                             <div>
                                 <a href="{?private}{wikiBaseUrl}{/private}{paths.truth.issues.entry}/{friendlyUrl}/{_id}">{title}{?private} <span class="label label-default">private</span>{/private}</a>
+                                {?contentPreview}
+                                    <div>{contentPreview}</div>
+                                {/contentPreview}
                                 {>"dust/truth/common/entry-row-footer" /}
                             </div>
                             <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
@@ -170,6 +185,9 @@
                             <span class="fa fa-comments-o text-primary" aria-hidden="true"></span>
                             <div>
                                 <a href="{?private}{wikiBaseUrl}{/private}{paths.truth.opinions.entry}/{friendlyUrl}/{_id}">{title}{?private} <span class="label label-default">private</span>{/private}</a>
+                                {?contentPreview}
+                                    <div>{contentPreview}</div>
+                                {/contentPreview}
                                 {>"dust/truth/common/entry-row-footer" /}
                             </div>
                             <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
