@@ -110,6 +110,9 @@
                     {/link}
                     <div>
                         <a href="{wikiBaseUrl}{paths.truth.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title} {?typeUX}<span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}</a>
+                        {?contentPreview}
+                            <div>{contentPreview}</div>
+                        {/contentPreview}
                         {>"dust/truth/common/entry-row-footer" /}
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>

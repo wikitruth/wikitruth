@@ -15,6 +15,9 @@
                     <i class="fa fa-comments-o text-primary" aria-hidden="true"></i>
                     <div>
                         <a href="{wikiBaseUrl}{paths.truth.opinions.entry}/{friendlyUrl}/{_id}">{title}</a>
+                        {?contentPreview}
+                            <div>{contentPreview}</div>
+                        {/contentPreview}
                         {>"dust/truth/common/entry-row-footer" /}
                     </div>
                     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
