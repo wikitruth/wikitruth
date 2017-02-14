@@ -46,43 +46,6 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="inputParent"><a role="button" data-toggle="collapse" href="#collapseParent" aria-expanded="false" aria-controls="collapseParent" class="wt-collapse-toggle collapsed">Parent</a></label>
-            <div class="collapse" id="collapseParent">
-                <textarea name="parent" id="inputParent" class="form-control" rows="1">{?argument}{argument.parentId}{:else}{parentArgument._id}{/argument}</textarea>
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputParent">
-                <a role="button" data-toggle="collapse" href="#collapseReferenceDate" aria-expanded="false" aria-controls="collapseReferenceDate" class="wt-collapse-toggle{^argument.referenceDateString} collapsed{/argument.referenceDateString}">Reference Date</a>
-            </label>
-            <div class="collapse{?argument.referenceDateString} in{/argument.referenceDateString}" id="collapseReferenceDate">
-                <div class='input-group date' id='inputRefDatePicker'>
-                    <input type="text" name="referenceDate" id="inputReferenceDate" class="form-control" value="{argument.referenceDateString}" />
-                    {!<input type="hidden" name="referenceDateUTC" id="inputReferenceDateUTC" value="" />!}
-                    <span class="input-group-addon">
-                        <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
-                </div>
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="inputParent"><a role="button" data-toggle="collapse" href="#collapseParentCorrelation" aria-expanded="false" aria-controls="collapseParentCorrelation" class="wt-collapse-toggle{^argument.against} collapsed{/argument.against}">Correlation to Parent</a></label>
-            <div class="collapse{?argument.against} in{/argument.against}" id="collapseParentCorrelation">
-                <div class="radio">
-                    <label class="text-success">
-                        <input type="radio" name="supportsParent" value="1" {^argument.against}checked="checked"{/argument.against}>
-                        Supporting Argument (for)
-                    </label>
-                </div>
-                <div class="radio">
-                    <label class="text-primary">
-                        <input type="radio" name="supportsParent" value="" {?argument.against}checked="checked"{/argument.against}>
-                        Opposing Argument (against)
-                    </label>
-                </div>
-            </div>
-        </div>
-        <div class="form-group">
             <label for="inputParent">Argument Type</label>
             <div class="radio">
                 <label>
@@ -118,6 +81,43 @@
                     <span class="text-warning"><strong>Value</strong></span><br/>
                     An argument on value, morality, ethics, goodness, or aesthetics (beauty)
                 </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputParent"><a role="button" data-toggle="collapse" href="#collapseParent" aria-expanded="false" aria-controls="collapseParent" class="wt-collapse-toggle collapsed">Parent</a></label>
+            <div class="collapse" id="collapseParent">
+                <textarea name="parent" id="inputParent" class="form-control" rows="1">{?argument}{argument.parentId}{:else}{parentArgument._id}{/argument}</textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputParent"><a role="button" data-toggle="collapse" href="#collapseParentCorrelation" aria-expanded="false" aria-controls="collapseParentCorrelation" class="wt-collapse-toggle{^argument.against} collapsed{/argument.against}">Relationship to Parent</a></label>
+            <div class="collapse{?argument.against} in{/argument.against}" id="collapseParentCorrelation">
+                <div class="radio">
+                    <label class="text-success">
+                        <input type="radio" name="supportsParent" value="1" {^argument.against}checked="checked"{/argument.against}>
+                        Supporting Argument (for)
+                    </label>
+                </div>
+                <div class="radio">
+                    <label class="text-primary">
+                        <input type="radio" name="supportsParent" value="" {?argument.against}checked="checked"{/argument.against}>
+                        Opposing Argument (against)
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputParent">
+                <a role="button" data-toggle="collapse" href="#collapseReferenceDate" aria-expanded="false" aria-controls="collapseReferenceDate" class="wt-collapse-toggle{^argument.referenceDateString} collapsed{/argument.referenceDateString}">Reference Date</a>
+            </label>
+            <div class="collapse{?argument.referenceDateString} in{/argument.referenceDateString}" id="collapseReferenceDate">
+                <div class='input-group date' id='inputRefDatePicker'>
+                    <input type="text" name="referenceDate" id="inputReferenceDate" class="form-control" value="{argument.referenceDateString}" />
+                    {!<input type="hidden" name="referenceDateUTC" id="inputReferenceDateUTC" value="" />!}
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
             </div>
         </div>
         <div class="form-group">

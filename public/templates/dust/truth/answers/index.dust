@@ -16,7 +16,7 @@
             <li class="list-group-item highlight"><i class="fa fa-answer-circle text-success-x" aria-hidden="true"></i> {^topic}Latest {/topic}Answers</li>
             {#answers}
                 <li class="list-group-item">
-                    <i class="fa fa-check-circle-o text-success" aria-hidden="true"></i>
+                    <i class="fa fa-check-circle-o text-color-1" aria-hidden="true"></i>
                     <div>
                         <a href="{wikiBaseUrl}{paths.truth.answers.entry}/{friendlyUrl}/{_id}">{title}</a>
                         {>"dust/truth/common/entry-row-footer" /}

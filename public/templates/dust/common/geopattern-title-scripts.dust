@@ -1,7 +1,7 @@
 <script src="/components/geopattern/js/geopattern.min.js"></script>
 <script type="text/javascript">
     $(function() {
-        $(".wt-profile-background").each(function() {
+        $(".wt-geopattern-title").each(function() {
             var title = $( this ).attr("title");
             var pattern = GeoPattern.generate(title);
             $(this).css("background-image", pattern.toDataUrl());

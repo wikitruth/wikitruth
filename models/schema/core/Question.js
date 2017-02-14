@@ -8,6 +8,7 @@ exports = module.exports = function(app, mongoose) {
     content: { type: String, default: '' },
     references: { type: String, default: '' },
     friendlyUrl: { type: String },
+    contentPreview: { type: String},
     screening: {
       status: { type: Number, default: constants.SCREENING_STATUS.status0.code}, // SCREENING_STATUS
       history: [{

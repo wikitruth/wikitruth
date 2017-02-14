@@ -14,7 +14,7 @@
                     <div class="media wt-category">
                         <div class="media-left media-top">
                             <a href="{wikiBaseUrl}{paths.truth.topics.entry}/{friendlyUrl}/{_id}">
-                                <div class="wt-category-icon" data-title="{title}"></div>
+                                <div class="wt-category-icon wt-geopattern-title" title="{title}"></div>
                             </a>
                         </div>
                         <div class="media-body">
@@ -57,14 +57,5 @@
 {/body}
 
 {<footer}
-    {>"dust/members/profile/profile-scripts" /}
-    <script type="text/javascript">
-        $(function() {
-            $(".wt-category-icon").each(function() {
-                var title = $( this ).data("title");
-                var pattern = GeoPattern.generate(title);
-                $(this).css("background-image", pattern.toDataUrl());
-            });
-        });
-    </script>
+    {>"dust/common/geopattern-title-scripts" /}
 {/footer}

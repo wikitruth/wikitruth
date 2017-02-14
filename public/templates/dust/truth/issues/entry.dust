@@ -7,8 +7,8 @@
 {<body}
     {>"dust/truth/common/entry-header" tab="overview" /}
     <div class="entry-header">
-        {>"dust/truth/common/entry-verdict" /}
         <span class="label label-danger">{issueType}</span>&nbsp;
+        {>"dust/truth/common/entry-verdict" /}
     </div>
     <div class="text-body">
         {!<p><span class="label label-danger">{issueType}</span></p>!}
@@ -17,3 +17,7 @@
     {>"dust/truth/common/entry-options" /}
     {>"dust/truth/common/entry-footer" /}
 {/body}
+
+{<footer}
+    {>"dust/common/geopattern-title-scripts" /}
+{/footer}

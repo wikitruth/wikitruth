@@ -5,10 +5,12 @@ var backup      = require('mongodb-backup'),
     path        = require("path"),
     async       = require('async'),
     Git         = require("nodegit"),
+    htmlToText  = require('html-to-text'),
     templates   = require('../models/templates'),
     config      = require('../config/config'),
     constants   = require('../models/constants'),
     flowUtils   = require('../utils/flowUtils'),
+    utils       = require('../utils/utils'),
     db          = require('../app').db.models;
 
 var cols = config.mongodb.collections,
@@ -80,7 +82,6 @@ function performGitBackup(backupDir, pathspec, gitConfig, callback) {
                                 // Abort the operation
                                 throw new Error("Nothing new to commit and push.");
                             }
-
                             /*patches.forEach((patch) => {
                                 patch.hunks().then((hunks) => {
                                     console.log('diff.hunks(): ' + hunks.length);
@@ -241,16 +242,22 @@ module.exports = function (router) {
                 topics: function (callback) {
                     db.Topic.find({}).exec((err, results) => {
                         async.eachSeries(results, function (result, callback) {
-                            result.screening.status = constants.SCREENING_STATUS.status1.code;
-                            db.Topic.update({ _id: result._id }, result, {}, function () {
-                                flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.topic, null, callback);
-                            });
+                            if(result.content && !result.contentPreview) {
+                                result.contentPreview = utils.getShortText(htmlToText.fromString(result.content, { wordwrap: false }), constants.SETTINGS.contentPreviewLength);
+                                //result.screening.status = constants.SCREENING_STATUS.status1.code;
+                                db.Topic.update({_id: result._id}, result, {}, function () {
+                                    //flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.topic, null, callback);
+                                    callback();
+                                });
+                            } else {
+                                callback();
+                            }
                         }, function (err) {
                             callback();
                         });
                     });
                 },
-                topicLinks: function (callback) {
+                /*topicLinks: function (callback) {
                     db.TopicLink.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
                             result.screening.status = constants.SCREENING_STATUS.status1.code;
@@ -259,20 +266,26 @@ module.exports = function (router) {
                             callback();
                         });
                     });
-                },
+                },*/
                 arguments: function (callback) {
                     db.Argument.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
-                            result.screening.status = constants.SCREENING_STATUS.status1.code;
-                            db.Argument.update({ _id: result._id }, result, {}, function () {
-                                flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.argument, null, callback);
-                            });
+                            if(result.content && !result.contentPreview) {
+                                result.contentPreview = utils.getShortText(htmlToText.fromString(result.content, { wordwrap: false }), constants.SETTINGS.contentPreviewLength);
+                                //result.screening.status = constants.SCREENING_STATUS.status1.code;
+                                db.Argument.update({ _id: result._id }, result, {}, function () {
+                                    //flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.argument, null, callback);
+                                    callback();
+                                });
+                            } else {
+                                callback();
+                            }
                         }, function (err) {
                             callback();
                         });
                     });
                 },
-                argumentLinks: function (callback) {
+                /*argumentLinks: function (callback) {
                     db.ArgumentLink.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
                             result.screening.status = constants.SCREENING_STATUS.status1.code;
@@ -281,14 +294,20 @@ module.exports = function (router) {
                             callback();
                         });
                     });
-                },
+                },*/
                 questions: function (callback) {
                     db.Question.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
-                            result.screening.status = constants.SCREENING_STATUS.status1.code;
-                            db.Question.update({ _id: result._id }, result, {}, function () {
-                                flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.question, null, callback);
-                            });
+                            if(result.content && !result.contentPreview) {
+                                result.contentPreview = utils.getShortText(htmlToText.fromString(result.content, { wordwrap: false }), constants.SETTINGS.contentPreviewLength);
+                                //result.screening.status = constants.SCREENING_STATUS.status1.code;
+                                db.Question.update({ _id: result._id }, result, {}, function () {
+                                    //flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.question, null, callback);
+                                    callback();
+                                });
+                            } else {
+                                callback();
+                            }
                         }, function (err) {
                             callback();
                         });
@@ -297,10 +316,16 @@ module.exports = function (router) {
                 answers: function (callback) {
                     db.Answer.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
-                            result.screening.status = constants.SCREENING_STATUS.status1.code;
-                            db.Answer.update({ _id: result._id }, result, {}, function () {
-                                flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.answer, null, callback);
-                            });
+                            if(result.content && !result.contentPreview) {
+                                result.contentPreview = utils.getShortText(htmlToText.fromString(result.content, { wordwrap: false }), constants.SETTINGS.contentPreviewLength);
+                                //result.screening.status = constants.SCREENING_STATUS.status1.code;
+                                db.Answer.update({ _id: result._id }, result, {}, function () {
+                                    //flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.answer, null, callback);
+                                    callback();
+                                });
+                            } else {
+                                callback();
+                            }
                         }, function (err) {
                             callback();
                         });
@@ -309,10 +334,16 @@ module.exports = function (router) {
                 issues: function (callback) {
                     db.Issue.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
-                            result.screening.status = constants.SCREENING_STATUS.status1.code;
-                            db.Issue.update({ _id: result._id }, result, {}, function () {
-                                flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.issue, null, callback);
-                            });
+                            if(result.content && !result.contentPreview) {
+                                result.contentPreview = utils.getShortText(htmlToText.fromString(result.content, { wordwrap: false }), constants.SETTINGS.contentPreviewLength);
+                                //result.screening.status = constants.SCREENING_STATUS.status1.code;
+                                db.Issue.update({ _id: result._id }, result, {}, function () {
+                                    //flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.issue, null, callback);
+                                    callback();
+                                });
+                            } else {
+                                callback();
+                            }
                         }, function (err) {
                             callback();
                         });
@@ -321,16 +352,22 @@ module.exports = function (router) {
                 opinions: function (callback) {
                     db.Opinion.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
-                            result.screening.status = constants.SCREENING_STATUS.status1.code;
-                            db.Opinion.update({ _id: result._id }, result, {}, function () {
-                                flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.opinion, null, callback);
-                            });
+                            if(result.content && !result.contentPreview) {
+                                result.contentPreview = utils.getShortText(htmlToText.fromString(result.content, { wordwrap: false }), constants.SETTINGS.contentPreviewLength);
+                                //result.screening.status = constants.SCREENING_STATUS.status1.code;
+                                db.Opinion.update({ _id: result._id }, result, {}, function () {
+                                    //flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.opinion, null, callback);
+                                    callback();
+                                });
+                            } else {
+                                callback();
+                            }
                         }, function (err) {
                             callback();
                         });
                     });
-                },
-                users: function (callback) {
+                }
+                /*users: function (callback) {
                     db.User.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
                             db.User.update({ _id: result._id }, result, {}, callback);
@@ -338,7 +375,7 @@ module.exports = function (router) {
                             callback();
                         });
                     });
-                }
+                }*/
             }, function (err, results) {
                 res.render(templates.admin.mongoBackup, model);
             });

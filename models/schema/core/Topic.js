@@ -6,6 +6,7 @@ exports = module.exports = function(app, mongoose) {
   var schema = new mongoose.Schema({
     title: { type: String, default: '' },
     contextTitle: { type: String }, // A title alias for current context
+    contentPreview: { type: String}, // A preview lines of text to display in list view
     content: { type: String, default: '' },
     friendlyUrl: { type: String },
     referenceDate: { type: Date }, // If the entry is time/date sensitive or may become obsolete in the future, add a ref date

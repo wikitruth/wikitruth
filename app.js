@@ -103,6 +103,10 @@ app.use(function(req, res, next) {
     } else if(res.locals.isContributor) {
         delete res.locals.isContributor;
     }
+
+    // allow templates to access the request query
+    res.locals.query = req.query;
+
     next();
 });
 

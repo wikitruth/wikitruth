@@ -108,6 +108,14 @@ module.exports = function (router) {
                             callback();
                         });
                 },
+                answers: function (callback) {
+                    db.Answer
+                        .find({ createUserId: model.member._id, private: false })
+                        .count(function(err, count) {
+                            model.answers = count;
+                            callback();
+                        });
+                },
                 issues: function (callback) {
                     db.Issue
                         .find({ createUserId: model.member._id, private: false })
@@ -127,9 +135,17 @@ module.exports = function (router) {
             }, function (err, results) {
                 flowUtils.setModelContext(req, model);
                 model.url = model.profileBaseUrl + '/contributions';
-                model.contributions = model.topics + model.arguments + model.questions + model.issues + model.opinions;
+                model.contributions = model.topics + model.arguments + model.questions + model.answers + model.issues + model.opinions;
                 res.render(templates.members.profile.index, model);
             });
+        });
+    });
+
+    router.get('/:username/following', function (req, res) {
+        var model = {};
+        setMemberModel(model, req, function () {
+            flowUtils.setModelContext(req, model);
+            res.render(templates.members.profile.following, model);
         });
     });
 
@@ -211,6 +227,28 @@ module.exports = function (router) {
                                     flowUtils.appendEntryExtra(result);
                                 });
                                 model.questions = results;
+                                if(results.length > 0) {
+                                    model.results = true;
+                                }
+                                callback();
+                            });
+                        });
+                },
+                answers: function (callback) {
+                    if(tab !== 'all' && tab !== 'answers') {
+                        return callback();
+                    }
+                    db.Answer
+                        .find({ createUserId: model.member._id })
+                        .sort({ title: 1 })
+                        .limit(tab === 'all' ? 15 : 0)
+                        .lean()
+                        .exec(function(err, results) {
+                            flowUtils.setEditorsUsername(results, function() {
+                                results.forEach(function (result) {
+                                    flowUtils.appendEntryExtra(result);
+                                });
+                                model.answers = results;
                                 if(results.length > 0) {
                                     model.results = true;
                                 }

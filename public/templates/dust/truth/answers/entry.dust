@@ -17,3 +17,7 @@
     {>"dust/truth/opinions/list-preview" /}
     {>"dust/truth/common/entry-footer" /}
 {/body}
+
+{<footer}
+    {>"dust/common/geopattern-title-scripts" /}
+{/footer}

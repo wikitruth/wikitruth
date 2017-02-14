@@ -13,14 +13,14 @@
                     <a href="{paths.truth.topics.entry}?topic={_id}">{title}</a> <span class="pull-right text-muted hide"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
             {/categories}
         </ul>!}
-    <h3 class="page-header">Categories</h3>
+    {!<h3 class="page-header">Categories</h3>!}
     <div class="row">
         {#categories}
             <div class="col-lg-4 col-md-6 col-sm-6">{! 73px !}
                 <div class="media wt-category">
                     <div class="media-left media-top">
                         <a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">
-                            <div class="wt-category-icon" data-title="{title}"></div>
+                            <div class="wt-category-icon wt-geopattern-title" title="{title}"></div>
                         </a>
                     </div>
                     <div class="media-body">
@@ -39,10 +39,66 @@
             </div>
         {/categories}
     </div>
-    <br/>
+    {!<br/>!}
+    <h1 class="page-header wt-header-x" id="browse">Latest Posts</h1>
+    <a href="#" class="btn btn-info btn-sm" role="button">Latest</a>&nbsp;
+    <a href="#" class="btn btn-default btn-sm" role="button">Popular</a>&nbsp;
+    &nbsp;&nbsp;&nbsp;
+    <a href="{screening.approvedUrl}" class="btn btn-{?screening.approved}info{:else}default{/screening.approved} btn-sm" role="button">Accepted</a>&nbsp;
+    <a href="{screening.pendingUrl}" class="btn btn-{?screening.pending}info{:else}default{/screening.pending} btn-sm" role="button">Pending</a>&nbsp;
+    <a href="{screening.rejectedUrl}" class="btn btn-{?screening.rejected}info{:else}default{/screening.rejected} btn-sm" role="button">Rejected</a>
+    <br/><br/>
+    <ul class="nav nav-tabs wt-tabs" role="tablist">
+        {!<li role="presentation"{@eq key=tab value="all"} class="active"{/eq}>
+            <a href="{paths.search}?q={keyword}" role="tab">
+                <i class="glyphicon glyphicon-globe" aria-hidden="true"></i> <span class="hidden-xxs">Everything</span>
+            </a>
+        </li>!}
+        <li role="presentation"{@eq key=tab value="topics"} class="active"{/eq}>
+            <a href="{paths.truth.index}?tab=topics{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="tab">
+                <i class="fa fa-folder-open" aria-hidden="true"></i> <span class="hidden-xxs">Topics</span>
+            </a>
+        </li>
+        <li role="presentation"{@eq key=tab value="arguments"} class="active"{/eq}>
+            <a href="{paths.truth.index}?tab=arguments{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="tab">
+                <i class="fa fa-flash" aria-hidden="true"></i> <span class="hidden-xs">Arguments</span>
+            </a>
+        </li>
+        <li role="presentation"{@eq key=tab value="questions"} class="active"{/eq}>
+            <a href="{paths.truth.index}?tab=questions{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="tab">
+                <i class="fa fa-question-circle" aria-hidden="true"></i><span class="hidden-xs"> Questions</span>
+            </a>
+        </li>
+        <li role="presentation"{@eq key=tab value="answers"} class="active"{/eq}>
+            <a href="{paths.truth.index}?tab=answers{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="tab">
+                <i class="fa fa-check-circle" aria-hidden="true"></i><span class="hidden-xs"> Answers</span>
+            </a>
+        </li>
+        <li role="presentation"{@eq key=tab value="issues"} class="active"{/eq}>
+            <a href="{paths.truth.index}?tab=issues{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="tab">
+                <i class="fa fa-exclamation-circle" aria-hidden="true"></i><span class="hidden-xs"> Issues</span>
+            </a>
+        </li>
+        <li role="presentation"{@eq key=tab value="opinions"} class="active"{/eq}>
+            <a href="{paths.truth.index}?tab=opinions{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="tab">
+                <i class="fa fa-comments-o" aria-hidden="true"></i><span class="hidden-xs"> Comments</span>
+            </a>
+        </li>
+        {?user.isAdmin}
+        <li role="presentation" class="dropdown"><a href="#" id="wtTabMore" class="dropdown-toggle" data-toggle="dropdown" aria-controls="wtTabMore-contents" aria-expanded="false">
+            <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span> {!<span class="caret"></span>!}</a>
+            <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="wtTabMore" id="wtTabMore-contents">
+                <li role="tab"><a href="{paths.truth.topics.create}">
+                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Topic</a></li>
+                {!<li role="separator" class="visible-xs divider"></li>
+                <li class="visible-xs"><a href="#"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments</a></li>
+                <li class="visible-xs"><a href="#"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions</a></li>!}
+            </ul>
+        {/user.isAdmin}
+    </ul>
     {?topics}
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight"><i class="fa fa-folder-open text-muted" aria-hidden="true"></i>&nbsp;&nbsp;Latest Topics</li>
+            <li class="list-group-item highlight"><i class="fa fa-folder-open text-muted" aria-hidden="true"></i> Topics</li>
             {#topics}
                 <li class="list-group-item">
                     <i class="fa fa-folder-open text-color-3" aria-hidden="true"></i>
@@ -55,17 +111,51 @@
             {/topics}
         </ul>
     {/topics}
+    {?arguments}
+        <ul class="list-group wt-list">
+            <li class="list-group-item highlight"><i class="glyphicon glyphicon-flash text-muted" aria-hidden="true"></i> Arguments</li>
+            {#arguments}
+                <li class="list-group-item">
+                    <i class="fa fa-flash text-{verdict.theme}" aria-hidden="true"></i>
+                    <div>
+                        <a href="{?private}{wikiBaseUrl}{/private}{paths.truth.arguments.entry}/{friendlyUrl}/{_id}">{title}{?typeUX} <span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}{?private} <span class="label label-default">private</span>{/private}</a>
+                        {>"dust/truth/common/entry-row-footer" /}
+                    </div>
+                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
+                </li>
+            {/arguments}
+        </ul>
+    {/arguments}
+    {?questions}
+        <ul class="list-group wt-list">
+            <li class="list-group-item highlight"><i class="fa fa-question-circle text-muted" aria-hidden="true"></i> {^topic}Latest {/topic}Questions</li>
+            {#questions}
+                <li class="list-group-item">
+                    <i class="fa fa-question-circle text-color-1" aria-hidden="true"></i>
+                    <div>
+                        <a href="{wikiBaseUrl}{paths.truth.questions.entry}/{friendlyUrl}/{_id}">{title}</a>
+                        {>"dust/truth/common/entry-row-footer" /}
+                    </div>
+                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+            {/questions}
+        </ul>
+    {/questions}
+    {?answers}
+        <ul class="list-group wt-list">
+            <li class="list-group-item highlight"><i class="fa fa-answer-circle text-success-x" aria-hidden="true"></i> {^topic}Latest {/topic}Answers</li>
+            {#answers}
+                <li class="list-group-item">
+                    <i class="fa fa-check-circle-o text-color-1" aria-hidden="true"></i>
+                    <div>
+                        <a href="{wikiBaseUrl}{paths.truth.answers.entry}/{friendlyUrl}/{_id}">{title}</a>
+                        {>"dust/truth/common/entry-row-footer" /}
+                    </div>
+                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+            {/answers}
+        </ul>
+    {/answers}
 {/body}
 
 {<footer}
-    <script src="/components/geopattern/js/geopattern.min.js"></script>
-    <script type="text/javascript">
-        $(function() {
-            $(".wt-category-icon").each(function() {
-                var title = $( this ).data("title");
-                var pattern = GeoPattern.generate(title);
-                $(this).css("background-image", pattern.toDataUrl());
-            });
-        });
-    </script>
+    {>"dust/common/geopattern-title-scripts" /}
 {/footer}

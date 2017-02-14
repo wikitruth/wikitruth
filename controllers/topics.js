@@ -4,6 +4,7 @@ var mongoose    = require('mongoose'),
     async       = require('async'),
     url         = require('url'),
     querystring = require('querystring'),
+    htmlToText  = require('html-to-text'),
     paths       = require('../models/paths'),
     templates   = require('../models/templates'),
     utils       = require('../utils/utils'),
@@ -308,6 +309,7 @@ function POST_create(req, res) {
         var tags = req.body.topicTags;
         var dateNow = Date.now();
         entity.content = req.body.content;
+        entity.contentPreview = utils.getShortText(htmlToText.fromString(req.body.content, { wordwrap: false }), constants.SETTINGS.contentPreviewLength);
         entity.title = req.body.title;
         entity.contextTitle = req.body.contextTitle;
         entity.references = req.body.references;

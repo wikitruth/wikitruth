@@ -21,6 +21,7 @@ module.exports = {
             index: 'dust/members/profile/profile',
             topics: 'dust/members/profile/topics',
             contributions: 'dust/members/profile/contributions',
+            following: 'dust/members/profile/following',
             pages: {
                 index: 'dust/members/profile/pages/index',
                 page: 'dust/members/profile/pages/page',

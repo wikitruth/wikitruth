@@ -14,7 +14,7 @@
                     <div class="media wt-category">
                         <div class="media-left media-top">
                             <a href="{paths.members.index}/{username}">
-                                <div class="photo-placeholder" title="{username}"></div>
+                                <div class="photo-placeholder wt-geopattern-title" title="{username}"></div>
                             </a>
                         </div>
                         <div class="media-body">
@@ -32,14 +32,5 @@
 {/body}
 
 {<footer}
-    <script src="/components/geopattern/js/geopattern.min.js"></script>
-    <script type="text/javascript">
-        $(function() {
-            $(".photo-placeholder").each(function() {
-                var title = $( this ).attr("title");
-                var pattern = GeoPattern.generate(title);
-                $(this).css("background-image", pattern.toDataUrl());
-            });
-        });
-    </script>
+    {>"dust/common/geopattern-title-scripts" /}
 {/footer}

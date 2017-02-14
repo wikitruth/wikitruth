@@ -27,9 +27,9 @@
         </a>
     </div>
     {?topic}
-        <div style="margin-bottom: 15px">
+        <div class="wt-related">
             {!<hr style="border: 0; margin: 0 0 0.375rem; border-top: 0.0625rem dotted #dcdcdc;"/>!}
-            <span style="font-size: 75%; font-weight: bold; color: #767676">Topics</span>&nbsp;
+            <span>Topics</span>&nbsp;
             <a href="{wikiBaseUrl}{paths.truth.topics.entry}/{topic.friendlyUrl}/{topic._id}"><span class="wt-label label label-default">{topic.title}</span></a>&nbsp;
             {#topicLinks}
                 <a href="{wikiBaseUrl}{paths.truth.topics.entry}/{friendlyUrl}/{_id}"><span class="wt-label label label-default">{title}</span></a>&nbsp;
@@ -106,4 +106,5 @@
             }
         });
     </script>
+    {>"dust/common/geopattern-title-scripts" /}
 {/footer}
