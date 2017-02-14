@@ -56,5 +56,5 @@
 {/body}
 
 {<footer}
-    {>"dust/members/profile/profile-scripts" /}
+    {>"dust/common/geopattern-title-scripts" /}
 {/footer}

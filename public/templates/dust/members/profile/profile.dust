@@ -15,7 +15,7 @@
         <div class="col-sm-6">
             <div class="row">
                 <a href="{url}">
-                    <div class="col-sm-4">
+                    <div class="col-sm-12">
                         <div class="well stat">
                             <div class="stat-value">{contributions}</div>
                             <div class="stat-label">Contributions</div>
@@ -38,13 +38,21 @@
                         </div>
                     </div>
                 </a>
-            </div>
-            <div class="row">
                 <a href="{url}?tab=questions">
                     <div class="col-sm-4">
                         <div class="well stat">
                             <div class="stat-value week-of-year">{questions}</div>
                             <div class="stat-label">Questions</div>
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div class="row">
+                <a href="{url}?tab=answers">
+                    <div class="col-sm-4">
+                        <div class="well stat">
+                            <div class="stat-value week-of-year">{answers}</div>
+                            <div class="stat-label">Answers</div>
                         </div>
                     </div>
                 </a>
@@ -69,13 +77,16 @@
     </div>
     {?loggedIn}
         <p><a href="/account/settings" class="no-underline"><i class="fa fa-pencil-square-o"></i> Edit Profile</a></p>
+    {:else}
+        {?user.username}
+            <p><a href="#" class="no-underline"><i class="fa fa-rss" aria-hidden="true"></i> Follow</a></p>
+        {/user.username}
     {/loggedIn}
-    <p><a href="#" class="no-underline"><i class="fa fa-rss" aria-hidden="true"></i> Follow</a></p>
     <p>Account Details</p>
     <p>Reputation</p>
     <p>Timeline &amp; Activities</p>
 {/body}
 
 {<footer}
-    {>"dust/members/profile/profile-scripts" /}
+    {>"dust/common/geopattern-title-scripts" /}
 {/footer}

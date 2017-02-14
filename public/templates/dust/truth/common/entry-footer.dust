@@ -4,7 +4,38 @@
         <i class="fa fa-bookmark"></i> <span class="text-uppercase">References</span>
         <p>{entry.references|s}</p>
     </small>
+    <br/>
 {/entry.references}
-<small class="text-muted">
+{!<small class="text-muted">
     <i class="fa fa-clock-o"></i> Posted <span title="{entry.createDate}">{entry.createDateString}</span> by <i class="fa fa-user-circle-o hidden"></i> <a class="text-muted" href="/members/{entry.createUsername}">{entry.createUsername}</a> | <i class="fa fa-clock-o"></i> Edited <span title="{entry.editDate}">{entry.editDateString}</span> by <i class="fa fa-user-circle-o hidden"></i> <a class="text-muted" href="/members/{entry.editUsername}">{entry.editUsername}</a>
-</small>
+</small>!}
+<hr style="border: 0; margin: 0.7rem 0 1.7rem; border-top: 0.0625rem dotted #dcdcdc;"/>
+<div class="row">
+    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-6">
+        <div class="media wt-category-x">
+            <div class="media-left media-top">
+                <a href="{paths.members.index}/{entry.createUsername}">
+                    <div class="wt-photo-small wt-geopattern-title" title="{entry.createUsername}"></div>
+                </a>
+            </div>
+            <div class="media-body">
+                <h4 class="media-heading"><a href="{paths.members.index}/{entry.createUsername}">{entry.createUsername}</a></h4>
+                <small class="text-muted">{!<i class="fa fa-clock-o"></i> !}Posted <span title="{entry.createDate}">{entry.createDateString}</span></small>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-6">
+        <div class="media wt-category-x">
+            <div class="media-left media-top">
+                <a href="{paths.members.index}/{entry.editUsername}">
+                    <div class="wt-photo-small wt-geopattern-title" title="{entry.editUsername}"></div>
+                </a>
+            </div>
+            <div class="media-body">
+                <h4 class="media-heading"><a href="{paths.members.index}/{entry.editUsername}">{entry.editUsername}</a></h4>
+                <small class="text-muted">{!<i class="fa fa-clock-o"></i> !}Edited <span title="{entry.editDate}">{entry.editDateString}</span></small>
+            </div>
+        </div>
+    </div>
+</div>
+<br/>

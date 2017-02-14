@@ -32,6 +32,11 @@
                         <i class="fa fa-question-circle" aria-hidden="true"></i><span class="hidden-xs"> Questions</span>
                     </a>
                 </li>
+                <li role="presentation"{@eq key=tab value="answers"} class="active"{/eq}>
+                    <a href="{url}?tab=answers" role="tab">
+                        <i class="fa fa-check-circle" aria-hidden="true"></i><span class="hidden-xs"> Answers</span>
+                    </a>
+                </li>
                 <li role="presentation"{@eq key=tab value="issues"} class="active"{/eq}>
                     <a href="{url}?tab=issues" role="tab">
                         <i class="fa fa-exclamation-circle" aria-hidden="true"></i><span class="hidden-xs"> Issues</span>
@@ -99,6 +104,23 @@
                     <div class="top-list-items-more"><a href="{url}?tab=questions" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
                 {/questionsMore}
             {/questions}
+            {?answers}
+                <h3 class="page-header-x">Answers</h3>
+                <ul class="list-group top-list-items wt-list">
+                    {#answers}
+                        <li class="list-group-item">
+                            <i class="fa fa-check-circle text-color-1" aria-hidden="true"></i>
+                            <div>
+                                <a href="{paths.truth.answers.entry}/{friendlyUrl}/{_id}">{title}</a>
+                                {>"dust/truth/common/entry-row-footer" /}
+                            </div>
+                            <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+                    {/answers}
+                </ul>
+                {?answersMore}
+                    <div class="top-list-items-more"><a href="{url}?tab=questions" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+                {/answersMore}
+            {/answers}
             {?issues}
                 <h3 class="page-header-x">Issues</h3>
                 <ul class="list-group top-list-items wt-list">
@@ -140,5 +162,5 @@
 {/body}
 
 {<footer}
-    {>"dust/members/profile/profile-scripts" /}
+    {>"dust/common/geopattern-title-scripts" /}
 {/footer}

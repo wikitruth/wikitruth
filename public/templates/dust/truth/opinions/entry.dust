@@ -15,3 +15,7 @@
     {>"dust/truth/common/entry-options" /}
     {>"dust/truth/common/entry-footer" /}
 {/body}
+
+{<footer}
+    {>"dust/common/geopattern-title-scripts" /}
+{/footer}

@@ -3,7 +3,7 @@
     <li><i class="fa fa-user-circle text-muted"></i> <a href="{paths.members.index}">Members</a></li>
     <li><i class="fa fa-user-circle text-muted"></i> <a href="{paths.members.index}/{member.username}">{member.username}</a></li>
 </ol>!}
-<h1 class="page-header wt-header wt-profile-background" title="{member.username}" style="padding-bottom: 50px;
+<h1 class="page-header wt-header wt-geopattern-title" title="{member.username}" style="padding-bottom: 50px;
     padding-top: 50px;text-align: center;
     background-image: linear-gradient(-110deg, #48227d 0%, #2f569c 100%);
     color: #fff;font-weight: normal;
@@ -37,6 +37,11 @@
         </a>
     </li>
     {/loggedIn}
+    <li role="presentation"{@eq key=profileTab value="following"} class="active"{/eq}>
+        <a href="{paths.members.index}/{member.username}/following" role="tab">
+            <i class="fa fa-rss"></i> Following
+        </a>
+    </li>
     <li role="presentation"{@eq key=profileTab value="pages"} class="active"{/eq}>
         <a href="{profileBaseUrl}{paths.members.profile.pages.index}" role="tab">
             <i class="fa fa-book"></i> {?loggedIn}My {/loggedIn}Pages

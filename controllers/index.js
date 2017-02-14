@@ -90,10 +90,16 @@ module.exports = function (router) {
     });
 
     router.get('/explore', function (req, res) {
-        var model = {};
+        var model = {
+            tab: req.query.tab ? req.query.tab : 'topics'
+        };
+        flowUtils.setScreeningModel(req, model);
         async.parallel({
             topics: function(callback) {
-                var query = { parentId: {$ne: null}, private: false, 'screening.status': constants.SCREENING_STATUS.status1.code };
+                if(model.tab !== 'topics') {
+                    return callback();
+                }
+                var query = { parentId: {$ne: null}, private: false, 'screening.status': model.screening.status };
                 //db.Topic.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
                 db.Topic
                     .find(query)
@@ -109,6 +115,94 @@ module.exports = function (router) {
                         callback();
                     });
                 });
+            },
+            arguments: function(callback) {
+                if(model.tab !== 'arguments') {
+                    return callback();
+                }
+                //var query = { parentId: {$ne: null}, private: false, 'screening.status': model.screening.status };
+                var query = {
+                    ownerType: constants.OBJECT_TYPES.topic,
+                    private: false,
+                    'screening.status': model.screening.status
+                };
+                //db.Topic.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
+                db.Argument
+                    .find(query)
+                    .sort({editDate: -1})
+                    .limit(25)
+                    .lean()
+                    .exec(function (err, results) {
+                        flowUtils.setEditorsUsername(results, function() {
+                            results.forEach(function (result) {
+                                result.topic = {
+                                    _id: result.ownerId
+                                };
+                                flowUtils.appendEntryExtra(result);
+                                flowUtils.setVerdictModel(result);
+                            });
+                            model.arguments = results;
+                            flowUtils.setModelContext(req, model);
+                            callback();
+                        });
+                    });
+            },
+            questions: function(callback) {
+                if(model.tab !== 'questions') {
+                    return callback();
+                }
+                var query = {
+                    ownerType: constants.OBJECT_TYPES.topic,
+                    private: false,
+                    'screening.status': model.screening.status
+                };
+                //db.Question.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
+                db.Question
+                    .find(query)
+                    .sort({editDate: -1})
+                    .limit(25)
+                    .lean()
+                    .exec(function (err, results) {
+                        flowUtils.setEditorsUsername(results, function() {
+                            results.forEach(function (result) {
+                                result.topic = {
+                                    _id: result.ownerId
+                                };
+                                flowUtils.appendEntryExtra(result);
+                            });
+                            model.questions = results;
+                            flowUtils.setModelContext(req, model);
+                            callback();
+                        });
+                    });
+            },
+            answers: function(callback) {
+                if(model.tab !== 'answers') {
+                    return callback();
+                }
+                var query = {
+                    private: false,
+                    'screening.status': model.screening.status
+                };
+                //db.Answer.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
+                db.Answer
+                    .find(query)
+                    .sort({editDate: -1})
+                    .limit(25)
+                    .lean()
+                    .exec(function (err, results) {
+                        flowUtils.setEditorsUsername(results, function () {
+                            results.forEach(function (result) {
+                                result.topic = {
+                                    _id: result.ownerId
+                                };
+                                flowUtils.appendEntryExtra(result);
+                            });
+                            model.answers = results;
+                            flowUtils.setModelContext(req, model);
+                            callback();
+                        });
+                    });
             },
             categories: function(callback) {
                 db.Topic
@@ -215,13 +309,18 @@ module.exports = function (router) {
         if(!keyword) {
             return res.render(templates.search, model);
         }
+        var privacyFilter = req.user ? [ { private: false }, { private: true, createUserId: req.user.id } ] : [ { private: false } ];
+        if(req.user) {
+            req.params.username = req.user.username;
+        }
+        flowUtils.setModelContext(req, model);
         async.parallel({
             topics: function(callback) {
                 if(tab !== 'all' && tab !== 'topics') {
                     return callback();
                 }
                 db.Topic
-                    .find({ $text : { $search : keyword }, private: false }, { score: { $meta: "textScore" } })
+                    .find({ $text : { $search : keyword }, $or: privacyFilter }, { score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
                     .limit(tab === 'all' ? 15 : 0)
                     .lean()
@@ -250,7 +349,7 @@ module.exports = function (router) {
                     return callback();
                 }
                 db.Argument
-                    .find({ $text : { $search : keyword }, private: false }, { score: { $meta: "textScore" } })
+                    .find({ $text : { $search : keyword }, $or: privacyFilter }, { score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
                     .limit(tab === 'all' ? 15 : 0)
                     .lean()
@@ -277,7 +376,7 @@ module.exports = function (router) {
                     return callback();
                 }
                 db.Question
-                    .find({ $text : { $search : keyword }, private: false }, { score: { $meta: "textScore" } })
+                    .find({ $text : { $search : keyword }, $or: privacyFilter }, { score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
                     .limit(tab === 'all' ? 15 : 0)
                     .lean()
@@ -294,12 +393,34 @@ module.exports = function (router) {
                     });
                 });
             },
+            answers: function (callback) {
+                if(tab !== 'all' && tab !== 'answers') {
+                    return callback();
+                }
+                db.Answer
+                    .find({ $text : { $search : keyword }, $or: privacyFilter }, { score: { $meta: "textScore" } })
+                    .sort({ score: { $meta: "textScore" } })
+                    .limit(tab === 'all' ? 15 : 0)
+                    .lean()
+                    .exec(function(err, results) {
+                        flowUtils.setEditorsUsername(results, function() {
+                            results.forEach(function (result) {
+                                flowUtils.appendEntryExtra(result);
+                            });
+                            model.answers = results;
+                            if(results.length > 0) {
+                                model.results = true;
+                            }
+                            callback();
+                        });
+                    });
+            },
             issues: function (callback) {
                 if(tab !== 'all' && tab !== 'issues') {
                     return callback();
                 }
                 db.Issue
-                    .find({ $text : { $search : keyword }, private: false }, { score: { $meta: "textScore" } })
+                    .find({ $text : { $search : keyword }, $or: privacyFilter }, { score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
                     .limit(tab === 'all' ? 15 : 0)
                     .lean()
@@ -324,7 +445,7 @@ module.exports = function (router) {
                     return callback();
                 }
                 db.Opinion
-                    .find({ $text : { $search : keyword }, private: false }, { score: { $meta: "textScore" } })
+                    .find({ $text : { $search : keyword }, $or: privacyFilter }, { score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
                     .limit(tab === 'all' ? 15 : 0)
                     .lean()

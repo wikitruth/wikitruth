@@ -4,7 +4,7 @@
             <li class="list-group-item highlight"><span class="glyphicon glyphicon-answer-sign text-success-x" aria-hidden="true"></span> Answers <span class="wt-label label label-default">{entry.childrenCount.answers.accepted}</span></li>
             {#answers}
                 <li class="list-group-item">
-                    <i class="fa fa-check-circle-o text-success text-muted-x" aria-hidden="true"></i>
+                    <i class="fa fa-check-circle-o text-color-1 text-muted-x" aria-hidden="true"></i>
                     <div>
                         <a href="{wikiBaseUrl}{paths.truth.answers.entry}/{friendlyUrl}/{_id}">{title}</a>
                         {>"dust/truth/common/entry-row-footer" /}

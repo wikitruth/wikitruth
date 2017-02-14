@@ -36,7 +36,7 @@
             <ul class="nav nav-tabs wt-tabs" role="tablist">
                 <li role="presentation"{@eq key=tab value="all"} class="active"{/eq}>
                     <a href="{paths.search}?q={keyword}" role="tab">
-                        <i class="glyphicon glyphicon-globe" aria-hidden="true"></i> Everything
+                        <i class="glyphicon glyphicon-globe" aria-hidden="true"></i> <span class="hidden-xxs">Everything</span>
                     </a>
                 </li>
                 <li role="presentation"{@eq key=tab value="topics"} class="active"{/eq}>
@@ -54,6 +54,11 @@
                         <i class="fa fa-question-circle" aria-hidden="true"></i><span class="hidden-xs"> Questions</span>
                     </a>
                 </li>
+                <li role="presentation"{@eq key=tab value="answers"} class="active"{/eq}>
+                    <a href="{paths.search}?q={keyword}&amp;tab=answers" role="tab">
+                        <i class="fa fa-check-circle" aria-hidden="true"></i><span class="hidden-xs"> Answers</span>
+                    </a>
+                </li>
                 <li role="presentation"{@eq key=tab value="issues"} class="active"{/eq}>
                     <a href="{paths.search}?q={keyword}&amp;tab=issues" role="tab">
                         <i class="fa fa-exclamation-circle" aria-hidden="true"></i><span class="hidden-xs"> Issues</span>
@@ -66,14 +71,14 @@
                 </li>
             </ul>
             {?topics}
-                <h3 class="page-header-x">Topics</h3>
+                <h3 class="page-header-x text-muted-0"><i class="fa fa-folder-open"></i> Topics</h3>
                 <ul class="list-group top-list-items wt-list">
                     {!<li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp; Topics</li>!}
                     {#topics}
                         <li class="list-group-item">
                             <i class="fa fa-folder-open text-color-3" aria-hidden="true"></i>
                             <div>
-                                <a href="{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{title}</a>
+                                <a href="{?private}{wikiBaseUrl}{/private}{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{title}{?private} <span class="label label-default">private</span>{/private}</a>
                                 {>"dust/truth/common/entry-row-footer" /}
                             </div>
                             <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
@@ -85,14 +90,14 @@
                 {/topicsMore}
             {/topics}
             {?arguments}
-                <h3 class="page-header-x">Arguments</h3>
+                <h3 class="page-header-x text-muted-0"><i class="fa fa-flash"></i> Arguments</h3>
                 <ul class="list-group top-list-items wt-list">
                     {!<li class="list-group-item highlight text-primary"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments</li>!}
                     {#arguments}
                         <li class="list-group-item">
                             <span class="glyphicon glyphicon-flash text-{verdict.theme}" aria-hidden="true"></span>
                             <div>
-                                <a href="{paths.truth.arguments.entry}/{friendlyUrl}/{_id}">{title} {?typeUX}<span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}</a>
+                                <a href="{?private}{wikiBaseUrl}{/private}{paths.truth.arguments.entry}/{friendlyUrl}/{_id}">{title}{?typeUX} <span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}{?private} <span class="label label-default">private</span>{/private}</a>
                                 {>"dust/truth/common/entry-row-footer" /}
                             </div>
                             <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
@@ -104,14 +109,14 @@
                 {/argumentsMore}
             {/arguments}
             {?questions}
-                <h3 class="page-header-x">Questions</h3>
+                <h3 class="page-header-x text-muted-0"><i class="fa fa-question-circle"></i> Questions</h3>
                 <ul class="list-group top-list-items wt-list">
                     {!<li class="list-group-item highlight"><span class="glyphicon glyphicon-question-sign text-success" aria-hidden="true"></span> Questions</li>!}
                     {#questions}
                         <li class="list-group-item">
                             <i class="fa fa-question-circle text-color-1" aria-hidden="true"></i>
                             <div>
-                                <a href="{paths.truth.questions.entry}/{friendlyUrl}/{_id}">{title}</a>
+                                <a href="{?private}{wikiBaseUrl}{/private}{paths.truth.questions.entry}/{friendlyUrl}/{_id}">{title}{?private} <span class="label label-default">private</span>{/private}</a>
                                 {>"dust/truth/common/entry-row-footer" /}
                             </div>
                             <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
@@ -121,15 +126,32 @@
                     <div class="top-list-items-more"><a href="{paths.search}?q={keyword}&amp;tab=questions" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
                 {/questionsMore}
             {/questions}
+            {?answers}
+                <h3 class="page-header-x text-muted-0"><i class="fa fa-check-circle-o"></i> Answers</h3>
+                <ul class="list-group top-list-items wt-list">
+                    {#answers}
+                        <li class="list-group-item">
+                            <i class="fa fa-check-circle text-color-1" aria-hidden="true"></i>
+                            <div>
+                                <a href="{?private}{wikiBaseUrl}{/private}{paths.truth.answers.entry}/{friendlyUrl}/{_id}">{title}{?private} <span class="label label-default">private</span>{/private}</a>
+                                {>"dust/truth/common/entry-row-footer" /}
+                            </div>
+                            <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+                    {/answers}
+                </ul>
+                {?answersMore}
+                    <div class="top-list-items-more"><a href="{paths.search}?q={keyword}&amp;tab=answers" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+                {/answersMore}
+            {/answers}
             {?issues}
-                <h3 class="page-header-x">Issues</h3>
+                <h3 class="page-header-x text-muted-0"><i class="fa fa-exclamation-circle"></i> Issues</h3>
                 <ul class="list-group top-list-items wt-list">
                     {!<li class="list-group-item highlight"><span class="fa fa-exclamation-circle text-success" aria-hidden="true"></span> Issues</li>!}
                     {#issues}
                         <li class="list-group-item">
                             <span class="fa fa-exclamation-circle text-danger" aria-hidden="true"></span>
                             <div>
-                                <a href="{paths.truth.issues.entry}/{friendlyUrl}/{_id}">{title}</a>
+                                <a href="{?private}{wikiBaseUrl}{/private}{paths.truth.issues.entry}/{friendlyUrl}/{_id}">{title}{?private} <span class="label label-default">private</span>{/private}</a>
                                 {>"dust/truth/common/entry-row-footer" /}
                             </div>
                             <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
@@ -140,14 +162,14 @@
                 {/issuesMore}
             {/issues}
             {?opinions}
-                <h3 class="page-header-x">Comments</h3>
+                <h3 class="page-header-x text-muted-0"><i class="fa fa-comments-o"></i> Comments</h3>
                 <ul class="list-group top-list-items wt-list">
                     {!<li class="list-group-item highlight"><span class="fa fa-comments-o text-success" aria-hidden="true"></span> Opinions</li>!}
                     {#opinions}
                         <li class="list-group-item">
                             <span class="fa fa-comments-o text-primary" aria-hidden="true"></span>
                             <div>
-                                <a href="{paths.truth.opinions.entry}/{friendlyUrl}/{_id}">{title}</a>
+                                <a href="{?private}{wikiBaseUrl}{/private}{paths.truth.opinions.entry}/{friendlyUrl}/{_id}">{title}{?private} <span class="label label-default">private</span>{/private}</a>
                                 {>"dust/truth/common/entry-row-footer" /}
                             </div>
                             <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>

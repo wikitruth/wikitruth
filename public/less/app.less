@@ -139,6 +139,13 @@ body {
   border-radius: 6px;
 }
 
+.wt-photo-small {
+  width: 48px;
+  height: 48px;
+  background-color: #4078c0;
+  border-radius: 50%;
+}
+
 .entry-header {
   margin-bottom: 10px;
 
@@ -280,7 +287,7 @@ a.no-underline:hover, .wt-list a:hover {
         font-size: 15px;
       }
 
-      > div {
+      > div.entry-row-footer {
         font-size: smaller;
       }
     }
@@ -315,6 +322,10 @@ a.wt-link-focus {
   padding: 35px 5px 5px 5px;
   border-radius: 10px 0 0 0;
   text-shadow: 0 0 5px rgba(255, 255, 255, 0.35);
+}
+
+.text-muted-0 {
+  color: #555;
 }
 
 .text-muted-2 {
@@ -362,6 +373,24 @@ a.wt-link-focus {
 .wt-nav-pills {
   &.nav-pills>li>a {
     padding: 5px 8px;
+  }
+}
+
+.wt-related {
+  margin-bottom: 15px;
+  margin-top: 0;
+
+  > span {
+    color: #767676;
+  }
+
+  .label {
+    font-size: inherit;
+    font-weight: normal;
+  }
+
+  a:hover {
+    text-decoration: none;
   }
 }
 

@@ -996,7 +996,6 @@ function setScreeningModel(req, model) {
         model.screening = {};
     }
 
-
     var baseUrl = url.parse(req.originalUrl);
     var newQuery = querystring.parse(baseUrl.query);
     baseUrl.search = null; // important, ensures new 'query' to take effect

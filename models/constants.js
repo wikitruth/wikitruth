@@ -293,5 +293,8 @@ module.exports = {
         dangerous: 22
     },
     SCREENING_STATUS: SCREENING_STATUS,
-    VERDICT_STATUS: VERDICT_STATUS
+    VERDICT_STATUS: VERDICT_STATUS,
+    SETTINGS: {
+        contentPreviewLength: 250
+    }
 };

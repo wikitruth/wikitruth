@@ -33,9 +33,9 @@
         {/keyArguments}
     </div>
     {?parentTopic}
-        <div style="margin-bottom: 15px; margin-top: 0px">
+        <div class="wt-related">
             {!<hr style="border: 0; margin: 0 0 0.375rem; border-top: 0.0625rem dotted #dcdcdc;"/>!}
-            <span style="font-size: 75%; font-weight: bold; color: #767676">Topics</span>&nbsp;
+            <span>Topics</span>&nbsp;
             <a href="{wikiBaseUrl}{paths.truth.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}"><span class="wt-label label label-default">{parentTopic.title}</span></a>&nbsp;
             {#topicLinks}
                 <a href="{wikiBaseUrl}{paths.truth.topics.entry}/{friendlyUrl}/{_id}"><span class="wt-label label label-default">{title}</span></a>&nbsp;
@@ -50,7 +50,7 @@
                     <div class="media wt-category">
                         <div class="media-left media-top">
                             <a href="{wikiBaseUrl}{paths.truth.topics.entry}/{friendlyUrl}/{_id}">
-                                <div class="wt-category-icon" data-title="{title}"></div>
+                                <div class="wt-category-icon wt-geopattern-title" title="{title}"></div>
                             </a>
                         </div>
                         <div class="media-body">
@@ -83,6 +83,9 @@
                         {/link}
                         <div>
                             <a href="{wikiBaseUrl}{paths.truth.topics.entry}/{friendlyUrl}/{_id}">{?link}{?link.title}{link.title}{:else}{title}{/link.title}{:else}{?contextTitle}{contextTitle}{:else}{title}{/contextTitle}{/link}</a>
+                            {?contentPreview}
+                                <div>{contentPreview}</div>
+                            {/contentPreview}
                             {>"dust/truth/common/entry-row-footer" /}
                         </div>
                         <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
@@ -139,7 +142,7 @@
         });
     </script>
 
-    {?mainTopic}
+    {!{?mainTopic}
         <script src="/components/geopattern/js/geopattern.min.js"></script>
         <script type="text/javascript">
             $(function() {
@@ -150,5 +153,7 @@
                 });
             });
         </script>
-    {/mainTopic}
+    {/mainTopic}!}
+
+    {>"dust/common/geopattern-title-scripts" /}
 {/footer}

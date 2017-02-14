@@ -1,0 +1,21 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {member.username}: Following - {titleSlogan}
+{/title}
+
+{<body}
+    {>"dust/members/profile/profile-header" profileTab="following" /}
+
+    <p style="font-weight: normal" class="text-muted-x">
+        {?loggedIn}
+            You are not following any posts.
+        {:else}
+            Member is not following any posts.
+        {/loggedIn}
+    </p>
+{/body}
+
+{<footer}
+    {>"dust/common/geopattern-title-scripts" /}
+{/footer}
