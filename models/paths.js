@@ -31,7 +31,7 @@ module.exports = {
             }
         }
     },
-    truth: {
+    wiki: {
         index: '/explore',
         topics: {
             index:  '/topics',
@@ -71,6 +71,7 @@ module.exports = {
         verdict: {
             update: '/verdict/update'
         },
+        screening: '/screening',
         related: '/related',
         clipboard: '/clipboard'
     }

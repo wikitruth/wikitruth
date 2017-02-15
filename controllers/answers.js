@@ -50,7 +50,7 @@ function GET_entry(req, res) {
         }, function (err, results) {
             flowUtils.setModelOwnerEntry(model);
             flowUtils.setModelContext(req, model);
-            res.render(templates.truth.answers.entry, model);
+            res.render(templates.wiki.answers.entry, model);
         });
     });
 }
@@ -79,7 +79,7 @@ function GET_index(req, res) {
                         if(model.childrenCount.pending === 0 && model.childrenCount.rejected === 0) {
                             model.screening.hidden = true;
                         }
-                        res.render(templates.truth.answers.index, model);
+                        res.render(templates.wiki.answers.index, model);
                     });
                 });
         });
@@ -102,7 +102,7 @@ function GET_index(req, res) {
                     });
                     model.answers = results;
                     flowUtils.setModelContext(req, model);
-                    res.render(templates.truth.answers.index, model);
+                    res.render(templates.wiki.answers.index, model);
                 });
             });
     }
@@ -112,7 +112,7 @@ function GET_create(req, res) {
     var model = {};
     flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function () {
         flowUtils.setModelContext(req, model);
-        res.render(templates.truth.answers.create, model);
+        res.render(templates.wiki.answers.create, model);
     });
 }
 
@@ -139,9 +139,9 @@ function POST_create(req, res) {
             var updateRedirect = function () {
                 var model = {};
                 flowUtils.setModelContext(req, model);
-                var url = model.wikiBaseUrl + paths.truth.answers.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
+                var url = model.wikiBaseUrl + paths.wiki.answers.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
                 res.redirect(url);
-                /*res.redirect((result ? paths.truth.answers.entry : paths.truth.answers.index) +
+                /*res.redirect((result ? paths.wiki.answers.entry : paths.wiki.answers.index) +
                  '?topic=' + req.query.topic +
                  (req.query.argument ? '&argument=' + req.query.argument : '') +
                  (result ? '&answer=' + req.query.answer : '')

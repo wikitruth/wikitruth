@@ -20,7 +20,7 @@ module.exports = function (router) {
 
                 }*/
 
-                res.render(templates.truth.outline.linkTo, model);
+                res.render(templates.wiki.outline.linkTo, model);
             });
         });
     });
@@ -29,7 +29,7 @@ module.exports = function (router) {
         var model = {};
         flowUtils.setTopicModels(req, model, function () {
             flowUtils.setArgumentModels(req, model, function () {
-                res.render(templates.truth.outline.create, model);
+                res.render(templates.wiki.outline.create, model);
             });
         });
     });

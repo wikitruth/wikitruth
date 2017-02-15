@@ -21,7 +21,7 @@ function GET_entry(req, res) {
     flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
         flowUtils.setModelOwnerEntry(model);
         flowUtils.setModelContext(req, model);
-        res.render(templates.truth.opinions.entry, model);
+        res.render(templates.wiki.opinions.entry, model);
     });
 }
 
@@ -51,7 +51,7 @@ function GET_index(req, res) {
                     if(model.childrenCount.pending === 0 && model.childrenCount.rejected === 0) {
                         model.screening.hidden = true;
                     }
-                    res.render(templates.truth.opinions.index, model);
+                    res.render(templates.wiki.opinions.index, model);
                 });
             });
         });
@@ -71,7 +71,7 @@ function GET_index(req, res) {
                 });
                 model.opinions = results;
                 flowUtils.setModelContext(req, model);
-                res.render(templates.truth.opinions.index, model);
+                res.render(templates.wiki.opinions.index, model);
             });
         });
     }
@@ -81,7 +81,7 @@ function GET_create(req, res) {
     var model = {};
     flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
         flowUtils.setModelContext(req, model);
-        res.render(templates.truth.opinions.create, model);
+        res.render(templates.wiki.opinions.create, model);
     });
 }
 
@@ -118,9 +118,9 @@ function POST_create(req, res) {
             var updateRedirect = function () {
                 var model = {};
                 flowUtils.setModelContext(req, model);
-                var url = model.wikiBaseUrl + paths.truth.opinions.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
+                var url = model.wikiBaseUrl + paths.wiki.opinions.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
                 res.redirect(url);
-                /*res.redirect((result ? paths.truth.opinions.entry : paths.truth.opinions.index) +
+                /*res.redirect((result ? paths.wiki.opinions.entry : paths.wiki.opinions.index) +
                  '?topic=' + req.query.topic +
                  (req.query.argument ? '&argument=' + req.query.argument : '') +
                  (result ? '&opinion=' + req.query.opinion : '')

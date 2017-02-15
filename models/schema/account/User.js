@@ -32,6 +32,9 @@ exports = module.exports = function(app, mongoose) {
     if (role === 'reviewer' && this.roles.reviewer) {
       return true;
     }
+    if (role === 'screener' && this.roles.screener) {
+      return true;
+    }
 
     return false;
   };

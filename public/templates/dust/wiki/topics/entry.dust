@@ -1,0 +1,162 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {topic.title} - {titleSlogan}
+{/title}
+
+{<body}
+    {>"dust/wiki/common/entry-header" tab="overview" /}
+    <div class="entry-header">
+        {>"dust/wiki/common/entry-verdict" /}
+    </div>
+    <div class="text-body collapsible">
+        {?topic.referenceDate}
+            <p><small class="text-muted" title="Reference Date"><i class="fa fa-clock-o"></i> {topic.referenceDateUTC}</small></p>
+        {/topic.referenceDate}
+        {topic.content|s}
+        <a href="#" onclick="return contentSeeMore()" class="content-see-more hidden">
+            <div class="content-see-more-gradient"></div>
+            <div class="content-see-more-text">See more</div>
+        </a>
+        {?keyArguments}
+            <div style="margin-top: 10px; margin-bottom: 10px;">
+                <div style="font-size: 12px;" class="text-muted">KEY ARGUMENTS</div>
+                {#keyArguments}
+                    <div class="text-muted">&bull; <a class="text-muted" href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a></div>
+                {/keyArguments}
+                {!<ul>
+                    {#keyArguments}
+                        <li><a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a></li>
+                    {/keyArguments}
+                </ul>!}
+            </div>
+        {/keyArguments}
+    </div>
+    {?parentTopic}
+        <div class="wt-related">
+            {!<hr style="border: 0; margin: 0 0 0.375rem; border-top: 0.0625rem dotted #dcdcdc;"/>!}
+            <span>Topics</span>&nbsp;
+            <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}"><span class="wt-label label label-default">{parentTopic.title}</span></a>&nbsp;
+            {#topicLinks}
+                <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}"><span class="wt-label label label-default">{title}</span></a>&nbsp;
+            {/topicLinks}
+        </div>
+    {/parentTopic}
+    {>"dust/wiki/common/entry-options" /}
+    {?mainTopic}
+        <div class="row" style="margin-top: 30px">
+            {#categories}
+                <div class="col-lg-4 col-md-6 col-sm-6">{! 73px !}
+                    <div class="media wt-category">
+                        <div class="media-left media-top">
+                            <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">
+                                <div class="wt-category-icon wt-geopattern-title" title="{title}"></div>
+                            </a>
+                        </div>
+                        <div class="media-body">
+                            <h4 class="media-heading"><a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">{?contextTitle}{contextTitle}{:else}{title}{/contextTitle}</a></h4>
+                            <div>
+                                {?subtopics}
+                                    {#subtopics}
+                                        <div><i class="fa fa-folder-open text-muted text-success-x" aria-hidden="true"></i>&nbsp;<a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">{shortTitle}</a></div>
+                                    {/subtopics}
+                                    <div><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a href="{wikiBaseUrl}{paths.wiki.topics.index}?topic={_id}" role="button">more</a></div>
+                                    {!<span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}!}
+                                {/subtopics}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {/categories}
+        </div>
+    {/mainTopic}
+    {?topics}
+        <div class="wt-list">
+            <ul class="list-group top-list-items">
+                <li class="list-group-item highlight text-muted"><i class="fa fa-folder-open text-success-x" aria-hidden="true"></i>&nbsp; Topics <span class="wt-label label label-default">{entry.childrenCount.topics.accepted}</span></li>
+                {#topics}
+                    <li class="list-group-item">
+                        {?link}
+                            <a href="{wikiBaseUrl}{paths.wiki.topics.link}?topic={topic._id}&amp;id={link._id}&amp;source={paths.wiki.topics.entry}" class="glyphicon glyphicon-link text-color-3"></a>
+                        {:else}
+                            <i class="fa fa-folder-open text-color-3" aria-hidden="true"></i>
+                        {/link}
+                        <div>
+                            <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">{?link}{?link.title}{link.title}{:else}{title}{/link.title}{:else}{?contextTitle}{contextTitle}{:else}{title}{/contextTitle}{/link}</a>
+                            {?contentPreview}
+                                <div>{contentPreview}</div>
+                            {/contentPreview}
+                            {>"dust/wiki/common/entry-row-footer" /}
+                        </div>
+                        <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
+                    </li>
+                {/topics}
+            </ul>
+            {@gt key=entry.childrenCount.topics.accepted value="15"}
+                <div class="top-list-items-more"><a href="{wikiBaseUrl}{paths.wiki.topics.index}/{topic.friendlyUrl}/{topic._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{entry.childrenCount.topics.accepted}</span></a></div>
+            {/gt}
+        </div>
+    {/topics}
+    {?arguments}
+        <div class="wt-list">
+            <ul class="list-group top-list-items">
+                <li class="list-group-item highlight text-primary-x text-muted-x"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments <span class="wt-label label label-default">{entry.childrenCount.arguments.accepted}</span></li>
+                {#arguments}
+                <li class="list-group-item">
+                    {?link}
+                        <a href="{wikiBaseUrl}{paths.wiki.arguments.link}?topic={link.ownerId}&amp;id={link._id}&amp;source={paths.wiki.topics.entry}/{friendlyUrl}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
+                    {:else}
+                        <span class="glyphicon glyphicon-flash text-{verdict.theme}" aria-hidden="true"></span>
+                    {/link}
+                    <div>
+                        <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title} {?typeUX}<span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}</a>
+                        {?contentPreview}
+                            <div>{contentPreview}</div>
+                        {/contentPreview}
+                        {>"dust/wiki/common/entry-row-footer" /}
+                    </div>
+                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
+                </li>
+                {/arguments}
+            </ul>
+            {@gt key=entry.childrenCount.arguments.accepted value="15"}
+                <div class="top-list-items-more"><a href="{wikiBaseUrl}{paths.wiki.arguments.index}?topic={topic._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{entry.childrenCount.arguments.accepted}</span></a></div>
+            {/gt}
+        </div>
+    {/arguments}
+    {>"dust/wiki/questions/list-preview" /}
+    {>"dust/wiki/issues/list-preview" /}
+    {>"dust/wiki/opinions/list-preview" /}
+    {>"dust/wiki/common/entry-footer" /}
+{/body}
+
+{<footer}
+    <script>
+        function contentSeeMore() {
+            $('.text-body').css('max-height', 'none');
+            $('.content-see-more').css('display', 'none');
+            return false;
+        }
+
+        $(function() {
+            if($('.text-body').css('height') === $('.text-body').css('max-height')) {
+                $('.content-see-more').removeClass('hidden');
+            }
+        });
+    </script>
+
+    {!{?mainTopic}
+        <script src="/components/geopattern/js/geopattern.min.js"></script>
+        <script type="text/javascript">
+            $(function() {
+                $(".wt-category-icon").each(function() {
+                    var title = $( this ).data("title");
+                    var pattern = GeoPattern.generate(title);
+                    $(this).css("background-image", pattern.toDataUrl());
+                });
+            });
+        </script>
+    {/mainTopic}!}
+
+    {>"dust/common/geopattern-title-scripts" /}
+{/footer}

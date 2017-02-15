@@ -1,0 +1,174 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {?topic}Edit{:else}New{/topic} Topic - {titleSlogan}
+{/title}
+
+{<body}
+    {>"dust/wiki/common/breadcrumb" /}
+    <h1 class="page-header">
+        <i class="fa fa-folder-open"></i> {?topic}Edit{:else}New{/topic} Topic
+    </h1>
+    <form method="post">
+        <input type="hidden" name="_csrf" value="{_csrf}">
+        <div class="form-group">
+            <label for="inputName">Title</label>
+            <textarea name="title" id="inputName" class="form-control" rows="1">{topic.title}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="inputName"><a role="button" data-toggle="collapse" href="#collapseContextTitle" aria-expanded="false" aria-controls="collapseContextTitle" class="wt-collapse-toggle{^topic.contextTitle} collapsed{/topic.contextTitle}">Title <span class="text-muted">(Contextual)</span></a></label>
+            <div class="collapse{?topic.contextTitle} in{/topic.contextTitle}" id="collapseContextTitle">
+                <textarea name="contextTitle" placeholder="Usually a shorter title, optional" id="contextTitle" class="form-control" rows="1">{topic.contextTitle}</textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputContent">Summary</label>
+            <textarea class="form-control" id="inputContent" name="content" rows="12">{topic.content}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="inputReferences">
+                <a role="button" data-toggle="collapse" href="#collapseReferences" aria-expanded="false" aria-controls="collapseReferences" class="wt-collapse-toggle{^topic.references} collapsed{/topic.references}">References</a>
+            </label>
+            <div class="collapse{?topic.references} in{/topic.references}" id="collapseReferences">
+                <textarea class="form-control" id="inputReferences" name="references" rows="3">{topic.references}</textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputParent"><a role="button" data-toggle="collapse" href="#collapseParent" aria-expanded="false" aria-controls="collapseParent" class="wt-collapse-toggle collapsed">Parent</a></label>
+            <div class="collapse" id="collapseParent">
+                <textarea name="parent" id="inputParent" class="form-control" rows="1">{?topic}{topic.parentId}{:else}{parentTopic._id}{/topic}</textarea>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="inputParent">
+                <a role="button" data-toggle="collapse" href="#collapseReferenceDate" aria-expanded="false" aria-controls="collapseReferenceDate" class="wt-collapse-toggle{^topic.referenceDateString} collapsed{/topic.referenceDateString}">Reference Date</a>
+            </label>
+            <div class="collapse{?topic.referenceDateString} in{/topic.referenceDateString}" id="collapseReferenceDate">
+                <div class='input-group date' id='inputRefDatePicker'>
+                    <input type="text" name="referenceDate" id="inputReferenceDate" class="form-control" value="{topic.referenceDateString}" />
+                    {!<input type="hidden" name="referenceDateUTC" id="inputReferenceDateUTC" value="" />!}
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>
+                <a role="button" data-toggle="collapse" href="#collapseTags" aria-expanded="false" aria-controls="collapseTags" class="wt-collapse-toggle{^topic.tags} collapsed{/topic.tags}">Tags</a>
+            </label>
+            <div class="collapse{?topic.tags} in{/topic.tags}" id="collapseTags">
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" class="topicTag" name="topicTags" value="20">
+                        <span class="text-info"><strong>{TOPIC_TAGS.tag20.text}</strong></span><br/>
+                        A primary, crucial, core or vital part of the parent entry.
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="hasEthicalValue" id="hasEthicalValue" value="1" {?topic.ethicalStatus.hasValue}checked="checked"{/topic.ethicalStatus.hasValue}>
+                        <span class="text-warning"><strong>{TOPIC_TAGS.tag10.text}</strong></span><br/>
+                        A topic containing containing moral, ethical, or aesthetic value
+                    </label>
+                </div>
+                <hr style="border: 0; margin: 0.7rem 0 0.7rem; border-top: 0.0625rem dotted #dcdcdc;"/>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" class="topicTag" name="topicTags" value="510">
+                        <span class="text-info"><strong>Root Category</strong></span><br/>
+                        A top-level category or container
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" class="topicTag" name="topicTags" value="520">
+                        <span class="text-info"><strong>Main Topic</strong></span><br/>
+                        A standalone or primary topic
+                    </label>
+                </div>
+                <hr style="border: 0; margin: 0.7rem 0 0.7rem; border-top: 0.0625rem dotted #dcdcdc;"/>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" class="topicTag" name="topicTags" value="530">
+                        <span class="text-info"><strong>Person</strong></span><br/>
+                        A notable personality or figure
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" class="topicTag" name="topicTags" value="540">
+                        <span class="text-info"><strong>Territory</strong></span><br/>
+                        A country or territory
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" class="topicTag" name="topicTags" value="550">
+                        <span class="text-info"><strong>Event</strong></span><br/>
+                        A notable event or happening
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" class="topicTag" name="topicTags" value="560">
+                        <span class="text-info"><strong>Organization</strong></span><br/>
+                        An organization, institution or group
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" class="topicTag" name="topicTags" value="570">
+                        <span class="text-info"><strong>Artifact</strong></span><br/>
+                        A public material (a popular claim) or a reference material (source)
+                    </label>
+                </div>
+            </div>
+        </div>
+        {!<div class="form-group">
+            <label for="inputIcon">Icon</label>
+            <textarea name="icon" id="inputIcon" class="form-control" rows="1">{topic.icon}</textarea>
+        </div>!}
+        <br/>
+        <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
+        <a class="btn btn-default" href="{cancelUrl}" role="button">Cancel</a>
+    </form>
+{/body}
+
+{<footer}
+    <script src="/components/textarea-autosize/dist/jquery.textarea_autosize.min.js"></script>
+    <!-- summernote -->
+    <link rel="stylesheet" href="/components/summernote/dist/summernote.css">
+    <script src="/components/summernote/dist/summernote.min.js"></script>
+    <!-- datetimepicker -->
+    <script type="text/javascript" src="/components/moment/min/moment.min.js"></script>
+    <script type="text/javascript" src="/components/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+    <link rel="stylesheet" href="/components/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" />
+    <script type="text/javascript">
+        $(function() {
+            $('#inputName,#inputParent,#contextTitle').textareaAutoSize();
+            $('#inputContent').summernote({
+                height: WT_CONSTANTS.summernote.contentHeight,
+                toolbar: WT_CONSTANTS.summernote.contentToolbar
+            });
+            $('#inputReferences').summernote({
+                height: WT_CONSTANTS.summernote.referenceHeight,
+                toolbar: WT_CONSTANTS.summernote.referenceToolbar
+            });
+
+            var topicTags = [{?topic.tags}{topic.tags}{/topic.tags}];
+            if(topicTags.length > 0) {
+                topicTags.forEach(function (item) {
+                    $(".topicTag[value='" + item + "'").prop('checked', true);
+                });
+            }
+
+            $('#inputRefDatePicker').datetimepicker({
+                sideBySide: false
+            });
+            /*$('#inputRefDatePicker').on('dp.change', function(e){
+                $('#inputReferenceDateUTC').val((new Date($('#inputReferenceDate').val())).toUTCString());
+            });*/
+        });
+    </script>
+{/footer}

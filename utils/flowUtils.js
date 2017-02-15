@@ -938,6 +938,24 @@ function setModelOwnerEntry(model) {
     }
 }
 
+function getDbModelByObjectType(typeId) {
+    switch (typeId) {
+        case constants.OBJECT_TYPES.topic:
+            return db.Topic;
+        case constants.OBJECT_TYPES.argument:
+            return db.Argument;
+        case constants.OBJECT_TYPES.question:
+            return db.Question;
+        case constants.OBJECT_TYPES.answer:
+            return db.Answer;
+        case constants.OBJECT_TYPES.issue:
+            return db.Issue;
+        case constants.OBJECT_TYPES.opinion:
+            return db.Opinion;
+    }
+    return null;
+}
+
 function createOwnerQueryFromModel(model) {
     if(model.issue) {
         return {
@@ -1065,5 +1083,6 @@ module.exports = {
     buildEntryUrl: buildEntryUrl,
     buildCancelUrl: buildCancelUrl,
     setScreeningModel: setScreeningModel,
-    initScreeningStatus: initScreeningStatus
+    initScreeningStatus: initScreeningStatus,
+    getDbModelByObjectType: getDbModelByObjectType
 };

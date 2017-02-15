@@ -1,0 +1,31 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {?entry}{entry.title}: {:else}Top {/entry}Questions - {titleSlogan}
+{/title}
+
+{<body}
+    {?topic}
+        {>"dust/wiki/common/entry-header" tab="questions" /}
+    {:else}
+        {>"dust/wiki/common/index-header" tab="top-questions" /}
+    {/topic}
+    {>"dust/wiki/common/screening-selector" /}
+    {?questions}
+        <ul class="list-group wt-list">
+            <li class="list-group-item highlight"><i class="fa fa-question-circle text-muted" aria-hidden="true"></i> {^topic}Latest {/topic}Questions</li>
+            {#questions}
+                <li class="list-group-item">
+                    <i class="fa fa-question-circle text-color-1" aria-hidden="true"></i>
+                    <div>
+                        <a href="{wikiBaseUrl}{paths.wiki.questions.entry}/{friendlyUrl}/{_id}">{title}</a>
+                        {?contentPreview}
+                            <div>{contentPreview}</div>
+                        {/contentPreview}
+                        {>"dust/wiki/common/entry-row-footer" /}
+                    </div>
+                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+            {/questions}
+        </ul>
+    {/questions}
+{/body}

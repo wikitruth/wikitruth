@@ -98,6 +98,12 @@ app.use(function(req, res, next) {
         delete res.locals.isAdmin;
     }
 
+    if(req.user.roles) {
+        res.locals.user.roles = req.user.roles;
+    } else if(res.locals.user.roles) {
+        delete res.locals.user.roles;
+    }
+
     if(req.user && req.user.username) {
         res.locals.isContributor = true;
     } else if(res.locals.isContributor) {
@@ -115,7 +121,7 @@ app.locals.projectName = app.config.projectName;
 app.locals.titleSlogan = app.config.titleSlogan;
 app.locals.copyrightYear = new Date().getFullYear();
 //app.locals.copyrightName = app.config.companyName;
-app.locals.cacheBreaker = 'br34k-01';
+app.locals.cacheBreaker = app.config.cacheBreaker;
 
 app.locals.paths = paths;
 app.locals.templates = templates;

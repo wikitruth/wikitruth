@@ -8,7 +8,7 @@ var flowUtils   = require('../utils/flowUtils'),
     db          = require('../app').db.models;
 
 function createReturnUrl(req, model) {
-    return paths.truth.arguments.entry + '/' + utils.urlify(model.argument.title) + '?argument=' + req.query.argument;
+    return paths.wiki.arguments.entry + '/' + utils.urlify(model.argument.title) + '?argument=' + req.query.argument;
 }
 
 module.exports = function (router) {
@@ -31,8 +31,9 @@ module.exports = function (router) {
                     model.verdictStatus = model.argument.verdict.status;
                 }
                 flowUtils.setModelContext(req, model);
+                model.entry = model.argument;
                 model.cancelUrl = createReturnUrl(req, model);
-                res.render(templates.truth.verdict.update, model);
+                res.render(templates.wiki.verdict.update, model);
             });
         });
     });

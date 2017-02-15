@@ -23,6 +23,13 @@ function ensureAdmin(req, res, next) {
   res.redirect('/');
 }
 
+function ensureScreener(req, res, next) {
+  if (req.user.canPlayRoleOf('screener')) {
+    return next();
+  }
+  res.redirect('/');
+}
+
 function ensureAccount(req, res, next) {
   if (req.user.canPlayRoleOf('account')) {
     if (req.app.config.requireAccountVerification) {
@@ -44,15 +51,19 @@ function ensureAccountOwner(req, res, next) {
 
 exports = module.exports = function(app, passport) {
 
-  app.get(paths.truth.topics.create, ensureAuthenticated);
-  app.get(paths.truth.arguments.create, ensureAuthenticated);
-  app.get(paths.truth.questions.create, ensureAuthenticated);
-  app.get(paths.truth.issues.create, ensureAuthenticated);
-  app.get(paths.truth.opinions.create, ensureAuthenticated);
+  app.get(paths.wiki.topics.create, ensureAuthenticated);
+  app.get(paths.wiki.arguments.create, ensureAuthenticated);
+  app.get(paths.wiki.questions.create, ensureAuthenticated);
+  app.get(paths.wiki.answers.create, ensureAuthenticated);
+  app.get(paths.wiki.issues.create, ensureAuthenticated);
+  app.get(paths.wiki.opinions.create, ensureAuthenticated);
 
   // member diary
   app.all('/members/:username/diary*', ensureAuthenticated);
   app.all('/members/:username/diary*', ensureAccountOwner);
+
+  app.post(paths.wiki.screening, ensureAuthenticated);
+  app.post(paths.wiki.screening, ensureScreener);
 
   //front end
   app.get('/home/', req('/index').init);

@@ -77,7 +77,7 @@ function GET_entry(req, res) {
         }, function (err, results) {
             flowUtils.setModelOwnerEntry(model);
             flowUtils.setModelContext(req, model);
-            res.render(templates.truth.questions.entry, model);
+            res.render(templates.wiki.questions.entry, model);
         });
     });
 }
@@ -106,7 +106,7 @@ function GET_index(req, res) {
                         if(model.childrenCount.pending === 0 && model.childrenCount.rejected === 0) {
                             model.screening.hidden = true;
                         }
-                        res.render(templates.truth.questions.index, model);
+                        res.render(templates.wiki.questions.index, model);
                     });
                 });
             });
@@ -130,7 +130,7 @@ function GET_index(req, res) {
                     });
                     model.questions = results;
                     flowUtils.setModelContext(req, model);
-                    res.render(templates.truth.questions.index, model);
+                    res.render(templates.wiki.questions.index, model);
                 });
             });
     }
@@ -140,7 +140,7 @@ function GET_create(req, res) {
     var model = {};
     flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function () {
         flowUtils.setModelContext(req, model);
-        res.render(templates.truth.questions.create, model);
+        res.render(templates.wiki.questions.create, model);
     });
 }
 
@@ -175,7 +175,7 @@ function POST_create(req, res) {
             var updateRedirect = function () {
                 var model = {};
                 flowUtils.setModelContext(req, model);
-                var url = model.wikiBaseUrl + paths.truth.questions.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
+                var url = model.wikiBaseUrl + paths.wiki.questions.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
                 res.redirect(url);
             };
             if(!result) { // if new entry, update parent children count

@@ -72,6 +72,7 @@ exports.projectName = 'Wikitruth';
 exports.titleSlogan = 'Wikitruth, the truth in totality of human knowledge';
 exports.systemEmail = 'your@email.com';
 exports.cryptoKey = 'abc123';
+exports.cacheBreaker = 'abc123';
 exports.loginAttempts = {
   forIp: 50,
   forIpAndUser: 7,

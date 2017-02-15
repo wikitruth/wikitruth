@@ -94,6 +94,7 @@ module.exports = function (router) {
             tab: req.query.tab ? req.query.tab : 'topics'
         };
         flowUtils.setScreeningModel(req, model);
+        flowUtils.setModelContext(req, model);
         async.parallel({
             topics: function(callback) {
                 if(model.tab !== 'topics') {
@@ -142,7 +143,6 @@ module.exports = function (router) {
                                 flowUtils.setVerdictModel(result);
                             });
                             model.arguments = results;
-                            flowUtils.setModelContext(req, model);
                             callback();
                         });
                     });
@@ -171,7 +171,6 @@ module.exports = function (router) {
                                 flowUtils.appendEntryExtra(result);
                             });
                             model.questions = results;
-                            flowUtils.setModelContext(req, model);
                             callback();
                         });
                     });
@@ -180,13 +179,9 @@ module.exports = function (router) {
                 if(model.tab !== 'answers') {
                     return callback();
                 }
-                var query = {
-                    private: false,
-                    'screening.status': model.screening.status
-                };
                 //db.Answer.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
                 db.Answer
-                    .find(query)
+                    .find({ private: false, 'screening.status': model.screening.status })
                     .sort({editDate: -1})
                     .limit(25)
                     .lean()
@@ -199,7 +194,44 @@ module.exports = function (router) {
                                 flowUtils.appendEntryExtra(result);
                             });
                             model.answers = results;
-                            flowUtils.setModelContext(req, model);
+                            callback();
+                        });
+                    });
+            },
+            issues: function (callback) {
+                if(model.tab !== 'issues') {
+                    return callback();
+                }
+                db.Issue
+                    .find({ private: false, 'screening.status': model.screening.status })
+                    .sort({editDate: -1})
+                    .limit(25)
+                    .lean()
+                    .exec(function(err, results) {
+                        flowUtils.setEditorsUsername(results, function() {
+                            results.forEach(function (result) {
+                                flowUtils.appendEntryExtra(result);
+                            });
+                            model.issues = results;
+                            callback();
+                        });
+                    });
+            },
+            opinions: function (callback) {
+                if(model.tab !== 'opinions') {
+                    return callback();
+                }
+                db.Opinion
+                    .find({ private: false, 'screening.status': model.screening.status })
+                    .sort({editDate: -1})
+                    .limit(25)
+                    .lean()
+                    .exec(function(err, results) {
+                        flowUtils.setEditorsUsername(results, function() {
+                            results.forEach(function (result) {
+                                flowUtils.appendEntryExtra(result);
+                            });
+                            model.opinions = results;
                             callback();
                         });
                     });
@@ -228,7 +260,7 @@ module.exports = function (router) {
                 });
             }
         }, function (err, results) {
-            res.render(templates.truth.index, model);
+            res.render(templates.wiki.index, model);
         });
     });
 
@@ -269,7 +301,7 @@ module.exports = function (router) {
                 }
             }
         }, function (err) {
-            res.render(templates.truth.clipboard, model);
+            res.render(templates.wiki.clipboard, model);
         });
     });
 
@@ -503,7 +535,7 @@ module.exports = function (router) {
         flowUtils.setTopicModels(req, model, function() {
             flowUtils.setArgumentModels(req, model, function () {
                 flowUtils.setQuestionModel(req, model, function () {
-                    res.render(templates.truth.related, model);
+                    res.render(templates.wiki.related, model);
                 });
             });
         });
