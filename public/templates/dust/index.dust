@@ -7,7 +7,7 @@
     <div class="jumbotron">
         <h1>The Wikitruth Project</h1>
         <p class="lead">A systematic way of discussion and knowledge contribution using dialectics and a vetting mechanism to verify between knowledge that is true or false, right or wrong, good or bad.</p>
-        <p><a class="btn btn-lg btn-success" style="width: 200px" href="{paths.truth.index}" role="button">Explore{! &raquo;!}</a></p>
+        <p><a class="btn btn-lg btn-success" style="width: 200px" href="{paths.wiki.index}" role="button">Explore{! &raquo;!}</a></p>
     </div>
 
     {!<div class="article-heading js-article-heading js-geopattern" style="background-image: url();">
@@ -30,17 +30,17 @@
         <div class="col-lg-4 col-md-6 col-sm-6 wt-section-col text-body">
             <h2 class="wt-feature-header" data-title="Truth &amp; Reality"><i class="fa fa-globe"></i> Truth &amp; Reality</h2>
             <p>Find out the truth and reality on important topics that impact the society including controversies around politics, environment, culture and conspiracy theories which divide the society and result to conflict.</p>
-            {!<p><a class="btn btn-default btn-block" href="{paths.truth.index}" role="button">Explore &raquo;</a></p>!}
+            {!<p><a class="btn btn-default btn-block" href="{paths.wiki.index}" role="button">Explore &raquo;</a></p>!}
         </div>
         <div class="col-lg-4 col-md-6 col-sm-6 wt-section-col text-body">
             <h2 class="wt-feature-header" data-title="Religion &amp; Worldviews"><i class="fa fa-book"></i> Religion &amp; Worldviews</h2>
             <p>Compilation of world religions, ideologies, philosophies and worldviews with details on their achievements or issues, their primary belief or doctrines categorized by good, bad, and dangerous.</p>
-            {!<p><a class="btn btn-default btn-block" href="{paths.truth.index}" role="button">Explore &raquo;</a></p>!}
+            {!<p><a class="btn btn-default btn-block" href="{paths.wiki.index}" role="button">Explore &raquo;</a></p>!}
         </div>
         <div class="col-lg-4 col-md-6 col-sm-6 wt-section-col text-body">
             <h2 class="wt-feature-header" data-title="Morality &amp; Ethics"><i class="fa fa-balance-scale"></i> Morality &amp; Ethics</h2>
             <p>Virtues, morally right and wrong acts supported by reason, facts and human consensus under the notion that there are right and wrong that most people can agree with and find them fair, logical and reasonable.</p>
-            {!<p><a class="btn btn-default btn-block" href="{paths.truth.index}" role="button">Explore &raquo;</a></p>!}
+            {!<p><a class="btn btn-default btn-block" href="{paths.wiki.index}" role="button">Explore &raquo;</a></p>!}
         </div>
     </div>
 
@@ -50,19 +50,19 @@
             {#truth}
                 <div class="media wt-category">
                     <div class="media-left media-top">
-                        <a href="{paths.truth.topics.entry}/{friendlyUrl}?topic={_id}">
+                        <a href="{paths.wiki.topics.entry}/{friendlyUrl}?topic={_id}">
                             <div class="photo-placeholder"></div>
                         </a>
                     </div>
                     <div class="media-body">
-                        <h4 class="media-heading"><a href="{paths.truth.topics.entry}/{friendlyUrl}?topic={_id}">{title}</a></h4>
+                        <h4 class="media-heading"><a href="{paths.wiki.topics.entry}/{friendlyUrl}?topic={_id}">{title}</a></h4>
                         <div>
                             {?subtopics}
                                 {#subtopics}
-                                    <div><i class="fa fa-folder-open text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.truth.topics.entry}/{friendlyUrl}?topic={_id}">{title}</a></div>
+                                    <div><i class="fa fa-folder-open text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.wiki.topics.entry}/{friendlyUrl}?topic={_id}">{title}</a></div>
                                 {/subtopics}
                             {/subtopics}
-                            <div><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.truth.index}?topic={_id}" role="button">more</a></div>
+                            <div><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.wiki.index}?topic={_id}" role="button">more</a></div>
                         </div>
                     </div>
                 </div>

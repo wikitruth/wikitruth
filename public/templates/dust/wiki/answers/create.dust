@@ -1,0 +1,48 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {?answer}Edit{:else}New{/answer} Answer - {titleSlogan}
+{/title}
+
+{<body}
+    {>"dust/wiki/common/breadcrumb" /}
+    <h1 class="page-header">
+        <i class="fa fa-answer-circle-o"></i> {?answer}Edit{:else}New{/answer} Answer
+    </h1>
+    <form method="post">
+        <input type="hidden" name="_csrf" value="{_csrf}">
+        <div class="form-group">
+            <label for="inputName">Answer</label>
+            <textarea name="title" id="inputName" class="form-control" rows="1">{answer.title}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="inputContent">Summary</label>
+            <textarea class="form-control" id="inputContent" name="content" rows="12">{answer.content}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="inputReferences">References</label>
+            <textarea class="form-control" id="inputReferences" name="references" rows="3">{answer.references}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
+        <a class="btn btn-default" href="{?answer}{paths.wiki.answers.entry}{:else}{paths.wiki.answers.index}{/answer}{?topic}?topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}{?answer}&amp;answer={answer._id}{/answer}" role="button">Cancel</a>
+    </form>
+{/body}
+
+{<footer}
+    <link rel="stylesheet" href="/components/summernote/dist/summernote.css">
+    <script src="/components/textarea-autosize/dist/jquery.textarea_autosize.min.js"></script>
+    <script src="/components/summernote/dist/summernote.min.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            $('#inputName').textareaAutoSize();
+            $('#inputContent').summernote({
+                height: WT_CONSTANTS.summernote.contentHeight,
+                toolbar: WT_CONSTANTS.summernote.contentToolbar
+            });
+            $('#inputReferences').summernote({
+                height: WT_CONSTANTS.summernote.referenceHeight,
+                toolbar: WT_CONSTANTS.summernote.referenceToolbar
+            });
+        });
+    </script>
+{/footer}

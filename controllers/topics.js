@@ -49,7 +49,7 @@ function GET_index(req, res) {
         //console.log('model.screening.hidden: ' + model.screening.hidden);
         flowUtils.setModelOwnerEntry(model);
         flowUtils.setModelContext(req, model);
-        res.render(templates.truth.topics.index, model);
+        res.render(templates.wiki.topics.index, model);
     });
 }
 
@@ -258,7 +258,7 @@ function GET_entry(req, res) {
             flowUtils.setModelOwnerEntry(model);
             flowUtils.setModelContext(req, model);
             flowUtils.setClipboardModel(req, model, constants.OBJECT_TYPES.topic);
-            res.render(templates.truth.topics.entry, model);
+            res.render(templates.wiki.topics.entry, model);
         });
     });
 }
@@ -297,8 +297,8 @@ function GET_create(req, res) {
             return res.redirect(model.wikiBaseUrl);
         }
         model.TOPIC_TAGS = constants.TOPIC_TAGS;
-        model.cancelUrl = flowUtils.buildCancelUrl(model, model.wikiBaseUrl + paths.truth.topics.entry, model.topic, model.parentTopic);
-        res.render(templates.truth.topics.create, model);
+        model.cancelUrl = flowUtils.buildCancelUrl(model, model.wikiBaseUrl + paths.wiki.topics.entry, model.topic, model.parentTopic);
+        res.render(templates.wiki.topics.create, model);
     });
 }
 
@@ -334,14 +334,14 @@ function POST_create(req, res) {
             entity.ownerType = constants.OBJECT_TYPES.user;
             entity.ownerId = req.user.id;
         } else if(!entity.parentId && !req.user.isAdmin()) {
-            // root topic & not admin & not private
+            // root topic & not admin & not private - non-admins are not allowed to create categories
             return res.redirect('/');
         }
         db.Topic.findOneAndUpdate(query, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function(err, updatedEntity) {
             var updateRedirect = function () {
                 var model = {};
                 flowUtils.setModelContext(req, model);
-                var url = model.wikiBaseUrl + paths.truth.topics.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
+                var url = model.wikiBaseUrl + paths.wiki.topics.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
                 res.redirect(url);
             };
 
@@ -390,7 +390,7 @@ function GET_link(req, res) {
     }, function (err, results) {
         flowUtils.setModelContext(req, model);
         model.cancelUrl = createCancelUrl(req);
-        res.render(templates.truth.topics.link, model);
+        res.render(templates.wiki.topics.link, model);
     });
 }
 

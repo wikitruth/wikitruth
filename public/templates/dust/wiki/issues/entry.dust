@@ -1,0 +1,23 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {entry.title} - {titleSlogan}
+{/title}
+
+{<body}
+    {>"dust/wiki/common/entry-header" tab="overview" /}
+    <div class="entry-header">
+        <span class="label label-danger">{issueType}</span>&nbsp;
+        {>"dust/wiki/common/entry-verdict" /}
+    </div>
+    <div class="text-body">
+        {!<p><span class="label label-danger">{issueType}</span></p>!}
+        <p>{entry.content|s}</p>
+    </div>
+    {>"dust/wiki/common/entry-options" /}
+    {>"dust/wiki/common/entry-footer" /}
+{/body}
+
+{<footer}
+    {>"dust/common/geopattern-title-scripts" /}
+{/footer}

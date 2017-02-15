@@ -1,0 +1,60 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    Screening Status - {titleSlogan}
+{/title}
+
+{<body}
+    {>"dust/wiki/common/breadcrumb" tab="screening" /}
+    {>"dust/wiki/common/page-header" tab="screening" /}
+    <form method="post">
+        <input type="hidden" name="_csrf" value="{_csrf}">
+        <div class="form-group">
+            <label for="inputReferences">Screening Status</label>
+            <div class="radio">
+                <label class="text-warning">
+                    <input type="radio" name="screeningStatus" value="0">
+                    Pending
+                </label>
+            </div>
+            <div class="radio">
+                <label class="text-success">
+                    <input type="radio" name="screeningStatus" value="1">
+                    Accepted
+                </label>
+            </div>
+            <div class="radio">
+                <label class="text-danger">
+                    <input type="radio" name="screeningStatus" value="2">
+                    Rejected
+                </label>
+            </div>
+        </div>
+        <br/>
+        {?user}
+            {?user.roles.screener}
+                <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
+            {:else}
+                <div class="alert alert-warning" role="alert">
+                    You need to be a screener to set the screening status. To apply as screener, <a href="{paths.contact}">click here</a>.
+                </div>
+            {/user.roles.screener}
+        {:else}
+            <div class="alert alert-warning" role="alert">
+                <b>You are not logged in</b>. Your <a href="#" title="IP address">IP address</a> will be publicly visible if you make any edits. If you <span class="plainlinks"><b><a class="external text" href="{paths.login}">log in</a></b> or <b><a class="external text" href="{paths.signup}">create an account</a></b></span>, your edits will be attributed to a user name, among <a href="#" title="Wikipedia:Why create an account?">other benefits</a>.
+            </div>
+        {/user}
+
+        <a class="btn btn-default" href="{cancelUrl}" role="button">Cancel</a>
+    </form>
+{/body}
+
+{<footer}
+    <script>
+        $(function() {
+            var screeningStatus = '{entry.screening.status}';
+            $("input[type='radio'][value='" + screeningStatus + "'").prop('checked', true);
+            $('[data-toggle="popover"]').popover();
+        });
+    </script>
+{/footer}

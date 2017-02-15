@@ -22,7 +22,7 @@ function GET_entry(req, res) {
         model.issueType = constants.ISSUE_TYPES['type' + model.issue.issueType].text;
         flowUtils.setModelOwnerEntry(model);
         flowUtils.setModelContext(req, model);
-        res.render(templates.truth.issues.entry, model);
+        res.render(templates.wiki.issues.entry, model);
     });
 }
 
@@ -52,7 +52,7 @@ function GET_index(req, res) {
                     if(model.childrenCount.pending === 0 && model.childrenCount.rejected === 0) {
                         model.screening.hidden = true;
                     }
-                    res.render(templates.truth.issues.index, model);
+                    res.render(templates.wiki.issues.index, model);
                 });
             });
         });
@@ -72,7 +72,7 @@ function GET_index(req, res) {
                 });
                 model.issues = results;
                 flowUtils.setModelContext(req, model);
-                res.render(templates.truth.issues.index, model);
+                res.render(templates.wiki.issues.index, model);
             });
         });
     }
@@ -83,7 +83,7 @@ function GET_create(req, res) {
     flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
         model.ISSUE_TYPES = constants.ISSUE_TYPES;
         flowUtils.setModelContext(req, model);
-        res.render(templates.truth.issues.create, model);
+        res.render(templates.wiki.issues.create, model);
     });
 }
 
@@ -121,9 +121,9 @@ function POST_create(req, res) {
             var updateRedirect = function () {
                 var model = {};
                 flowUtils.setModelContext(req, model);
-                var url = model.wikiBaseUrl + paths.truth.issues.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
+                var url = model.wikiBaseUrl + paths.wiki.issues.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
                 res.redirect(url);
-                /*res.redirect((result ? paths.truth.issues.entry : paths.truth.issues.index) +
+                /*res.redirect((result ? paths.wiki.issues.entry : paths.wiki.issues.index) +
                  '?topic=' + req.query.topic +
                  (req.query.argument ? '&argument=' + req.query.argument : '') +
                  (result ? '&issue=' + req.query.issue : '')

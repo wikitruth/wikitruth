@@ -267,18 +267,20 @@ var TOPIC_TAGS = {
     }
 };
 
+var OBJECT_TYPES = {
+    topic: 1,
+    argument: 2,
+    question: 3,
+    comment: 4,
+    definition: 5,
+    issue: 10,
+    opinion: 11,
+    answer: 12,
+    user: 21
+};
+
 module.exports = {
-    OBJECT_TYPES: {
-        topic: 1,
-        argument: 2,
-        question: 3,
-        comment: 4,
-        definition: 5,
-        issue: 10,
-        opinion: 11,
-        answer: 12,
-        user: 21
-    },
+    OBJECT_TYPES: OBJECT_TYPES,
     ARGUMENT_TYPES: ARGUMENT_TYPES,
     ISSUE_TYPES: ISSUE_TYPES,
     ARGUMENT_TAGS: ARGUMENT_TAGS,
@@ -296,5 +298,14 @@ module.exports = {
     VERDICT_STATUS: VERDICT_STATUS,
     SETTINGS: {
         contentPreviewLength: 250
+    },
+    OBJECT_NAMES_MAP: {
+        1: 'topics',
+        2: 'arguments',
+        3: 'questions',
+        4: 'comments',
+        10: 'issues',
+        11: 'opinions',
+        12: 'answers'
     }
 };

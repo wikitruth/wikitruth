@@ -1,0 +1,24 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {question.title} - {titleSlogan}
+{/title}
+
+{<body}
+    {>"dust/wiki/common/entry-header" tab="overview" /}
+    <div class="entry-header">
+        {>"dust/wiki/common/entry-verdict" /}
+    </div>
+    <div class="text-body">
+        <p>{question.content|s}</p>
+    </div>
+    {>"dust/wiki/common/entry-options" /}
+    {>"dust/wiki/answers/list-preview" /}
+    {>"dust/wiki/issues/list-preview" /}
+    {>"dust/wiki/opinions/list-preview" /}
+    {>"dust/wiki/common/entry-footer" /}
+{/body}
+
+{<footer}
+    {>"dust/common/geopattern-title-scripts" /}
+{/footer}

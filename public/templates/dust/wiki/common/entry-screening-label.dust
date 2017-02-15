@@ -1,0 +1,9 @@
+{@eq key=entry.screening.status value=0}
+    <span class="label label-warning"><i class="fa fa-question-circle"></i> Pending</span>&nbsp;
+{/eq}
+{@eq key=entry.screening.status value=1}
+    <span class="label label-success-x label-primary"><i class="fa fa-check-circle"></i> Accepted</span>&nbsp;
+{/eq}
+{@eq key=entry.screening.status value=2}
+    <span class="label label-danger"><i class="fa fa-close"></i> Rejected</span>&nbsp;
+{/eq}

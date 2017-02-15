@@ -29,50 +29,51 @@ module.exports = {
             }
         }
     },
-    truth: {
-        index: 'dust/truth/explore',
-        indexHeader: 'dust/truth/index-header',
-        entryHeader: 'dust/truth/entry-header',
+    wiki: {
+        index: 'dust/wiki/explore',
+        indexHeader: 'dust/wiki/index-header',
+        entryHeader: 'dust/wiki/entry-header',
         topics: {
-            index: 'dust/truth/topics/index',
-            create: 'dust/truth/topics/create',
-            entry: 'dust/truth/topics/entry',
-            link: 'dust/truth/topics/link'
+            index: 'dust/wiki/topics/index',
+            create: 'dust/wiki/topics/create',
+            entry: 'dust/wiki/topics/entry',
+            link: 'dust/wiki/topics/link'
         },
         arguments: {
-            index: 'dust/truth/arguments/index',
-            create: 'dust/truth/arguments/create',
-            entry: 'dust/truth/arguments/entry',
-            link: 'dust/truth/arguments/link'
+            index: 'dust/wiki/arguments/index',
+            create: 'dust/wiki/arguments/create',
+            entry: 'dust/wiki/arguments/entry',
+            link: 'dust/wiki/arguments/link'
         },
         questions: {
-            index: 'dust/truth/questions/index',
-            create: 'dust/truth/questions/create',
-            entry: 'dust/truth/questions/entry'
+            index: 'dust/wiki/questions/index',
+            create: 'dust/wiki/questions/create',
+            entry: 'dust/wiki/questions/entry'
         },
         answers: {
-            index: 'dust/truth/answers/index',
-            create: 'dust/truth/answers/create',
-            entry: 'dust/truth/answers/entry'
+            index: 'dust/wiki/answers/index',
+            create: 'dust/wiki/answers/create',
+            entry: 'dust/wiki/answers/entry'
         },
         issues: {
-            create: 'dust/truth/issues/create',
-            index:  'dust/truth/issues/index',
-            entry:  'dust/truth/issues/entry'
+            create: 'dust/wiki/issues/create',
+            index:  'dust/wiki/issues/index',
+            entry:  'dust/wiki/issues/entry'
         },
         opinions: {
-            create: 'dust/truth/opinions/create',
-            index:  'dust/truth/opinions/index',
-            entry:  'dust//truth/opinions/entry'
+            create: 'dust/wiki/opinions/create',
+            index:  'dust/wiki/opinions/index',
+            entry:  'dust/wiki/opinions/entry'
         },
         outline: {
-            create: 'dust/truth/outline/create',
-            linkTo: 'dust/truth/outline/link-to'
+            create: 'dust/wiki/outline/create',
+            linkTo: 'dust/wiki/outline/link-to'
         },
         verdict: {
-            update: 'dust/truth/verdict/update'
+            update: 'dust/wiki/verdict/update'
         },
-        related: 'dust/truth/related',
-        clipboard: 'dust/truth/clipboard'
+        screening: 'dust/wiki/screening',
+        related: 'dust/wiki/related',
+        clipboard: 'dust/wiki/clipboard'
     }
 };
