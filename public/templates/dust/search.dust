@@ -78,7 +78,9 @@
                         <li class="list-group-item">
                             <i class="fa fa-folder-open text-color-3" aria-hidden="true"></i>
                             <div>
-                                <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">{title}{?private} <span class="label label-default">private</span>{/private}</a>
+                                <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">{title}{?private} <span class="label label-default">private</span>{/private}
+                                    {>"dust/wiki/common/entry-row-screening-label" /}
+                                </a>
                                 {?contentPreview}
                                     <div>{contentPreview}</div>
                                 {/contentPreview}
@@ -100,7 +102,9 @@
                         <li class="list-group-item">
                             <span class="glyphicon glyphicon-flash text-{verdict.theme}" aria-hidden="true"></span>
                             <div>
-                                <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.arguments.entry}/{friendlyUrl}/{_id}">{title}{?typeUX} <span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}{?private} <span class="label label-default">private</span>{/private}</a>
+                                <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.arguments.entry}/{friendlyUrl}/{_id}">{title}{?typeUX} <span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}{?private} <span class="label label-default">private</span>{/private}
+                                    {>"dust/wiki/common/entry-row-screening-label" /}
+                                </a>
                                 {?contentPreview}
                                     <div>{contentPreview}</div>
                                 {/contentPreview}
@@ -122,7 +126,9 @@
                         <li class="list-group-item">
                             <i class="fa fa-question-circle text-color-1" aria-hidden="true"></i>
                             <div>
-                                <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.questions.entry}/{friendlyUrl}/{_id}">{title}{?private} <span class="label label-default">private</span>{/private}</a>
+                                <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.questions.entry}/{friendlyUrl}/{_id}">{title}{?private} <span class="label label-default">private</span>{/private}
+                                    {>"dust/wiki/common/entry-row-screening-label" /}
+                                </a>
                                 {?contentPreview}
                                     <div>{contentPreview}</div>
                                 {/contentPreview}
@@ -142,7 +148,9 @@
                         <li class="list-group-item">
                             <i class="fa fa-check-circle text-color-1" aria-hidden="true"></i>
                             <div>
-                                <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.answers.entry}/{friendlyUrl}/{_id}">{title}{?private} <span class="label label-default">private</span>{/private}</a>
+                                <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.answers.entry}/{friendlyUrl}/{_id}">{title}{?private} <span class="label label-default">private</span>{/private}
+                                    {>"dust/wiki/common/entry-row-screening-label" /}
+                                </a>
                                 {?contentPreview}
                                     <div>{contentPreview}</div>
                                 {/contentPreview}
@@ -163,7 +171,9 @@
                         <li class="list-group-item">
                             <span class="fa fa-exclamation-circle text-danger" aria-hidden="true"></span>
                             <div>
-                                <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.issues.entry}/{friendlyUrl}/{_id}">{title}{?private} <span class="label label-default">private</span>{/private}</a>
+                                <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.issues.entry}/{friendlyUrl}/{_id}">{title}{?private} <span class="label label-default">private</span>{/private}
+                                    {>"dust/wiki/common/entry-row-screening-label" /}
+                                </a>
                                 {?contentPreview}
                                     <div>{contentPreview}</div>
                                 {/contentPreview}
@@ -184,7 +194,9 @@
                         <li class="list-group-item">
                             <span class="fa fa-comments-o text-primary" aria-hidden="true"></span>
                             <div>
-                                <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.opinions.entry}/{friendlyUrl}/{_id}">{title}{?private} <span class="label label-default">private</span>{/private}</a>
+                                <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.opinions.entry}/{friendlyUrl}/{_id}">{title}{?private} <span class="label label-default">private</span>{/private}
+                                    {>"dust/wiki/common/entry-row-screening-label" /}
+                                </a>
                                 {?contentPreview}
                                     <div>{contentPreview}</div>
                                 {/contentPreview}
