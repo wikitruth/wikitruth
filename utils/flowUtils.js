@@ -40,6 +40,9 @@ function appendEntryExtra(item) {
     item.editDateString = utils.timeSince(item.editDate, true) + ' ago';
     item.createDateString = utils.timeSince(item.createDate, true) + ' ago';
 
+    item.sameEditor = item.createUserId.toString() === item.editUserId.toString();
+    item.sameEditDate = item.createDate.valueOf() === item.editDate.valueOf();
+
     if(item.referenceDate) {
         item.referenceDateString = item.referenceDate.toLocaleString();
         item.referenceDateUTC = item.referenceDate.toUTCString();
