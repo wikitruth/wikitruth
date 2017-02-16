@@ -98,7 +98,7 @@ app.use(function(req, res, next) {
         delete res.locals.isAdmin;
     }
 
-    if(req.user.roles) {
+    if(req.user && req.user.roles) {
         res.locals.user.roles = req.user.roles;
     } else if(res.locals.user.roles) {
         delete res.locals.user.roles;
