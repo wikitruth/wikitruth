@@ -159,7 +159,7 @@
             var topicTags = [{?topic.tags}{topic.tags}{/topic.tags}];
             if(topicTags.length > 0) {
                 topicTags.forEach(function (item) {
-                    $(".topicTag[value='" + item + "'").prop('checked', true);
+                    $(".topicTag[value='" + item + "']").prop('checked', true);
                 });
             }
 

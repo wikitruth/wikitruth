@@ -374,6 +374,22 @@ a.wt-link-focus {
   &.nav-pills>li>a {
     padding: 5px 8px;
   }
+
+  &.nav-pills>li.active.brand-danger>a {
+    background-color: @brand-danger;
+
+    .badge {
+      color: @brand-danger;
+    }
+  }
+
+  &.nav-pills>li.active.brand-warning>a {
+    background-color: @brand-warning;
+
+    .badge {
+      color: @brand-warning;
+    }
+  }
 }
 
 .wt-related {

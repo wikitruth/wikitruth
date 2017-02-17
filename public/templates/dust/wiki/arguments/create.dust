@@ -248,7 +248,7 @@
             var argumentTags = [{?argument.tags}{argument.tags}{/argument.tags}];
             if(argumentTags.length > 0) {
                 argumentTags.forEach(function (item) {
-                    $(".argumentTag[value='" + item + "'").prop('checked', true);
+                    $(".argumentTag[value='" + item + "']").prop('checked', true);
                 });
             }
 
