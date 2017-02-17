@@ -89,7 +89,7 @@
 {/linkCount}
 {^username}
     {?entry.screening.status}
-        <a href="{paths.wiki.screening}?{?topic}topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}{?answer}&amp;answer={answer._id}{/answer}{?issue}&amp;issue={issue._id}{/issue}{?opinion}&amp;opinion={opinion._id}{/opinion}" title="Update Screening Status" class="no-underline">
+        <a href="{paths.wiki.screening}?{?topic}topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}{?answer}&amp;answer={answer._id}{/answer}{?issue}&amp;issue={issue._id}{/issue}{?opinion}&amp;opinion={opinion._id}{/opinion}" title="Click to change screening status" class="no-underline">
             {>"dust/wiki/common/entry-screening-label" /}
         </a>
     {/entry.screening.status}

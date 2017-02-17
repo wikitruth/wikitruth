@@ -941,8 +941,8 @@ function setModelOwnerEntry(model) {
     }
 }
 
-function getDbModelByObjectType(typeId) {
-    switch (typeId) {
+function getDbModelByObjectType(type) {
+    switch (type) {
         case constants.OBJECT_TYPES.topic:
             return db.Topic;
         case constants.OBJECT_TYPES.argument:
@@ -1057,6 +1057,62 @@ function initScreeningStatus(req, entity) {
     }
 }
 
+function getParent(entity, type) {
+    switch (type) {
+        case constants.OBJECT_TYPES.topic:
+            if(entity.parentId) {
+                return {
+                    entryId: entity.parentId,
+                    entryType: constants.OBJECT_TYPES.topic
+                };
+            } else if(entity.ownerId) {
+                return {
+                    entryId: entity.ownerId,
+                    entryType: entity.ownerType
+                };
+            }
+            break;
+        case constants.OBJECT_TYPES.argument:
+            if(entity.parentId) {
+                return {
+                    entryId: entity.parentId,
+                    entryType: constants.OBJECT_TYPES.argument
+                };
+            } else if(entity.ownerId) {
+                return {
+                    entryId: entity.ownerId,
+                    entryType: entity.ownerType
+                };
+            }
+            break;
+        case constants.OBJECT_TYPES.question:
+        case constants.OBJECT_TYPES.issue:
+            return {
+                entryId: entity.ownerId,
+                entryType: entity.ownerType
+            };
+        case constants.OBJECT_TYPES.answer:
+            return {
+                entryId: entity.questionId,
+                entryType: constants.OBJECT_TYPES.question
+            };
+        case constants.OBJECT_TYPES.opinion:
+            if(entity.parentId) {
+                return {
+                    entryId: entity.parentId,
+                    entryType: constants.OBJECT_TYPES.opinion
+                };
+            } else if(entity.ownerId) {
+                return {
+                    entryId: entity.ownerId,
+                    entryType: entity.ownerType
+                };
+            }
+            break;
+    }
+    return null;
+}
+
 module.exports = {
     getBackupDir: getBackupDir,
     isOwner: isOwner,
@@ -1087,5 +1143,6 @@ module.exports = {
     buildCancelUrl: buildCancelUrl,
     setScreeningModel: setScreeningModel,
     initScreeningStatus: initScreeningStatus,
-    getDbModelByObjectType: getDbModelByObjectType
+    getDbModelByObjectType: getDbModelByObjectType,
+    getParent: getParent
 };

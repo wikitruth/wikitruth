@@ -37,7 +37,15 @@ module.exports = function (router) {
                         'screening.status': screeningStatus
                     }
                 }, function (err, num) {
-                    res.redirect(createReturnUrl(req, model));
+                    var parent = flowUtils.getParent(model.entry, ownerQuery.ownerType);
+                    if(parent) {
+                        flowUtils.updateChildrenCount(parent.entryId, parent.entryType, ownerQuery.ownerType, function () {
+                            res.redirect(createReturnUrl(req, model));
+                        });
+                    } else {
+                        // item has no parent
+                        res.redirect(createReturnUrl(req, model));
+                    }
                 });
             } else {
                 return res.status(500).send({ error: 'Invalid db model.' });

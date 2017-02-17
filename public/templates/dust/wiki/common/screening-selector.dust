@@ -4,10 +4,10 @@
             {!<li role="presentation" class="active"><a href="#">All <span class="badge">{entry.childrenCount.topics}</span></a></li>!}
             <li role="presentation"{?screening.approved} class="active"{/screening.approved}><a href="{screening.approvedUrl}">Accepted <span class="badge">{childrenCount.accepted}</span></a></li>
             {@gt key=childrenCount.pending value="0"}
-                <li role="presentation"{?screening.pending} class="active"{/screening.pending}><a href="{screening.pendingUrl}">Pending <span class="badge">{childrenCount.pending}</span></a></li>
+                <li role="presentation"{?screening.pending} class="active brand-warning"{/screening.pending}><a href="{screening.pendingUrl}">Pending <span class="badge">{childrenCount.pending}</span></a></li>
             {/gt}
             {@gt key=childrenCount.rejected value="0"}
-                <li role="presentation"{?screening.rejected} class="active"{/screening.rejected}><a href="{screening.rejectedUrl}">Rejected <span class="badge">{childrenCount.rejected}</span></a></li>
+                <li role="presentation"{?screening.rejected} class="active brand-danger"{/screening.rejected}><a href="{screening.rejectedUrl}">Rejected <span class="badge">{childrenCount.rejected}</span></a></li>
             {/gt}
         </ul>
         <br/>
