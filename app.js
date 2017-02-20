@@ -88,26 +88,16 @@ helmet(app);
 //response locals
 app.use(function(req, res, next) {
     //res.cookie('_csrfToken', req.csrfToken());
-    res.locals.user = {};
-    res.locals.user.defaultReturnUrl = req.user && req.user.defaultReturnUrl();
-    res.locals.user.username = req.user && req.user.username;
 
-    if(req.user && req.user.isAdmin()){
-        res.locals.user.isAdmin = true;
-    } else if(res.locals.isAdmin) {
-        delete res.locals.isAdmin;
-    }
-
-    if(req.user && req.user.roles) {
+    if(req.user) {
+        res.locals.user = {};
+        res.locals.user.username = req.user.username;
+        res.locals.user.defaultReturnUrl = req.user.defaultReturnUrl();
+        res.locals.user.isAdmin = req.user.isAdmin();
         res.locals.user.roles = req.user.roles;
-    } else if(res.locals.user.roles) {
-        delete res.locals.user.roles;
-    }
-
-    if(req.user && req.user.username) {
-        res.locals.isContributor = true;
-    } else if(res.locals.isContributor) {
-        delete res.locals.isContributor;
+        res.locals.isContributor = req.user.username;
+    } else if(res.locals.user) {
+        delete res.locals.user;
     }
 
     // allow templates to access the request query
