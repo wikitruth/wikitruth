@@ -26,6 +26,9 @@ exports = module.exports = function(app, mongoose) {
     negative: { type: Boolean, default: false }, // a negative or positive statement
     against: { type: Boolean, default: false } // how it relates to parent Argument, default is in support
   });
+  schema.methods.getType = function() {
+    return constants.OBJECT_TYPES.argumentLink;
+  };
   schema.plugin(require('../plugins/pagedFind'));
   schema.set('autoIndex', (app.get('env') === 'development'));
   app.db.model('ArgumentLink', schema);

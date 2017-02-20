@@ -75,6 +75,7 @@ function GET_entry(req, res) {
                 });
             }
         }, function (err, results) {
+            model.isEntryOwner = model.isQuestionOwner;
             flowUtils.setModelOwnerEntry(model);
             flowUtils.setModelContext(req, model);
             res.render(templates.wiki.questions.entry, model);

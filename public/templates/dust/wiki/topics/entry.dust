@@ -18,9 +18,12 @@
             <div class="content-see-more-gradient"></div>
             <div class="content-see-more-text">See more</div>
         </a>
-        {?keyArguments}
-            <div style="margin-top: 10px; margin-bottom: 10px;">
-                <div style="font-size: 12px;" class="text-muted">KEY ARGUMENTS</div>
+        {?hasKeyEntries}
+            <div style="margin-top: 15px; margin-bottom: 10px;">
+                <div style="font-size-x: 12px; font-weight: bold;" class="text-muted">Key Contents</div>
+                {#keyTopics}
+                    <div class="text-muted">&bull; <a class="text-muted" href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a></div>
+                {/keyTopics}
                 {#keyArguments}
                     <div class="text-muted">&bull; <a class="text-muted" href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a></div>
                 {/keyArguments}
@@ -30,7 +33,7 @@
                     {/keyArguments}
                 </ul>!}
             </div>
-        {/keyArguments}
+        {/hasKeyEntries}
     </div>
     {?parentTopic}
         <div class="wt-related">
@@ -144,19 +147,6 @@
             }
         });
     </script>
-
-    {!{?mainTopic}
-        <script src="/components/geopattern/js/geopattern.min.js"></script>
-        <script type="text/javascript">
-            $(function() {
-                $(".wt-category-icon").each(function() {
-                    var title = $( this ).data("title");
-                    var pattern = GeoPattern.generate(title);
-                    $(this).css("background-image", pattern.toDataUrl());
-                });
-            });
-        </script>
-    {/mainTopic}!}
-
+    {!{?mainTopic}{/mainTopic}!}
     {>"dust/common/geopattern-title-scripts" /}
 {/footer}

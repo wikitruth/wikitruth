@@ -45,6 +45,9 @@ exports = module.exports = function(app, mongoose) {
       }
     }
   });
+  schema.methods.getType = function() {
+    return constants.OBJECT_TYPES.question;
+  };
   schema.plugin(require('../plugins/pagedFind'));
   schema.index({ title: 1 });
   schema.index({

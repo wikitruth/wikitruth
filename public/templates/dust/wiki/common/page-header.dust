@@ -77,4 +77,12 @@
             {/issue}
         {/opinion}
     </div>
+    {@eq key=entry.screening.status value=0}
+        <br/>
+        <div class="alert alert-warning" role="alert"><strong>Warning!</strong> This post is pending for screening and has not been checked for its quality or potential issues, please take caution.</div>
+    {/eq}
+    {@eq key=entry.screening.status value=2}
+        <br/>
+        <div class="alert alert-danger" role="alert"><strong>Beware!</strong> This post was rejected due to its quality or issues, please take caution.</div>
+    {/eq}
 </div>

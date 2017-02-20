@@ -33,6 +33,9 @@ exports = module.exports = function(app, mongoose) {
     editDate: { type: Date, default: Date.now },
     editUserId: { type: mongoose.Schema.ObjectId, ref: 'User'}
   });
+  schema.methods.getType = function() {
+    return constants.OBJECT_TYPES.opinion;
+  };
   schema.plugin(require('../plugins/pagedFind'));
   schema.index({ title: 1 });
   schema.index({
