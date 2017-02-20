@@ -48,6 +48,7 @@ function GET_entry(req, res) {
                 });
             }
         }, function (err, results) {
+            model.isEntryOwner = model.isAnswerOwner;
             flowUtils.setModelOwnerEntry(model);
             flowUtils.setModelContext(req, model);
             res.render(templates.wiki.answers.entry, model);

@@ -19,6 +19,7 @@ function GET_entry(req, res) {
         }
     }
     flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
+        model.isEntryOwner = model.isOpinionOwner;
         flowUtils.setModelOwnerEntry(model);
         flowUtils.setModelContext(req, model);
         res.render(templates.wiki.opinions.entry, model);

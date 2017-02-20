@@ -20,6 +20,7 @@ function GET_entry(req, res) {
     }
     flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
         model.issueType = constants.ISSUE_TYPES['type' + model.issue.issueType].text;
+        model.isEntryOwner = model.isIssueOwner;
         flowUtils.setModelOwnerEntry(model);
         flowUtils.setModelContext(req, model);
         res.render(templates.wiki.issues.entry, model);

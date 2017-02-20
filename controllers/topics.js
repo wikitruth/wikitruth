@@ -132,6 +132,12 @@ function GET_entry(req, res) {
                 var query = { parentId: req.query.topic, 'screening.status': constants.SCREENING_STATUS.status1.code };
                 flowUtils.getTopics(query, 15, function (err, results) {
                     model.topics = results;
+                    model.keyTopics = results.filter(function (result) {
+                        return result.tags.indexOf(constants.TOPIC_TAGS.tag20.code) >= 0;
+                    });
+                    if(model.keyTopics.length > 0) {
+                        model.hasKeyEntries = true;
+                    }
                     callback();
                 });
             },
@@ -196,6 +202,9 @@ function GET_entry(req, res) {
                     model.keyArguments = results.filter(function (result) {
                         return result.tags.indexOf(constants.ARGUMENT_TAGS.tag20.code) >= 0;
                     });
+                    if(model.keyArguments.length > 0) {
+                        model.hasKeyEntries = true;
+                    }
                     model.verdict = {
                         counts: flowUtils.getVerdictCount(results)
                     };
@@ -252,9 +261,7 @@ function GET_entry(req, res) {
                     });
             }
         }, function (err, results) {
-            if(model.isTopicOwner) {
-                model.isEntryOwner = true;
-            }
+            model.isEntryOwner = model.isTopicOwner;
             flowUtils.setModelOwnerEntry(model);
             flowUtils.setModelContext(req, model);
             flowUtils.setClipboardModel(req, model, constants.OBJECT_TYPES.topic);

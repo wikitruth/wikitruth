@@ -269,7 +269,9 @@ var TOPIC_TAGS = {
 
 var OBJECT_TYPES = {
     topic: 1,
+    topicLink: 32,
     argument: 2,
+    argumentLink: 31,
     question: 3,
     comment: 4,
     definition: 5,

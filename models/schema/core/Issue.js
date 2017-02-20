@@ -34,6 +34,9 @@ exports = module.exports = function(app, mongoose) {
     private: { type: Boolean, default: false }, // if true, should be restricted to group/user owners and not included in public backup
     isCritical: { type: Boolean }
   });
+  schema.methods.getType = function() {
+    return constants.OBJECT_TYPES.issue;
+  };
   schema.plugin(require('../plugins/pagedFind'));
   schema.index({ title: 1 });
   schema.index({

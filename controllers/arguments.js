@@ -150,9 +150,7 @@ function GET_entry(req, res) {
             }
         }, function (err, results) {
             flowUtils.setVerdictModel(model.argument);
-            if(model.isArgumentOwner) {
-                model.isEntryOwner = true;
-            }
+            model.isEntryOwner = model.isArgumentOwner;
 
             // Argument Tags
             var tags = model.argument.tags;

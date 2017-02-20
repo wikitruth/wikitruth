@@ -23,6 +23,9 @@ exports = module.exports = function(app, mongoose) {
     ownerId: { type: mongoose.Schema.ObjectId, default: null }, // Required when owner is not a Topic. Useful for filtering
     ownerType: { type: Number, default: -1 } // OBJECT_TYPES
   });
+  schema.methods.getType = function() {
+    return constants.OBJECT_TYPES.topicLink;
+  };
   schema.plugin(require('../plugins/pagedFind'));
   schema.set('autoIndex', (app.get('env') === 'development'));
   app.db.model('TopicLink', schema);
