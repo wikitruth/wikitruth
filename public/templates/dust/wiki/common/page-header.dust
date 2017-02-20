@@ -79,10 +79,22 @@
     </div>
     {@eq key=entry.screening.status value=0}
         <br/>
-        <div class="alert alert-warning" role="alert"><strong>Warning!</strong> This post is pending for screening and has not been checked for its quality or potential issues, please take caution.</div>
+        <div class="alert alert-warning" role="alert">
+            {?isEntryOwner}
+                Your post is <strong>Pending Screening</strong> and has not been checked for its quality or potential issues and will be screened soon.
+            {:else}
+                <strong>Warning!</strong> This post is pending for screening and has not been checked for its quality or potential issues, please take caution.
+            {/isEntryOwner}
+        </div>
     {/eq}
     {@eq key=entry.screening.status value=2}
         <br/>
-        <div class="alert alert-danger" role="alert"><strong>Beware!</strong> This post was rejected due to its quality or issues, please take caution.</div>
+        <div class="alert alert-danger" role="alert">
+            {?isEntryOwner}
+                Sorry! Your post was <strong>Rejected</strong> due to its quality or issues, please check the screening comment for more details.
+            {:else}
+                <strong>Beware!</strong> This post was rejected due to its quality or issues, please take caution.
+            {/isEntryOwner}
+        </div>
     {/eq}
 </div>
