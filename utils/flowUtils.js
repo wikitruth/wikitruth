@@ -1113,6 +1113,15 @@ function getParent(entity, type) {
     return null;
 }
 
+function setMemberFullname(member) {
+    if(member.roles.account) {
+        var fullname = member.roles.account.name.full;
+        if(fullname && fullname !== member.username) {
+            member.fullname = fullname;
+        }
+    }
+}
+
 module.exports = {
     getBackupDir: getBackupDir,
     isOwner: isOwner,
@@ -1144,5 +1153,6 @@ module.exports = {
     setScreeningModel: setScreeningModel,
     initScreeningStatus: initScreeningStatus,
     getDbModelByObjectType: getDbModelByObjectType,
-    getParent: getParent
+    getParent: getParent,
+    setMemberFullname: setMemberFullname
 };

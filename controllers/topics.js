@@ -397,7 +397,7 @@ function GET_link(req, res) {
     }, function (err, results) {
         flowUtils.setModelContext(req, model);
         model.cancelUrl = createCancelUrl(req);
-        res.render(templates.wiki.topics.link, model);
+        res.render(templates.wiki.topics.link.edit, model);
     });
 }
 
@@ -432,10 +432,6 @@ module.exports = function (router) {
         GET_index(req, res);
     });
 
-    router.get('/:friendlyUrl/:id', function (req, res) {
-        GET_index(req, res);
-    });
-
     router.get('/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
         GET_entry(req, res);
     });
@@ -452,12 +448,19 @@ module.exports = function (router) {
     });
 
 
-    router.get('/link', function (req, res) {
+    router.get('/link/edit', function (req, res) {
         GET_link(req, res);
     });
 
-    router.post('/link', function (req, res) {
+    router.post('/link/edit', function (req, res) {
         POST_link(req, res);
+    });
+
+    /**
+     * Place this here to prevent it from overriding /link/* paths
+     */
+    router.get('/:friendlyUrl/:id', function (req, res) {
+        GET_index(req, res);
     });
 };
 

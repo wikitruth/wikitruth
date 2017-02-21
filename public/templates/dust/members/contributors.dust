@@ -5,31 +5,12 @@
 {/title}
 
 {<body}
-    {>"dust/members/members-header" tab="contributors" /}
+    {>"dust/members/common/members-header" tab="contributors" /}
     {?contributors}
         <h3 class="page-header">Contributors</h3>
         <div class="row">
             {#contributors}
-                <div class="col-lg-4 col-md-6 col-sm-6">{! 73px !}
-                    <div class="media wt-category">
-                        <div class="media-left media-top">
-                            <a href="{paths.members.index}/{username}">
-                                <div class="photo-placeholder wt-geopattern-title" title="{username}"></div>
-                            </a>
-                        </div>
-                        <div class="media-body">
-                            {?roles.account.name.full}
-                                <h4 class="media-heading"><a href="{paths.members.index}/{username}">{roles.account.name.full}</a></h4>
-                                <div><strong>{username}</strong></div>
-                            {:else}
-                                <h4 class="media-heading"><a href="{paths.members.index}/{username}">{username}</a></h4>
-                            {/roles.account.name.full}
-                            <div>
-                                <div><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.members.index}/{username}" role="button">view profile</a></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {>"dust/members/common/member-item" /}
             {/contributors}
         </div>
         <br/>
