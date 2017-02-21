@@ -38,7 +38,7 @@
             {#topics}
                 <li class="list-group-item">
                     {?link}
-                        <a href="{wikiBaseUrl}{paths.wiki.topics.link}?topic={topic._id}&amp;id={link._id}&amp;source={wikiBaseUrl}" class="glyphicon glyphicon-link text-success"></a>
+                        <a href="{wikiBaseUrl}{paths.wiki.topics.link.edit}?topic={topic._id}&amp;id={link._id}&amp;source={wikiBaseUrl}" class="glyphicon glyphicon-link text-success"></a>
                     {:else}
                         <i class="fa fa-folder-open text-color-3" aria-hidden="true"></i>
                     {/link}

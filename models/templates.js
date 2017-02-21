@@ -37,7 +37,10 @@ module.exports = {
             index: 'dust/wiki/topics/index',
             create: 'dust/wiki/topics/create',
             entry: 'dust/wiki/topics/entry',
-            link: 'dust/wiki/topics/link'
+            link: {
+                edit: 'dust/wiki/topics/link/edit',
+                entry: 'dust/wiki/topics/link/entry'
+            }
         },
         arguments: {
             index: 'dust/wiki/arguments/index',

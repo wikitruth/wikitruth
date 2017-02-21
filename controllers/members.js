@@ -36,11 +36,15 @@ module.exports = function (router) {
         var model = {};
         db.User
             .find({})
+            .populate('roles.account', 'name.full')
             .sort({title: 1})
             .lean()
             .exec(function (err, results) {
-            model.contributors = results;
-            res.render(templates.members.contributors, model);
+                results.forEach(function(result) {
+                    flowUtils.setMemberFullname(result);
+                });
+                model.contributors = results;
+                res.render(templates.members.contributors, model);
         });
     });
 
@@ -48,11 +52,15 @@ module.exports = function (router) {
         var model = {};
         db.User
             .find({ 'roles.screener': true})
+            .populate('roles.account', 'name.full')
             .sort({title: 1})
             .lean()
             .exec(function (err, results) {
-            model.screeners = results;
-            res.render(templates.members.screeners, model);
+                results.forEach(function(result) {
+                    flowUtils.setMemberFullname(result);
+                });
+                model.screeners = results;
+                res.render(templates.members.screeners, model);
         });
     });
 
@@ -60,11 +68,15 @@ module.exports = function (router) {
         var model = {};
         db.User
             .find({ 'roles.reviewer': true})
+            .populate('roles.account', 'name.full')
             .sort({title: 1})
             .lean()
             .exec(function (err, results) {
-            model.reviewers = results;
-            res.render(templates.members.reviewers, model);
+                results.forEach(function(result) {
+                    flowUtils.setMemberFullname(result);
+                });
+                model.reviewers = results;
+                res.render(templates.members.reviewers, model);
         });
     });
 
@@ -72,11 +84,15 @@ module.exports = function (router) {
         var model = {};
         db.User
             .find({ 'roles.admin': {$exists: true}})
+            .populate('roles.account', 'name.full')
             .sort({title: 1})
             .lean()
             .exec(function (err, results) {
-            model.administrators = results;
-            res.render(templates.members.administrators, model);
+                results.forEach(function(result) {
+                    flowUtils.setMemberFullname(result);
+                });
+                model.administrators = results;
+                res.render(templates.members.administrators, model);
         });
     });
 

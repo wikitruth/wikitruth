@@ -38,7 +38,7 @@
     {?parentTopic}
         <div class="wt-related">
             {!<hr style="border: 0; margin: 0 0 0.375rem; border-top: 0.0625rem dotted #dcdcdc;"/>!}
-            <span>Topics</span>&nbsp;
+            <span title="Related Topics">Topics</span>&nbsp;
             <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}"><span class="wt-label label label-default">{parentTopic.title}</span></a>&nbsp;
             {#topicLinks}
                 <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}"><span class="wt-label label label-default">{title}</span></a>&nbsp;
@@ -79,13 +79,19 @@
                 <li class="list-group-item highlight text-muted"><i class="fa fa-folder-open text-success-x" aria-hidden="true"></i>&nbsp; Topics <span class="wt-label label label-default">{entry.childrenCount.topics.accepted}</span></li>
                 {#topics}
                     <li class="list-group-item">
-                        {?link}
-                            <a href="{wikiBaseUrl}{paths.wiki.topics.link}?topic={topic._id}&amp;id={link._id}&amp;source={paths.wiki.topics.entry}" class="glyphicon glyphicon-link text-color-3"></a>
-                        {:else}
-                            <i class="fa fa-folder-open text-color-3" aria-hidden="true"></i>
-                        {/link}
+                        <i class="fa fa-folder-open text-color-3" aria-hidden="true"></i>
                         <div>
-                            <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">{?link}{?link.title}{link.title}{:else}{title}{/link.title}{:else}{?contextTitle}{contextTitle}{:else}{title}{/contextTitle}{/link}</a>
+                            {?link}
+                                <a href="{wikiBaseUrl}{paths.wiki.topics.link.edit}?topic={topic._id}&amp;id={link._id}&amp;source={paths.wiki.topics.entry}">
+                                    {?link.title}{link.title}{:else}{title}{/link.title}
+                                </a>
+                                &nbsp;
+                                <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}" title="Open linked entry - {title}"><span class="label label-warning"><span class="fa fa-link text-color-3-x"></span> link</span></a>
+                            {:else}
+                                <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">
+                                    {?contextTitle}{contextTitle}{:else}{title}{/contextTitle}
+                                </a>
+                            {/link}
                             {?contentPreview}
                                 <div>{contentPreview}</div>
                             {/contentPreview}

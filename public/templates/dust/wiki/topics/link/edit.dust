@@ -7,7 +7,7 @@
 {<body}
     {>"dust/wiki/common/breadcrumb" /}
     <h1 class="page-header">
-        {topic.title}: Link
+        {topic.title} <span class="label label-warning" style="font-size: 16px; font-weight: normal; padding: .2em .4em .2em; letter-spacing: normal">Link</span>
     </h1>
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">

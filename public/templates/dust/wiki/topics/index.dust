@@ -13,7 +13,7 @@
             {#topics}
                 <li class="list-group-item">
                     {?link}
-                        <a href="{wikiBaseUrl}{paths.wiki.topics.link}?topic={topic._id}&amp;id={link._id}&amp;source={paths.wiki.index}" class="glyphicon glyphicon-link text-color-3"></a>
+                        <a href="{wikiBaseUrl}{paths.wiki.topics.link.edit}?topic={topic._id}&amp;id={link._id}&amp;source={paths.wiki.index}" class="glyphicon glyphicon-link text-color-3"></a>
                     {:else}
                         <i class="fa fa-folder-open text-color-3" aria-hidden="true"></i>
                     {/link}

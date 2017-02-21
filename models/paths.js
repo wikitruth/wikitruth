@@ -37,7 +37,10 @@ module.exports = {
             index:  '/topics',
             entry:  '/topic',
             create: '/topics/create',
-            link: '/topics/link'
+            link: {
+                edit: '/topics/link/edit',
+                entry: '/topics/link/entry'
+            }
         },
         arguments: {
             index:  '/arguments',
