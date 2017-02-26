@@ -18,12 +18,153 @@ var argumentController  = require('./arguments'),
 module.exports = function (router) {
 
     router.get('/', function (req, res) {
+        var MAX_RESULT = 5;
         var model = {};
         db.User.findOne({}, function(err, result) {
             if(!result) {
                 res.redirect(paths.install);
             } else {
-                res.render(templates.index, model);
+                flowUtils.setScreeningModel(req, model);
+                flowUtils.setModelContext(req, model);
+                async.parallel({
+                    topics: function(callback) {
+                        var query = { parentId: {$ne: null}, private: false, 'screening.status': model.screening.status };
+                        db.Topic
+                            .find(query)
+                            .sort({editDate: -1})
+                            .limit(MAX_RESULT)
+                            .lean()
+                            .exec(function (err, results) {
+                                flowUtils.setEditorsUsername(results, function() {
+                                    results.forEach(function(result) {
+                                        flowUtils.appendEntryExtra(result);
+                                    });
+                                    model.topics = results;
+                                    if(results.length === MAX_RESULT) {
+                                        model.topicsMore = true;
+                                    }
+                                    callback();
+                                });
+                            });
+                    },
+                    arguments: function(callback) {
+                        var query = {
+                            ownerType: constants.OBJECT_TYPES.topic,
+                            private: false,
+                            'screening.status': model.screening.status
+                        };
+                        db.Argument
+                            .find(query)
+                            .sort({editDate: -1})
+                            .limit(MAX_RESULT)
+                            .lean()
+                            .exec(function (err, results) {
+                                flowUtils.setEditorsUsername(results, function() {
+                                    results.forEach(function (result) {
+                                        result.topic = {
+                                            _id: result.ownerId
+                                        };
+                                        flowUtils.appendEntryExtra(result);
+                                        flowUtils.setVerdictModel(result);
+                                    });
+                                    model.arguments = results;
+                                    if(results.length === MAX_RESULT) {
+                                        model.argumentsMore = true;
+                                    }
+                                    callback();
+                                });
+                            });
+                    },
+                    questions: function(callback) {
+                        var query = {
+                            ownerType: constants.OBJECT_TYPES.topic,
+                            private: false,
+                            'screening.status': model.screening.status
+                        };
+                        db.Question
+                            .find(query)
+                            .sort({editDate: -1})
+                            .limit(MAX_RESULT)
+                            .lean()
+                            .exec(function (err, results) {
+                                flowUtils.setEditorsUsername(results, function() {
+                                    results.forEach(function (result) {
+                                        result.topic = {
+                                            _id: result.ownerId
+                                        };
+                                        flowUtils.appendEntryExtra(result);
+                                    });
+                                    model.questions = results;
+                                    if(results.length === MAX_RESULT) {
+                                        model.questionsMore = true;
+                                    }
+                                    callback();
+                                });
+                            });
+                    },
+                    answers: function(callback) {
+                        db.Answer
+                            .find({ private: false, 'screening.status': model.screening.status })
+                            .sort({editDate: -1})
+                            .limit(MAX_RESULT)
+                            .lean()
+                            .exec(function (err, results) {
+                                flowUtils.setEditorsUsername(results, function () {
+                                    results.forEach(function (result) {
+                                        result.topic = {
+                                            _id: result.ownerId
+                                        };
+                                        flowUtils.appendEntryExtra(result);
+                                    });
+                                    model.answers = results;
+                                    if(results.length === MAX_RESULT) {
+                                        model.answersMore = true;
+                                    }
+                                    callback();
+                                });
+                            });
+                    },
+                    issues: function (callback) {
+                        db.Issue
+                            .find({ private: false, 'screening.status': model.screening.status })
+                            .sort({editDate: -1})
+                            .limit(MAX_RESULT)
+                            .lean()
+                            .exec(function(err, results) {
+                                flowUtils.setEditorsUsername(results, function() {
+                                    results.forEach(function (result) {
+                                        flowUtils.appendEntryExtra(result);
+                                    });
+                                    model.issues = results;
+                                    if(results.length === MAX_RESULT) {
+                                        model.issuesMore = true;
+                                    }
+                                    callback();
+                                });
+                            });
+                    },
+                    opinions: function (callback) {
+                        db.Opinion
+                            .find({ private: false, 'screening.status': model.screening.status })
+                            .sort({editDate: -1})
+                            .limit(MAX_RESULT)
+                            .lean()
+                            .exec(function(err, results) {
+                                flowUtils.setEditorsUsername(results, function() {
+                                    results.forEach(function (result) {
+                                        flowUtils.appendEntryExtra(result);
+                                    });
+                                    model.opinions = results;
+                                    if(results.length === MAX_RESULT) {
+                                        model.opinionsMore = true;
+                                    }
+                                    callback();
+                                });
+                            });
+                    }
+                }, function (err, results) {
+                    res.render(templates.index, model);
+                });
             }
         });
         /*async.parallel({
@@ -90,6 +231,7 @@ module.exports = function (router) {
     });
 
     router.get('/explore', function (req, res) {
+        var MAX_RESULT = 25;
         var model = {
             tab: req.query.tab ? req.query.tab : 'topics'
         };
@@ -105,7 +247,7 @@ module.exports = function (router) {
                 db.Topic
                     .find(query)
                     .sort({editDate: -1})
-                    .limit(25)
+                    .limit(MAX_RESULT)
                     .lean()
                     .exec(function (err, results) {
                     flowUtils.setEditorsUsername(results, function() {
@@ -113,6 +255,9 @@ module.exports = function (router) {
                             flowUtils.appendEntryExtra(result);
                         });
                         model.topics = results;
+                        if(results.length > 0) {
+                            model.results = true;
+                        }
                         callback();
                     });
                 });
@@ -131,7 +276,7 @@ module.exports = function (router) {
                 db.Argument
                     .find(query)
                     .sort({editDate: -1})
-                    .limit(25)
+                    .limit(MAX_RESULT)
                     .lean()
                     .exec(function (err, results) {
                         flowUtils.setEditorsUsername(results, function() {
@@ -143,6 +288,9 @@ module.exports = function (router) {
                                 flowUtils.setVerdictModel(result);
                             });
                             model.arguments = results;
+                            if(results.length > 0) {
+                                model.results = true;
+                            }
                             callback();
                         });
                     });
@@ -160,7 +308,7 @@ module.exports = function (router) {
                 db.Question
                     .find(query)
                     .sort({editDate: -1})
-                    .limit(25)
+                    .limit(MAX_RESULT)
                     .lean()
                     .exec(function (err, results) {
                         flowUtils.setEditorsUsername(results, function() {
@@ -171,6 +319,9 @@ module.exports = function (router) {
                                 flowUtils.appendEntryExtra(result);
                             });
                             model.questions = results;
+                            if(results.length > 0) {
+                                model.results = true;
+                            }
                             callback();
                         });
                     });
@@ -183,7 +334,7 @@ module.exports = function (router) {
                 db.Answer
                     .find({ private: false, 'screening.status': model.screening.status })
                     .sort({editDate: -1})
-                    .limit(25)
+                    .limit(MAX_RESULT)
                     .lean()
                     .exec(function (err, results) {
                         flowUtils.setEditorsUsername(results, function () {
@@ -194,6 +345,9 @@ module.exports = function (router) {
                                 flowUtils.appendEntryExtra(result);
                             });
                             model.answers = results;
+                            if(results.length > 0) {
+                                model.results = true;
+                            }
                             callback();
                         });
                     });
@@ -205,7 +359,7 @@ module.exports = function (router) {
                 db.Issue
                     .find({ private: false, 'screening.status': model.screening.status })
                     .sort({editDate: -1})
-                    .limit(25)
+                    .limit(MAX_RESULT)
                     .lean()
                     .exec(function(err, results) {
                         flowUtils.setEditorsUsername(results, function() {
@@ -213,6 +367,9 @@ module.exports = function (router) {
                                 flowUtils.appendEntryExtra(result);
                             });
                             model.issues = results;
+                            if(results.length > 0) {
+                                model.results = true;
+                            }
                             callback();
                         });
                     });
@@ -224,7 +381,7 @@ module.exports = function (router) {
                 db.Opinion
                     .find({ private: false, 'screening.status': model.screening.status })
                     .sort({editDate: -1})
-                    .limit(25)
+                    .limit(MAX_RESULT)
                     .lean()
                     .exec(function(err, results) {
                         flowUtils.setEditorsUsername(results, function() {
@@ -232,6 +389,9 @@ module.exports = function (router) {
                                 flowUtils.appendEntryExtra(result);
                             });
                             model.opinions = results;
+                            if(results.length > 0) {
+                                model.results = true;
+                            }
                             callback();
                         });
                     });
@@ -331,6 +491,7 @@ module.exports = function (router) {
 
 
     router.get('/search', function (req, res) {
+        var MAX_RESULT = 15;
         var keyword = req.query.q;
         var tab = req.query.tab ? req.query.tab : 'all';
         var model = {
@@ -354,7 +515,7 @@ module.exports = function (router) {
                 db.Topic
                     .find({ $text : { $search : keyword }, $or: privacyFilter }, { score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
-                    .limit(tab === 'all' ? 15 : 0)
+                    .limit(tab === 'all' ? MAX_RESULT : 0)
                     .lean()
                     .exec(function(err, results) {
                         if(err || !results) {
@@ -367,7 +528,7 @@ module.exports = function (router) {
                             });
                             model.topics = results;
                             if(results.length > 0) {
-                                if(results.length === 15) {
+                                if(results.length === MAX_RESULT) {
                                     model.topicsMore = true;
                                 }
                                 model.results = true;
@@ -383,7 +544,7 @@ module.exports = function (router) {
                 db.Argument
                     .find({ $text : { $search : keyword }, $or: privacyFilter }, { score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
-                    .limit(tab === 'all' ? 15 : 0)
+                    .limit(tab === 'all' ? MAX_RESULT : 0)
                     .lean()
                     .exec(function(err, results) {
                         flowUtils.setEditorsUsername(results, function() {
@@ -394,7 +555,7 @@ module.exports = function (router) {
                             flowUtils.sortArguments(results);
                             model.arguments = results;
                             if (results.length > 0) {
-                                if(results.length === 15) {
+                                if(results.length === MAX_RESULT) {
                                     model.argumentsMore = true;
                                 }
                                 model.results = true;
@@ -410,7 +571,7 @@ module.exports = function (router) {
                 db.Question
                     .find({ $text : { $search : keyword }, $or: privacyFilter }, { score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
-                    .limit(tab === 'all' ? 15 : 0)
+                    .limit(tab === 'all' ? MAX_RESULT : 0)
                     .lean()
                     .exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
@@ -432,7 +593,7 @@ module.exports = function (router) {
                 db.Answer
                     .find({ $text : { $search : keyword }, $or: privacyFilter }, { score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
-                    .limit(tab === 'all' ? 15 : 0)
+                    .limit(tab === 'all' ? MAX_RESULT : 0)
                     .lean()
                     .exec(function(err, results) {
                         flowUtils.setEditorsUsername(results, function() {
@@ -454,7 +615,7 @@ module.exports = function (router) {
                 db.Issue
                     .find({ $text : { $search : keyword }, $or: privacyFilter }, { score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
-                    .limit(tab === 'all' ? 15 : 0)
+                    .limit(tab === 'all' ? MAX_RESULT : 0)
                     .lean()
                     .exec(function(err, results) {
                         flowUtils.setEditorsUsername(results, function() {
@@ -463,7 +624,7 @@ module.exports = function (router) {
                             });
                             model.issues = results;
                             if (results.length > 0) {
-                                if(results.length === 15) {
+                                if(results.length === MAX_RESULT) {
                                     model.issuesMore = true;
                                 }
                                 model.results = true;
@@ -479,7 +640,7 @@ module.exports = function (router) {
                 db.Opinion
                     .find({ $text : { $search : keyword }, $or: privacyFilter }, { score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
-                    .limit(tab === 'all' ? 15 : 0)
+                    .limit(tab === 'all' ? MAX_RESULT : 0)
                     .lean()
                     .exec(function(err, results) {
                         flowUtils.setEditorsUsername(results, function() {
@@ -488,7 +649,7 @@ module.exports = function (router) {
                             });
                             model.opinions = results;
                             if (results.length > 0) {
-                                if(results.length === 15) {
+                                if(results.length === MAX_RESULT) {
                                     model.opinionsMore = true;
                                 }
                                 model.results = true;

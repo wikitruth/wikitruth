@@ -158,11 +158,19 @@ function GET_entry(req, res) {
                 var tagLabels = [];
                 if(model.argument.ethicalStatus.hasValue) {
                     tagLabels.push(constants.ARGUMENT_TAGS.tag10);
+                    model.hasValue = true;
                 }
                 tags.forEach(function (tag) {
                     tagLabels.push(constants.ARGUMENT_TAGS['tag' + tag]);
+                    if(!model.hasValue && tag === constants.ARGUMENT_TAGS.tag10.code) {
+                        model.hasValue = true;
+                    }
                 });
                 model.tagLabels = tagLabels;
+            }
+
+            if(!model.hasValue && (model.argument.ethicalStatus.hasValue || model.argument.typeId === constants.ARGUMENT_TYPES.ethical)) {
+                model.hasValue = true;
             }
             flowUtils.setModelOwnerEntry(model);
             flowUtils.setModelContext(req, model);

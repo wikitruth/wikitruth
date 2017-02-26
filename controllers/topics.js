@@ -84,14 +84,20 @@ function GET_entry(req, res) {
             var tagLabels = [];
             if(model.topic.ethicalStatus.hasValue) {
                 tagLabels.push(constants.TOPIC_TAGS.tag10);
+                model.hasValue = true;
             }
             tags.forEach(function (tag) {
                 tagLabels.push(constants.TOPIC_TAGS['tag' + tag]);
                 if(tag === constants.TOPIC_TAGS.tag520.code) {
                     model.mainTopic = true;
                 }
+                if(!model.hasValue && tag === constants.ARGUMENT_TAGS.tag10.code) {
+                    model.hasValue = true;
+                }
             });
             model.tagLabels = tagLabels;
+        } else if(model.topic.ethicalStatus.hasValue) {
+            model.hasValue = true;
         }
 
         async.parallel({
