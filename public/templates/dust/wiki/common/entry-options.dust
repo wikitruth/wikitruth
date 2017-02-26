@@ -1,6 +1,6 @@
 <div style="margin-bottom-x: 15px" class="clearfix" id="entry-options" data-entry-id="{entry._id}" data-entry-type="{entryType}" data-csrf="{_csrf}">
     <div class="dropdown pull-left entry-options">
-        <a href="#" class="text-muted no-underline dropdown-toggle" title="Reply" data-toggle="dropdown" aria-controls="wtDropdownReply" aria-haspopup="true" aria-expanded="false"><i class="fa fa-reply" aria-hidden="true"></i> Reply</a>
+        <a href="#" class="text-muted no-underline dropdown-toggle" title="Reply" data-toggle="dropdown" aria-controls="wtDropdownReply" aria-haspopup="true" aria-expanded="false"><i class="fa fa-reply" aria-hidden="true"></i><span class="hidden-xxxs"> Reply</span></a>
         <ul class="dropdown-menu dropdown-menu-right-x" aria-labelledby="wtTabMore" id="wtDropdownReply">
             <li class="dropdown-header">Reply With...</li>
             {^issue}
@@ -25,15 +25,20 @@
         </ul>
     </div>
     <div class="pull-left entry-options">
-        <a href="#" class="text-muted no-underline" title="Expose - this entry is important"><i class="fa fa-arrow-circle-o-up" aria-hidden="true"></i> Expose</a>
-        <a href="#" class="text-muted no-underline" title="Bury - this entry is NOT important" style-x="margin-right: 45px"><i class="fa fa-arrow-circle-o-down" aria-hidden="true"></i> Bury</a>
+        <a href="#" class="text-muted no-underline" title="Expose - this entry is important" style="margin-right: 10px"><i class="fa fa-arrow-circle-o-up" aria-hidden="true"></i> Expose</a>
+        <a href="#" class="text-muted no-underline" title="Bury - this entry is NOT important" style="margin-right: 0px"><i class="fa fa-arrow-circle-o-down" aria-hidden="true"></i> Bury</a>
+        {?hasValue}
+            <span class="text-muted-2" style="margin-left: 5px; margin-right: 5px;"> | </span>
+            <a href="#" class="text-muted no-underline" title="Good - something that is good or has ethical value" style="margin-right: 10px"><i class="fa fa-thumbs-o-up" aria-hidden="true"></i> Good</a>
+            <a href="#" class="text-muted no-underline" title="Bad - something that is bad or unethical" style="margin-right: 0px"><i class="fa fa-thumbs-o-down" aria-hidden="true"></i> Bad</a>
+        {/hasValue}
         {!<a href="#" class="text-muted no-underline" title="Timeline"><i class="fa fa-home" aria-hidden="true"></i><span class="hidden-xxs"> Timeline</span></a>!}
         {!<a href="#" class="text-muted no-underline"><i class="fa fa-comments" aria-hidden="true"></i><span class="hidden-xxs"> Discussions</span></a>
         <a href="#" class="text-muted no-underline"><i class="fa fa-exclamation-circle" aria-hidden="true"></i><span class="hidden-xxs"> Issues</span></a>
         <a href="#" class="text-muted no-underline"><i class="fa fa-tags" aria-hidden="true"></i><span class="hidden-xs"> Tags</span></a>
         <a href="#" class="text-muted no-underline" title="Opinions"><i class="fa fa-comments-o" aria-hidden="true"></i><span class="hidden-xs"> Opinions</span></a>!}
     </div>
-    <div class="dropdown pull-left">
+    <div class="dropdown pull-left" style="margin-left: 10px">
         <a href="#" class="text-muted dropdown-toggle wt-link-focus" data-toggle="dropdown" aria-controls="wtTabEntryMore-contents" aria-haspopup="true" aria-expanded="false">
             <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span> {!<span class="caret"></span>!}</a>
         <ul class="dropdown-menu dropdown-menu-right-x" aria-labelledby="wtTabEntryMore" id="wtTabEntryMore-contents">

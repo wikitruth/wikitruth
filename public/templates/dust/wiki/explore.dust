@@ -24,14 +24,18 @@
                         </a>
                     </div>
                     <div class="media-body">
-                        <h4 class="media-heading"><a href="{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">{title}</a></h4>
+                        <h4 class="media-heading"><a href="{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">{title}</a>
+                        </h4>
+
                         <div>
                             {?subtopics}
                                 {#subtopics}
-                                    <div><i class="fa fa-folder-open text-muted text-success-x" aria-hidden="true"></i>&nbsp;<a href="{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">{shortTitle}</a></div>
+                                    <div><i class="fa fa-folder-open text-muted text-success-x" aria-hidden="true"></i>&nbsp;<a
+                                            href="{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">{shortTitle}</a></div>
                                 {/subtopics}
-                                <div><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.wiki.topics.index}?topic={_id}" role="button">more</a></div>
-                                {!<span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}!}
+                                <div><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a
+                                        href="{paths.wiki.topics.index}?topic={_id}" role="button">more</a></div>
+                            {!<span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}!}
                             {/subtopics}
                         </div>
                     </div>
@@ -47,9 +51,15 @@
     </div>
     &nbsp;&nbsp;
     <div class="btn-group" role="group" aria-label="Screening Filter">
-        <a href="{screening.approvedUrl}#browse" class="btn btn-{?screening.approved}info{:else}default{/screening.approved} btn-sm" role="button">Accepted</a>
-        <a href="{screening.pendingUrl}#browse" class="btn btn-{?screening.pending}warning{:else}default{/screening.pending} btn-sm" role="button">Pending</a>
-        <a href="{screening.rejectedUrl}#browse" class="btn btn-{?screening.rejected}danger{:else}default{/screening.rejected} btn-sm" role="button">Rejected</a>
+        <a href="{screening.approvedUrl}#browse"
+           class="btn btn-{?screening.approved}info{:else}default{/screening.approved} btn-sm"
+           role="button">Accepted</a>
+        <a href="{screening.pendingUrl}#browse"
+           class="btn btn-{?screening.pending}warning{:else}default{/screening.pending} btn-sm"
+           role="button">Pending</a>
+        <a href="{screening.rejectedUrl}#browse"
+           class="btn btn-{?screening.rejected}danger{:else}default{/screening.rejected} btn-sm"
+           role="button">Rejected</a>
     </div>
     <br/><br/>
     <ul class="nav nav-tabs wt-tabs" role="tablist">
@@ -59,37 +69,44 @@
             </a>
         </li>!}
         <li role="presentation"{@eq key=tab value="topics"} class="active"{/eq}>
-            <a href="{paths.wiki.index}?tab=topics{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="tab">
+            <a href="{paths.wiki.index}?tab=topics{?query.screening}&amp;screening={query.screening}{/query.screening}#browse"
+               role="tab">
                 <i class="fa fa-folder-open" aria-hidden="true"></i> <span class="hidden-xxs">Topics</span>
             </a>
         </li>
         <li role="presentation"{@eq key=tab value="arguments"} class="active"{/eq}>
-            <a href="{paths.wiki.index}?tab=arguments{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="tab">
+            <a href="{paths.wiki.index}?tab=arguments{?query.screening}&amp;screening={query.screening}{/query.screening}#browse"
+               role="tab">
                 <i class="fa fa-flash" aria-hidden="true"></i> <span class="hidden-xs">Arguments</span>
             </a>
         </li>
         <li role="presentation"{@eq key=tab value="questions"} class="active"{/eq}>
-            <a href="{paths.wiki.index}?tab=questions{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="tab">
+            <a href="{paths.wiki.index}?tab=questions{?query.screening}&amp;screening={query.screening}{/query.screening}#browse"
+               role="tab">
                 <i class="fa fa-question-circle" aria-hidden="true"></i><span class="hidden-xs"> Questions</span>
             </a>
         </li>
         <li role="presentation"{@eq key=tab value="answers"} class="active"{/eq}>
-            <a href="{paths.wiki.index}?tab=answers{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="tab">
+            <a href="{paths.wiki.index}?tab=answers{?query.screening}&amp;screening={query.screening}{/query.screening}#browse"
+               role="tab">
                 <i class="fa fa-check-circle" aria-hidden="true"></i><span class="hidden-xs"> Answers</span>
             </a>
         </li>
         <li role="presentation"{@eq key=tab value="issues"} class="active"{/eq}>
-            <a href="{paths.wiki.index}?tab=issues{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="tab">
+            <a href="{paths.wiki.index}?tab=issues{?query.screening}&amp;screening={query.screening}{/query.screening}#browse"
+               role="tab">
                 <i class="fa fa-exclamation-circle" aria-hidden="true"></i><span class="hidden-xs"> Issues</span>
             </a>
         </li>
         <li role="presentation"{@eq key=tab value="opinions"} class="active"{/eq}>
-            <a href="{paths.wiki.index}?tab=opinions{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="tab">
+            <a href="{paths.wiki.index}?tab=opinions{?query.screening}&amp;screening={query.screening}{/query.screening}#browse"
+               role="tab">
                 <i class="fa fa-comments-o" aria-hidden="true"></i><span class="hidden-xs"> Comments</span>
             </a>
         </li>
         {?user.isAdmin}
-        <li role="presentation" class="dropdown"><a href="#" id="wtTabMore" class="dropdown-toggle" data-toggle="dropdown" aria-controls="wtTabMore-contents" aria-expanded="false">
+        <li role="presentation" class="dropdown">
+            <a href="#" id="wtTabMore" class="dropdown-toggle" data-toggle="dropdown" aria-controls="wtTabMore-contents" aria-expanded="false">
             <span class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span> {!<span class="caret"></span>!}</a>
             <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="wtTabMore" id="wtTabMore-contents">
                 <li role="tab"><a href="{paths.wiki.topics.create}">
@@ -113,7 +130,8 @@
                         {/contentPreview}
                         {>"dust/wiki/common/entry-row-footer" /}
                     </div>
-                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
+                    <span class="pull-right text-muted hidden-xxs">
+                        <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
                 </li>
             {/topics}
         </ul>
@@ -125,7 +143,8 @@
                 <li class="list-group-item">
                     <i class="fa fa-flash text-{verdict.theme}" aria-hidden="true"></i>
                     <div>
-                        <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.arguments.entry}/{friendlyUrl}/{_id}">{title}{?typeUX} <span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}{?private} <span class="label label-default">private</span>{/private}</a>
+                        <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.arguments.entry}/{friendlyUrl}/{_id}">{title}
+                            {?typeUX} <span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}{?private} <span class="label label-default">private</span>{/private}</a>
                         {?contentPreview}
                             <div>{contentPreview}</div>
                         {/contentPreview}
@@ -149,7 +168,8 @@
                         {/contentPreview}
                         {>"dust/wiki/common/entry-row-footer" /}
                     </div>
-                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
+                </li>
             {/questions}
         </ul>
     {/questions}
@@ -166,16 +186,19 @@
                         {/contentPreview}
                         {>"dust/wiki/common/entry-row-footer" /}
                     </div>
-                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
+                </li>
             {/answers}
         </ul>
     {/answers}
     {?issues}
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight"><span class="fa fa-exclamation-circle text-success" aria-hidden="true"></span> Issues</li>
+            <li class="list-group-item highlight"><span class="fa fa-exclamation-circle text-success" aria-hidden="true"></span> Issues
+            </li>
             {#issues}
                 <li class="list-group-item">
                     <span class="fa fa-exclamation-circle text-danger" aria-hidden="true"></span>
+
                     <div>
                         <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.issues.entry}/{friendlyUrl}/{_id}">{title}{?private} <span class="label label-default">private</span>{/private}</a>
                         {?contentPreview}
@@ -183,7 +206,8 @@
                         {/contentPreview}
                         {>"dust/wiki/common/entry-row-footer" /}
                     </div>
-                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
+                </li>
             {/issues}
         </ul>
     {/issues}
@@ -200,10 +224,26 @@
                         {/contentPreview}
                         {>"dust/wiki/common/entry-row-footer" /}
                     </div>
-                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
+                </li>
             {/opinions}
         </ul>
     {/opinions}
+    {?results}
+        <div class="pagination-container" style="text-align: center">
+            <ul class="pagination" style="margin-top: 0;">
+                <li class="disabled"><a href="#browse" aria-label="Previous"><span aria-hidden="true">Previous</span></a></li>
+                <li class="active"><a href="#browse">1 <span class="sr-only">(current)</span></a></li>
+                <li><a href="#browse">2</a></li>
+                <li><a href="#browse">3</a></li>
+                <li><a href="#browse">4</a></li>
+                <li><a href="#browse">5</a></li>
+                <li><a href="#browse" aria-label="Next"><span aria-hidden="true">Next</span></a></li>
+            </ul>
+        </div>
+    {:else}
+        <h4 style="font-weight: normal">No results found.</h4>
+    {/results}
 {/body}
 
 {<footer}
