@@ -112,7 +112,7 @@ app.locals.titleSlogan = app.config.titleSlogan;
 app.locals.copyrightYear = new Date().getFullYear();
 //app.locals.copyrightName = app.config.companyName;
 app.locals.cacheBreaker = app.config.cacheBreaker;
-
+app.locals.googleAnalyticsTrackingId = app.config.googleAnalyticsTrackingId;
 app.locals.paths = paths;
 app.locals.templates = templates;
 
