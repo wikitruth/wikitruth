@@ -678,7 +678,6 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
                 issues: updateIssues,
                 opinions: updateOpinions
             }, function (err, results) {
-                console.log('childrenCount: ' + JSON.stringify(countNode));
                 db.Topic.update({_id: entryId}, {
                     $set: countNode
                 }, function (err, num) {
@@ -697,7 +696,6 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
                 issues: updateIssues,
                 opinions: updateOpinions
             }, function (err, results) {
-                console.log('childrenCount: ' + JSON.stringify(countNode));
                 db.Argument.update({_id: entryId}, {
                     $set: countNode
                 }, function (err, num) {
@@ -715,7 +713,6 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
                 issues: updateIssues,
                 opinions: updateOpinions
             }, function (err, results) {
-                console.log('childrenCount: ' + JSON.stringify(countNode));
                 db.Question.update({_id: entryId}, {
                     $set: countNode
                 }, function (err, num) {
@@ -732,7 +729,6 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
                 issues: updateIssues,
                 opinions: updateOpinions
             }, function (err, results) {
-                console.log('childrenCount: ' + JSON.stringify(countNode));
                 db.Answer.update({_id: entryId}, {
                     $set: countNode
                 }, function (err, num) {
@@ -748,7 +744,6 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
             async.parallel({
                 opinions: updateOpinions
             }, function (err, results) {
-                console.log('childrenCount: ' + JSON.stringify(countNode));
                 db.Issue.update({_id: entryId}, {
                     $set: countNode
                 }, function (err, num) {
@@ -764,7 +759,6 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
             async.parallel({
                 opinions: updateOpinions
             }, function (err, results) {
-                console.log('childrenCount: ' + JSON.stringify(countNode));
                 db.Opinion.update({_id: entryId}, {
                     $set: countNode
                 }, function (err, num) {
@@ -1049,7 +1043,7 @@ function setScreeningModel(req, model) {
 }
 
 function initScreeningStatus(req, entity) {
-    if(req.user.roles.reviewer || req.params.username) {
+    if(req.user.roles.reviewer || req.params.username || req.body.username) { /* req.body.username is used by clipboard */
         entity.screening = {
             status: constants.SCREENING_STATUS.status1.code,
             history: []

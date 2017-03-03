@@ -239,7 +239,7 @@ module.exports = function (router) {
         } else if(action === 'fix') {
             // this will set the default values in every doc
             async.parallel({
-                topics: function (callback) {
+                /*topics: function (callback) {
                     db.Topic.find({}).exec((err, results) => {
                         async.eachSeries(results, function (result, callback) {
                             if(result.content && !result.contentPreview) {
@@ -256,18 +256,20 @@ module.exports = function (router) {
                             callback();
                         });
                     });
-                },
-                /*topicLinks: function (callback) {
+                },*/
+                topicLinks: function (callback) {
                     db.TopicLink.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
-                            result.screening.status = constants.SCREENING_STATUS.status1.code;
+                            if(result.private) {
+                                result.screening.status = constants.SCREENING_STATUS.status1.code;
+                            }
                             db.TopicLink.update({ _id: result._id }, result, {}, callback);
                         }, function (err) {
                             callback();
                         });
                     });
-                },*/
-                arguments: function (callback) {
+                }
+                /*arguments: function (callback) {
                     db.Argument.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
                             if(result.content && !result.contentPreview) {
@@ -284,7 +286,7 @@ module.exports = function (router) {
                             callback();
                         });
                     });
-                },
+                },*/
                 /*argumentLinks: function (callback) {
                     db.ArgumentLink.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
@@ -295,7 +297,7 @@ module.exports = function (router) {
                         });
                     });
                 },*/
-                questions: function (callback) {
+                /*questions: function (callback) {
                     db.Question.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
                             if(result.content && !result.contentPreview) {
@@ -366,7 +368,7 @@ module.exports = function (router) {
                             callback();
                         });
                     });
-                }
+                }*/
                 /*users: function (callback) {
                     db.User.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
