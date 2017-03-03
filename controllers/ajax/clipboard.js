@@ -69,7 +69,9 @@ module.exports = function (router) {
                             entity.private = parent.private;
                             entity.createUserId = req.user.id;
                             entity.createDate = dateNow;
-                            db.TopicLink.update({topicId: topicId, parentId: parent._id}, entity, {upsert: true}, function() {
+                            flowUtils.initScreeningStatus(req, entity);
+                            console.log('entity: ' + JSON.stringify(entity));
+                            db.TopicLink.findOneAndUpdate({topicId: topicId, parentId: parent._id}, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function(err, updatedEntity) {
                                 callback();
                             });
                         }, function () {
@@ -94,7 +96,8 @@ module.exports = function (router) {
                             entity.threadId = null; // TODO: set to self._id
                             entity.createUserId = req.user.id;
                             entity.createDate = dateNow;
-                            db.ArgumentLink.update({argumentId: argumentId, parentId: null, ownerId: parent._id}, entity, {upsert: true}, function(err, writeResult) {
+                            flowUtils.initScreeningStatus(req, entity);
+                            db.ArgumentLink.findOneAndUpdate({argumentId: argumentId, parentId: null, ownerId: parent._id}, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function(err, updatedEntity) {
                                 callback();
                             });
                         }, function () {
@@ -126,7 +129,8 @@ module.exports = function (router) {
                     entity.private = parent.private;
                     entity.createUserId = req.user.id;
                     entity.createDate = dateNow;
-                    db.ArgumentLink.update({argumentId: argumentId, parentId: parent._id}, entity, {upsert: true}, function(err, writeResult) {
+                    flowUtils.initScreeningStatus(req, entity);
+                    db.ArgumentLink.findOneAndUpdate({argumentId: argumentId, parentId: parent._id}, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function(err, updatedEntity) {
                         callback();
                     });
                 }, function () {
@@ -164,7 +168,7 @@ module.exports = function (router) {
                                 var parentId = result.parentId;
                                 // Update entry
                                 result.parentId = id;
-                                db.Topic.update({_id: result._id}, result, {upsert: true}, function(err, writeResult) {
+                                db.Topic.findOneAndUpdate({_id: result._id}, result, { upsert: true, new: true, setDefaultsOnInsert: true }, function(err, updatedEntity) {
                                     if(parentId) {
                                         flowUtils.updateChildrenCount(parentId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, callback);
                                     } else {
@@ -202,7 +206,7 @@ module.exports = function (router) {
                                 result.ownerId = id; // TODO: how about children ???
                                 result.ownerType = constants.OBJECT_TYPES.topic;
                                 result.threadId = null; // TODO: should set to self._id ???
-                                db.Argument.update({_id: result._id}, result, {upsert: true}, function(err, writeResult) {
+                                db.Argument.findOneAndUpdate({_id: result._id}, result, { upsert: true, new: true, setDefaultsOnInsert: true }, function(err, updatedEntity) {
                                     if(parentId) {
                                         flowUtils.updateChildrenCount(parentId, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.argument, callback);
                                     } else {
@@ -254,7 +258,7 @@ module.exports = function (router) {
                             result.ownerId = parent.parentId; // TODO: how about children ???
                             result.ownerType = parent.ownerType;
                             result.threadId = parent.threadId ? parent.threadId : id;
-                            db.Argument.update({_id: result._id}, result, {upsert: true}, function(err, writeResult) {
+                            db.Argument.findOneAndUpdate({_id: result._id}, result, { upsert: true, new: true, setDefaultsOnInsert: true }, function(err, updatedEntity) {
                                 if(parentId) {
                                     flowUtils.updateChildrenCount(parentId, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.argument, callback);
                                 } else {

@@ -570,11 +570,11 @@ module.exports = function (router) {
         topicController.POST_create(req, res);
     });
 
-    router.get('/:username/diary/topics/link', function (req, res) {
+    router.get('/:username/diary/topics/link/edit', function (req, res) {
         topicController.GET_link(req, res);
     });
 
-    router.post('/:username/diary/topics/link', function (req, res) {
+    router.post('/:username/diary/topics/link/edit', function (req, res) {
         topicController.POST_link(req, res);
     });
 
