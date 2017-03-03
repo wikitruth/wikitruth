@@ -25,8 +25,8 @@
         </ul>
     </div>
     <div class="pull-left entry-options">
-        <a href="#" class="text-muted no-underline" title="Expose - this entry is important" style="margin-right: 10px"><i class="fa fa-arrow-circle-o-up" aria-hidden="true"></i> Expose</a>
-        <a href="#" class="text-muted no-underline" title="Bury - this entry is NOT important" style="margin-right: 0px"><i class="fa fa-arrow-circle-o-down" aria-hidden="true"></i> Bury</a>
+        <a href="#" class="text-muted no-underline" title="Expose - this entry is important" style="margin-right: 10px"><i class="fa fa-arrow-circle-o-up" aria-hidden="true"></i><span class="hidden-xxxxs"> Expose</span></a>
+        <a href="#" class="text-muted no-underline" title="Bury - this entry is NOT important" style="margin-right: 0px"><i class="fa fa-arrow-circle-o-down" aria-hidden="true"></i><span class="hidden-xxxxs"> Bury</span></a>
         {?hasValue}
             <span class="text-muted-2" style="margin-left: 5px; margin-right: 5px;"> | </span>
             <a href="#" class="text-muted no-underline" title="Good - something that is good or has ethical value" style="margin-right: 10px"><i class="fa fa-thumbs-o-up" aria-hidden="true"></i> Good</a>

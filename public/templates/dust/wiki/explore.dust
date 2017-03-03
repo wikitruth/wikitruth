@@ -41,17 +41,18 @@
     </div>
     {!<br/>!}
     <h1 class="page-header wt-header-x" id="browse">Latest Posts</h1>
-    <div class="btn-group" role="group" aria-label="Latest or Popular Filter">
-        <a href="#browse" class="btn btn-info btn-sm" role="button">Latest</a>
-        <a href="#browse" class="btn btn-default btn-sm" role="button">Popular</a>
+    <div style="margin-bottom: 15px">
+        <div class="btn-group" role="group" aria-label="Latest or Popular Filter" style="margin-bottom: 5px">
+            <a href="#browse" class="btn btn-info btn-sm" role="button">Latest</a>
+            <a href="#browse" class="btn btn-default btn-sm" role="button">Popular</a>
+        </div>
+        &nbsp;&nbsp;
+        <div class="btn-group" role="group" aria-label="Screening Filter" style="margin-bottom: 5px">
+            <a href="{screening.approvedUrl}#browse" class="btn btn-{?screening.approved}info{:else}default{/screening.approved} btn-sm" role="button">Accepted</a>
+            <a href="{screening.pendingUrl}#browse" class="btn btn-{?screening.pending}warning{:else}default{/screening.pending} btn-sm" role="button">Pending</a>
+            <a href="{screening.rejectedUrl}#browse" class="btn btn-{?screening.rejected}danger{:else}default{/screening.rejected} btn-sm" role="button">Rejected</a>
+        </div>
     </div>
-    &nbsp;&nbsp;
-    <div class="btn-group" role="group" aria-label="Screening Filter">
-        <a href="{screening.approvedUrl}#browse" class="btn btn-{?screening.approved}info{:else}default{/screening.approved} btn-sm" role="button">Accepted</a>
-        <a href="{screening.pendingUrl}#browse" class="btn btn-{?screening.pending}warning{:else}default{/screening.pending} btn-sm" role="button">Pending</a>
-        <a href="{screening.rejectedUrl}#browse" class="btn btn-{?screening.rejected}danger{:else}default{/screening.rejected} btn-sm" role="button">Rejected</a>
-    </div>
-    <br/><br/>
     <ul class="nav nav-tabs wt-tabs" role="tablist">
         {!<li role="presentation"{@eq key=tab value="all"} class="active"{/eq}>
             <a href="{paths.search}?q={keyword}" role="tab">
