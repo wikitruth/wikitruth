@@ -21,7 +21,11 @@ block body
           button.close(type='button', data-dismiss='alert') &times;
           |<%- err %>
         |<% }); %>
-      div.form-group(class!='<%- errfor.email ? "has-error" : "" %>')
+      div#username.form-group(class!='<%- errfor.username ? "has-error" : "" %>')
+        label Pick a Username:
+        input.form-control(type='text', name='username', value!='<%= username %>')
+        span.help-block <%- errfor.username %>
+      div#email.form-group(class!='<%- errfor.email ? "has-error" : "" %>')
         label Enter Your Email:
         input.form-control(type='text', name='email', value!='<%= email %>')
         span.help-block <%- errfor.email %>
