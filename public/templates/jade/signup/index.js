@@ -251,7 +251,9 @@ exports.signupFacebook = function(req, res, next) {
       }
       if (!user) {
         req.session.socialProfile = info.profile;
-        res.render('jade/signup/social.jade', { email: info.profile.emails && info.profile.emails[0].value || '' });
+        res.render('jade/signup/social.jade', {
+          email: info.profile.emails && info.profile.emails[0].value || '',
+          username: info.profile.username || '' });
       }
       else {
         res.render('jade/signup/index.jade', {
@@ -331,7 +333,13 @@ exports.signupSocial = function(req, res){
   var workflow = req.app.utility.workflow(req, res);
 
   workflow.on('validate', function() {
-    if (!req.body.email) {
+    if (!req.body.username) {
+      workflow.outcome.errfor.username = 'required';
+    }
+    else if (!/^[a-zA-Z0-9\_]+$/.test(req.body.username)) {
+      workflow.outcome.errfor.username = 'invalid username format';
+    }
+    else if (!req.body.email) {
       workflow.outcome.errfor.email = 'required';
     }
     else if (!/^[a-zA-Z0-9\-\_\.\+]+@[a-zA-Z0-9\-\_\.]+\.[a-zA-Z0-9\-\_]+$/.test(req.body.email)) {
@@ -346,9 +354,9 @@ exports.signupSocial = function(req, res){
   });
 
   workflow.on('duplicateUsernameCheck', function() {
-    workflow.username = req.session.socialProfile.username || req.session.socialProfile.id;
-    if (!/^[a-zA-Z0-9\-\_]+$/.test(workflow.username)) {
-      workflow.username = workflow.username.replace(/[^a-zA-Z0-9\-\_]/g, '');
+    workflow.username = req.body.username; //req.session.socialProfile.username || req.session.socialProfile.id;
+    if (!/^[a-zA-Z0-9\_]+$/.test(workflow.username)) {
+      workflow.username = workflow.username.replace(/[^a-zA-Z0-9\_]/g, '');
     }
 
     req.app.db.models.User.findOne({ username: workflow.username }, function(err, user) {
@@ -357,7 +365,9 @@ exports.signupSocial = function(req, res){
       }
 
       if (user) {
-        workflow.username = workflow.username + req.session.socialProfile.id;
+        //workflow.username = workflow.username + req.session.socialProfile.id;
+        workflow.outcome.errfor.username = 'username already exists';
+        return workflow.emit('response');
       }
       else {
         workflow.username = workflow.username;

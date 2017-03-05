@@ -1,5 +1,9 @@
 'use strict';
 
+/*var   url         = require('url'),
+      querystring = require('querystring');*/
+
+
 var getReturnUrl = function(req) {
   var returnUrl = req.user.defaultReturnUrl();
   if (req.session.returnUrl) {
@@ -207,6 +211,11 @@ exports.loginFacebook = function(req, res, next){
           oauthGoogle: !!req.app.config.oauth.google.key,
           oauthTumblr: !!req.app.config.oauth.tumblr.key
         });
+
+        /*var nextUrl = url.parse(req.originalUrl);
+        nextUrl.pathname = '/signup/facebook/callback';
+        nextUrl.query = querystring.parse(nextUrl.query);
+        res.redirect(url.format(nextUrl));*/
       }
       else {
         req.login(user, function(err) {

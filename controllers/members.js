@@ -179,7 +179,7 @@ module.exports = function (router) {
                     }
                     db.Topic
                         .find({ createUserId: model.member._id })
-                        .sort({ title: 1 })
+                        .sort({editDate: -1})
                         .limit(tab === 'all' ? 15 : 0)
                         .lean()
                         .exec(function(err, results) {
@@ -207,7 +207,7 @@ module.exports = function (router) {
                     }
                     db.Argument
                         .find({ createUserId: model.member._id })
-                        .sort({ title: 1 })
+                        .sort({editDate: -1})
                         .limit(tab === 'all' ? 15 : 0)
                         .lean()
                         .exec(function(err, results) {
@@ -234,7 +234,7 @@ module.exports = function (router) {
                     }
                     db.Question
                         .find({ createUserId: model.member._id })
-                        .sort({ title: 1 })
+                        .sort({editDate: -1})
                         .limit(tab === 'all' ? 15 : 0)
                         .lean()
                         .exec(function(err, results) {
@@ -256,7 +256,7 @@ module.exports = function (router) {
                     }
                     db.Answer
                         .find({ createUserId: model.member._id })
-                        .sort({ title: 1 })
+                        .sort({editDate: -1})
                         .limit(tab === 'all' ? 15 : 0)
                         .lean()
                         .exec(function(err, results) {
@@ -278,7 +278,7 @@ module.exports = function (router) {
                     }
                     db.Issue
                         .find({ createUserId: model.member._id })
-                        .sort({ title: 1 })
+                        .sort({editDate: -1})
                         .limit(tab === 'all' ? 15 : 0)
                         .lean()
                         .exec(function(err, results) {
@@ -303,7 +303,7 @@ module.exports = function (router) {
                     }
                     db.Opinion
                         .find({ createUserId: model.member._id })
-                        .sort({ title: 1 })
+                        .sort({editDate: -1})
                         .limit(tab === 'all' ? 15 : 0)
                         .lean()
                         .exec(function(err, results) {
