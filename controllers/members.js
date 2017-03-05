@@ -178,7 +178,7 @@ module.exports = function (router) {
                         return callback();
                     }
                     db.Topic
-                        .find({ createUserId: model.member._id })
+                        .find({ createUserId: model.member._id, private: false })
                         .sort({editDate: -1})
                         .limit(tab === 'all' ? 15 : 0)
                         .lean()
@@ -206,7 +206,7 @@ module.exports = function (router) {
                         return callback();
                     }
                     db.Argument
-                        .find({ createUserId: model.member._id })
+                        .find({ createUserId: model.member._id, private: false })
                         .sort({editDate: -1})
                         .limit(tab === 'all' ? 15 : 0)
                         .lean()
@@ -233,7 +233,7 @@ module.exports = function (router) {
                         return callback();
                     }
                     db.Question
-                        .find({ createUserId: model.member._id })
+                        .find({ createUserId: model.member._id, private: false })
                         .sort({editDate: -1})
                         .limit(tab === 'all' ? 15 : 0)
                         .lean()
@@ -255,7 +255,7 @@ module.exports = function (router) {
                         return callback();
                     }
                     db.Answer
-                        .find({ createUserId: model.member._id })
+                        .find({ createUserId: model.member._id, private: false })
                         .sort({editDate: -1})
                         .limit(tab === 'all' ? 15 : 0)
                         .lean()
@@ -277,7 +277,7 @@ module.exports = function (router) {
                         return callback();
                     }
                     db.Issue
-                        .find({ createUserId: model.member._id })
+                        .find({ createUserId: model.member._id, private: false })
                         .sort({editDate: -1})
                         .limit(tab === 'all' ? 15 : 0)
                         .lean()
@@ -302,7 +302,7 @@ module.exports = function (router) {
                         return callback();
                     }
                     db.Opinion
-                        .find({ createUserId: model.member._id })
+                        .find({ createUserId: model.member._id, private: false })
                         .sort({editDate: -1})
                         .limit(tab === 'all' ? 15 : 0)
                         .lean()
