@@ -321,19 +321,22 @@ function setTopicModels(req, model, callback) {
 
 function setClipboardModel(req, model, entryType) {
     var clipboard = req.session.clipboard;
+    model.clipboard = {
+        visible: true
+    };
     if(clipboard) {
         var topics = clipboard['object' + constants.OBJECT_TYPES.topic];
         var args = clipboard['object' + constants.OBJECT_TYPES.argument];
         var count = topics.length + args.length;
         if (count > 0) {
-            model.clipboard = {
-                count: count
-            };
+            model.clipboard.count = count;
             var marked = false;
-            if ((entryType === constants.OBJECT_TYPES.topic && model.topic && topics.indexOf(model.topic._id.toString()) > -1) ||
-                (entryType === constants.OBJECT_TYPES.argument && model.argument && args.indexOf(model.argument._id.toString()) > -1)) {
-                model.clipboard.marked = true;
-                marked = true;
+            if(entryType) {
+                if ((entryType === constants.OBJECT_TYPES.topic && model.topic && topics.indexOf(model.topic._id.toString()) > -1) ||
+                    (entryType === constants.OBJECT_TYPES.argument && model.argument && args.indexOf(model.argument._id.toString()) > -1)) {
+                    model.clipboard.marked = true;
+                    marked = true;
+                }
             }
             if(!(count === 1 && marked)) {
                 model.clipboard.canPaste = true;

@@ -420,6 +420,7 @@ module.exports = function (router) {
                 });
             }
         }, function (err, results) {
+            flowUtils.setClipboardModel(req, model);
             res.render(templates.wiki.index, model);
         });
     });
@@ -429,6 +430,12 @@ module.exports = function (router) {
         var clipboard = req.session.clipboard || {};
         var topicIds = clipboard['object' + constants.OBJECT_TYPES.topic];
         var argumentIds = clipboard['object' + constants.OBJECT_TYPES.argument];
+
+        if(req.user) {
+            req.params.username = req.user.username;
+        }
+        flowUtils.setModelContext(req, model);
+
         async.parallel({
             topics: function (callback) {
                 if(topicIds && topicIds.length > 0) {
@@ -438,6 +445,9 @@ module.exports = function (router) {
                         }
                     };
                     db.Topic.find(query, function(err, results) {
+                        results.forEach(function (result) {
+                            flowUtils.appendEntryExtra(result);
+                        });
                         model.topics = results;
                         callback();
                     });
@@ -453,6 +463,9 @@ module.exports = function (router) {
                         }
                     };
                     db.Argument.find(query, function(err, results) {
+                        results.forEach(function (result) {
+                            flowUtils.appendEntryExtra(result);
+                        });
                         model.arguments = results;
                         callback();
                     });

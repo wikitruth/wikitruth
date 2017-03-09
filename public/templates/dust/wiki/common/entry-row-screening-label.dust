@@ -1,6 +1,2 @@
-{@eq key=screening.status value=0}
-    &nbsp;<span class="label label-warning"><i class="fa fa-question-circle"></i> Pending</span>
-{/eq}
-{@eq key=screening.status value=2}
-    &nbsp;<span class="label label-danger"><i class="fa fa-close"></i> Rejected</span>
-{/eq}
+{@eq key=screening.status value=0} <span class="label label-warning"><i class="fa fa-question-circle"></i> Pending</span>{/eq}
+{@eq key=screening.status value=2} <span class="label label-danger"><i class="fa fa-close"></i> Rejected</span>{/eq}

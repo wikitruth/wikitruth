@@ -1,4 +1,4 @@
-<div style="margin-bottom-x: 15px" class="clearfix" id="entry-options" data-entry-id="{entry._id}" data-entry-type="{entryType}" data-csrf="{_csrf}" data-username="{username}">
+<div style="margin-bottom-x: 15px" class="clearfix">
     <div class="dropdown pull-left entry-options">
         <a href="#" class="text-muted no-underline dropdown-toggle" title="Reply" data-toggle="dropdown" aria-controls="wtDropdownReply" aria-haspopup="true" aria-expanded="false"><i class="fa fa-reply" aria-hidden="true"></i><span class="hidden-xxxs"> Reply</span></a>
         <ul class="dropdown-menu dropdown-menu-right-x" aria-labelledby="wtTabMore" id="wtDropdownReply">
@@ -78,37 +78,7 @@
             {/isContributor}
             <li><a href="#" role="tab"><i class="fa fa-rss" aria-hidden="true"></i> Follow</a></li>
             <li><a href="#" role="tab"><i class="fa fa-info-circle" aria-hidden="true"></i> Details</a></li>
-            {?isContributor}
-                <li role="separator" class="divider"></li>
-                <li class="dropdown-header">Clipboard</li>
-                {?clipboard}
-                    <li><a href="{paths.wiki.clipboard}" role="tab"><i class="fa fa-clipboard" aria-hidden="true"></i> View marked ({clipboard.count})</a></li>
-                {/clipboard}
-                {^clipboard.marked}
-                    {?isEntryOwner}
-                        <li><a href="#" role="tab" onclick="return clipboardMarkEntry()"><i class="fa fa-check" aria-hidden="true"></i> Mark for Copy or Move</a></li>
-                    {/isEntryOwner}
-                {/clipboard.marked}
-                {?clipboard}
-                    {?clipboard.canPaste}
-                        {!<li class="dropdown dropdown-submenu">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-paste" aria-hidden="true"></i> Paste</a>
-                            <ul class="dropdown-menu">
-                            </ul>
-                        </li>!}
-                        {^issue}
-                            {^opinion}
-                                {^question}
-                                    <li><a href="#" role="tab" onclick="return clipboardPasteAsLink()"><i class="fa fa-link" aria-hidden="true"></i> Paste Here As Links</a></li>
-                                {/question}
-                            {/opinion}
-                        {/issue}
-                        {!<li><a href="#" role="tab"><i class="fa fa-copy" aria-hidden="true"></i> Paste Here As Duplicates</a></li>!}
-                        <li><a href="#" role="tab" onclick="return clipboardMoveHere()"><i class="fa fa-cut" aria-hidden="true"></i> Move Here</a></li>
-                    {/clipboard.canPaste}
-                    <li><a href="#" role="tab" onclick="return clipboardClear()"><i class="fa fa-trash" aria-hidden="true"></i> Clear</a></li>
-                {/clipboard}
-            {/isContributor}
+            {!{>"dust/wiki/common/clipboard" /}!}
             {?user.isAdmin}
                 <li role="separator" class="divider"></li>
                 <li class="dropdown-header">Admin</li>
@@ -129,115 +99,6 @@
             <li><a href="#" role="tab"><i class="fa fa-flag" aria-hidden="true"></i> Report</a></li>
         </ul>
     </div>
-    <script>
-        function entryTakeOwnership() {
-            if(confirm('Are you sure you want to Take Ownership of this entry?')) {
-                var csrf = $('#entry-options').data('csrf');
-                var id = $('#entry-options').data('entry-id');
-                var type = $('#entry-options').data('entry-type');
-
-                $.ajax({
-                    type: "POST",
-                    url: "/ajax/entry/take-ownership",
-                    data: JSON.stringify({ id: id, type: type, _csrf: csrf }),
-                    contentType: 'application/json',
-                    success: function (data) {
-                        location.reload();
-                    }
-                });
-            }
-
-            return false;
-        }
-
-        function entryDelete() {
-            if(confirm('Are you sure you want to Delete this entry?')) {
-                var csrf = $('#entry-options').data('csrf');
-                var id = $('#entry-options').data('entry-id');
-                var type = $('#entry-options').data('entry-type');
-
-                $.ajax({
-                    type: "POST",
-                    url: "/ajax/entry/delete",
-                    data: JSON.stringify({ id: id, type: type, _csrf: csrf }),
-                    contentType: 'application/json',
-                    success: function (data) {
-                        location.href = '/';
-                    }
-                });
-            }
-            return false;
-        }
-
-        function clipboardMarkEntry() {
-            var csrf = $('#entry-options').data('csrf');
-            var id = $('#entry-options').data('entry-id');
-            var type = $('#entry-options').data('entry-type');
-
-            $.ajax({
-                type: "POST",
-                url: "/ajax/clipboard/mark",
-                data: JSON.stringify({ id: id, type: type, _csrf: csrf }),
-                contentType: 'application/json',
-                success: function (data) {
-                    location.reload();
-                }
-            });
-            return false;
-        }
-
-        function clipboardClear() {
-            var csrf = $('#entry-options').data('csrf');
-            $.ajax({
-                type: "POST",
-                url: "/ajax/clipboard/clear",
-                data: JSON.stringify({ _csrf: csrf }),
-                contentType: 'application/json',
-                success: function (data) {
-                    location.reload();
-                }
-            });
-            return false;
-        }
-
-        function clipboardMoveHere() {
-            if(confirm('Are you sure you want to Move the marked items here?')) {
-                var csrf = $('#entry-options').data('csrf');
-                var id = $('#entry-options').data('entry-id');
-                var type = $('#entry-options').data('entry-type');
-                var username = $('#entry-options').data('username');
-                $.ajax({
-                    type: "POST",
-                    url: "/ajax/clipboard/move",
-                    data: JSON.stringify({ id: id, type: type, _csrf: csrf, username: username }),
-                    contentType: 'application/json',
-                    success: function (data) {
-                        location.reload();
-                    }
-                });
-            }
-            return false;
-        }
-
-        function clipboardPasteAsLink() {
-            if(confirm('Are you sure you want to Paste As Links the marked items here?')) {
-                var csrf = $('#entry-options').data('csrf');
-                var id = $('#entry-options').data('entry-id');
-                var type = $('#entry-options').data('entry-type');
-                var username = $('#entry-options').data('username');
-                $.ajax({
-                    type: "POST",
-                    url: "/ajax/clipboard/paste-link",
-                    data: JSON.stringify({ id: id, type: type, _csrf: csrf, username: username }),
-                    contentType: 'application/json',
-                    success: function (data) {
-                        location.reload();
-                    }
-                });
-            }
-            return false;
-        }
-    </script>
 </div>
 <hr style="border: 0; margin: 0.7rem 0 0.7rem; border-top: 0.0625rem dotted #dcdcdc; margin-bottom: 15px"/>
 {!

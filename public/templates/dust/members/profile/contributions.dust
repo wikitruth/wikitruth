@@ -49,143 +49,155 @@
                 </li>
             </ul>
             {?topics}
-                <h3 class="page-header-x">Topics</h3>
-                <ul class="list-group top-list-items wt-list">
-                    {!<li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp; Topics</li>!}
-                    {#topics}
-                        <li class="list-group-item">
-                            <i class="fa fa-folder-open text-color-3" aria-hidden="true"></i>
-                            <div>
-                                <a href="{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">{title}
-                                    {>"dust/wiki/common/entry-row-screening-label" /}
-                                </a>
-                                {?contentPreview}
-                                    <div>{contentPreview}</div>
-                                {/contentPreview}
-                                {>"dust/wiki/common/entry-row-footer" /}
-                            </div>
-                            <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
-                        </li>
-                    {/topics}
-                </ul>
-                {?topicsMore}
-                    <div class="top-list-items-more"><a href="{url}?tab=topics" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
-                {/topicsMore}
+                <div style="padding-bottom: 15px; padding-top: 5px;">
+                    <h4 class="page-header-x text-muted-0"><i class="fa fa-folder-open"></i> Topics</h4>
+                    <ul class="list-group top-list-items wt-list">
+                        {!<li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp; Topics</li>!}
+                        {#topics}
+                            <li class="list-group-item">
+                                <i class="fa fa-folder-open text-color-3" aria-hidden="true"></i>
+                                <div>
+                                    <a href="{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">{title}
+                                        {>"dust/wiki/common/entry-row-screening-label" /}
+                                    </a>
+                                    {?contentPreview}
+                                        <div>{contentPreview}</div>
+                                    {/contentPreview}
+                                    {>"dust/wiki/common/entry-row-footer" /}
+                                </div>
+                                <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
+                            </li>
+                        {/topics}
+                    </ul>
+                    {?topicsMore}
+                        <div class="top-list-items-more"><a href="{url}?tab=topics" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+                    {/topicsMore}
+                </div>
             {/topics}
             {?arguments}
-                <h3 class="page-header-x">Arguments</h3>
-                <ul class="list-group top-list-items wt-list">
-                    {!<li class="list-group-item highlight text-primary"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments</li>!}
-                    {#arguments}
-                        <li class="list-group-item">
-                            <span class="glyphicon glyphicon-flash text-{verdict.theme}" aria-hidden="true"></span>
-                            <div>
-                                <a href="{paths.wiki.arguments.entry}/{friendlyUrl}/{_id}">{title} {?typeUX}<span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}
-                                    {>"dust/wiki/common/entry-row-screening-label" /}
-                                </a>
-                                {?contentPreview}
-                                    <div>{contentPreview}</div>
-                                {/contentPreview}
-                                {>"dust/wiki/common/entry-row-footer" /}
-                            </div>
-                            <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
-                        </li>
-                    {/arguments}
-                </ul>
-                {?argumentsMore}
-                    <div class="top-list-items-more"><a href="{url}?tab=arguments" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
-                {/argumentsMore}
+                <div style="padding-bottom: 15px; padding-top: 5px;">
+                    <h4 class="page-header-x text-muted-0"><i class="fa fa-flash"></i> Arguments</h4>
+                    <ul class="list-group top-list-items wt-list">
+                        {!<li class="list-group-item highlight text-primary"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments</li>!}
+                        {#arguments}
+                            <li class="list-group-item">
+                                <span class="glyphicon glyphicon-flash text-{verdict.theme}" aria-hidden="true"></span>
+                                <div>
+                                    <a href="{paths.wiki.arguments.entry}/{friendlyUrl}/{_id}">{title} {?typeUX}<span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}
+                                        {>"dust/wiki/common/entry-row-screening-label" /}
+                                    </a>
+                                    {?contentPreview}
+                                        <div>{contentPreview}</div>
+                                    {/contentPreview}
+                                    {>"dust/wiki/common/entry-row-footer" /}
+                                </div>
+                                <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
+                            </li>
+                        {/arguments}
+                    </ul>
+                    {?argumentsMore}
+                        <div class="top-list-items-more"><a href="{url}?tab=arguments" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+                    {/argumentsMore}
+                </div>
             {/arguments}
             {?questions}
-                <h3 class="page-header-x">Questions</h3>
-                <ul class="list-group top-list-items wt-list">
-                    {!<li class="list-group-item highlight"><span class="glyphicon glyphicon-question-sign text-success" aria-hidden="true"></span> Questions</li>!}
-                    {#questions}
-                        <li class="list-group-item">
-                            <i class="fa fa-question-circle text-color-1" aria-hidden="true"></i>
-                            <div>
-                                <a href="{paths.wiki.questions.entry}/{friendlyUrl}/{_id}">{title}
-                                    {>"dust/wiki/common/entry-row-screening-label" /}
-                                </a>
-                                {?contentPreview}
-                                    <div>{contentPreview}</div>
-                                {/contentPreview}
-                                {>"dust/wiki/common/entry-row-footer" /}
-                            </div>
-                            <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
-                    {/questions}
-                </ul>
-                {?questionsMore}
-                    <div class="top-list-items-more"><a href="{url}?tab=questions" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
-                {/questionsMore}
+                <div style="padding-bottom: 15px; padding-top: 5px;">
+                    <h4 class="page-header-x text-muted-0"><i class="fa fa-question-circle"></i> Questions</h4>
+                    <ul class="list-group top-list-items wt-list">
+                        {!<li class="list-group-item highlight"><span class="glyphicon glyphicon-question-sign text-success" aria-hidden="true"></span> Questions</li>!}
+                        {#questions}
+                            <li class="list-group-item">
+                                <i class="fa fa-question-circle text-color-1" aria-hidden="true"></i>
+                                <div>
+                                    <a href="{paths.wiki.questions.entry}/{friendlyUrl}/{_id}">{title}
+                                        {>"dust/wiki/common/entry-row-screening-label" /}
+                                    </a>
+                                    {?contentPreview}
+                                        <div>{contentPreview}</div>
+                                    {/contentPreview}
+                                    {>"dust/wiki/common/entry-row-footer" /}
+                                </div>
+                                <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+                        {/questions}
+                    </ul>
+                    {?questionsMore}
+                        <div class="top-list-items-more"><a href="{url}?tab=questions" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+                    {/questionsMore}
+                </div>
             {/questions}
             {?answers}
-                <h3 class="page-header-x">Answers</h3>
-                <ul class="list-group top-list-items wt-list">
-                    {#answers}
-                        <li class="list-group-item">
-                            <i class="fa fa-check-circle text-color-1" aria-hidden="true"></i>
-                            <div>
-                                <a href="{paths.wiki.answers.entry}/{friendlyUrl}/{_id}">{title}
-                                    {>"dust/wiki/common/entry-row-screening-label" /}
-                                </a>
-                                {?contentPreview}
-                                    <div>{contentPreview}</div>
-                                {/contentPreview}
-                                {>"dust/wiki/common/entry-row-footer" /}
-                            </div>
-                            <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
-                    {/answers}
-                </ul>
-                {?answersMore}
-                    <div class="top-list-items-more"><a href="{url}?tab=questions" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
-                {/answersMore}
+                <div style="padding-bottom: 15px; padding-top: 5px;">
+                    <h4 class="page-header-x text-muted-0"><i class="fa fa-check-circle-o"></i> Answers</h4>
+                    <ul class="list-group top-list-items wt-list">
+                        {#answers}
+                            <li class="list-group-item">
+                                <i class="fa fa-check-circle text-color-1" aria-hidden="true"></i>
+                                <div>
+                                    <a href="{paths.wiki.answers.entry}/{friendlyUrl}/{_id}">{title}
+                                        {>"dust/wiki/common/entry-row-screening-label" /}
+                                    </a>
+                                    {?contentPreview}
+                                        <div>{contentPreview}</div>
+                                    {/contentPreview}
+                                    {>"dust/wiki/common/entry-row-footer" /}
+                                </div>
+                                <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+                        {/answers}
+                    </ul>
+                    {?answersMore}
+                        <div class="top-list-items-more"><a href="{url}?tab=questions" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+                    {/answersMore}
+                </div>
             {/answers}
             {?issues}
-                <h3 class="page-header-x">Issues</h3>
-                <ul class="list-group top-list-items wt-list">
-                    {!<li class="list-group-item highlight"><span class="fa fa-exclamation-circle text-success" aria-hidden="true"></span> Issues</li>!}
-                    {#issues}
-                        <li class="list-group-item">
-                            <span class="fa fa-exclamation-circle text-danger" aria-hidden="true"></span>
-                            <div>
-                                <a href="{paths.wiki.issues.entry}/{friendlyUrl}/{_id}">{title}
-                                    {>"dust/wiki/common/entry-row-screening-label" /}
-                                </a>
-                                {?contentPreview}
-                                    <div>{contentPreview}</div>
-                                {/contentPreview}
-                                {>"dust/wiki/common/entry-row-footer" /}
-                            </div>
-                            <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
-                    {/issues}
-                </ul>
-                {?issuesMore}
-                    <div class="top-list-items-more"><a href="{url}?tab=issues" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
-                {/issuesMore}
+                <div style="padding-bottom: 15px; padding-top: 5px;">
+                    <h4 class="page-header-x text-muted-0"><i class="fa fa-exclamation-circle"></i> Issues</h4>
+                    <ul class="list-group top-list-items wt-list">
+                        {!<li class="list-group-item highlight"><span class="fa fa-exclamation-circle text-success" aria-hidden="true"></span> Issues</li>!}
+                        {#issues}
+                            <li class="list-group-item">
+                                <span class="fa fa-exclamation-circle text-danger" aria-hidden="true"></span>
+                                <div>
+                                    <a href="{paths.wiki.issues.entry}/{friendlyUrl}/{_id}">{title}
+                                        {>"dust/wiki/common/entry-row-screening-label" /}
+                                    </a>
+                                    {?contentPreview}
+                                        <div>{contentPreview}</div>
+                                    {/contentPreview}
+                                    {>"dust/wiki/common/entry-row-footer" /}
+                                </div>
+                                <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+                        {/issues}
+                    </ul>
+                    {?issuesMore}
+                        <div class="top-list-items-more"><a href="{url}?tab=issues" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+                    {/issuesMore}
+                </div>
             {/issues}
             {?opinions}
-                <h3 class="page-header-x">Comments</h3>
-                <ul class="list-group top-list-items wt-list">
-                    {!<li class="list-group-item highlight"><span class="fa fa-comments-o text-success" aria-hidden="true"></span> Opinions</li>!}
-                    {#opinions}
-                        <li class="list-group-item">
-                            <span class="fa fa-comments-o text-primary" aria-hidden="true"></span>
-                            <div>
-                                <a href="{paths.wiki.opinions.entry}/{friendlyUrl}/{_id}">{title}
-                                    {>"dust/wiki/common/entry-row-screening-label" /}
-                                </a>
-                                {?contentPreview}
-                                    <div>{contentPreview}</div>
-                                {/contentPreview}
-                                {>"dust/wiki/common/entry-row-footer" /}
-                            </div>
-                            <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
-                    {/opinions}
-                </ul>
-                {?opinionsMore}
-                    <div class="top-list-items-more"><a href="{url}?tab=opinions" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
-                {/opinionsMore}
+                <div style="padding-bottom: 15px; padding-top: 5px;">
+                    <h4 class="page-header-x text-muted-0"><i class="fa fa-comments-o"></i> Comments</h4>
+                    <ul class="list-group top-list-items wt-list">
+                        {!<li class="list-group-item highlight"><span class="fa fa-comments-o text-success" aria-hidden="true"></span> Opinions</li>!}
+                        {#opinions}
+                            <li class="list-group-item">
+                                <span class="fa fa-comments-o text-primary" aria-hidden="true"></span>
+                                <div>
+                                    <a href="{paths.wiki.opinions.entry}/{friendlyUrl}/{_id}">{title}
+                                        {>"dust/wiki/common/entry-row-screening-label" /}
+                                    </a>
+                                    {?contentPreview}
+                                        <div>{contentPreview}</div>
+                                    {/contentPreview}
+                                    {>"dust/wiki/common/entry-row-footer" /}
+                                </div>
+                                <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+                        {/opinions}
+                    </ul>
+                    {?opinionsMore}
+                        <div class="top-list-items-more"><a href="{url}?tab=opinions" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+                    {/opinionsMore}
+                </div>
             {/opinions}
         </div>
     {/results}
