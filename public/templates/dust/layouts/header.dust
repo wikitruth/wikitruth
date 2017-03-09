@@ -38,6 +38,7 @@
                         <li><a href="/topic/debates-discussions"><i class="fa fa-commenting" aria-hidden="true"></i> Debates</a></li>
                         <li><a href="/topic/dictionary"><span class="glyphicon glyphicon-font" aria-hidden="true"></span> Dictionary</a></li>
                         <li><a href="/topic/sacred-texts"><i class="fa fa-book"></i> Manuscripts</a></li>
+                        {>"dust/wiki/common/clipboard" /}
                     </ul>
                 </li>
                 <!--<li class="hidden-xs"><a href="/about/">About</a></li>-->

@@ -11,12 +11,16 @@
         <input type="hidden" name="_csrf" value="{_csrf}">
         {?topics}
             <div class="form-group">
-                <label for="inputReferences">Marked Topics <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a>:</label>
+                <label for="inputReferences" class="text-muted-0">Marked Topics <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a></label>
                 {#topics}
                     <div class="checkbox">
                         <label>
                             <input type="checkbox" name="topics" value="{_id}">
-                            {title}
+                            <strong>{title}</strong>{?private} <span class="label label-default">private</span>{/private}{>"dust/wiki/common/entry-row-screening-label" /}
+                            &nbsp;<a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}" title="Open Topic"><i class="fa fa-external-link"></i></a>
+                            {?contentPreview}
+                                <div>{contentPreview}</div>
+                            {/contentPreview}
                         </label>
                     </div>
                 {/topics}
@@ -25,12 +29,16 @@
         {/topics}
         {?arguments}
             <div class="form-group">
-                <label for="inputReferences">Marked Arguments <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a>:</label>
+                <label for="inputReferences" class="text-muted-0">Marked Arguments <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a></label>
                 {#arguments}
                     <div class="checkbox">
                         <label>
                             <input type="checkbox" name="arguments" value="{_id}">
-                            {title}
+                            <strong>{title}</strong>{?typeUX} <span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}{?private} <span class="label label-default">private</span>{/private}{>"dust/wiki/common/entry-row-screening-label" /}
+                            &nbsp;<a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.arguments.entry}/{friendlyUrl}/{_id}" title="Open Argument"><i class="fa fa-external-link"></i></a>
+                            {?contentPreview}
+                                <div>{contentPreview}</div>
+                            {/contentPreview}
                         </label>
                     </div>
                 {/arguments}

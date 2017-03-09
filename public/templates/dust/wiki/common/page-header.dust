@@ -13,7 +13,7 @@
             &nbsp;<span class="label label-warning" style="font-size: 16px; font-weight: normal; padding: .2em .4em .2em; letter-spacing: normal">Verdict</span>
         {/eq}
         {@eq key=tab value="clipboard"}
-            &nbsp;<span class="label label-warning" style="font-size: 16px; font-weight: normal; padding: .2em .4em .2em; letter-spacing: normal">Clipboard</span>
+            Clipboard
         {/eq}
         {@eq key=tab value="screening"}
             &nbsp;<span class="label label-warning" style="font-size: 16px; font-weight: normal; padding: .2em .4em .2em; letter-spacing: normal">Screening</span>

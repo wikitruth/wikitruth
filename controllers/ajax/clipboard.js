@@ -19,7 +19,7 @@ function createNewArrayExcludeId(sourceIds, removeId) {
     var ids = [];
     for (var i = 0; i < sourceIds.length; ++i) { // remove self if included
         var id = sourceIds[i];
-        if (removeId != id) {
+        if (!removeId || removeId != id) {
             ids.push(id);
         }
     }
@@ -43,7 +43,12 @@ module.exports = function (router) {
     router.post('/paste-link', function (req, res) {
         // Destination
         var id = req.body.id;
-        var type = req.body.type;
+        var type = req.body.type; // the type of destination
+
+        if(!id || !type) {
+            // linking to root, stop!
+            return res.send({});
+        }
 
         var dateNow = Date.now();
         var clipboard = setupClipboard(req);
@@ -148,14 +153,21 @@ module.exports = function (router) {
         // Destination
         var id = req.body.id;
         var type = req.body.type;
+        var username = req.body.username;
 
         var clipboard = setupClipboard(req);
         var topics = clipboard['object' + constants.OBJECT_TYPES.topic];
         var args = clipboard['object' + constants.OBJECT_TYPES.argument];
-        if(type == constants.OBJECT_TYPES.topic) {
+
+        if(!id) { // if moving to root
+            id = null;
+            type = null;
+        }
+
+        if(!id || type == constants.OBJECT_TYPES.topic) {
             async.parallel({
                 topics: function (callback) { // move topics as children
-                    if (topics.length === 0) {
+                    if (topics.length === 0 || !username && !req.user.isAdmin()) { // if moving to root but user is not admin, deny
                         return callback();
                     }
                     var ids = createNewArrayExcludeId(topics, id);
@@ -165,31 +177,39 @@ module.exports = function (router) {
                         .exec(function (err, results) {
                             // Update each moved entry and their parent count
                             async.each(results, function(result, callback){
+
+                                // FIXME: for now, prevent moving from Diary to public and vice versa
+                                if(result.private && !username || !result.private && username) {
+                                    return callback();
+                                }
+
                                 var parentId = result.parentId;
-                                // Update entry
+                                // Update entry parent
                                 result.parentId = id;
                                 db.Topic.findOneAndUpdate({_id: result._id}, result, { upsert: true, new: true, setDefaultsOnInsert: true }, function(err, updatedEntity) {
                                     if(parentId) {
+                                        // Update old parent's children
                                         flowUtils.updateChildrenCount(parentId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, callback);
                                     } else {
                                         callback();
                                     }
                                 });
                             }, function () {
-                                flowUtils.updateChildrenCount(id, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, function () {
+                                if(id) {
+                                    // update new parent's children
+                                    flowUtils.updateChildrenCount(id, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, callback);
+                                } else {
                                     callback();
-                                });
+                                }
                             });
                     });
                     /*db.Topic.update({_id: {$in: ids}}, {$set: {parentId: id}}, {multi: true}, function (err, num) {
                         // FIXME: update the old parents count
-                        flowUtils.updateChildrenCount(id, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, function () {
-                            callback();
-                        });
+                        flowUtils.updateChildrenCount(id, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, callback);
                     });*/
                 },
                 arguments: function (callback) {
-                    if (args.length === 0) {
+                    if (args.length === 0 || !id) {
                         return callback();
                     }
                     var ids = createNewArrayExcludeId(args, id);

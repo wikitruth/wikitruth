@@ -546,6 +546,7 @@ module.exports = function (router) {
             }
         }, function (err, results) {
             flowUtils.setModelContext(req, model);
+            flowUtils.setClipboardModel(req, model);
             res.render(templates.members.profile.topics, model);
         });
     });
