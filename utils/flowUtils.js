@@ -320,10 +320,8 @@ function setTopicModels(req, model, callback) {
 }
 
 function setClipboardModel(req, model, entryType) {
+    model.clipboard = {};
     var clipboard = req.session.clipboard;
-    model.clipboard = {
-        visible: true
-    };
     if(clipboard) {
         var topics = clipboard['object' + constants.OBJECT_TYPES.topic];
         var args = clipboard['object' + constants.OBJECT_TYPES.argument];
@@ -342,6 +340,10 @@ function setClipboardModel(req, model, entryType) {
                 model.clipboard.canPaste = true;
             }
         }
+    }
+
+    if(model.entry || model.clipboard.count) {
+        model.clipboard.visible = true;
     }
 }
 
@@ -840,6 +842,8 @@ function setVerdictModel(result) {
 
 function sortArguments(results) {
     results.sort(function (a, b) {
+        if(a.typeId === constants.ARGUMENT_TYPES.artifact && b.typeId !== constants.ARGUMENT_TYPES.artifact) { return 1; }
+        if(a.typeId !== constants.ARGUMENT_TYPES.artifact && b.typeId === constants.ARGUMENT_TYPES.artifact) { return -1; }
         if(a.verdict.category > b.verdict.category) { return -1; }
         if(a.verdict.category < b.verdict.category) { return 1; }
         if(a.title > b.title) { return 1; }

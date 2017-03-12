@@ -572,11 +572,11 @@ module.exports = function (router) {
     });
 
     router.get('/:username/diary/topics/link/edit', function (req, res) {
-        topicController.GET_link(req, res);
+        topicController.GET_link_edit(req, res);
     });
 
     router.post('/:username/diary/topics/link/edit', function (req, res) {
-        topicController.POST_link(req, res);
+        topicController.POST_link_edit(req, res);
     });
 
 
@@ -599,11 +599,11 @@ module.exports = function (router) {
     });
 
     router.get('/:username/diary/arguments/link', function (req, res) {
-        argumentController.GET_link(req, res);
+        argumentController.GET_link_edit(req, res);
     });
 
     router.post('/:username/diary/arguments/link', function (req, res) {
-        argumentController.POST_link(req, res);
+        argumentController.POST_link_edit(req, res);
     });
 
 

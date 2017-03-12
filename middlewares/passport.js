@@ -1,6 +1,6 @@
 'use strict';
 
-exports = module.exports = function(app, passport) {
+module.exports = function(app, passport) {
   var LocalStrategy = require('passport-local').Strategy,
       TwitterStrategy = require('passport-twitter').Strategy,
       GitHubStrategy = require('passport-github').Strategy,

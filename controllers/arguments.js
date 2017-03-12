@@ -386,7 +386,7 @@ function POST_create(req, res) {
     });
 }
 
-function GET_link(req, res) {
+function GET_link_edit(req, res) {
     var model = {};
     flowUtils.setTopicModels(req, model, function () {
         async.series({
@@ -421,12 +421,12 @@ function GET_link(req, res) {
         }, function (err, results) {
             model.cancelUrl = createCancelUrl(req);
             flowUtils.setModelContext(req, model);
-            res.render(templates.wiki.arguments.link, model);
+            res.render(templates.wiki.arguments.link.edit, model);
         });
     });
 }
 
-function POST_link(req, res) {
+function POST_link_edit(req, res) {
     var action = req.body.action;
     if(action === 'delete') {
         db.ArgumentLink.findByIdAndRemove(req.query.id, function(err, link) {
@@ -480,11 +480,11 @@ module.exports = function (router) {
 
 
     router.get('/link', function (req, res) {
-        GET_link(req, res);
+        GET_link_edit(req, res);
     });
 
     router.post('/link', function (req, res) {
-        POST_link(req, res);
+        POST_link_edit(req, res);
     });
 };
 
@@ -492,5 +492,5 @@ module.exports.GET_entry = GET_entry;
 module.exports.GET_index = GET_index;
 module.exports.GET_create = GET_create;
 module.exports.POST_create = POST_create;
-module.exports.GET_link = GET_link;
-module.exports.POST_link = POST_link;
+module.exports.GET_link_edit = GET_link_edit;
+module.exports.POST_link_edit = POST_link_edit;

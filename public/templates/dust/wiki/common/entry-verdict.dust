@@ -18,10 +18,10 @@
             </span>
         </a>&nbsp;
         {?proArgumentCount}
-            <span class="label label-primary pull-right-x" title="The number of supporting arguments."><i class="fa fa-thumbs-up"></i> {proArgumentCount}</span>&nbsp;
+            <span class="label label-primary pull-right-x" title="The number of supporting arguments."><i class="fa fa-plus-square"></i> {proArgumentCount} {@eq key=proArgumentCount value=1}pro{:else}pros{/eq}</span>&nbsp;
         {/proArgumentCount}
         {?conArgumentCount}
-            <span class="label label-primary pull-right-x" title="The number of opposing arguments."><i class="fa fa-thumbs-down"></i> {conArgumentCount}</span>&nbsp;
+            <span class="label label-primary pull-right-x" title="The number of opposing arguments."><i class="fa fa-minus-square"></i> {conArgumentCount} {@eq key=conArgumentCount value=1}con{:else}cons{/eq}</span>&nbsp;
         {/conArgumentCount}
 
         {!&nbsp;<span class="label label-primary"><i class="fa fa-flash"></i>

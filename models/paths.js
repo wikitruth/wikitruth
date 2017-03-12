@@ -46,7 +46,10 @@ module.exports = {
             index:  '/arguments',
             entry:  '/argument',
             create: '/arguments/create',
-            link: '/arguments/link'
+            link: {
+                edit: '/arguments/link/edit',
+                entry: '/arguments/link/entry'
+            }
         },
         questions: {
             create: '/questions/create',

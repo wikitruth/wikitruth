@@ -16,7 +16,7 @@
             <textarea name="title" id="inputName" class="form-control" rows="1">{link.title}</textarea>
         </div>
         <button type="submit" name="action" value="submit" class="btn btn-primary">Submit</button>&nbsp;
-        <button type="submit" name="action" value="delete" class="btn btn-danger">Delete</button>&nbsp;
+        <button type="submit" name="action" value="delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this Link?');">Delete</button>&nbsp;
         <a class="btn btn-default" href="{cancelUrl}" role="button">Cancel</a>
     </form>
 {/body}

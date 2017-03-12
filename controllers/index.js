@@ -250,17 +250,17 @@ module.exports = function (router) {
                     .limit(MAX_RESULT)
                     .lean()
                     .exec(function (err, results) {
-                    flowUtils.setEditorsUsername(results, function() {
-                        results.forEach(function(result) {
-                            flowUtils.appendEntryExtra(result);
+                        flowUtils.setEditorsUsername(results, function() {
+                            results.forEach(function(result) {
+                                flowUtils.appendEntryExtra(result);
+                            });
+                            model.topics = results;
+                            if(results.length > 0) {
+                                model.results = true;
+                            }
+                            callback();
                         });
-                        model.topics = results;
-                        if(results.length > 0) {
-                            model.results = true;
-                        }
-                        callback();
                     });
-                });
             },
             arguments: function(callback) {
                 if(model.tab !== 'arguments') {
@@ -402,22 +402,45 @@ module.exports = function (router) {
                     .sort({title: 1})
                     .lean()
                     .exec(function (err, results) {
-                    async.each(results, function(result, callback) {
-                        result.friendlyUrl = utils.urlify(result.title);
-                        result.comments = utils.numberWithCommas(utils.randomInt(1, 100000));
-                        db.Topic.find( { parentId: result._id } ).limit(3).sort({ title: 1 }).exec(function(err, subtopics) {
-                            subtopics.forEach(function(subtopic){
-                                subtopic.friendlyUrl = utils.urlify(subtopic.title);
-                                subtopic.shortTitle = utils.getShortText(subtopic.contextTitle ? subtopic.contextTitle : subtopic.title, 38);
-                            });
-                            result.subtopics = subtopics;
+                        async.each(results, function(result, callback) {
+                            result.friendlyUrl = utils.urlify(result.title);
+                            result.comments = utils.numberWithCommas(utils.randomInt(1, 100000));
+                            db.Topic
+                                .find( { parentId: result._id } )
+                                .limit(3)
+                                .sort({ title: 1 })
+                                .lean()
+                                .exec(function(err, subtopics) {
+                                    if(subtopics.length > 0) {
+                                        subtopics.forEach(function (subtopic) {
+                                            subtopic.friendlyUrl = utils.urlify(subtopic.title);
+                                            subtopic.shortTitle = utils.getShortText(subtopic.contextTitle ? subtopic.contextTitle : subtopic.title, 38);
+                                        });
+                                        result.subtopics = subtopics;
+                                        callback();
+                                    } else {
+                                        // if subtopics are less than 3, get some arguments
+                                        var query = {
+                                            parentId: null,
+                                            ownerId: result._id,
+                                            ownerType: constants.OBJECT_TYPES.topic,
+                                            'screening.status': constants.SCREENING_STATUS.status1.code
+                                        };
+                                        flowUtils.getArguments(query, 3, function (err, subarguments) {
+                                            subarguments.forEach(function (subargument) {
+                                                subargument.shortTitle = utils.getShortText(subargument.contextTitle ? subargument.contextTitle : subargument.title, 38);
+                                            });
+                                            flowUtils.sortArguments(subarguments);
+                                            result.subarguments = subarguments;
+                                            callback();
+                                        });
+                                    }
+                                });
+                        }, function(err) {
+                            model.categories = results;
                             callback();
                         });
-                    }, function(err) {
-                        model.categories = results;
-                        callback();
                     });
-                });
             }
         }, function (err, results) {
             flowUtils.setClipboardModel(req, model);

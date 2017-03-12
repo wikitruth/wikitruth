@@ -20,7 +20,7 @@
         </a>
         {?hasKeyEntries}
             <div style="margin-top: 15px; margin-bottom: 10px;">
-                <div style="font-size-x: 12px; font-weight: bold;" class="text-muted">Highlights{!Key Contents!}</div>
+                <div style="font-size-x: 12px; font-weight: bold;" class="text-muted">Highlights{!Key Contents|Quick Facts!}</div>
                 {#keyTopics}
                     <div class="text-muted">&bull; <a class="text-muted" href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a></div>
                 {/keyTopics}
@@ -63,8 +63,15 @@
                                     {#subtopics}
                                         <div><i class="fa fa-folder-open text-muted text-success-x" aria-hidden="true"></i>&nbsp;<a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">{shortTitle}</a></div>
                                     {/subtopics}
-                                    <div><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a href="{wikiBaseUrl}{paths.wiki.topics.index}?topic={_id}" role="button">more</a></div>
+                                    <div><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}" role="button">more</a></div>
                                     {!<span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}!}
+                                {:else}
+                                    {?subarguments}
+                                        {#subarguments}
+                                            <div><i class="fa fa-flash text-muted text-success-x" aria-hidden="true"></i>&nbsp;<a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{friendlyUrl}/{_id}">{shortTitle}</a></div>
+                                        {/subarguments}
+                                        <div><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}" role="button">more</a></div>
+                                    {/subarguments}
                                 {/subtopics}
                             </div>
                         </div>
@@ -113,7 +120,7 @@
                 {#arguments}
                 <li class="list-group-item">
                     {?link}
-                        <a href="{wikiBaseUrl}{paths.wiki.arguments.link}?topic={link.ownerId}&amp;id={link._id}&amp;source={paths.wiki.topics.entry}/{friendlyUrl}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
+                        <a href="{wikiBaseUrl}{paths.wiki.arguments.link.edit}?topic={link.ownerId}&amp;id={link._id}&amp;source={paths.wiki.topics.entry}/{friendlyUrl}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
                     {:else}
                         <span class="glyphicon glyphicon-flash text-{verdict.theme}" aria-hidden="true"></span>
                     {/link}

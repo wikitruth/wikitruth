@@ -2,7 +2,7 @@
 
 var constants   = require('../../constants');
 
-exports = module.exports = function(app, mongoose) {
+module.exports = function(app, mongoose) {
   var schema = new mongoose.Schema({
     title: { type: String, default: '' },
     contentPreview: { type: String}, // A preview lines of text to display in list view
