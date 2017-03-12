@@ -428,6 +428,7 @@ module.exports = function (router) {
                                         };
                                         flowUtils.getArguments(query, 3, function (err, subarguments) {
                                             subarguments.forEach(function (subargument) {
+                                                flowUtils.setVerdictModel(subargument);
                                                 subargument.shortTitle = utils.getShortText(subargument.contextTitle ? subargument.contextTitle : subargument.title, 38);
                                             });
                                             flowUtils.sortArguments(subarguments);
