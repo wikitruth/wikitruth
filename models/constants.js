@@ -281,6 +281,12 @@ var OBJECT_TYPES = {
     user: 21
 };
 
+var LINK_TYPES = {
+    child: 1, // default???
+    parent: 2,
+    reference: 3
+};
+
 module.exports = {
     OBJECT_TYPES: OBJECT_TYPES,
     ARGUMENT_TYPES: ARGUMENT_TYPES,
@@ -309,5 +315,6 @@ module.exports = {
         10: 'issues',
         11: 'opinions',
         12: 'answers'
-    }
+    },
+    LINK_TYPES: LINK_TYPES
 };

@@ -2,7 +2,7 @@
 
 var constants   = require('../../constants');
 
-exports = module.exports = function(app, mongoose) {
+module.exports = function(app, mongoose) {
   var schema = new mongoose.Schema({
     title: { type: String, default: '' }, // Contextual Title
     parentId: { type: mongoose.Schema.ObjectId, default: null, ref: 'Topic' }, // Used when the parent is also a topic
@@ -19,6 +19,8 @@ exports = module.exports = function(app, mongoose) {
         status: { type: Number } // SCREENING_STATUS
       }]
     },
+    linkType: { type: Number, default: constants.LINK_TYPES.child },
+    bidirectional: { type: Boolean, default: true },
     private: { type: Boolean, default: false }, // if true, should be restricted to group/user owners and not included in public backup
     ownerId: { type: mongoose.Schema.ObjectId, default: null }, // Required when owner is not a Topic. Useful for filtering
     ownerType: { type: Number, default: -1 } // OBJECT_TYPES

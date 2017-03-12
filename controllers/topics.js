@@ -117,13 +117,31 @@ function GET_entry(req, res) {
                                 .sort({ title: 1 })
                                 .lean()
                                 .exec(function(err, subtopics) {
-                                subtopics.forEach(function(subtopic){
-                                    subtopic.friendlyUrl = utils.urlify(subtopic.title);
-                                    subtopic.shortTitle = utils.getShortText(subtopic.contextTitle ? subtopic.contextTitle : subtopic.title, 38);
+                                    if(subtopics.length > 0) {
+                                        subtopics.forEach(function (subtopic) {
+                                            subtopic.friendlyUrl = utils.urlify(subtopic.title);
+                                            subtopic.shortTitle = utils.getShortText(subtopic.contextTitle ? subtopic.contextTitle : subtopic.title, 38);
+                                        });
+                                        result.subtopics = subtopics;
+                                        callback();
+                                    } else {
+                                        // if subtopics are less than 3, get some arguments
+                                        var query = {
+                                            parentId: null,
+                                            ownerId: result._id,
+                                            ownerType: constants.OBJECT_TYPES.topic,
+                                            'screening.status': constants.SCREENING_STATUS.status1.code
+                                        };
+                                        flowUtils.getArguments(query, 3, function (err, subarguments) {
+                                            subarguments.forEach(function (subargument) {
+                                                subargument.shortTitle = utils.getShortText(subargument.contextTitle ? subargument.contextTitle : subargument.title, 38);
+                                            });
+                                            flowUtils.sortArguments(subarguments);
+                                            result.subarguments = subarguments;
+                                            callback();
+                                        });
+                                    }
                                 });
-                                result.subtopics = subtopics;
-                                callback();
-                            });
                         }, function(err) {
                             model.categories = results;
                             callback();
@@ -304,6 +322,10 @@ function GET_create(req, res) {
             }
         }
     }, function (err, results) {
+        if(model.topic && !model.topic.createUserId.equals(req.user.id)) {
+            // not the owner, stop editing
+            return res.redirect('/');
+        }
         flowUtils.setModelContext(req, model);
         if(!model.topic && !model.parentTopic && !req.params.username && !req.user.isAdmin()) {
             // A public create on root topics but not an admin
@@ -318,6 +340,10 @@ function GET_create(req, res) {
 function POST_create(req, res) {
     var query = { _id: req.query.id || new mongoose.Types.ObjectId() };
     db.Topic.findOne(query, function(err, result) {
+        if(result && !result.createUserId.equals(req.user.id)) {
+            // not the owner, stop editing
+            return res.redirect('/');
+        }
         var entity = result ? result : {};
         var tags = req.body.topicTags;
         var dateNow = Date.now();
@@ -369,7 +395,7 @@ function POST_create(req, res) {
     });
 }
 
-function GET_link(req, res) {
+function GET_link_edit(req, res) {
     var model = {};
     async.series({
         entry: function (callback) {
@@ -407,7 +433,7 @@ function GET_link(req, res) {
     });
 }
 
-function POST_link(req, res) {
+function POST_link_edit(req, res) {
     var action = req.body.action;
     if(action === 'delete') {
         db.TopicLink.findByIdAndRemove(req.query.id, function(err, link) {
@@ -455,11 +481,11 @@ module.exports = function (router) {
 
 
     router.get('/link/edit', function (req, res) {
-        GET_link(req, res);
+        GET_link_edit(req, res);
     });
 
     router.post('/link/edit', function (req, res) {
-        POST_link(req, res);
+        POST_link_edit(req, res);
     });
 
     /**
@@ -474,5 +500,5 @@ module.exports.GET_index = GET_index;
 module.exports.GET_entry = GET_entry;
 module.exports.GET_create = GET_create;
 module.exports.POST_create = POST_create;
-module.exports.GET_link = GET_link;
-module.exports.POST_link = POST_link;
+module.exports.GET_link_edit = GET_link_edit;
+module.exports.POST_link_edit = POST_link_edit;

@@ -127,6 +127,63 @@
                 <a href="{paths.wiki.related}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}">
                     <span class="glyphicon glyphicon-random" aria-hidden="true"></span> Related</a></li>!}
             {!<li><a href="#" role="tab"><span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Details</a></li>!}
+            <li role="separator" class="divider"></li>
+            {?isContributor}
+                {?isOpinionOwner}
+                    <li><a href="{wikiBaseUrl}{paths.wiki.opinions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;opinion={opinion._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Comment</a></li>
+                {:else}
+                    {?isIssueOwner}
+                        <li><a href="{wikiBaseUrl}{paths.wiki.issues.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;issue={issue._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Issue</a></li>
+                    {:else}
+                        {?isAnswerOwner}
+                            <li><a href="{wikiBaseUrl}{paths.wiki.answers.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}&amp;answer={answer._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Answer</a></li>
+                        {:else}
+                            {?question}
+                                {?isQuestionOwner}
+                                    <li><a href="{wikiBaseUrl}{paths.wiki.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Question</a></li>
+                                {/isQuestionOwner}
+                            {:else}
+                                {?argument}
+                                    {?isArgumentOwner}
+                                        <li><a href="{wikiBaseUrl}{paths.wiki.arguments.create}?topic={topic._id}&amp;id={argument._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Argument</a></li>
+                                    {/isArgumentOwner}
+                                {:else}
+                                    {?topic}
+                                        {?isTopicOwner}
+                                            <li><a href="{wikiBaseUrl}{paths.wiki.topics.create}?id={topic._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Topic</a></li>
+                                        {/isTopicOwner}
+                                    {/topic}
+                                {/argument}
+                            {/question}
+                        {/isAnswerOwner}
+                    {!<li><a href="{paths.wiki.outline.link}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> Manage Links</a></li>!}
+                    {!<li><a href="#" role="tab"><span class="glyphicon glyphicon-tags" aria-hidden="true"></span> Manage Tags</a></li>!}
+                    {/isIssueOwner}
+                {/isOpinionOwner}
+            {!<li><a href="#" role="tab"><span class="glyphicon glyphicon-move" aria-hidden="true"></span> Move...</a></li>!}
+            {/isContributor}
+            {?user.isAdmin}
+            {!<li role="separator" class="divider"></li>
+            <li class="dropdown-header">Admin</li>!}
+                {^isEntryOwner}
+                    <li><a href="#" onclick="return entryTakeOwnership()"><i class="fa fa-hand-grab-o" aria-hidden="true"></i> Take Ownership</a></li>
+                {/isEntryOwner}
+                <li><a href="#" onclick="return entryDelete()"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</a></li>
+            {/user.isAdmin}
+            <li role="separator" class="divider"></li>
+            <li><a href="#" role="tab"><i class="fa fa-rss" aria-hidden="true"></i> Follow</a></li>
+            {!<li role="separator" class="divider"></li>!}
+            {!<li><a href="#" role="tab"><i class="fa fa-share" aria-hidden="true"></i> Share</a></li>!}
+            {!<li><a href="#" role="tab"><i class="fa fa-copy" aria-hidden="true"></i> Copy text</a></li>!}
+            {!{>"dust/wiki/common/clipboard" /}!}
+            <li><a href="#" role="tab"><i class="fa fa-flag" aria-hidden="true"></i> Report</a></li>
+            <li><a href="#" role="tab"><i class="fa fa-info-circle" aria-hidden="true"></i> Details</a></li>
+            {?user.roles.screener}
+                <li role="separator" class="divider"></li>
+                <li class="dropdown-header">Screener</li>
+                <li><a href="{paths.wiki.screening}?{?topic}topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}{?answer}&amp;answer={answer._id}{/answer}{?issue}&amp;issue={issue._id}{/issue}{?opinion}&amp;opinion={opinion._id}{/opinion}" title="Set screening status" class="no-underline">
+                    <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Screening Status</a></li>
+            {/user.roles.screener}
         </ul>
     </li>
 </ul>

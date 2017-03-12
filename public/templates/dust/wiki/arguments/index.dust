@@ -17,7 +17,7 @@
             {#proArguments}
                 <li class="list-group-item">
                     {?link}
-                        <a href="{wikiBaseUrl}{paths.wiki.arguments.link}?topic={link.ownerId}&amp;argument={link.parentId}&amp;id={link._id}&amp;source={paths.wiki.arguments.index}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
+                        <a href="{wikiBaseUrl}{paths.wiki.arguments.link.edit}?topic={link.ownerId}&amp;argument={link.parentId}&amp;id={link._id}&amp;source={paths.wiki.arguments.index}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
                     {:else}
                         <i class="glyphicon glyphicon-flash text-{verdict.theme}" aria-hidden="true"></i>
                     {/link}
@@ -40,7 +40,7 @@
             {#conArguments}
                 <li class="list-group-item">
                     {?link}
-                        <a href="{wikiBaseUrl}{paths.wiki.arguments.link}?topic={link.ownerId}&amp;argument={link.parentId}&amp;id={link._id}&amp;source={paths.wiki.arguments.index}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
+                        <a href="{wikiBaseUrl}{paths.wiki.arguments.link.edit}?topic={link.ownerId}&amp;argument={link.parentId}&amp;id={link._id}&amp;source={paths.wiki.arguments.index}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
                     {:else}
                         <i class="fa fa-flash text-{verdict.theme}" aria-hidden="true"></i>
                     {/link}

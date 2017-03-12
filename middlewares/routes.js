@@ -49,10 +49,12 @@ function ensureAccountOwner(req, res, next) {
   res.redirect('/');
 }
 
-exports = module.exports = function(app, passport) {
+module.exports = function(app, passport) {
 
   app.get(paths.wiki.topics.create, ensureAuthenticated);
+  app.get(paths.wiki.topics.link.edit, ensureAuthenticated);
   app.get(paths.wiki.arguments.create, ensureAuthenticated);
+  app.get(paths.wiki.arguments.link.edit, ensureAuthenticated);
   app.get(paths.wiki.questions.create, ensureAuthenticated);
   app.get(paths.wiki.answers.create, ensureAuthenticated);
   app.get(paths.wiki.issues.create, ensureAuthenticated);

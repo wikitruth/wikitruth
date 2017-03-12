@@ -45,7 +45,7 @@
                 {#proArguments}
                 <li class="list-group-item">
                     {?link}
-                        <a href="{wikiBaseUrl}{paths.wiki.arguments.link}?topic={ownerId}&amp;argument={link.parentId}&amp;id={link._id}&amp;source={paths.wiki.arguments.entry}/{friendlyUrl}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
+                        <a href="{wikiBaseUrl}{paths.wiki.arguments.link.edit}?topic={ownerId}&amp;argument={link.parentId}&amp;id={link._id}&amp;source={paths.wiki.arguments.entry}/{friendlyUrl}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
                     {:else}
                         <i class="glyphicon glyphicon-flash text-{verdict.theme}" aria-hidden="true"></i>
                     {/link}
@@ -67,7 +67,7 @@
                     {#conArguments}
                         <li class="list-group-item">
                             {?link}
-                                <a href="{wikiBaseUrl}{paths.wiki.arguments.link}?topic={ownerId}&amp;argument={link.parentId}&amp;id={link._id}&amp;source={paths.wiki.arguments.entry}/{friendlyUrl}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
+                                <a href="{wikiBaseUrl}{paths.wiki.arguments.link.edit}?topic={ownerId}&amp;argument={link.parentId}&amp;id={link._id}&amp;source={paths.wiki.arguments.entry}/{friendlyUrl}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
                             {:else}
                                 <i class="glyphicon glyphicon-flash text-{verdict.theme}" aria-hidden="true"></i>
                             {/link}
