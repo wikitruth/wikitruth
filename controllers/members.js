@@ -523,14 +523,37 @@ module.exports = function (router) {
                         async.each(results, function(result, callback) {
                             result.friendlyUrl = utils.urlify(result.title);
                             result.comments = utils.numberWithCommas(utils.randomInt(1, 100000));
-                            db.Topic.find( { parentId: result._id } ).limit(3).sort({ title: 1 }).exec(function(err, subtopics) {
-                                subtopics.forEach(function(subtopic){
-                                    subtopic.friendlyUrl = utils.urlify(subtopic.title);
-                                    subtopic.shortTitle = utils.getShortText(subtopic.contextTitle ? subtopic.contextTitle : subtopic.title, 38);
+                            db.Topic
+                                .find( { parentId: result._id } )
+                                .limit(3)
+                                .sort({ title: 1 })
+                                .lean()
+                                .exec(function(err, subtopics) {
+                                    if(subtopics.length > 0) {
+                                        subtopics.forEach(function(subtopic){
+                                            subtopic.friendlyUrl = utils.urlify(subtopic.title);
+                                            subtopic.shortTitle = utils.getShortText(subtopic.contextTitle ? subtopic.contextTitle : subtopic.title, 38);
+                                        });
+                                        result.subtopics = subtopics;
+                                        callback();
+                                    } else {
+                                        // if subtopics are less than 3, get some arguments
+                                        var query = {
+                                            parentId: null,
+                                            ownerId: result._id,
+                                            ownerType: constants.OBJECT_TYPES.topic
+                                        };
+                                        flowUtils.getArguments(query, 3, function (err, subarguments) {
+                                            subarguments.forEach(function (subargument) {
+                                                flowUtils.setVerdictModel(subargument);
+                                                subargument.shortTitle = utils.getShortText(subargument.contextTitle ? subargument.contextTitle : subargument.title, 38);
+                                            });
+                                            flowUtils.sortArguments(subarguments);
+                                            result.subarguments = subarguments;
+                                            callback();
+                                        });
+                                    }
                                 });
-                                result.subtopics = subtopics;
-                                callback();
-                            });
                         }, function(err) {
                             model.categories = results;
                             callback();
