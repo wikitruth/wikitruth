@@ -414,7 +414,7 @@ module.exports = function (router) {
                                     if(subtopics.length > 0) {
                                         subtopics.forEach(function (subtopic) {
                                             subtopic.friendlyUrl = utils.urlify(subtopic.title);
-                                            subtopic.shortTitle = utils.getShortText(subtopic.contextTitle ? subtopic.contextTitle : subtopic.title, 38);
+                                            subtopic.shortTitle = utils.getShortText(subtopic.contextTitle ? subtopic.contextTitle : subtopic.title, constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN);
                                         });
                                         result.subtopics = subtopics;
                                         callback();
@@ -429,7 +429,7 @@ module.exports = function (router) {
                                         flowUtils.getArguments(query, 3, function (err, subarguments) {
                                             subarguments.forEach(function (subargument) {
                                                 flowUtils.setVerdictModel(subargument);
-                                                subargument.shortTitle = utils.getShortText(subargument.contextTitle ? subargument.contextTitle : subargument.title, 38);
+                                                subargument.shortTitle = utils.getShortText(subargument.contextTitle ? subargument.contextTitle : subargument.title, constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN);
                                             });
                                             flowUtils.sortArguments(subarguments);
                                             result.subarguments = subarguments;
