@@ -305,7 +305,8 @@ module.exports = {
     SCREENING_STATUS: SCREENING_STATUS,
     VERDICT_STATUS: VERDICT_STATUS,
     SETTINGS: {
-        contentPreviewLength: 250
+        contentPreviewLength: 250,
+        TILE_MAX_SUB_ENTRY_LEN: 35
     },
     OBJECT_NAMES_MAP: {
         1: 'topics',
