@@ -41,6 +41,9 @@ function GET_index(req, res) {
             });
         }
     }, function (err, results) {
+        if(!model.topic || !flowUtils.isEntryOnIntendedUrl(req, model.topic)) {
+            return res.redirect('/');
+        }
         model.childrenCount = model.topic.childrenCount.topics;
         if(model.childrenCount.pending === 0 && model.childrenCount.rejected === 0) {
             model.screening.hidden = true;
@@ -71,7 +74,7 @@ function GET_entry(req, res) {
         }
     }
     flowUtils.setTopicModels(req, model, function () {
-        if(!model.topic) {
+        if(!model.topic || !flowUtils.isEntryOnIntendedUrl(req, model.topic)) {
             return res.redirect('/');
         }
         if(!req.query.topic) {
@@ -297,7 +300,6 @@ function GET_entry(req, res) {
 
 function GET_create(req, res) {
     var model = {};
-
     async.series({
         topic: function(callback){
             if(req.query.id) {
@@ -323,7 +325,7 @@ function GET_create(req, res) {
             }
         }
     }, function (err, results) {
-        if(model.topic && !model.topic.createUserId.equals(req.user.id)) {
+        if(flowUtils.isEntryOwner(req, model.topic)) {
             // not the owner, stop editing
             return res.redirect('/');
         }
@@ -341,7 +343,7 @@ function GET_create(req, res) {
 function POST_create(req, res) {
     var query = { _id: req.query.id || new mongoose.Types.ObjectId() };
     db.Topic.findOne(query, function(err, result) {
-        if(result && !result.createUserId.equals(req.user.id)) {
+        if(result && !flowUtils.isEntryOwner(req, result)) {
             // not the owner, stop editing
             return res.redirect('/');
         }
@@ -428,6 +430,10 @@ function GET_link_edit(req, res) {
             }
         }
     }, function (err, results) {
+        if(model.link && !flowUtils.isEntryOwner(req, model.link)) {
+            // VALIDATION: non-owners cannot update other's entry
+            return res.redirect(createCancelUrl(req));
+        }
         flowUtils.setModelContext(req, model);
         model.cancelUrl = createCancelUrl(req);
         res.render(templates.wiki.topics.link.edit, model);
@@ -437,6 +443,10 @@ function GET_link_edit(req, res) {
 function POST_link_edit(req, res) {
     var action = req.body.action;
     if(action === 'delete') {
+        if(!req.user.isAdmin()) {
+            // VALIDATION: only admin can delete a link
+            return res.redirect(createCancelUrl(req));
+        }
         db.TopicLink.findByIdAndRemove(req.query.id, function(err, link) {
             flowUtils.updateChildrenCount(link.parentId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, function () {
                 res.redirect(createCancelUrl(req));
@@ -445,6 +455,10 @@ function POST_link_edit(req, res) {
     } else if(action === 'submit') {
         var query = { _id: req.query.id };
         db.TopicLink.findOne(query, function (err, result) {
+            if(result && !flowUtils.isEntryOwner(req, result)) {
+                // VALIDATION: non-owners cannot update other's entry
+                return res.redirect(createCancelUrl(req));
+            }
             var entity = result ? result : {};
             entity.title = req.body.title;
             entity.editUserId = req.user.id;
