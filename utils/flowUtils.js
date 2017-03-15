@@ -886,15 +886,15 @@ function getVerdictCount(args) {
 }
 
 function createOwnerQueryFromQuery(req) {
-    if(req.query.issue) {
-        return {
-            ownerType: constants.OBJECT_TYPES.issue,
-            ownerId: req.query.issue
-        };
-    } else if(req.query.opinion) {
+    if(req.query.opinion) {
         return {
             ownerType: constants.OBJECT_TYPES.opinion,
             ownerId: req.query.opinion
+        };
+    } else if(req.query.issue) {
+        return {
+            ownerType: constants.OBJECT_TYPES.issue,
+            ownerId: req.query.issue
         };
     } else if(req.query.answer) {
         return {

@@ -283,6 +283,7 @@ function GET_create(req, res) {
                 var query = { _id: req.query.argument ? req.query.argument : model.argument && model.argument.parentId ? model.argument.parentId : null };
                 if(query._id) {
                     db.Argument.findOne(query, function (err, result) {
+                        flowUtils.appendEntryExtra(result);
                         model.parentArgument = result;
                         callback();
                     });
@@ -506,11 +507,11 @@ module.exports = function (router) {
     });
 
 
-    router.get('/link', function (req, res) {
+    router.get('/link/edit', function (req, res) {
         GET_link_edit(req, res);
     });
 
-    router.post('/link', function (req, res) {
+    router.post('/link/edit', function (req, res) {
         POST_link_edit(req, res);
     });
 };

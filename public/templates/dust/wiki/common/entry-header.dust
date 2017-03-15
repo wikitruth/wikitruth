@@ -114,10 +114,10 @@
                         <li role="separator" class="divider"></li>
                     {/answer}
                 {/question}
-                <li><a href="{wikiBaseUrl}{paths.wiki.issues.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
+                <li><a href="{wikiBaseUrl}{paths.wiki.issues.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}{?answer}&amp;answer={answer._id}{/answer}" role="tab">
                     <span class="fa fa-exclamation-circle" aria-hidden="true"></span> New Issue</a></li>
             {/issue}
-            <li><a href="{wikiBaseUrl}{paths.wiki.opinions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
+            <li><a href="{wikiBaseUrl}{paths.wiki.opinions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}{?answer}&amp;answer={answer._id}{/answer}{?issue}&amp;issue={issue._id}{/issue}" role="tab">
                 <span class="fa fa-comments-o" aria-hidden="true"></span> New Comment</a></li>
                 {!<li role="separator" class="divider"></li>!}
             {!<li>
@@ -130,10 +130,10 @@
             <li role="separator" class="divider"></li>
             {?isContributor}
                 {?isOpinionOwner}
-                    <li><a href="{wikiBaseUrl}{paths.wiki.opinions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;opinion={opinion._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Comment</a></li>
+                    <li><a href="{wikiBaseUrl}{paths.wiki.opinions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}{?answer}&amp;answer={answer._id}{/answer}{?issue}&amp;issue={issue._id}{/issue}&amp;opinion={opinion._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Comment</a></li>
                 {:else}
                     {?isIssueOwner}
-                        <li><a href="{wikiBaseUrl}{paths.wiki.issues.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;issue={issue._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Issue</a></li>
+                        <li><a href="{wikiBaseUrl}{paths.wiki.issues.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}{?answer}&amp;answer={answer._id}{/answer}&amp;issue={issue._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Issue</a></li>
                     {:else}
                         {?isAnswerOwner}
                             <li><a href="{wikiBaseUrl}{paths.wiki.answers.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}&amp;answer={answer._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Answer</a></li>
@@ -169,6 +169,47 @@
                     <li><a href="#" onclick="return entryTakeOwnership()"><i class="fa fa-hand-grab-o" aria-hidden="true"></i> Take Ownership</a></li>
                 {/isEntryOwner}
                 <li><a href="#" onclick="return entryDelete()"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</a></li>
+                <script>
+
+                    function entryTakeOwnership() {
+                        if(confirm('Are you sure you want to Take Ownership of this entry?')) {
+                            var csrf = $('body').data('csrf');
+                            var id = $('body').data('entry-id');
+                            var type = $('body').data('entry-type');
+
+                            $.ajax({
+                                type: "POST",
+                                url: "/ajax/entry/take-ownership",
+                                data: JSON.stringify({ id: id, type: type, _csrf: csrf }),
+                                contentType: 'application/json',
+                                success: function (data) {
+                                    location.reload();
+                                }
+                            });
+                        }
+
+                        return false;
+                    }
+
+                    function entryDelete() {
+                        if(confirm('Are you sure you want to Delete this entry?')) {
+                            var csrf = $('body').data('csrf');
+                            var id = $('body').data('entry-id');
+                            var type = $('body').data('entry-type');
+
+                            $.ajax({
+                                type: "POST",
+                                url: "/ajax/entry/delete",
+                                data: JSON.stringify({ id: id, type: type, _csrf: csrf }),
+                                contentType: 'application/json',
+                                success: function (data) {
+                                    location.href = '/';
+                                }
+                            });
+                        }
+                        return false;
+                    }
+                </script>
             {/user.isAdmin}
             <li role="separator" class="divider"></li>
             <li><a href="#" role="tab"><i class="fa fa-rss" aria-hidden="true"></i> Follow</a></li>

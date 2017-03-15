@@ -46,7 +46,7 @@
                 {/question}
             {:else}
                 {?answer}
-                    <i class="fa fa-question-circle-o"></i> An answer on <a href="{wikiBaseUrl}{paths.wiki.questions.entry}/{question.friendlyUrl}/{question._id}">{question.title}</a>
+                    <i class="fa fa-check-circle-o"></i> An answer on <a href="{wikiBaseUrl}{paths.wiki.questions.entry}/{question.friendlyUrl}/{question._id}">{question.title}</a>
                 {:else}
                     {?question}
                         <i class="fa fa-question-circle-o"></i> A question on&nbsp;
