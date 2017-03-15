@@ -1124,7 +1124,7 @@ function setMemberFullname(member) {
 }
 
 function isEntryOnIntendedUrl(req, entry) {
-    return !entry.private && !req.param.username || entry.private && req.param.username && entry.createUserId.equals(req.user.id);
+    return !entry.private && !req.params.username || entry.private && req.params.username && entry.createUserId.equals(req.user.id);
 }
 
 module.exports = {
