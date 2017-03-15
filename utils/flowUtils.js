@@ -19,12 +19,12 @@ function getBackupDir(isPrivate) {
     return __dirname + '/../config/mongodb' + (isPrivate ? '/users' : '');
 }
 
-function isOwner(req, item, model) {
-    return item && req.user && item.createUserId && req.user.id && item.createUserId.equals(req.user.id);
+function isEntryOwner(req, item) {
+    return item && item.createUserId && req.user && req.user.id && item.createUserId.equals(req.user.id);
 }
 
 function appendOwnerFlag(req, item, model) {
-    if(isOwner(req, item, model)) {
+    if(isEntryOwner(req, item)) {
         model.isItemOwner = true;
     }
 }
@@ -119,7 +119,7 @@ function setQuestionModel(req, model, callback) {
         db.Question.findOne({_id: req.query.question}, function (err, result) {
             model.question = result;
             appendEntryExtra(result);
-            if(isOwner(req, result, model)) {
+            if(isEntryOwner(req, result)) {
                 model.isQuestionOwner = true;
             }
             setUsername(result, callback);
@@ -134,7 +134,7 @@ function setAnswerModel(req, model, callback) {
         db.Answer.findOne({_id: req.query.answer}, function (err, result) {
             model.answer = result;
             appendEntryExtra(result);
-            if(isOwner(req, result, model)) {
+            if(isEntryOwner(req, result)) {
                 model.isAnswerOwner = true;
             }
             setUsername(result, callback);
@@ -149,7 +149,7 @@ function setIssueModel(req, model, callback) {
         db.Issue.findOne({_id: req.query.issue}, function (err, result) {
             model.issue = result;
             appendEntryExtra(result);
-            if(isOwner(req, result, model)) {
+            if(isEntryOwner(req, result)) {
                 model.isIssueOwner = true;
             }
             setUsername(result, callback);
@@ -164,7 +164,7 @@ function setOpinionModel(req, model, callback) {
         db.Opinion.findOne({_id: req.query.opinion}, function (err, result) {
             model.opinion = result;
             appendEntryExtra(result);
-            if(isOwner(req, result, model)) {
+            if(isEntryOwner(req, result)) {
                 model.isOpinionOwner = true;
             }
             setUsername(result, callback);
@@ -184,7 +184,7 @@ function setArgumentModels(req, model, callback) {
                     }
                     model.argument = result;
                     appendEntryExtra(result);
-                    if (isOwner(req, result, model)) {
+                    if (isEntryOwner(req, result)) {
                         model.isArgumentOwner = true;
                     }
                     setUsername(result, callback);
@@ -279,7 +279,7 @@ function setTopicModels(req, model, callback) {
                     }
                     model.topic = result;
                     appendEntryExtra(result);
-                    if(isOwner(req, result, model)) {
+                    if(isEntryOwner(req, result)) {
                         model.isTopicOwner = true;
                     }
                     setUsername(result, callback);
@@ -1123,9 +1123,14 @@ function setMemberFullname(member) {
     }
 }
 
+function isEntryOnIntendedUrl(req, entry) {
+    return !entry.private && !req.param.username || entry.private && req.param.username && entry.createUserId.equals(req.user.id);
+}
+
 module.exports = {
     getBackupDir: getBackupDir,
-    isOwner: isOwner,
+    isEntryOwner: isEntryOwner,
+    isEntryOnIntendedUrl: isEntryOnIntendedUrl,
     appendOwnerFlag: appendOwnerFlag,
     setArgumentModels: setArgumentModels,
     setTopicModels: setTopicModels,

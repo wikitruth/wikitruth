@@ -34,6 +34,9 @@ function GET_entry(req, res) {
     }
     var ownerQuery = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument };
     flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
+        if(!flowUtils.isEntryOnIntendedUrl(req, model.argument)) {
+            return res.redirect('/');
+        }
         async.parallel({
             arguments: function(callback) {
                 // Top Arguments
@@ -186,6 +189,9 @@ function GET_index(req, res) {
         flowUtils.setTopicModels(req, model, function () {
             flowUtils.setScreeningModel(req, model);
             flowUtils.setArgumentModels(req, model, function () {
+                if(model.argument && !flowUtils.isEntryOnIntendedUrl(req, model.argument) || model.topic && !flowUtils.isEntryOnIntendedUrl(req, model.topic)) {
+                    return res.redirect('/');
+                }
                 var query = { 'screening.status': model.screening.status };
                 if(req.query.argument) {
                     query.parentId = model.argument._id;
@@ -285,6 +291,9 @@ function GET_create(req, res) {
                 }
             }
         }, function (err, results) {
+            if(model.argument && !flowUtils.isEntryOwner(req, model.argument)){
+                return res.redirect('/');
+            }
             model.ARGUMENT_TAGS = constants.ARGUMENT_TAGS;
             flowUtils.setModelContext(req, model);
             res.render(templates.wiki.arguments.create, model);
@@ -309,6 +318,9 @@ function POST_create(req, res) {
         update: function (callback) {
             var query = { _id: req.query.id || new mongoose.Types.ObjectId() };
             db.Argument.findOne(query, function(err, result) {
+                if(result && !flowUtils.isEntryOwner(req, result)){
+                    return callback({ error: 'Not allowed to update, not the owner.' });
+                }
                 var tags = req.body.argumentTags;
                 var dateNow = Date.now();
                 entry = result;
@@ -361,6 +373,10 @@ function POST_create(req, res) {
             });
         }
     }, function (err, results) {
+        if(err) {
+            console.error(err);
+            return res.redirect('/');
+        }
         var updateRedirect = function () {
             var model = {};
             flowUtils.setModelContext(req, model);
@@ -419,6 +435,9 @@ function GET_link_edit(req, res) {
                 }
             }
         }, function (err, results) {
+            if(model.link && !flowUtils.isEntryOwner(req, model.link)) {
+                return res.redirect(createCancelUrl(req));
+            }
             model.cancelUrl = createCancelUrl(req);
             flowUtils.setModelContext(req, model);
             res.render(templates.wiki.arguments.link.edit, model);
@@ -429,6 +448,10 @@ function GET_link_edit(req, res) {
 function POST_link_edit(req, res) {
     var action = req.body.action;
     if(action === 'delete') {
+        if(!req.user.isAdmin()) {
+            // VALIDATION: only admin can delete a link
+            return res.redirect(createCancelUrl(req));
+        }
         db.ArgumentLink.findByIdAndRemove(req.query.id, function(err, link) {
             if(link.parentId) {
                 flowUtils.updateChildrenCount(link.parentId, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.argument, function () {
@@ -443,6 +466,10 @@ function POST_link_edit(req, res) {
     } else if(action === 'submit') {
         var query = { _id: req.query.id };
         db.ArgumentLink.findOne(query, function (err, result) {
+            if(result && !flowUtils.isEntryOwner(req, result)) {
+                // VALIDATION: non-owners cannot update other's entry
+                return res.redirect(createCancelUrl(req));
+            }
             var entity = result ? result : {};
             entity.title = req.body.title;
             entity.editUserId = req.user.id;
