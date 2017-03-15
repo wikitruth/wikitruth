@@ -30,7 +30,7 @@
                 {?grandParentArgument.parentId}
                     <li><i class="fa fa-flash text-muted"></i> <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{grandParentArgument.parentId}">..</a></li>
                 {/grandParentArgument.parentId}
-                <li><i class="fa fa-flash text-muted"></i> <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{grandParentArgument.friendlyUrl}/{grandParentArgument._id}">{grandParentArgument.shortTitle}</a></li>
+                <li>{^grandParentArgument.parentId}<i class="fa fa-flash text-muted"></i> {/grandParentArgument.parentId}<a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{grandParentArgument.friendlyUrl}/{grandParentArgument._id}">{grandParentArgument.shortTitle}</a></li>
             {:else}
                 <li><i class="fa fa-flash text-muted"></i> <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{parentArgument.parentId}">..</a></li>
             {/grandParentArgument}
@@ -52,7 +52,7 @@
     {/question}
     {?answer}
     {!<li><a href="{paths.wiki.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">Questions</a></li>!}
-        <li><i class="fa fa-question-circle-o text-muted"></i> <a href="{wikiBaseUrl}{paths.wiki.answers.entry}/{answer.friendlyUrl}/{answer._id}">{answer.shortTitle}</a></li>
+        <li><i class="fa fa-check-circle-o text-muted"></i> <a href="{wikiBaseUrl}{paths.wiki.answers.entry}/{answer.friendlyUrl}/{answer._id}">{answer.shortTitle}</a></li>
     {/answer}
     {?issue}
         {!<li><a href="{paths.wiki.issues.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}">Issues</a></li>!}

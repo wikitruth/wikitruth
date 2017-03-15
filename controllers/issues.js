@@ -1,6 +1,7 @@
 'use strict';
 
 var mongoose    = require('mongoose'),
+    async       = require('async'),
     htmlToText  = require('html-to-text'),
     utils       = require('../utils/utils'),
     flowUtils   = require('../utils/flowUtils'),
@@ -18,12 +19,29 @@ function GET_entry(req, res) {
             req.query.issue = req.params.friendlyUrl;
         }
     }
-    flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
-        model.issueType = constants.ISSUE_TYPES['type' + model.issue.issueType].text;
-        model.isEntryOwner = model.isIssueOwner;
-        flowUtils.setModelOwnerEntry(model);
-        flowUtils.setModelContext(req, model);
-        res.render(templates.wiki.issues.entry, model);
+    var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
+    flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
+        ownerQuery['screening.status'] = constants.SCREENING_STATUS.status1.code;
+        async.parallel({
+            opinions: function (callback) {
+                // Top Opinions
+                db.Opinion.find(ownerQuery).limit(15).sort({ title: 1 }).lean().exec(function(err, results) {
+                    flowUtils.setEditorsUsername(results, function() {
+                        results.forEach(function (result) {
+                            flowUtils.appendEntryExtra(result);
+                        });
+                        model.opinions = results;
+                        callback();
+                    });
+                });
+            }
+        }, function (err, results) {
+            model.issueType = constants.ISSUE_TYPES['type' + model.issue.issueType].text;
+            model.isEntryOwner = model.isIssueOwner;
+            flowUtils.setModelOwnerEntry(model);
+            flowUtils.setModelContext(req, model);
+            res.render(templates.wiki.issues.entry, model);
+        });
     });
 }
 
@@ -107,16 +125,11 @@ function POST_create(req, res) {
         }
         entity.private = req.params.username ? true : false;
         if(!entity.ownerId) {
-            if(req.query.argument) {
-                entity.ownerId = req.query.argument;
-                entity.ownerType = constants.OBJECT_TYPES.argument;
-            } else if(req.query.question) {
-                entity.ownerId = req.query.question;
-                entity.ownerType = constants.OBJECT_TYPES.question;
-            } else if(req.query.topic) { // parent is a topic
-                entity.ownerId = req.query.topic;
-                entity.ownerType = constants.OBJECT_TYPES.topic;
-            }
+            delete req.query.opinion;
+            delete req.query.issue;
+            var q = flowUtils.createOwnerQueryFromQuery(req);
+            entity.ownerId = q.ownerId;
+            entity.ownerType = q.ownerType;
         }
         db.Issue.findOneAndUpdate(query, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function (err, updatedEntity) {
             var updateRedirect = function () {

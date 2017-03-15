@@ -12,8 +12,9 @@ var mongoose    = require('mongoose'),
 var topicController     = require('./topics'),
     argumentController  = require('./arguments'),
     questionController  = require('./questions'),
-    issueController  = require('./issues'),
-    opinionController  = require('./opinions');
+    answerController    = require('./answers'),
+    issueController     = require('./issues'),
+    opinionController   = require('./opinions');
 
 function setMemberModel(model, req, callback) {
     if(req.params.username) {
@@ -621,11 +622,11 @@ module.exports = function (router) {
         argumentController.POST_create(req, res);
     });
 
-    router.get('/:username/diary/arguments/link', function (req, res) {
+    router.get('/:username/diary/arguments/link/edit', function (req, res) {
         argumentController.GET_link_edit(req, res);
     });
 
-    router.post('/:username/diary/arguments/link', function (req, res) {
+    router.post('/:username/diary/arguments/link/edit', function (req, res) {
         argumentController.POST_link_edit(req, res);
     });
 
@@ -646,6 +647,25 @@ module.exports = function (router) {
 
     router.post('/:username/diary/questions/create', function (req, res) {
         questionController.POST_create(req, res);
+    });
+
+
+    /* Diary Answers */
+
+    router.get('/:username/diary/answers', function (req, res) {
+        answerController.GET_index(req, res);
+    });
+
+    router.get('/:username/diary/answer(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        answerController.GET_entry(req, res);
+    });
+
+    router.get('/:username/diary/answers/create', function (req, res) {
+        answerController.GET_create(req, res);
+    });
+
+    router.post('/:username/diary/answers/create', function (req, res) {
+        answerController.POST_create(req, res);
     });
 
 

@@ -104,16 +104,10 @@ function POST_create(req, res) {
         }
         entity.private = req.params.username ? true : false;
         if(!entity.ownerId) {
-            if(req.query.argument) {
-                entity.ownerId = req.query.argument;
-                entity.ownerType = constants.OBJECT_TYPES.argument;
-            } else if(req.query.question) {
-                entity.ownerId = req.query.question;
-                entity.ownerType = constants.OBJECT_TYPES.question;
-            } else if(req.query.topic) { // parent is a topic
-                entity.ownerId = req.query.topic;
-                entity.ownerType = constants.OBJECT_TYPES.topic;
-            }
+            delete req.query.opinion;
+            var q = flowUtils.createOwnerQueryFromQuery(req);
+            entity.ownerId = q.ownerId;
+            entity.ownerType = q.ownerType;
         }
         db.Opinion.findOneAndUpdate(query, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function (err, updatedEntity) {
             var updateRedirect = function () {
