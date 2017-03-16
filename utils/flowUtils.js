@@ -6,6 +6,7 @@ var db          = require('../app').db.models,
     config      = require('../config/config'),
     url         = require('url'),
     querystring = require('querystring'),
+    htmlToText  = require('html-to-text'),
     async       = require('async');
 
 function getBackupDir(isPrivate) {
@@ -1202,8 +1203,13 @@ function isEntryOnIntendedUrl(req, entry) {
     return !entry.private && !req.params.username || entry.private && req.params.username && entry.createUserId.equals(req.user.id);
 }
 
+function createContentPreview(content) {
+    return utils.getShortText(htmlToText.fromString(content, { wordwrap: false, hideLinkHrefIfSameAsText: true }), constants.SETTINGS.contentPreviewLength);
+}
+
 module.exports = {
     getBackupDir: getBackupDir,
+    createContentPreview: createContentPreview,
     isEntryOwner: isEntryOwner,
     isEntryOnIntendedUrl: isEntryOnIntendedUrl,
     appendOwnerFlag: appendOwnerFlag,

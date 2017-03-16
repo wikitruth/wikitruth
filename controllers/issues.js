@@ -2,7 +2,6 @@
 
 var mongoose    = require('mongoose'),
     async       = require('async'),
-    htmlToText  = require('html-to-text'),
     utils       = require('../utils/utils'),
     flowUtils   = require('../utils/flowUtils'),
     paths       = require('../models/paths'),
@@ -105,7 +104,7 @@ function POST_create(req, res) {
         var entity = result ? result : {};
         entity.title = req.body.title;
         entity.content = req.body.content;
-        entity.contentPreview = utils.getShortText(htmlToText.fromString(req.body.content, { wordwrap: false }), constants.SETTINGS.contentPreviewLength);
+        entity.contentPreview = flowUtils.createContentPreview(req.body.content);
         entity.friendlyUrl = utils.urlify(req.body.title);
         entity.issueType = req.body.issueType;
         entity.editUserId = req.user.id;

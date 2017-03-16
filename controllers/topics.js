@@ -4,7 +4,6 @@ var mongoose    = require('mongoose'),
     async       = require('async'),
     url         = require('url'),
     querystring = require('querystring'),
-    htmlToText  = require('html-to-text'),
     paths       = require('../models/paths'),
     templates   = require('../models/templates'),
     utils       = require('../utils/utils'),
@@ -299,7 +298,7 @@ function GET_create(req, res) {
             }
         }
     }, function (err, results) {
-        if(!flowUtils.isEntryOwner(req, model.topic)) {
+        if(model.topic && !flowUtils.isEntryOwner(req, model.topic)) {
             // not the owner, stop editing
             return res.redirect('/');
         }
@@ -325,7 +324,7 @@ function POST_create(req, res) {
         var tags = req.body.topicTags;
         var dateNow = Date.now();
         entity.content = req.body.content;
-        entity.contentPreview = utils.getShortText(htmlToText.fromString(req.body.content, { wordwrap: false }), constants.SETTINGS.contentPreviewLength);
+        entity.contentPreview = flowUtils.createContentPreview(req.body.content);
         entity.title = req.body.title;
         entity.contextTitle = req.body.contextTitle;
         entity.references = req.body.references;
@@ -368,6 +367,192 @@ function POST_create(req, res) {
             } else {
                 updateRedirect();
             }
+        });
+    });
+}
+
+function GET_link_entry(req, res) {
+    // Topic home: display top subtopics, top arguments
+    var model = {};
+    async.series({
+        entry: function (callback) {
+            if(req.query.id) {
+                db.TopicLink.findOne({_id: req.query.id}, function(err, link) {
+                    model.link = link;
+                    db.Topic.findOne({_id: link.topicId}, function(err, result) {
+                        result.friendlyUrl = utils.urlify(result.title);
+                        result.shortTitle = utils.getShortText(result.title);
+                        model.topic = result;
+                        callback();
+                    });
+                });
+            } else {
+                callback();
+            }
+        },
+        parentEntry: function (callback) {
+            var query = { _id: req.query.topic ? req.query.topic : model.topic && model.topic.parentId ? model.topic.parentId : null };
+            if(query._id) {
+                db.Topic.findOne(query, function (err, result) {
+                    result.friendlyUrl = utils.urlify(result.title);
+                    result.shortTitle = utils.getShortText(result.title);
+                    model.parentTopic = result;
+                    callback();
+                });
+            } else {
+                callback();
+            }
+        }
+    }, function (err, results) {
+        flowUtils.setModelContext(req, model);
+        model.cancelUrl = createCancelUrl(req);
+        res.render(templates.wiki.topics.link.edit, model);
+    });
+    if(!req.query.topic) {
+        if(req.params.id) {
+            req.query.topic = req.params.id;
+        } else {
+            var friendlyId = req.params.friendlyUrl;
+            if(friendlyId) {
+                if(utils.isObjectIdString(friendlyId)) {
+                    req.query.topic = friendlyId;
+                } else {
+                    req.query.friendlyUrl = friendlyId;
+                }
+            }
+        }
+    }
+    flowUtils.setTopicModels(req, model, function () {
+        if(!model.topic) {
+            return res.redirect('/');
+        }
+        if(!req.query.topic) {
+            req.query.topic = model.topic._id;
+        }
+
+        // Topic Tags
+        var tags = model.topic.tags;
+        if(tags && tags.length > 0) {
+            var tagLabels = [];
+            if(model.topic.ethicalStatus.hasValue) {
+                tagLabels.push(constants.TOPIC_TAGS.tag10);
+                model.hasValue = true;
+            }
+            tags.forEach(function (tag) {
+                tagLabels.push(constants.TOPIC_TAGS['tag' + tag]);
+                if(tag === constants.TOPIC_TAGS.tag520.code) {
+                    model.mainTopic = true;
+                }
+                if(!model.hasValue && tag === constants.ARGUMENT_TAGS.tag10.code) {
+                    model.hasValue = true;
+                }
+            });
+            model.tagLabels = tagLabels;
+        } else if(model.topic.ethicalStatus.hasValue) {
+            model.hasValue = true;
+        }
+
+        async.parallel({
+            topics: function(callback) {
+                // Top Subtopics
+                var query = { parentId: req.query.topic, 'screening.status': constants.SCREENING_STATUS.status1.code };
+                flowUtils.getTopics(query, 15, function (err, results) {
+                    model.topics = results;
+                    model.keyTopics = results.filter(function (result) {
+                        return result.tags.indexOf(constants.TOPIC_TAGS.tag20.code) >= 0;
+                    });
+                    if(model.keyTopics.length > 0) {
+                        model.hasKeyEntries = true;
+                    }
+                    callback();
+                });
+            },
+            links: function (callback) {
+                // Top Linked Topics
+                var query = { topicId: req.query.topic, 'screening.status': constants.SCREENING_STATUS.status1.code };
+                /*db.TopicLink.find(query, function(err, results) {
+                 callback(null, results);
+                 });*/
+                db.TopicLink
+                    .find(query)
+                    .lean()
+                    .exec(function(err, links) {
+                        if(links.length > 0) {
+                            model.linkCount = links.length + 1;
+                            var ids = links.map(function (link) {
+                                return link.parentId;
+                            });
+                            var query = {
+                                _id: {
+                                    $in: ids
+                                }
+                            };
+                            db.Topic
+                                .find(query)
+                                .sort({title: 1})
+                                .lean()
+                                .exec(function (err, results) {
+                                    if (results.length > 0) {
+                                        model.topicLinks = results;
+                                        results.forEach(function (result) {
+                                            result.friendlyUrl = utils.urlify(result.title);
+                                            var link = links.find(function (link) {
+                                                return link.topicId.equals(result._id);
+                                            });
+                                            if (link) {
+                                                result.link = link;
+                                            }
+                                        });
+                                    }
+                                    callback();
+                                });
+                        } else {
+                            callback();
+                        }
+                    });
+            },
+            issues: function (callback) {
+                // Top Issues
+                var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, 'screening.status': constants.SCREENING_STATUS.status1.code };
+                db.Issue
+                    .find(query)
+                    .limit(15)
+                    .sort({ title: 1 })
+                    .lean()
+                    .exec(function(err, results) {
+                        flowUtils.setEditorsUsername(results, function() {
+                            results.forEach(function (result) {
+                                flowUtils.appendEntryExtra(result);
+                            });
+                            model.issues = results;
+                            callback();
+                        });
+                    });
+            },
+            opinions: function (callback) {
+                // Top Opinions
+                var query = { parentId: null, ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, 'screening.status': constants.SCREENING_STATUS.status1.code };
+                db.Opinion
+                    .find(query)
+                    .limit(15)
+                    .sort({ title: 1 })
+                    .lean()
+                    .exec(function(err, results) {
+                        flowUtils.setEditorsUsername(results, function() {
+                            results.forEach(function (result) {
+                                flowUtils.appendEntryExtra(result);
+                            });
+                            model.opinions = results;
+                            callback();
+                        });
+                    });
+            }
+        }, function (err, results) {
+            model.isEntryOwner = model.isTopicOwner;
+            flowUtils.setModelOwnerEntry(model);
+            flowUtils.setModelContext(req, model);
+            flowUtils.setClipboardModel(req, model, constants.OBJECT_TYPES.topic);
+            res.render(templates.wiki.topics.entry, model);
         });
     });
 }
@@ -469,6 +654,10 @@ module.exports = function (router) {
     });
 
 
+    router.get('/link/entry', function (req, res) {
+        GET_link_entry(req, res);
+    });
+
     router.get('/link/edit', function (req, res) {
         GET_link_edit(req, res);
     });
@@ -489,5 +678,6 @@ module.exports.GET_index = GET_index;
 module.exports.GET_entry = GET_entry;
 module.exports.GET_create = GET_create;
 module.exports.POST_create = POST_create;
+module.exports.GET_link_entry = GET_link_entry;
 module.exports.GET_link_edit = GET_link_edit;
 module.exports.POST_link_edit = POST_link_edit;
