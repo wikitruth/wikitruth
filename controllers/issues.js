@@ -22,18 +22,10 @@ function GET_entry(req, res) {
     var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
     flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
         ownerQuery['screening.status'] = constants.SCREENING_STATUS.status1.code;
+        ownerQuery.parentId = null;
         async.parallel({
             opinions: function (callback) {
-                // Top Opinions
-                db.Opinion.find(ownerQuery).limit(15).sort({ title: 1 }).lean().exec(function(err, results) {
-                    flowUtils.setEditorsUsername(results, function() {
-                        results.forEach(function (result) {
-                            flowUtils.appendEntryExtra(result);
-                        });
-                        model.opinions = results;
-                        callback();
-                    });
-                });
+                flowUtils.getTopOpinions(ownerQuery, model, callback);
             }
         }, function (err, results) {
             model.issueType = constants.ISSUE_TYPES['type' + model.issue.issueType].text;
@@ -137,11 +129,6 @@ function POST_create(req, res) {
                 flowUtils.setModelContext(req, model);
                 var url = model.wikiBaseUrl + paths.wiki.issues.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
                 res.redirect(url);
-                /*res.redirect((result ? paths.wiki.issues.entry : paths.wiki.issues.index) +
-                 '?topic=' + req.query.topic +
-                 (req.query.argument ? '&argument=' + req.query.argument : '') +
-                 (result ? '&issue=' + req.query.issue : '')
-                 );*/
             };
             if(!result) { // if new entry, update parent children count
                 flowUtils.updateChildrenCount(entity.ownerId, entity.ownerType, constants.OBJECT_TYPES.issue, function () {

@@ -161,13 +161,48 @@ function setIssueModel(req, model, callback) {
 
 function setOpinionModel(req, model, callback) {
     if(req.query.opinion) {
-        db.Opinion.findOne({_id: req.query.opinion}, function (err, result) {
-            model.opinion = result;
-            appendEntryExtra(result);
-            if(isEntryOwner(req, result)) {
-                model.isOpinionOwner = true;
+        async.series({
+            opinion: function (callback) {
+                db.Opinion.findOne({_id: req.query.opinion}, function (err, result) {
+                    if(err || !result) {
+                        return callback(err);
+                    }
+                    model.opinion = result;
+                    appendEntryExtra(result);
+                    if (isEntryOwner(req, result)) {
+                        model.isOpinionOwner = true;
+                    }
+                    setUsername(result, callback);
+                });
+            },
+            parentOpinion: function (callback) {
+                if(model.opinion && model.opinion.parentId) {
+                    db.Opinion.findOne({_id: model.opinion.parentId}, function (err, result) {
+                        if (result) {
+                            appendEntryExtra(result);
+                            model.parentOpinion = result;
+                        }
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
+            },
+            grandParentOpinion: function (callback) {
+                if(model.parentOpinion && model.parentOpinion.parentId) {
+                    db.Opinion.findOne({_id: model.parentOpinion.parentId}, function (err, result) {
+                        if (result) {
+                            appendEntryExtra(result);
+                            model.grandParentOpinion = result;
+                        }
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
             }
-            setUsername(result, callback);
+        }, function (err, results) {
+            callback();
         });
     } else {
         callback();
@@ -475,6 +510,40 @@ function getArguments(query, limit, callback) {
     });
 }
 
+function getTopIssues(query, model, callback) {
+    db.Issue
+        .find(query)
+        .limit(15)
+        .lean()
+        .sort({ title: 1 })
+        .exec(function(err, results) {
+            setEditorsUsername(results, function() {
+                results.forEach(function (result) {
+                    appendEntryExtra(result);
+                });
+                model.issues = results;
+                callback();
+            });
+        });
+}
+
+function getTopOpinions(query, model, callback) {
+    db.Opinion
+        .find(query)
+        .limit(15)
+        .sort({ title: 1 })
+        .lean()
+        .exec(function(err, results) {
+            setEditorsUsername(results, function() {
+                results.forEach(function (result) {
+                    appendEntryExtra(result);
+                });
+                model.opinions = results;
+                callback();
+            });
+        });
+}
+
 function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
     var countNode = {};
 
@@ -483,24 +552,27 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
             var topics = countNode.childrenCount.topics;
             async.parallel({
                 accepted: function(callback) {
-                    db.Topic.count({parentId: entryId, 'screening.status': constants.SCREENING_STATUS.status1.code }, function (err, count) {
-                        db.TopicLink.count({parentId: entryId, 'screening.status': constants.SCREENING_STATUS.status1.code }, function (err, linkCount) {
+                    var query = {parentId: entryId, 'screening.status': constants.SCREENING_STATUS.status1.code };
+                    db.Topic.count(query, function (err, count) {
+                        db.TopicLink.count(query, function (err, linkCount) {
                             topics.accepted = count + linkCount;
                             callback();
                         });
                     });
                 },
                 pending: function(callback) {
-                    db.Topic.count({parentId: entryId, 'screening.status': constants.SCREENING_STATUS.status0.code }, function (err, count) {
-                        db.TopicLink.count({parentId: entryId, 'screening.status': constants.SCREENING_STATUS.status0.code }, function (err, linkCount) {
+                    var query = {parentId: entryId, 'screening.status': constants.SCREENING_STATUS.status0.code };
+                    db.Topic.count(query, function (err, count) {
+                        db.TopicLink.count(query, function (err, linkCount) {
                             topics.pending = count + linkCount;
                             callback();
                         });
                     });
                 },
                 rejected: function(callback) {
-                    db.Topic.count({parentId: entryId, 'screening.status': constants.SCREENING_STATUS.status2.code }, function (err, count) {
-                        db.TopicLink.count({parentId: entryId, 'screening.status': constants.SCREENING_STATUS.status2.code }, function (err, linkCount) {
+                    var query = {parentId: entryId, 'screening.status': constants.SCREENING_STATUS.status2.code };
+                    db.Topic.count(query, function (err, count) {
+                        db.TopicLink.count(query, function (err, linkCount) {
                             topics.rejected = count + linkCount;
                             callback();
                         });
@@ -519,24 +591,27 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
             var args = countNode.childrenCount['arguments'];
             async.parallel({
                 accepted: function(callback) {
-                    db.Argument.count({ ownerId: entryId, parentId: null, 'screening.status': constants.SCREENING_STATUS.status1.code }, function (err, count) {
-                        db.ArgumentLink.count({ ownerId: entryId, parentId: null, 'screening.status': constants.SCREENING_STATUS.status1.code }, function (err, linkCount) {
+                    var query = { ownerId: entryId, parentId: null, 'screening.status': constants.SCREENING_STATUS.status1.code };
+                    db.Argument.count(query, function (err, count) {
+                        db.ArgumentLink.count(query, function (err, linkCount) {
                             args.accepted = count + linkCount;
                             callback();
                         });
                     });
                 },
                 pending: function(callback) {
-                    db.Argument.count({ ownerId: entryId, parentId: null, 'screening.status': constants.SCREENING_STATUS.status0.code }, function (err, count) {
-                        db.ArgumentLink.count({ ownerId: entryId, parentId: null, 'screening.status': constants.SCREENING_STATUS.status0.code }, function (err, linkCount) {
+                    var query = { ownerId: entryId, parentId: null, 'screening.status': constants.SCREENING_STATUS.status0.code };
+                    db.Argument.count(query, function (err, count) {
+                        db.ArgumentLink.count(query, function (err, linkCount) {
                             args.pending = count + linkCount;
                             callback();
                         });
                     });
                 },
                 rejected: function(callback) {
-                    db.Argument.count({ ownerId: entryId, parentId: null, 'screening.status': constants.SCREENING_STATUS.status2.code }, function (err, count) {
-                        db.ArgumentLink.count({ ownerId: entryId, parentId: null, 'screening.status': constants.SCREENING_STATUS.status2.code }, function (err, linkCount) {
+                    var query = { ownerId: entryId, parentId: null, 'screening.status': constants.SCREENING_STATUS.status2.code };
+                    db.Argument.count(query, function (err, count) {
+                        db.ArgumentLink.count(query, function (err, linkCount) {
                             args.rejected = count + linkCount;
                             callback();
                         });
@@ -1132,18 +1207,24 @@ module.exports = {
     isEntryOwner: isEntryOwner,
     isEntryOnIntendedUrl: isEntryOnIntendedUrl,
     appendOwnerFlag: appendOwnerFlag,
+
     setArgumentModels: setArgumentModels,
     setTopicModels: setTopicModels,
     setQuestionModel: setQuestionModel,
     setIssueModel: setIssueModel,
     setOpinionModel: setOpinionModel,
     setEntryModels: setEntryModels,
+
     appendEntryExtra: appendEntryExtra,
     setEditorsUsername: setEditorsUsername,
     setClipboardModel: setClipboardModel,
 
     getTopics: getTopics,
     getArguments: getArguments,
+
+    getTopIssues: getTopIssues,
+    getTopOpinions: getTopOpinions,
+
     sortArguments: sortArguments,
     updateChildrenCount: updateChildrenCount,
     syncChildren: syncChildren,

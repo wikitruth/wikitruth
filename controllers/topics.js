@@ -255,38 +255,12 @@ function GET_entry(req, res) {
             issues: function (callback) {
                 // Top Issues
                 var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, 'screening.status': constants.SCREENING_STATUS.status1.code };
-                db.Issue
-                    .find(query)
-                    .limit(15)
-                    .sort({ title: 1 })
-                    .lean()
-                    .exec(function(err, results) {
-                        flowUtils.setEditorsUsername(results, function() {
-                            results.forEach(function (result) {
-                                flowUtils.appendEntryExtra(result);
-                            });
-                            model.issues = results;
-                            callback();
-                        });
-                    });
+                flowUtils.getTopIssues(query, model, callback);
             },
             opinions: function (callback) {
                 // Top Opinions
-                var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, 'screening.status': constants.SCREENING_STATUS.status1.code };
-                db.Opinion
-                    .find(query)
-                    .limit(15)
-                    .sort({ title: 1 })
-                    .lean()
-                    .exec(function(err, results) {
-                        flowUtils.setEditorsUsername(results, function() {
-                            results.forEach(function (result) {
-                                flowUtils.appendEntryExtra(result);
-                            });
-                            model.opinions = results;
-                            callback();
-                        });
-                    });
+                var query = { parentId: null, ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, 'screening.status': constants.SCREENING_STATUS.status1.code };
+                flowUtils.getTopOpinions(query, model, callback);
             }
         }, function (err, results) {
             model.isEntryOwner = model.isTopicOwner;
@@ -325,7 +299,7 @@ function GET_create(req, res) {
             }
         }
     }, function (err, results) {
-        if(flowUtils.isEntryOwner(req, model.topic)) {
+        if(!flowUtils.isEntryOwner(req, model.topic)) {
             // not the owner, stop editing
             return res.redirect('/');
         }

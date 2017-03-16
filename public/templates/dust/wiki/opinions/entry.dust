@@ -13,6 +13,7 @@
         <p>{entry.content|s}</p>
     </div>
     {>"dust/wiki/common/entry-options" /}
+    {>"dust/wiki/opinions/list-preview" /}
     {>"dust/wiki/common/entry-footer" /}
 {/body}
 

@@ -1,6 +1,7 @@
 'use strict';
 
 var mongoose    = require('mongoose'),
+    async       = require('async'),
     htmlToText  = require('html-to-text'),
     utils       = require('../utils/utils'),
     flowUtils   = require('../utils/flowUtils'),
@@ -8,6 +9,19 @@ var mongoose    = require('mongoose'),
     templates   = require('../models/templates'),
     constants   = require('../models/constants'),
     db          = require('../app').db.models;
+
+function shiftModels(req, model) {
+    if(!req.query.id){
+        // shift models one step down
+        if(model.parentOpinion) {
+            model.grandParentOpinion = model.parentOpinion;
+        }
+        if(model.opinion) {
+            model.parentOpinion = model.opinion;
+            delete model.opinion;
+        }
+    }
+}
 
 function GET_entry(req, res) {
     var model = {};
@@ -19,10 +33,20 @@ function GET_entry(req, res) {
         }
     }
     flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
-        model.isEntryOwner = model.isOpinionOwner;
-        flowUtils.setModelOwnerEntry(model);
-        flowUtils.setModelContext(req, model);
-        res.render(templates.wiki.opinions.entry, model);
+        var query = {
+            parentId: model.opinion._id,
+            'screening.status': constants.SCREENING_STATUS.status1.code
+        };
+        async.parallel({
+            opinions: function (callback) {
+                flowUtils.getTopOpinions(query, model, callback);
+            }
+        }, function (err, results) {
+            model.isEntryOwner = model.isOpinionOwner;
+            flowUtils.setModelOwnerEntry(model);
+            flowUtils.setModelContext(req, model);
+            res.render(templates.wiki.opinions.entry, model);
+        });
     });
 }
 
@@ -80,51 +104,69 @@ function GET_index(req, res) {
 
 function GET_create(req, res) {
     var model = {};
+    if(req.query.id) { req.query.opinion = req.query.id; }
     flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
+        shiftModels(req, model);
+        if(model.opinion && !flowUtils.isEntryOwner(req, model.opinion)){
+            return res.redirect('/');
+        }
         flowUtils.setModelContext(req, model);
         res.render(templates.wiki.opinions.create, model);
     });
 }
 
 function POST_create(req, res) {
-    var query = { _id: req.query.opinion || new mongoose.Types.ObjectId() };
-    db.Opinion.findOne(query, function(err, result) {
+    var model = {};
+    if(req.query.id) { req.query.opinion = req.query.id; }
+    flowUtils.setOpinionModel(req, model, function (err) {
+        shiftModels(req, model);
+
         var dateNow = Date.now();
-        var entity = result ? result : {};
+        var entity = model.opinion ? model.opinion : {};
         entity.title = req.body.title;
         entity.content = req.body.content;
         entity.contentPreview = utils.getShortText(htmlToText.fromString(req.body.content, { wordwrap: false }), constants.SETTINGS.contentPreviewLength);
         entity.friendlyUrl = utils.urlify(req.body.title);
         entity.editUserId = req.user.id;
         entity.editDate = dateNow;
-        if(!result) {
+        if(!model.opinion) {
             entity.createUserId = req.user.id;
             entity.createDate = dateNow;
             flowUtils.initScreeningStatus(req, entity);
         }
         entity.private = req.params.username ? true : false;
-        if(!entity.ownerId) {
+        if(model.parentOpinion) {
+            // A child opinion
+            var parent = model.parentOpinion;
+            entity.parentId = parent._id;
+            entity.ownerId = parent.ownerId;
+            entity.ownerType = parent.ownerType;
+        } else {
             delete req.query.opinion;
             var q = flowUtils.createOwnerQueryFromQuery(req);
+            // A root argument.
+            entity.parentId = null;
             entity.ownerId = q.ownerId;
             entity.ownerType = q.ownerType;
         }
+        var query = { _id: req.query.id || new mongoose.Types.ObjectId() };
         db.Opinion.findOneAndUpdate(query, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function (err, updatedEntity) {
             var updateRedirect = function () {
                 var model = {};
                 flowUtils.setModelContext(req, model);
                 var url = model.wikiBaseUrl + paths.wiki.opinions.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
                 res.redirect(url);
-                /*res.redirect((result ? paths.wiki.opinions.entry : paths.wiki.opinions.index) +
-                 '?topic=' + req.query.topic +
-                 (req.query.argument ? '&argument=' + req.query.argument : '') +
-                 (result ? '&opinion=' + req.query.opinion : '')
-                 );*/
             };
-            if(!result) { // if new entry, update parent children count
-                flowUtils.updateChildrenCount(entity.ownerId, entity.ownerType, constants.OBJECT_TYPES.opinion, function () {
-                    updateRedirect();
-                });
+            if(!model.opinion) { // if new entry, update parent count
+                if(entity.parentId) { // parent is always an opinion object
+                    flowUtils.updateChildrenCount(entity.parentId, constants.OBJECT_TYPES.opinion, constants.OBJECT_TYPES.opinion, function () {
+                        updateRedirect();
+                    });
+                } else { // parent can be anything
+                    flowUtils.updateChildrenCount(entity.ownerId, entity.ownerType, constants.OBJECT_TYPES.opinion, function () {
+                        updateRedirect();
+                    });
+                }
             } else {
                 updateRedirect();
             }
