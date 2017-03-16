@@ -24,28 +24,11 @@ function GET_entry(req, res) {
         ownerQuery['screening.status'] = constants.SCREENING_STATUS.status1.code;
         async.parallel({
             issues: function (callback) {
-                // Top Issues
-                db.Issue.find(ownerQuery).limit(15).sort({ title: 1 }).lean().exec(function(err, results) {
-                    flowUtils.setEditorsUsername(results, function() {
-                        results.forEach(function (result) {
-                            flowUtils.appendEntryExtra(result);
-                        });
-                        model.issues = results;
-                        callback();
-                    });
-                });
+                flowUtils.getTopIssues(ownerQuery, model, callback);
             },
             opinions: function (callback) {
-                // Top Opinions
-                db.Opinion.find(ownerQuery).limit(15).sort({ title: 1 }).lean().exec(function(err, results) {
-                    flowUtils.setEditorsUsername(results, function() {
-                        results.forEach(function (result) {
-                            flowUtils.appendEntryExtra(result);
-                        });
-                        model.opinions = results;
-                        callback();
-                    });
-                });
+                var query = { parentId: null, ownerId: req.query.answer, ownerType: constants.OBJECT_TYPES.answer, 'screening.status': constants.SCREENING_STATUS.status1.code };
+                flowUtils.getTopOpinions(query, model, callback);
             }
         }, function (err, results) {
             model.isEntryOwner = model.isAnswerOwner;

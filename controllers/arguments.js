@@ -122,34 +122,12 @@ function GET_entry(req, res) {
             issues: function (callback) {
                 // Top Issues
                 var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument, 'screening.status': constants.SCREENING_STATUS.status1.code };
-                db.Issue.find(query).limit(15).sort({ title: 1 }).lean().exec(function(err, results) {
-                    flowUtils.setEditorsUsername(results, function() {
-                        results.forEach(function (result) {
-                            flowUtils.appendEntryExtra(result);
-                        });
-                        model.issues = results;
-                        if(results.length >= 15) {
-                            model.issuesMore = true;
-                        }
-                        callback();
-                    });
-                });
+                flowUtils.getTopIssues(query, model, callback);
             },
             opinions: function (callback) {
                 // Top Opinions
-                var query = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument, 'screening.status': constants.SCREENING_STATUS.status1.code };
-                db.Opinion.find(query).limit(15).sort({ title: 1 }).lean().exec(function(err, results) {
-                    flowUtils.setEditorsUsername(results, function() {
-                        results.forEach(function (result) {
-                            flowUtils.appendEntryExtra(result);
-                        });
-                        model.opinions = results;
-                        if(results.length >= 15) {
-                            model.opinionsMore = true;
-                        }
-                        callback();
-                    });
-                });
+                var query = { parentId: null, ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument, 'screening.status': constants.SCREENING_STATUS.status1.code };
+                flowUtils.getTopOpinions(query, model, callback);
             }
         }, function (err, results) {
             flowUtils.setVerdictModel(model.argument);
@@ -383,11 +361,8 @@ function POST_create(req, res) {
             flowUtils.setModelContext(req, model);
             var url = model.wikiBaseUrl + paths.wiki.arguments.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
             res.redirect(url);
-            /*res.redirect((entry || parent ? paths.wiki.arguments.entry : paths.wiki.topics.entry)
-                + '?topic=' + req.query.topic + (entry ? '&argument=' + entry._id : parent ? '&argument=' + parent._id : '')
-            );*/
         };
-        if(!entry) { // update parent count on create only
+        if(!entry) { // if new entry, update parent count
             if(entity.parentId) {
                 flowUtils.updateChildrenCount(entity.parentId, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.argument, function () {
                     updateRedirect();

@@ -19,6 +19,12 @@
             <label for="inputContent">Summary</label>
             <textarea class="form-control" id="inputContent" name="content" rows="12">{opinion.content}</textarea>
         </div>
+        <div class="form-group">
+            <label for="inputParent"><a role="button" data-toggle="collapse" href="#collapseParent" aria-expanded="false" aria-controls="collapseParent" class="wt-collapse-toggle collapsed">Parent</a></label>
+            <div class="collapse" id="collapseParent">
+                <textarea name="parent" id="inputParent" class="form-control" rows="1">{?opinion}{opinion.parentId}{:else}{parentOpinion._id}{/opinion}</textarea>
+            </div>
+        </div>
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
         <a class="btn btn-default" href="{?opinion}{paths.wiki.opinions.entry}{:else}{paths.wiki.opinions.index}{/opinion}{?topic}?topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}{?opinion}&amp;opinion={opinion._id}{/opinion}" role="button">Cancel</a>
     </form>
