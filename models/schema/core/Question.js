@@ -17,6 +17,7 @@ module.exports = function(app, mongoose) {
         status: { type: Number } // SCREENING_STATUS
       }]
     },
+    categoryId: { type: mongoose.Schema.ObjectId, ref: 'Topic' }, // the root topic where this entry belong
     ownerId: { type: mongoose.Schema.ObjectId },
     ownerType: { type: Number }, // MODEL_TYPES
     createDate: { type: Date, default: Date.now },
@@ -35,7 +36,8 @@ module.exports = function(app, mongoose) {
         total: { type: Number, default: 0 },
         accepted: { type: Number, default: 0 },
         pending: { type: Number, default: 0 },
-        rejected: { type: Number, default: 0 }
+        rejected: { type: Number, default: 0 },
+        acceptedCritical: { type: Number, default: 0 }
       },
       opinions: {
         total: { type: Number, default: 0 },

@@ -133,6 +133,7 @@ module.exports = function (router) {
                             .exec(function(err, results) {
                                 flowUtils.setEditorsUsername(results, function() {
                                     results.forEach(function (result) {
+                                        result.issueType = constants.ISSUE_TYPES['type' + result.issueType];
                                         flowUtils.appendEntryExtra(result);
                                     });
                                     model.issues = results;
@@ -364,6 +365,7 @@ module.exports = function (router) {
                     .exec(function(err, results) {
                         flowUtils.setEditorsUsername(results, function() {
                             results.forEach(function (result) {
+                                result.issueType = constants.ISSUE_TYPES['type' + result.issueType];
                                 flowUtils.appendEntryExtra(result);
                             });
                             model.issues = results;
@@ -657,6 +659,7 @@ module.exports = function (router) {
                     .exec(function(err, results) {
                         flowUtils.setEditorsUsername(results, function() {
                             results.forEach(function (result) {
+                                result.issueType = constants.ISSUE_TYPES['type' + result.issueType];
                                 flowUtils.appendEntryExtra(result);
                             });
                             model.issues = results;
@@ -718,9 +721,33 @@ module.exports = function (router) {
         answerController.GET_entry(req, res);
     });
 
+
+    /* Opinions and Aliases */
+
     router.get('/opinion(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
         opinionController.GET_entry(req, res);
     });
+
+    router.get('/comment(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        opinionController.GET_entry(req, res);
+    });
+
+    router.get('/comments/', function (req, res) {
+        opinionController.GET_index(req, res);
+    });
+
+    router.get('/comments/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        opinionController.GET_entry(req, res);
+    });
+
+    router.get('/comments/create', function (req, res) {
+        opinionController.GET_create(req, res);
+    });
+
+    router.post('/comments/create', function (req, res) {
+        opinionController.POST_create(req, res);
+    });
+
 
     router.get('/issue(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
         issueController.GET_entry(req, res);

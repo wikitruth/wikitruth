@@ -7,7 +7,12 @@ var flowUtils   = require('../utils/flowUtils'),
     paths       = require('../models/paths');
 
 function createReturnUrl(req, model) {
-    return paths.wiki[constants.OBJECT_NAMES_MAP[model.ownerType]].entry + '/' + utils.urlify(model.entry.title) + '/' + model.entry._id;
+    if(model.entry.private) {
+        model.wikiBaseUrl = '/members/' + req.user.username + '/diary';
+    } else {
+        model.wikiBaseUrl = '';
+    }
+    return model.wikiBaseUrl + paths.wiki[constants.OBJECT_NAMES_MAP[model.ownerType]].entry + '/' + utils.urlify(model.entry.title) + '/' + model.entry._id;
 }
 
 module.exports = function (router) {

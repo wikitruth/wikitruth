@@ -16,6 +16,7 @@ module.exports = function(app, mongoose) {
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     editDate: { type: Date, default: Date.now },
     editUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
+    categoryId: { type: mongoose.Schema.ObjectId, ref: 'Topic' }, // the root topic where this entry belong
     ownerId: { type: mongoose.Schema.ObjectId, default: null }, // Required when owner is not a Topic. Useful for filtering
     ownerType: { type: Number, default: -1 }, // OBJECT_TYPES
     icon: { type: String }, // ex: "fa fa-plane"
@@ -47,6 +48,11 @@ module.exports = function(app, mongoose) {
         }]
       }
     ],
+    verdict: {
+      status: { type: Number },
+      editDate: { type: Date },
+      editUserId: { type: mongoose.Schema.ObjectId, ref: 'User'}
+    },
     childrenCount: {
       topics: {
         total: { type: Number, default: 0 },
@@ -70,7 +76,8 @@ module.exports = function(app, mongoose) {
         total: { type: Number, default: 0 },
         accepted: { type: Number, default: 0 },
         pending: { type: Number, default: 0 },
-        rejected: { type: Number, default: 0 }
+        rejected: { type: Number, default: 0 },
+        acceptedCritical: { type: Number, default: 0 }
       },
       opinions: {
         total: { type: Number, default: 0 },

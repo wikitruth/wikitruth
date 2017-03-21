@@ -54,19 +54,7 @@
                     <ul class="list-group top-list-items wt-list">
                         {!<li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp; Topics</li>!}
                         {#topics}
-                            <li class="list-group-item">
-                                <i class="fa fa-folder-open text-color-3" aria-hidden="true"></i>
-                                <div>
-                                    <a href="{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">{title}
-                                        {>"dust/wiki/common/entry-row-screening-label" /}
-                                    </a>
-                                    {?contentPreview}
-                                        <div>{contentPreview}</div>
-                                    {/contentPreview}
-                                    {>"dust/wiki/common/entry-row-footer" /}
-                                </div>
-                                <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
-                            </li>
+                            {>"dust/wiki/topics/entry-row" labels="true" /}
                         {/topics}
                     </ul>
                     {?topicsMore}
@@ -106,18 +94,7 @@
                     <ul class="list-group top-list-items wt-list">
                         {!<li class="list-group-item highlight"><span class="glyphicon glyphicon-question-sign text-success" aria-hidden="true"></span> Questions</li>!}
                         {#questions}
-                            <li class="list-group-item">
-                                <i class="fa fa-question-circle text-color-1" aria-hidden="true"></i>
-                                <div>
-                                    <a href="{paths.wiki.questions.entry}/{friendlyUrl}/{_id}">{title}
-                                        {>"dust/wiki/common/entry-row-screening-label" /}
-                                    </a>
-                                    {?contentPreview}
-                                        <div>{contentPreview}</div>
-                                    {/contentPreview}
-                                    {>"dust/wiki/common/entry-row-footer" /}
-                                </div>
-                                <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+                            {>"dust/wiki/questions/entry-row" labels="true" /}
                         {/questions}
                     </ul>
                     {?questionsMore}
@@ -155,18 +132,7 @@
                     <ul class="list-group top-list-items wt-list">
                         {!<li class="list-group-item highlight"><span class="fa fa-exclamation-circle text-success" aria-hidden="true"></span> Issues</li>!}
                         {#issues}
-                            <li class="list-group-item">
-                                <span class="fa fa-exclamation-circle text-danger" aria-hidden="true"></span>
-                                <div>
-                                    <a href="{paths.wiki.issues.entry}/{friendlyUrl}/{_id}">{title}
-                                        {>"dust/wiki/common/entry-row-screening-label" /}
-                                    </a>
-                                    {?contentPreview}
-                                        <div>{contentPreview}</div>
-                                    {/contentPreview}
-                                    {>"dust/wiki/common/entry-row-footer" /}
-                                </div>
-                                <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+                            {>"dust/wiki/issues/entry-row" labels="true" /}
                         {/issues}
                     </ul>
                     {?issuesMore}
@@ -180,18 +146,7 @@
                     <ul class="list-group top-list-items wt-list">
                         {!<li class="list-group-item highlight"><span class="fa fa-comments-o text-success" aria-hidden="true"></span> Opinions</li>!}
                         {#opinions}
-                            <li class="list-group-item">
-                                <span class="fa fa-comments-o text-primary" aria-hidden="true"></span>
-                                <div>
-                                    <a href="{paths.wiki.opinions.entry}/{friendlyUrl}/{_id}">{title}
-                                        {>"dust/wiki/common/entry-row-screening-label" /}
-                                    </a>
-                                    {?contentPreview}
-                                        <div>{contentPreview}</div>
-                                    {/contentPreview}
-                                    {>"dust/wiki/common/entry-row-footer" /}
-                                </div>
-                                <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+                            {>"dust/wiki/opinions/entry-row" labels="true" /}
                         {/opinions}
                     </ul>
                     {?opinionsMore}

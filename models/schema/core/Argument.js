@@ -19,6 +19,7 @@ module.exports = function(app, mongoose) {
       }]
     },
     parentId: { type: mongoose.Schema.ObjectId, default: null }, // always an Argument
+    categoryId: { type: mongoose.Schema.ObjectId, ref: 'Topic' }, // the root topic where this entry belong
     ownerId: { type: mongoose.Schema.ObjectId }, // usually a Topic but can be a different object
     ownerType: { type: Number }, // OBJECT_TYPES
     createDate: { type: Date, default: Date.now },
@@ -56,7 +57,8 @@ module.exports = function(app, mongoose) {
         total: { type: Number, default: 0 },
         accepted: { type: Number, default: 0 },
         pending: { type: Number, default: 0 },
-        rejected: { type: Number, default: 0 }
+        rejected: { type: Number, default: 0 },
+        acceptedCritical: { type: Number, default: 0 }
       },
       opinions: {
         total: { type: Number, default: 0 },

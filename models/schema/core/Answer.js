@@ -18,17 +18,24 @@ module.exports = function(app, mongoose) {
       }]
     },
     questionId: { type: mongoose.Schema.ObjectId },
+    categoryId: { type: mongoose.Schema.ObjectId, ref: 'Topic' }, // the root topic where this entry belong
     createDate: { type: Date, default: Date.now },
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     editDate: { type: Date, default: Date.now },
     editUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     private: { type: Boolean, default: false }, // if true, should be restricted to group/user owners and not included in public backup
+    verdict: {
+      status: { type: Number },
+      editDate: { type: Date },
+      editUserId: { type: mongoose.Schema.ObjectId, ref: 'User'}
+    },
     childrenCount: {
       issues: {
         total: { type: Number, default: 0 },
         accepted: { type: Number, default: 0 },
         pending: { type: Number, default: 0 },
-        rejected: { type: Number, default: 0 }
+        rejected: { type: Number, default: 0 },
+        acceptedCritical: { type: Number, default: 0 }
       },
       opinions: {
         total: { type: Number, default: 0 },

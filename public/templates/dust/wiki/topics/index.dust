@@ -18,7 +18,20 @@
                         <i class="fa fa-folder-open text-color-3" aria-hidden="true"></i>
                     {/link}
                     <div>
-                        <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">{?link}{?link.title}{link.title}{:else}{title}{/link.title}{:else}{?contextTitle}{contextTitle}{:else}{title}{/contextTitle}{/link}</a>
+                        <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">
+                            {?link}
+                                {?link.title}
+                                    {link.title}
+                                {:else}
+                                    {title}
+                                {/link.title}
+                            {:else}
+                                {?contextTitle}
+                                    {contextTitle}
+                                {:else}
+                                    {title}
+                                {/contextTitle}
+                            {/link}</a>
                         {?contentPreview}
                             <div>{contentPreview}</div>
                         {/contentPreview}

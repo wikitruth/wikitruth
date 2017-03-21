@@ -112,18 +112,7 @@
         <ul class="list-group wt-list">
             <li class="list-group-item highlight"><i class="fa fa-folder-open text-muted" aria-hidden="true"></i> Topics</li>
             {#topics}
-                <li class="list-group-item">
-                    <i class="fa fa-folder-open text-color-3" aria-hidden="true"></i>
-                    <div>
-                        <a href="{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">{title}</a>
-                        {?contentPreview}
-                            <div>{contentPreview}</div>
-                        {/contentPreview}
-                        {>"dust/wiki/common/entry-row-footer" /}
-                    </div>
-                    <span class="pull-right text-muted hidden-xxs">
-                        <span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
-                </li>
+                {>"dust/wiki/topics/entry-row" /}
             {/topics}
         </ul>
     {/topics}
@@ -131,18 +120,7 @@
         <ul class="list-group wt-list">
             <li class="list-group-item highlight"><i class="glyphicon glyphicon-flash text-muted" aria-hidden="true"></i> Arguments</li>
             {#arguments}
-                <li class="list-group-item">
-                    <i class="fa fa-flash text-{verdict.theme}" aria-hidden="true"></i>
-                    <div>
-                        <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.arguments.entry}/{friendlyUrl}/{_id}">{title}
-                            {?typeUX} <span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}{?private} <span class="label label-default">private</span>{/private}</a>
-                        {?contentPreview}
-                            <div>{contentPreview}</div>
-                        {/contentPreview}
-                        {>"dust/wiki/common/entry-row-footer" /}
-                    </div>
-                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
-                </li>
+                {>"dust/wiki/arguments/entry-row" /}
             {/arguments}
         </ul>
     {/arguments}
@@ -150,17 +128,7 @@
         <ul class="list-group wt-list">
             <li class="list-group-item highlight"><i class="fa fa-question-circle text-muted" aria-hidden="true"></i> Questions</li>
             {#questions}
-                <li class="list-group-item">
-                    <i class="fa fa-question-circle text-color-1" aria-hidden="true"></i>
-                    <div>
-                        <a href="{wikiBaseUrl}{paths.wiki.questions.entry}/{friendlyUrl}/{_id}">{title}</a>
-                        {?contentPreview}
-                            <div>{contentPreview}</div>
-                        {/contentPreview}
-                        {>"dust/wiki/common/entry-row-footer" /}
-                    </div>
-                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
-                </li>
+                {>"dust/wiki/questions/entry-row" /}
             {/questions}
         </ul>
     {/questions}
@@ -168,17 +136,7 @@
         <ul class="list-group wt-list">
             <li class="list-group-item highlight"><i class="fa fa-answer-circle text-success-x" aria-hidden="true"></i> Answers</li>
             {#answers}
-                <li class="list-group-item">
-                    <i class="fa fa-check-circle-o text-color-1" aria-hidden="true"></i>
-                    <div>
-                        <a href="{wikiBaseUrl}{paths.wiki.answers.entry}/{friendlyUrl}/{_id}">{title}</a>
-                        {?contentPreview}
-                            <div>{contentPreview}</div>
-                        {/contentPreview}
-                        {>"dust/wiki/common/entry-row-footer" /}
-                    </div>
-                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
-                </li>
+                {>"dust/wiki/answers/entry-row" /}
             {/answers}
         </ul>
     {/answers}
@@ -187,18 +145,7 @@
             <li class="list-group-item highlight"><span class="fa fa-exclamation-circle text-success" aria-hidden="true"></span> Issues
             </li>
             {#issues}
-                <li class="list-group-item">
-                    <span class="fa fa-exclamation-circle text-danger" aria-hidden="true"></span>
-
-                    <div>
-                        <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.issues.entry}/{friendlyUrl}/{_id}">{title}{?private} <span class="label label-default">private</span>{/private}</a>
-                        {?contentPreview}
-                            <div>{contentPreview}</div>
-                        {/contentPreview}
-                        {>"dust/wiki/common/entry-row-footer" /}
-                    </div>
-                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
-                </li>
+                {>"dust/wiki/issues/entry-row" /}
             {/issues}
         </ul>
     {/issues}
@@ -206,32 +153,12 @@
         <ul class="list-group wt-list">
             <li class="list-group-item highlight"><span class="fa fa-comments-o text-success" aria-hidden="true"></span> Comments</li>
             {#opinions}
-                <li class="list-group-item">
-                    <span class="fa fa-comments-o text-primary" aria-hidden="true"></span>
-                    <div>
-                        <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.opinions.entry}/{friendlyUrl}/{_id}">{title}{?private} <span class="label label-default">private</span>{/private}</a>
-                        {?contentPreview}
-                            <div>{contentPreview}</div>
-                        {/contentPreview}
-                        {>"dust/wiki/common/entry-row-footer" /}
-                    </div>
-                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
-                </li>
+                {>"dust/wiki/issues/entry-row" /}
             {/opinions}
         </ul>
     {/opinions}
     {?results}
-        <div class="pagination-container" style="text-align: center">
-            <ul class="pagination" style="margin-top: 0;">
-                <li class="disabled"><a href="#browse" aria-label="Previous"><span aria-hidden="true">Previous</span></a></li>
-                <li class="active"><a href="#browse">1 <span class="sr-only">(current)</span></a></li>
-                <li><a href="#browse">2</a></li>
-                <li><a href="#browse">3</a></li>
-                <li><a href="#browse">4</a></li>
-                <li><a href="#browse">5</a></li>
-                <li><a href="#browse" aria-label="Next"><span aria-hidden="true">Next</span></a></li>
-            </ul>
-        </div>
+        {>"dust/wiki/common/pager" /}
     {:else}
         <h4 style="font-weight: normal">No results found.</h4>
     {/results}

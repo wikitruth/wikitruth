@@ -3,16 +3,7 @@
         <ul class="list-group top-list-items">
             <li class="list-group-item highlight"><span class="glyphicon glyphicon-answer-sign text-success-x" aria-hidden="true"></span> Answers <span class="wt-label label label-default">{entry.childrenCount.answers.accepted}</span></li>
             {#answers}
-                <li class="list-group-item">
-                    <i class="fa fa-check-circle-o text-color-1 text-muted-x" aria-hidden="true"></i>
-                    <div>
-                        <a href="{wikiBaseUrl}{paths.wiki.answers.entry}/{friendlyUrl}/{_id}">{title}</a>
-                        {?contentPreview}
-                            <div>{contentPreview}</div>
-                        {/contentPreview}
-                        {>"dust/wiki/common/entry-row-footer" /}
-                    </div>
-                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span></li>
+                {>"dust/wiki/answers/entry-row" /}
             {/answers}
         </ul>
         {@gt key=entry.childrenCount.answers.accepted value="15"}
