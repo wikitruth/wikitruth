@@ -29,7 +29,7 @@ var VERDICT_STATUS = {
 VERDICT_STATUS.getLabel = function (status) {
     switch (status) {
         case VERDICT_STATUS.status_true:
-            return 'TRUE';
+            return 'TRUE'; // "Reviewed" if Topic
         case VERDICT_STATUS.status_false:
             return 'FALSE';
         case VERDICT_STATUS.claim:
@@ -54,7 +54,7 @@ VERDICT_STATUS.getLabel = function (status) {
             return 'Misleading (Invalid)';
 
         case VERDICT_STATUS.pending:
-            return 'Claim (Unverified)';
+            return 'Claim (Unverified)'; // "Pending Review" if Topic
     }
 };
 
@@ -161,34 +161,42 @@ var SCREENING_STATUS = {
 var ISSUE_TYPES = {
     type10: {
         code: 10,
+        critical: true,
         text: "Logical fallacy"
     },
     type20: {
         code: 20,
+        critical: true,
         text: "Biased or flawed reasoning"
     },
     type30: {
         code: 30,
+        critical: true,
         text: "Terminology issue"
     },
     type40: {
         code: 40,
+        critical: true,
         text: "Unwelcome content"
     },
     type50: {
         code: 50,
+        critical: false,
         text: "Incoherent or unrelated"
     },
     type60: {
         code: 60,
+        critical: false,
         text: "Too broad or multiple topics"
     },
     type70: {
         code: 70,
+        critical: false,
         text: "Unsubstantiated claim"
     },
     type100: {
         code: 100,
+        critical: false,
         text: "Other issue"
     }
 };

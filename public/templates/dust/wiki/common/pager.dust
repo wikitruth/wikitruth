@@ -1,0 +1,11 @@
+<div class="pagination-container" style="text-align: center">
+    <ul class="pagination" style="margin-top: 0;">
+        <li class="disabled"><a href="#browse" aria-label="Previous"><span aria-hidden="true">Previous</span></a></li>
+        <li class="active"><a href="#browse">1 <span class="sr-only">(current)</span></a></li>
+        <li><a href="#browse">2</a></li>
+        <li><a href="#browse">3</a></li>
+        <li><a href="#browse">4</a></li>
+        <li><a href="#browse">5</a></li>
+        <li><a href="#browse" aria-label="Next"><span aria-hidden="true">Next</span></a></li>
+    </ul>
+</div>

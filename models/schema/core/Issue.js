@@ -9,6 +9,7 @@ module.exports = function(app, mongoose) {
     contentPreview: { type: String}, // A preview lines of text to display in list view
     friendlyUrl: { type: String },
     issueType: { type: Number, default: constants.ISSUE_TYPES.type100.code },
+    categoryId: { type: mongoose.Schema.ObjectId, ref: 'Topic' }, // the root topic where this entry belong
     ownerId: { type: mongoose.Schema.ObjectId },
     ownerType: { type: Number }, // OBJECT_TYPES
     screening: {
@@ -31,8 +32,8 @@ module.exports = function(app, mongoose) {
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     editDate: { type: Date, default: Date.now },
     editUserId: { type: mongoose.Schema.ObjectId, ref: 'User'},
-    private: { type: Boolean, default: false }, // if true, should be restricted to group/user owners and not included in public backup
-    isCritical: { type: Boolean }
+    private: { type: Boolean, default: false } // if true, should be restricted to group/user owners and not included in public backup
+    //critical: { type: Boolean, default: true } // this can be determined from the issueType
   });
   schema.methods.getType = function() {
     return constants.OBJECT_TYPES.issue;

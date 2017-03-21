@@ -7,7 +7,7 @@
 {<body}
     {>"dust/wiki/common/entry-header" tab="overview" /}
     <div class="entry-header">
-        <span class="label label-danger">{issueType}</span>&nbsp;
+        <span class="label label-{?issueType.critical}danger{:else}warning{/issueType.critical}">{issueType.text}</span>&nbsp;
         {>"dust/wiki/common/entry-verdict" /}
     </div>
     <div class="text-body">

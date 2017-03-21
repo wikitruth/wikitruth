@@ -22,8 +22,24 @@ module.exports = function(app, mongoose) {
     linkType: { type: Number, default: constants.LINK_TYPES.child },
     bidirectional: { type: Boolean, default: true },
     private: { type: Boolean, default: false }, // if true, should be restricted to group/user owners and not included in public backup
+    categoryId: { type: mongoose.Schema.ObjectId, ref: 'Topic' }, // the root topic where this entry belong
     ownerId: { type: mongoose.Schema.ObjectId, default: null }, // Required when owner is not a Topic. Useful for filtering
-    ownerType: { type: Number, default: -1 } // OBJECT_TYPES
+    ownerType: { type: Number, default: -1 }, // OBJECT_TYPES
+    childrenCount: {
+      issues: {
+        total: { type: Number, default: 0 },
+        accepted: { type: Number, default: 0 },
+        pending: { type: Number, default: 0 },
+        rejected: { type: Number, default: 0 },
+        acceptedCritical: { type: Number, default: 0 }
+      },
+      opinions: {
+        total: { type: Number, default: 0 },
+        accepted: { type: Number, default: 0 },
+        pending: { type: Number, default: 0 },
+        rejected: { type: Number, default: 0 }
+      }
+    }
   });
   schema.methods.getType = function() {
     return constants.OBJECT_TYPES.topicLink;

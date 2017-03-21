@@ -27,7 +27,7 @@ function GET_entry(req, res) {
                 flowUtils.getTopOpinions(ownerQuery, model, callback);
             }
         }, function (err, results) {
-            model.issueType = constants.ISSUE_TYPES['type' + model.issue.issueType].text;
+            model.issueType = constants.ISSUE_TYPES['type' + model.issue.issueType];
             model.isEntryOwner = model.isIssueOwner;
             flowUtils.setModelOwnerEntry(model);
             flowUtils.setModelContext(req, model);
@@ -51,6 +51,7 @@ function GET_index(req, res) {
                 .exec(function (err, results) {
                 flowUtils.setEditorsUsername(results, function() {
                     results.forEach(function (result) {
+                        result.issueType = constants.ISSUE_TYPES['type' + result.issueType];
                         flowUtils.appendEntryExtra(result);
                     });
                     model.issues = results;
@@ -73,18 +74,19 @@ function GET_index(req, res) {
             .limit(100)
             .lean()
             .exec(function(err, results) {
-            flowUtils.setEditorsUsername(results, function() {
-                results.forEach(function (result) {
-                    result.topic = {
-                        _id: result.ownerId
-                    };
-                    flowUtils.appendEntryExtra(result);
+                flowUtils.setEditorsUsername(results, function() {
+                    results.forEach(function (result) {
+                        result.issueType = constants.ISSUE_TYPES['type' + result.issueType];
+                        result.topic = {
+                            _id: result.ownerId
+                        };
+                        flowUtils.appendEntryExtra(result);
+                    });
+                    model.issues = results;
+                    flowUtils.setModelContext(req, model);
+                    res.render(templates.wiki.issues.index, model);
                 });
-                model.issues = results;
-                flowUtils.setModelContext(req, model);
-                res.render(templates.wiki.issues.index, model);
             });
-        });
     }
 }
 

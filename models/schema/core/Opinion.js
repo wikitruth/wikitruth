@@ -9,6 +9,7 @@ module.exports = function(app, mongoose) {
     contentPreview: { type: String}, // A preview lines of text to display in list view
     friendlyUrl: { type: String },
     parentId: { type: mongoose.Schema.ObjectId, default: null },
+    categoryId: { type: mongoose.Schema.ObjectId, ref: 'Topic' }, // the root topic where this entry belong
     ownerId: { type: mongoose.Schema.ObjectId },
     ownerType: { type: Number }, // OBJECT_TYPES
     screening: {
@@ -20,6 +21,13 @@ module.exports = function(app, mongoose) {
       }]
     },
     childrenCount: {
+      issues: {
+        total: { type: Number, default: 0 },
+        accepted: { type: Number, default: 0 },
+        pending: { type: Number, default: 0 },
+        rejected: { type: Number, default: 0 },
+        acceptedCritical: { type: Number, default: 0 }
+      },
       opinions: {
         total: { type: Number, default: 0 },
         accepted: { type: Number, default: 0 },
