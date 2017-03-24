@@ -13,22 +13,22 @@
         {/pageTitle}
     </title>
 
-    <link rel="apple-touch-icon" sizes="57x57" href="/img/favicons/apple-icon-57x57.png">
-    <link rel="apple-touch-icon" sizes="60x60" href="/img/favicons/apple-icon-60x60.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="/img/favicons/apple-icon-72x72.png">
-    <link rel="apple-touch-icon" sizes="76x76" href="/img/favicons/apple-icon-76x76.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="/img/favicons/apple-icon-114x114.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="/img/favicons/apple-icon-120x120.png">
-    <link rel="apple-touch-icon" sizes="144x144" href="/img/favicons/apple-icon-144x144.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="/img/favicons/apple-icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/img/favicons/apple-icon-180x180.png">
-    <link rel="icon" type="image/png" sizes="192x192"  href="/img/favicons/android-icon-192x192.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/img/favicons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="/img/favicons/favicon-96x96.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/img/favicons/favicon-16x16.png">
-    <link rel="manifest" href="/img/favicons/manifest.json">
+    <link rel="apple-touch-icon" sizes="57x57" href="/img/{application.resPath}favicons/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/img/{application.resPath}favicons/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/img/{application.resPath}favicons/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/img/{application.resPath}favicons/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/img/{application.resPath}favicons/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/img/{application.resPath}favicons/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/img/{application.resPath}favicons/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/img/{application.resPath}favicons/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/{application.resPath}favicons/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="/img/{application.resPath}favicons/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/{application.resPath}favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/img/{application.resPath}favicons/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/{application.resPath}favicons/favicon-16x16.png">
+    <link rel="manifest" href="/img/{application.resPath}favicons/manifest.json">
     <meta name="msapplication-TileColor" content="#ffffff">
-    <meta name="msapplication-TileImage" content="/img/favicons/ms-icon-144x144.png">
+    <meta name="msapplication-TileImage" content="/img/{application.resPath}favicons/ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">
 
     <!-- Bootstrap -->
@@ -55,7 +55,7 @@
         </script>
     {/googleAnalyticsTrackingId}
 </head>
-<body data-entry-id="{entry._id}" data-entry-type="{entryType}" data-csrf="{_csrf}" data-username="{username}">
+<body data-entry-id="{entry._id}" data-entry-type="{entryType}" data-csrf="{_csrf}" data-username="{username}" {?application}class="app-{application.id}"{/application}>
     {>"dust/layouts/header" /}
     <div class="container">
         {+body /}
