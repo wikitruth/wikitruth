@@ -18,7 +18,7 @@
             <li><a href="https://www.facebook.com/wikitruth.co" class="no-underline"><i class="fa fa-facebook-official"></i><span class="hidden-xxs"> Facebook</span></a></li>
             {!<li><a href="//blog.wikitruth.co">Blog</a></li>!}
             <li><a href="https://github.com/wikitruth/wikitruth" target="_blank" class="no-underline"><i class="fa fa-github"></i><span class="hidden-xxs"> Github</span></a></li>
-            <li><a href="{paths.about}" class="no-underline"><i class="fa fa-info-circle"></i><span class="hidden-xs"> About</span></a></li>
+            <li><a href="{?application}{application.aboutUrl}{:else}{paths.about}{/application}" class="no-underline"><i class="fa fa-info-circle"></i><span class="hidden-xs"> About</span></a></li>
             <li><a href="{paths.contact}" class="no-underline"><i class="fa fa-comment"></i><span class="hidden-xs"> Contact</span></a></li>
         </ul>
         <div class="clearfix"></div>

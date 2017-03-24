@@ -2,6 +2,7 @@
 
 //dependencies
 var config          = require('./config/config'),
+    applications    = require('./models/applications'),
     paths           = require('./models/paths'),
     templates       = require('./models/templates'),
     express         = require('express'),
@@ -86,7 +87,7 @@ app.use(passport.session());
 helmet(app);
 
 //response locals
-app.use(function(req, res, next) {
+app.use(/^[^\.]+$/, function(req, res, next) {
     //res.cookie('_csrfToken', req.csrfToken());
 
     if(req.user) {
@@ -102,6 +103,15 @@ app.use(function(req, res, next) {
 
     // allow templates to access the request query
     res.locals.query = req.query;
+
+    // set the application
+    var application = applications.getApplication(req);
+    res.locals.application = application;
+    if(application) {
+        application.resPath = application.id + '/';
+        res.locals.projectName = application.navTitle;
+        res.locals.titleSlogan = application.slogan;
+    }
 
     next();
 });

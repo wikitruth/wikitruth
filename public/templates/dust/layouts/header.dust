@@ -12,7 +12,7 @@
     <div class="container">
         <div class="navbar-header">
             <a href="/" class="navbar-brand">
-                <img src="/img/logo-64x64.png" alt="Logo" class="navbar-logo">
+                <img src="{?application}{application.logoIcon}{:else}/img/logo-64x64.png{/application}" alt="Logo" class="navbar-logo">
                     <span class="navbar-brand-label"><span class="hidden-xxxs">{projectName}</span></span></a>
             {!<button data-toggle="collapse" data-target=".my-navbar-collapse" class="navbar-toggle collapsed">
                 <span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></button>!}
@@ -35,9 +35,16 @@
                         <li role="separator" class="divider"></li>!}
                         <li class="dropdown-header">more</li>
                         <li><a href="{paths.members.index}"><i class="fa fa-user-circle"></i> Members</a></li>
-                        <li><a href="/topic/debates-discussions"><i class="fa fa-commenting" aria-hidden="true"></i> Debates</a></li>
-                        <li><a href="/topic/dictionary"><span class="glyphicon glyphicon-font" aria-hidden="true"></span> Dictionary</a></li>
-                        <li><a href="/topic/sacred-texts"><i class="fa fa-book"></i> Manuscripts</a></li>
+                        <li role="separator" class="divider"></li>
+                        {?application}
+                            {#application.sections}
+                                <li><a href="{url}" title="{description}"><i class="{iconClass}" aria-hidden="true"></i> {title}</a></li>
+                            {/application.sections}
+                        {:else}
+                            <li><a href="/topic/debates-discussions"><i class="fa fa-commenting" aria-hidden="true"></i> Debates</a></li>
+                            <li><a href="/topic/dictionary"><span class="glyphicon glyphicon-font" aria-hidden="true"></span> Dictionary</a></li>
+                            <li><a href="/topic/sacred-texts"><i class="fa fa-book"></i> Manuscripts</a></li>
+                        {/application}
                         {>"dust/wiki/common/clipboard" /}
                     </ul>
                 </li>

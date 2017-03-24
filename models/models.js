@@ -1,6 +1,6 @@
 'use strict';
 
-exports = module.exports = function(app, mongoose) {
+module.exports = function(app, mongoose) {
   //embeddable docs first
   require('./schema/account/Note')(app, mongoose);
   require('./schema/account/Status')(app, mongoose);
