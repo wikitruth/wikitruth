@@ -28,6 +28,7 @@ module.exports = function(app, mongoose) {
     private: { type: Boolean, default: false }, // if true, should be restricted to group/user owners and not included in public backup
     negative: { type: Boolean, default: false }, // a negative or positive statement
     against: { type: Boolean, default: false }, // how it relates to parent Argument, default is in support
+    tags: [ { type: Number } ], // OBJECT_TAGS
     childrenCount: {
       issues: {
         total: { type: Number, default: 0 },

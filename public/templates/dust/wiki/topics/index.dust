@@ -11,34 +11,7 @@
         <ul class="list-group wt-list">
             <li class="list-group-item highlight"><i class="fa fa-folder-open text-success-x" aria-hidden="true"></i>&nbsp;&nbsp;Topics</li>
             {#topics}
-                <li class="list-group-item">
-                    {?link}
-                        <a href="{wikiBaseUrl}{paths.wiki.topics.link.edit}?topic={topic._id}&amp;id={link._id}&amp;source={paths.wiki.index}" class="glyphicon glyphicon-link text-color-3"></a>
-                    {:else}
-                        <i class="fa fa-folder-open text-color-3" aria-hidden="true"></i>
-                    {/link}
-                    <div>
-                        <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">
-                            {?link}
-                                {?link.title}
-                                    {link.title}
-                                {:else}
-                                    {title}
-                                {/link.title}
-                            {:else}
-                                {?contextTitle}
-                                    {contextTitle}
-                                {:else}
-                                    {title}
-                                {/contextTitle}
-                            {/link}</a>
-                        {?contentPreview}
-                            <div>{contentPreview}</div>
-                        {/contentPreview}
-                        {>"dust/wiki/common/entry-row-footer" /}
-                    </div>
-                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
-                </li>
+                {>"dust/wiki/topics/entry-row" /}
             {/topics}
         </ul>
     {/topics}

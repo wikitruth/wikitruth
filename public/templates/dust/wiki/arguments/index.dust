@@ -15,21 +15,7 @@
         <ul class="list-group wt-list">
             <li class="list-group-item highlight text-primary-x"><i class="glyphicon glyphicon-flash" aria-hidden="true"></i> {^topic}Latest Arguments{:else}{?argument}Supporting Arguments{:else}Arguments{/argument}{/topic}</li>
             {#proArguments}
-                <li class="list-group-item">
-                    {?link}
-                        <a href="{wikiBaseUrl}{paths.wiki.arguments.link.edit}?topic={link.ownerId}&amp;argument={link.parentId}&amp;id={link._id}&amp;source={paths.wiki.arguments.index}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
-                    {:else}
-                        <i class="glyphicon glyphicon-flash text-{verdict.theme}" aria-hidden="true"></i>
-                    {/link}
-                    <div>
-                        <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title} {?typeUX}<span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}</a>
-                        {?contentPreview}
-                            <div>{contentPreview}</div>
-                        {/contentPreview}
-                        {>"dust/wiki/common/entry-row-footer" /}
-                    </div>
-                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
-                </li>
+                {>"dust/wiki/arguments/entry-row" /}
             {/proArguments}
             {!<li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Birds Prove Natural Selection is Naturally Wrong <span class="label label-danger">negative</span> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 10,456</span></li>!}
         </ul>
@@ -38,21 +24,7 @@
         <ul class="list-group wt-list">
             <li class="list-group-item highlight text-primary-x"><i class="fa fa-flash" aria-hidden="true"></i> Opposing Arguments</li>
             {#conArguments}
-                <li class="list-group-item">
-                    {?link}
-                        <a href="{wikiBaseUrl}{paths.wiki.arguments.link.edit}?topic={link.ownerId}&amp;argument={link.parentId}&amp;id={link._id}&amp;source={paths.wiki.arguments.index}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
-                    {:else}
-                        <i class="fa fa-flash text-{verdict.theme}" aria-hidden="true"></i>
-                    {/link}
-                    <div>
-                        <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title} {?typeUX}<span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}</a>
-                        {?contentPreview}
-                            <div>{contentPreview}</div>
-                        {/contentPreview}
-                        {>"dust/wiki/common/entry-row-footer" /}
-                    </div>
-                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
-                </li>
+                {>"dust/wiki/arguments/entry-row" /}
             {/conArguments}
             {!<li class="list-group-item"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Birds Prove Natural Selection is Naturally Wrong <span class="label label-danger">negative</span> <span class="pull-right"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> 10,456</span></li>!}
         </ul>

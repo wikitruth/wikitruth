@@ -1,0 +1,70 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {entry.title2}: Link - {titleSlogan}
+{/title}
+
+{<body}
+    {>"dust/wiki/common/entry-header" tab="overview" /}
+    <div class="entry-header">
+        {>"dust/wiki/common/entry-verdict" /}
+    </div>
+    <div class="text-body collapsible">
+        {?entry.topic.referenceDate}
+            <p><small class="text-muted" title="Reference Date"><i class="fa fa-clock-o"></i> {entry.topic.referenceDateUTC}</small></p>
+        {/entry.topic.referenceDate}
+        {entry.topic.content|s}
+        <a href="#" onclick="return contentSeeMore()" class="content-see-more hidden">
+            <div class="content-see-more-gradient"></div>
+            <div class="content-see-more-text">See more</div>
+        </a>
+        {?hasKeyEntries}
+            <div style="margin-top: 15px; margin-bottom: 10px;">
+                <div style="font-size-x: 12px; font-weight: bold;" class="text-muted">Highlights{!Key Contents|Quick Facts!}</div>
+                {#keyTopics}
+                    <div class="text-muted">&bull; <a class="text-muted" href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a></div>
+                {/keyTopics}
+                {#keyArguments}
+                    <div class="text-muted">&bull; <a class="text-muted" href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a></div>
+                {/keyArguments}
+                {!<ul>
+                    {#keyArguments}
+                        <li><a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a></li>
+                    {/keyArguments}
+                </ul>!}
+            </div>
+        {/hasKeyEntries}
+    </div>
+    {?parentTopic}
+        <div class="wt-related">
+            {!<hr class="wt-dotted-line" style="margin: 0 0 0.375rem"/>!}
+            <span title="Related Topics">Topics</span>&nbsp;
+            <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}"><span class="wt-label label label-default">{parentTopic.title}</span></a>&nbsp;
+            {#topicLinks}
+                <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}"><span class="wt-label label label-default">{title}</span></a>&nbsp;
+            {/topicLinks}
+        </div>
+    {/parentTopic}
+    {>"dust/wiki/common/entry-options" /}
+    {>"dust/wiki/issues/list-preview" /}
+    {>"dust/wiki/opinions/list-preview" /}
+    {>"dust/wiki/common/entry-footer" /}
+{/body}
+
+{<footer}
+    <script>
+        function contentSeeMore() {
+            $('.text-body').css('max-height', 'none');
+            $('.content-see-more').css('display', 'none');
+            return false;
+        }
+
+        $(function() {
+            if($('.text-body').css('height') === $('.text-body').css('max-height')) {
+                $('.content-see-more').removeClass('hidden');
+            }
+        });
+    </script>
+    {!{?mainTopic}{/mainTopic}!}
+    {>"dust/common/geopattern-title-scripts" /}
+{/footer}

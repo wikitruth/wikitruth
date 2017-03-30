@@ -1,21 +1,21 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {topic.title}: Link - {titleSlogan}
+    {entry.title2}: Link - {titleSlogan}
 {/title}
 
 {<body}
-    {>"dust/wiki/common/breadcrumb" /}
-    <h1 class="page-header">
-        {topic.title} <span class="label label-warning" style="font-size: 16px; font-weight: normal; padding: .2em .4em .2em; letter-spacing: normal">Link</span>
-    </h1>
+    {>"dust/wiki/common/entry-header" /}
+    {!<h1 class="page-header">
+        {topicLink.topic.title} <span class="label label-warning wt-subtitle"><i class="fa fa-link"></i></span>
+    </h1>!}
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
         <div class="form-group">
             <label for="inputName">Title <span class="text-muted">(Contextual)</span></label>
-            <textarea name="title" id="inputName" class="form-control" rows="1">{link.title}</textarea>
+            <textarea name="title" id="inputName" class="form-control" rows="1">{topicLink.title}</textarea>
         </div>
-        <button type="submit" name="action" value="submit" class="btn btn-primary">Submit</button>&nbsp;
+        <button type="submit" name="action" value="submit" class="btn btn-primary">Update</button>&nbsp;
         <button type="submit" name="action" value="delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this Link?');">Delete</button>&nbsp;
         <a class="btn btn-default" href="{cancelUrl}" role="button">Cancel</a>
     </form>

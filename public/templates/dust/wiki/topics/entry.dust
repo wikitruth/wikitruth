@@ -37,7 +37,7 @@
     </div>
     {?parentTopic}
         <div class="wt-related">
-            {!<hr style="border: 0; margin: 0 0 0.375rem; border-top: 0.0625rem dotted #dcdcdc;"/>!}
+            {!<hr class="wt-dotted-line" style="margin: 0 0 0.375rem"/>!}
             <span title="Related Topics">Topics</span>&nbsp;
             <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}"><span class="wt-label label label-default">{parentTopic.title}</span></a>&nbsp;
             {#topicLinks}
@@ -85,27 +85,7 @@
             <ul class="list-group top-list-items">
                 <li class="list-group-item highlight text-muted"><i class="fa fa-folder-open text-success-x" aria-hidden="true"></i>&nbsp; Topics <span class="wt-label label label-default">{entry.childrenCount.topics.accepted}</span></li>
                 {#topics}
-                    <li class="list-group-item">
-                        <i class="fa fa-folder-open text-color-3" aria-hidden="true"></i>
-                        <div>
-                            {?link}
-                                <a href="{wikiBaseUrl}{paths.wiki.topics.link.edit}?topic={topic._id}&amp;id={link._id}&amp;source={paths.wiki.topics.entry}">
-                                    {?link.title}{link.title}{:else}{title}{/link.title}
-                                </a>
-                                &nbsp;
-                                <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}" title="Open linked entry - {title}"><span class="label label-warning"><span class="fa fa-link text-color-3-x"></span> link</span></a>
-                            {:else}
-                                <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">
-                                    {?contextTitle}{contextTitle}{:else}{title}{/contextTitle}
-                                </a>
-                            {/link}
-                            {?contentPreview}
-                                <div>{contentPreview}</div>
-                            {/contentPreview}
-                            {>"dust/wiki/common/entry-row-footer" /}
-                        </div>
-                        <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
-                    </li>
+                    {>"dust/wiki/topics/entry-row" /}
                 {/topics}
             </ul>
             {@gt key=entry.childrenCount.topics.accepted value="15"}
@@ -118,21 +98,7 @@
             <ul class="list-group top-list-items">
                 <li class="list-group-item highlight text-primary-x text-muted-x"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments <span class="wt-label label label-default">{entry.childrenCount.arguments.accepted}</span></li>
                 {#arguments}
-                <li class="list-group-item">
-                    {?link}
-                        <a href="{wikiBaseUrl}{paths.wiki.arguments.link.edit}?topic={link.ownerId}&amp;id={link._id}&amp;source={paths.wiki.topics.entry}/{friendlyUrl}" class="glyphicon glyphicon-link text-{verdict.theme}"></a>
-                    {:else}
-                        <span class="glyphicon glyphicon-flash text-{verdict.theme}" aria-hidden="true"></span>
-                    {/link}
-                    <div>
-                        <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title} {?typeUX}<span class="label label-{typeUX.theme}">{typeUX.label}</span>{/typeUX}</a>
-                        {?contentPreview}
-                            <div>{contentPreview}</div>
-                        {/contentPreview}
-                        {>"dust/wiki/common/entry-row-footer" /}
-                    </div>
-                    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
-                </li>
+                    {>"dust/wiki/arguments/entry-row" /}
                 {/arguments}
             </ul>
             {@gt key=entry.childrenCount.arguments.accepted value="15"}

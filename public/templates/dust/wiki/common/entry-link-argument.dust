@@ -1,0 +1,5 @@
+{?argument}
+    <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argument.friendlyUrl}/{argument._id}">{argument.title}</a>
+{:else}
+    <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
+{/argument}

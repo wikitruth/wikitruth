@@ -130,7 +130,6 @@ function GET_entry(req, res) {
             }
         }, function (err, results) {
             flowUtils.setVerdictModel(model.argument);
-            model.isEntryOwner = model.isArgumentOwner;
 
             // Argument Tags
             var tags = model.argument.tags;
@@ -377,46 +376,61 @@ function POST_create(req, res) {
     });
 }
 
-function GET_link_edit(req, res) {
+function GET_link_entry(req, res) {
     var model = {};
-    flowUtils.setTopicModels(req, model, function () {
-        async.series({
-            argument: function (callback) {
-                if(req.query.id) {
-                    db.ArgumentLink.findOne({_id: req.query.id}, function(err, link) {
-                        model.link = link;
-                        db.Argument.findOne({_id: link.argumentId}, function(err, result) {
-                            result.friendlyUrl = utils.urlify(result.title);
-                            result.shortTitle = utils.getShortText(result.title);
-                            model.argument = result;
-                            callback();
-                        });
-                    });
-                } else {
-                    callback();
-                }
-            },
-            parentArgument: function (callback) {
-                var query = { _id: req.query.argument ? req.query.argument : model.link && model.link.parentId ? model.link.parentId : null };
-                if(query._id) {
-                    db.Argument.findOne(query, function (err, result) {
-                        result.friendlyUrl = utils.urlify(result.title);
-                        result.shortTitle = utils.getShortText(result.title);
-                        model.parentArgument = result;
-                        callback();
-                    });
-                } else {
-                    callback();
-                }
-            }
-        }, function (err, results) {
-            if(model.link && !flowUtils.isEntryOwner(req, model.link)) {
+    var ownerQuery = {ownerId: req.params.id, ownerType: constants.OBJECT_TYPES.argumentLink};
+    flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
+        if (!flowUtils.isEntryOnIntendedUrl(req, model.argumentLink)) {
+            return res.redirect('/');
+        }
+
+        if (model.argumentLink) {
+            if (!flowUtils.isEntryOwner(req, model.argumentLink)) {
+                // VALIDATION: non-owners cannot update other's entry
                 return res.redirect(createCancelUrl(req));
             }
-            model.cancelUrl = createCancelUrl(req);
+        }
+
+        async.parallel({
+            issues: function (callback) {
+                // Top Issues
+                var query = {
+                    ownerId: ownerQuery.ownerId,
+                    ownerType: ownerQuery.ownerType,
+                    'screening.status': constants.SCREENING_STATUS.status1.code
+                };
+                flowUtils.getTopIssues(query, model, callback);
+            },
+            opinions: function (callback) {
+                // Top Opinions
+                var query = {
+                    parentId: null,
+                    ownerId: ownerQuery.ownerId,
+                    ownerType: ownerQuery.ownerType,
+                    'screening.status': constants.SCREENING_STATUS.status1.code
+                };
+                flowUtils.getTopOpinions(query, model, callback);
+            }
+        }, function (err, results) {
+            flowUtils.setModelOwnerEntry(model);
             flowUtils.setModelContext(req, model);
-            res.render(templates.wiki.arguments.link.edit, model);
+            flowUtils.setClipboardModel(req, model, constants.OBJECT_TYPES.argumentLink);
+            res.render(templates.wiki.arguments.link.entry, model);
         });
+    });
+}
+
+function GET_link_edit(req, res) {
+    var model = {};
+    var ownerQuery = { ownerId: req.query.id, ownerType: constants.OBJECT_TYPES.argumentLink };
+    flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
+        if(model.argumentLink && !flowUtils.isEntryOwner(req, model.argumentLink)) {
+            return res.redirect(createCancelUrl(req));
+        }
+        model.cancelUrl = createCancelUrl(req);
+        flowUtils.setModelOwnerEntry(model);
+        flowUtils.setModelContext(req, model);
+        res.render(templates.wiki.arguments.link.edit, model);
     });
 }
 
@@ -481,6 +495,10 @@ module.exports = function (router) {
     });
 
 
+    router.get('/entry/:friendlyUrl/link/:id', function (req, res) {
+        GET_link_entry(req, res);
+    });
+
     router.get('/link/edit', function (req, res) {
         GET_link_edit(req, res);
     });
@@ -494,5 +512,6 @@ module.exports.GET_entry = GET_entry;
 module.exports.GET_index = GET_index;
 module.exports.GET_create = GET_create;
 module.exports.POST_create = POST_create;
+module.exports.GET_link_entry = GET_link_entry;
 module.exports.GET_link_edit = GET_link_edit;
 module.exports.POST_link_edit = POST_link_edit;

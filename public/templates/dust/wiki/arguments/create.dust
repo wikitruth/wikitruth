@@ -6,25 +6,11 @@
 
 {<body}
     {>"dust/wiki/common/breadcrumb" /}
-    <div style="margin-bottom: 20px">
-        <h1 class="page-header wt-header" style="margin-bottom: 0; padding-bottom: 0">
+    <div class="wt-create-header">
+        <h2 class="page-header wt-header">
             <i class="fa fa-flash"></i> {?argument}Edit{:else}New{/argument} Argument
-        </h1>
-        <hr style="border: 0; margin: 0.7rem 0 0.7rem; border-top: 0.0625rem dotted #dcdcdc;"/>
-        <div style="font-style-x: italic; font-size: smaller;" class="text-muted">
-            {?argument}
-                {!<i class="fa fa-bolt"></i> Editing <a href="{paths.wiki.arguments.entry}/{argument.friendlyUrl}/{argument._id}">{argument.title}</a>!}
-            {:else}
-                {?parentArgument}
-                    ...for or against <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
-                {:else}
-                    {?topic}
-                        ...under the topic <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
-                    {/topic}
-                {/parentArgument}
-
-            {/argument}
-        </div>
+        </h2>
+        {>"dust/wiki/common/create-subtitle" /}
     </div>
     <div class="alert alert-success" role="alert">An argument can be a statement of fact, claim, assertion, or a conclusion that describes reality or truth. Create arguments to break-down a topic into small, easy to understand statements. Arguments can be re-used on other topics by creating a link.</div>
     <form method="post">
@@ -71,7 +57,7 @@
             <div class="radio">
                 <label>
                     <input type="radio" id="radioTypeId{argumentTypes.experience}" name="typeId" value="{argumentTypes.experience}">
-                    <span class="text-info"><strong>Experience</strong></span><br/>
+                    <span class="text-info"><strong>Testimony</strong></span><br/>
                     A personal experience of an event perceived through the senses, a testimony
                 </label>
             </div>
@@ -145,7 +131,7 @@
                         </div>
                     </div>
                 </div>
-                <hr style="border: 0; margin: 0.7rem 0 0.7rem; border-top: 0.0625rem dotted #dcdcdc;"/>
+                <hr class="wt-dotted-line" />
                 <div class="row">
                     <div class="col-md-6">
                         <div class="checkbox">

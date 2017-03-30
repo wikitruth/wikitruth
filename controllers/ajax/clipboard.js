@@ -46,8 +46,7 @@ module.exports = function (router) {
         var type = req.body.type; // the type of destination
 
         if(!id || !type) {
-            // linking to root, stop!
-            return res.send({});
+            return res.send({}); // linking to root, stop!
         }
 
         var dateNow = Date.now();
@@ -55,7 +54,7 @@ module.exports = function (router) {
         var topics = clipboard['object' + constants.OBJECT_TYPES.topic];
         var args = clipboard['object' + constants.OBJECT_TYPES.argument];
         if(type == constants.OBJECT_TYPES.topic) {
-            db.Topic.findOne({_id: id}, function(err, parent) {
+            db.Topic.findOne({_id: id}, function(err, parent) { // parent is the target
                 async.parallel({
                     topics: function (callback) {
                         if (topics.length === 0) {
