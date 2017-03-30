@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {argument.title} - {titleSlogan}
+    {entry.title2}: Link - {titleSlogan}
 {/title}
 
 {<body}
@@ -17,10 +17,10 @@
                 An argument under the topic <a href="{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
             {/parentArgument}
         </p>!}
-        {?argument.referenceDate}
-            <p><small class="text-muted" title="Reference Date"><i class="fa fa-clock-o"></i> {argument.referenceDateUTC}</small></p>
-        {/argument.referenceDate}
-        {argument.content|s}
+        {?entry.argument.referenceDate}
+            <p><small class="text-muted" title="Reference Date"><i class="fa fa-clock-o"></i> {entry.argument.referenceDateUTC}</small></p>
+        {/entry.argument.referenceDate}
+        {entry.argument.content|s}
         <a href="#" onclick="return contentSeeMore()" class="content-see-more hidden">
             <div class="content-see-more-gradient"></div>
             <div class="content-see-more-text">See more</div>
@@ -37,34 +37,6 @@
         </div>
     {/topic}
     {>"dust/wiki/common/entry-options" /}
-    {?arguments}
-        <div class="wt-list">
-            {?proArguments}
-            <ul class="list-group top-list-items">
-                <li class="list-group-item highlight text-primary"><i class="glyphicon glyphicon-flash" aria-hidden="true"></i> Supporting Arguments <span class="wt-label label label-default">{proArgumentCount}</span></li>
-                {#proArguments}
-                    {>"dust/wiki/arguments/entry-row" /}
-                {/proArguments}
-            </ul>
-            {/proArguments}
-            {?conArguments}
-                <ul class="list-group top-list-items">
-                    <li class="list-group-item highlight text-primary"><i class="glyphicon glyphicon-flash" aria-hidden="true"></i> Opposing Arguments <span class="wt-label label label-default">{conArgumentCount}</span></li>
-                    {#conArguments}
-                        {>"dust/wiki/arguments/entry-row" /}
-                    {/conArguments}
-                </ul>
-                {@gt key=conArgumentCount value="15"}
-                    <div class="top-list-items-more"><a href="{wikiBaseUrl}{paths.wiki.arguments.index}?topic={topic._id}&amp;argument={argument._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{conArgumentCount}</span></a></div>
-                {/gt}
-            {:else}
-                {@gt key=proArgumentCount value="15"}
-                    <div class="top-list-items-more"><a href="{wikiBaseUrl}{paths.wiki.arguments.index}?topic={topic._id}&amp;argument={argument._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{proArgumentCount}</span></a></div>
-                {/gt}
-            {/conArguments}
-        </div>
-    {/arguments}
-    {>"dust/wiki/questions/list-preview" /}
     {>"dust/wiki/issues/list-preview" /}
     {>"dust/wiki/opinions/list-preview" /}
     {>"dust/wiki/common/entry-footer" /}

@@ -14,20 +14,38 @@ module.exports = function (router) {
             var dateNow = Date.now();
             var query = {_id: id};
             if(type == constants.OBJECT_TYPES.topic) {
-                db.Topic.findOne(query, function(err, entry) {
+                db.Topic.findOne(query, function (err, entry) {
                     entry.createUserId = req.user.id;
                     entry.editUserId = req.user.id;
                     entry.editDate = dateNow;
-                    db.Topic.update(query, entry, {upsert: true}, function(err, writeResult) {
+                    db.Topic.update(query, entry, {upsert: true}, function (err, writeResult) {
                         res.send({});
                     });
                 });
+            } else if(type == constants.OBJECT_TYPES.topicLink) {
+                    db.TopicLink.findOne(query, function(err, entry) {
+                        entry.createUserId = req.user.id;
+                        entry.editUserId = req.user.id;
+                        entry.editDate = dateNow;
+                        db.TopicLink.update(query, entry, {upsert: true}, function(err, writeResult) {
+                            res.send({});
+                        });
+                    });
             } else if(type == constants.OBJECT_TYPES.argument) {
                 db.Argument.findOne(query, function(err, entry) {
                     entry.createUserId = req.user.id;
                     entry.editUserId = req.user.id;
                     entry.editDate = dateNow;
                     db.Argument.update(query, entry, {upsert: true}, function(err, writeResult) {
+                        res.send({});
+                    });
+                });
+            } else if(type == constants.OBJECT_TYPES.argumentLink) {
+                db.ArgumentLink.findOne(query, function(err, entry) {
+                    entry.createUserId = req.user.id;
+                    entry.editUserId = req.user.id;
+                    entry.editDate = dateNow;
+                    db.ArgumentLink.update(query, entry, {upsert: true}, function(err, writeResult) {
                         res.send({});
                     });
                 });
@@ -40,12 +58,30 @@ module.exports = function (router) {
                         res.send({});
                     });
                 });
+            } else if(type == constants.OBJECT_TYPES.answer) {
+                db.Answer.findOne(query, function(err, entry) {
+                    entry.createUserId = req.user.id;
+                    entry.editUserId = req.user.id;
+                    entry.editDate = dateNow;
+                    db.Answer.update(query, entry, {upsert: true}, function(err, writeResult) {
+                        res.send({});
+                    });
+                });
             } else if(type == constants.OBJECT_TYPES.issue) {
                 db.Issue.findOne(query, function(err, entry) {
                     entry.createUserId = req.user.id;
                     entry.editUserId = req.user.id;
                     entry.editDate = dateNow;
                     db.Issue.update(query, entry, {upsert: true}, function(err, writeResult) {
+                        res.send({});
+                    });
+                });
+            } else if(type == constants.OBJECT_TYPES.opinion) {
+                db.Opinion.findOne(query, function(err, entry) {
+                    entry.createUserId = req.user.id;
+                    entry.editUserId = req.user.id;
+                    entry.editDate = dateNow;
+                    db.Opinion.update(query, entry, {upsert: true}, function(err, writeResult) {
                         res.send({});
                     });
                 });

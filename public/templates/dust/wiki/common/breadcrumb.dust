@@ -24,6 +24,9 @@
     {?topic}
         <li><a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}">{?topic.contextTitle}{topic.contextTitle}{:else}{topic.shortTitle}{/topic.contextTitle}</a></li>
     {/topic}
+    {?topicLink}
+        <li><a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topicLink.topic.friendlyUrl}/link/{topicLink._id}">{?topicLink.title}{topicLink.title}{:else}{topicLink.topic.shortTitle}{/topicLink.title}</a> <i class="fa fa-link text-muted"></i></li>
+    {/topicLink}
     {?parentArgument}
         {?parentArgument.parentId}
             {?grandParentArgument}
@@ -46,6 +49,9 @@
     {?argument}
         <li>{^parentArgument}<i class="fa fa-flash text-muted"></i> {/parentArgument}<a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argument.friendlyUrl}/{argument._id}">{argument.shortTitle}</a></li>
     {/argument}
+    {?argumentLink}
+        <li><a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/link/{argumentLink._id}">{?argumentLink.title}{argumentLink.title}{:else}{argumentLink.argument.shortTitle}{/argumentLink.title}</a> <i class="fa fa-link text-muted"></i></li>
+    {/argumentLink}
     {?question}
         {!<li><a href="{paths.wiki.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">Questions</a></li>!}
         <li><i class="fa fa-question-circle-o text-muted"></i> <a href="{wikiBaseUrl}{paths.wiki.questions.entry}/{question.friendlyUrl}/{question._id}">{question.shortTitle}</a></li>

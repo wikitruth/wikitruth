@@ -1,14 +1,14 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {argument.title}: Link - {titleSlogan}
+    {entry.title2}: Link - {titleSlogan}
 {/title}
 
 {<body}
-    {>"dust/wiki/common/breadcrumb" /}
-    <h1 class="page-header">
+    {>"dust/wiki/common/entry-header" /}
+    {!<h1 class="page-header">
         {argument.title}: Link
-    </h1>
+    </h1>!}
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
         <div class="form-group">
@@ -44,7 +44,7 @@
                 </label>
             </div>
         </div>
-        <button type="submit" name="action" value="submit" class="btn btn-primary">Submit</button>&nbsp;
+        <button type="submit" name="action" value="submit" class="btn btn-primary">Update</button>&nbsp;
         <button type="submit" name="action" value="delete" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this Link?');">Delete</button>&nbsp;
         <a class="btn btn-default" href="{cancelUrl}" role="button">Cancel</a>
     </form>

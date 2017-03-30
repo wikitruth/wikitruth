@@ -112,10 +112,19 @@ body {
   text-decoration: none;
 }
 
-.page-header.wt-header {
-  border-bottom: none;
-  margin-bottom: 10px;
-  margin-top: 30px;
+.page-header {
+  &.wt-header {
+    border-bottom: none;
+    margin-bottom: 10px;
+    margin-top: 30px;
+  }
+
+  .wt-subtitle {
+    font-size: 16px;
+    font-weight: normal;
+    padding: .2em .4em .2em;
+    letter-spacing: normal;
+  }
 }
 
 .list-group.top-list-items, .entry-tabs {
@@ -364,6 +373,10 @@ a.wt-link-focus {
   color: #cc317c
 }
 
+.wt-text-warning {
+  color: #f0ad4e;
+}
+
 .media.wt-category {
   margin-bottom: 5px;
   min-height: 140px;
@@ -376,6 +389,14 @@ a.wt-link-focus {
 
   h4.media-heading a {
     text-shadow: 0 0 3px rgba(51, 122, 183, 0.15);
+  }
+}
+
+.wt-create-header {
+  margin-bottom: 20px;
+
+  .wt-header {
+    margin-bottom: 0; padding-bottom: 0;
   }
 }
 
@@ -445,6 +466,10 @@ a.wt-link-focus {
     /* symbol for "collapsed" panels */
     content: "\00a0\e080";    /* adjust as needed, taken from bootstrap.css */
   }
+}
+
+.wt-dotted-line {
+  border: 0; margin: 0.7rem 0 0.7rem; border-top: 0.0625rem dotted #dcdcdc;
 }
 
 .btn.btn-info.btn-fb {

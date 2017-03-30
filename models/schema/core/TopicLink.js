@@ -11,6 +11,7 @@ module.exports = function(app, mongoose) {
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     editDate: { type: Date, default: Date.now },
     editUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
+    tags: [ { type: Number } ], // OBJECT_TAGS
     screening: {
       status: { type: Number, default: constants.SCREENING_STATUS.status0.code}, // SCREENING_STATUS
       history: [{

@@ -262,7 +262,6 @@ function GET_entry(req, res) {
                 flowUtils.getTopOpinions(query, model, callback);
             }
         }, function (err, results) {
-            model.isEntryOwner = model.isTopicOwner;
             flowUtils.setModelOwnerEntry(model);
             flowUtils.setModelContext(req, model);
             flowUtils.setClipboardModel(req, model, constants.OBJECT_TYPES.topic);
@@ -373,7 +372,39 @@ function POST_create(req, res) {
 
 function GET_link_entry(req, res) {
     var model = {};
-    async.series({
+    var ownerQuery = { ownerId: req.params.id, ownerType: constants.OBJECT_TYPES.topicLink };
+    flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
+        if (!flowUtils.isEntryOnIntendedUrl(req, model.topicLink)) {
+            return res.redirect('/');
+        }
+
+        if(model.topicLink) {
+            if(!flowUtils.isEntryOwner(req, model.topicLink)) {
+                // VALIDATION: non-owners cannot update other's entry
+                return res.redirect(createCancelUrl(req));
+            }
+        }
+
+        async.parallel({
+            issues: function (callback) {
+                // Top Issues
+                var query = { ownerId: ownerQuery.ownerId, ownerType: ownerQuery.ownerType, 'screening.status': constants.SCREENING_STATUS.status1.code };
+                flowUtils.getTopIssues(query, model, callback);
+            },
+            opinions: function (callback) {
+                // Top Opinions
+                var query = { parentId: null, ownerId: ownerQuery.ownerId, ownerType: ownerQuery.ownerType, 'screening.status': constants.SCREENING_STATUS.status1.code };
+                flowUtils.getTopOpinions(query, model, callback);
+            }
+        }, function (err, results) {
+            flowUtils.setModelOwnerEntry(model);
+            flowUtils.setModelContext(req, model);
+            flowUtils.setClipboardModel(req, model, constants.OBJECT_TYPES.topicLink);
+            res.render(templates.wiki.topics.link.entry, model);
+        });
+    });
+
+    /*async.series({
         entry: function (callback) {
             if(req.query.id) {
                 db.TopicLink.findOne({_id: req.query.id}, function(err, link) {
@@ -403,19 +434,26 @@ function GET_link_entry(req, res) {
             }
         }
     }, function (err, results) {
-        if(model.link && !flowUtils.isEntryOwner(req, model.link)) {
-            // VALIDATION: non-owners cannot update other's entry
-            return res.redirect(createCancelUrl(req));
-        }
-        flowUtils.setModelContext(req, model);
-        model.cancelUrl = createCancelUrl(req);
-        res.render(templates.wiki.topics.link.entry, model);
-    });
+
+    });*/
 }
 
 function GET_link_edit(req, res) {
     var model = {};
-    async.series({
+    var ownerQuery = { ownerId: req.query.id, ownerType: constants.OBJECT_TYPES.topicLink };
+    flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
+        if(model.topicLink) {
+            if(!flowUtils.isEntryOwner(req, model.topicLink)) {
+                // VALIDATION: non-owners cannot update other's entry
+                return res.redirect(createCancelUrl(req));
+            }
+        }
+        model.cancelUrl = createCancelUrl(req);
+        flowUtils.setModelOwnerEntry(model);
+        flowUtils.setModelContext(req, model);
+        res.render(templates.wiki.topics.link.edit, model);
+    });
+    /*async.series({
         entry: function (callback) {
             if(req.query.id) {
                 db.TopicLink.findOne({_id: req.query.id}, function(err, link) {
@@ -445,14 +483,8 @@ function GET_link_edit(req, res) {
             }
         }
     }, function (err, results) {
-        if(model.link && !flowUtils.isEntryOwner(req, model.link)) {
-            // VALIDATION: non-owners cannot update other's entry
-            return res.redirect(createCancelUrl(req));
-        }
-        flowUtils.setModelContext(req, model);
-        model.cancelUrl = createCancelUrl(req);
-        res.render(templates.wiki.topics.link.edit, model);
-    });
+
+    });*/
 }
 
 function POST_link_edit(req, res) {
@@ -510,7 +542,7 @@ module.exports = function (router) {
     });
 
 
-    router.get('/link/entry', function (req, res) {
+    router.get('/entry/:friendlyUrl/link/:id', function (req, res) {
         GET_link_entry(req, res);
     });
 

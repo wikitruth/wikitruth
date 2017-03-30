@@ -6,9 +6,12 @@
 
 {<body}
     {>"dust/wiki/common/breadcrumb" /}
-    <h1 class="page-header">
-        <i class="fa fa-folder-open"></i> {?topic}Edit{:else}New{/topic} Topic
-    </h1>
+    <div class="wt-create-header">
+        <h2 class="page-header wt-header">
+            <i class="fa fa-folder-open"></i> {?topic}Edit{:else}New{/topic} Topic
+        </h2>
+        {>"dust/wiki/common/create-subtitle" /}
+    </div>
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
         <div class="form-group">
@@ -72,7 +75,7 @@
                         A topic containing containing moral, ethical, or aesthetic value
                     </label>
                 </div>
-                <hr style="border: 0; margin: 0.7rem 0 0.7rem; border-top: 0.0625rem dotted #dcdcdc;"/>
+                <hr class="wt-dotted-line" />
                 <div class="checkbox">
                     <label>
                         <input type="checkbox" class="topicTag" name="topicTags" value="510">
@@ -87,7 +90,7 @@
                         A standalone or primary topic
                     </label>
                 </div>
-                <hr style="border: 0; margin: 0.7rem 0 0.7rem; border-top: 0.0625rem dotted #dcdcdc;"/>
+                <hr class="wt-dotted-line" />
                 <div class="checkbox">
                     <label>
                         <input type="checkbox" class="topicTag" name="topicTags" value="530">

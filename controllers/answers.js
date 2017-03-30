@@ -30,7 +30,6 @@ function GET_entry(req, res) {
                 flowUtils.getTopOpinions(query, model, callback);
             }
         }, function (err, results) {
-            model.isEntryOwner = model.isAnswerOwner;
             flowUtils.setModelOwnerEntry(model);
             flowUtils.setModelContext(req, model);
             res.render(templates.wiki.answers.entry, model);

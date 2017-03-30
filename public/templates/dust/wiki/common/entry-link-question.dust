@@ -1,0 +1,5 @@
+{?question}
+    <a href="{wikiBaseUrl}{paths.wiki.questions.entry}/{question.friendlyUrl}/{question._id}">{question.title}</a>
+{:else}
+    {>"dust/wiki/common/entry-link-argument" /}
+{/question}

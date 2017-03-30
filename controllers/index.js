@@ -705,13 +705,23 @@ module.exports = function (router) {
 
     /* Entry routes mapping */
 
-    router.get('/topic(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+    router.get('/topic/:friendlyUrl/:id', function (req, res) {
         topicController.GET_entry(req, res);
     });
 
-    router.get('/argument(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+    router.get('/topic/:friendlyUrl/link/:id', function (req, res) {
+        topicController.GET_link_entry(req, res);
+    });
+
+
+    router.get('/argument/:friendlyUrl/:id', function (req, res) {
         argumentController.GET_entry(req, res);
     });
+
+    router.get('/argument/:friendlyUrl/link/:id', function (req, res) {
+        argumentController.GET_link_entry(req, res);
+    });
+
 
     router.get('/question(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
         questionController.GET_entry(req, res);

@@ -127,7 +127,7 @@ ARGUMENT_TYPES.getUXInfo = function (typeId) {
             label = "artifact";
             break;
         case ARGUMENT_TYPES.experience:
-            label = "experience";
+            label = "testimony";
             break;
         case ARGUMENT_TYPES.prediction:
             label = "prediction";

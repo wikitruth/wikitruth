@@ -31,8 +31,10 @@ function appendOwnerFlag(req, item, model) {
 }
 
 function appendEntryExtra(item) {
-    item.friendlyUrl = utils.urlify(item.title);
-    item.shortTitle = utils.getShortText(item.title);
+    if(item.title) {
+        item.friendlyUrl = utils.urlify(item.title);
+        item.shortTitle = utils.getShortText(item.title);
+    }
     item.comments = utils.randomInt(0,999);
     //item.editUsername = 'root';
     item.points = utils.randomInt(0,9999);
@@ -210,6 +212,42 @@ function setOpinionModel(req, model, callback) {
     }
 }
 
+function setArgumentLinkModel(req, model, callback) {
+    if(req.query.argumentLink) {
+        async.series({
+            argumentLink: function (callback) {
+                db.ArgumentLink.findOne({_id: req.query.argumentLink}, function(err, result) {
+                    model.argumentLink = result;
+                    appendEntryExtra(result);
+                    if(isEntryOwner(req, result)) {
+                        model.isArgumentLinkOwner = true;
+                    }
+                    setUsername(result, callback);
+                });
+            },
+            argument: function (callback) {
+                if(model.argumentLink) {
+                    db.Argument.findOne({_id: model.argumentLink.argumentId}, function (err, result) {
+                        if (result) {
+                            appendEntryExtra(result);
+                            model.argumentLink.argument = result;
+                            model.argumentLink.title2 = model.argumentLink.title ? model.argumentLink.title : result.title;
+                            model.argumentLink.content2 = result.content;
+                        }
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
+            }
+        }, function (err, results) {
+            callback();
+        });
+    } else {
+        callback();
+    }
+}
+
 function setArgumentModels(req, model, callback) {
     if(req.query.argument) {
         async.series({
@@ -260,43 +298,39 @@ function setArgumentModels(req, model, callback) {
     }
 }
 
-function setEntryModels(query, req, model, callback) {
-    if(!query.ownerType) { // if the query or entry does not follow owner id/type concept.
-        return callback();
-    }
-
-    if(query.ownerType === constants.OBJECT_TYPES.topic) {
-        req.query.topic = query.ownerId;
-        setTopicModels(req, model, callback);
-    } else if(query.ownerType === constants.OBJECT_TYPES.argument) {
-        req.query.argument = query.ownerId;
-        setArgumentModels(req, model, function () {
-            setTopicModels(req, model, callback);
+function setTopicLinkModel(req, model, callback) {
+    if(req.query.topicLink) {
+        async.series({
+            topicLink: function (callback) {
+                db.TopicLink.findOne({_id: req.query.topicLink}, function(err, result) {
+                    model.topicLink = result;
+                    appendEntryExtra(result);
+                    if(isEntryOwner(req, result)) {
+                        model.isTopicLinkOwner = true;
+                    }
+                    setUsername(result, callback);
+                });
+            },
+            topic: function (callback) {
+                if(model.topicLink) {
+                    db.Topic.findOne({_id: model.topicLink.topicId}, function (err, result) {
+                        if (result) {
+                            appendEntryExtra(result);
+                            model.topicLink.topic = result;
+                            model.topicLink.title2 = model.topicLink.title ? model.topicLink.title : result.title;
+                            model.topicLink.content2 = result.content;
+                        }
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
+            }
+        }, function (err, results) {
+            callback();
         });
-    } else if(query.ownerType === constants.OBJECT_TYPES.question) {
-        req.query.question = query.ownerId;
-        setQuestionModel(req, model, function () {
-            setEntryModels(model.question, req, model, callback);
-        });
-    } else if(query.ownerType === constants.OBJECT_TYPES.answer) {
-        req.query.answer = query.ownerId;
-        setAnswerModel(req, model, function () {
-            var q = {
-                ownerType: constants.OBJECT_TYPES.question,
-                ownerId: model.answer.questionId
-            };
-            setEntryModels(q, req, model, callback);
-        });
-    } else if(query.ownerType === constants.OBJECT_TYPES.issue) {
-        req.query.issue = query.ownerId;
-        setIssueModel(req, model, function () {
-            setEntryModels(model.issue, req, model, callback);
-        });
-    } else if(query.ownerType === constants.OBJECT_TYPES.opinion) {
-        req.query.opinion = query.ownerId;
-        setOpinionModel(req, model, function () {
-            setEntryModels(model.opinion, req, model, callback);
-        });
+    } else {
+        callback();
     }
 }
 
@@ -349,6 +383,65 @@ function setTopicModels(req, model, callback) {
             }
         }, function (err, results) {
             callback();
+        });
+    } else {
+        callback();
+    }
+}
+
+/**
+ * Retrieves the entry from query.ownerId, query.ownerType
+ * @param query: ownerId and ownerType is required
+ * @param req: only used by specific setters (setTopicModels, setArgumentModels, etc)
+ * @param model
+ * @param callback
+ * @returns void
+ */
+function setEntryModels(query, req, model, callback) {
+    if(!query.ownerType || query.ownerType === -1) { // if the query or entry does not follow owner id/type concept.
+        return callback();
+    }
+
+    if(query.ownerType === constants.OBJECT_TYPES.topic) {
+        req.query.topic = query.ownerId;
+        setTopicModels(req, model, callback);
+    } else if(query.ownerType === constants.OBJECT_TYPES.topicLink) {
+        req.query.topicLink = query.ownerId;
+        setTopicLinkModel(req, model, function () {
+            var q = { ownerType: constants.OBJECT_TYPES.topic, ownerId: model.topicLink.parentId };
+            setEntryModels(q, req, model, callback);
+        });
+    } else if(query.ownerType === constants.OBJECT_TYPES.argument) {
+        req.query.argument = query.ownerId;
+        setArgumentModels(req, model, function () {
+            setTopicModels(req, model, callback);
+        });
+    } else if(query.ownerType === constants.OBJECT_TYPES.argumentLink) {
+        req.query.argumentLink = query.ownerId;
+        setArgumentLinkModel(req, model, function () {
+            var q = model.argumentLink.parentId ? { ownerType: constants.OBJECT_TYPES.argument, ownerId: model.argumentLink.parentId } : model.argumentLink;
+            setEntryModels(q, req, model, callback);
+        });
+    } else if(query.ownerType === constants.OBJECT_TYPES.question) {
+        req.query.question = query.ownerId;
+        setQuestionModel(req, model, function () {
+            setEntryModels(model.question, req, model, callback);
+        });
+    } else if(query.ownerType === constants.OBJECT_TYPES.answer) {
+        req.query.answer = query.ownerId;
+        setAnswerModel(req, model, function () {
+            var q = { ownerType: constants.OBJECT_TYPES.question, ownerId: model.answer.questionId };
+            setEntryModels(q, req, model, callback);
+        });
+    } else if(query.ownerType === constants.OBJECT_TYPES.issue) {
+        req.query.issue = query.ownerId;
+        setIssueModel(req, model, function () {
+            setEntryModels(model.issue, req, model, callback);
+        });
+    } else if(query.ownerType === constants.OBJECT_TYPES.opinion) {
+        req.query.opinion = query.ownerId;
+        setOpinionModel(req, model, function () {
+            setEntryModels(model.opinion, req, model, callback);
         });
     } else {
         callback();
@@ -982,10 +1075,20 @@ function createOwnerQueryFromQuery(req) {
             ownerType: constants.OBJECT_TYPES.question,
             ownerId: req.query.question
         };
+    } else if(req.query.argumentLink) {
+        return {
+            ownerType: constants.OBJECT_TYPES.argumentLink,
+            ownerId: req.query.argumentLink
+        };
     } else if(req.query.argument) {
         return {
             ownerType: constants.OBJECT_TYPES.argument,
             ownerId: req.query.argument
+        };
+    } else if(req.query.topicLink) {
+        return {
+            ownerType: constants.OBJECT_TYPES.topicLink,
+            ownerId: req.query.topicLink
         };
     } else if(req.query.topic) {
         return {
@@ -1000,21 +1103,35 @@ function setModelOwnerEntry(model) {
     if(model.opinion) {
         model.entry = model.opinion;
         model.entryType = constants.OBJECT_TYPES.opinion;
+        model.isEntryOwner = model.isOpinionOwner;
     } else if(model.issue) {
         model.entry = model.issue;
         model.entryType = constants.OBJECT_TYPES.issue;
+        model.isEntryOwner = model.isIssueOwner;
     } else if(model.answer) {
         model.entry = model.answer;
         model.entryType = constants.OBJECT_TYPES.answer;
+        model.isEntryOwner = model.isAnswerOwner;
     } else if(model.question) {
         model.entry = model.question;
         model.entryType = constants.OBJECT_TYPES.question;
+        model.isEntryOwner = model.isQuestionOwner;
+    } else if(model.argumentLink) {
+        model.entry = model.argumentLink;
+        model.entryType = constants.OBJECT_TYPES.argumentLink;
+        model.isEntryOwner = model.isArgumentLinkOwner;
     } else if(model.argument) {
         model.entry = model.argument;
         model.entryType = constants.OBJECT_TYPES.argument;
+        model.isEntryOwner = model.isArgumentOwner;
+    } else if(model.topicLink) {
+        model.entry = model.topicLink;
+        model.entryType = constants.OBJECT_TYPES.topicLink;
+        model.isEntryOwner = model.isTopicLinkOwner;
     } else if(model.topic) {
         model.entry = model.topic;
         model.entryType = constants.OBJECT_TYPES.topic;
+        model.isEntryOwner = model.isTopicOwner;
     }
 }
 
@@ -1022,8 +1139,12 @@ function getDbModelByObjectType(type) {
     switch (type) {
         case constants.OBJECT_TYPES.topic:
             return db.Topic;
+        case constants.OBJECT_TYPES.topicLink:
+            return db.TopicLink;
         case constants.OBJECT_TYPES.argument:
             return db.Argument;
+        case constants.OBJECT_TYPES.argumentLink:
+            return db.ArgumentLink;
         case constants.OBJECT_TYPES.question:
             return db.Question;
         case constants.OBJECT_TYPES.answer:
@@ -1052,10 +1173,20 @@ function createOwnerQueryFromModel(model) {
             ownerType: constants.OBJECT_TYPES.question,
             ownerId: model.question._id
         };
+    } else if(model.argumentLink) {
+        return {
+            ownerType: constants.OBJECT_TYPES.argumentLink,
+            ownerId: model.argumentLink._id
+        };
     } else if(model.argument) {
         return {
             ownerType: constants.OBJECT_TYPES.argument,
             ownerId: model.argument._id
+        };
+    } else if(model.topicLink) {
+        return {
+            ownerType: constants.OBJECT_TYPES.topicLink,
+            ownerId: model.topicLink._id
         };
     } else if(model.topic) {
         return {
@@ -1149,7 +1280,33 @@ function getParent(entity, type) {
                 };
             }
             break;
+        case constants.OBJECT_TYPES.topicLink:
+            if(entity.parentId) {
+                return {
+                    entryId: entity.parentId,
+                    entryType: constants.OBJECT_TYPES.topic
+                };
+            } else if(entity.ownerId) {
+                return {
+                    entryId: entity.ownerId,
+                    entryType: entity.ownerType
+                };
+            }
+            break;
         case constants.OBJECT_TYPES.argument:
+            if(entity.parentId) {
+                return {
+                    entryId: entity.parentId,
+                    entryType: constants.OBJECT_TYPES.argument
+                };
+            } else if(entity.ownerId) {
+                return {
+                    entryId: entity.ownerId,
+                    entryType: entity.ownerType
+                };
+            }
+            break;
+        case constants.OBJECT_TYPES.argumentLink:
             if(entity.parentId) {
                 return {
                     entryId: entity.parentId,

@@ -1,12 +1,23 @@
 <li class="list-group-item">
     <i class="fa fa-folder-open text-color-3" aria-hidden="true"></i>
     <div>
-        <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">{title}
-            {?labels}
-                {?private} <span class="label label-default">private</span>{/private}
-                {>"dust/wiki/common/entry-row-screening-label" /}
-            {/labels}
-        </a>
+        {?link}
+            <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.topics.entry}/{friendlyUrl}/link/{link._id}">
+                {?link.title}{link.title}{:else}{title}{/link.title}
+            </a>
+            &nbsp;
+            <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}" title="Open linked Topic - {title}">
+                <span class="fa fa-link text-warning"></span>
+            </a>
+        {:else}
+            <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">
+                {?contextTitle}{contextTitle}{:else}{title}{/contextTitle}
+            </a>
+        {/link}
+        {?labels}
+            {?private} <span class="label label-default">private</span>{/private}
+            {>"dust/wiki/common/entry-row-screening-label" /}
+        {/labels}
         {?contentPreview}
             <div>{contentPreview}</div>
         {/contentPreview}

@@ -5,26 +5,30 @@
             <li class="dropdown-header">Reply With...</li>
             {^opinion}
                 {^issue}
-                    {^question}
-                        {^argument}
-                            <li><a href="{wikiBaseUrl}{paths.wiki.topics.create}?topic={topic._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Topic</a></li>
-                        {/argument}
-                        <li><a href="{wikiBaseUrl}{paths.wiki.arguments.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> New Argument</a></li>
-                        <li><a href="{wikiBaseUrl}{paths.wiki.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
-                            <span class="fa fa-question-circle" aria-hidden="true"></span> New Question</a></li>
-                        <li role="separator" class="divider"></li>
-                    {:else}
-                        {^answer}
-                            <li><a href="{wikiBaseUrl}{paths.wiki.answers.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
-                                <span class="fa fa-question-circle" aria-hidden="true"></span> New Answer</a></li>
-                            <li role="separator" class="divider"></li>
-                        {/answer}
-                    {/question}
-                    <li><a href="{wikiBaseUrl}{paths.wiki.issues.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}{?answer}&amp;answer={answer._id}{/answer}" role="tab">
+                    {^topicLink}
+                        {^argumentLink}
+                            {^question}
+                                {^argument}
+                                    <li><a href="{wikiBaseUrl}{paths.wiki.topics.create}?topic={topic._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Topic</a></li>
+                                {/argument}
+                                <li><a href="{wikiBaseUrl}{paths.wiki.arguments.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> New Argument</a></li>
+                                <li><a href="{wikiBaseUrl}{paths.wiki.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
+                                    <span class="fa fa-question-circle" aria-hidden="true"></span> New Question</a></li>
+                                <li role="separator" class="divider"></li>
+                            {:else}
+                                {^answer}
+                                    <li><a href="{wikiBaseUrl}{paths.wiki.answers.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
+                                        <span class="fa fa-question-circle" aria-hidden="true"></span> New Answer</a></li>
+                                    <li role="separator" class="divider"></li>
+                                {/answer}
+                            {/question}
+                        {/argumentLink}
+                    {/topicLink}
+                    <li><a href="{wikiBaseUrl}{paths.wiki.issues.create}?topic={topic._id}{?topicLink}&amp;topicLink={topicLink._id}{/topicLink}{?argumentLink}&amp;argumentLink={argumentLink._id}{/argumentLink}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}{?answer}&amp;answer={answer._id}{/answer}" role="tab">
                         <span class="fa fa-exclamation-circle" aria-hidden="true"></span> New Issue</a></li>
                 {/issue}
             {/opinion}
-            <li><a href="{wikiBaseUrl}{paths.wiki.opinions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}{?answer}&amp;answer={answer._id}{/answer}{?issue}&amp;issue={issue._id}{/issue}{?opinion}&amp;opinion={opinion._id}{/opinion}" role="tab">
+            <li><a href="{wikiBaseUrl}{paths.wiki.opinions.create}?topic={topic._id}{?topicLink}&amp;topicLink={topicLink._id}{/topicLink}{?argumentLink}&amp;argumentLink={argumentLink._id}{/argumentLink}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}{?answer}&amp;answer={answer._id}{/answer}{?issue}&amp;issue={issue._id}{/issue}{?opinion}&amp;opinion={opinion._id}{/opinion}" role="tab">
                 <span class="fa fa-comments-o" aria-hidden="true"></span> New Comment</a></li>
         </ul>
     </div>
@@ -44,17 +48,29 @@
                                 <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit</a>
                             {/isQuestionOwner}
                         {:else}
-                            {?argument}
-                                {?isArgumentOwner}
-                                    <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.arguments.create}?topic={topic._id}&amp;id={argument._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit</a>
-                                {/isArgumentOwner}
+                            {?argumentLink}
+                                {?isArgumentLinkOwner}
+                                    <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.arguments.link.edit}?id={argumentLink._id}&amp;source={wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/link/{argumentLink._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit</a>
+                                {/isArgumentLinkOwner}
                             {:else}
-                                {?topic}
-                                    {?isTopicOwner}
-                                        <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.topics.create}?id={topic._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit</a>
-                                    {/isTopicOwner}
-                                {/topic}
-                            {/argument}
+                                {?argument}
+                                    {?isArgumentOwner}
+                                        <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.arguments.create}?topic={topic._id}&amp;id={argument._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit</a>
+                                    {/isArgumentOwner}
+                                {:else}
+                                    {?topicLink}
+                                        {?isTopicLinkOwner}
+                                            <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.topics.link.edit}?id={topicLink._id}&amp;source={wikiBaseUrl}{paths.wiki.topics.entry}/{topicLink.topic.friendlyUrl}/link/{topicLink._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit</a>
+                                        {/isTopicLinkOwner}
+                                    {:else}
+                                        {?topic}
+                                            {?isTopicOwner}
+                                                <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.topics.create}?id={topic._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit</a>
+                                            {/isTopicOwner}
+                                        {/topic}
+                                    {/topicLink}
+                                {/argument}
+                            {/argumentLink}
                         {/question}
                     {/isAnswerOwner}
                 {!<li><a href="{paths.wiki.outline.link}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> Manage Links</a></li>!}
@@ -138,7 +154,7 @@
     </ul>
 </div>!}
 </div>
-<hr style="border: 0; margin: 0.7rem 0 0.7rem; border-top: 0.0625rem dotted #dcdcdc; margin-bottom: 15px"/>
+<hr class="wt-dotted-line" style="margin-bottom: 15px"/>
 {!
 <ul class="nav nav-tabs wt-tabs-l2" role="tablist">
     {!<li role="presentation" class="active"><a href="#" role="tab"><span class="glyphicon glyphicon-file" aria-hidden="true"></span> Overview</a></li>!

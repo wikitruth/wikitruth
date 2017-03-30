@@ -38,8 +38,7 @@ module.exports = {
             entry:  '/topic',
             create: '/topics/create',
             link: {
-                edit: '/topics/link/edit',
-                entry: '/topics/link/entry'
+                edit: '/topics/link/edit'
             }
         },
         arguments: {
@@ -47,8 +46,7 @@ module.exports = {
             entry:  '/argument',
             create: '/arguments/create',
             link: {
-                edit: '/arguments/link/edit',
-                entry: '/arguments/link/entry'
+                edit: '/arguments/link/edit'
             }
         },
         questions: {

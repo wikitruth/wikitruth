@@ -28,7 +28,6 @@ function GET_entry(req, res) {
             }
         }, function (err, results) {
             model.issueType = constants.ISSUE_TYPES['type' + model.issue.issueType];
-            model.isEntryOwner = model.isIssueOwner;
             flowUtils.setModelOwnerEntry(model);
             flowUtils.setModelContext(req, model);
             res.render(templates.wiki.issues.entry, model);
@@ -94,6 +93,7 @@ function GET_create(req, res) {
     var model = {};
     flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
         model.ISSUE_TYPES = constants.ISSUE_TYPES;
+        flowUtils.setModelOwnerEntry(model);
         flowUtils.setModelContext(req, model);
         res.render(templates.wiki.issues.create, model);
     });

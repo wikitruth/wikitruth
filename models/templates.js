@@ -39,7 +39,7 @@ module.exports = {
             entry: 'dust/wiki/topics/entry',
             link: {
                 edit: 'dust/wiki/topics/link/edit',
-                entry: 'dust/wiki/topics/entry'
+                entry: 'dust/wiki/topics/link/entry'
             }
         },
         arguments: {

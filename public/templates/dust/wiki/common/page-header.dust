@@ -2,78 +2,61 @@
     <h2 class="page-header wt-header" style="margin-bottom: 0; padding-bottom: 0">
         {?entry}
             {entry.title}
-            {!{?argument.against}
-                <span class="label label-primary" style="font-size: 10px; font-weight: normal; padding: .2em .6em .3em; letter-spacing: normal; margin-left: 8px">opposing</span>
-            {/argument.against}!}
+            {!{?argument.against} <span class="label label-primary wt-subtitle">opposing</span>{/argument.against}!}
+            {?entry.topic}
+                {^entry.title}{entry.topic.title}{/entry.title} <span class="label-x label-warning-x wt-subtitle-x" style="padding: 0; font-size: 18px;"><i class="fa fa-link wt-text-warning"></i></span>
+            {/entry.topic}
+            {?entry.argument}
+                {^entry.title}{entry.argument.title}{/entry.title} <span class="label-x label-warning-x wt-subtitle-x" style="padding: 0; font-size: 18px;"><i class="fa fa-link wt-text-warning"></i></span>
+            {/entry.argument}
         {/entry}
-        {@eq key=tab value="link-to"}
-            &nbsp;<span class="label label-warning" style="font-size: 16px; font-weight: normal; padding: .2em .4em .2em; letter-spacing: normal">Links</span>
-        {/eq}
-        {@eq key=tab value="update-verdict"}
-            &nbsp;<span class="label label-warning" style="font-size: 16px; font-weight: normal; padding: .2em .4em .2em; letter-spacing: normal">Verdict</span>
-        {/eq}
-        {@eq key=tab value="clipboard"}
-            Clipboard
-        {/eq}
-        {@eq key=tab value="screening"}
-            &nbsp;<span class="label label-warning" style="font-size: 16px; font-weight: normal; padding: .2em .4em .2em; letter-spacing: normal">Screening</span>
-        {/eq}
+        {@eq key=tab value="link-to"} <span class="label label-warning wt-subtitle">Links</span>{/eq}
+        {@eq key=tab value="update-verdict"} <span class="label label-warning wt-subtitle">Verdict</span>{/eq}
+        {@eq key=tab value="clipboard"}Clipboard{/eq}
+        {@eq key=tab value="screening"} <span class="label label-warning wt-subtitle">Screening</span>{/eq}
     </h2>
-    <hr style="border: 0; margin: 0.7rem 0 0.7rem; border-top: 0.0625rem dotted #dcdcdc;"/>
+    <hr class="wt-dotted-line" />
     <div style="font-style-x: italic; font-size: smaller;" class="text-muted">
         {?opinion}
-            <i class="fa fa-comments-o"></i> A comment on&nbsp;
-            {?question}
-                <a href="{wikiBaseUrl}{paths.wiki.questions.entry}/{question.friendlyUrl}/{question._id}">{question.title}</a>
-            {:else}
-                {?argument}
-                    <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argument.friendlyUrl}/{argument._id}">{argument.title}</a>
-                {:else}
-                    <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
-                {/argument}
-            {/question}
+            <i class="fa fa-comments-o"></i> A comment on {>"dust/wiki/common/entry-link-question" /}
         {:else}
             {?issue}
-                <i class="fa fa-exclamation-circle"></i> An issue on&nbsp;
-                {?question}
-                    <a href="{wikiBaseUrl}{paths.wiki.questions.entry}/{question.friendlyUrl}/{question._id}">{question.title}</a>
-                {:else}
-                    {?argument}
-                        <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argument.friendlyUrl}/{argument._id}">{argument.title}</a>
-                    {:else}
-                        <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
-                    {/argument}
-                {/question}
+                <i class="fa fa-exclamation-circle"></i> An issue on {>"dust/wiki/common/entry-link-question" /}
             {:else}
                 {?answer}
                     <i class="fa fa-check-circle-o"></i> An answer on <a href="{wikiBaseUrl}{paths.wiki.questions.entry}/{question.friendlyUrl}/{question._id}">{question.title}</a>
                 {:else}
                     {?question}
-                        <i class="fa fa-question-circle-o"></i> A question on&nbsp;
-                        {?argument}
-                            <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argument.friendlyUrl}/{argument._id}">{argument.title}</a>
-                        {:else}
-                            <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
-                        {/argument}
+                        <i class="fa fa-question-circle-o"></i> A question on {>"dust/wiki/common/entry-link-argument" /}
                     {:else}
-                        {?argument}
-                            {?parentArgument}
-                                <i class="fa fa-bolt"></i> A sub-argument {?argument.against}<span class="text-danger">against</span>{:else}in support for{/argument.against} <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
-                            {:else}
-                                <i class="fa fa-bolt"></i> An argument under the topic <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
-                            {/parentArgument}
+                        {?argumentLink}
+                            <i class="fa fa-link"></i> Argument <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/{argumentLink.argument._id}">{argumentLink.argument.title}</a> linked to
+                            {?argument} <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argument.friendlyUrl}/{argument._id}">{argument.title}</a>
+                                {:else} <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
+                            {/argument}
                         {:else}
-                            {?topic}
-                                {?parentTopic}
-                                    <i class="fa fa-folder-open-o"></i> A sub-topic under <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}">{parentTopic.title}</a>
+                            {?argument}
+                                {?parentArgument}
+                                    <i class="fa fa-bolt"></i> A sub-argument {?argument.against}<span class="text-danger">against</span>{:else}in support for{/argument.against} <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
                                 {:else}
-                                    <i class="fa fa-folder-open-o"></i> A topic category
-                                {/parentTopic}
-                            {/topic}
-                        {/argument}
+                                    <i class="fa fa-bolt"></i> An argument under the topic <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
+                                {/parentArgument}
+                            {:else}
+                                {?topicLink}
+                                    <i class="fa fa-link"></i> Topic <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topicLink.topic.friendlyUrl}/{topicLink.topic._id}">{topicLink.topic.title}</a> linked to <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
+                                {:else}
+                                    {?topic}
+                                        {?parentTopic}
+                                            <i class="fa fa-folder-open-o"></i> A sub-topic under <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}">{parentTopic.title}</a>
+                                        {:else}
+                                            <i class="fa fa-folder-open-o"></i> A topic category
+                                        {/parentTopic}
+                                    {/topic}
+                                {/topicLink}
+                            {/argument}
+                        {/argumentLink}
                     {/question}
                 {/answer}
-
             {/issue}
         {/opinion}
     </div>
