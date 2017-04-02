@@ -3,32 +3,40 @@
     {?opinion}
         ...under the comment <a href="{wikiBaseUrl}{paths.wiki.opinions.entry}/{opinion.friendlyUrl}/{opinion._id}">{opinion.title}</a>
     {:else}
-        {?answer}
-            ...under the answer <a href="{wikiBaseUrl}{paths.wiki.answers.entry}/{answer.friendlyUrl}/{answer._id}">{answer.title}</a>
+        {?issue}
+            ...under the issue <a href="{wikiBaseUrl}{paths.wiki.issues.entry}/{issue.friendlyUrl}/{issue._id}">{issue.title}</a>
         {:else}
-            {?question}
-                ...under the question <a href="{wikiBaseUrl}{paths.wiki.questions.entry}/{question.friendlyUrl}/{question._id}">{question.title}</a>
+            {?answer}
+                ...under the answer <a href="{wikiBaseUrl}{paths.wiki.answers.entry}/{answer.friendlyUrl}/{answer._id}">{answer.title}</a>
             {:else}
-                {?argumentLink}
-                    ...under the argument link <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/{argumentLink._id}">{argumentLink.title2}</a>
+                {?question}
+                    ...under the question <a href="{wikiBaseUrl}{paths.wiki.questions.entry}/{question.friendlyUrl}/{question._id}">{question.title}</a>
                 {:else}
-                    {?argument}
-                        ...under the argument <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argument.friendlyUrl}/{argument._id}">{argument.title}</a>
+                    {?argumentLink}
+                        ...under the argument link <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/link/{argumentLink._id}">{argumentLink.title2}</a>
                     {:else}
-                        {?topicLink}
-                            ...under the topic link <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topicLink.topic.friendlyUrl}/{topicLink._id}">{topicLink.title2}</a>
+                        {?argument}
+                            ...under the argument <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argument.friendlyUrl}/{argument._id}">{argument.title}</a>
                         {:else}
-                            {?topic}
-                                ...under the topic <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
+                            {?parentArgument}
+                                ...under the parent argument <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
                             {:else}
-                                {?parentTopic}
-                                    ...under the topic <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}">{parentTopic.title}</a>
-                                {/parentTopic}
-                            {/topic}
-                        {/topicLink}
-                    {/argument}
-                {/argumentLink}
-            {/question}
-        {/answer}
+                                {?topicLink}
+                                    ...under the topic link <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topicLink.topic.friendlyUrl}/link/{topicLink._id}">{topicLink.title2}</a>
+                                {:else}
+                                    {?topic}
+                                        ...under the topic <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
+                                    {:else}
+                                        {?parentTopic}
+                                            ...under the topic <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}">{parentTopic.title}</a>
+                                        {/parentTopic}
+                                    {/topic}
+                                {/topicLink}
+                            {/parentArgument}
+                        {/argument}
+                    {/argumentLink}
+                {/question}
+            {/answer}
+        {/issue}
     {/opinion}
 </div>

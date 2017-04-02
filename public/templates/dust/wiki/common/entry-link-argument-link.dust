@@ -1,0 +1,5 @@
+{?argumentLink}
+    argument link <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/link/{argumentLink._id}">{argumentLink.title2}</a>
+{:else}
+    {>"dust/wiki/common/entry-link-argument" /}
+{/argumentLink}

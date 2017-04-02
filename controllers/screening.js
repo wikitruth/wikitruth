@@ -12,7 +12,14 @@ function createReturnUrl(req, model) {
     } else {
         model.wikiBaseUrl = '';
     }
-    return model.wikiBaseUrl + paths.wiki[constants.OBJECT_NAMES_MAP[model.ownerType]].entry + '/' + utils.urlify(model.entry.title) + '/' + model.entry._id;
+    switch (model.ownerType) {
+        case constants.OBJECT_TYPES.topicLink:
+            return model.wikiBaseUrl + paths.wiki.topics.entry + '/' + utils.urlify(model.entry.title2) + '/link/' + model.entry._id;
+        case constants.OBJECT_TYPES.argumentLink:
+            return model.wikiBaseUrl + paths.wiki.arguments.entry + '/' + utils.urlify(model.entry.title2) + '/link/' + model.entry._id;
+        default:
+            return model.wikiBaseUrl + paths.wiki[constants.OBJECT_NAMES_MAP[model.ownerType]].entry + '/' + utils.urlify(model.entry.title) + '/' + model.entry._id;
+    }
 }
 
 module.exports = function (router) {
