@@ -638,8 +638,16 @@ function getTopOpinions(query, model, callback) {
         });
 }
 
+/**
+ * Updates the childrenCount property of the specified entry
+ * @param entryId: parent entryId
+ * @param entryType: parent entryType
+ * @param specificEntryType: specific child entries to update
+ * @param callback
+ */
 function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
     var countNode = {};
+    var model = {}, req = {};
 
     var updateTopics = function (callback) {
         if(!specificEntryType || specificEntryType === constants.OBJECT_TYPES.topic) {
@@ -683,9 +691,10 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
     var updateArguments = function (callback) {
         if(!specificEntryType || specificEntryType === constants.OBJECT_TYPES.argument) {
             var args = countNode.childrenCount['arguments'];
+            var q = { ownerId: model.argument ? model.argument.ownerId : entryId, parentId: model.argument ? model.argument._id : null };
             async.parallel({
                 accepted: function(callback) {
-                    var query = { ownerId: entryId, parentId: null, 'screening.status': constants.SCREENING_STATUS.status1.code };
+                    var query = { ownerId: q.ownerId, parentId: q.parentId, 'screening.status': constants.SCREENING_STATUS.status1.code };
                     db.Argument.count(query, function (err, count) {
                         db.ArgumentLink.count(query, function (err, linkCount) {
                             args.accepted = count + linkCount;
@@ -694,7 +703,7 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
                     });
                 },
                 pending: function(callback) {
-                    var query = { ownerId: entryId, parentId: null, 'screening.status': constants.SCREENING_STATUS.status0.code };
+                    var query = { ownerId: q.ownerId, parentId: q.parentId, 'screening.status': constants.SCREENING_STATUS.status0.code };
                     db.Argument.count(query, function (err, count) {
                         db.ArgumentLink.count(query, function (err, linkCount) {
                             args.pending = count + linkCount;
@@ -703,7 +712,7 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
                     });
                 },
                 rejected: function(callback) {
-                    var query = { ownerId: entryId, parentId: null, 'screening.status': constants.SCREENING_STATUS.status2.code };
+                    var query = { ownerId: q.ownerId, parentId: q.parentId, 'screening.status': constants.SCREENING_STATUS.status2.code };
                     db.Argument.count(query, function (err, count) {
                         db.ArgumentLink.count(query, function (err, linkCount) {
                             args.rejected = count + linkCount;
@@ -840,11 +849,10 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
         }
     };
 
-    var model = {}, req = {};
     if(entryType === constants.OBJECT_TYPES.topic) {
-        req = { query: { topic: entryId } };
+        req = {query: {topic: entryId}};
         setEntryModels(createOwnerQueryFromQuery(req), req, model, function () {
-            countNode = { childrenCount: model.topic.childrenCount };
+            countNode = {childrenCount: model.topic.childrenCount};
             async.parallel({
                 topics: updateTopics,
                 arguments: updateArguments,
@@ -860,6 +868,22 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
             });
         });
 
+    } else if(entryType === constants.OBJECT_TYPES.topicLink) {
+            req = { query: { topicLink: entryId } };
+            setEntryModels(createOwnerQueryFromQuery(req), req, model, function () {
+                countNode = { childrenCount: model.topicLink.childrenCount };
+                async.parallel({
+                    issues: updateIssues,
+                    opinions: updateOpinions
+                }, function (err, results) {
+                    db.TopicLink.update({_id: entryId}, {
+                        $set: countNode
+                    }, function (err, num) {
+                        callback();
+                    });
+                });
+            });
+
     } else if(entryType === constants.OBJECT_TYPES.argument) {
         req = { query: { argument: entryId } };
         setEntryModels(createOwnerQueryFromQuery(req), req, model, function () {
@@ -871,6 +895,22 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
                 opinions: updateOpinions
             }, function (err, results) {
                 db.Argument.update({_id: entryId}, {
+                    $set: countNode
+                }, function (err, num) {
+                    callback();
+                });
+            });
+        });
+
+    } else if(entryType === constants.OBJECT_TYPES.argumentLink) {
+        req = { query: { argumentLink: entryId } };
+        setEntryModels(createOwnerQueryFromQuery(req), req, model, function () {
+            countNode = { childrenCount: model.argumentLink.childrenCount };
+            async.parallel({
+                issues: updateIssues,
+                opinions: updateOpinions
+            }, function (err, results) {
+                db.ArgumentLink.update({_id: entryId}, {
                     $set: countNode
                 }, function (err, num) {
                     callback();
@@ -931,6 +971,7 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
         setEntryModels(createOwnerQueryFromQuery(req), req, model, function () {
             countNode = { childrenCount: model.opinion.childrenCount };
             async.parallel({
+                issues: updateIssues,
                 opinions: updateOpinions
             }, function (err, results) {
                 db.Opinion.update({_id: entryId}, {

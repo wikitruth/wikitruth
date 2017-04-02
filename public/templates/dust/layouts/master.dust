@@ -55,7 +55,7 @@
         </script>
     {/googleAnalyticsTrackingId}
 </head>
-<body data-entry-id="{entry._id}" data-entry-type="{entryType}" data-csrf="{_csrf}" data-username="{username}" {?application}class="app-{application.id}"{/application}>
+<body data-entry-id="{entry._id}" data-entry-type="{entryType}" data-csrf="{_csrf}"{?username} data-username="{username}"{/username}{?application} class="app-{application.id}"{/application}>
     {>"dust/layouts/header" /}
     <div class="container">
         {+body /}

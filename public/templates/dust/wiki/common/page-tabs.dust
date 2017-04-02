@@ -2,35 +2,49 @@
     {^opinion}
         {^issue}
             {^question}
-                {^argument}
-                    <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
-                        <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}" role="tab">
-                            <span class="glyphicon glyphicon-home text-muted-x" aria-hidden="true"></span><span class="hidden-xxs"> Overview</span></a>
-                    </li>
-                    {@gt key=entry.childrenCount.topics.total value="0"}
-                        <li role="presentation"{@eq key=tab value="topics"} class="active"{/eq}>
-                            <a href="{wikiBaseUrl}{paths.wiki.topics.index}/{topic.friendlyUrl}/{topic._id}" role="tab">
-                                <i class="fa fa-folder-open text-muted-x" aria-hidden="true"></i><span class="hidden-xs"> Topics</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.topics.accepted}</span></a>
+                {^argumentLink}
+                    {^topicLink}
+                        {^argument}
+                            <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
+                                <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}" role="tab">
+                                    <span class="glyphicon glyphicon-home text-muted-x" aria-hidden="true"></span><span class="hidden-xxs"> Overview</span></a>
+                            </li>
+                            {@gt key=entry.childrenCount.topics.total value="0"}
+                                <li role="presentation"{@eq key=tab value="topics"} class="active"{/eq}>
+                                    <a href="{wikiBaseUrl}{paths.wiki.topics.index}/{topic.friendlyUrl}/{topic._id}" role="tab">
+                                        <i class="fa fa-folder-open text-muted-x" aria-hidden="true"></i><span class="hidden-xs"> Topics</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.topics.accepted}</span></a>
+                                </li>
+                            {/gt}
+                        {:else}
+                            <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
+                                <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argument.friendlyUrl}/{argument._id}" role="tab">
+                                    <span class="glyphicon glyphicon-home text-muted-x" aria-hidden="true"></span> Overview</a>
+                            </li>
+                        {/argument}
+                        <li role="presentation"{@eq key=tab value="arguments"} class="active"{/eq}>
+                            {@gt key=entry.childrenCount.arguments.total value="0"}
+                                <a href="{wikiBaseUrl}{paths.wiki.arguments.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" aria-controls="home" role="tab">
+                                    <span class="glyphicon glyphicon-flash text-muted-x" aria-hidden="true"></span><span class="hidden-xs"> Arguments</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.arguments.accepted}</span></a>
+                            {/gt}
                         </li>
-                    {/gt}
+                        <li role="presentation"{@eq key=tab value="questions"} class="active"{/eq}>
+                            {@gt key=entry.childrenCount.questions.total value="0"}
+                                <a href="{wikiBaseUrl}{paths.wiki.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
+                                    <span class="glyphicon glyphicon-question-sign text-muted-x" aria-hidden="true"></span><span class="hidden-xs"> Questions</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.questions.accepted}</span></a>
+                            {/gt}
+                        </li>
+                    {:else}
+                        <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
+                            <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topicLink.topic.friendlyUrl}/link/{topicLink._id}" role="tab">
+                                <span class="glyphicon glyphicon-home text-muted-x" aria-hidden="true"></span> Overview</a>
+                        </li>
+                    {/topicLink}
                 {:else}
                     <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
-                        <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argument.friendlyUrl}/{argument._id}" role="tab">
+                        <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/link/{argumentLink._id}" role="tab">
                             <span class="glyphicon glyphicon-home text-muted-x" aria-hidden="true"></span> Overview</a>
                     </li>
-                {/argument}
-                <li role="presentation"{@eq key=tab value="arguments"} class="active"{/eq}>
-                    {@gt key=entry.childrenCount.arguments.total value="0"}
-                        <a href="{wikiBaseUrl}{paths.wiki.arguments.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" aria-controls="home" role="tab">
-                            <span class="glyphicon glyphicon-flash text-muted-x" aria-hidden="true"></span><span class="hidden-xs"> Arguments</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.arguments.accepted}</span></a>
-                    {/gt}
-                </li>
-                <li role="presentation"{@eq key=tab value="questions"} class="active"{/eq}>
-                    {@gt key=entry.childrenCount.questions.total value="0"}
-                        <a href="{wikiBaseUrl}{paths.wiki.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
-                            <span class="glyphicon glyphicon-question-sign text-muted-x" aria-hidden="true"></span><span class="hidden-xs"> Questions</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.questions.accepted}</span></a>
-                    {/gt}
-                </li>
+                {/argumentLink}
             {:else}
                 {^answer}
                     <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
@@ -52,13 +66,13 @@
             {/question}
             <li role="presentation"{@eq key=tab value="issues"} class="active"{/eq}>
                 {@gt key=entry.childrenCount.issues.total value="0"}
-                    <a href="{wikiBaseUrl}{paths.wiki.issues.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
+                    <a href="{wikiBaseUrl}{paths.wiki.issues.index}?topic={topic._id}{?topicLink}&amp;topicLink={topicLink._id}{/topicLink}{?argumentLink}&amp;argumentLink={argumentLink._id}{/argumentLink}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
                         <i class="fa fa-exclamation-circle text-muted-x" aria-hidden="true"></i><span class="hidden-xs"> Issues</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.issues.accepted}</span></a>
                 {/gt}
             </li>
             <li role="presentation"{@eq key=tab value="opinions"} class="active"{/eq}>
                 {@gt key=entry.childrenCount.opinions.total value="0"}
-                    <a href="{wikiBaseUrl}{paths.wiki.opinions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
+                    <a href="{wikiBaseUrl}{paths.wiki.opinions.index}?topic={topic._id}{?topicLink}&amp;topicLink={topicLink._id}{/topicLink}{?argumentLink}&amp;argumentLink={argumentLink._id}{/argumentLink}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab">
                         <i class="fa fa-comments-o text-muted-x" aria-hidden="true"></i><span class="hidden-xs"> Comments</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.opinions.accepted}</span></a>
                 {/gt}
             </li>
@@ -238,7 +252,7 @@
             {?user.roles.screener}
                 <li role="separator" class="divider"></li>
                 <li class="dropdown-header">Screener</li>
-                <li><a href="{paths.wiki.screening}?{?topic}topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}{?answer}&amp;answer={answer._id}{/answer}{?issue}&amp;issue={issue._id}{/issue}{?opinion}&amp;opinion={opinion._id}{/opinion}" title="Set screening status" class="no-underline">
+                <li><a href="{paths.wiki.screening}?{?topic}topic={topic._id}{/topic}{?topicLink}&amp;topicLink={topicLink._id}{/topicLink}{?argumentLink}&amp;argumentLink={argumentLink._id}{/argumentLink}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}{?answer}&amp;answer={answer._id}{/answer}{?issue}&amp;issue={issue._id}{/issue}{?opinion}&amp;opinion={opinion._id}{/opinion}" title="Set screening status" class="no-underline">
                     <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Screening Status</a></li>
             {/user.roles.screener}
         </ul>
