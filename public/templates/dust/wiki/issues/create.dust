@@ -10,7 +10,11 @@
         <h2 class="page-header wt-header">
             <i class="fa fa-exclamation-circle"></i> {?issue}Edit{:else}New{/issue} Issue
         </h2>
-        {>"dust/wiki/common/create-subtitle" /}
+        {?issue}
+            {>"dust/wiki/common/subtitle-edit" /}
+        {:else}
+            {>"dust/wiki/common/subtitle-create" /}
+        {/issue}
     </div>
     <div class="alert alert-success" role="alert">An issue is a problem found in a topic, argument, or question. An issue helps to keep track of a problem found by a reviewer and it helps determine the quality of an entry.</div>
     <form method="post">

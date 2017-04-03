@@ -10,7 +10,11 @@
         <h2 class="page-header wt-header">
             <i class="fa fa-flash"></i> {?argument}Edit{:else}New{/argument} Argument
         </h2>
-        {>"dust/wiki/common/create-subtitle" /}
+        {?argument}
+            {>"dust/wiki/common/subtitle-edit" /}
+        {:else}
+            {>"dust/wiki/common/subtitle-create" /}
+        {/argument}
     </div>
     <div class="alert alert-success" role="alert">An argument can be a statement of fact, claim, assertion, or a conclusion that describes reality or truth. Create arguments to break-down a topic into small, easy to understand statements. Arguments can be re-used on other topics by creating a link.</div>
     <form method="post">
