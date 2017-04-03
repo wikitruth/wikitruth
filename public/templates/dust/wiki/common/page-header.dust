@@ -15,48 +15,7 @@
         {@eq key=tab value="clipboard"}Clipboard{/eq}
         {@eq key=tab value="screening"} <span class="label label-warning wt-subtitle">Screening</span>{/eq}
     </h2>
-    <hr class="wt-dotted-line" />
-    <div style="font-style-x: italic; font-size: smaller;" class="text-muted">
-        {?opinion}
-            <i class="fa fa-comments-o"></i> A comment on {>"dust/wiki/common/entry-link-question" /}
-        {:else}
-            {?issue}
-                <i class="fa fa-exclamation-circle"></i> An issue on {>"dust/wiki/common/entry-link-question" /}
-            {:else}
-                {?answer}
-                    <i class="fa fa-check-circle-o"></i> An answer on {>"dust/wiki/common/entry-link-question" /}
-                {:else}
-                    {?question}
-                        <i class="fa fa-question-circle-o"></i> A question on {>"dust/wiki/common/entry-link-argument" /}
-                    {:else}
-                        {?argumentLink}
-                            <i class="fa fa-link"></i> Argument <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/{argumentLink.argument._id}">{argumentLink.argument.title}</a> linked to {>"dust/wiki/common/entry-link-argument" /}
-                        {:else}
-                            {?argument}
-                                {?parentArgument}
-                                    <i class="fa fa-bolt"></i> A sub-argument {?argument.against}<span class="text-danger">against</span>{:else}in support for{/argument.against} <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
-                                {:else}
-                                    <i class="fa fa-bolt"></i> An argument under the topic <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
-                                {/parentArgument}
-                            {:else}
-                                {?topicLink}
-                                    <i class="fa fa-link"></i> Topic <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topicLink.topic.friendlyUrl}/{topicLink.topic._id}">{topicLink.topic.title}</a> linked to <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
-                                {:else}
-                                    {?topic}
-                                        {?parentTopic}
-                                            <i class="fa fa-folder-open-o"></i> A sub-topic under <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}">{parentTopic.title}</a>
-                                        {:else}
-                                            <i class="fa fa-folder-open-o"></i> A topic category
-                                        {/parentTopic}
-                                    {/topic}
-                                {/topicLink}
-                            {/argument}
-                        {/argumentLink}
-                    {/question}
-                {/answer}
-            {/issue}
-        {/opinion}
-    </div>
+    {>"dust/wiki/common/subtitle-edit" /}
     {@eq key=entry.screening.status value=0}
         <br/>
         <div class="alert alert-warning" role="alert">

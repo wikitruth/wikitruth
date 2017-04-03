@@ -10,7 +10,11 @@
         <h2 class="page-header wt-header">
             <i class="fa fa-folder-open"></i> {?topic}Edit{:else}New{/topic} Topic
         </h2>
-        {>"dust/wiki/common/create-subtitle" /}
+        {?topic}
+            {>"dust/wiki/common/subtitle-edit" /}
+        {:else}
+            {>"dust/wiki/common/subtitle-create" /}
+        {/topic}
     </div>
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
