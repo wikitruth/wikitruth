@@ -583,6 +583,10 @@ module.exports = function (router) {
         topicController.GET_index(req, res);
     });
 
+    router.get('/:username/diary/topic/:friendlyUrl/link/:id', function (req, res) {
+        topicController.GET_link_entry(req, res);
+    });
+
     router.get('/:username/diary/topic(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
         topicController.GET_entry(req, res);
     });
@@ -608,6 +612,10 @@ module.exports = function (router) {
 
     router.get('/:username/diary/arguments', function (req, res) {
         argumentController.GET_index(req, res);
+    });
+
+    router.get('/:username/diary/argument/:friendlyUrl/link/:id', function (req, res) {
+        argumentController.GET_link_entry(req, res);
     });
 
     router.get('/:username/diary/argument(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
