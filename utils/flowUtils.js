@@ -201,7 +201,7 @@ function setOpinionModel(req, model, callback) {
                         if (result) {
                             appendEntryExtra(result);
                             if(model.opinion2) {
-                                model.parentOpinion2 = result
+                                model.parentOpinion2 = result;
                             } else {
                                 model.parentOpinion = result;
                             }
