@@ -179,6 +179,11 @@ var ISSUE_TYPES = {
         critical: true,
         text: "Unwelcome content"
     },
+    type45: {
+        code: 45,
+        critical: true,
+        text: "Other issue (critical)"
+    },
     type50: {
         code: 50,
         critical: false,
@@ -197,7 +202,7 @@ var ISSUE_TYPES = {
     type100: {
         code: 100,
         critical: false,
-        text: "Other issue"
+        text: "Other issue (warning)"
     }
 };
 

@@ -118,7 +118,7 @@ function POST_create(req, res) {
         }
         entity.private = req.params.username ? true : false;
         if(!entity.ownerId) {
-            delete req.query.opinion;
+            //delete req.query.opinion;
             delete req.query.issue;
             var q = flowUtils.createOwnerQueryFromQuery(req);
             entity.ownerId = q.ownerId;

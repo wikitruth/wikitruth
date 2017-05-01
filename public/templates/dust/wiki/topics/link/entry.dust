@@ -11,7 +11,7 @@
     </div>
     <div class="text-body collapsible">
         {?entry.topic.referenceDate}
-            <p><small class="text-muted" title="Reference Date"><i class="fa fa-clock-o"></i> {entry.topic.referenceDateUTC}</small></p>
+            <p><small class="text-muted" title="Reference Date"><i class="fa fa-clock-o"></i> {entry.topic.referenceDateSimple}</small></p>
         {/entry.topic.referenceDate}
         {entry.topic.content|s}
         <a href="#" onclick="return contentSeeMore()" class="content-see-more hidden">

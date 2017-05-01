@@ -1,10 +1,10 @@
 <hr class="wt-dotted-line" />
 <div style="font-style-x: italic; font-size: smaller;" class="text-muted">
-    {?opinion}
-        <i class="fa fa-comments-o"></i> A comment on {>"dust/wiki/common/entry-link-question" /}
+    {?isOpinionEntry}
+        <i class="fa fa-comments-o"></i> A comment on {>"dust/wiki/common/entry-link-opinion" /}
     {:else}
-        {?issue}
-            <i class="fa fa-exclamation-circle"></i> An issue on {>"dust/wiki/common/entry-link-question" /}
+        {?isIssueEntry}
+            <i class="fa fa-exclamation-circle"></i> An issue on {>"dust/wiki/common/entry-link-opinion" /}
         {:else}
             {?answer}
                 <i class="fa fa-check-circle-o"></i> An answer on {>"dust/wiki/common/entry-link-question" /}
@@ -37,6 +37,6 @@
                     {/argumentLink}
                 {/question}
             {/answer}
-        {/issue}
-    {/opinion}
+        {/isIssueEntry}
+    {/isOpinionEntry}
 </div>

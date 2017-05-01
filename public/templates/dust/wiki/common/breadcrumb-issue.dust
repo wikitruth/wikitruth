@@ -1,0 +1,1 @@
+<li><i class="fa fa-exclamation-circle text-muted"></i> <a href="{wikiBaseUrl}{paths.wiki.issues.entry}/{issue.friendlyUrl}/{issue._id}">{issue.shortTitle}</a></li>
