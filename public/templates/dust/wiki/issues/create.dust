@@ -65,6 +65,13 @@
             </div>
             <div class="radio">
                 <label>
+                    <input type="radio" id="radioType45" name="issueType" value="45">
+                    <span class="text-danger"><strong>Other issue (Critical)</strong></span><br/>
+                    A critical issue not covered above.
+                </label>
+            </div>
+            <div class="radio">
+                <label>
                     <input type="radio" id="radioType50" name="issueType" value="50">
                     <span class="text-warning"><strong>Incoherent or unrelated</strong></span><br/>
                     The entry is incoherent or unrelated to the parent entry. If this is a placement issue, consider moving to the more appropriate location.
@@ -93,7 +100,7 @@
             <div class="radio">
                 <label>
                     <input type="radio" id="radioType100" name="issueType" value="100">
-                    <span class="text-warning"><strong>Other issue</strong></span><br/>
+                    <span class="text-warning"><strong>Other issue (Warning)</strong></span><br/>
                     Grammar or spelling issue, unorganized content, confusing statement, or any other issue.
                 </label>
             </div>

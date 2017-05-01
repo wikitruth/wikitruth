@@ -1,7 +1,13 @@
 <hr class="wt-dotted-line" />
 <div style="font-style-x: italic; font-size: smaller;" class="text-muted">
-    {?opinion}
-        ...under the comment <a href="{wikiBaseUrl}{paths.wiki.opinions.entry}/{opinion.friendlyUrl}/{opinion._id}">{opinion.title}</a>
+    {^isIssueEntry}
+        {?opinion}
+            ...under the comment <a href="{wikiBaseUrl}{paths.wiki.opinions.entry}/{opinion.friendlyUrl}/{opinion._id}">{opinion.title}</a>
+        {:else}
+            {?parentOpinion}
+                ...under the parent comment <a href="{wikiBaseUrl}{paths.wiki.opinions.entry}/{parentOpinion.friendlyUrl}/{parentOpinion._id}">{parentOpinion.title}</a>
+            {/parentOpinion}
+        {/opinion}
     {:else}
         {?issue}
             ...under the issue <a href="{wikiBaseUrl}{paths.wiki.issues.entry}/{issue.friendlyUrl}/{issue._id}">{issue.title}</a>
@@ -38,5 +44,5 @@
                 {/question}
             {/answer}
         {/issue}
-    {/opinion}
+    {/isIssueEntry}
 </div>

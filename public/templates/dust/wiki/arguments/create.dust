@@ -16,7 +16,7 @@
             {>"dust/wiki/common/subtitle-create" /}
         {/argument}
     </div>
-    <div class="alert alert-success" role="alert">An argument can be a statement of fact, claim, assertion, or a conclusion that describes reality or truth. Create arguments to break-down a topic into small, easy to understand statements. Arguments can be re-used on other topics by creating a link.</div>
+    <div class="alert alert-success" role="alert">An argument is a statement of fact, claim, assertion, or a conclusion that describes reality or truth. Create arguments to break-down a topic into small, easy to understand statements. Arguments can be re-used on other topics by creating a link.</div>
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
         <div class="form-group">

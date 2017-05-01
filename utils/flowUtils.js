@@ -7,7 +7,10 @@ var db          = require('../app').db.models,
     url         = require('url'),
     querystring = require('querystring'),
     htmlToText  = require('html-to-text'),
+    moment      = require('moment'),
     async       = require('async');
+
+var mn = " 12:00 AM";
 
 function getBackupDir(isPrivate) {
     var backupRoot = isPrivate && config.mongodb.privateBackupRoot ? config.mongodb.privateBackupRoot : config.mongodb.backupRoot;
@@ -36,7 +39,6 @@ function appendEntryExtra(item) {
         item.shortTitle = utils.getShortText(item.title);
     }
     item.comments = utils.randomInt(0,999);
-    //item.editUsername = 'root';
     item.points = utils.randomInt(0,9999);
 
     //var editDateString = result.editDate.toUTCString();
@@ -47,8 +49,14 @@ function appendEntryExtra(item) {
     item.sameEditDate = item.createDate.valueOf() === item.editDate.valueOf();
 
     if(item.referenceDate) {
-        item.referenceDateString = item.referenceDate.toLocaleString();
+        var refDate = moment(item.referenceDate);
+        item.referenceDateString = item.referenceDate.toLocaleString(); // FIXME: using this on front-end might produce an issue when the locale of the server does not match the locale of the client.
         item.referenceDateUTC = item.referenceDate.toUTCString();
+        //item.referenceDateSimple = item.referenceDate.toLocaleString(); // toDateString(): Tue Dec 27 2016, toLocaleString(): 12/27/2016, 8:50:00 PM, toISOString(): 2016-12-27T12:50:00.000Z
+        item.referenceDateSimple = refDate.format('lll'); // see https://momentjs.com/docs/#/displaying/format/
+        if(item.referenceDateSimple.endsWith(mn)) {
+            item.referenceDateSimple = item.referenceDateSimple.substring(0, item.referenceDateSimple.length - mn.length);
+        }
     }
 }
 
@@ -170,20 +178,33 @@ function setOpinionModel(req, model, callback) {
                     if(err || !result) {
                         return callback(err);
                     }
-                    model.opinion = result;
+                    if(model.opinion) {
+                        model.opinion2 = result;
+                    } else {
+                        model.opinion = result;
+                    }
                     appendEntryExtra(result);
                     if (isEntryOwner(req, result)) {
-                        model.isOpinionOwner = true;
+                        if(model.opinion2) {
+                            model.isOpinionOwner2 = true;
+                        } else {
+                            model.isOpinionOwner = true;
+                        }
                     }
                     setUsername(result, callback);
                 });
             },
             parentOpinion: function (callback) {
-                if(model.opinion && model.opinion.parentId) {
-                    db.Opinion.findOne({_id: model.opinion.parentId}, function (err, result) {
+                var opinion = model.opinion2 || model.opinion;
+                if(opinion && opinion.parentId) {
+                    db.Opinion.findOne({_id: opinion.parentId}, function (err, result) {
                         if (result) {
                             appendEntryExtra(result);
-                            model.parentOpinion = result;
+                            if(model.opinion2) {
+                                model.parentOpinion2 = result
+                            } else {
+                                model.parentOpinion = result;
+                            }
                         }
                         callback();
                     });
@@ -192,11 +213,16 @@ function setOpinionModel(req, model, callback) {
                 }
             },
             grandParentOpinion: function (callback) {
-                if(model.parentOpinion && model.parentOpinion.parentId) {
-                    db.Opinion.findOne({_id: model.parentOpinion.parentId}, function (err, result) {
+                var parentOpinion = model.parentOpinion2 || model.parentOpinion;
+                if(parentOpinion && parentOpinion.parentId) {
+                    db.Opinion.findOne({_id: parentOpinion.parentId}, function (err, result) {
                         if (result) {
                             appendEntryExtra(result);
-                            model.grandParentOpinion = result;
+                            if(model.opinion2) {
+                                model.grandParentOpinion2 = result;
+                            } else {
+                                model.grandParentOpinion = result;
+                            }
                         }
                         callback();
                     });
@@ -441,7 +467,7 @@ function setEntryModels(query, req, model, callback) {
     } else if(query.ownerType === constants.OBJECT_TYPES.opinion) {
         req.query.opinion = query.ownerId;
         setOpinionModel(req, model, function () {
-            setEntryModels(model.opinion, req, model, callback);
+            setEntryModels(model.opinion2 || model.opinion, req, model, callback);
         });
     } else {
         callback();
@@ -548,14 +574,14 @@ function getArguments(query, limit, callback) {
                 .sort({ title: 1 })
                 .lean()
                 .exec(function(err, results) {
-                setEditorsUsername(results, function() {
-                    results.forEach(function (result) {
-                        appendEntryExtra(result);
-                        //result.link = false;
-                        //result.against = false;
+                    setEditorsUsername(results, function() {
+                        results.forEach(function (result) {
+                            appendEntryExtra(result);
+                            //result.link = false;
+                            //result.against = false;
+                        });
+                        callback(null, results);
                     });
-                    callback(null, results);
-                });
             });
         },
         links: function (callback) {
@@ -613,6 +639,7 @@ function getTopIssues(query, model, callback) {
         .exec(function(err, results) {
             setEditorsUsername(results, function() {
                 results.forEach(function (result) {
+                    result.issueType = constants.ISSUE_TYPES['type' + result.issueType];
                     appendEntryExtra(result);
                 });
                 model.issues = results;
@@ -1141,14 +1168,22 @@ function createOwnerQueryFromQuery(req) {
 }
 
 function setModelOwnerEntry(model) {
-    if(model.opinion) {
+    /*if(model.opinion2) {
+        model.entry = model.opinion2;
+        model.entryType = constants.OBJECT_TYPES.opinion;
+        model.isEntryOwner = model.isOpinionOwner2;
+        model.isOpinionEntry2 = true;
+    } else*/
+    if(model.opinion && (!model.issue || model.opinion.ownerType === constants.OBJECT_TYPES.issue)) {
         model.entry = model.opinion;
         model.entryType = constants.OBJECT_TYPES.opinion;
         model.isEntryOwner = model.isOpinionOwner;
+        model.isOpinionEntry = true;
     } else if(model.issue) {
         model.entry = model.issue;
         model.entryType = constants.OBJECT_TYPES.issue;
         model.isEntryOwner = model.isIssueOwner;
+        model.isIssueEntry = true;
     } else if(model.answer) {
         model.entry = model.answer;
         model.entryType = constants.OBJECT_TYPES.answer;
@@ -1402,7 +1437,16 @@ function isEntryOnIntendedUrl(req, entry) {
 }
 
 function createContentPreview(content) {
-    return utils.getShortText(htmlToText.fromString(content, { wordwrap: false, hideLinkHrefIfSameAsText: true }), constants.SETTINGS.contentPreviewLength);
+    return utils.getShortText(
+        htmlToText.fromString(content,
+            {
+                wordwrap: false,
+                hideLinkHrefIfSameAsText: true,
+                ignoreImage: true,
+                ignoreHref: true
+            }),
+        constants.SETTINGS.contentPreviewLength
+    );
 }
 
 module.exports = {

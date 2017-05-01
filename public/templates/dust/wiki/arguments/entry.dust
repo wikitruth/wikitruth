@@ -18,7 +18,7 @@
             {/parentArgument}
         </p>!}
         {?argument.referenceDate}
-            <p><small class="text-muted" title="Reference Date"><i class="fa fa-clock-o"></i> {argument.referenceDateUTC}</small></p>
+            <p><small class="text-muted" title="Reference Date"><i class="fa fa-clock-o"></i> {argument.referenceDateSimple}</small></p>
         {/argument.referenceDate}
         {argument.content|s}
         <a href="#" onclick="return contentSeeMore()" class="content-see-more hidden">

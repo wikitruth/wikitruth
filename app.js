@@ -4,6 +4,7 @@
 var config          = require('./config/config'),
     applications    = require('./models/applications'),
     paths           = require('./models/paths'),
+    constants       = require('./models/constants'),
     templates       = require('./models/templates'),
     express         = require('express'),
     cookieParser    = require('cookie-parser'),
@@ -125,6 +126,7 @@ app.locals.cacheBreaker = app.config.cacheBreaker;
 app.locals.googleAnalyticsTrackingId = app.config.googleAnalyticsTrackingId;
 app.locals.paths = paths;
 app.locals.templates = templates;
+app.locals.constants = constants;
 
 //setup passport
 require('./middlewares/passport')(app, passport);

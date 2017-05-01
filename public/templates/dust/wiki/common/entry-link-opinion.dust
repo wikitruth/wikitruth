@@ -1,0 +1,37 @@
+{^isOpinionEntry}
+    {?opinion}
+        comment <a href="{wikiBaseUrl}{paths.wiki.opinions.entry}/{opinion.friendlyUrl}/{opinion._id}">{opinion.title}</a>
+    {:else}
+        {?issue}
+            {^isIssueEntry}
+                issue <a href="{wikiBaseUrl}{paths.wiki.issues.entry}/{issue.friendlyUrl}/{issue._id}">{issue.title}</a>
+            {:else}
+                {?opinion}
+                    comment <a href="{wikiBaseUrl}{paths.wiki.opinions.entry}/{opinion.friendlyUrl}/{opinion._id}">{opinion.title}</a>
+                {:else}
+                    {>"dust/wiki/common/entry-link-question" /}
+                {/opinion}
+            {/isIssueEntry}
+        {:else}
+            {>"dust/wiki/common/entry-link-question" /}
+        {/issue}
+    {/opinion}
+{:else}
+    {?parentOpinion}
+        parent comment <a href="{wikiBaseUrl}{paths.wiki.opinions.entry}/{parentOpinion.friendlyUrl}/{parentOpinion._id}">{parentOpinion.title}</a>
+    {:else}
+        {?issue}
+            {^isIssueEntry}
+                issue <a href="{wikiBaseUrl}{paths.wiki.issues.entry}/{issue.friendlyUrl}/{issue._id}">{issue.title}</a>
+            {:else}
+                {?opinion}
+                    comment <a href="{wikiBaseUrl}{paths.wiki.opinions.entry}/{opinion.friendlyUrl}/{opinion._id}">{opinion.title}</a>
+                {:else}
+                    {>"dust/wiki/common/entry-link-question" /}
+                {/opinion}
+            {/isIssueEntry}
+        {:else}
+            {>"dust/wiki/common/entry-link-question" /}
+        {/issue}
+    {/parentOpinion}
+{/isOpinionEntry}

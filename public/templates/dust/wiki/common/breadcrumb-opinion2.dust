@@ -1,0 +1,22 @@
+{?parentOpinion2}
+    {?parentOpinion2.parentId}
+        {?grandParentOpinion2}
+            {?grandParentOpinion2.parentId}
+                <li><i class="fa fa-comments-o text-muted"></i> <a href="{wikiBaseUrl}{paths.wiki.opinions.entry}/{grandParentOpinion2.parentId}">..</a></li>
+            {/grandParentOpinion2.parentId}
+            <li>{^grandParentOpinion2.parentId}<i class="fa fa-comments-o text-muted"></i> {/grandParentOpinion2.parentId}<a href="{wikiBaseUrl}{paths.wiki.opinions.entry}/{grandParentOpinion2.friendlyUrl}/{grandParentOpinion2._id}">{grandParentOpinion2.shortTitle}</a></li>
+        {:else}
+            <li><i class="fa fa-comments-o text-muted"></i> <a href="{wikiBaseUrl}{paths.wiki.opinions.entry}/{parentOpinion2.parentId}">..</a></li>
+        {/grandParentOpinion2}
+    {!{:else}
+        <li><a href="{paths.wiki.opinions.index}?topic={topic._id}">Opinions</a></li>!}
+    {/parentOpinion2.parentId}
+    <li>{^parentOpinion2.parentId}<i class="fa fa-comments-o text-muted"></i> {/parentOpinion2.parentId}<a href="{wikiBaseUrl}{paths.wiki.opinions.entry}/{parentOpinion2.friendlyUrl}/{parentOpinion2._id}">{parentOpinion2.shortTitle}</a></li>
+{!{:else}
+    {?opinion}
+        <li><a href="{paths.wiki.opinions.index}?topic={topic._id}">Opinions</a></li>
+    {/opinion}!}
+{/parentOpinion2}
+{?opinion2}
+    <li>{^parentOpinion2}<i class="fa fa-comments-o text-muted"></i> {/parentOpinion2}<a href="{wikiBaseUrl}{paths.wiki.opinions.entry}/{opinion2.friendlyUrl}/{opinion2._id}">{opinion2.shortTitle}</a></li>
+{/opinion2}

@@ -31,12 +31,18 @@ function GET_entry(req, res) {
             req.query.opinion = req.params.friendlyUrl;
         }
     }
-    flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
+    var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
+    flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
         var query = {
             parentId: model.opinion._id,
             'screening.status': constants.SCREENING_STATUS.status1.code
         };
         async.parallel({
+            issues: function (callback) {
+                // Top Issues
+                ownerQuery['screening.status'] = constants.SCREENING_STATUS.status1.code;
+                flowUtils.getTopIssues(ownerQuery, model, callback);
+            },
             opinions: function (callback) {
                 flowUtils.getTopOpinions(query, model, callback);
             }
@@ -108,6 +114,7 @@ function GET_create(req, res) {
         if(model.opinion && !flowUtils.isEntryOwner(req, model.opinion)){
             return res.redirect('/');
         }
+        flowUtils.setModelOwnerEntry(model);
         flowUtils.setModelContext(req, model);
         res.render(templates.wiki.opinions.create, model);
     });
