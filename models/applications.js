@@ -19,6 +19,7 @@ var APPLICATIONS = [
             /*'localhost',*/
             'www.fixthephilippines.org'
         ],
+        googleAnalyticsTrackingId: 'UA-66543450-2',
         jumbotron: {
             title: "Let's fix the Philippines",
             description: 'A system to promote transparency and accountability, help citizens identify, raise and fix issues in the Philippine society and government.'

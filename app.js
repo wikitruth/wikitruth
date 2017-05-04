@@ -112,6 +112,7 @@ app.use(/^[^\.]+$/, function(req, res, next) {
         application.resPath = application.id + '/';
         res.locals.projectName = application.navTitle;
         res.locals.titleSlogan = application.slogan;
+        res.locals.googleAnalyticsTrackingId = application.googleAnalyticsTrackingId;
     }
 
     next();
