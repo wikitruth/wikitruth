@@ -8,7 +8,7 @@
     {@gt key=childrenCount.issues.accepted value="0"}<span><i class="fa fa-exclamation-circle" aria-hidden="true"></i> {childrenCount.issues.accepted}</span>{/gt}
     {@gt key=childrenCount.opinions.accepted value="0"}<span><i class="fa fa-comments-o" aria-hidden="true"></i> {childrenCount.opinions.accepted}</span>{/gt}
     {?referenceDate}
-        <span class="text-muted" title="Reference Date"><i class="fa fa-clock-o"></i> {referenceDateSimple}</span>
+        <span title="Reference Date"><i class="fa fa-clock-o"></i> {referenceDateSimple}</span>
     {/referenceDate}
 </div>
 {!<div class="text-muted wt-row-footer"><i class="fa fa-user"></i> {editUsername} <i class="fa fa-clock-o"></i> {editDateString} <i class="fa fa-diamond"></i> {points}

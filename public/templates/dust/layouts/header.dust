@@ -20,7 +20,7 @@
         <div class="navbar-collapse my-navbar-collapse collapse">
             <ul class="nav navbar-nav">
                 <!--<li class="hidden-xs"><a href="/">Home</a></li>-->
-                <li><a href="{paths.wiki.index}" title="Explore"><i class="fa fa-globe"></i><span class="hidden-xxs"> Explore</span></a></li>
+                <li><a href="{?application}{application.exploreUrl}{:else}{paths.wiki.index}{/application}" title="Explore"><i class="fa fa-globe"></i><span class="hidden-xxs"> Explore</span></a></li>
                 <li><a href="{paths.search}" title="Search"><i class="fa fa-search"></i><span class="hidden-xs"> Search</span></a></li>
                 {!<li><a href="{paths.worldviews.index}" title="Religion & Worldviews"><i class="fa fa-book"></i><span class="hidden-xs"> Religion</span></a></li>
                 <li><a href="{paths.morality.index}" title="Morality & Ethics"><i class="fa fa-balance-scale"></i><span class="hidden-xs"> Morality</span></a></li>!}

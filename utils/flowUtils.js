@@ -1168,14 +1168,13 @@ function createOwnerQueryFromQuery(req) {
 }
 
 function setModelOwnerEntry(model) {
-    /*if(model.opinion2) {
-        model.entry = model.opinion2;
-        model.entryType = constants.OBJECT_TYPES.opinion;
-        model.isEntryOwner = model.isOpinionOwner2;
-        model.isOpinionEntry2 = true;
-    } else*/
     if(model.opinion && (!model.issue || model.opinion.ownerType === constants.OBJECT_TYPES.issue)) {
         model.entry = model.opinion;
+        model.entryType = constants.OBJECT_TYPES.opinion;
+        model.isEntryOwner = model.isOpinionOwner;
+        model.isOpinionEntry = true;
+    } else if(model.parentOpinion && (!model.issue || model.parentOpinion.ownerType === constants.OBJECT_TYPES.issue)) {
+        model.entry = model.parentOpinion;
         model.entryType = constants.OBJECT_TYPES.opinion;
         model.isEntryOwner = model.isOpinionOwner;
         model.isOpinionEntry = true;
