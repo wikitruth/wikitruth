@@ -36,14 +36,16 @@ module.exports = function (router) {
                             .lean()
                             .exec(function (err, results) {
                                 flowUtils.setEditorsUsername(results, function() {
-                                    results.forEach(function(result) {
-                                        flowUtils.appendEntryExtra(result);
+                                    flowUtils.setEntryParents(results, constants.OBJECT_TYPES.topic, function() {
+                                        results.forEach(function(result) {
+                                            flowUtils.appendEntryExtra(result);
+                                        });
+                                        model.topics = results;
+                                        if(results.length === MAX_RESULT) {
+                                            model.topicsMore = true;
+                                        }
+                                        callback();
                                     });
-                                    model.topics = results;
-                                    if(results.length === MAX_RESULT) {
-                                        model.topicsMore = true;
-                                    }
-                                    callback();
                                 });
                             });
                     },
@@ -60,18 +62,20 @@ module.exports = function (router) {
                             .lean()
                             .exec(function (err, results) {
                                 flowUtils.setEditorsUsername(results, function() {
-                                    results.forEach(function (result) {
-                                        result.topic = {
-                                            _id: result.ownerId
-                                        };
-                                        flowUtils.appendEntryExtra(result);
-                                        flowUtils.setVerdictModel(result);
+                                    flowUtils.setEntryParents(results, constants.OBJECT_TYPES.argument, function() {
+                                        results.forEach(function (result) {
+                                            result.topic = {
+                                                _id: result.ownerId
+                                            };
+                                            flowUtils.appendEntryExtra(result);
+                                            flowUtils.setVerdictModel(result);
+                                        });
+                                        model.arguments = results;
+                                        if(results.length === MAX_RESULT) {
+                                            model.argumentsMore = true;
+                                        }
+                                        callback();
                                     });
-                                    model.arguments = results;
-                                    if(results.length === MAX_RESULT) {
-                                        model.argumentsMore = true;
-                                    }
-                                    callback();
                                 });
                             });
                     },
@@ -252,14 +256,16 @@ module.exports = function (router) {
                     .lean()
                     .exec(function (err, results) {
                         flowUtils.setEditorsUsername(results, function() {
-                            results.forEach(function(result) {
-                                flowUtils.appendEntryExtra(result);
+                            flowUtils.setEntryParents(results, constants.OBJECT_TYPES.topic, function() {
+                                results.forEach(function(result) {
+                                    flowUtils.appendEntryExtra(result);
+                                });
+                                model.topics = results;
+                                if(results.length > 0) {
+                                    model.results = true;
+                                }
+                                callback();
                             });
-                            model.topics = results;
-                            if(results.length > 0) {
-                                model.results = true;
-                            }
-                            callback();
                         });
                     });
             },
@@ -281,18 +287,20 @@ module.exports = function (router) {
                     .lean()
                     .exec(function (err, results) {
                         flowUtils.setEditorsUsername(results, function() {
-                            results.forEach(function (result) {
-                                result.topic = {
-                                    _id: result.ownerId
-                                };
-                                flowUtils.appendEntryExtra(result);
-                                flowUtils.setVerdictModel(result);
+                            flowUtils.setEntryParents(results, constants.OBJECT_TYPES.argument, function () {
+                                results.forEach(function (result) {
+                                    result.topic = {
+                                        _id: result.ownerId
+                                    };
+                                    flowUtils.appendEntryExtra(result);
+                                    flowUtils.setVerdictModel(result);
+                                });
+                                model.arguments = results;
+                                if (results.length > 0) {
+                                    model.results = true;
+                                }
+                                callback();
                             });
-                            model.arguments = results;
-                            if(results.length > 0) {
-                                model.results = true;
-                            }
-                            callback();
                         });
                     });
             },

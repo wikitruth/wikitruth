@@ -18,6 +18,9 @@
             {?private} <span class="label label-default">private</span>{/private}
             {>"dust/wiki/common/entry-row-screening-label" /}
         {/labels}
+        {?subtitle}
+            {>"dust/wiki/common/entry-row-subtitle" /}
+        {/subtitle}
         {?contentPreview}
             <div>{contentPreview}</div>
         {/contentPreview}

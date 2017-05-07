@@ -69,7 +69,7 @@
                 <ul class="list-group top-list-items wt-list">
                     {!<li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp; Topics</li>!}
                     {#topics}
-                        {>"dust/wiki/topics/entry-row" /}
+                        {>"dust/wiki/topics/entry-row" subtitle="true" /}
                     {/topics}
                 </ul>
                 {?topicsMore}
@@ -83,7 +83,7 @@
             <ul class="list-group top-list-items wt-list">
                 {!<li class="list-group-item highlight text-primary"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments</li>!}
                 {#arguments}
-                    {>"dust/wiki/arguments/entry-row" /}
+                    {>"dust/wiki/arguments/entry-row" subtitle="true" /}
                 {/arguments}
             </ul>
             {?argumentsMore}

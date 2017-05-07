@@ -126,4 +126,4 @@ Login, customize, and enjoy!
 
 ## Connect and discuss
 
-Feel free to send feedback to thewikitruth@gmail.com or join the discussion on [Facebook](https://www.facebook.com/wikitruth.co).
+Feel free to send feedback to wikitruth.co@gmail.com or join the discussion on [Facebook](https://www.facebook.com/wikitruth.co).

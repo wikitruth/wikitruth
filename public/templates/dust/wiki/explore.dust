@@ -112,7 +112,7 @@
         <ul class="list-group wt-list">
             <li class="list-group-item highlight"><i class="fa fa-folder-open text-muted" aria-hidden="true"></i> Topics</li>
             {#topics}
-                {>"dust/wiki/topics/entry-row" /}
+                {>"dust/wiki/topics/entry-row" subtitle="true" /}
             {/topics}
         </ul>
     {/topics}
@@ -120,7 +120,7 @@
         <ul class="list-group wt-list">
             <li class="list-group-item highlight"><i class="glyphicon glyphicon-flash text-muted" aria-hidden="true"></i> Arguments</li>
             {#arguments}
-                {>"dust/wiki/arguments/entry-row" /}
+                {>"dust/wiki/arguments/entry-row" subtitle="true" /}
             {/arguments}
         </ul>
     {/arguments}
