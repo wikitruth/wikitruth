@@ -60,6 +60,90 @@ function appendEntryExtra(item) {
     }
 }
 
+function setEntryParents(items, typeId, callback) {
+    if(!items || items.length === 0) { return callback(); }
+
+    var topicIds = [], argumentIds = [];
+    var topics = {}, args = {};
+    switch (typeId) {
+        case constants.OBJECT_TYPES.topic:
+            items.forEach(function (item) {
+                if(item.parentId && !topicIds[item.parentId.valueOf()]) {
+                    topicIds.push(item.parentId.valueOf());
+                }
+            });
+            break;
+        case constants.OBJECT_TYPES.argument:
+            items.forEach(function (item) {
+                if(item.parentId && !argumentIds[item.parentId.valueOf()]) {
+                    argumentIds.push(item.parentId.valueOf());
+                } else if(!topicIds[item.ownerId.valueOf()]){
+                    topicIds.push(item.ownerId.valueOf());
+                }
+            });
+            break;
+        case constants.OBJECT_TYPES.question:
+            items.forEach(function (item) {
+                switch (item.ownerType) {
+                    case constants.OBJECT_TYPES.topic:
+                        topicIds.push(item.ownerId.valueOf());
+                        break;
+                    case constants.OBJECT_TYPES.argument:
+                        argumentIds.push(item.ownerId.valueOf());
+                        break;
+                }
+            });
+            break;
+    }
+
+    async.parallel({
+        topics: function (callback) {
+            var query = { _id: { $in: topicIds } };
+            db.Topic
+                .find(query)
+                .exec(function (err, results) {
+                    results.forEach(function (result) {
+                        topics[result._id.valueOf()] = result;
+                    });
+                    callback();
+                });
+        },
+        arguments: function (callback) {
+            var query = { _id: { $in: argumentIds } };
+            db.Argument
+                .find(query)
+                .exec(function (err, results) {
+                    results.forEach(function (result) {
+                        args[result._id.valueOf()] = result;
+                    });
+                    callback();
+                });
+        }
+    }, function (err, results) {
+
+        switch (typeId) {
+            case constants.OBJECT_TYPES.topic:
+                items.forEach(function (item) {
+                    if(item.parentId) {
+                        item.parentTopic = topics[item.parentId.valueOf()];
+                    }
+                });
+                break;
+            case constants.OBJECT_TYPES.argument:
+                items.forEach(function (item) {
+                    if(item.parentId) {
+                        item.parentArgument = args[item.parentId.valueOf()];
+                    } else {
+                        item.parentTopic = topics[item.ownerId.valueOf()];
+                    }
+                });
+                break;
+        }
+
+        callback();
+    });
+}
+
 function setEditorsUsername(items, callback) {
     if(items && items.length > 0) {
         var seen = {};
@@ -1461,6 +1545,7 @@ module.exports = {
     setIssueModel: setIssueModel,
     setOpinionModel: setOpinionModel,
     setEntryModels: setEntryModels,
+    setEntryParents: setEntryParents,
 
     appendEntryExtra: appendEntryExtra,
     setEditorsUsername: setEditorsUsername,
