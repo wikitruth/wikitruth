@@ -569,18 +569,20 @@ module.exports = function (router) {
                             callback(err);
                         }
                         flowUtils.setEditorsUsername(results, function() {
-                            results.forEach(function (result) {
-                                flowUtils.appendEntryExtra(result);
-                                //result.link = false;
-                            });
-                            model.topics = results;
-                            if(results.length > 0) {
-                                if(results.length === MAX_RESULT) {
-                                    model.topicsMore = true;
+                            flowUtils.setEntryParents(results, constants.OBJECT_TYPES.topic, function () {
+                                results.forEach(function (result) {
+                                    flowUtils.appendEntryExtra(result);
+                                    //result.link = false;
+                                });
+                                model.topics = results;
+                                if (results.length > 0) {
+                                    if (results.length === MAX_RESULT) {
+                                        model.topicsMore = true;
+                                    }
+                                    model.results = true;
                                 }
-                                model.results = true;
-                            }
-                            callback();
+                                callback();
+                            });
                         });
                 });
             },
@@ -595,19 +597,21 @@ module.exports = function (router) {
                     .lean()
                     .exec(function(err, results) {
                         flowUtils.setEditorsUsername(results, function() {
-                            results.forEach(function (result) {
-                                flowUtils.appendEntryExtra(result);
-                                flowUtils.setVerdictModel(result);
-                            });
-                            flowUtils.sortArguments(results);
-                            model.arguments = results;
-                            if (results.length > 0) {
-                                if(results.length === MAX_RESULT) {
-                                    model.argumentsMore = true;
+                            flowUtils.setEntryParents(results, constants.OBJECT_TYPES.argument, function () {
+                                results.forEach(function (result) {
+                                    flowUtils.appendEntryExtra(result);
+                                    flowUtils.setVerdictModel(result);
+                                });
+                                flowUtils.sortArguments(results);
+                                model.arguments = results;
+                                if (results.length > 0) {
+                                    if (results.length === MAX_RESULT) {
+                                        model.argumentsMore = true;
+                                    }
+                                    model.results = true;
                                 }
-                                model.results = true;
-                            }
-                            callback();
+                                callback();
+                            });
                         });
                 });
             },
