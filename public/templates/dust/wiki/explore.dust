@@ -128,7 +128,7 @@
         <ul class="list-group wt-list">
             <li class="list-group-item highlight"><i class="fa fa-question-circle text-muted" aria-hidden="true"></i> Questions</li>
             {#questions}
-                {>"dust/wiki/questions/entry-row" /}
+                {>"dust/wiki/questions/entry-row" subtitle="true" /}
             {/questions}
         </ul>
     {/questions}
@@ -136,7 +136,7 @@
         <ul class="list-group wt-list">
             <li class="list-group-item highlight"><i class="fa fa-answer-circle text-success-x" aria-hidden="true"></i> Answers</li>
             {#answers}
-                {>"dust/wiki/answers/entry-row" /}
+                {>"dust/wiki/answers/entry-row" subtitle="true" /}
             {/answers}
         </ul>
     {/answers}
@@ -145,7 +145,7 @@
             <li class="list-group-item highlight"><span class="fa fa-exclamation-circle text-success" aria-hidden="true"></span> Issues
             </li>
             {#issues}
-                {>"dust/wiki/issues/entry-row" /}
+                {>"dust/wiki/issues/entry-row" subtitle="true" /}
             {/issues}
         </ul>
     {/issues}
@@ -153,7 +153,7 @@
         <ul class="list-group wt-list">
             <li class="list-group-item highlight"><span class="fa fa-comments-o text-success" aria-hidden="true"></span> Comments</li>
             {#opinions}
-                {>"dust/wiki/issues/entry-row" /}
+                {>"dust/wiki/opinions/entry-row" subtitle="true" /}
             {/opinions}
         </ul>
     {/opinions}

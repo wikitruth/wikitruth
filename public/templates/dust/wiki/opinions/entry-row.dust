@@ -7,6 +7,9 @@
                 {>"dust/wiki/common/entry-row-screening-label" /}
             {/labels}
         </a>
+        {?subtitle}
+            {>"dust/wiki/common/entry-row-subtitle" /}
+        {/subtitle}
         {?contentPreview}
             <div>{contentPreview}</div>
         {/contentPreview}
