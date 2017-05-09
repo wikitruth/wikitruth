@@ -187,18 +187,20 @@ module.exports = function (router) {
                             if(err || !results) {
                                 callback(err);
                             }
-                            flowUtils.setEditorsUsername(results, function() {
-                                results.forEach(function (result) {
-                                    flowUtils.appendEntryExtra(result);
-                                });
-                                model.topics = results;
-                                if(results.length > 0) {
-                                    if(results.length === 15) {
-                                        model.topicsMore = true;
+                            flowUtils.setEntryParents(results, constants.OBJECT_TYPES.topic, function() {
+                                flowUtils.setEditorsUsername(results, function () {
+                                    results.forEach(function (result) {
+                                        flowUtils.appendEntryExtra(result);
+                                    });
+                                    model.topics = results;
+                                    if (results.length > 0) {
+                                        if (results.length === 15) {
+                                            model.topicsMore = true;
+                                        }
+                                        model.results = true;
                                     }
-                                    model.results = true;
-                                }
-                                callback();
+                                    callback();
+                                });
                             });
                         });
                 },
@@ -212,20 +214,22 @@ module.exports = function (router) {
                         .limit(tab === 'all' ? 15 : 0)
                         .lean()
                         .exec(function(err, results) {
-                            flowUtils.setEditorsUsername(results, function() {
-                                results.forEach(function (result) {
-                                    flowUtils.appendEntryExtra(result);
-                                    flowUtils.setVerdictModel(result);
-                                });
-                                flowUtils.sortArguments(results);
-                                model.arguments = results;
-                                if (results.length > 0) {
-                                    if(results.length === 15) {
-                                        model.argumentsMore = true;
+                            flowUtils.setEntryParents(results, constants.OBJECT_TYPES.argument, function() {
+                                flowUtils.setEditorsUsername(results, function () {
+                                    results.forEach(function (result) {
+                                        flowUtils.appendEntryExtra(result);
+                                        flowUtils.setVerdictModel(result);
+                                    });
+                                    flowUtils.sortArguments(results);
+                                    model.arguments = results;
+                                    if (results.length > 0) {
+                                        if (results.length === 15) {
+                                            model.argumentsMore = true;
+                                        }
+                                        model.results = true;
                                     }
-                                    model.results = true;
-                                }
-                                callback();
+                                    callback();
+                                });
                             });
                         });
                 },
@@ -239,15 +243,17 @@ module.exports = function (router) {
                         .limit(tab === 'all' ? 15 : 0)
                         .lean()
                         .exec(function(err, results) {
-                            flowUtils.setEditorsUsername(results, function() {
-                                results.forEach(function (result) {
-                                    flowUtils.appendEntryExtra(result);
+                            flowUtils.setEntryParents(results, constants.OBJECT_TYPES.question, function() {
+                                flowUtils.setEditorsUsername(results, function () {
+                                    results.forEach(function (result) {
+                                        flowUtils.appendEntryExtra(result);
+                                    });
+                                    model.questions = results;
+                                    if (results.length > 0) {
+                                        model.results = true;
+                                    }
+                                    callback();
                                 });
-                                model.questions = results;
-                                if(results.length > 0) {
-                                    model.results = true;
-                                }
-                                callback();
                             });
                         });
                 },
@@ -261,15 +267,17 @@ module.exports = function (router) {
                         .limit(tab === 'all' ? 15 : 0)
                         .lean()
                         .exec(function(err, results) {
-                            flowUtils.setEditorsUsername(results, function() {
-                                results.forEach(function (result) {
-                                    flowUtils.appendEntryExtra(result);
+                            flowUtils.setEntryParents(results, constants.OBJECT_TYPES.answer, function() {
+                                flowUtils.setEditorsUsername(results, function () {
+                                    results.forEach(function (result) {
+                                        flowUtils.appendEntryExtra(result);
+                                    });
+                                    model.answers = results;
+                                    if (results.length > 0) {
+                                        model.results = true;
+                                    }
+                                    callback();
                                 });
-                                model.answers = results;
-                                if(results.length > 0) {
-                                    model.results = true;
-                                }
-                                callback();
                             });
                         });
                 },
@@ -283,18 +291,20 @@ module.exports = function (router) {
                         .limit(tab === 'all' ? 15 : 0)
                         .lean()
                         .exec(function(err, results) {
-                            flowUtils.setEditorsUsername(results, function() {
-                                results.forEach(function (result) {
-                                    flowUtils.appendEntryExtra(result);
-                                });
-                                model.issues = results;
-                                if (results.length > 0) {
-                                    if(results.length === 15) {
-                                        model.issuesMore = true;
+                            flowUtils.setEntryParents(results, constants.OBJECT_TYPES.issue, function() {
+                                flowUtils.setEditorsUsername(results, function () {
+                                    results.forEach(function (result) {
+                                        flowUtils.appendEntryExtra(result);
+                                    });
+                                    model.issues = results;
+                                    if (results.length > 0) {
+                                        if (results.length === 15) {
+                                            model.issuesMore = true;
+                                        }
+                                        model.results = true;
                                     }
-                                    model.results = true;
-                                }
-                                callback();
+                                    callback();
+                                });
                             });
                         });
                 },
@@ -308,18 +318,20 @@ module.exports = function (router) {
                         .limit(tab === 'all' ? 15 : 0)
                         .lean()
                         .exec(function(err, results) {
-                            flowUtils.setEditorsUsername(results, function() {
-                                results.forEach(function (result) {
-                                    flowUtils.appendEntryExtra(result);
-                                });
-                                model.opinions = results;
-                                if (results.length > 0) {
-                                    if(results.length === 15) {
-                                        model.opinionsMore = true;
+                            flowUtils.setEntryParents(results, constants.OBJECT_TYPES.opinion, function() {
+                                flowUtils.setEditorsUsername(results, function () {
+                                    results.forEach(function (result) {
+                                        flowUtils.appendEntryExtra(result);
+                                    });
+                                    model.opinions = results;
+                                    if (results.length > 0) {
+                                        if (results.length === 15) {
+                                            model.opinionsMore = true;
+                                        }
+                                        model.results = true;
                                     }
-                                    model.results = true;
-                                }
-                                callback();
+                                    callback();
+                                });
                             });
                         });
                 }

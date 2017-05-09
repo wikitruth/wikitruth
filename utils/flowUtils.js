@@ -63,8 +63,8 @@ function appendEntryExtra(item) {
 function setEntryParents(items, typeId, callback) {
     if(!items || items.length === 0) { return callback(); }
 
-    var topicIds = [], argumentIds = [];
-    var topics = {}, args = {};
+    var topicIds = [], topicLinkIds = [], argumentIds = [], argumentLinkIds = [], questionIds = [], answerIds =[], issueIds = [], opinionIds = [];
+    var topics = {}, topicLinks = {}, args = {}, argumentLinks = {}, questions = {}, answers = {}, issues = {}, opinions = {};
     switch (typeId) {
         case constants.OBJECT_TYPES.topic:
             items.forEach(function (item) {
@@ -82,14 +82,39 @@ function setEntryParents(items, typeId, callback) {
                 }
             });
             break;
+        case constants.OBJECT_TYPES.answer:
+            items.forEach(function (item) {
+                questionIds.push(item.questionId.valueOf());
+            });
+            break;
         case constants.OBJECT_TYPES.question:
+        case constants.OBJECT_TYPES.issue:
+        case constants.OBJECT_TYPES.opinion:
             items.forEach(function (item) {
                 switch (item.ownerType) {
                     case constants.OBJECT_TYPES.topic:
                         topicIds.push(item.ownerId.valueOf());
                         break;
+                    case constants.OBJECT_TYPES.topicLink:
+                        topicLinkIds.push(item.ownerId.valueOf());
+                        break;
                     case constants.OBJECT_TYPES.argument:
                         argumentIds.push(item.ownerId.valueOf());
+                        break;
+                    case constants.OBJECT_TYPES.argumentLink:
+                        argumentLinkIds.push(item.ownerId.valueOf());
+                        break;
+                    case constants.OBJECT_TYPES.question:
+                        questionIds.push(item.ownerId.valueOf());
+                        break;
+                    case constants.OBJECT_TYPES.answer:
+                        answerIds.push(item.ownerId.valueOf());
+                        break;
+                    case constants.OBJECT_TYPES.issue:
+                        issueIds.push(item.ownerId.valueOf());
+                        break;
+                    case constants.OBJECT_TYPES.opinion:
+                        opinionIds.push(item.ownerId.valueOf());
                         break;
                 }
             });
@@ -98,26 +123,147 @@ function setEntryParents(items, typeId, callback) {
 
     async.parallel({
         topics: function (callback) {
-            var query = { _id: { $in: topicIds } };
-            db.Topic
-                .find(query)
-                .exec(function (err, results) {
-                    results.forEach(function (result) {
-                        topics[result._id.valueOf()] = result;
+            if(topicIds.length > 0) {
+                db.Topic
+                    .find({ _id: { $in: topicIds }})
+                    .exec(function (err, results) {
+                        results.forEach(function (result) {
+                            topics[result._id.valueOf()] = result;
+                        });
+                        callback();
                     });
-                    callback();
-                });
+            } else {
+                callback();
+            }
+        },
+        topicLinks: function (callback) {
+            if(topicLinkIds.length > 0) {
+                db.TopicLink
+                    .find({ _id: { $in: topicLinkIds }})
+                    .exec(function (err, results) {
+                        var topicIds2 = [], topics2 = {};
+                        results.forEach(function (result) {
+                            topicIds2.push(result.topicId.valueOf());
+                        });
+                        db.Topic
+                            .find({ _id: { $in: topicIds2 }})
+                            .exec(function (err, results2) {
+                                results2.forEach(function (result) {
+                                    topics2[result._id.valueOf()] = result;
+                                });
+                                results.forEach(function (result) {
+                                    result.topic = topics2[result.topicId.valueOf()];
+                                    result.title2 = result.title ? result.title : result.topic.title;
+                                    topicLinks[result._id.valueOf()] = result;
+                                });
+                                callback();
+                            });
+                    });
+            } else {
+                callback();
+            }
         },
         arguments: function (callback) {
-            var query = { _id: { $in: argumentIds } };
-            db.Argument
-                .find(query)
-                .exec(function (err, results) {
-                    results.forEach(function (result) {
-                        args[result._id.valueOf()] = result;
+            if(argumentIds.length > 0) {
+                var query = {_id: {$in: argumentIds}};
+                db.Argument
+                    .find(query)
+                    .exec(function (err, results) {
+                        results.forEach(function (result) {
+                            args[result._id.valueOf()] = result;
+                        });
+                        callback();
                     });
-                    callback();
-                });
+            } else {
+                callback();
+            }
+        },
+        argumentLinks: function (callback) {
+            if(argumentLinkIds.length > 0) {
+                db.ArgumentLink
+                    .find({ _id: { $in: argumentLinkIds }})
+                    .exec(function (err, results) {
+                        var argumentIds2 = [], arguments2 = {};
+                        results.forEach(function (result) {
+                            argumentIds2.push(result.argumentId.valueOf());
+                        });
+                        db.Argument
+                            .find({ _id: { $in: argumentIds2 }})
+                            .exec(function (err, results2) {
+                                results2.forEach(function (result) {
+                                    arguments2[result._id.valueOf()] = result;
+                                });
+                                results.forEach(function (result) {
+                                    result.argument = arguments2[result.argumentId.valueOf()];
+                                    result.title2 = result.title ? result.title : result.argument.title;
+                                    argumentLinks[result._id.valueOf()] = result;
+                                });
+                                callback();
+                        });
+                    });
+            } else {
+                callback();
+            }
+        },
+        questions: function (callback) {
+            if(questionIds.length > 0) {
+                var query = {_id: {$in: questionIds}};
+                db.Question
+                    .find(query)
+                    .exec(function (err, results) {
+                        results.forEach(function (result) {
+                            questions[result._id.valueOf()] = result;
+                        });
+                        callback();
+                    });
+            } else {
+                callback();
+            }
+        },
+        answers: function (callback) {
+            if(answerIds.length > 0) {
+                var query = {_id: {$in: answerIds}};
+                db.Answer
+                    .find(query)
+                    .exec(function (err, results) {
+                        results.forEach(function (result) {
+                            answers[result._id.valueOf()] = result;
+                        });
+                        callback();
+                    });
+            } else {
+                callback();
+            }
+        },
+        issues: function (callback) {
+            if(issueIds.length > 0) {
+                var query = {_id: {$in: issueIds}};
+                db.Issue
+                    .find(query)
+                    .exec(function (err, results) {
+                        results.forEach(function (result) {
+                            issues[result._id.valueOf()] = result;
+                        });
+                        callback();
+                    });
+            } else {
+                callback();
+            }
+        },
+        opinions: function (callback) {
+            if(opinionIds.length > 0) {
+                var query = {_id: {$in: opinionIds}};
+                db.Opinion
+                    .find(query)
+                    .exec(function (err, results) {
+                        results.forEach(function (result) {
+                            opinions[result._id.valueOf()] = result;
+                        });
+                        callback();
+                    });
+            } else {
+                callback();
+            }
         }
     }, function (err, results) {
 
@@ -135,6 +281,43 @@ function setEntryParents(items, typeId, callback) {
                         item.parentArgument = args[item.parentId.valueOf()];
                     } else {
                         item.parentTopic = topics[item.ownerId.valueOf()];
+                    }
+                });
+                break;
+            case constants.OBJECT_TYPES.answer:
+                items.forEach(function (item) {
+                    item.parentQuestion = questions[item.questionId.valueOf()];
+                });
+                break;
+            case constants.OBJECT_TYPES.question:
+            case constants.OBJECT_TYPES.issue:
+            case constants.OBJECT_TYPES.opinion:
+                items.forEach(function (item) {
+                    switch (item.ownerType) {
+                        case constants.OBJECT_TYPES.topic:
+                            item.parentTopic = topics[item.ownerId.valueOf()];
+                            break;
+                        case constants.OBJECT_TYPES.topicLink:
+                            item.parentTopicLink = topicLinks[item.ownerId.valueOf()];
+                            break;
+                        case constants.OBJECT_TYPES.argument:
+                            item.parentArgument = args[item.ownerId.valueOf()];
+                            break;
+                        case constants.OBJECT_TYPES.argumentLink:
+                            item.parentArgumentLink = argumentLinks[item.ownerId.valueOf()];
+                            break;
+                        case constants.OBJECT_TYPES.question:
+                            item.parentQuestion = questions[item.ownerId.valueOf()];
+                            break;
+                        case constants.OBJECT_TYPES.answer:
+                            item.parentAnswer = answers[item.ownerId.valueOf()];
+                            break;
+                        case constants.OBJECT_TYPES.issue:
+                            item.parentIssue = issues[item.ownerId.valueOf()];
+                            break;
+                        case constants.OBJECT_TYPES.opinion:
+                            item.parentOpinion = opinions[item.ownerId.valueOf()];
+                            break;
                     }
                 });
                 break;

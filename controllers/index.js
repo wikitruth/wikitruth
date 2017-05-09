@@ -91,18 +91,20 @@ module.exports = function (router) {
                             .limit(MAX_RESULT)
                             .lean()
                             .exec(function (err, results) {
-                                flowUtils.setEditorsUsername(results, function() {
-                                    results.forEach(function (result) {
-                                        result.topic = {
-                                            _id: result.ownerId
-                                        };
-                                        flowUtils.appendEntryExtra(result);
+                                flowUtils.setEntryParents(results, constants.OBJECT_TYPES.question, function() {
+                                    flowUtils.setEditorsUsername(results, function () {
+                                        results.forEach(function (result) {
+                                            result.topic = {
+                                                _id: result.ownerId
+                                            };
+                                            flowUtils.appendEntryExtra(result);
+                                        });
+                                        model.questions = results;
+                                        if (results.length === MAX_RESULT) {
+                                            model.questionsMore = true;
+                                        }
+                                        callback();
                                     });
-                                    model.questions = results;
-                                    if(results.length === MAX_RESULT) {
-                                        model.questionsMore = true;
-                                    }
-                                    callback();
                                 });
                             });
                     },
@@ -113,18 +115,20 @@ module.exports = function (router) {
                             .limit(MAX_RESULT)
                             .lean()
                             .exec(function (err, results) {
-                                flowUtils.setEditorsUsername(results, function () {
-                                    results.forEach(function (result) {
-                                        result.topic = {
-                                            _id: result.ownerId
-                                        };
-                                        flowUtils.appendEntryExtra(result);
+                                flowUtils.setEntryParents(results, constants.OBJECT_TYPES.answer, function() {
+                                    flowUtils.setEditorsUsername(results, function () {
+                                        results.forEach(function (result) {
+                                            result.topic = {
+                                                _id: result.ownerId
+                                            };
+                                            flowUtils.appendEntryExtra(result);
+                                        });
+                                        model.answers = results;
+                                        if (results.length === MAX_RESULT) {
+                                            model.answersMore = true;
+                                        }
+                                        callback();
                                     });
-                                    model.answers = results;
-                                    if(results.length === MAX_RESULT) {
-                                        model.answersMore = true;
-                                    }
-                                    callback();
                                 });
                             });
                     },
@@ -135,16 +139,18 @@ module.exports = function (router) {
                             .limit(MAX_RESULT)
                             .lean()
                             .exec(function(err, results) {
-                                flowUtils.setEditorsUsername(results, function() {
-                                    results.forEach(function (result) {
-                                        result.issueType = constants.ISSUE_TYPES['type' + result.issueType];
-                                        flowUtils.appendEntryExtra(result);
+                                flowUtils.setEntryParents(results, constants.OBJECT_TYPES.issue, function() {
+                                    flowUtils.setEditorsUsername(results, function () {
+                                        results.forEach(function (result) {
+                                            result.issueType = constants.ISSUE_TYPES['type' + result.issueType];
+                                            flowUtils.appendEntryExtra(result);
+                                        });
+                                        model.issues = results;
+                                        if (results.length === MAX_RESULT) {
+                                            model.issuesMore = true;
+                                        }
+                                        callback();
                                     });
-                                    model.issues = results;
-                                    if(results.length === MAX_RESULT) {
-                                        model.issuesMore = true;
-                                    }
-                                    callback();
                                 });
                             });
                     },
@@ -155,15 +161,17 @@ module.exports = function (router) {
                             .limit(MAX_RESULT)
                             .lean()
                             .exec(function(err, results) {
-                                flowUtils.setEditorsUsername(results, function() {
-                                    results.forEach(function (result) {
-                                        flowUtils.appendEntryExtra(result);
+                                flowUtils.setEntryParents(results, constants.OBJECT_TYPES.opinion, function() {
+                                    flowUtils.setEditorsUsername(results, function () {
+                                        results.forEach(function (result) {
+                                            flowUtils.appendEntryExtra(result);
+                                        });
+                                        model.opinions = results;
+                                        if (results.length === MAX_RESULT) {
+                                            model.opinionsMore = true;
+                                        }
+                                        callback();
                                     });
-                                    model.opinions = results;
-                                    if(results.length === MAX_RESULT) {
-                                        model.opinionsMore = true;
-                                    }
-                                    callback();
                                 });
                             });
                     }
@@ -320,18 +328,20 @@ module.exports = function (router) {
                     .limit(MAX_RESULT)
                     .lean()
                     .exec(function (err, results) {
-                        flowUtils.setEditorsUsername(results, function() {
-                            results.forEach(function (result) {
-                                result.topic = {
-                                    _id: result.ownerId
-                                };
-                                flowUtils.appendEntryExtra(result);
+                        flowUtils.setEntryParents(results, constants.OBJECT_TYPES.question, function () {
+                            flowUtils.setEditorsUsername(results, function () {
+                                results.forEach(function (result) {
+                                    result.topic = {
+                                        _id: result.ownerId
+                                    };
+                                    flowUtils.appendEntryExtra(result);
+                                });
+                                model.questions = results;
+                                if (results.length > 0) {
+                                    model.results = true;
+                                }
+                                callback();
                             });
-                            model.questions = results;
-                            if(results.length > 0) {
-                                model.results = true;
-                            }
-                            callback();
                         });
                     });
             },
@@ -346,18 +356,20 @@ module.exports = function (router) {
                     .limit(MAX_RESULT)
                     .lean()
                     .exec(function (err, results) {
-                        flowUtils.setEditorsUsername(results, function () {
-                            results.forEach(function (result) {
-                                result.topic = {
-                                    _id: result.ownerId
-                                };
-                                flowUtils.appendEntryExtra(result);
+                        flowUtils.setEntryParents(results, constants.OBJECT_TYPES.answer, function () {
+                            flowUtils.setEditorsUsername(results, function () {
+                                results.forEach(function (result) {
+                                    result.topic = {
+                                        _id: result.ownerId
+                                    };
+                                    flowUtils.appendEntryExtra(result);
+                                });
+                                model.answers = results;
+                                if (results.length > 0) {
+                                    model.results = true;
+                                }
+                                callback();
                             });
-                            model.answers = results;
-                            if(results.length > 0) {
-                                model.results = true;
-                            }
-                            callback();
                         });
                     });
             },
@@ -371,16 +383,18 @@ module.exports = function (router) {
                     .limit(MAX_RESULT)
                     .lean()
                     .exec(function(err, results) {
-                        flowUtils.setEditorsUsername(results, function() {
-                            results.forEach(function (result) {
-                                result.issueType = constants.ISSUE_TYPES['type' + result.issueType];
-                                flowUtils.appendEntryExtra(result);
+                        flowUtils.setEntryParents(results, constants.OBJECT_TYPES.issue, function () {
+                            flowUtils.setEditorsUsername(results, function () {
+                                results.forEach(function (result) {
+                                    result.issueType = constants.ISSUE_TYPES['type' + result.issueType];
+                                    flowUtils.appendEntryExtra(result);
+                                });
+                                model.issues = results;
+                                if (results.length > 0) {
+                                    model.results = true;
+                                }
+                                callback();
                             });
-                            model.issues = results;
-                            if(results.length > 0) {
-                                model.results = true;
-                            }
-                            callback();
                         });
                     });
             },
@@ -394,15 +408,17 @@ module.exports = function (router) {
                     .limit(MAX_RESULT)
                     .lean()
                     .exec(function(err, results) {
-                        flowUtils.setEditorsUsername(results, function() {
-                            results.forEach(function (result) {
-                                flowUtils.appendEntryExtra(result);
+                        flowUtils.setEntryParents(results, constants.OBJECT_TYPES.opinion, function () {
+                            flowUtils.setEditorsUsername(results, function () {
+                                results.forEach(function (result) {
+                                    flowUtils.appendEntryExtra(result);
+                                });
+                                model.opinions = results;
+                                if (results.length > 0) {
+                                    model.results = true;
+                                }
+                                callback();
                             });
-                            model.opinions = results;
-                            if(results.length > 0) {
-                                model.results = true;
-                            }
-                            callback();
                         });
                     });
             },
@@ -626,14 +642,16 @@ module.exports = function (router) {
                     .lean()
                     .exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
-                        results.forEach(function (result) {
-                            flowUtils.appendEntryExtra(result);
+                        flowUtils.setEntryParents(results, constants.OBJECT_TYPES.question, function () {
+                            results.forEach(function (result) {
+                                flowUtils.appendEntryExtra(result);
+                            });
+                            model.questions = results;
+                            if (results.length > 0) {
+                                model.results = true;
+                            }
+                            callback();
                         });
-                        model.questions = results;
-                        if(results.length > 0) {
-                            model.results = true;
-                        }
-                        callback();
                     });
                 });
             },
@@ -648,14 +666,16 @@ module.exports = function (router) {
                     .lean()
                     .exec(function(err, results) {
                         flowUtils.setEditorsUsername(results, function() {
-                            results.forEach(function (result) {
-                                flowUtils.appendEntryExtra(result);
+                            flowUtils.setEntryParents(results, constants.OBJECT_TYPES.answer, function () {
+                                results.forEach(function (result) {
+                                    flowUtils.appendEntryExtra(result);
+                                });
+                                model.answers = results;
+                                if (results.length > 0) {
+                                    model.results = true;
+                                }
+                                callback();
                             });
-                            model.answers = results;
-                            if(results.length > 0) {
-                                model.results = true;
-                            }
-                            callback();
                         });
                     });
             },
@@ -670,18 +690,20 @@ module.exports = function (router) {
                     .lean()
                     .exec(function(err, results) {
                         flowUtils.setEditorsUsername(results, function() {
-                            results.forEach(function (result) {
-                                result.issueType = constants.ISSUE_TYPES['type' + result.issueType];
-                                flowUtils.appendEntryExtra(result);
-                            });
-                            model.issues = results;
-                            if (results.length > 0) {
-                                if(results.length === MAX_RESULT) {
-                                    model.issuesMore = true;
+                            flowUtils.setEntryParents(results, constants.OBJECT_TYPES.issue, function () {
+                                results.forEach(function (result) {
+                                    result.issueType = constants.ISSUE_TYPES['type' + result.issueType];
+                                    flowUtils.appendEntryExtra(result);
+                                });
+                                model.issues = results;
+                                if (results.length > 0) {
+                                    if (results.length === MAX_RESULT) {
+                                        model.issuesMore = true;
+                                    }
+                                    model.results = true;
                                 }
-                                model.results = true;
-                            }
-                            callback();
+                                callback();
+                            });
                         });
                 });
             },
@@ -696,17 +718,19 @@ module.exports = function (router) {
                     .lean()
                     .exec(function(err, results) {
                         flowUtils.setEditorsUsername(results, function() {
-                            results.forEach(function (result) {
-                                flowUtils.appendEntryExtra(result);
-                            });
-                            model.opinions = results;
-                            if (results.length > 0) {
-                                if(results.length === MAX_RESULT) {
-                                    model.opinionsMore = true;
+                            flowUtils.setEntryParents(results, constants.OBJECT_TYPES.opinion, function () {
+                                results.forEach(function (result) {
+                                    flowUtils.appendEntryExtra(result);
+                                });
+                                model.opinions = results;
+                                if (results.length > 0) {
+                                    if (results.length === MAX_RESULT) {
+                                        model.opinionsMore = true;
+                                    }
+                                    model.results = true;
                                 }
-                                model.results = true;
-                            }
-                            callback();
+                                callback();
+                            });
                         });
                 });
             }
