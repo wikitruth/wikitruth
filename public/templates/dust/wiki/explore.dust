@@ -48,7 +48,7 @@
     </div>
     {!<br/>!}
     <h1 class="page-header wt-header" id="browse">Latest Posts</h1>
-    <div style="margin-bottom: 15px">
+    <div style="margin-bottom: 15px" class="wt-btn-group">
         <div class="btn-group" role="group" aria-label="Latest or Popular Filter" style="margin-bottom: 5px">
             <a href="#browse" class="btn btn-info btn-sm" role="button">Latest</a>
             <a href="#browse" class="btn btn-default btn-sm" role="button">Popular</a>
