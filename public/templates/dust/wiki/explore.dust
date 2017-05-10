@@ -47,7 +47,7 @@
         {/categories}
     </div>
     {!<br/>!}
-    <h1 class="page-header wt-header-x" id="browse">Latest Posts</h1>
+    <h1 class="page-header wt-header" id="browse">Latest Posts</h1>
     <div style="margin-bottom: 15px">
         <div class="btn-group" role="group" aria-label="Latest or Popular Filter" style="margin-bottom: 5px">
             <a href="#browse" class="btn btn-info btn-sm" role="button">Latest</a>
@@ -110,7 +110,7 @@
     </ul>
     {?topics}
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight"><i class="fa fa-folder-open text-muted" aria-hidden="true"></i> Topics</li>
+            <li class="list-group-item highlight"><i class="fa fa-folder-open text-muted-x" aria-hidden="true"></i> Topics</li>
             {#topics}
                 {>"dust/wiki/topics/entry-row" subtitle="true" /}
             {/topics}
@@ -118,7 +118,7 @@
     {/topics}
     {?arguments}
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight"><i class="glyphicon glyphicon-flash text-muted" aria-hidden="true"></i> Arguments</li>
+            <li class="list-group-item highlight"><i class="glyphicon glyphicon-flash text-muted-x" aria-hidden="true"></i> Arguments</li>
             {#arguments}
                 {>"dust/wiki/arguments/entry-row" subtitle="true" /}
             {/arguments}
@@ -126,7 +126,7 @@
     {/arguments}
     {?questions}
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight"><i class="fa fa-question-circle text-muted" aria-hidden="true"></i> Questions</li>
+            <li class="list-group-item highlight"><i class="fa fa-question-circle text-muted-x" aria-hidden="true"></i> Questions</li>
             {#questions}
                 {>"dust/wiki/questions/entry-row" subtitle="true" /}
             {/questions}
@@ -142,8 +142,7 @@
     {/answers}
     {?issues}
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight"><span class="fa fa-exclamation-circle text-success" aria-hidden="true"></span> Issues
-            </li>
+            <li class="list-group-item highlight"><span class="fa fa-exclamation-circle text-success-x" aria-hidden="true"></span> Issues</li>
             {#issues}
                 {>"dust/wiki/issues/entry-row" subtitle="true" /}
             {/issues}
@@ -151,7 +150,7 @@
     {/issues}
     {?opinions}
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight"><span class="fa fa-comments-o text-success" aria-hidden="true"></span> Comments</li>
+            <li class="list-group-item highlight"><span class="fa fa-comments-o text-success-x" aria-hidden="true"></span> Comments</li>
             {#opinions}
                 {>"dust/wiki/opinions/entry-row" subtitle="true" /}
             {/opinions}

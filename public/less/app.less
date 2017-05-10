@@ -232,9 +232,9 @@ a.no-underline:hover, a.no-underline:focus, .wt-list a:hover, .wt-list a:focus {
 .list-group .list-group-item.highlight {
   background-color: #f8f8f8;
 
-  > .fa, > .glyphicon {
+  /*> .fa, > .glyphicon {
     color: #888;
-  }
+  }*/
 }
 
 
@@ -259,7 +259,16 @@ a.no-underline:hover, a.no-underline:focus, .wt-list a:hover, .wt-list a:focus {
 
   .highlight {
     color: #555;
-    border-bottom: 0;
+    font-size: 20px;
+    background-color: transparent;
+    border: 0;
+    border-bottom: .0625rem solid #dcdcdc; /* dotted */
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+
+    >.fa, >.glyphicon {
+      font-size: 20px;
+    }
   }
 
   .text-success {
@@ -275,12 +284,12 @@ a.no-underline:hover, a.no-underline:focus, .wt-list a:hover, .wt-list a:focus {
   }
 
   .list-group-item {
-    border-color: #eee;
-    margin-bottom: 0;
+    /*border-color: #eee;*/
+    padding-left: 0;
 
-    >.fa, >.glyphicon {
+    /*>.fa, >.glyphicon {
       font-size: 16px;
-    }
+    }*/
 
     >.pull-right {
       display: none;
@@ -299,12 +308,13 @@ a.no-underline:hover, a.no-underline:focus, .wt-list a:hover, .wt-list a:focus {
   }
 
   .list-group-item:not(.highlight) {
-    border-top-width: 0;
-    border-bottom-width: 0;
+    border: none;
+    margin-bottom: 0;
 
     > .glyphicon, > .fa {
       position: absolute;
       top: 12px;
+      font-size: 16px;
     }
 
     > div {
