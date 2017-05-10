@@ -22,7 +22,7 @@
             {>"dust/wiki/common/entry-row-subtitle" /}
         {/subtitle}
         {?contentPreview}
-            <div>{contentPreview}</div>
+            <div class="wt-entry-row-content">{contentPreview}</div>
         {/contentPreview}
         {>"dust/wiki/common/entry-row-footer" /}
     </div>
