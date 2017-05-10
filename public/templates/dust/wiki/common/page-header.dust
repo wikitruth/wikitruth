@@ -1,5 +1,5 @@
 <div style="margin-bottom: 20px">
-    <h2 class="page-header wt-header" style="margin-bottom: 0; padding-bottom: 0">
+    <h1 class="page-header wt-header" style="margin-bottom: 0; padding-bottom: 0">
         {?entry}
             {entry.title}
             {!{?argument.against} <span class="label label-primary wt-subtitle">opposing</span>{/argument.against}!}
@@ -14,7 +14,7 @@
         {@eq key=tab value="update-verdict"} <span class="label label-warning wt-subtitle">Verdict</span>{/eq}
         {@eq key=tab value="clipboard"}Clipboard{/eq}
         {@eq key=tab value="screening"} <span class="label label-warning wt-subtitle">Screening</span>{/eq}
-    </h2>
+    </h1>
     {>"dust/wiki/common/subtitle-edit" /}
     {@eq key=entry.screening.status value=0}
         <br/>

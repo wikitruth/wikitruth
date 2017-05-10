@@ -1,4 +1,4 @@
-<div style="font-style-x: italic; font-size: smaller; margin-bottom: 2px" class="text-muted">
+<div class="wt-entry-row-subtitle text-muted">
     {?parentOpinion}
         On comment <a href="{wikiBaseUrl}{paths.wiki.opinions.entry}/{parentOpinion.friendlyUrl}/{parentOpinion._id}">{parentOpinion.title}</a>
     {:else}
