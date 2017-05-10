@@ -61,13 +61,13 @@
         {/application}
     </div>
 
-    <h1 class="page-header wt-header-x"><i class="fa fa-globe"></i> Latest Posts</h1>
+    <h1 class="page-header wt-header"><i class="fa fa-globe"></i> Latest Posts</h1>
     <div class="wt-search">
         {?topics}
             <div style="padding-bottom: 15px; padding-top: 5px;">
-                <h3 class="page-header-x text-muted-0"><i class="fa fa-folder-open"></i> Topics</h3>
+                {!<h3 class="page-header-x text-muted-0"><i class="fa fa-folder-open"></i> Topics</h3>!}
                 <ul class="list-group top-list-items wt-list">
-                    {!<li class="list-group-item highlight"><span class="glyphicon glyphicon-folder-open text-success" aria-hidden="true"></span>&nbsp; Topics</li>!}
+                    <li class="list-group-item highlight"><i class="fa fa-folder-open text-success-x" aria-hidden="true"></i> Topics</li>
                     {#topics}
                         {>"dust/wiki/topics/entry-row" subtitle="true" /}
                     {/topics}
@@ -79,9 +79,9 @@
         {/topics}
         {?arguments}
             <div style="padding-bottom: 15px; padding-top: 5px;">
-            <h3 class="page-header-x text-muted-0"><i class="fa fa-flash"></i> Arguments</h3>
+            {!<h3 class="page-header-x text-muted-0"><i class="fa fa-flash"></i> Arguments</h3>!}
             <ul class="list-group top-list-items wt-list">
-                {!<li class="list-group-item highlight text-primary"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments</li>!}
+                <li class="list-group-item highlight text-primary"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments</li>
                 {#arguments}
                     {>"dust/wiki/arguments/entry-row" subtitle="true" /}
                 {/arguments}
@@ -93,9 +93,9 @@
         {/arguments}
         {?questions}
             <div style="padding-bottom: 15px; padding-top: 5px;">
-            <h3 class="page-header-x text-muted-0"><i class="fa fa-question-circle"></i> Questions</h3>
+            {!<h3 class="page-header-x text-muted-0"><i class="fa fa-question-circle"></i> Questions</h3>!}
             <ul class="list-group top-list-items wt-list">
-                {!<li class="list-group-item highlight"><span class="glyphicon glyphicon-question-sign text-success" aria-hidden="true"></span> Questions</li>!}
+                <li class="list-group-item highlight"><span class="glyphicon glyphicon-question-sign text-success-x" aria-hidden="true"></span> Questions</li>
                 {#questions}
                     {>"dust/wiki/questions/entry-row" subtitle="true" /}
                 {/questions}
@@ -107,8 +107,9 @@
         {/questions}
         {?answers}
             <div style="padding-bottom: 15px; padding-top: 5px;">
-            <h3 class="page-header-x text-muted-0"><i class="fa fa-check-circle-o"></i> Answers</h3>
+            {!<h3 class="page-header-x text-muted-0"><i class="fa fa-check-circle-o"></i> Answers</h3>!}
             <ul class="list-group top-list-items wt-list">
+                <li class="list-group-item highlight"><i class="fa fa-check-circle-o text-success-x" aria-hidden="true"></i> Answers</li>
                 {#answers}
                     {>"dust/wiki/answers/entry-row" subtitle="true" /}
                 {/answers}
@@ -120,9 +121,9 @@
         {/answers}
         {?issues}
             <div style="padding-bottom: 15px; padding-top: 5px;">
-            <h3 class="page-header-x text-muted-0"><i class="fa fa-exclamation-circle"></i> Issues</h3>
+            {!<h3 class="page-header-x text-muted-0"><i class="fa fa-exclamation-circle"></i> Issues</h3>!}
             <ul class="list-group top-list-items wt-list">
-                {!<li class="list-group-item highlight"><span class="fa fa-exclamation-circle text-success" aria-hidden="true"></span> Issues</li>!}
+                <li class="list-group-item highlight"><i class="fa fa-exclamation-circle text-success-x" aria-hidden="true"></i> Issues</li>
                 {#issues}
                     {>"dust/wiki/issues/entry-row" subtitle="true" /}
                 {/issues}
@@ -134,9 +135,9 @@
         {/issues}
         {?opinions}
             <div style="padding-bottom: 15px; padding-top: 5px;">
-            <h3 class="page-header-x text-muted-0"><i class="fa fa-comments-o"></i> Comments</h3>
+            {!<h3 class="page-header-x text-muted-0"><i class="fa fa-comments-o"></i> Comments</h3>!}
             <ul class="list-group top-list-items wt-list">
-                {!<li class="list-group-item highlight"><span class="fa fa-comments-o text-success" aria-hidden="true"></span> Opinions</li>!}
+                <li class="list-group-item highlight"><span class="fa fa-comments-o text-success-x" aria-hidden="true"></span> Opinions</li>
                 {#opinions}
                     {>"dust/wiki/opinions/entry-row" subtitle="true" /}
                 {/opinions}

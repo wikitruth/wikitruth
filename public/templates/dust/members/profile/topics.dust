@@ -41,7 +41,7 @@
             {/categories}
         </div>
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight"><i class="fa fa-folder-open text-success-x" aria-hidden="true"></i>&nbsp;&nbsp;Topics</li>
+            <li class="list-group-item highlight"><i class="fa fa-folder-open text-success-x" aria-hidden="true"></i> Topics</li>
             {#topics}
                 <li class="list-group-item">
                     {?link}
