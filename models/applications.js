@@ -8,7 +8,7 @@ var wikitruthDomains = [
 var APPLICATIONS = [
     {
         id: 'fixtheph',
-        title: 'Fix the Philippines',
+        title: 'Fix The Philippines',
         navTitle: 'fixtheph',
         slogan: 'Fix the Philippines, help citizens identify, raise and fix issues in their society and the government',
         logoIcon: '/img/fixtheph/logo-64x64.png',
@@ -21,7 +21,7 @@ var APPLICATIONS = [
         ],
         googleAnalyticsTrackingId: 'UA-66543450-2',
         jumbotron: {
-            title: "Let's fix the Philippines",
+            title: "Let's Fix The Philippines",
             description: 'A system to promote transparency and accountability, help citizens identify, raise and fix issues in the Philippine society and government.'
         },
         sections: [

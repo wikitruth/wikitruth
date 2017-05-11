@@ -11,7 +11,7 @@
             </a>
         {:else}
             <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">
-                {?contextTitle}{contextTitle}{:else}{title}{/contextTitle}
+                {?standalone}{title}{:else}{?contextTitle}{contextTitle}{:else}{title}{/contextTitle}{/standalone}
             </a>
         {/link}
         {?labels}

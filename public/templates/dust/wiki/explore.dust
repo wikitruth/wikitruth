@@ -112,7 +112,7 @@
         <ul class="list-group wt-list">
             <li class="list-group-item highlight"><i class="fa fa-folder-open text-muted-x" aria-hidden="true"></i> Topics</li>
             {#topics}
-                {>"dust/wiki/topics/entry-row" subtitle="true" /}
+                {>"dust/wiki/topics/entry-row" standalone="true" subtitle="true" /}
             {/topics}
         </ul>
     {/topics}
