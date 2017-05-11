@@ -54,7 +54,7 @@
                     <ul class="list-group top-list-items wt-list">
                         <li class="list-group-item highlight"><span class="fa fa-folder-open text-success-x" aria-hidden="true"></span>&nbsp; Topics</li>
                         {#topics}
-                            {>"dust/wiki/topics/entry-row" subtitle="true" labels="true" /}
+                            {>"dust/wiki/topics/entry-row" standalone="true" subtitle="true" labels="true" /}
                         {/topics}
                     </ul>
                     {?topicsMore}
