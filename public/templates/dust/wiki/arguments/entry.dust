@@ -10,13 +10,6 @@
         {>"dust/wiki/common/entry-verdict" /}
     </div>
     <div class="text-body collapsible">
-        {!<p style="font-style: italic; margin: 10px 0 10px 0; font-size: smaller;">
-            {?parentArgument}
-                {?argument.against}An argument against{:else}A supporting argument for{/argument.against} <a href="{paths.wiki.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
-            {:else}
-                An argument under the topic <a href="{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
-            {/parentArgument}
-        </p>!}
         {?argument.referenceDate}
             <p><small class="text-muted" title="Reference Date"><i class="fa fa-clock-o"></i> {argument.referenceDateSimple}</small></p>
         {/argument.referenceDate}
@@ -28,7 +21,6 @@
     </div>
     {?topic}
         <div class="wt-related">
-            {! <hr class="wt-dotted-line" style="margin: 0 0 0.375rem" /> !}
             <span title="Related Topics">Topics</span>&nbsp;
             <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}"><span class="wt-label label label-default">{topic.title}</span></a>&nbsp;
             {#topicLinks}
@@ -41,7 +33,7 @@
         <div class="wt-list">
             {?proArguments}
             <ul class="list-group top-list-items">
-                <li class="list-group-item highlight text-primary"><i class="glyphicon glyphicon-flash" aria-hidden="true"></i> Supporting Arguments <span class="wt-label label label-default">{proArgumentCount}</span></li>
+                <li class="list-group-item highlight text-primary"><i class="glyphicon glyphicon-flash" aria-hidden="true"></i> Supporting {contents.argument.shortList} <span class="wt-label label label-default">{proArgumentCount}</span></li>
                 {#proArguments}
                     {>"dust/wiki/arguments/entry-row" /}
                 {/proArguments}
@@ -49,7 +41,7 @@
             {/proArguments}
             {?conArguments}
                 <ul class="list-group top-list-items">
-                    <li class="list-group-item highlight text-primary"><i class="glyphicon glyphicon-flash" aria-hidden="true"></i> Opposing Arguments <span class="wt-label label label-default">{conArgumentCount}</span></li>
+                    <li class="list-group-item highlight text-primary"><i class="glyphicon glyphicon-flash" aria-hidden="true"></i> Opposing {contents.argument.shortList} <span class="wt-label label label-default">{conArgumentCount}</span></li>
                     {#conArguments}
                         {>"dust/wiki/arguments/entry-row" /}
                     {/conArguments}

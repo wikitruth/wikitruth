@@ -12,8 +12,10 @@ var APPLICATIONS = [
         navTitle: 'fixtheph',
         slogan: 'Fix the Philippines, help citizens identify, raise and fix issues in their society and the government',
         logoIcon: '/img/fixtheph/logo-64x64.png',
+        homeUrl: 'https://fixthephilippines.org',
         aboutUrl: '/topic/fixthephilippines-org',
         exploreUrl: '/topic/republic-of-the-philippines',
+        exploreTopicId: '57aa74e0b663fb1072c7766d',
         domains: [
             'fixthephilippines.org',
             /*'localhost',*/

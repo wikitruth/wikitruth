@@ -1,11 +1,11 @@
 'use strict';
 
-var utils       = require('../utils/utils'),
+var //utils       = require('../utils/utils'),
     templates   = require('../models/templates'),
     paths       = require('../models/paths'),
     constants   = require('../models/constants'),
-    db          = require('../app').db.models,
     flowUtils   = require('../utils/flowUtils'),
+    db          = require('../app').db.models,
     async       = require('async');
 
 var argumentController  = require('./arguments'),
@@ -421,55 +421,12 @@ module.exports = function (router) {
                             });
                         });
                     });
-            },
+            }/*,
             categories: function(callback) {
-                db.Topic
-                    .find({parentId: null, private: false, 'screening.status': constants.SCREENING_STATUS.status1.code })
-                    .sort({title: 1})
-                    .lean()
-                    .exec(function (err, results) {
-                        async.each(results, function(result, callback) {
-                            result.friendlyUrl = utils.urlify(result.title);
-                            result.comments = utils.numberWithCommas(utils.randomInt(1, 100000));
-                            db.Topic
-                                .find( { parentId: result._id } )
-                                .limit(3)
-                                .sort({ title: 1 })
-                                .lean()
-                                .exec(function(err, subtopics) {
-                                    if(subtopics.length > 0) {
-                                        subtopics.forEach(function (subtopic) {
-                                            subtopic.friendlyUrl = utils.urlify(subtopic.title);
-                                            subtopic.shortTitle = utils.getShortText(subtopic.contextTitle ? subtopic.contextTitle : subtopic.title, constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN);
-                                        });
-                                        result.subtopics = subtopics;
-                                        callback();
-                                    } else {
-                                        // if subtopics are less than 3, get some arguments
-                                        var query = {
-                                            parentId: null,
-                                            ownerId: result._id,
-                                            ownerType: constants.OBJECT_TYPES.topic,
-                                            'screening.status': constants.SCREENING_STATUS.status1.code
-                                        };
-                                        flowUtils.getArguments(query, 3, function (err, subarguments) {
-                                            subarguments.forEach(function (subargument) {
-                                                flowUtils.setVerdictModel(subargument);
-                                                subargument.shortTitle = utils.getShortText(subargument.contextTitle ? subargument.contextTitle : subargument.title, constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN);
-                                            });
-                                            flowUtils.sortArguments(subarguments);
-                                            result.subarguments = subarguments;
-                                            callback();
-                                        });
-                                    }
-                                });
-                        }, function(err) {
-                            model.categories = results;
-                            callback();
-                        });
-                    });
-            }
+                flowUtils.getCategories(model, callback);
+            }*/
         }, function (err, results) {
+            model.categories = req.app.locals.appCategories; // = model.categories;
             flowUtils.setClipboardModel(req, model);
             res.render(templates.wiki.index, model);
         });

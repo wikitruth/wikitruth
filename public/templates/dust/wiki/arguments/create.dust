@@ -1,14 +1,14 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {?argument}Edit{:else}New{/argument} Argument - {titleSlogan}
+    {?argument}Edit{:else}New{/argument} {contents.argument.entry} - {titleSlogan}
 {/title}
 
 {<body}
     {>"dust/wiki/common/breadcrumb" /}
     <div class="wt-create-header">
         <h2 class="page-header wt-header">
-            <i class="fa fa-flash"></i> {?argument}Edit{:else}New{/argument} Argument
+            <i class="fa fa-flash"></i> {?argument}Edit{:else}New{/argument} {contents.argument.entry}
         </h2>
         {?argument}
             {>"dust/wiki/common/subtitle-edit" /}

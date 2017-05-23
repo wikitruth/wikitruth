@@ -16,6 +16,7 @@
             <button type="submit" name="buttonAction" value="push" class="btn btn-success" onclick="return confirm('Are you sure you want to Commit & Push the DB?')">Commit &amp; Push</button>&nbsp;
         {/gitBackup}
         <button type="submit" name="buttonAction" value="fix" class="btn btn-info" onclick="return confirm('Are you sure you want to Fix Stuff?')">Fix Stuff</button>&nbsp;
+        <button type="submit" name="buttonAction" value="recache" class="btn btn-info" onclick="return confirm('Are you sure you want to reset app cache?')">Reset Cache</button>&nbsp;
         {?action}
             <br/>
             <h1>{action} done!</h1>

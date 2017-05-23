@@ -7,7 +7,7 @@
                         {^argument}
                             <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
                                 <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}" role="tab">
-                                    <span class="glyphicon glyphicon-home text-muted-x" aria-hidden="true"></span><span class="hidden-xxs"> Overview</span></a>
+                                    <span class="glyphicon glyphicon-home text-muted-x" aria-hidden="true"></span><span class="hidden-xxs-x"> Overview</span></a>
                             </li>
                             {@gt key=entry.childrenCount.topics.total value="0"}
                                 <li role="presentation"{@eq key=tab value="topics"} class="active"{/eq}>
@@ -24,7 +24,7 @@
                         <li role="presentation"{@eq key=tab value="arguments"} class="active"{/eq}>
                             {@gt key=entry.childrenCount.arguments.total value="0"}
                                 <a href="{wikiBaseUrl}{paths.wiki.arguments.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" aria-controls="home" role="tab">
-                                    <span class="glyphicon glyphicon-flash text-muted-x" aria-hidden="true"></span><span class="hidden-xs"> Arguments</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.arguments.accepted}</span></a>
+                                    <span class="glyphicon glyphicon-flash text-muted-x" aria-hidden="true"></span><span class="hidden-xs"> {contents.argument.shortList}</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.arguments.accepted}</span></a>
                             {/gt}
                         </li>
                         <li role="presentation"{@eq key=tab value="questions"} class="active"{/eq}>
@@ -125,12 +125,12 @@
                             {:else}
                                 {?argumentLink}
                                     {?isArgumentLinkOwner}
-                                        <li><a href="{wikiBaseUrl}{paths.wiki.arguments.link.edit}?id={argumentLink._id}&amp;source={wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/link/{argumentLink._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Argument Link</a></li>
+                                        <li><a href="{wikiBaseUrl}{paths.wiki.arguments.link.edit}?id={argumentLink._id}&amp;source={wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/link/{argumentLink._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit {contents.argument.entry} Link</a></li>
                                     {/isArgumentLinkOwner}
                                 {:else}
                                     {?argument}
                                         {?isArgumentOwner}
-                                            <li><a href="{wikiBaseUrl}{paths.wiki.arguments.create}?topic={topic._id}&amp;id={argument._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit Argument</a></li>
+                                            <li><a href="{wikiBaseUrl}{paths.wiki.arguments.create}?topic={topic._id}&amp;id={argument._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit {contents.argument.entry}</a></li>
                                         {/isArgumentOwner}
                                     {:else}
                                         {?topicLink}
