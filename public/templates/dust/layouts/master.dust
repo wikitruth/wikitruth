@@ -74,7 +74,7 @@
                 <ul class="wt-nav nav dropdown-menu-x dropdown-menu-right-x">
                     <li class="dropdown-header">Categories</li>
                     {#appCategories}
-                        <li><a href="{paths.wiki.topics.entry}/{friendlyUrl}/{_id}"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> {title}</a></li>
+                        <li><a href="{paths.wiki.topics.entry}/{friendlyUrl}/{_id}"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> {?contextTitle}{contextTitle}{:else}{title}{/contextTitle}</a></li>
                     {/appCategories}
                     <li role="separator" class="divider"></li>
                     <li class="dropdown-header">Apps</li>
