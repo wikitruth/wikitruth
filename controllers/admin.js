@@ -1,17 +1,18 @@
 'use strict';
 
-var backup      = require('mongodb-backup'),
-    fs          = require('fs'),
-    path        = require("path"),
-    async       = require('async'),
-    Git         = require("nodegit"),
-    //htmlToText  = require('html-to-text'),
-    templates   = require('../models/templates'),
-    config      = require('../config/config'),
-    constants   = require('../models/constants'),
-    flowUtils   = require('../utils/flowUtils'),
-    //utils       = require('../utils/utils'),
-    db          = require('../app').db.models;
+var backup          = require('mongodb-backup'),
+    fs              = require('fs'),
+    path            = require("path"),
+    async           = require('async'),
+    Git             = require("nodegit"),
+    //htmlToText    = require('html-to-text'),
+    templates       = require('../models/templates'),
+    config          = require('../config/config'),
+    constants       = require('../models/constants'),
+    applications    = require('../models/applications'),
+    flowUtils       = require('../utils/flowUtils'),
+    //utils         = require('../utils/utils'),
+    db              = require('../app').db.models;
 
 var cols = config.mongodb.collections,
     privateDirName = 'users';
@@ -486,6 +487,13 @@ module.exports = function (router) {
                     render();
                 }
             });
+        } else if (action === 'recache') {
+            delete req.app.locals.appCategories;
+            var apps = applications.getApplications();
+            apps.forEach(function(app) {
+                delete app.appCategories;
+            });
+            res.render(templates.admin.mongoBackup, model);
         }
     });
 };

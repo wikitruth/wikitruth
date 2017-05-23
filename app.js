@@ -2,10 +2,12 @@
 
 //dependencies
 var config          = require('./config/config'),
-    applications    = require('./models/applications'),
+    //applications    = require('./models/applications'),
     paths           = require('./models/paths'),
     constants       = require('./models/constants'),
+    contents        = require('./models/contents'),
     templates       = require('./models/templates'),
+    applications    = require('./models/applications'),
     express         = require('express'),
     cookieParser    = require('cookie-parser'),
     bodyParser      = require('body-parser'),
@@ -87,47 +89,26 @@ app.use(passport.session());
 //app.use(csrf({ cookie: { signed: true } }));
 helmet(app);
 
-//response locals
-app.use(/^[^\.]+$/, function(req, res, next) {
-    //res.cookie('_csrfToken', req.csrfToken());
-
-    if(req.user) {
-        res.locals.user = {};
-        res.locals.user.username = req.user.username;
-        res.locals.user.defaultReturnUrl = req.user.defaultReturnUrl();
-        res.locals.user.isAdmin = req.user.isAdmin();
-        res.locals.user.roles = req.user.roles;
-        res.locals.isContributor = req.user.username;
-    } else if(res.locals.user) {
-        delete res.locals.user;
-    }
-
-    // allow templates to access the request query
-    res.locals.query = req.query;
-
-    // set the application
-    var application = applications.getApplication(req);
-    res.locals.application = application;
-    if(application) {
-        application.resPath = application.id + '/';
-        res.locals.projectName = application.navTitle;
-        res.locals.titleSlogan = application.slogan;
-        res.locals.googleAnalyticsTrackingId = application.googleAnalyticsTrackingId;
-    }
-
-    next();
-});
+// setup response locals
+require('./middlewares/locals')(app, passport);
 
 //global locals
 app.locals.projectName = app.config.projectName;
 app.locals.titleSlogan = app.config.titleSlogan;
+app.locals.homeUrl = app.config.homeUrl;
 app.locals.copyrightYear = new Date().getFullYear();
+app.locals.wikitruth = {
+    projectName: app.config.projectName,
+    homeUrl: app.config.homeUrl
+};
 //app.locals.copyrightName = app.config.companyName;
 app.locals.cacheBreaker = app.config.cacheBreaker;
 app.locals.googleAnalyticsTrackingId = app.config.googleAnalyticsTrackingId;
 app.locals.paths = paths;
+app.locals.applications = applications.getApplications();
 app.locals.templates = templates;
 app.locals.constants = constants;
+app.locals.contents = contents;
 
 //setup passport
 require('./middlewares/passport')(app, passport);

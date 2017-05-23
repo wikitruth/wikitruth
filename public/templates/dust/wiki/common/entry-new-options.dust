@@ -6,7 +6,7 @@
                     {^argument}
                         <li><a href="{wikiBaseUrl}{paths.wiki.topics.create}?topic={topic._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Topic</a></li>
                     {/argument}
-                    <li><a href="{wikiBaseUrl}{paths.wiki.arguments.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> New Argument</a></li>
+                    <li><a href="{wikiBaseUrl}{paths.wiki.arguments.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> New {contents.argument.entry}</a></li>
                     <li><a href="{wikiBaseUrl}{paths.wiki.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
                         <span class="fa fa-question-circle" aria-hidden="true"></span> New Question</a></li>
                     <li role="separator" class="divider"></li>

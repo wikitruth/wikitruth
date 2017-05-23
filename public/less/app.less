@@ -77,8 +77,7 @@ body {
 @media screen and (min-width: 768px) {
   /* Remove the padding we set earlier */
   .header,
-  .marketing,
-  .footer {
+  .marketing /*,.footer*/ {
     padding-right: 0;
     padding-left: 0;
   }
@@ -225,6 +224,42 @@ a.no-underline:hover, a.no-underline:focus, .wt-list a:hover, .wt-list a:focus {
 
   > li > a {
     color: #767676;
+  }
+}
+
+.wt-nav.nav {
+  /* border */
+  padding-top: 10px;
+  padding-bottom: 10px;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  margin-bottom: 25px;
+
+  .divider {
+    height: 1px;
+    margin: 9px 0;
+    overflow: hidden;
+    background-color: #e5e5e5;
+    margin-left: 12px;
+    margin-right: 12px;
+
+    &.light {
+      background-color: transparent;
+      margin-top: 4px;
+      margin-bottom: 4px;
+    }
+  }
+
+  >li > a {
+    display: block;
+    padding: 3px 20px;
+    clear: both;
+    font-weight: normal;
+    line-height: 1.42857143;
+    color: #333;
+    /*white-space: nowrap;*/
+    font-size: 16px;
+    text-overflow: ellipsis;
   }
 }
 
@@ -592,5 +627,56 @@ div pre {
     .navbar-brand-label {
       margin-left: 40px;
     }
+  }
+}
+
+.container-fluid {
+  max-width: 1450px;
+}
+
+/*
+ * Off Canvas
+ * --------------------------------------------------
+ */
+@media screen and (max-width: @screen-md) {
+  .row-offcanvas {
+    position: relative;
+    -webkit-transition: all .25s ease-out;
+    -o-transition: all .25s ease-out;
+    transition: all .25s ease-out;
+
+    .sidebar-offcanvas {
+      position: absolute;
+      top: 0;
+      width: 290px; /* 50% */ /* 6 columns */
+    }
+  }
+
+  .row-offcanvas-right {
+    right: 0;
+  }
+
+  .row-offcanvas-left {
+    left: 0;
+  }
+
+  .row-offcanvas-right
+  .sidebar-offcanvas {
+    right: -290px; /* 50% */ /* 6 columns */
+  }
+
+  .row-offcanvas-left
+  .sidebar-offcanvas {
+    left: -290px; /* 50% */ /* 6 columns */
+  }
+
+  .row-offcanvas-right.active {
+    right: 290px; /* 50% */ /* 6 columns */
+    display: block;
+  }
+
+  .row-offcanvas-left.active {
+    left: 290px; /* 50% */ /* 6 columns */
+    display: block;
   }
 }

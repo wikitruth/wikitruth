@@ -11,7 +11,7 @@
 </footer>!}
 
 <div class="footer">
-    <div class="container">
+    <div class="container-fluid">
         <span class="copyright pull-right">&copy; {copyrightYear}&nbsp;<a href="https://github.com/wikitruth" target="_blank">Wikitruth <span class="hidden-xs">Foundation</span></a></span>
         <ul class="links">
             <li><a href="/" class="no-underline"><i class="fa fa-home"></i><span class="hidden-xxs"> Home</span></a></li>

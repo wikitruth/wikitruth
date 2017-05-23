@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {?topic}{topic.title}: Arguments{:else}Top Arguments{/topic} - {titleSlogan}
+    {?topic}{topic.title}: {contents.argument.shortList}{:else}Top {contents.argument.shortList}{/topic} - {titleSlogan}
 {/title}
 
 {<body}
@@ -13,7 +13,7 @@
     {>"dust/wiki/common/screening-selector" /}
     {?proArguments}
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight text-primary-x"><i class="glyphicon glyphicon-flash" aria-hidden="true"></i> {^topic}Latest Arguments{:else}{?argument}Supporting Arguments{:else}Arguments{/argument}{/topic}</li>
+            <li class="list-group-item highlight text-primary-x"><i class="glyphicon glyphicon-flash" aria-hidden="true"></i> {^topic}Latest {contents.argument.shortList}{:else}{?argument}Supporting {contents.argument.shortList}{:else}{contents.argument.longList}{/argument}{/topic}</li>
             {#proArguments}
                 {>"dust/wiki/arguments/entry-row" /}
             {/proArguments}
@@ -22,7 +22,7 @@
     {/proArguments}
     {?conArguments}
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight text-primary-x"><i class="glyphicon glyphicon-flash" aria-hidden="true"></i> Opposing Arguments</li>
+            <li class="list-group-item highlight text-primary-x"><i class="glyphicon glyphicon-flash" aria-hidden="true"></i> Opposing {contents.argument.shortList}</li>
             {#conArguments}
                 {>"dust/wiki/arguments/entry-row" /}
             {/conArguments}
