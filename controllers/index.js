@@ -754,6 +754,17 @@ module.exports = function (router) {
         issueController.GET_entry(req, res);
     });
 
+    /* Visualize */
+    router.get('/visualize', function (req, res) {
+        var model = {};
+        var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
+        flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
+            flowUtils.setModelOwnerEntry(model);
+            flowUtils.setModelContext(req, model);
+            res.render(templates.wiki.visualize, model);
+        });
+    });
+
     /* Related */
 
     router.get('/related', function (req, res) {

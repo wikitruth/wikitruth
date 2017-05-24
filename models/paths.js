@@ -76,6 +76,7 @@ module.exports = {
             update: '/verdict/update'
         },
         screening: '/screening',
+        visualize: '/visualize',
         related: '/related',
         clipboard: '/clipboard'
     }

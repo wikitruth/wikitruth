@@ -132,10 +132,12 @@
                 </div>
             </div>
         </div>
-        {!<div class="form-group">
-            <label for="inputIcon">Icon</label>
-            <textarea name="icon" id="inputIcon" class="form-control" rows="1">{topic.icon}</textarea>
-        </div>!}
+        <div class="form-group">
+            <label for="inputIcon"><a role="button" data-toggle="collapse" href="#collapseIcon" aria-expanded="false" aria-controls="collapseIcon" class="wt-collapse-toggle{^topic.icon} collapsed{/topic.icon}">Icon</a></label>
+            <div class="collapse{?topic.icon} in{/topic.icon}" id="collapseIcon">
+                <textarea name="icon" id="inputIcon" placeholder="Font Awesome icon class" class="form-control" rows="1">{topic.icon}</textarea>
+            </div>
+        </div>
         <br/>
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
         <a class="btn btn-default" href="{cancelUrl}" role="button">Cancel</a>
