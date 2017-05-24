@@ -29,3 +29,21 @@ var WT_CONSTANTS = {
         opinion: 11
     }
 };
+
+/* Off Canvas */
+$(document).ready(function () {
+    var sidebar = $('.sidebar-offcanvas');
+    if(sidebar.length > 0) {
+        $('[data-toggle="offcanvas"]').click(function () {
+            $('.row-offcanvas').toggleClass('active');
+            if (sidebar.hasClass('visible-sm')) {
+                setTimeout(function () {
+                    sidebar.toggleClass('visible-xs visible-sm');
+                }, 250);
+            } else {
+                sidebar.toggleClass('visible-xs visible-sm');
+                $('.row-offcanvas').css('min-height', (parseInt(sidebar.css('height')) + parseInt(sidebar.css('margin-bottom')) + parseInt(sidebar.css('margin-top'))) + 'px');
+            }
+        });
+    }
+});

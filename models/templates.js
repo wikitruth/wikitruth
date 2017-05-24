@@ -79,6 +79,7 @@ module.exports = {
             update: 'dust/wiki/verdict/update'
         },
         screening: 'dust/wiki/screening',
+        visualize: 'dust/wiki/visualize',
         related: 'dust/wiki/related',
         clipboard: 'dust/wiki/clipboard'
     }
