@@ -1,10 +1,10 @@
 'use strict';
 
-var //utils       = require('../utils/utils'),
-    templates   = require('../models/templates'),
+var templates   = require('../models/templates'),
     paths       = require('../models/paths'),
     constants   = require('../models/constants'),
     flowUtils   = require('../utils/flowUtils'),
+    utils       = require('../utils/utils'),
     db          = require('../app').db.models,
     async       = require('async');
 
@@ -756,12 +756,82 @@ module.exports = function (router) {
 
     /* Visualize */
     router.get('/visualize', function (req, res) {
-        var model = {};
+        var model = {}, nodes = [], edges = [];
         var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
         flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
-            flowUtils.setModelOwnerEntry(model);
-            flowUtils.setModelContext(req, model);
-            res.render(templates.wiki.visualize, model);
+            var topicId = model.topic ? model.topic._id : null;
+            async.parallel({
+                visualize: function (callback) {
+                    db.Topic
+                        .find({
+                            parentId: topicId,
+                            private: false,
+                            'screening.status': constants.SCREENING_STATUS.status1.code
+                        })
+                        .sort({title: 1})
+                        .lean()
+                        .exec(function (err, results) {
+                            if(!topicId) {
+                                topicId = '0';
+                                nodes.push({id: topicId, label: 'Wikitruth', color: '#f0ad4e'});
+                            } else {
+                                nodes.push({id: topicId, label: utils.getShortText(model.topic.title, 15), color: '#f0ad4e'});
+                            }
+                            async.each(results, function (result, callback) {
+                                result.friendlyUrl = utils.urlify(result.title);
+                                result.shortTitle = utils.getShortText(result.contextTitle ? result.contextTitle : result.title, 15);
+                                nodes.push({id: result._id, label: result.shortTitle, color: '#FB7E81'});
+                                edges.push({from: topicId, to: result._id});
+                                db.Topic
+                                    .find({parentId: result._id})
+                                    .limit(10)
+                                    .sort({title: 1})
+                                    .lean()
+                                    .exec(function (err, subtopics) {
+                                        if (subtopics.length > 0) {
+                                            subtopics.forEach(function (subtopic) {
+                                                subtopic.friendlyUrl = utils.urlify(subtopic.title);
+                                                subtopic.shortTitle = utils.getShortText(subtopic.contextTitle ? subtopic.contextTitle : subtopic.title, 15);
+                                                nodes.push({id: subtopic._id, label: subtopic.shortTitle});
+                                                edges.push({from: subtopic._id, to: result._id});
+                                            });
+                                            result.subtopics = subtopics;
+                                            callback();
+                                        } else {
+                                            // if subtopics are less than 3, get some arguments
+                                            var query = {
+                                                parentId: null,
+                                                ownerId: result._id,
+                                                ownerType: constants.OBJECT_TYPES.topic,
+                                                'screening.status': constants.SCREENING_STATUS.status1.code
+                                            };
+                                            flowUtils.getArguments(query, 10, function (err, subarguments) {
+                                                subarguments.forEach(function (subargument) {
+                                                    flowUtils.setVerdictModel(subargument);
+                                                    subargument.shortTitle = utils.getShortText(subargument.contextTitle ? subargument.contextTitle : subargument.title, 15);
+                                                    nodes.push({id: subargument._id, label: subargument.shortTitle, color: '#7BE141'});
+                                                    edges.push({from: subargument._id, to: result._id});
+                                                });
+                                                flowUtils.sortArguments(subarguments);
+                                                result.subarguments = subarguments;
+                                                callback();
+                                            });
+                                        }
+                                    });
+                            }, function (err) {
+                                callback();
+                            });
+                        });
+                }
+            }, function (err, results) {
+                model.visualize = {
+                    nodes: nodes,
+                    edges: edges
+                };
+                flowUtils.setModelOwnerEntry(model);
+                flowUtils.setModelContext(req, model);
+                res.render(templates.wiki.visualize, model);
+            });
         });
     });
 
