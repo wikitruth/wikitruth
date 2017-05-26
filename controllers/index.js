@@ -246,7 +246,8 @@ module.exports = function (router) {
     router.get('/explore', function (req, res) {
         var MAX_RESULT = 25;
         var model = {
-            tab: req.query.tab ? req.query.tab : 'topics'
+            tab: req.query.tab ? req.query.tab : 'topics',
+            categories: req.app.locals.appCategories // = model.categories;
         };
         flowUtils.setScreeningModel(req, model);
         flowUtils.setModelContext(req, model);
@@ -426,7 +427,6 @@ module.exports = function (router) {
                 flowUtils.getCategories(model, callback);
             }*/
         }, function (err, results) {
-            model.categories = req.app.locals.appCategories; // = model.categories;
             flowUtils.setClipboardModel(req, model);
             res.render(templates.wiki.index, model);
         });
