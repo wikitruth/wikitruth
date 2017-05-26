@@ -50,7 +50,7 @@
             {?argumentLink}
                 <br/>
                 <div class="alert alert-warning" role="alert">
-                    <i class="fa fa-share"></i> This is a link to argument <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/{argumentLink.argument._id}">{argumentLink.argument.title}</a>
+                    <i class="fa fa-share"></i> This is a link to {contents.argument.entryL} <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/{argumentLink.argument._id}">{argumentLink.argument.title}</a>
                 </div>
             {/argumentLink}
         {/comment}

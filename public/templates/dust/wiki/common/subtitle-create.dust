@@ -19,13 +19,13 @@
                     ...under the question <a href="{wikiBaseUrl}{paths.wiki.questions.entry}/{question.friendlyUrl}/{question._id}">{question.title}</a>
                 {:else}
                     {?argumentLink}
-                        ...under the argument link <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/link/{argumentLink._id}">{argumentLink.title2}</a>
+                        ...under the {contents.argument.entryL} link <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/link/{argumentLink._id}">{argumentLink.title2}</a>
                     {:else}
                         {?argument}
-                            ...under the argument <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argument.friendlyUrl}/{argument._id}">{argument.title}</a>
+                            ...under the {contents.argument.entryL} <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argument.friendlyUrl}/{argument._id}">{argument.title}</a>
                         {:else}
                             {?parentArgument}
-                                ...under the parent argument <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
+                                ...under the parent {contents.argument.entryL} <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
                             {:else}
                                 {?topicLink}
                                     ...under the topic link <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topicLink.topic.friendlyUrl}/link/{topicLink._id}">{topicLink.title2}</a>

@@ -13,13 +13,13 @@
                     <i class="fa fa-question-circle-o"></i> A question on {>"dust/wiki/common/entry-link-argument" /}
                 {:else}
                     {?argumentLink}
-                        <i class="fa fa-link"></i> Argument <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/{argumentLink.argument._id}">{argumentLink.argument.title}</a> linked to {>"dust/wiki/common/entry-link-argument" /}
+                        <i class="fa fa-link"></i> {contents.argument.entry} <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/{argumentLink.argument._id}">{argumentLink.argument.title}</a> linked to {>"dust/wiki/common/entry-link-argument" /}
                     {:else}
                         {?argument}
                             {?parentArgument}
-                                <i class="fa fa-bolt"></i> A sub-argument {?argument.against}<span class="text-danger">against</span>{:else}in support for{/argument.against} <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
+                                <i class="fa fa-bolt"></i> A sub-{contents.argument.entryL} {?argument.against}<span class="text-danger">against</span>{:else}in support for{/argument.against} <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
                             {:else}
-                                <i class="fa fa-bolt"></i> An argument under the topic <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
+                                <i class="fa fa-bolt"></i> An {contents.argument.entryL} under the topic <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
                             {/parentArgument}
                         {:else}
                             {?topicLink}
