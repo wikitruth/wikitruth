@@ -8,7 +8,8 @@ module.exports = {
         entry: 'Statement',*/
         shortList: 'Facts',
         longList: 'Facts',
-        entry: 'Fact'
+        entry: 'Fact',
+        entryL: 'fact'
         /*shortList: 'Arguments',
         longList: 'Arguments',
         entry: 'Argument'*/

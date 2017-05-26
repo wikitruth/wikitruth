@@ -12,10 +12,10 @@
                     On question <a href="{wikiBaseUrl}{paths.wiki.questions.entry}/{parentQuestion.friendlyUrl}/{parentQuestion._id}">{parentQuestion.title}</a>
                 {:else}
                     {?parentArgumentLink}
-                        On argument link <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{parentArgumentLink.argument.friendlyUrl}/link/{parentArgumentLink._id}">{parentArgumentLink.title2}</a>
+                        On {contents.argument.entryL} link <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{parentArgumentLink.argument.friendlyUrl}/link/{parentArgumentLink._id}">{parentArgumentLink.title2}</a>
                     {:else}
                         {?parentArgument}
-                            {?argument.against}<span class="text-danger">Against</span>{:else}On{/argument.against} argument <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
+                            {?argument.against}<span class="text-danger">Against</span>{:else}On{/argument.against} {contents.argument.entryL} <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
                         {:else}
                             {?parentTopicLink}
                                 On topic link <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{parentTopicLink.topic.friendlyUrl}/link/{parentTopicLink._id}">{parentTopicLink.title2}</a>

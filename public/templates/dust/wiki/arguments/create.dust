@@ -16,7 +16,7 @@
             {>"dust/wiki/common/subtitle-create" /}
         {/argument}
     </div>
-    <div class="alert alert-success" role="alert">An argument is a statement of fact, claim, assertion, or a conclusion that describes reality or truth. Create arguments to break-down a topic into small, easy to understand statements. Arguments can be re-used on other topics by creating a link.</div>
+    <div class="alert alert-success" role="alert">A statement of fact, claim, assertion, or a conclusion that describes reality or truth. Create arguments to break-down a topic into small, easy to understand statements. Arguments can be re-used on other topics by creating a link.</div>
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
         <div class="form-group">
@@ -36,7 +36,7 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="inputParent">Argument Type</label>
+            <label for="inputParent">{contents.argument.entry} Type</label>
             <div class="radio">
                 <label>
                     <input type="radio" id="radioTypeId{argumentTypes.factual}" name="typeId" value="{argumentTypes.factual}">
@@ -85,13 +85,13 @@
                 <div class="radio">
                     <label class="text-success">
                         <input type="radio" name="supportsParent" value="1" {^argument.against}checked="checked"{/argument.against}>
-                        Supporting Argument (for)
+                        Supporting {contents.argument.entry} (for)
                     </label>
                 </div>
                 <div class="radio">
                     <label class="text-primary">
                         <input type="radio" name="supportsParent" value="" {?argument.against}checked="checked"{/argument.against}>
-                        Opposing Argument (against)
+                        Opposing {contents.argument.entry} (against)
                     </label>
                 </div>
             </div>
@@ -130,7 +130,7 @@
                             <label>
                                 <input type="checkbox" name="hasEthicalValue" value="1" {?argument.ethicalStatus.hasValue}checked="checked"{/argument.ethicalStatus.hasValue}>
                                 <span class="text-warning"><strong>{ARGUMENT_TAGS.tag10.text}</strong></span><br/>
-                                A argument on truth but containing moral, ethical, or aesthetic value
+                                An argument on truth but containing moral, ethical, or aesthetic value
                             </label>
                         </div>
                     </div>
