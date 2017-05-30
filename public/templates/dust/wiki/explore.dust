@@ -15,7 +15,7 @@
         </ul>!}
     {!<h3 class="page-header">Categories</h3>!}
     <div class="row">
-        {#categories}
+        {#appCategories}
             <div class="col-lg-4 col-md-6 col-sm-6">{! 73px !}
                 <div class="media wt-category">
                     <div class="media-left media-top">
@@ -44,7 +44,7 @@
                     </div>
                 </div>
             </div>
-        {/categories}
+        {/appCategories}
     </div>
     {!<br/>!}
     <h1 class="page-header wt-header" id="browse">Latest Posts</h1>

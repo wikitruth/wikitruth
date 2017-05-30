@@ -6,6 +6,7 @@ module.exports = function(app, mongoose) {
     content: { type: String, default: '' },
     source: { type: String, default: '' },
     url: { type: String, default: '' },
+    friendlyUrl: { type: String },
     ownerId: { type: mongoose.Schema.ObjectId },
     ownerType: { type: Number }, // MODEL_TYPES
     createDate: { type: Date, default: Date.now },
@@ -16,5 +17,5 @@ module.exports = function(app, mongoose) {
   schema.plugin(require('../plugins/pagedFind'));
   schema.index({ title: 1 });
   schema.set('autoIndex', (app.get('env') === 'development'));
-  app.db.model('Reference', schema);
+  app.db.model('Source', schema);
 };
