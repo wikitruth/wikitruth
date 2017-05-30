@@ -27,7 +27,7 @@
             <textarea class="form-control" id="inputContent" name="content" rows="12">{question.content}</textarea>
         </div>
         <div class="form-group">
-            <label for="inputReferences">References</label>
+            <label for="inputReferences">Sources</label>
             <textarea class="form-control" id="inputReferences" name="references" rows="3">{question.references}</textarea>
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;

@@ -25,5 +25,6 @@ module.exports = function(app, mongoose) {
   require('./schema/core/Issue')(app, mongoose);
   require('./schema/core/Opinion')(app, mongoose);
   require('./schema/core/Page')(app, mongoose);
+  //require('./schema/core/Source')(app, mongoose);
   require('./schema/core/Word')(app, mongoose);
 };

@@ -29,7 +29,7 @@
         </div>
         <div class="form-group">
             <label for="inputReferences">
-                <a role="button" data-toggle="collapse" href="#collapseReferences" aria-expanded="false" aria-controls="collapseReferences" class="wt-collapse-toggle{^argument.references} collapsed{/argument.references}">References</a>
+                <a role="button" data-toggle="collapse" href="#collapseReferences" aria-expanded="false" aria-controls="collapseReferences" class="wt-collapse-toggle{^argument.references} collapsed{/argument.references}">Sources</a>
             </label>
             <div class="collapse{?argument.references} in{/argument.references}" id="collapseReferences">
                 <textarea class="form-control" id="inputReferences" name="references" rows="3">{argument.references}</textarea>
