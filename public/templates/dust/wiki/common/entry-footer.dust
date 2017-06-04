@@ -1,7 +1,7 @@
 <br/>
 {?entry.references}
     <small class="text-muted">
-        <i class="fa fa-bookmark"></i> <span class="text-uppercase">References</span>
+        <i class="fa fa-bookmark"></i> <span class="text-uppercase">Sources</span>
         <p>{entry.references|s}</p>
     </small>
     <hr class="wt-dotted-line" style="margin: 0.7rem 0 1.7rem"/>

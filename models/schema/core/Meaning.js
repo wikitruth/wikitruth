@@ -13,5 +13,5 @@ module.exports = function(app, mongoose) {
   schema.index({ id: 1 });
   schema.index({ word: 1 });
   schema.set('autoIndex', (app.get('env') === 'development'));
-  app.db.model('Word', schema);
+  app.db.model('Meaning', schema);
 };
