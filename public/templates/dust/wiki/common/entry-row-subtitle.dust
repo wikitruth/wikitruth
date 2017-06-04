@@ -1,27 +1,27 @@
 <div class="wt-entry-row-subtitle text-muted">
     {?parentOpinion}
-        On comment <a href="{wikiBaseUrl}{paths.wiki.opinions.entry}/{parentOpinion.friendlyUrl}/{parentOpinion._id}">{parentOpinion.title}</a>
+        On comment <a href="{?parentOpinion.private}{wikiBaseUrl}{/parentOpinion.private}{paths.wiki.opinions.entry}/{parentOpinion.friendlyUrl}/{parentOpinion._id}">{parentOpinion.title}</a>
     {:else}
         {?parentIssue}
-            On issue <a href="{wikiBaseUrl}{paths.wiki.issues.entry}/{parentIssue.friendlyUrl}/{parentIssue._id}">{parentIssue.title}</a>
+            On issue <a href="{?parentIssue.private}{wikiBaseUrl}{/parentIssue.private}{paths.wiki.issues.entry}/{parentIssue.friendlyUrl}/{parentIssue._id}">{parentIssue.title}</a>
         {:else}
             {?parentAnswer}
-                On answer <a href="{wikiBaseUrl}{paths.wiki.answers.entry}/{parentAnswer.friendlyUrl}/{parentAnswer._id}">{parentAnswer.title}</a>
+                On answer <a href="{?parentAnswer.private}{wikiBaseUrl}{/parentAnswer.private}{paths.wiki.answers.entry}/{parentAnswer.friendlyUrl}/{parentAnswer._id}">{parentAnswer.title}</a>
             {:else}
                 {?parentQuestion}
-                    On question <a href="{wikiBaseUrl}{paths.wiki.questions.entry}/{parentQuestion.friendlyUrl}/{parentQuestion._id}">{parentQuestion.title}</a>
+                    On question <a href="{?parentQuestion.private}{wikiBaseUrl}{/parentQuestion.private}{paths.wiki.questions.entry}/{parentQuestion.friendlyUrl}/{parentQuestion._id}">{parentQuestion.title}</a>
                 {:else}
                     {?parentArgumentLink}
-                        On {contents.argument.entryL} link <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{parentArgumentLink.argument.friendlyUrl}/link/{parentArgumentLink._id}">{parentArgumentLink.title2}</a>
+                        On {contents.argument.entryL} link <a href="{?parentArgumentLink.private}{wikiBaseUrl}{/parentArgumentLink.private}{paths.wiki.arguments.entry}/{parentArgumentLink.argument.friendlyUrl}/link/{parentArgumentLink._id}">{parentArgumentLink.title2}</a>
                     {:else}
                         {?parentArgument}
-                            {?argument.against}<span class="text-danger">Against</span>{:else}On{/argument.against} {contents.argument.entryL} <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
+                            {?argument.against}<span class="text-danger">Against</span>{:else}On{/argument.against} {contents.argument.entryL} <a href="{?parentArgument.private}{wikiBaseUrl}{/parentArgument.private}{paths.wiki.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
                         {:else}
                             {?parentTopicLink}
-                                On topic link <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{parentTopicLink.topic.friendlyUrl}/link/{parentTopicLink._id}">{parentTopicLink.title2}</a>
+                                On topic link <a href="{?parentTopicLink.private}{wikiBaseUrl}{/parentTopicLink.private}{paths.wiki.topics.entry}/{parentTopicLink.topic.friendlyUrl}/link/{parentTopicLink._id}">{parentTopicLink.title2}</a>
                             {:else}
                                 {?parentTopic}
-                                    On topic <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}">{parentTopic.title}</a>
+                                    On topic <a href="{?parentTopic.private}{wikiBaseUrl}{/parentTopic.private}{paths.wiki.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}">{parentTopic.title}</a>
                                 {:else}
                                     A topic category
                                 {/parentTopic}

@@ -124,7 +124,7 @@ ARGUMENT_TYPES.getUXInfo = function (typeId) {
             theme = "warning";
             break;
         case ARGUMENT_TYPES.artifact:
-            label = "source";
+            label = "artifact";
             break;
         case ARGUMENT_TYPES.experience:
             label = "testimony";
