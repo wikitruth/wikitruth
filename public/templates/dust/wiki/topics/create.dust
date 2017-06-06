@@ -177,12 +177,7 @@
                 popover: {
                     air: WT_CONSTANTS.summernote.contentToolbar
                 },
-                airMode: true,
-                callbacks: {
-                    onInit: function () {
-                        disableEditorTooltipsOnTouchDevice();
-                    }
-                }
+                airMode: true
             });
 
             var topicTags = [{?topic.tags}{topic.tags}{/topic.tags}];
