@@ -76,10 +76,7 @@ function GET_index(req, res) {
                     model.opinions = results;
 
                     // screening and children count
-                    model.childrenCount = model.entry.childrenCount.opinions;
-                    if(model.childrenCount.pending === 0 && model.childrenCount.rejected === 0) {
-                        model.screening.hidden = true;
-                    }
+                    flowUtils.setScreeningModelCount(model, model.entry.childrenCount.opinions);
                     res.render(templates.wiki.opinions.index, model);
                 });
             });

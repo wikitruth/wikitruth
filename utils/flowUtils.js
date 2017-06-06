@@ -1583,6 +1583,10 @@ function setScreeningModel(req, model) {
     baseUrl.query = newQuery;
     model.screening.rejectedUrl = url.format(baseUrl);
 
+    newQuery.screening = 'archived';
+    baseUrl.query = newQuery;
+    model.screening.archivedUrl = url.format(baseUrl);
+
     if(req.query.screening) {
         if(req.query.screening === 'pending'){
             model.screening.pending = true;
@@ -1591,6 +1595,10 @@ function setScreeningModel(req, model) {
         } else if (req.query.screening === 'rejected') {
             model.screening.rejected = true;
             model.screening.status = constants.SCREENING_STATUS.status2.code;
+            return;
+        } else if (req.query.screening === 'archived') {
+            model.screening.archived = true;
+            model.screening.status = constants.SCREENING_STATUS.status3.code;
             return;
         }
     }
@@ -1604,6 +1612,15 @@ function initScreeningStatus(req, entity) {
             status: constants.SCREENING_STATUS.status1.code,
             history: []
         };
+    }
+}
+
+function setScreeningModelCount(model, childrenCount) {
+    model.childrenCount = childrenCount;
+    if(model.childrenCount.pending === 0 && model.childrenCount.rejected === 0) {
+        model.screening.hidden = true;
+    } else {
+        model.childrenCount.archived = utils.randomInt(1,9);
     }
 }
 
@@ -1802,6 +1819,7 @@ module.exports = {
     buildCancelUrl: buildCancelUrl,
     setScreeningModel: setScreeningModel,
     initScreeningStatus: initScreeningStatus,
+    setScreeningModelCount: setScreeningModelCount,
     getDbModelByObjectType: getDbModelByObjectType,
     getParent: getParent,
     setMemberFullname: setMemberFullname,

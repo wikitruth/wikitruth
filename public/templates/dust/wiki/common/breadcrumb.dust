@@ -1,4 +1,4 @@
-<ol class="breadcrumb wt-bc" style="margin-top: 30px">
+<ol class="breadcrumb wt-bc">
     {?username}
         <li><i class="fa fa-user-circle text-muted"></i> <a href="{paths.members.index}">Members</a></li>
         <li><i class="fa fa-user-circle text-muted"></i> <a href="{paths.members.index}/{username}">{username}</a></li>

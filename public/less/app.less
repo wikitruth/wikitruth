@@ -89,62 +89,17 @@ body {
   text-shadow: 0 0 5px rgba(255, 255, 255, 0.35);
 }
 
-/* Responsive: Portrait tablets and up */
-@media screen and (min-width: @screen-sm) {
-  /* Remove the padding we set earlier */
-  .header,
-  .marketing /*,.footer*/ {
+.breadcrumb.wt-bc {
+  margin-top: 30px;
+
+  a {
+    color: #555;
+  }
+
+  >li+li:before {
     padding-right: 0;
-    padding-left: 0;
-  }
-  /* Space out the masthead */
-  .header {
-    margin-bottom: 30px;
-  }
-  /* Remove the bottom border on the jumbotron for visual effect */
-  .jumbotron {
-    border-bottom: 0;
   }
 }
-
-@media screen and (max-width: @screen-xs-max) {
-  .container, .container-fluid {
-
-    .jumbotron {
-      padding-top: 10px;
-      padding-bottom: 10px;
-      margin-bottom: 10px;
-
-      .btn {
-        padding: 10px 15px;
-        font-size: 18px;
-      }
-
-      .wt-btn-explore {
-        width: 160px;
-      }
-
-      p {
-        font-size: 18px;
-      }
-    }
-
-    .wt-feature-header {
-      padding-top: 10px;
-      font-size: 24px;
-    }
-
-    .wt-section-col p {
-      font-size: 15px;
-    }
-  }
-}
-
-.highlight {
-  background-color: #f8f8f8;
-  font-weight: bold;
-}
-
 
 /* wikitruth custom css */
 
@@ -173,6 +128,78 @@ body {
     padding: .2em .4em .2em;
     letter-spacing: normal;
   }
+}
+
+/* Responsive: Portrait tablets and up */
+@media screen and (min-width: @screen-sm) {
+  /* Remove the padding we set earlier */
+  .header,
+  .marketing /*,.footer*/ {
+    padding-right: 0;
+    padding-left: 0;
+  }
+  /* Space out the masthead */
+  .header {
+    margin-bottom: 30px;
+  }
+  /* Remove the bottom border on the jumbotron for visual effect */
+  .jumbotron {
+    border-bottom: 0;
+  }
+}
+
+@media screen and (max-width: @screen-xs-max) {
+  .container, .container-fluid {
+
+    .jumbotron {
+      padding-top: 10px;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+      margin-top: 20px;
+
+      .btn {
+        padding: 10px 15px;
+        font-size: 18px;
+      }
+
+      .wt-btn-explore {
+        width: 160px;
+      }
+
+      p {
+        font-size: 18px;
+      }
+    }
+
+    .wt-feature-header {
+      padding-top: 10px;
+      font-size: 24px;
+    }
+
+    .wt-section-col p {
+      font-size: 15px;
+    }
+
+    .breadcrumb.wt-bc {
+      margin-top: 20px;
+    }
+
+    .page-header {
+      &.wt-header, &.wt-header-2 {
+        font-size: 32px;
+        margin-top: 20px;
+      }
+
+      .wt-subtitle {
+      }
+    }
+
+  }
+}
+
+.highlight {
+  background-color: #f8f8f8;
+  font-weight: bold;
 }
 
 .list-group.top-list-items, .entry-tabs {
@@ -219,17 +246,6 @@ body {
   }
 }
 
-
-.breadcrumb.wt-bc {
-  a {
-    color: #555;
-  }
-
-  >li+li:before {
-    padding-right: 0;
-  }
-}
-
 .wt-label.label {
   white-space: normal;
 
@@ -244,7 +260,7 @@ a.no-underline:hover, a.no-underline:focus, .wt-list a:hover, .wt-list a:focus {
 }
 
 .nav.nav-tabs.wt-tabs {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 
   a {
     color: #555;
@@ -269,7 +285,7 @@ a.no-underline:hover, a.no-underline:focus, .wt-list a:hover, .wt-list a:focus {
 }
 
 .nav.nav-tabs.wt-tabs-l2 {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 
   > li > a {
     color: #767676;
@@ -422,7 +438,7 @@ a.no-underline:hover, a.no-underline:focus, .wt-list a:hover, .wt-list a:focus {
         font-size: 16px;
       }
 
-      > div.entry-row-footer {
+      > div.wt-entry-row-footer {
         font-size: 12px;
       }
     }
@@ -441,9 +457,11 @@ a.no-underline:hover, a.no-underline:focus, .wt-list a:hover, .wt-list a:focus {
   margin-bottom: 2px;
 }
 
-.entry-row-footer > span {
-  display: inline-block;
-  margin-right: 12px;
+.wt-entry-row-footer {
+  & > span, & > a {
+    display: inline-block;
+    margin-right: 12px;
+  }
 }
 
 .wt-section-col {
@@ -539,7 +557,6 @@ a.wt-link-focus {
 
   &.nav-pills>li.active.brand-danger>a {
     background-color: @brand-danger;
-
     .badge {
       color: @brand-danger;
     }
@@ -547,9 +564,22 @@ a.wt-link-focus {
 
   &.nav-pills>li.active.brand-warning>a {
     background-color: @brand-warning;
-
     .badge {
       color: @brand-warning;
+    }
+  }
+
+  &.nav-pills>li.active.brand-info>a {
+    background-color: @brand-info;
+    .badge {
+      color: @brand-info;
+    }
+  }
+
+  &.nav-pills>li.active.brand-success>a {
+    background-color: @brand-success;
+    .badge {
+      color: @brand-success;
     }
   }
 }
@@ -566,6 +596,7 @@ a.wt-link-focus {
     font-size: inherit;
     font-weight: normal;
     margin-bottom: 5px;
+    margin-right: 4px;
     display: inline-block;
   }
 
@@ -695,7 +726,13 @@ div pre {
   margin-top: 30px;
 }
 
-@media screen and (max-width: @screen-md) {
+@media screen and (max-width: @screen-xs-max) {
+  .sidebar-offcanvas {
+    margin-top: 20px;
+  }
+}
+
+@media screen and (max-width: @screen-md-max) {
 
   .row-offcanvas {
     position: relative;

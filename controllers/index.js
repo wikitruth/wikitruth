@@ -773,15 +773,15 @@ module.exports = function (router) {
                         .exec(function (err, results) {
                             if(!topicId) {
                                 topicId = '0';
-                                nodes.push({id: topicId, label: 'Wikitruth', color: '#f0ad4e'});
+                                nodes.push({id: topicId, label: 'Wikitruth', color: '#f0ad4e', font: {size: 16}});
                             } else {
-                                nodes.push({id: topicId, label: utils.getShortText(model.topic.title, 15), color: '#f0ad4e'});
+                                nodes.push({id: topicId, label: utils.getShortText(model.topic.title, 15), color: '#f0ad4e', font: {size: 16}});
                             }
                             async.each(results, function (result, callback) {
                                 result.friendlyUrl = utils.urlify(result.title);
                                 result.shortTitle = utils.getShortText(result.contextTitle ? result.contextTitle : result.title, 15);
                                 nodes.push({id: result._id, label: result.shortTitle, color: '#FB7E81'});
-                                edges.push({from: topicId, to: result._id});
+                                edges.push({from: topicId, to: result._id, width: 4});
                                 db.Topic
                                     .find({parentId: result._id})
                                     .limit(10)

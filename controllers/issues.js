@@ -58,10 +58,7 @@ function GET_index(req, res) {
                     flowUtils.setModelContext(req, model);
 
                     // screening and children count
-                    model.childrenCount = model.entry.childrenCount.issues;
-                    if(model.childrenCount.pending === 0 && model.childrenCount.rejected === 0) {
-                        model.screening.hidden = true;
-                    }
+                    flowUtils.setScreeningModelCount(model, model.entry.childrenCount.issues);
                     res.render(templates.wiki.issues.index, model);
                 });
             });

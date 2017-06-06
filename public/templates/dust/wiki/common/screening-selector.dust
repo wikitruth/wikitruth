@@ -9,6 +9,7 @@
             {@gt key=childrenCount.rejected value="0"}
                 <li role="presentation"{?screening.rejected} class="active brand-danger"{/screening.rejected}><a href="{screening.rejectedUrl}">Rejected <span class="badge">{childrenCount.rejected}</span></a></li>
             {/gt}
+            <li style="float: right" role="presentation"{?screening.archived} class="active brand-info"{/screening.archived}><a href="{screening.archivedUrl}">Archived <span class="badge">{childrenCount.archived}</span></a></li>
         </ul>
         <br/>
     {/screening.hidden}
