@@ -43,10 +43,7 @@ function GET_index(req, res) {
         if(!model.topic || !flowUtils.isEntryOnIntendedUrl(req, model.topic)) {
             return res.redirect('/');
         }
-        model.childrenCount = model.topic.childrenCount.topics;
-        if(model.childrenCount.pending === 0 && model.childrenCount.rejected === 0) {
-            model.screening.hidden = true;
-        }
+        flowUtils.setScreeningModelCount(model, model.topic.childrenCount.topics);
         //console.log('model.childrenCount: ' + JSON.stringify(model.childrenCount));
         //console.log('model.screening.hidden: ' + model.screening.hidden);
         flowUtils.setModelOwnerEntry(model);
@@ -112,7 +109,7 @@ function GET_entry(req, res) {
                     .exec(function (err, results) {
                         async.each(results, function(result, callback) {
                             result.friendlyUrl = utils.urlify(result.title);
-                            result.comments = utils.numberWithCommas(utils.randomInt(1, 100000));
+                            //result.comments = utils.numberWithCommas(utils.randomInt(1, 100000));
                             db.Topic
                                 .find( { parentId: result._id } )
                                 .limit(3)

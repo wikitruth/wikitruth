@@ -29,32 +29,32 @@ var VERDICT_STATUS = {
 VERDICT_STATUS.getLabel = function (status) {
     switch (status) {
         case VERDICT_STATUS.status_true:
-            return 'TRUE'; // "Reviewed" if Topic
+            return 'verified'; // "Reviewed" if Topic
         case VERDICT_STATUS.status_false:
-            return 'FALSE';
+            return 'false';
         case VERDICT_STATUS.claim:
-            return 'Claim (Inconclusive)';
+            return 'inconclusive';
 
         case VERDICT_STATUS.most_likely:
-            return 'Most Like True';
+            return 'most like true';
         case VERDICT_STATUS.very_likely:
-            return 'Very Likely';
+            return 'very likely';
         case VERDICT_STATUS.likely:
-            return 'Likely';
+            return 'likely';
         case VERDICT_STATUS.makes_sense:
-            return 'Makes Sense';
+            return 'makes sense';
 
         case VERDICT_STATUS.unlikely:
-            return 'Unlikely';
+            return 'unlikely';
         case VERDICT_STATUS.very_unlikely:
-            return 'Very Unlikely';
+            return 'very unlikely';
         case VERDICT_STATUS.most_likely_false:
-            return 'Most Likely False';
+            return 'most likely false';
         case VERDICT_STATUS.misleading_invalid:
-            return 'Misleading (Invalid)';
+            return 'misleading (invalid)';
 
         case VERDICT_STATUS.pending:
-            return 'Claim (Unverified)'; // "Pending Review" if Topic
+            return 'unverified'; // "Pending Review" if Topic
     }
 };
 
@@ -155,6 +155,10 @@ var SCREENING_STATUS = {
     status2: {
         code: 2,
         text: "Rejected"
+    },
+    status3: {
+        code: 3,
+        text: "Archived"
     }
 };
 

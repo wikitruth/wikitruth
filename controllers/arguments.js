@@ -198,10 +198,7 @@ function GET_index(req, res) {
                     flowUtils.setModelOwnerEntry(model);
 
                     // screening and children count
-                    model.childrenCount = model.entry.childrenCount['arguments'];
-                    if(model.childrenCount.pending === 0 && model.childrenCount.rejected === 0) {
-                        model.screening.hidden = true;
-                    }
+                    flowUtils.setScreeningModelCount(model, model.entry.childrenCount['arguments']);
                     res.render(templates.wiki.arguments.index, model);
                 });
             });

@@ -6,10 +6,13 @@
 
 {<header}
     <link rel="stylesheet" href="/components/vis/dist/vis.min.css">
+    <link rel="stylesheet" href="/components/vis/dist/vis-network.min.css">
     <script src="/components/vis/dist/vis.min.js"></script>
     <style type="text/css">
         #mynetwork {
-            border: 1px solid #eee;
+            /*border: 1px solid #eee;*/
+            background-color: #eee;
+            border-radius: 5px;
         }
     </style>
 {/header}
@@ -19,7 +22,12 @@
     {>"dust/wiki/common/page-header" tab="visualize" /}
     <div class="row">
         <div class="col-md-12">
-            <div id="mynetwork"></div>
+            <div id="mynetwork">
+                <div style="text-align: center; padding: 50px;">
+                    <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
         </div>
     </div>
 {/body}
@@ -53,11 +61,17 @@
             nodes: nodes,
             edges: edges
         };
-        var options = {};
+        var options = {
+            interaction: {
+                navigationButtons: true,
+                keyboard: true
+            }
+        };
 
         /* initialize your network! */
         var container = $('#mynetwork');
-        container.css('height', ($(window).height() - $('.navbar-header').height()) + 'px'); /*container.css('width'));*/
+        container.css('height', ($(window).height() - $('.navbar-header').height() - 50) + 'px'); /*container.css('width'));*/
         var network = new vis.Network(container.get(0), data, options);
+
     </script>
 {/footer}
