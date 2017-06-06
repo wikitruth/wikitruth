@@ -165,11 +165,24 @@
             $('#inputName,#inputParent,#contextTitle').textareaAutoSize();
             $('#inputContent').summernote({
                 height: WT_CONSTANTS.summernote.contentHeight,
-                toolbar: WT_CONSTANTS.summernote.contentToolbar
+                toolbar: WT_CONSTANTS.summernote.contentToolbar,
+                popover: {
+                    air: WT_CONSTANTS.summernote.contentToolbar
+                },
+                airMode: true
             });
             $('#inputReferences').summernote({
                 height: WT_CONSTANTS.summernote.referenceHeight,
-                toolbar: WT_CONSTANTS.summernote.referenceToolbar
+                toolbar: WT_CONSTANTS.summernote.referenceToolbar,
+                popover: {
+                    air: WT_CONSTANTS.summernote.contentToolbar
+                },
+                airMode: true,
+                callbacks: {
+                    onInit: function () {
+                        disableEditorTooltipsOnTouchDevice();
+                    }
+                }
             });
 
             var topicTags = [{?topic.tags}{topic.tags}{/topic.tags}];

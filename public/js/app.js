@@ -30,6 +30,12 @@ var WT_CONSTANTS = {
     }
 };
 
+function disableEditorTooltipsOnTouchDevice() {
+    if($('.note-editor').length > 0 && ('ontouchstart' in document.documentElement)) {
+        $('.note-editor .note-btn').tooltip('disable');
+    }
+}
+
 /* Off Canvas */
 $(document).ready(function () {
     var sidebar = $('.sidebar-offcanvas');

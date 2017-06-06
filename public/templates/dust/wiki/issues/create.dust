@@ -127,7 +127,12 @@
             });
             $('#inputReferences').summernote({
                 height: WT_CONSTANTS.summernote.referenceHeight,
-                toolbar: WT_CONSTANTS.summernote.referenceToolbar
+                toolbar: WT_CONSTANTS.summernote.referenceToolbar,
+                callbacks: {
+                    onInit: function () {
+                        disableEditorTooltipsOnTouchDevice();
+                    }
+                }
             });
 
             var issueType = '{?issue}{issue.issueType}{:else}{ISSUE_TYPES.type100.code}{/issue}';
