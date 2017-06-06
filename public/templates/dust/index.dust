@@ -12,7 +12,7 @@
             <h1>The Wikitruth Project</h1>
             <p class="lead">A systematic way of discussion and knowledge contribution using dialectics and a vetting mechanism to verify between knowledge that is true or false, right or wrong, good or bad.</p>
         {/application}
-        <p><a class="btn btn-lg btn-success" style="width: 220px; margin-bottom: 5px" href="{?application}{application.exploreUrl}{:else}{paths.wiki.index}{/application}" role="button">Explore{! &raquo;!}</a>&nbsp;<a class="btn btn-lg btn-warning" href="{?application}{application.aboutUrl}{:else}{paths.about}{/application}" style="margin-bottom: 5px" role="button">Learn more</a></p>
+        <p><a class="btn btn-lg btn-success wt-btn-explore" href="{?application}{application.exploreUrl}{:else}{paths.wiki.index}{/application}" role="button">Explore{! &raquo;!}</a>&nbsp;<a class="btn btn-lg btn-warning" href="{?application}{application.aboutUrl}{:else}{paths.about}{/application}" style="margin-bottom: 5px" role="button">Learn more</a></p>
     </div>
 
     {!<div class="article-heading js-article-heading js-geopattern" style="background-image: url();">

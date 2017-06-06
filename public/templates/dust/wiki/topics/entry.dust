@@ -39,9 +39,9 @@
         <div class="wt-related">
             {!<hr class="wt-dotted-line" style="margin: 0 0 0.375rem"/>!}
             <span title="Related Topics">Topics</span>&nbsp;
-            <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}"><span class="wt-label label label-default">{parentTopic.title}</span></a>&nbsp;
+            <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}"><span class="wt-label label label-default">{parentTopic.title}</span></a>
             {#topicLinks}
-                <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}"><span class="wt-label label label-default">{title}</span></a>&nbsp;
+                <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}"><span class="wt-label label label-default">{title}</span></a>
             {/topicLinks}
         </div>
     {/parentTopic}
