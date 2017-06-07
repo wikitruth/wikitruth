@@ -78,7 +78,7 @@
                     {!<li><a href="#/switch?content=3">{?showEverything}<i class="fa fa-circle"></i>{:else}<i class="fa fa-check-square-o"></i>{/showEverything} Everything</a></li>!}
                     <li role="separator" class="divider light"></li>
                     {!<li><a href="#"><i class="fa fa-folder-o"></i> <strong>Structured</strong></a></li>!}
-                    <li><a href="{paths.wiki.visualize}{?topic}?topic={topic._id}{/topic}"><i class="fa fa-snowflake-o"></i> Visualize</a></li>
+                    <li><a href="{paths.wiki.visualize}{?topic}?topic={topic._id}{:else}{?application}?topic={application.exploreTopicId}{/application}{/topic}"><i class="fa fa-snowflake-o"></i> Visualize</a></li>
                     <li role="separator" class="divider"></li>
                     <li class="dropdown-header">Categories</li>
                     {#appCategories}
