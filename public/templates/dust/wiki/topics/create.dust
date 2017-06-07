@@ -83,8 +83,8 @@
                 <div class="checkbox">
                     <label>
                         <input type="checkbox" class="topicTag" name="topicTags" value="510">
-                        <span class="text-info"><strong>Root Category</strong></span><br/>
-                        A top-level category or container
+                        <span class="text-info"><strong>Topic Category</strong></span><br/>
+                        A topic category or container
                     </label>
                 </div>
                 <div class="checkbox">
