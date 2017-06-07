@@ -757,6 +757,7 @@ module.exports = function (router) {
     /* Visualize */
     router.get('/visualize', function (req, res) {
         var model = {}, nodes = [], edges = [];
+        var textSize = 25;
         var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
         flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
             var topicId = model.topic ? model.topic._id : null;
@@ -773,14 +774,14 @@ module.exports = function (router) {
                         .exec(function (err, results) {
                             if(!topicId) {
                                 topicId = '0';
-                                nodes.push({id: topicId, label: 'Wikitruth', color: '#f0ad4e', font: {size: 16}});
+                                nodes.push({id: topicId, label: 'Wikitruth', value: 10, color: '#f0ad4e', font: {size: 16}});
                             } else {
-                                nodes.push({id: topicId, label: utils.getShortText(model.topic.title, 15), color: '#f0ad4e', font: {size: 16}});
+                                nodes.push({id: topicId, label: utils.getShortText(model.topic.title, textSize), value: 10, color: '#f0ad4e', font: {size: 16}});
                             }
                             async.each(results, function (result, callback) {
                                 result.friendlyUrl = utils.urlify(result.title);
-                                result.shortTitle = utils.getShortText(result.contextTitle ? result.contextTitle : result.title, 15);
-                                nodes.push({id: result._id, label: result.shortTitle, color: '#FB7E81'});
+                                result.shortTitle = utils.getShortText(result.contextTitle ? result.contextTitle : result.title, textSize);
+                                nodes.push({id: result._id, label: result.shortTitle, value: 6, color: '#FB7E81'});
                                 edges.push({from: topicId, to: result._id, width: 4});
                                 db.Topic
                                     .find({parentId: result._id})
@@ -791,8 +792,8 @@ module.exports = function (router) {
                                         if (subtopics.length > 0) {
                                             subtopics.forEach(function (subtopic) {
                                                 subtopic.friendlyUrl = utils.urlify(subtopic.title);
-                                                subtopic.shortTitle = utils.getShortText(subtopic.contextTitle ? subtopic.contextTitle : subtopic.title, 15);
-                                                nodes.push({id: subtopic._id, label: subtopic.shortTitle});
+                                                subtopic.shortTitle = utils.getShortText(subtopic.contextTitle ? subtopic.contextTitle : subtopic.title, textSize);
+                                                nodes.push({id: subtopic._id, label: subtopic.shortTitle, value: 4});
                                                 edges.push({from: subtopic._id, to: result._id});
                                             });
                                             result.subtopics = subtopics;
@@ -808,8 +809,8 @@ module.exports = function (router) {
                                             flowUtils.getArguments(query, 10, function (err, subarguments) {
                                                 subarguments.forEach(function (subargument) {
                                                     flowUtils.setVerdictModel(subargument);
-                                                    subargument.shortTitle = utils.getShortText(subargument.contextTitle ? subargument.contextTitle : subargument.title, 15);
-                                                    nodes.push({id: subargument._id, label: subargument.shortTitle, color: '#7BE141'});
+                                                    subargument.shortTitle = utils.getShortText(subargument.contextTitle ? subargument.contextTitle : subargument.title, textSize);
+                                                    nodes.push({id: subargument._id, label: subargument.shortTitle, value: 4, shape: 'square', color: '#7BE141', type: 'argument'});
                                                     edges.push({from: subargument._id, to: result._id});
                                                 });
                                                 flowUtils.sortArguments(subarguments);
