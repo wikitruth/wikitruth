@@ -55,20 +55,7 @@ function GET_index(req, res) {
 function GET_entry(req, res) {
     // Topic home: display top subtopics, top arguments
     var model = {};
-    if(!req.query.topic) {
-        if(req.params.id) {
-            req.query.topic = req.params.id;
-        } else {
-            var friendlyId = req.params.friendlyUrl;
-            if(friendlyId) {
-                if(utils.isObjectIdString(friendlyId)) {
-                    req.query.topic = friendlyId;
-                } else {
-                    req.query.friendlyUrl = friendlyId;
-                }
-            }
-        }
-    }
+    flowUtils.ensureEntryIdParam(req, 'topic');
     flowUtils.setTopicModels(req, model, function () {
         if(!model.topic || !flowUtils.isEntryOnIntendedUrl(req, model.topic)) {
             return res.redirect('/');

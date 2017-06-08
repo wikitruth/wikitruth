@@ -14,7 +14,7 @@
     {?argument.verdict.label}
         <a href="{paths.wiki.verdict.update}?{?argument}argument={argument._id}{/argument}{?question}topic={topic._id}&amp;question={question._id}{/question}" title="Update Verdict" class="no-underline">
             <span class="label label-{argument.verdict.theme}" title="This content is not yet reviewed, please take caution.">
-                <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> {argument.verdict.label}
+                <i class="fa fa-{argument.verdict.icon}" aria-hidden="true"></i> {argument.verdict.label}
             </span>
         </a>&nbsp;
         {?proArgumentCount}

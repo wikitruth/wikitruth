@@ -22,8 +22,14 @@
     {>"dust/wiki/common/page-header" tab="visualize" /}
     <div class="row">
         <div class="col-md-12">
-            <div id="nodeLink" class="hide" style="position:absolute; z-index: 100; background-color: #00b0b9; padding: 3px; border-radius: 3px; margin: 5px">
-                <a href="#" style="color: #fff; text-decoration: none"><span></span> <i class="fa fa-arrow-circle-right"></i></a></div>
+            <div id="nodeLink" class="hide" style="position:absolute; z-index: 100">
+                <div class="explore" style="background-color: #00b0b9; padding: 3px 5px; border-radius: 3px; margin: 5px; display: inline-block">
+                    <a title="Explore" href="#" style="color: #fff; text-decoration: none"><span></span> <i class="fa fa-arrow-circle-right"></i></a>
+                </div>
+                <div class="visualize" style="background-color: #00b0b9; padding: 3px 5px; border-radius: 3px; margin: 5px; display: inline-block">
+                    <a title="Visualize" href="#" style="color: #fff; text-decoration: none"><i class="fa fa-snowflake-o"></i></a>
+                </div>
+            </div>
             <div id="loader" style="position:absolute; z-index: 150; padding: 10px">
                 <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
                 <span class="sr-only">Loading...</span>
@@ -38,25 +44,9 @@
     <script type="text/javascript">
         /* create an array with nodes */
         var nodes = new vis.DataSet({visualize.nodes|js|s});
-        /*var nodes = new vis.DataSet([
-            {id: 1, label: 'Node 1'},
-            {id: 2, label: 'Node 2'},
-            {id: 3, label: 'Node 3'},
-            {id: 4, label: 'Node 4'},
-            {id: 5, label: 'Node 5'}
-        ]);*/
 
         /* create an array with edges */
         var edges = new vis.DataSet({visualize.edges|js|s});
-        /*var edges = new vis.DataSet([
-            {from: 1, to: 3},
-            {from: 1, to: 2},
-            {from: 2, to: 4},
-            {from: 2, to: 5}
-        ]);*/
-
-        /* create a network */
-
 
         /* provide the data in the vis format */
         var data = {
@@ -65,7 +55,14 @@
         };
         var options = {
             nodes: {
-                shape: 'dot'
+                shape: 'dot',
+                font: {
+                    multi: true,
+                    ital: {
+                        size: 10,
+                        color: '#ccc'
+                    }
+                }
             },
             interaction: {
                 navigationButtons: true,
@@ -73,35 +70,51 @@
             }
         };
 
-        /* initialize your network! */
+        /* initialize the container */
         var container = $('#mynetwork');
-        container.css('height', ($(window).height() - $('.navbar-header').height() - 50) + 'px'); /*container.css('width'));*/
+        var containerHeight = $(window).height() - $('.navbar-header').height() - 50;
+        var containerWidth = container.width();
+        container.css('height', (containerHeight > containerWidth ? containerWidth : containerHeight) + 'px');
+
+        /* create a network */
         var network = new vis.Network(container.get(0), data, options);
         network.on("click", function (params) {
-            /*params.event = "[original event]";
-            document.getElementById('eventSpan').innerHTML = '<h2>Click event:</h2>' + JSON.stringify(params, null, 4);*/
-
             var nodeId = this.getNodeAt(params.pointer.DOM);
             if(nodeId) {
                 var node = nodes.get(nodeId);
                 var href = nodeId === '0' ? '/' : '/topic/' + nodeId;
+                if(node.more) {
+                    href = node.topicId ? '/topic/' + node.topicId : '/';
+                }
                 if(node.type === 'argument') {
                     href = '/argument/' + nodeId;
+                    $('#nodeLink .visualize').addClass('hide');
+                } else {
+                    $('#nodeLink .visualize').removeClass('hide');
+                    $('#nodeLink .visualize a').attr('href', '/visualize' + href);
                 }
-                $('#nodeLink a').attr('href', href);
-                $('#nodeLink span').text(node.label);
+
+                $('#nodeLink .explore a').attr('href', href);
+                $('#nodeLink .explore span').text(node.originalLabel ? node.originalLabel : node.label);
                 $('#nodeLink').removeClass('hide');
             } else {
                 $('#nodeLink').addClass('hide');
             }
-            /*
-            console.log('click event, getNodeAt returns: ' + this.getNodeAt(params.pointer.DOM));
+        });
+        network.on("doubleClick", function (params) {
             var nodeId = this.getNodeAt(params.pointer.DOM);
-            var node = nodes.get(nodeId);
-            nodes.update({
-                id: nodeId,
-                label: node.label + ' abc'
-            });*/
+            if(nodeId) {
+                var node = nodes.get(nodeId);
+                var href = nodeId === '0' ? '/' : '/topic/' + nodeId;
+                if(node.more) {
+                    href = node.topicId ? '/topic/' + node.topicId : '/';
+                }
+                if(node.type === 'argument') {
+
+                } else {
+                    location.href='/visualize' + href;
+                }
+            }
         });
         network.on("afterDrawing", function (ctx) {
             $('#loader').addClass('hide');

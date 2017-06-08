@@ -1323,6 +1323,7 @@ function setVerdictModel(result) {
         };
     }
     var status = result.verdict.status;
+    var theme = constants.VERDICT_STATUS.getTheme(status);
     var category = constants.VERDICT_STATUS.getCategory(status);
     switch (category) {
         case constants.VERDICT_STATUS.categories.true:
@@ -1337,7 +1338,8 @@ function setVerdictModel(result) {
     }
     result.verdict.category = category;
     result.verdict.label = constants.VERDICT_STATUS.getLabel(status);
-    result.verdict.theme = constants.VERDICT_STATUS.getTheme(status);
+    result.verdict.theme = theme.theme;
+    result.verdict.icon = theme.icon;
 
     if( typeof result.typeId !== 'undefined' && result.typeId !== constants.ARGUMENT_TYPES.factual) {
         result.typeUX = constants.ARGUMENT_TYPES.getUXInfo(result.typeId);
@@ -1387,6 +1389,23 @@ function getVerdictCount(args) {
         delete verdictCount.pending;
     }
     return verdictCount;
+}
+
+function ensureEntryIdParam(req, entry) {
+    if(!req.query[entry]) {
+        if(req.params.id) {
+            req.query[entry] = req.params.id;
+        } else {
+            var friendlyId = req.params.friendlyUrl;
+            if(friendlyId) {
+                if(utils.isObjectIdString(friendlyId)) {
+                    req.query[entry] = friendlyId;
+                } else {
+                    req.query.friendlyUrl = friendlyId;
+                }
+            }
+        }
+    }
 }
 
 function createOwnerQueryFromQuery(req) {
@@ -1813,6 +1832,7 @@ module.exports = {
     setVerdictModel: setVerdictModel,
     createOwnerQueryFromQuery: createOwnerQueryFromQuery,
     createOwnerQueryFromModel: createOwnerQueryFromModel,
+    ensureEntryIdParam: ensureEntryIdParam,
 
     setModelContext: setModelContext,
     buildEntryUrl: buildEntryUrl,

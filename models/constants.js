@@ -65,18 +65,18 @@ VERDICT_STATUS.getTheme = function (status) {
         case VERDICT_STATUS.very_likely:
         case VERDICT_STATUS.likely:
         case VERDICT_STATUS.makes_sense:
-            return 'success';
+            return { theme: 'success', icon: 'check-circle' };
 
         case VERDICT_STATUS.status_false:
         case VERDICT_STATUS.unlikely:
         case VERDICT_STATUS.very_unlikely:
         case VERDICT_STATUS.most_likely_false:
         case VERDICT_STATUS.misleading_invalid:
-            return 'danger';
+            return { theme: 'danger', icon: 'exclamation-circle' };
 
         case VERDICT_STATUS.claim:
         case VERDICT_STATUS.pending:
-            return 'warning';
+            return { theme: 'warning', icon: 'question-circle' };
     }
 };
 

@@ -24,13 +24,7 @@ function createCancelUrl(req) {
 
 function GET_entry(req, res) {
     var model = {};
-    if(!req.query.argument) {
-        if(req.params.id) {
-            req.query.argument = req.params.id;
-        } else {
-            req.query.argument = req.params.friendlyUrl;
-        }
-    }
+    flowUtils.ensureEntryIdParam(req, 'argument');
     var ownerQuery = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument };
     flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
         if(!flowUtils.isEntryOnIntendedUrl(req, model.argument)) {
