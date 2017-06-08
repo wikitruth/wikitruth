@@ -86,8 +86,10 @@
                 if(node.more) {
                     href = node.topicId ? '/topic/' + node.topicId : '/';
                 }
-                if(node.type === 'argument') {
-                    href = '/argument/' + nodeId;
+                if(node.type === 'argument' || node.current) {
+                    if(node.type === 'argument') {
+                        href = '/argument/' + nodeId;
+                    }
                     $('#nodeLink .visualize').addClass('hide');
                 } else {
                     $('#nodeLink .visualize').removeClass('hide');
@@ -106,12 +108,7 @@
             if(nodeId) {
                 var node = nodes.get(nodeId);
                 var href = nodeId === '0' ? '/' : '/topic/' + nodeId;
-                if(node.more) {
-                    href = node.topicId ? '/topic/' + node.topicId : '/';
-                }
-                if(node.type === 'argument') {
-
-                } else {
+                if(!(node.current || node.more || node.type === 'argument')) {
                     location.href='/visualize' + href;
                 }
             }

@@ -739,7 +739,7 @@ module.exports = function (router) {
     router.get('/visualize(/topic)?(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
         flowUtils.ensureEntryIdParam(req, 'topic');
         var model = {}, nodes = [], edges = [], node;
-        var textSize = 25, nodeSize = 11;
+        var textSize = 25, nodeSize = 11, rootId = '0';
         var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
         flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
             var topicId = model.topic ? model.topic._id : null;
@@ -755,25 +755,25 @@ module.exports = function (router) {
                         .lean()
                         .exec(function (err, results) {
                             if(!topicId) {
-                                topicId = '0';
-                                nodes.push({id: topicId, label: 'Wikitruth', value: 10, color: '#f0ad4e', font: {size: 16}});
+                                topicId = rootId;
+                                nodes.push({id: topicId, label: 'Wikitruth', value: 10, color: '#f0ad4e', font: {size: 16}, current: true });
                             } else {
-                                nodes.push({id: topicId, label: utils.getShortText(model.topic.title, textSize), value: 10, color: '#f0ad4e', font: {size: 16}});
+                                nodes.push({id: topicId, label: utils.getShortText(model.topic.title, textSize), value: 10, color: '#f0ad4e', font: {size: 16}, current: true });
 
                                 // add parent
                                 if(model.parentTopic) {
-                                    nodes.push({id: model.parentTopic._id, label: utils.getShortText(model.parentTopic.title, textSize) + ' (up level)', value: 6, shape: 'triangle', color: '#cc317c'});
+                                    nodes.push({id: model.parentTopic._id, label: utils.getShortText(model.parentTopic.title, textSize) + '\n(up level)', value: 6, shapex: 'triangle', color: '#cc317c'});
                                     edges.push({from: topicId, to: model.parentTopic._id, width: 4});
                                     if(model.grandParentTopic) {
-                                        nodes.push({id: model.grandParentTopic._id, label: utils.getShortText(model.grandParentTopic.title, textSize) + ' (up two levels)', value: 4, shape: 'triangle', color: '#cc317c'});
-                                        edges.push({from: model.parentTopic._id, to: model.grandParentTopic._id, width: 4});
+                                        nodes.push({id: model.grandParentTopic._id, label: utils.getShortText(model.grandParentTopic.title, textSize) + '\n(up 2 levels)', value: 4, shapex: 'triangle', color: '#cc317c'});
+                                        edges.push({from: model.parentTopic._id, to: model.grandParentTopic._id});
                                     } else {
-                                        nodes.push({id: '0', label: 'Wikitruth (up two levels)', value: 4, shape: 'triangle', color: '#cc317c'});
-                                        edges.push({from: '0', to: model.parentTopic._id, width: 4});
+                                        nodes.push({id: rootId, label: 'Wikitruth\n(up 2 levels)', value: 4, shapex: 'triangle', color: '#cc317c'});
+                                        edges.push({from: rootId, to: model.parentTopic._id});
                                     }
                                 } else {
-                                    nodes.push({id: '0', label: 'Wikitruth (up level)', value: 4, shape: 'triangle', color: '#cc317c'});
-                                    edges.push({from: '0', to: topicId, width: 4});
+                                    nodes.push({id: rootId, label: 'Wikitruth\n(up level)', value: 6, shapex: 'triangle', color: '#cc317c'});
+                                    edges.push({from: rootId, to: topicId, width: 4});
                                 }
                             }
                             var resultCounter = 0;
@@ -836,13 +836,22 @@ module.exports = function (router) {
                                             };
                                             flowUtils.getArguments(query, nodeSize, function (err, subarguments) {
                                                 subarguments.forEach(function (subargument) {
-                                                    flowUtils.setVerdictModel(subargument);
-                                                    subargument.shortTitle = utils.getShortText(subargument.contextTitle ? subargument.contextTitle : subargument.title, textSize);
-                                                    nodes.push({id: subargument._id, label: subargument.shortTitle, value: 4, shape: 'square', color: '#7BE141', type: 'argument'});
-                                                    edges.push({from: subargument._id, to: result._id});
+                                                    if(!nodes.find(function(item) { return subargument._id.equals(item.id); })) {
+                                                        flowUtils.setVerdictModel(subargument);
+                                                        subargument.shortTitle = utils.getShortText(subargument.contextTitle ? subargument.contextTitle : subargument.title, textSize);
+                                                        nodes.push({
+                                                            id: subargument._id,
+                                                            label: subargument.shortTitle,
+                                                            value: 4,
+                                                            shape: 'square',
+                                                            color: '#7BE141',
+                                                            type: 'argument'
+                                                        });
+                                                        edges.push({from: subargument._id, to: result._id});
+                                                    }
                                                 });
-                                                flowUtils.sortArguments(subarguments);
-                                                result.subarguments = subarguments;
+                                                /*flowUtils.sortArguments(subarguments);
+                                                result.subarguments = subarguments;*/
                                                 callback();
                                             });
                                         }
