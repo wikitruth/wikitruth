@@ -86,7 +86,7 @@
                 if(node.more) {
                     href = node.topicId ? '/topic/' + node.topicId : '/';
                 }
-                if(node.type === 'argument' || node.current) {
+                if(node.type === 'argument' || node.current || node.more) {
                     if(node.type === 'argument') {
                         href = '/argument/' + nodeId;
                     }
