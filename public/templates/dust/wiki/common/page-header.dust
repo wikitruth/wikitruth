@@ -16,7 +16,7 @@
         {@eq key=tab value="update-verdict"} <span class="label label-warning wt-subtitle">Verdict</span>{/eq}
         {@eq key=tab value="clipboard"}Clipboard{/eq}
         {@eq key=tab value="screening"} <span class="label label-warning wt-subtitle">Screening</span>{/eq}
-        {@eq key=tab value="visualize"} <span class="label label-warning wt-subtitle">Visualize</span>{/eq}
+        {!{@eq key=tab value="visualize"} <span class="label label-warning wt-subtitle">Visualize</span>{/eq}!}
     </h1>
     {>"dust/wiki/common/subtitle-edit" /}
     {@eq key=entry.screening.status value=0}

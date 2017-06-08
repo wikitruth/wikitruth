@@ -24,13 +24,7 @@ function shiftModels(req, model) {
 
 function GET_entry(req, res) {
     var model = {};
-    if(!req.query.opinion) {
-        if(req.params.id) {
-            req.query.opinion = req.params.id;
-        } else {
-            req.query.opinion = req.params.friendlyUrl;
-        }
-    }
+    flowUtils.ensureEntryIdParam(req, 'opinion');
     var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
     flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
         var query = {

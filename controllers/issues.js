@@ -11,13 +11,7 @@ var mongoose    = require('mongoose'),
 
 function GET_entry(req, res) {
     var model = {};
-    if(!req.query.issue) {
-        if(req.params.id) {
-            req.query.issue = req.params.id;
-        } else {
-            req.query.issue = req.params.friendlyUrl;
-        }
-    }
+    flowUtils.ensureEntryIdParam(req, 'issue');
     var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
     flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
         ownerQuery['screening.status'] = constants.SCREENING_STATUS.status1.code;

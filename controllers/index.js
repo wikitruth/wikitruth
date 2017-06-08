@@ -64,9 +64,6 @@ module.exports = function (router) {
                                 flowUtils.setEditorsUsername(results, function() {
                                     flowUtils.setEntryParents(results, constants.OBJECT_TYPES.argument, function() {
                                         results.forEach(function (result) {
-                                            result.topic = {
-                                                _id: result.ownerId
-                                            };
                                             flowUtils.appendEntryExtra(result);
                                             flowUtils.setVerdictModel(result);
                                         });
@@ -94,9 +91,6 @@ module.exports = function (router) {
                                 flowUtils.setEntryParents(results, constants.OBJECT_TYPES.question, function() {
                                     flowUtils.setEditorsUsername(results, function () {
                                         results.forEach(function (result) {
-                                            result.topic = {
-                                                _id: result.ownerId
-                                            };
                                             flowUtils.appendEntryExtra(result);
                                         });
                                         model.questions = results;
@@ -118,9 +112,6 @@ module.exports = function (router) {
                                 flowUtils.setEntryParents(results, constants.OBJECT_TYPES.answer, function() {
                                     flowUtils.setEditorsUsername(results, function () {
                                         results.forEach(function (result) {
-                                            result.topic = {
-                                                _id: result.ownerId
-                                            };
                                             flowUtils.appendEntryExtra(result);
                                         });
                                         model.answers = results;
@@ -246,8 +237,7 @@ module.exports = function (router) {
     router.get('/explore', function (req, res) {
         var MAX_RESULT = 25;
         var model = {
-            tab: req.query.tab ? req.query.tab : 'topics',
-            categories: req.app.locals.appCategories // = model.categories;
+            tab: req.query.tab ? req.query.tab : 'topics'
         };
         flowUtils.setScreeningModel(req, model);
         flowUtils.setModelContext(req, model);
@@ -298,9 +288,6 @@ module.exports = function (router) {
                         flowUtils.setEditorsUsername(results, function() {
                             flowUtils.setEntryParents(results, constants.OBJECT_TYPES.argument, function () {
                                 results.forEach(function (result) {
-                                    result.topic = {
-                                        _id: result.ownerId
-                                    };
                                     flowUtils.appendEntryExtra(result);
                                     flowUtils.setVerdictModel(result);
                                 });
@@ -332,9 +319,6 @@ module.exports = function (router) {
                         flowUtils.setEntryParents(results, constants.OBJECT_TYPES.question, function () {
                             flowUtils.setEditorsUsername(results, function () {
                                 results.forEach(function (result) {
-                                    result.topic = {
-                                        _id: result.ownerId
-                                    };
                                     flowUtils.appendEntryExtra(result);
                                 });
                                 model.questions = results;
@@ -360,9 +344,6 @@ module.exports = function (router) {
                         flowUtils.setEntryParents(results, constants.OBJECT_TYPES.answer, function () {
                             flowUtils.setEditorsUsername(results, function () {
                                 results.forEach(function (result) {
-                                    result.topic = {
-                                        _id: result.ownerId
-                                    };
                                     flowUtils.appendEntryExtra(result);
                                 });
                                 model.answers = results;
@@ -755,9 +736,10 @@ module.exports = function (router) {
     });
 
     /* Visualize */
-    router.get('/visualize', function (req, res) {
-        var model = {}, nodes = [], edges = [];
-        var textSize = 25;
+    router.get('/visualize(/topic)?(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        flowUtils.ensureEntryIdParam(req, 'topic');
+        var model = {}, nodes = [], edges = [], node;
+        var textSize = 25, nodeSize = 11;
         var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
         flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
             var topicId = model.topic ? model.topic._id : null;
@@ -777,23 +759,69 @@ module.exports = function (router) {
                                 nodes.push({id: topicId, label: 'Wikitruth', value: 10, color: '#f0ad4e', font: {size: 16}});
                             } else {
                                 nodes.push({id: topicId, label: utils.getShortText(model.topic.title, textSize), value: 10, color: '#f0ad4e', font: {size: 16}});
+
+                                // add parent
+                                if(model.parentTopic) {
+                                    nodes.push({id: model.parentTopic._id, label: utils.getShortText(model.parentTopic.title, textSize) + ' (up level)', value: 6, shape: 'triangle', color: '#cc317c'});
+                                    edges.push({from: topicId, to: model.parentTopic._id, width: 4});
+                                    if(model.grandParentTopic) {
+                                        nodes.push({id: model.grandParentTopic._id, label: utils.getShortText(model.grandParentTopic.title, textSize) + ' (up two levels)', value: 4, shape: 'triangle', color: '#cc317c'});
+                                        edges.push({from: model.parentTopic._id, to: model.grandParentTopic._id, width: 4});
+                                    } else {
+                                        nodes.push({id: '0', label: 'Wikitruth (up two levels)', value: 4, shape: 'triangle', color: '#cc317c'});
+                                        edges.push({from: '0', to: model.parentTopic._id, width: 4});
+                                    }
+                                } else {
+                                    nodes.push({id: '0', label: 'Wikitruth (up level)', value: 4, shape: 'triangle', color: '#cc317c'});
+                                    edges.push({from: '0', to: topicId, width: 4});
+                                }
                             }
+                            var resultCounter = 0;
                             async.each(results, function (result, callback) {
+                                resultCounter++;
+                                if(model.topic && resultCounter === nodeSize) {
+                                    node = {id: result._id, label: 'more...', value: 6, color: '#FB7E81', more: true};
+                                    node.originalLabel = node.label;
+                                    node.topicId = model.topic._id;
+                                    node.label += ' <i>*' + model.topic.childrenCount.topics.accepted + '</i>';
+                                    nodes.push(node);
+                                    edges.push({from: topicId, to: result._id, width: 4});
+                                    return callback();
+                                }
                                 result.friendlyUrl = utils.urlify(result.title);
                                 result.shortTitle = utils.getShortText(result.contextTitle ? result.contextTitle : result.title, textSize);
                                 nodes.push({id: result._id, label: result.shortTitle, value: 6, color: '#FB7E81'});
                                 edges.push({from: topicId, to: result._id, width: 4});
                                 db.Topic
-                                    .find({parentId: result._id})
-                                    .limit(10)
+                                    .find({
+                                        parentId: result._id,
+                                        'screening.status': constants.SCREENING_STATUS.status1.code
+                                    })
+                                    .limit(nodeSize)
                                     .sort({title: 1})
                                     .lean()
                                     .exec(function (err, subtopics) {
                                         if (subtopics.length > 0) {
+                                            var subtopicCounter = 0;
                                             subtopics.forEach(function (subtopic) {
+                                                subtopicCounter++;
+                                                if(subtopicCounter === nodeSize) {
+                                                    node = {id: subtopic._id, label: 'more...', value: 4, more: true};
+                                                    node.originalLabel = node.label;
+                                                    node.topicId = result._id;
+                                                    node.label += ' <i>*' + result.childrenCount.topics.accepted + '</i>';
+                                                    nodes.push(node);
+                                                    edges.push({from: subtopic._id, to: result._id});
+                                                    return;
+                                                }
                                                 subtopic.friendlyUrl = utils.urlify(subtopic.title);
                                                 subtopic.shortTitle = utils.getShortText(subtopic.contextTitle ? subtopic.contextTitle : subtopic.title, textSize);
-                                                nodes.push({id: subtopic._id, label: subtopic.shortTitle, value: 4});
+                                                node = {id: subtopic._id, label: subtopic.shortTitle, value: 4};
+                                                if(subtopic.childrenCount.topics.accepted > 0) {
+                                                    node.originalLabel = node.label;
+                                                    node.label += ' <i>*' + subtopic.childrenCount.topics.accepted + '</i>';
+                                                }
+                                                nodes.push(node);
                                                 edges.push({from: subtopic._id, to: result._id});
                                             });
                                             result.subtopics = subtopics;
@@ -806,7 +834,7 @@ module.exports = function (router) {
                                                 ownerType: constants.OBJECT_TYPES.topic,
                                                 'screening.status': constants.SCREENING_STATUS.status1.code
                                             };
-                                            flowUtils.getArguments(query, 10, function (err, subarguments) {
+                                            flowUtils.getArguments(query, nodeSize, function (err, subarguments) {
                                                 subarguments.forEach(function (subargument) {
                                                     flowUtils.setVerdictModel(subargument);
                                                     subargument.shortTitle = utils.getShortText(subargument.contextTitle ? subargument.contextTitle : subargument.title, textSize);
