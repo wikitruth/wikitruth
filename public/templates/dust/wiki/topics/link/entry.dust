@@ -20,18 +20,15 @@
         </a>
         {?hasKeyEntries}
             <div style="margin-top: 15px; margin-bottom: 10px;">
-                <div style="font-size-x: 12px; font-weight: bold;" class="text-muted">Highlights{!Key Contents|Quick Facts!}</div>
-                {#keyTopics}
-                    <div class="text-muted">&bull; <a class="text-muted" href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a></div>
-                {/keyTopics}
-                {#keyArguments}
-                    <div class="text-muted">&bull; <a class="text-muted" href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a></div>
-                {/keyArguments}
-                {!<ul>
+                <div style="font-size-x: 12px; font-weight: bold;">Highlights{!Key Contents|Quick Facts!}</div>
+                <ul>
+                    {#keyTopics}
+                        <li><a class="text-muted" href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a></li>
+                    {/keyTopics}
                     {#keyArguments}
-                        <li><a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a></li>
+                        <li><a class="text-muted" href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a></li>
                     {/keyArguments}
-                </ul>!}
+                </ul>
             </div>
         {/hasKeyEntries}
     </div>

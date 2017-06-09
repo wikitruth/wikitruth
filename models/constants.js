@@ -217,7 +217,7 @@ var ARGUMENT_TAGS = {
     },
     tag20: {
         code: 20,
-        text: "Key Argument"
+        text: "Key Fact"
     },
     tag30: {
         code: 30,

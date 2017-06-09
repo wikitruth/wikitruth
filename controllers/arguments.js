@@ -291,6 +291,9 @@ function POST_create(req, res) {
                 }
                 var tags = req.body.argumentTags;
                 var dateNow = Date.now();
+                if(tags && !(tags instanceof Array)) {
+                    tags = [tags];
+                }
                 entry = result;
                 entity = result ? result : {};
                 entity.content = req.body.content;

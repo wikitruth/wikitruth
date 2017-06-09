@@ -1,6 +1,7 @@
 <div class="text-muted-2 wt-entry-row-footer">
     <span><i class="fa fa-clock-o"></i> {editDateString}</span>
     <a class="text-muted-2" href="/members/{editUsername}">{!<i class="fa fa-user"></i>!}<i class="fa fa-user-circle-o text-muted-3"></i> {editUsername}</a>
+    <a href="#" class="text-muted-2"><i class="fa fa-reply"></i> reply</a>
     {!<span><i class="fa fa-smile-o"></i> {points}</span>!}
     {@gt key=childrenCount.topics.accepted value="0"}<span><i class="fa fa-folder-open-o" aria-hidden="true"></i> {childrenCount.topics.accepted}</span>{/gt}
     {@gt key=childrenCount.arguments.accepted value="0"}<span><i class="fa fa-flash" aria-hidden="true"></i> {childrenCount.arguments.accepted}</span>{/gt}
@@ -10,7 +11,6 @@
     {?referenceDate}
         <span title="Reference Date"><i class="fa fa-clock-o"></i> {referenceDateSimple}</span>
     {/referenceDate}
-    <a href="#" class="text-muted-2"><i class="fa fa-reply"></i> reply</a>
     <a href="#" class="text-muted-2"><i class="glyphicon glyphicon-option-horizontal"></i></a>
 </div>
 {!<div class="text-muted wt-row-footer"><i class="fa fa-user"></i> {editUsername} <i class="fa fa-clock-o"></i> {editDateString} <i class="fa fa-diamond"></i> {points}

@@ -306,6 +306,9 @@ function POST_create(req, res) {
         var entity = result ? result : {};
         var tags = req.body.topicTags;
         var dateNow = Date.now();
+        if(tags && !(tags instanceof Array)) {
+            tags = [tags];
+        }
         entity.content = req.body.content;
         entity.contentPreview = flowUtils.createContentPreview(req.body.content);
         entity.title = req.body.title;
