@@ -339,6 +339,7 @@ function POST_create(req, res) {
             return res.redirect('/');
         }
         db.Topic.findOneAndUpdate(query, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function(err, updatedEntity) {
+
             var updateRedirect = function () {
                 var model = {};
                 flowUtils.setModelContext(req, model);

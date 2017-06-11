@@ -1,0 +1,24 @@
+{?hasKeyEntries}
+    <div style="margin-top: 15px;">
+        {?keyTopics}
+            <div style="margin-bottom: 10px">
+                <div style="font-weight: bold;">Key topics{!Key Contents|Quick Facts|Key facts!}</div>
+                <ul>
+                    {#keyTopics}
+                        <li><a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a></li>
+                    {/keyTopics}
+                </ul>
+            </div>
+        {/keyTopics}
+        {?keyArguments}
+            <div style="margin-bottom: 10px">
+                <div style="font-weight: bold;">Key facts{!Key Contents|Quick Facts|Key facts!}</div>
+                <ul>
+                    {#keyArguments}
+                        <li><a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a></li>
+                    {/keyArguments}
+                </ul>
+            </div>
+        {/keyArguments}
+    </div>
+{/hasKeyEntries}
