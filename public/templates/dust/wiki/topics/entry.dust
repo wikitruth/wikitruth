@@ -18,24 +18,7 @@
             <div class="content-see-more-gradient"></div>
             <div class="content-see-more-text">See more</div>
         </a>
-        {?hasKeyEntries}
-            <div style="margin-top: 15px; margin-bottom: 10px;">
-                <div style="font-size-x: 12px; font-weight: bold;">Highlights{!Key Contents|Quick Facts!}</div>
-                <ul>
-                    {#keyTopics}
-                        <li><a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a></li>
-                    {/keyTopics}
-                    {#keyArguments}
-                        <li><a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a></li>
-                    {/keyArguments}
-                </ul>
-                {!<ul>
-                    {#keyArguments}
-                        <li><a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a></li>
-                    {/keyArguments}
-                </ul>!}
-            </div>
-        {/hasKeyEntries}
+        {>"dust/wiki/common/entry-outline" /}
     </div>
     {?parentTopic}
         <div class="wt-related">

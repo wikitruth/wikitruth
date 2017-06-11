@@ -320,24 +320,38 @@ a.no-underline:hover, a.no-underline:focus, .wt-list a:hover, .wt-list a:focus {
     }
   }
 
-  >li > a {
-    display: block;
-    padding: 3px 20px;
-    clear: both;
-    font-weight: normal;
-    line-height: 1.42857143;
-    color: #333;
-    /*white-space: nowrap;*/
-    font-size: 16px;
-    text-overflow: ellipsis;
+  >li {
+    a {
+      display: block;
+      padding: 3px 20px;
+      clear: both;
+      font-weight: normal;
+      line-height: 1.42857143;
+      color: #333;
+      /*white-space: nowrap;*/
+      font-size: 16px;
+      text-overflow: ellipsis;
 
-    & > i.fa {
-      min-width: 22px;
-      text-align: center;
+      & > i.fa {
+        min-width: 22px;
+        text-align: center;
+      }
+
+      & > img {
+        margin-right: 6px;
+      }
     }
 
-    & > img {
-      margin-right: 6px;
+    .nav li {
+      a {
+        padding-left: 45px;
+      }
+
+      .nav li {
+        a {
+          padding-left: 70px;
+        }
+      }
     }
   }
 }
