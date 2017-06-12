@@ -327,7 +327,7 @@ module.exports = {
     VERDICT_STATUS: VERDICT_STATUS,
     SETTINGS: {
         contentPreviewLength: 250,
-        TILE_MAX_SUB_ENTRY_LEN: 35
+        TILE_MAX_SUB_ENTRY_LEN: 30
     },
     OBJECT_NAMES_MAP: {
         1: 'topics',
