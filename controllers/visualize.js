@@ -13,7 +13,7 @@ module.exports = function (router) {
     router.get('(/topic)?(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
         flowUtils.ensureEntryIdParam(req, 'topic');
         var model = {}, nodes = [], edges = [], node;
-        var textSize = 25, nodeSize = 16, rootId = '0';
+        var textSize = 25, nodeSize = 14, rootId = '0'; // from nodeSize = 15 is producing an error
         var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
         flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
             var topicId = model.topic ? model.topic._id : null;
