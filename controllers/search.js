@@ -11,11 +11,13 @@ module.exports = function (router) {
     router.get('/', function (req, res) {
         var MAX_RESULT = 15;
         var keyword = req.query.q;
+        var allTabs = !req.query.tab;
+        var limit = allTabs ? MAX_RESULT : 0;
         var tab = req.query.tab ? req.query.tab : 'all';
         var model = {
             tab: tab,
             keyword: keyword,
-            results: tab !== 'all'
+            results: !allTabs // this is to allow the user to switch to other tabs if the current is empty
         };
         if(!keyword) {
             return res.render(templates.search, model);
@@ -27,13 +29,13 @@ module.exports = function (router) {
         flowUtils.setModelContext(req, model);
         async.parallel({
             topics: function(callback) {
-                if(tab !== 'all' && tab !== 'topics') {
+                if(!allTabs && tab !== 'topics') {
                     return callback();
                 }
                 db.Topic
                     .find({ $text : { $search : keyword }, $or: privacyFilter }, { score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
-                    .limit(tab === 'all' ? MAX_RESULT : 0)
+                    .limit(limit)
                     .lean()
                     .exec(function(err, results) {
                         if(err || !results) {
@@ -47,7 +49,7 @@ module.exports = function (router) {
                                 });
                                 model.topics = results;
                                 if (results.length > 0) {
-                                    if (results.length === MAX_RESULT) {
+                                    if (allTabs && results.length >= MAX_RESULT) {
                                         model.topicsMore = true;
                                     }
                                     model.results = true;
@@ -58,13 +60,13 @@ module.exports = function (router) {
                 });
             },
             arguments: function(callback) {
-                if(tab !== 'all' && tab !== 'arguments') {
+                if(!allTabs && tab !== 'arguments') {
                     return callback();
                 }
                 db.Argument
                     .find({ $text : { $search : keyword }, $or: privacyFilter }, { score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
-                    .limit(tab === 'all' ? MAX_RESULT : 0)
+                    .limit(limit)
                     .lean()
                     .exec(function(err, results) {
                         flowUtils.setEditorsUsername(results, function() {
@@ -76,7 +78,7 @@ module.exports = function (router) {
                                 flowUtils.sortArguments(results);
                                 model.arguments = results;
                                 if (results.length > 0) {
-                                    if (results.length === MAX_RESULT) {
+                                    if (allTabs && results.length >= MAX_RESULT) {
                                         model.argumentsMore = true;
                                     }
                                     model.results = true;
@@ -87,13 +89,13 @@ module.exports = function (router) {
                 });
             },
             questions: function (callback) {
-                if(tab !== 'all' && tab !== 'questions') {
+                if(!allTabs && tab !== 'questions') {
                     return callback();
                 }
                 db.Question
                     .find({ $text : { $search : keyword }, $or: privacyFilter }, { score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
-                    .limit(tab === 'all' ? MAX_RESULT : 0)
+                    .limit(limit)
                     .lean()
                     .exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
@@ -103,6 +105,9 @@ module.exports = function (router) {
                             });
                             model.questions = results;
                             if (results.length > 0) {
+                                if (allTabs && results.length >= MAX_RESULT) {
+                                    model.questionsMore = true;
+                                }
                                 model.results = true;
                             }
                             callback();
@@ -111,13 +116,13 @@ module.exports = function (router) {
                 });
             },
             answers: function (callback) {
-                if(tab !== 'all' && tab !== 'answers') {
+                if(!allTabs && tab !== 'answers') {
                     return callback();
                 }
                 db.Answer
                     .find({ $text : { $search : keyword }, $or: privacyFilter }, { score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
-                    .limit(tab === 'all' ? MAX_RESULT : 0)
+                    .limit(limit)
                     .lean()
                     .exec(function(err, results) {
                         flowUtils.setEditorsUsername(results, function() {
@@ -127,6 +132,9 @@ module.exports = function (router) {
                                 });
                                 model.answers = results;
                                 if (results.length > 0) {
+                                    if (allTabs && results.length >= MAX_RESULT) {
+                                        model.answersMore = true;
+                                    }
                                     model.results = true;
                                 }
                                 callback();
@@ -135,13 +143,13 @@ module.exports = function (router) {
                     });
             },
             issues: function (callback) {
-                if(tab !== 'all' && tab !== 'issues') {
+                if(!allTabs && tab !== 'issues') {
                     return callback();
                 }
                 db.Issue
                     .find({ $text : { $search : keyword }, $or: privacyFilter }, { score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
-                    .limit(tab === 'all' ? MAX_RESULT : 0)
+                    .limit(limit)
                     .lean()
                     .exec(function(err, results) {
                         flowUtils.setEditorsUsername(results, function() {
@@ -152,7 +160,7 @@ module.exports = function (router) {
                                 });
                                 model.issues = results;
                                 if (results.length > 0) {
-                                    if (results.length === MAX_RESULT) {
+                                    if (allTabs && results.length >= MAX_RESULT) {
                                         model.issuesMore = true;
                                     }
                                     model.results = true;
@@ -163,13 +171,13 @@ module.exports = function (router) {
                 });
             },
             opinions: function (callback) {
-                if(tab !== 'all' && tab !== 'opinions') {
+                if(!allTabs && tab !== 'opinions') {
                     return callback();
                 }
                 db.Opinion
                     .find({ $text : { $search : keyword }, $or: privacyFilter }, { score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
-                    .limit(tab === 'all' ? MAX_RESULT : 0)
+                    .limit(limit)
                     .lean()
                     .exec(function(err, results) {
                         flowUtils.setEditorsUsername(results, function() {
@@ -179,7 +187,7 @@ module.exports = function (router) {
                                 });
                                 model.opinions = results;
                                 if (results.length > 0) {
-                                    if (results.length === MAX_RESULT) {
+                                    if (allTabs && results.length >= MAX_RESULT) {
                                         model.opinionsMore = true;
                                     }
                                     model.results = true;

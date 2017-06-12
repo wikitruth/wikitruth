@@ -57,11 +57,7 @@
             nodes: {
                 shape: 'dot',
                 font: {
-                    multi: true,
-                    ital: {
-                        size: 10,
-                        color: '#ccc'
-                    }
+                    multi: true
                 }
             },
             interaction: {
