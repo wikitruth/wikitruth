@@ -170,6 +170,7 @@ module.exports = function (router) {
         var model = {};
         setMemberModel(model, req, function () {
             var tab = req.query.tab ? req.query.tab : 'all';
+            var LIMIT = tab === 'all' ? 15 : 0;
             model.tab = tab;
             model.results = tab !== 'all';
             model.url = '/members/' + model.member.username + '/contributions';
@@ -181,7 +182,7 @@ module.exports = function (router) {
                     db.Topic
                         .find({ createUserId: model.member._id, private: false })
                         .sort({editDate: -1})
-                        .limit(tab === 'all' ? 15 : 0)
+                        .limit(LIMIT)
                         .lean()
                         .exec(function(err, results) {
                             if(err || !results) {
@@ -211,7 +212,7 @@ module.exports = function (router) {
                     db.Argument
                         .find({ createUserId: model.member._id, private: false })
                         .sort({editDate: -1})
-                        .limit(tab === 'all' ? 15 : 0)
+                        .limit(LIMIT)
                         .lean()
                         .exec(function(err, results) {
                             flowUtils.setEntryParents(results, constants.OBJECT_TYPES.argument, function() {
@@ -240,7 +241,7 @@ module.exports = function (router) {
                     db.Question
                         .find({ createUserId: model.member._id, private: false })
                         .sort({editDate: -1})
-                        .limit(tab === 'all' ? 15 : 0)
+                        .limit(LIMIT)
                         .lean()
                         .exec(function(err, results) {
                             flowUtils.setEntryParents(results, constants.OBJECT_TYPES.question, function() {
@@ -264,7 +265,7 @@ module.exports = function (router) {
                     db.Answer
                         .find({ createUserId: model.member._id, private: false })
                         .sort({editDate: -1})
-                        .limit(tab === 'all' ? 15 : 0)
+                        .limit(LIMIT)
                         .lean()
                         .exec(function(err, results) {
                             flowUtils.setEntryParents(results, constants.OBJECT_TYPES.answer, function() {
@@ -288,7 +289,7 @@ module.exports = function (router) {
                     db.Issue
                         .find({ createUserId: model.member._id, private: false })
                         .sort({editDate: -1})
-                        .limit(tab === 'all' ? 15 : 0)
+                        .limit(LIMIT)
                         .lean()
                         .exec(function(err, results) {
                             flowUtils.setEntryParents(results, constants.OBJECT_TYPES.issue, function() {
@@ -315,7 +316,7 @@ module.exports = function (router) {
                     db.Opinion
                         .find({ createUserId: model.member._id, private: false })
                         .sort({editDate: -1})
-                        .limit(tab === 'all' ? 15 : 0)
+                        .limit(LIMIT)
                         .lean()
                         .exec(function(err, results) {
                             flowUtils.setEntryParents(results, constants.OBJECT_TYPES.opinion, function() {

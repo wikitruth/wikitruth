@@ -9,15 +9,16 @@ var templates   = require('../models/templates'),
 module.exports = function (router) {
 
     router.get('/', function (req, res) {
-        var MAX_RESULT = 25;
+        var LIMIT = req.query.tab ? 25 : 15;
+        var tab = req.query.tab ? req.query.tab : 'all';
         var model = {
-            tab: req.query.tab ? req.query.tab : 'topics'
+            tab: tab
         };
         flowUtils.setScreeningModel(req, model);
         flowUtils.setModelContext(req, model);
         async.parallel({
             topics: function(callback) {
-                if(model.tab !== 'topics') {
+                if(model.tab !== 'all' && model.tab !== 'topics') {
                     return callback();
                 }
                 var query = { parentId: {$ne: null}, private: false, 'screening.status': model.screening.status };
@@ -25,7 +26,7 @@ module.exports = function (router) {
                 db.Topic
                     .find(query)
                     .sort({editDate: -1})
-                    .limit(MAX_RESULT)
+                    .limit(LIMIT)
                     .lean()
                     .exec(function (err, results) {
                         flowUtils.setEditorsUsername(results, function() {
@@ -43,7 +44,7 @@ module.exports = function (router) {
                     });
             },
             arguments: function(callback) {
-                if(model.tab !== 'arguments') {
+                if(model.tab !== 'all' && model.tab !== 'arguments') {
                     return callback();
                 }
                 //var query = { parentId: {$ne: null}, private: false, 'screening.status': model.screening.status };
@@ -56,7 +57,7 @@ module.exports = function (router) {
                 db.Argument
                     .find(query)
                     .sort({editDate: -1})
-                    .limit(MAX_RESULT)
+                    .limit(LIMIT)
                     .lean()
                     .exec(function (err, results) {
                         flowUtils.setEditorsUsername(results, function() {
@@ -75,7 +76,7 @@ module.exports = function (router) {
                     });
             },
             questions: function(callback) {
-                if(model.tab !== 'questions') {
+                if(model.tab !== 'all' && model.tab !== 'questions') {
                     return callback();
                 }
                 var query = {
@@ -87,7 +88,7 @@ module.exports = function (router) {
                 db.Question
                     .find(query)
                     .sort({editDate: -1})
-                    .limit(MAX_RESULT)
+                    .limit(LIMIT)
                     .lean()
                     .exec(function (err, results) {
                         flowUtils.setEntryParents(results, constants.OBJECT_TYPES.question, function () {
@@ -105,14 +106,14 @@ module.exports = function (router) {
                     });
             },
             answers: function(callback) {
-                if(model.tab !== 'answers') {
+                if(model.tab !== 'all' && model.tab !== 'answers') {
                     return callback();
                 }
                 //db.Answer.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
                 db.Answer
                     .find({ private: false, 'screening.status': model.screening.status })
                     .sort({editDate: -1})
-                    .limit(MAX_RESULT)
+                    .limit(LIMIT)
                     .lean()
                     .exec(function (err, results) {
                         flowUtils.setEntryParents(results, constants.OBJECT_TYPES.answer, function () {
@@ -130,13 +131,13 @@ module.exports = function (router) {
                     });
             },
             issues: function (callback) {
-                if(model.tab !== 'issues') {
+                if(model.tab !== 'all' && model.tab !== 'issues') {
                     return callback();
                 }
                 db.Issue
                     .find({ private: false, 'screening.status': model.screening.status })
                     .sort({editDate: -1})
-                    .limit(MAX_RESULT)
+                    .limit(LIMIT)
                     .lean()
                     .exec(function(err, results) {
                         flowUtils.setEntryParents(results, constants.OBJECT_TYPES.issue, function () {
@@ -155,13 +156,13 @@ module.exports = function (router) {
                     });
             },
             opinions: function (callback) {
-                if(model.tab !== 'opinions') {
+                if(model.tab !== 'all' && model.tab !== 'opinions') {
                     return callback();
                 }
                 db.Opinion
                     .find({ private: false, 'screening.status': model.screening.status })
                     .sort({editDate: -1})
-                    .limit(MAX_RESULT)
+                    .limit(LIMIT)
                     .lean()
                     .exec(function(err, results) {
                         flowUtils.setEntryParents(results, constants.OBJECT_TYPES.opinion, function () {
