@@ -113,19 +113,10 @@ module.exports = function (router) {
                                                     if(!nodes.find(function(item) { return subargument._id.equals(item.id); })) {
                                                         flowUtils.setVerdictModel(subargument);
                                                         subargument.shortTitle = utils.getShortText(subargument.contextTitle ? subargument.contextTitle : subargument.title, textSize);
-                                                        nodes.push({
-                                                            id: subargument._id,
-                                                            label: subargument.shortTitle,
-                                                            value: 4,
-                                                            shape: 'square',
-                                                            color: '#7BE141',
-                                                            type: 'argument'
-                                                        });
-                                                        edges.push({from: subargument._id, to: result._id});
+                                                        nodes.push({ id: subargument._id, label: subargument.shortTitle, value: 4, shape: 'square', color: '#7BE141', type: 'argument' });
+                                                        edges.push({ from: subargument._id, to: result._id });
                                                     }
                                                 });
-                                                /*flowUtils.sortArguments(subarguments);
-                                                result.subarguments = subarguments;*/
                                                 callback();
                                             });
                                         }

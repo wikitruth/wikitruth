@@ -115,6 +115,9 @@
                 {>"dust/wiki/topics/entry-row" standalone="true" subtitle="true" /}
             {/topics}
         </ul>
+        {?topicsMore}
+            <div class="top-list-items-more"><a href="{paths.wiki.index}?tab=topics{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+        {/topicsMore}
     {/topics}
     {?arguments}
         <ul class="list-group wt-list">
@@ -123,6 +126,9 @@
                 {>"dust/wiki/arguments/entry-row" subtitle="true" /}
             {/arguments}
         </ul>
+        {?argumentsMore}
+            <div class="top-list-items-more"><a href="{paths.wiki.index}?tab=arguments{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+        {/argumentsMore}
     {/arguments}
     {?questions}
         <ul class="list-group wt-list">
@@ -131,6 +137,9 @@
                 {>"dust/wiki/questions/entry-row" subtitle="true" /}
             {/questions}
         </ul>
+        {?questionsMore}
+            <div class="top-list-items-more"><a href="{paths.wiki.index}?tab=questions{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+        {/questionsMore}
     {/questions}
     {?answers}
         <ul class="list-group wt-list">
@@ -139,6 +148,9 @@
                 {>"dust/wiki/answers/entry-row" subtitle="true" /}
             {/answers}
         </ul>
+        {?answersMore}
+            <div class="top-list-items-more"><a href="{paths.wiki.index}?tab=answers{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+        {/answersMore}
     {/answers}
     {?issues}
         <ul class="list-group wt-list">
@@ -147,6 +159,9 @@
                 {>"dust/wiki/issues/entry-row" subtitle="true" /}
             {/issues}
         </ul>
+        {?issuesMore}
+            <div class="top-list-items-more"><a href="{paths.wiki.index}?tab=issues{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+        {/issuesMore}
     {/issues}
     {?opinions}
         <ul class="list-group wt-list">
@@ -155,6 +170,9 @@
                 {>"dust/wiki/opinions/entry-row" subtitle="true" /}
             {/opinions}
         </ul>
+        {?opinionsMore}
+            <div class="top-list-items-more"><a href="{paths.wiki.index}?tab=opinions{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+        {/opinionsMore}
     {/opinions}
     {?results}
         {>"dust/wiki/common/pager" /}
