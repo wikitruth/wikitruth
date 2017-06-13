@@ -71,16 +71,18 @@
                 </li>
             </ul>
             {?topics}
-                {!<h3 class="page-header-x text-muted-0"><i class="fa fa-folder-open"></i> Topics</h3>!}
-                <ul class="list-group top-list-items wt-list">
-                    <li class="list-group-item highlight"><span class="fa fa-folder-open text-success-x" aria-hidden="true"></span>&nbsp; Topics</li>
-                    {#topics}
-                        {>"dust/wiki/topics/entry-row" standalone="true" subtitle="true" labels="true" /}
-                    {/topics}
-                </ul>
-                {?topicsMore}
-                    <div class="top-list-items-more"><a href="{paths.search}?q={keyword}&amp;tab=topics" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
-                {/topicsMore}
+                <div class="wt-list-container">
+                    {!<h3 class="page-header-x text-muted-0"><i class="fa fa-folder-open"></i> Topics</h3>!}
+                    <ul class="list-group top-list-items wt-list">
+                        <li class="list-group-item highlight"><span class="fa fa-folder-open text-success-x" aria-hidden="true"></span>&nbsp; Topics</li>
+                        {#topics}
+                            {>"dust/wiki/topics/entry-row" standalone="true" subtitle="true" labels="true" /}
+                        {/topics}
+                    </ul>
+                    {?topicsMore}
+                        <div class="top-list-items-more"><a href="{paths.search}?q={keyword}&amp;tab=topics" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+                    {/topicsMore}
+                </div>
             {/topics}
             {?arguments}
                 {!<h3 class="page-header-x text-muted-0"><i class="fa fa-flash"></i> Arguments</h3>!}

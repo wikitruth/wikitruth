@@ -14,7 +14,9 @@ var topicController     = require('./topics'),
     questionController  = require('./questions'),
     answerController    = require('./answers'),
     issueController     = require('./issues'),
-    opinionController   = require('./opinions');
+    opinionController   = require('./opinions'),
+
+    visualizeController = require('./visualize');
 
 function setMemberModel(model, req, callback) {
     if(req.params.username) {
@@ -519,6 +521,10 @@ module.exports = function (router) {
         });
     });
 
+    /* Visualize */
+    router.get('/:username/diary/visualize(/topic)?(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        visualizeController.GET_index(req, res);
+    });
 
     /* Diary Topics */
 

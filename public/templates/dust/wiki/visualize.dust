@@ -89,10 +89,10 @@
                     $('#nodeLink .visualize').addClass('hide');
                 } else {
                     $('#nodeLink .visualize').removeClass('hide');
-                    $('#nodeLink .visualize a').attr('href', '/visualize' + href);
+                    $('#nodeLink .visualize a').attr('href', '{wikiBaseUrl}/visualize' + href);
                 }
 
-                $('#nodeLink .explore a').attr('href', href);
+                $('#nodeLink .explore a').attr('href', '{wikiBaseUrl}' + href);
                 $('#nodeLink .explore span').text(node.originalLabel ? node.originalLabel : node.label);
                 $('#nodeLink').removeClass('hide');
             } else {
@@ -105,7 +105,7 @@
                 var node = nodes.get(nodeId);
                 var href = nodeId === '0' ? '/' : '/topic/' + nodeId;
                 if(!(node.current || node.more || node.type === 'argument')) {
-                    location.href='/visualize' + href;
+                    location.href='{wikiBaseUrl}/visualize' + href;
                 }
             }
         });

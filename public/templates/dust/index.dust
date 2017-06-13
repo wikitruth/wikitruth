@@ -70,7 +70,7 @@
         <div class="row">
             <div class="col-md-6 col-sm-12">
                 {?topics}
-                    <div style="padding-bottom: 15px; padding-top: 5px;">
+                    <div class="wt-list-container">
                         {!<h3 class="page-header-x text-muted-0"><i class="fa fa-folder-open"></i> Topics</h3>!}
                         <ul class="list-group top-list-items wt-list">
                             <li class="list-group-item highlight"><i class="fa fa-folder-open text-success-x" aria-hidden="true"></i> Topics</li>
@@ -86,7 +86,7 @@
             </div>
             <div class="col-md-6 col-sm-12">
                 {?arguments}
-                    <div style="padding-bottom: 15px; padding-top: 5px;">
+                    <div class="wt-list-container">
                         {!<h3 class="page-header-x text-muted-0"><i class="fa fa-flash"></i> Arguments</h3>!}
                         <ul class="list-group top-list-items wt-list">
                             <li class="list-group-item highlight text-primary"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> Arguments</li>
@@ -105,7 +105,7 @@
         <div class="row">
             <div class="col-md-6 col-sm-12">
                 {?questions}
-                    <div style="padding-bottom: 15px; padding-top: 5px;">
+                    <div class="wt-list-container">
                         {!<h3 class="page-header-x text-muted-0"><i class="fa fa-question-circle"></i> Questions</h3>!}
                         <ul class="list-group top-list-items wt-list">
                             <li class="list-group-item highlight"><span class="glyphicon glyphicon-question-sign text-success-x" aria-hidden="true"></span> Questions</li>
@@ -121,7 +121,7 @@
             </div>
             <div class="col-md-6 col-sm-12">
                 {?answers}
-                    <div style="padding-bottom: 15px; padding-top: 5px;">
+                    <div class="wt-list-container">
                         {!<h3 class="page-header-x text-muted-0"><i class="fa fa-check-circle-o"></i> Answers</h3>!}
                         <ul class="list-group top-list-items wt-list">
                             <li class="list-group-item highlight"><i class="fa fa-check-circle-o text-success-x" aria-hidden="true"></i> Answers</li>
@@ -139,7 +139,7 @@
         <div class="row">
             <div class="col-md-6 col-sm-12">
                 {?issues}
-                    <div style="padding-bottom: 15px; padding-top: 5px;">
+                    <div class="wt-list-container">
                         {!<h3 class="page-header-x text-muted-0"><i class="fa fa-exclamation-circle"></i> Issues</h3>!}
                         <ul class="list-group top-list-items wt-list">
                             <li class="list-group-item highlight"><i class="fa fa-exclamation-circle text-success-x" aria-hidden="true"></i> Issues</li>
@@ -155,7 +155,7 @@
             </div>
             <div class="col-md-6 col-sm-12">
                 {?opinions}
-                    <div style="padding-bottom: 15px; padding-top: 5px;">
+                    <div class="wt-list-container">
                         {!<h3 class="page-header-x text-muted-0"><i class="fa fa-comments-o"></i> Comments</h3>!}
                         <ul class="list-group top-list-items wt-list">
                             <li class="list-group-item highlight"><span class="fa fa-comments-o text-success-x" aria-hidden="true"></span> Opinions</li>
