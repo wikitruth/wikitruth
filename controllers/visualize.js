@@ -11,7 +11,7 @@ var templates   = require('../models/templates'),
 function GET_index(req, res) {
     flowUtils.ensureEntryIdParam(req, 'topic');
     var model = {}, nodes = [], edges = [], node;
-    var textSize = 25, nodeSize = 14, rootId = '0', rootLabel = 'Wikitruth'; // from nodeSize = 15 is producing an error
+    var textSize = 25, nodeSize = 12, rootId = '0', rootLabel = 'Wikitruth'; // from nodeSize = 15 is producing an error
     var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
     flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
         var topicId = model.topic ? model.topic._id : null;
