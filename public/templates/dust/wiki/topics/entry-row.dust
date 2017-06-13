@@ -20,6 +20,10 @@
         {/labels}
         {?subtitle}
             {>"dust/wiki/common/entry-row-subtitle" /}
+        {:else}
+            {?link}
+                {>"dust/wiki/common/entry-row-subtitle" /}
+            {/link}
         {/subtitle}
         {?contentPreview}
             <div class="wt-entry-row-content">{contentPreview}</div>

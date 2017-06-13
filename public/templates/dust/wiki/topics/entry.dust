@@ -34,34 +34,7 @@
     {?mainTopic}
         <div class="row" style="margin-top: 30px">
             {#categories}
-                <div class="col-lg-4 col-md-6 col-sm-6">{! 73px !}
-                    <div class="media wt-category">
-                        <div class="media-left media-top">
-                            <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">
-                                <div class="wt-category-icon wt-geopattern-title" title="{title}"></div>
-                            </a>
-                        </div>
-                        <div class="media-body">
-                            <h4 class="media-heading"><a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">{?contextTitle}{contextTitle}{:else}{title}{/contextTitle}</a></h4>
-                            <div>
-                                {?subtopics}
-                                    {#subtopics}
-                                        <div><i class="fa fa-folder-open text-muted text-success-x" aria-hidden="true"></i>&nbsp;<a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">{shortTitle}</a></div>
-                                    {/subtopics}
-                                    <div><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}" role="button">more</a></div>
-                                    {!<span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}!}
-                                {:else}
-                                    {?subarguments}
-                                        {#subarguments}
-                                            <div><i class="fa fa-flash text-muted text-success-x" aria-hidden="true"></i>&nbsp;<a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{friendlyUrl}/{_id}">{shortTitle}</a></div>
-                                        {/subarguments}
-                                        <div><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}" role="button">more</a></div>
-                                    {/subarguments}
-                                {/subtopics}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {>"dust/wiki/topics/tiles" /}
             {/categories}
         </div>
     {/mainTopic}
