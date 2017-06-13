@@ -803,29 +803,44 @@ function getTopics(query, limit, callback) {
                         var ids = links.map(function (link) {
                             return link.topicId;
                         });
-                        var query = {
-                            _id: {
-                                $in: ids
-                            }
-                        };
+                        var query = { _id: { $in: ids } };
                         db.Topic
                             .find(query)
                             .limit(limit)
                             .sort({title: 1})
                             .lean()
                             .exec(function (err, results) {
-                                setEditorsUsername(results, function () {
-                                    results.forEach(function (result) {
-                                        appendEntryExtra(result);
-                                        var link = links.find(function (link) {
-                                            return link.topicId.equals(result._id);
+                                if(results.length > 0) {
+                                    var parentIds = results.filter(function (result) {
+                                            return !!result.parentId;
+                                        }).map(function (result) {
+                                            return result.parentId;
                                         });
-                                        if (link) {
-                                            result.link = link;
-                                        }
-                                    });
+                                    query = { _id: { $in: parentIds } };
+                                    db.Topic
+                                        .find(query)
+                                        .lean()
+                                        .exec(function (err, linkParents) {
+                                            setEditorsUsername(results, function () {
+                                                results.forEach(function (result) {
+                                                    appendEntryExtra(result);
+                                                    var link = links.find(function (link) {
+                                                        return link.topicId.equals(result._id);
+                                                    });
+                                                    if (link) {
+                                                        var linkParent = linkParents.find(function (linkParent) {
+                                                            return linkParent._id.equals(result.parentId);
+                                                        });
+                                                        result.parentTopic = linkParent;
+                                                        result.link = link;
+                                                    }
+                                                });
+                                                callback(null, results);
+                                            });
+                                        });
+                                } else {
                                     callback(null, results);
-                                });
+                                }
                             });
                     } else {
                         callback(null, []);
@@ -867,30 +882,71 @@ function getArguments(query, limit, callback) {
                         var ids = links.map(function (link) {
                             return link.argumentId;
                         });
-                        var query = {
-                            _id: {
-                                $in: ids
-                            }
-                        };
+                        var query = { _id: { $in: ids } };
                         db.Argument
                             .find(query)
                             .limit(limit)
                             .sort({title: 1})
                             .lean()
                             .exec(function (err, results) {
-                                setEditorsUsername(results, function () {
-                                    results.forEach(function (result) {
-                                        appendEntryExtra(result);
-                                        var link = links.find(function (link) {
-                                            return link.argumentId.equals(result._id);
-                                        });
-                                        if (link) {
-                                            result.link = link;
-                                            result.against = link.against;
+                                if(results.length > 0) {
+                                    async.parallel({
+                                        parentTopics: function (callback) {
+                                            var topicIds = results.filter(function (result) {
+                                                return !result.parentId && result.ownerId;
+                                            }).map(function (result) {
+                                                return result.ownerId;
+                                            });
+                                            db.Topic
+                                                .find({ _id: { $in: topicIds } })
+                                                .lean()
+                                                .exec(function (err, parentTopics) {
+                                                    callback(null, parentTopics);
+                                                });
+                                        },
+                                        parentArguments: function (callback) {
+                                            var parentIds = results.filter(function (result) {
+                                                return !!result.parentId;
+                                            }).map(function (result) {
+                                                return result.parentId;
+                                            });
+                                            query = { _id: { $in: parentIds } };
+                                            db.Argument
+                                                .find(query)
+                                                .lean()
+                                                .exec(function (err, parentArguments) {
+                                                    callback(null, parentArguments);
+                                                });
                                         }
+                                    }, function (err, linkParents) {
+                                        setEditorsUsername(results, function () {
+                                            results.forEach(function (result) {
+                                                appendEntryExtra(result);
+                                                var link = links.find(function (link) {
+                                                    return link.argumentId.equals(result._id);
+                                                });
+                                                if (link) {
+                                                    if(result.parentId) {
+                                                        var parentArgument = linkParents.parentArguments.find(function (linkParent) {
+                                                            return linkParent._id.equals(result.parentId);
+                                                        });
+                                                        result.parentArgument = parentArgument;
+                                                    } else if(result.ownerType === constants.OBJECT_TYPES.topic && result.ownerId) {
+                                                        var linkParent = linkParents.parentTopics.find(function (linkParent) {
+                                                            return linkParent._id.equals(result.ownerId);
+                                                        });
+                                                        result.parentTopic = linkParent;
+                                                    }
+                                                    result.link = link;
+                                                    result.against = link.against;
+                                                }
+                                            });
+                                            callback(null, results);
+                                        });
                                     });
+                                } else {
                                     callback(null, results);
-                                });
+                                }
                             });
                     } else {
                         callback(null, []);
