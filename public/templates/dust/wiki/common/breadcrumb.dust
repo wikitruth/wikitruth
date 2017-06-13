@@ -87,7 +87,7 @@
     {@eq key=tab value="screening"}
         <li class="active">Screening</li>
     {/eq}
-    {@eq key=tab value="visualize"}
+    {!{@eq key=tab value="visualize"}
         <li class="active">Visualize</li>
-    {/eq}
+    {/eq}!}
 </ol>
