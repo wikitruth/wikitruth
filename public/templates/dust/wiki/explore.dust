@@ -35,7 +35,7 @@
     </div>
     <ul class="nav nav-tabs wt-tabs" role="tablist">
         <li role="presentation"{@eq key=tab value="all"} class="active"{/eq}>
-            <a href="{paths.wiki.index}?tab=all{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="tab">
+            <a href="{paths.wiki.index}{?query.screening}?screening={query.screening}{/query.screening}#browse" role="tab">
                 <i class="fa fa-globe" aria-hidden="true"></i> All
             </a>
         </li>
