@@ -691,8 +691,8 @@ a.wt-link-focus {
     overflow: hidden;
   }
 
-  ul {
-    padding-left: 20px;
+  ul, ol {
+    /*padding-left: 25px;*/
 
     a {
       color: #333;
@@ -746,6 +746,12 @@ div pre {
     .navbar-brand-label {
       margin-left: 40px;
     }
+  }
+}
+
+div.vis-network div.vis-navigation div.vis-button {
+  &.vis-up, &.vis-down, &.vis-left, &.vis-right {
+    display: none;
   }
 }
 
