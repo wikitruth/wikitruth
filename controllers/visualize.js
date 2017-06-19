@@ -10,8 +10,8 @@ var templates   = require('../models/templates'),
 
 function GET_index(req, res) {
     flowUtils.ensureEntryIdParam(req, 'topic');
-    var model = {}, nodes = [], edges = [], node;
-    var textSize = 25, nodeSize = 12, rootId = '0', rootLabel = 'Wikitruth'; // from nodeSize = 15 is producing an error
+    var model = {}, nodes = [], edges = [], node, rootId;
+    var textSize = 25, nodeSize = 12, ROOT_ID = '0', rootLabel = 'Wikitruth'; // from nodeSize = 15 is producing an error
     var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
     flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
         var topicId = model.topic ? model.topic._id : null;
@@ -20,6 +20,7 @@ function GET_index(req, res) {
             private: false,
             'screening.status': constants.SCREENING_STATUS.status1.code
         };
+        rootId = topicId ? topicId : ROOT_ID;
         if(req.params.username && req.user && req.user.username === req.params.username) {
             query.private = true;
             rootLabel = 'My Diary';
@@ -37,7 +38,7 @@ function GET_index(req, res) {
                     .lean()
                     .exec(function (err, results) {
                         if(!topicId) {
-                            topicId = rootId;
+                            topicId = ROOT_ID;
                             nodes.push({id: topicId, label: rootLabel, value: 10, color: '#f0ad4e', font: {size: 16}, current: true });
                         } else {
                             nodes.push({id: topicId, label: utils.getShortText(model.topic.title, textSize), value: 10, color: '#f0ad4e', font: {size: 16}, current: true });
@@ -50,12 +51,12 @@ function GET_index(req, res) {
                                     nodes.push({id: model.grandParentTopic._id, label: utils.getShortText(model.grandParentTopic.title, textSize) + '\n(up 2 levels)', value: 4, shapex: 'triangle', color: '#cc317c'});
                                     edges.push({from: model.parentTopic._id, to: model.grandParentTopic._id});
                                 } else {
-                                    nodes.push({id: rootId, label: rootLabel+ '\n(up 2 levels)', value: 4, shapex: 'triangle', color: '#cc317c'});
-                                    edges.push({from: rootId, to: model.parentTopic._id});
+                                    nodes.push({id: ROOT_ID, label: rootLabel+ '\n(up 2 levels)', value: 4, shapex: 'triangle', color: '#cc317c'});
+                                    edges.push({from: ROOT_ID, to: model.parentTopic._id});
                                 }
                             } else {
-                                nodes.push({id: rootId, label: rootLabel + '\n(up level)', value: 6, shapex: 'triangle', color: '#cc317c'});
-                                edges.push({from: rootId, to: topicId, width: 4});
+                                nodes.push({id: ROOT_ID, label: rootLabel + '\n(up level)', value: 6, shapex: 'triangle', color: '#cc317c'});
+                                edges.push({from: ROOT_ID, to: topicId, width: 4});
                             }
                         }
 
@@ -196,7 +197,8 @@ function GET_index(req, res) {
         }, function (err, results) {
             model.visualize = {
                 nodes: nodes,
-                edges: edges
+                edges: edges,
+                rootId: rootId
             };
             flowUtils.setModelOwnerEntry(model);
             flowUtils.setModelContext(req, model);
