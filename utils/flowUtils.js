@@ -37,11 +37,15 @@ function isCategoryTopic(entry) {
     return entry.tags.indexOf(constants.TOPIC_TAGS.tag510.code);
 }
 
-function appendEntryExtra(item) {
+function appendListExtra(item) {
     if(item.title) {
         item.friendlyUrl = utils.urlify(item.title);
         item.shortTitle = utils.getShortText(item.title);
     }
+}
+
+function appendEntryExtra(item) {
+    appendListExtra(item);
     item.comments = utils.randomInt(0,999);
     item.points = utils.randomInt(0,9999);
 
@@ -132,6 +136,7 @@ function setEntryParents(items, typeId, callback) {
                     .find({ _id: { $in: topicIds }})
                     .exec(function (err, results) {
                         results.forEach(function (result) {
+                            appendListExtra(result);
                             topics[result._id.valueOf()] = result;
                         });
                         callback();
@@ -144,18 +149,19 @@ function setEntryParents(items, typeId, callback) {
             if(topicLinkIds.length > 0) {
                 db.TopicLink
                     .find({ _id: { $in: topicLinkIds }})
-                    .exec(function (err, results) {
+                    .exec(function (err, linkResults) {
                         var topicIds2 = [], topics2 = {};
-                        results.forEach(function (result) {
+                        linkResults.forEach(function (result) {
                             topicIds2.push(result.topicId.valueOf());
                         });
                         db.Topic
                             .find({ _id: { $in: topicIds2 }})
-                            .exec(function (err, results2) {
-                                results2.forEach(function (result) {
+                            .exec(function (err, topicResults) {
+                                topicResults.forEach(function (result) {
+                                    appendListExtra(result);
                                     topics2[result._id.valueOf()] = result;
                                 });
-                                results.forEach(function (result) {
+                                linkResults.forEach(function (result) {
                                     result.topic = topics2[result.topicId.valueOf()];
                                     result.title2 = result.title ? result.title : result.topic.title;
                                     topicLinks[result._id.valueOf()] = result;
@@ -174,6 +180,7 @@ function setEntryParents(items, typeId, callback) {
                     .find(query)
                     .exec(function (err, results) {
                         results.forEach(function (result) {
+                            appendListExtra(result);
                             args[result._id.valueOf()] = result;
                         });
                         callback();
@@ -195,6 +202,7 @@ function setEntryParents(items, typeId, callback) {
                             .find({ _id: { $in: argumentIds2 }})
                             .exec(function (err, results2) {
                                 results2.forEach(function (result) {
+                                    appendListExtra(result);
                                     arguments2[result._id.valueOf()] = result;
                                 });
                                 results.forEach(function (result) {
@@ -216,6 +224,7 @@ function setEntryParents(items, typeId, callback) {
                     .find(query)
                     .exec(function (err, results) {
                         results.forEach(function (result) {
+                            appendListExtra(result);
                             questions[result._id.valueOf()] = result;
                         });
                         callback();
@@ -231,6 +240,7 @@ function setEntryParents(items, typeId, callback) {
                     .find(query)
                     .exec(function (err, results) {
                         results.forEach(function (result) {
+                            appendListExtra(result);
                             answers[result._id.valueOf()] = result;
                         });
                         callback();
@@ -246,6 +256,7 @@ function setEntryParents(items, typeId, callback) {
                     .find(query)
                     .exec(function (err, results) {
                         results.forEach(function (result) {
+                            appendListExtra(result);
                             issues[result._id.valueOf()] = result;
                         });
                         callback();
@@ -261,6 +272,7 @@ function setEntryParents(items, typeId, callback) {
                     .find(query)
                     .exec(function (err, results) {
                         results.forEach(function (result) {
+                            appendListExtra(result);
                             opinions[result._id.valueOf()] = result;
                         });
                         callback();
@@ -1388,16 +1400,75 @@ function syncChildren(parentIds, entryType, callback) {
 }
 
 // Set or update categoryId
-function syncCategoryId(entry, recursive) {
+function syncCategoryId(entry, update, recursive, callback) {
     var entryType = entry.getType();
-
     switch (entryType) {
         case constants.OBJECT_TYPES.topic:
             if(!entry.parentId) { // A root category, set category to null
                 entry.categoryId = null;
+                callback();
+            } else if(isCategoryTopic(entry)) {
+                entry.categoryId = entry.parentId;
+                callback();
             } else {
-
+                db.Topic.findOne({_id: entry.parentId}, function (err, parent) {
+                    if(isCategoryTopic(parent)) {
+                        entry.categoryId = entry.parentId;
+                    } else {
+                        entry.categoryId = entry.categoryId;
+                    }
+                    callback();
+                });
             }
+
+            /*db.Opinion.update({_id: entryId}, {
+                $set: countNode
+            }, function (err, num) {
+                callback();
+            });
+            db.Topic.findOneAndUpdate(query, entity, { new: true }, function(err, updatedEntity) {
+                var updateRedirect = function () {
+                    var model = {};
+                    flowUtils.setModelContext(req, model);
+                    var url = model.wikiBaseUrl + paths.wiki.topics.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
+                    res.redirect(url);
+                };
+                if(entity.parentId && !result) { // update parent count on create only
+                    flowUtils.updateChildrenCount(updatedEntity.parentId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, function () {
+                        updateRedirect();
+                    });
+                }
+            });*/
+            break;
+        case constants.OBJECT_TYPES.topicLink:
+            db.Topic.findOne({_id: entry.parentId}, function (err, parent) {
+                if(isCategoryTopic(parent)) {
+                    entry.categoryId = parent._id;
+                } else {
+                    entry.categoryId = entry.categoryId;
+                }
+                callback();
+            });
+            break;
+        case constants.OBJECT_TYPES.argument:
+            db.Topic.findOne({_id: entry.ownerId}, function (err, owner) {
+                if(isCategoryTopic(owner)) {
+                    entry.categoryId = owner._id;
+                } else {
+                    entry.categoryId = owner.categoryId;
+                }
+                callback();
+            });
+            break;
+        case constants.OBJECT_TYPES.argumentLink:
+            break;
+        case constants.OBJECT_TYPES.question:
+            break;
+        case constants.OBJECT_TYPES.answer:
+            break;
+        case constants.OBJECT_TYPES.issue:
+            break;
+        case constants.OBJECT_TYPES.opinion:
             break;
     }
 }

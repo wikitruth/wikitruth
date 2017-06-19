@@ -338,5 +338,14 @@ module.exports = {
         11: 'opinions',
         12: 'answers'
     },
+    OBJECT_ID_NAME_MAP: {
+        1: 'topic',
+        2: 'argument',
+        3: 'question',
+        4: 'comment',
+        10: 'issue',
+        11: 'opinion',
+        12: 'answer'
+    },
     LINK_TYPES: LINK_TYPES
 };

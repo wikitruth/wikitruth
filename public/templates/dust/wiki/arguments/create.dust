@@ -54,7 +54,7 @@
             <div class="radio">
                 <label>
                     <input type="radio" id="radioTypeId{argumentTypes.artifact}" name="typeId" value="{argumentTypes.artifact}">
-                    <span class="text-info"><strong>Source</strong></span><br/>
+                    <span class="text-info"><strong>Artifact</strong></span><br/>
                     A public material (a popular claim) or a reference material (source)
                 </label>
             </div>

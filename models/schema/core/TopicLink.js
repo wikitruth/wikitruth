@@ -24,7 +24,7 @@ module.exports = function(app, mongoose) {
     bidirectional: { type: Boolean, default: true },
     private: { type: Boolean, default: false }, // if true, should be restricted to group/user owners and not included in public backup
     categoryId: { type: mongoose.Schema.ObjectId, ref: 'Topic' }, // the root topic where this entry belong
-    ownerId: { type: mongoose.Schema.ObjectId, default: null }, // Required when owner is not a Topic. Useful for filtering
+    ownerId: { type: mongoose.Schema.ObjectId, default: null }, // Required when owner is not a Topic. Useful for filtering. Not populated when parent is Topic.
     ownerType: { type: Number, default: -1 }, // OBJECT_TYPES
     childrenCount: {
       issues: {

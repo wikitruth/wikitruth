@@ -10,7 +10,7 @@
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
         <div class="form-group">
-            <label for="inputReferences">Definitive <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a></label>
+            <label for="inputReferences">Definitive (Deductive) <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a></label>
             <div class="radio">
                 <label class="text-success">
                     <input type="radio" name="verdictStatus" id="radioVerdict1" value="1">
@@ -37,7 +37,7 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="inputReferences">Positive Probabilistic <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a></label>
+            <label for="inputReferences">Positive Probabilistic (Inductive) <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a></label>
             <div class="radio">
                 <label class="text-success">
                     <input type="radio" name="verdictStatus" id="radioVerdict13" value="13">
@@ -64,7 +64,7 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="inputReferences">Negative Probabilistic <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a></label>
+            <label for="inputReferences">Negative Probabilistic (Inductive) <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a></label>
             <div class="radio">
                 <label class="text-danger">
                     <input type="radio" name="verdictStatus" id="radioVerdict21" value="21">

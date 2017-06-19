@@ -2,11 +2,11 @@
     <i class="fa fa-folder-open text-color-3" aria-hidden="true"></i>
     <div>
         {?link}
-            <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.topics.entry}/{friendlyUrl}/link/{link._id}">
+            <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.topics.entry}/{friendlyUrl}/link/{link._id}" title="Open linked Topic - {title}">
                 {?link.title}{link.title}{:else}{title}{/link.title}
             </a>
             &nbsp;
-            <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}" title="Open linked Topic - {title}">
+            <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">
                 <span class="fa fa-link text-warning"></span>
             </a>
         {:else}

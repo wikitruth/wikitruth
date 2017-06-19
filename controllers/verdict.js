@@ -8,7 +8,14 @@ var flowUtils   = require('../utils/flowUtils'),
     db          = require('../app').db.models;
 
 function createReturnUrl(req, model) {
-    return paths.wiki.arguments.entry + '/' + utils.urlify(model.argument.title) + '?argument=' + req.query.argument;
+    switch (model.entryType) {
+        case constants.OBJECT_TYPES.topic:
+            return model.wikiBaseUrl + paths.wiki.topics.entry + '/' + utils.urlify(model.entry.title) + '/' + model.entry._id;
+        case constants.OBJECT_TYPES.argument:
+            return model.wikiBaseUrl + paths.wiki.arguments.entry + '/' + utils.urlify(model.entry.title) + '/' + req.query.argument;
+        default:
+            return model.wikiBaseUrl + paths.wiki[constants.OBJECT_NAMES_MAP[model.ownerType]].entry + '/' + utils.urlify(model.entry.title) + '/' + model.entry._id;
+    }
 }
 
 module.exports = function (router) {
@@ -19,42 +26,44 @@ module.exports = function (router) {
         var model = {
             verdictStatus: constants.VERDICT_STATUS.pending
         };
-        flowUtils.setArgumentModels(req, model, function () {
-            var query = model.argument ? { 'topic': model.argument.ownerId } : req.query;
-            flowUtils.setTopicModels({query: query}, model, function () {
-                //var item = model.argument ? model.argument : model.topic;
-                /*var parent = null;
-                if(model.argument) {
-                } else if(model.topic) {
-                }*/
-                if(model.argument && model.argument.verdict && model.argument.verdict.status) {
-                    model.verdictStatus = model.argument.verdict.status;
-                }
-                flowUtils.setModelContext(req, model);
-                model.entry = model.argument;
-                model.cancelUrl = createReturnUrl(req, model);
-                res.render(templates.wiki.verdict.update, model);
-            });
+        var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
+        flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
+            flowUtils.setModelOwnerEntry(model);
+            flowUtils.setModelContext(req, model);
+            if(model.entry && model.entry.verdict && model.entry.verdict.status) {
+                model.verdictStatus = model.entry.verdict.status;
+            }
+            model.cancelUrl = createReturnUrl(req, model);
+            res.render(templates.wiki.verdict.update, model);
         });
     });
 
     router.post('/update', function (req, res) {
         var model = {};
-        flowUtils.setTopicModels(req, model, function () {
-            flowUtils.setArgumentModels(req, model, function () {
-                var verdictStatus = req.body.verdictStatus;
-                db.Argument.update({_id: model.argument._id}, {
-                    $set: {
-                        verdict: {
-                            status: verdictStatus,
-                            editDate: Date.now() ,
-                            editUserId: req.user.id
-                        }
+        var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
+        flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
+            flowUtils.setModelOwnerEntry(model);
+            flowUtils.setModelContext(req, model);
+            var updateQuery = {
+                $set: {
+                    verdict: {
+                        status: req.body.verdictStatus,
+                        editDate: Date.now() ,
+                        editUserId: req.user.id
                     }
-                }, function (err, num) {
-                    res.redirect(createReturnUrl(req, model));
-                });
-            });
+                }
+            };
+            var redirectCallback = function (err, num) {
+                res.redirect(createReturnUrl(req, model));
+            };
+            switch (model.entryType) {
+                case constants.OBJECT_TYPES.topic:
+                    db.Topic.update({_id: model.entry._id}, updateQuery, redirectCallback);
+                    break;
+                case constants.OBJECT_TYPES.argument:
+                    db.Argument.update({_id: model.entry._id}, updateQuery, redirectCallback);
+                    break;
+            }
         });
     });
 };
