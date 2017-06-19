@@ -111,7 +111,10 @@ var ARGUMENT_TYPES = {
     ethical: 0,
     factual: 1,
     prediction: 2,
+
     artifact: 3,
+    artifactLabel: 'artifact',
+
     experience: 4
 };
 
@@ -124,7 +127,7 @@ ARGUMENT_TYPES.getUXInfo = function (typeId) {
             theme = "warning";
             break;
         case ARGUMENT_TYPES.artifact:
-            label = "artifact";
+            label = ARGUMENT_TYPES.artifactLabel;
             break;
         case ARGUMENT_TYPES.experience:
             label = "testimony";
