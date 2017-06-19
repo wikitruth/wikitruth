@@ -12,7 +12,7 @@
                             {@gt key=entry.childrenCount.topics.total value="0"}
                                 <li role="presentation"{@eq key=tab value="topics"} class="active"{/eq}>
                                     <a href="{wikiBaseUrl}{paths.wiki.topics.index}/{topic.friendlyUrl}/{topic._id}" role="tab">
-                                        <i class="fa fa-folder-open text-muted-x" aria-hidden="true"></i><span class="hidden-xs"> Topics</span> <span class="wt-label label label-default text-muted">{entry.childrenCount.topics.accepted}</span></a>
+                                        <i class="fa fa-folder-open text-muted-x" aria-hidden="true"></i> Topics <span class="wt-label label label-default text-muted">{entry.childrenCount.topics.accepted}</span></a>
                                 </li>
                             {/gt}
                         {:else}

@@ -73,6 +73,7 @@
         container.css('height', (containerHeight > containerWidth ? containerWidth : containerHeight) + 'px');
 
         /* create a network */
+        var loaded = false;
         var network = new vis.Network(container.get(0), data, options);
         network.on("click", function (params) {
             var nodeId = this.getNodeAt(params.pointer.DOM);
@@ -110,7 +111,13 @@
             }
         });
         network.on("afterDrawing", function (ctx) {
-            $('#loader').addClass('hide');
+            if(!loaded) {
+                $('#loader').addClass('hide');
+                if(network.getScale() < 0.5) {
+                    network.focus('{visualize.rootId}', { scale: 0.5 });
+                }
+                loaded = true;
+            }
         });
     </script>
 {/footer}
