@@ -823,6 +823,7 @@ function getTopics(query, limit, callback) {
                             .lean()
                             .exec(function (err, results) {
                                 if(results.length > 0) {
+                                    // Get parents for rendering the subtitle
                                     var parentIds = results.filter(function (result) {
                                             return !!result.parentId;
                                         }).map(function (result) {
@@ -833,7 +834,7 @@ function getTopics(query, limit, callback) {
                                         .find(query)
                                         .lean()
                                         .exec(function (err, linkParents) {
-                                            setEditorsUsername(results, function () {
+                                            setEditorsUsername(results, function () { // FIXME: is this needed?
                                                 results.forEach(function (result) {
                                                     appendEntryExtra(result);
                                                     var link = links.find(function (link) {
@@ -843,6 +844,9 @@ function getTopics(query, limit, callback) {
                                                         var linkParent = linkParents.find(function (linkParent) {
                                                             return linkParent._id.equals(result.parentId);
                                                         });
+                                                        if(linkParent) {
+                                                            appendListExtra(linkParent);
+                                                        }
                                                         result.parentTopic = linkParent;
                                                         result.link = link;
                                                     }
@@ -942,11 +946,17 @@ function getArguments(query, limit, callback) {
                                                         var parentArgument = linkParents.parentArguments.find(function (linkParent) {
                                                             return linkParent._id.equals(result.parentId);
                                                         });
+                                                        if(parentArgument) {
+                                                            appendListExtra(parentArgument);
+                                                        }
                                                         result.parentArgument = parentArgument;
                                                     } else if(result.ownerType === constants.OBJECT_TYPES.topic && result.ownerId) {
                                                         var linkParent = linkParents.parentTopics.find(function (linkParent) {
                                                             return linkParent._id.equals(result.ownerId);
                                                         });
+                                                        if(linkParent) {
+                                                            appendListExtra(linkParent);
+                                                        }
                                                         result.parentTopic = linkParent;
                                                     }
                                                     result.link = link;
