@@ -489,7 +489,7 @@ module.exports = function (router) {
     });
 
 
-    router.get('/entry/:friendlyUrl/link/:id', function (req, res) {
+    router.get('/entry(/:friendlyUrl)?/link/:id', function (req, res) {
         GET_link_entry(req, res);
     });
 

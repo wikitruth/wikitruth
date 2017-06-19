@@ -192,7 +192,9 @@
                                 data: JSON.stringify({ id: id, type: type, _csrf: csrf }),
                                 contentType: 'application/json',
                                 success: function (data) {
-                                    location.href = '/';
+                                    if(data.redirectUrl) {
+                                        location.href = data.redirectUrl;
+                                    }
                                 }
                             });
                         }

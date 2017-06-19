@@ -13,7 +13,11 @@
             {?username}
                 My Diary
             {:else}
-                Explore
+                {@eq key=tab value="visualize"}
+                    Visualize
+                {:else}
+                    Explore
+                {/eq}
             {/username}
         {/entry}
         {@eq key=tab value="link-to"} <span class="label label-warning wt-subtitle">Links</span>{/eq}

@@ -3,7 +3,7 @@
         {?keyTopics}
             <div style="margin-bottom: 10px">
                 <div style="font-weight: bold;">Key topics{!Key Contents|Quick Facts|Key facts!}</div>
-                <ul>
+                <ul class="min-indent">
                     {#keyTopics}
                         <li><a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a></li>
                     {/keyTopics}
@@ -13,7 +13,7 @@
         {?keyArguments}
             <div style="margin-bottom: 10px">
                 <div style="font-weight: bold;">Key facts{!Key Contents|Quick Facts|Key facts!}</div>
-                <ul>
+                <ul class="min-indent">
                     {#keyArguments}
                         <li><a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{friendlyUrl}/{_id}">{?link.title}{link.title}{:else}{title}{/link.title}</a></li>
                     {/keyArguments}

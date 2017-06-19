@@ -155,9 +155,6 @@ function GET_entry(req, res) {
             links: function (callback) {
                 // Top Linked Topics
                 var query = { topicId: req.query.topic, 'screening.status': constants.SCREENING_STATUS.status1.code };
-                /*db.TopicLink.find(query, function(err, results) {
-                 callback(null, results);
-                 });*/
                 db.TopicLink
                     .find(query)
                     .lean()
@@ -246,6 +243,7 @@ function GET_entry(req, res) {
                 flowUtils.getTopOpinions(query, model, callback);
             }
         }, function (err, results) {
+            flowUtils.setVerdictModel(model.topic);
             flowUtils.setModelOwnerEntry(model);
             flowUtils.setModelContext(req, model);
             flowUtils.setClipboardModel(req, model, constants.OBJECT_TYPES.topic);
@@ -530,7 +528,7 @@ module.exports = function (router) {
     });
 
 
-    router.get('/entry/:friendlyUrl/link/:id', function (req, res) {
+    router.get('/entry(/:friendlyUrl)?/link/:id', function (req, res) {
         GET_link_entry(req, res);
     });
 

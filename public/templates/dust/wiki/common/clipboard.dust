@@ -29,7 +29,7 @@
                 {!<li><a href="#" role="tab"><i class="fa fa-copy" aria-hidden="true"></i> Paste Here As Duplicates</a></li>!}
                 <li><a href="#" role="tab" onclick="return clipboardMoveHere()"><i class="fa fa-cut" aria-hidden="true"></i> Move Here</a></li>
             {/clipboard.canPaste}
-            <li><a href="#" role="tab" onclick="return clipboardClear()"><i class="fa fa-trash" aria-hidden="true"></i> Clear</a></li>
+            <li><a href="#" role="tab" onclick="return clipboardClear()"><i class="fa fa-trash" aria-hidden="true"></i> Clear marked</a></li>
         {/clipboard.count}
         <script>
 
