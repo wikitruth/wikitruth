@@ -135,20 +135,26 @@ function POST_create(req, res) {
                 entity.ownerType = constants.OBJECT_TYPES.topic;
             }
         }
-        db.Question.findOneAndUpdate(query, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function (err, updatedEntity) {
-            var updateRedirect = function () {
-                var model = {};
-                flowUtils.setModelContext(req, model);
-                var url = model.wikiBaseUrl + paths.wiki.questions.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
-                res.redirect(url);
-            };
-            if(!result) { // if new entry, update parent children count
-                flowUtils.updateChildrenCount(entity.ownerId, entity.ownerType, constants.OBJECT_TYPES.question, function () {
+        flowUtils.syncCategoryId(entity, { entryType: constants.OBJECT_TYPES.question }, function () {
+            db.Question.findOneAndUpdate(query, entity, {
+                upsert: true,
+                new: true,
+                setDefaultsOnInsert: true
+            }, function (err, updatedEntity) {
+                var updateRedirect = function () {
+                    var model = {};
+                    flowUtils.setModelContext(req, model);
+                    var url = model.wikiBaseUrl + paths.wiki.questions.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
+                    res.redirect(url);
+                };
+                if (!result) { // if new entry, update parent children count
+                    flowUtils.updateChildrenCount(entity.ownerId, entity.ownerType, constants.OBJECT_TYPES.question, function () {
+                        updateRedirect();
+                    });
+                } else {
                     updateRedirect();
-                });
-            } else {
-                updateRedirect();
-            }
+                }
+            });
         });
     });
 }

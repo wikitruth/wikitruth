@@ -145,27 +145,33 @@ function POST_create(req, res) {
             entity.ownerId = q.ownerId;
             entity.ownerType = q.ownerType;
         }
-        var query = { _id: req.query.id || new mongoose.Types.ObjectId() };
-        db.Opinion.findOneAndUpdate(query, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function (err, updatedEntity) {
-            var updateRedirect = function () {
-                var model = {};
-                flowUtils.setModelContext(req, model);
-                var url = model.wikiBaseUrl + paths.wiki.opinions.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
-                res.redirect(url);
-            };
-            if(!model.opinion) { // if new entry, update parent count
-                if(entity.parentId) { // parent is always an opinion object
-                    flowUtils.updateChildrenCount(entity.parentId, constants.OBJECT_TYPES.opinion, constants.OBJECT_TYPES.opinion, function () {
-                        updateRedirect();
-                    });
-                } else { // parent can be anything
-                    flowUtils.updateChildrenCount(entity.ownerId, entity.ownerType, constants.OBJECT_TYPES.opinion, function () {
-                        updateRedirect();
-                    });
+        flowUtils.syncCategoryId(entity, { entryType: constants.OBJECT_TYPES.opinion }, function () {
+            var query = {_id: req.query.id || new mongoose.Types.ObjectId()};
+            db.Opinion.findOneAndUpdate(query, entity, {
+                upsert: true,
+                new: true,
+                setDefaultsOnInsert: true
+            }, function (err, updatedEntity) {
+                var updateRedirect = function () {
+                    var model = {};
+                    flowUtils.setModelContext(req, model);
+                    var url = model.wikiBaseUrl + paths.wiki.opinions.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
+                    res.redirect(url);
+                };
+                if (!model.opinion) { // if new entry, update parent count
+                    if (entity.parentId) { // parent is always an opinion object
+                        flowUtils.updateChildrenCount(entity.parentId, constants.OBJECT_TYPES.opinion, constants.OBJECT_TYPES.opinion, function () {
+                            updateRedirect();
+                        });
+                    } else { // parent can be anything
+                        flowUtils.updateChildrenCount(entity.ownerId, entity.ownerType, constants.OBJECT_TYPES.opinion, function () {
+                            updateRedirect();
+                        });
+                    }
+                } else {
+                    updateRedirect();
                 }
-            } else {
-                updateRedirect();
-            }
+            });
         });
     });
 }

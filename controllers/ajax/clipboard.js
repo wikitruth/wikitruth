@@ -74,9 +74,18 @@ module.exports = function (router) {
                             entity.createUserId = req.user.id;
                             entity.createDate = dateNow;
                             flowUtils.initScreeningStatus(req, entity);
-                            console.log('entity: ' + JSON.stringify(entity));
-                            db.TopicLink.findOneAndUpdate({topicId: topicId, parentId: parent._id}, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function(err, updatedEntity) {
-                                callback();
+                            //console.log('entity: ' + JSON.stringify(entity));
+                            flowUtils.syncCategoryId(entity, { entryType: constants.OBJECT_TYPES.topicLink }, function () {
+                                db.TopicLink.findOneAndUpdate({
+                                    topicId: topicId,
+                                    parentId: parent._id
+                                }, entity, {
+                                    upsert: true,
+                                    new: true,
+                                    setDefaultsOnInsert: true
+                                }, function (err, updatedEntity) {
+                                    callback();
+                                });
                             });
                         }, function () {
                             callback();
@@ -101,8 +110,18 @@ module.exports = function (router) {
                             entity.createUserId = req.user.id;
                             entity.createDate = dateNow;
                             flowUtils.initScreeningStatus(req, entity);
-                            db.ArgumentLink.findOneAndUpdate({argumentId: argumentId, parentId: null, ownerId: parent._id}, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function(err, updatedEntity) {
-                                callback();
+                            flowUtils.syncCategoryId(entity, { entryType: constants.OBJECT_TYPES.argumentLink }, function () {
+                                db.ArgumentLink.findOneAndUpdate({
+                                    argumentId: argumentId,
+                                    parentId: null,
+                                    ownerId: parent._id
+                                }, entity, {
+                                    upsert: true,
+                                    new: true,
+                                    setDefaultsOnInsert: true
+                                }, function (err, updatedEntity) {
+                                    callback();
+                                });
                             });
                         }, function () {
                             callback();
@@ -134,8 +153,13 @@ module.exports = function (router) {
                     entity.createUserId = req.user.id;
                     entity.createDate = dateNow;
                     flowUtils.initScreeningStatus(req, entity);
-                    db.ArgumentLink.findOneAndUpdate({argumentId: argumentId, parentId: parent._id}, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function(err, updatedEntity) {
-                        callback();
+                    flowUtils.syncCategoryId(entity, { entryType: constants.OBJECT_TYPES.argumentLink }, function () {
+                        db.ArgumentLink.findOneAndUpdate({
+                            argumentId: argumentId,
+                            parentId: parent._id
+                        }, entity, {upsert: true, new: true, setDefaultsOnInsert: true}, function (err, updatedEntity) {
+                            callback();
+                        });
                     });
                 }, function () {
                     flowUtils.updateChildrenCount(parent._id, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.argument, function () {
@@ -185,13 +209,19 @@ module.exports = function (router) {
                                 var parentId = result.parentId;
                                 // Update entry parent
                                 result.parentId = id;
-                                db.Topic.findOneAndUpdate({_id: result._id}, result, { upsert: true, new: true, setDefaultsOnInsert: true }, function(err, updatedEntity) {
-                                    if(parentId) {
-                                        // Update old parent's children
-                                        flowUtils.updateChildrenCount(parentId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, callback);
-                                    } else {
-                                        callback();
-                                    }
+                                flowUtils.syncCategoryId(result, { entryType: constants.OBJECT_TYPES.topic, update: false, recursive: true }, function () {
+                                    db.Topic.findOneAndUpdate({_id: result._id}, result, {
+                                        upsert: true,
+                                        new: true,
+                                        setDefaultsOnInsert: true
+                                    }, function (err, updatedEntity) {
+                                        if (parentId) {
+                                            // Update old parent's children
+                                            flowUtils.updateChildrenCount(parentId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, callback);
+                                        } else {
+                                            callback();
+                                        }
+                                    });
                                 });
                             }, function () {
                                 if(id) {
@@ -225,12 +255,18 @@ module.exports = function (router) {
                                 result.ownerId = id; // TODO: how about children ???
                                 result.ownerType = constants.OBJECT_TYPES.topic;
                                 result.threadId = null; // TODO: should set to self._id ???
-                                db.Argument.findOneAndUpdate({_id: result._id}, result, { upsert: true, new: true, setDefaultsOnInsert: true }, function(err, updatedEntity) {
-                                    if(parentId) {
-                                        flowUtils.updateChildrenCount(parentId, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.argument, callback);
-                                    } else {
-                                        flowUtils.updateChildrenCount(ownerId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.argument, callback);
-                                    }
+                                flowUtils.syncCategoryId(result, { entryType: constants.OBJECT_TYPES.argument, update: false, recursive: true }, function () {
+                                    db.Argument.findOneAndUpdate({_id: result._id}, result, {
+                                        upsert: true,
+                                        new: true,
+                                        setDefaultsOnInsert: true
+                                    }, function (err, updatedEntity) {
+                                        if (parentId) {
+                                            flowUtils.updateChildrenCount(parentId, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.argument, callback);
+                                        } else {
+                                            flowUtils.updateChildrenCount(ownerId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.argument, callback);
+                                        }
+                                    });
                                 });
                             }, function () {
                                 async.parallel([
@@ -277,12 +313,18 @@ module.exports = function (router) {
                             result.ownerId = parent.parentId; // TODO: how about children ???
                             result.ownerType = parent.ownerType;
                             result.threadId = parent.threadId ? parent.threadId : id;
-                            db.Argument.findOneAndUpdate({_id: result._id}, result, { upsert: true, new: true, setDefaultsOnInsert: true }, function(err, updatedEntity) {
-                                if(parentId) {
-                                    flowUtils.updateChildrenCount(parentId, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.argument, callback);
-                                } else {
-                                    flowUtils.updateChildrenCount(ownerId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.argument, callback);
-                                }
+                            flowUtils.syncCategoryId(result, { entryType: constants.OBJECT_TYPES.argument, update: false, recursive: true }, function () {
+                                db.Argument.findOneAndUpdate({_id: result._id}, result, {
+                                    upsert: true,
+                                    new: true,
+                                    setDefaultsOnInsert: true
+                                }, function (err, updatedEntity) {
+                                    if (parentId) {
+                                        flowUtils.updateChildrenCount(parentId, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.argument, callback);
+                                    } else {
+                                        flowUtils.updateChildrenCount(ownerId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.argument, callback);
+                                    }
+                                });
                             });
                         }, function () {
                             async.parallel([
