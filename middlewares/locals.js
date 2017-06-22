@@ -5,7 +5,7 @@ var flowUtils       = require('../utils/flowUtils'),
 
 module.exports = function(app, passport) {
 
-    //response locals
+    // response locals
 
     app.use(/^[^\.]+$/, function(req, res, next) {
         //res.cookie('_csrfToken', req.csrfToken());
@@ -23,6 +23,7 @@ module.exports = function(app, passport) {
 
         // allow templates to access the request query
         res.locals.query = req.query;
+        res.locals.preferences = req.session.preferences;
 
         // set the application
         var model = {};

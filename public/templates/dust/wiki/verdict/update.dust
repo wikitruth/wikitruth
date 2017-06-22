@@ -37,7 +37,7 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="inputReferences">Positive Probabilistic (Inductive) <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a></label>
+            <label for="inputReferences">Positive Probabilistic (Inductive/Abductive) <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a></label>
             <div class="radio">
                 <label class="text-success">
                     <input type="radio" name="verdictStatus" id="radioVerdict13" value="13">
@@ -64,7 +64,7 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="inputReferences">Negative Probabilistic (Inductive) <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a></label>
+            <label for="inputReferences">Negative Probabilistic (Inductive/Abductive) <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a></label>
             <div class="radio">
                 <label class="text-danger">
                     <input type="radio" name="verdictStatus" id="radioVerdict21" value="21">

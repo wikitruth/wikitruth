@@ -336,22 +336,27 @@ function POST_create(req, res) {
             // root topic & not admin & not private - non-admins are not allowed to create categories
             return res.redirect('/');
         }
-        db.Topic.findOneAndUpdate(query, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function(err, updatedEntity) {
+        flowUtils.syncCategoryId(entity, { entryType: constants.OBJECT_TYPES.topic }, function () {
+            db.Topic.findOneAndUpdate(query, entity, {
+                upsert: true,
+                new: true,
+                setDefaultsOnInsert: true
+            }, function (err, updatedEntity) {
+                var updateRedirect = function () {
+                    var model = {};
+                    flowUtils.setModelContext(req, model);
+                    var url = model.wikiBaseUrl + paths.wiki.topics.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
+                    res.redirect(url);
+                };
 
-            var updateRedirect = function () {
-                var model = {};
-                flowUtils.setModelContext(req, model);
-                var url = model.wikiBaseUrl + paths.wiki.topics.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
-                res.redirect(url);
-            };
-
-            if(entity.parentId && !result) { // update parent count on create only
-                flowUtils.updateChildrenCount(updatedEntity.parentId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, function () {
+                if (entity.parentId && !result) { // update parent count on create only
+                    flowUtils.updateChildrenCount(updatedEntity.parentId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, function () {
+                        updateRedirect();
+                    });
+                } else {
                     updateRedirect();
-                });
-            } else {
-                updateRedirect();
-            }
+                }
+            });
         });
     });
 }

@@ -108,25 +108,31 @@ function POST_create(req, res) {
             flowUtils.initScreeningStatus(req, entity);
         }
         entity.private = req.params.username ? true : false;
-        db.Answer.findOneAndUpdate(query, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function (err, updatedEntity) {
-            var updateRedirect = function () {
-                var model = {};
-                flowUtils.setModelContext(req, model);
-                var url = model.wikiBaseUrl + paths.wiki.answers.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
-                res.redirect(url);
-                /*res.redirect((result ? paths.wiki.answers.entry : paths.wiki.answers.index) +
-                 '?topic=' + req.query.topic +
-                 (req.query.argument ? '&argument=' + req.query.argument : '') +
-                 (result ? '&answer=' + req.query.answer : '')
-                 );*/
-            };
-            if(!result) { // if new entry, update parent children count
-                flowUtils.updateChildrenCount(updatedEntity.questionId, constants.OBJECT_TYPES.question, constants.OBJECT_TYPES.answer, function () {
+        flowUtils.syncCategoryId(entity, { entryType: constants.OBJECT_TYPES.answer }, function () {
+            db.Answer.findOneAndUpdate(query, entity, {
+                upsert: true,
+                new: true,
+                setDefaultsOnInsert: true
+            }, function (err, updatedEntity) {
+                var updateRedirect = function () {
+                    var model = {};
+                    flowUtils.setModelContext(req, model);
+                    var url = model.wikiBaseUrl + paths.wiki.answers.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
+                    res.redirect(url);
+                    /*res.redirect((result ? paths.wiki.answers.entry : paths.wiki.answers.index) +
+                     '?topic=' + req.query.topic +
+                     (req.query.argument ? '&argument=' + req.query.argument : '') +
+                     (result ? '&answer=' + req.query.answer : '')
+                     );*/
+                };
+                if (!result) { // if new entry, update parent children count
+                    flowUtils.updateChildrenCount(updatedEntity.questionId, constants.OBJECT_TYPES.question, constants.OBJECT_TYPES.answer, function () {
+                        updateRedirect();
+                    });
+                } else {
                     updateRedirect();
-                });
-            } else {
-                updateRedirect();
-            }
+                }
+            });
         });
     });
 }

@@ -115,20 +115,26 @@ function POST_create(req, res) {
             entity.ownerId = q.ownerId;
             entity.ownerType = q.ownerType;
         }
-        db.Issue.findOneAndUpdate(query, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function (err, updatedEntity) {
-            var updateRedirect = function () {
-                var model = {};
-                flowUtils.setModelContext(req, model);
-                var url = model.wikiBaseUrl + paths.wiki.issues.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
-                res.redirect(url);
-            };
-            if(!result) { // if new entry, update parent children count
-                flowUtils.updateChildrenCount(entity.ownerId, entity.ownerType, constants.OBJECT_TYPES.issue, function () {
+        flowUtils.syncCategoryId(entity, { entryType: constants.OBJECT_TYPES.issue }, function () {
+            db.Issue.findOneAndUpdate(query, entity, {
+                upsert: true,
+                new: true,
+                setDefaultsOnInsert: true
+            }, function (err, updatedEntity) {
+                var updateRedirect = function () {
+                    var model = {};
+                    flowUtils.setModelContext(req, model);
+                    var url = model.wikiBaseUrl + paths.wiki.issues.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
+                    res.redirect(url);
+                };
+                if (!result) { // if new entry, update parent children count
+                    flowUtils.updateChildrenCount(entity.ownerId, entity.ownerType, constants.OBJECT_TYPES.issue, function () {
+                        updateRedirect();
+                    });
+                } else {
                     updateRedirect();
-                });
-            } else {
-                updateRedirect();
-            }
+                }
+            });
         });
     });
 }

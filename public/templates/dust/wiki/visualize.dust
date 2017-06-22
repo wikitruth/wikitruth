@@ -13,6 +13,32 @@
             /*border: 1px solid #eee;*/
             background-color: #eee;
             border-radius: 5px;
+            min-height: 500px;
+            width: 100%;
+            height: 100%;
+        }
+
+        .fullscreen {
+            z-index: 10000;
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
+        }
+
+        .wt-viz-btn-cont {
+            position:absolute;
+            z-index: 100;
+        }
+
+        .wt-viz-btn-cont .wt-viz-btn {
+            background-color: #00b0b9; padding: 3px 5px; border-radius: 3px; margin: 5px; display: inline-block;
+        }
+
+        .wt-viz-btn-cont .wt-viz-btn a{
+            color: #fff; text-decoration: none;
         }
     </style>
 {/header}
@@ -22,19 +48,27 @@
     {>"dust/wiki/common/page-header" tab="visualize" /}
     <div class="row">
         <div class="col-md-12">
-            <div id="nodeLink" class="hide" style="position:absolute; z-index: 100">
-                <div class="explore" style="background-color: #00b0b9; padding: 3px 5px; border-radius: 3px; margin: 5px; display: inline-block">
-                    <a title="Explore" href="#" style="color: #fff; text-decoration: none"><span></span> <i class="fa fa-arrow-circle-right"></i></a>
+            <div class="vis-container{?preferences.fullscreen} fullscreen{/preferences.fullscreen}">
+                <div id="nodeLink" class="wt-viz-btn-cont hide">
+                    <div class="wt-viz-btn explore">
+                        <a title="Explore" href="#"><span></span> <i class="fa fa-arrow-circle-right"></i></a>
+                    </div>
+                    <div class="wt-viz-btn visualize">
+                        <a title="Visualize" href="#"><i class="fa fa-snowflake-o"></i></a>
+                    </div>
+
                 </div>
-                <div class="visualize" style="background-color: #00b0b9; padding: 3px 5px; border-radius: 3px; margin: 5px; display: inline-block">
-                    <a title="Visualize" href="#" style="color: #fff; text-decoration: none"><i class="fa fa-snowflake-o"></i></a>
+                <div class="wt-viz-btn-cont" style="right: 15px">
+                    <div class="wt-viz-btn toggle-fs">
+                        <a title="Toggle Fullscreen" href="#"><i class="glyphicon"></i></a>
+                    </div>
                 </div>
-            </div>
-            <div id="loader" style="position:absolute; z-index: 150; padding: 10px">
-                <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
-                <span class="sr-only">Loading...</span>
-            </div>
-            <div id="mynetwork" style="z-index: 50">
+                <div id="loader" style="position:absolute; z-index: 150; padding: 10px">
+                    <i class="fa fa-spinner fa-spin fa-3x fa-fw"></i>
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <div id="mynetwork" style="z-index: 50">
+                </div>
             </div>
         </div>
     </div>
@@ -42,6 +76,59 @@
 
 {<footer}
     <script type="text/javascript">
+        var loaded = false;
+        var viz = $('#mynetwork');
+        var container = $('.vis-container');
+        var fullscreen = container.hasClass('fullscreen');
+        var fsIcon = $('.toggle-fs i');
+
+        var resizeViz = function () {
+            if(!fullscreen) {
+                var containerHeight = $(window).height() - $('.navbar-header').height() - 50;
+                var containerWidth = viz.width();
+                viz.css('height', (containerHeight > containerWidth ? containerWidth : containerHeight) + 'px');
+            } else {
+                viz.css('height', '');
+            }
+        };
+
+        var updateFullscreenIcon = function () {
+            if(fullscreen) {
+                fsIcon.removeClass('glyphicon-resize-full');
+                fsIcon.addClass('glyphicon glyphicon-resize-small');
+            } else {
+                fsIcon.removeClass('glyphicon-resize-small');
+                fsIcon.addClass('glyphicon-resize-full');
+            }
+        };
+
+        var toggleFullscreen = function () {
+            if(fullscreen) {
+                container.removeClass('fullscreen');
+            } else {
+                container.addClass('fullscreen');
+            }
+
+            /* update the fs flag */
+            fullscreen = container.hasClass('fullscreen');
+            updateFullscreenIcon();
+            resizeViz();
+
+            /* save fs state to user preferences */
+            var csrf = $('body').data('csrf');
+            $.ajax({
+                type: "POST",
+                url: "/ajax/preferences/update",
+                data: JSON.stringify({ _csrf: csrf, fullscreen: fullscreen }),
+                contentType: 'application/json',
+                success: function (data) {}
+            });
+        };
+
+        $('.toggle-fs a').on('click', function() {
+            toggleFullscreen();
+        });
+
         /* create an array with nodes */
         var nodes = new vis.DataSet({visualize.nodes|js|s});
 
@@ -63,41 +150,49 @@
             interaction: {
                 navigationButtons: true,
                 keyboard: true
-            }
+            }/*,
+            layout: {
+                hierarchical: {
+                    direction: 'UD'
+                }
+            }*/
         };
 
         /* initialize the container */
-        var container = $('#mynetwork');
-        var containerHeight = $(window).height() - $('.navbar-header').height() - 50;
-        var containerWidth = container.width();
-        container.css('height', (containerHeight > containerWidth ? containerWidth : containerHeight) + 'px');
+        resizeViz();
+        updateFullscreenIcon();
+
+        var showNodeBtns = function (nodeId) {
+            var node = nodes.get(nodeId);
+            var href = nodeId === '0' ? '/' : '/topic/' + nodeId;
+            if(node.more) {
+                href = node.topicId ? '/topic/' + node.topicId : '/';
+            }
+            if(node.type === 'argument' || node.current || node.more) {
+                if(node.type === 'argument') {
+                    href = '/argument/' + nodeId;
+                }
+                $('#nodeLink .visualize').addClass('hide');
+            } else {
+                $('#nodeLink .visualize').removeClass('hide');
+                $('#nodeLink .visualize a').attr('href', '{wikiBaseUrl}/visualize' + href);
+            }
+
+            $('#nodeLink .explore a').attr('href', '{wikiBaseUrl}' + href);
+            $('#nodeLink .explore span').text(node.originalLabel ? node.originalLabel : node.label);
+            $('#nodeLink').removeClass('hide');
+        };
 
         /* create a network */
-        var loaded = false;
-        var network = new vis.Network(container.get(0), data, options);
+        var rootId = '{visualize.rootId}';
+        var network = new vis.Network(viz.get(0), data, options);
         network.on("click", function (params) {
             var nodeId = this.getNodeAt(params.pointer.DOM);
             if(nodeId) {
-                var node = nodes.get(nodeId);
-                var href = nodeId === '0' ? '/' : '/topic/' + nodeId;
-                if(node.more) {
-                    href = node.topicId ? '/topic/' + node.topicId : '/';
-                }
-                if(node.type === 'argument' || node.current || node.more) {
-                    if(node.type === 'argument') {
-                        href = '/argument/' + nodeId;
-                    }
-                    $('#nodeLink .visualize').addClass('hide');
-                } else {
-                    $('#nodeLink .visualize').removeClass('hide');
-                    $('#nodeLink .visualize a').attr('href', '{wikiBaseUrl}/visualize' + href);
-                }
-
-                $('#nodeLink .explore a').attr('href', '{wikiBaseUrl}' + href);
-                $('#nodeLink .explore span').text(node.originalLabel ? node.originalLabel : node.label);
-                $('#nodeLink').removeClass('hide');
+                showNodeBtns(nodeId);
             } else {
-                $('#nodeLink').addClass('hide');
+                /*$('#nodeLink').addClass('hide');*/
+                showNodeBtns(rootId);
             }
         });
         network.on("doubleClick", function (params) {
@@ -112,12 +207,18 @@
         });
         network.on("afterDrawing", function (ctx) {
             if(!loaded) {
-                $('#loader').addClass('hide');
-                if(network.getScale() < 0.5) {
-                    network.focus('{visualize.rootId}', { scale: 0.5 });
-                }
                 loaded = true;
+                $('#loader').addClass('hide');
+                showNodeBtns(rootId);
+                if(network.getScale() < 0.5) {
+                    network.focus(rootId, { scale: 0.5 });
+                }
+
             }
+        });
+
+        $(window).resize(function() {
+            resizeViz();
         });
     </script>
 {/footer}

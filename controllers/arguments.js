@@ -337,9 +337,15 @@ function POST_create(req, res) {
                 /*} else if(req.user.isAdmin()) {
                  entity.createUserId = req.body.author;
                  }*/
-                db.Argument.findOneAndUpdate(query, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function (err, doc) {
-                    updatedEntity = doc;
-                    callback();
+                flowUtils.syncCategoryId(entity, { entryType: constants.OBJECT_TYPES.argument }, function () {
+                    db.Argument.findOneAndUpdate(query, entity, {
+                        upsert: true,
+                        new: true,
+                        setDefaultsOnInsert: true
+                    }, function (err, doc) {
+                        updatedEntity = doc;
+                        callback();
+                    });
                 });
             });
         }

@@ -15,6 +15,7 @@ var config          = require('./config/config'),
     mongoStore      = require('connect-mongo')(session),
     passport        = require('passport'),
     mongoose        = require('mongoose'),
+    bluebird       = require('bluebird'),
     helmet          = require('helmet'),
     cons            = require('consolidate'),
     //csrf            = require('csurf'),
@@ -50,6 +51,7 @@ app.config = config;
 //app.server = http.createServer(app);
 
 //setup mongoose
+mongoose.Promise = bluebird;
 app.db = mongoose.createConnection(config.mongodb.uri);
 app.db.on('error', console.error.bind(console, 'mongoose connection error: '));
 app.db.once('open', function () {

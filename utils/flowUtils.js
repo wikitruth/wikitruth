@@ -34,7 +34,7 @@ function appendOwnerFlag(req, item, model) {
 }
 
 function isCategoryTopic(entry) {
-    return entry.tags.indexOf(constants.TOPIC_TAGS.tag510.code);
+    return entry.tags.indexOf(constants.TOPIC_TAGS.tag510.code) > -1;
 }
 
 function appendListExtra(item) {
@@ -834,7 +834,7 @@ function getTopics(query, limit, callback) {
                                         .find(query)
                                         .lean()
                                         .exec(function (err, linkParents) {
-                                            setEditorsUsername(results, function () { // FIXME: is this needed?
+                                            setEditorsUsername(results, function () {
                                                 results.forEach(function (result) {
                                                     appendEntryExtra(result);
                                                     var link = links.find(function (link) {
@@ -1410,22 +1410,25 @@ function syncChildren(parentIds, entryType, callback) {
 }
 
 // Set or update categoryId
-function syncCategoryId(entry, update, recursive, callback) {
-    var entryType = entry.getType();
-    switch (entryType) {
+function syncCategoryId(entry, options, callback) {
+    /*if(!options) {
+        options = {
+            update: false,
+            recursive: false
+        };
+    }*/
+    switch (options.entryType) {
         case constants.OBJECT_TYPES.topic:
             if(!entry.parentId) { // A root category, set category to null
                 entry.categoryId = null;
                 callback();
-            } else if(isCategoryTopic(entry)) {
-                entry.categoryId = entry.parentId;
-                callback();
             } else {
                 db.Topic.findOne({_id: entry.parentId}, function (err, parent) {
-                    if(isCategoryTopic(parent)) {
-                        entry.categoryId = entry.parentId;
+                    if(!parent.parentId || isCategoryTopic(parent)) {
+                        entry.categoryId = parent._id;
                     } else {
-                        entry.categoryId = entry.categoryId;
+                        // this applies regardless entry is a category or not
+                        entry.categoryId = parent.categoryId;
                     }
                     callback();
                 });
@@ -1452,7 +1455,7 @@ function syncCategoryId(entry, update, recursive, callback) {
             break;
         case constants.OBJECT_TYPES.topicLink:
             db.Topic.findOne({_id: entry.parentId}, function (err, parent) {
-                if(isCategoryTopic(parent)) {
+                if(!parent.parentId || isCategoryTopic(parent)) {
                     entry.categoryId = parent._id;
                 } else {
                     entry.categoryId = entry.categoryId;
@@ -1461,8 +1464,13 @@ function syncCategoryId(entry, update, recursive, callback) {
             });
             break;
         case constants.OBJECT_TYPES.argument:
+        case constants.OBJECT_TYPES.argumentLink:
+        case constants.OBJECT_TYPES.question:
+        case constants.OBJECT_TYPES.answer:
+        case constants.OBJECT_TYPES.issue:
+        case constants.OBJECT_TYPES.opinion:
             db.Topic.findOne({_id: entry.ownerId}, function (err, owner) {
-                if(isCategoryTopic(owner)) {
+                if(!owner.parentId || isCategoryTopic(owner)) {
                     entry.categoryId = owner._id;
                 } else {
                     entry.categoryId = owner.categoryId;
@@ -1470,16 +1478,8 @@ function syncCategoryId(entry, update, recursive, callback) {
                 callback();
             });
             break;
-        case constants.OBJECT_TYPES.argumentLink:
-            break;
-        case constants.OBJECT_TYPES.question:
-            break;
-        case constants.OBJECT_TYPES.answer:
-            break;
-        case constants.OBJECT_TYPES.issue:
-            break;
-        case constants.OBJECT_TYPES.opinion:
-            break;
+        default:
+            callback();
     }
 }
 
