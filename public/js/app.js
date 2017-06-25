@@ -6,15 +6,19 @@ var WT_CONSTANTS = {
             ['font', ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
             /*['fontname', ['fontname']],*/
             ['color', ['color']],
-            ['para', ['ul', 'ol', 'paragraph']],
+            ['list', ['ul', 'ol']],
+            ['para', ['paragraph']],
             ['table', ['table']],
             ['insert', ['link', 'picture', 'video']],
-            ['view', ['fullscreen', 'codeview', 'help']]
+            ['view', ['fullscreen']],
+            ['view2', ['codeview']],
+            ['help', ['help']]
         ],
         referenceHeight: 100,
         referenceToolbar: [
             ['font', ['bold', 'underline', 'strikethrough', 'clear']],
-            ['para', ['ul', 'ol', 'paragraph']],
+            ['list', ['ul', 'ol']],
+            ['para', ['paragraph']],
             ['insert', ['link']],
             ['view', ['codeview']]
         ]
