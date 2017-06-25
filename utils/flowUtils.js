@@ -1748,6 +1748,45 @@ function buildCancelUrl(model, cancelBaseUrl, entry, parent) {
     return cancelUrl;
 }
 
+function buildParentUrl(req, entry) {
+    var getBaseUrl = function (entry) {
+        return entry.private ? '/members/' + req.user.username + '/diary' : '';
+    };
+    var buildRedirectUrl = function (entry) {
+        var wikiBaseUrl = getBaseUrl(entry);
+        switch (entry.ownerType) {
+            case constants.OBJECT_TYPES.topicLink:
+                return wikiBaseUrl + '/topic/link/' + entry.ownerId;
+            case constants.OBJECT_TYPES.argumentLink:
+                return wikiBaseUrl + '/argument/link/' + entry.ownerId;
+            default:
+                return wikiBaseUrl + '/' + constants.OBJECT_ID_NAME_MAP[entry.ownerType] + '/' + entry.ownerId;
+        }
+    };
+
+    switch (entry.getType()) {
+        case constants.OBJECT_TYPES.topic:
+            return getBaseUrl(entry) + (entry.parentId ? '/topic/' + entry.parentId : '/');
+
+        case constants.OBJECT_TYPES.topicLink:
+            return getBaseUrl(entry) + '/topic/' + entry.parentId;
+
+        case constants.OBJECT_TYPES.argument:
+        case constants.OBJECT_TYPES.argumentLink:
+            return entry.parentId ? getBaseUrl(entry) + '/argument/' + entry.parentId : buildRedirectUrl(entry);
+
+        case constants.OBJECT_TYPES.answer:
+            return getBaseUrl(entry) + '/question/' + entry.questionId;
+
+        case constants.OBJECT_TYPES.question:
+        case constants.OBJECT_TYPES.issue:
+        case constants.OBJECT_TYPES.opinion:
+            return buildRedirectUrl(entry);
+    }
+
+    return '/';
+}
+
 function setScreeningModel(req, model) {
     if(!model.screening) {
         model.screening = {};
@@ -2008,6 +2047,7 @@ module.exports = {
 
     buildEntryUrl: buildEntryUrl,
     buildCancelUrl: buildCancelUrl,
+    buildParentUrl: buildParentUrl,
     getDbModelByObjectType: getDbModelByObjectType,
     getParent: getParent,
     getCategories: getCategories

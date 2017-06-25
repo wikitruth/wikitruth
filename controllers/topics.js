@@ -487,7 +487,7 @@ function POST_link_edit(req, res) {
         }
         db.TopicLink.findByIdAndRemove(req.query.id, function(err, link) {
             flowUtils.updateChildrenCount(link.parentId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, function () {
-                res.redirect(createCancelUrl(req));
+                res.redirect(flowUtils.buildParentUrl(req, link));
             });
         });
     } else if(action === 'submit') {

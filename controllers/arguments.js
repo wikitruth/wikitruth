@@ -444,11 +444,11 @@ function POST_link_edit(req, res) {
         db.ArgumentLink.findByIdAndRemove(req.query.id, function(err, link) {
             if(link.parentId) {
                 flowUtils.updateChildrenCount(link.parentId, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.argument, function () {
-                    res.redirect(createCancelUrl(req));
+                    res.redirect(flowUtils.buildParentUrl(req, link));
                 });
             } else {
                 flowUtils.updateChildrenCount(link.ownerId, link.ownerType, constants.OBJECT_TYPES.argument, function () {
-                    res.redirect(createCancelUrl(req));
+                    res.redirect(flowUtils.buildParentUrl(req, link));
                 });
             }
         });

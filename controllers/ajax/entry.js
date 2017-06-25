@@ -96,20 +96,6 @@ module.exports = function (router) {
     router.post('/delete', function (req, res) {
         var id = req.body.id;
         var type = req.body.type;
-        var getBaseUrl = function (entry) {
-            return entry.private ? '/members/' + req.user.username + '/diary' : '';
-        };
-        var buildRedirectUrl = function (entry) {
-            var wikiBaseUrl = getBaseUrl(entry);
-            switch (entry.ownerType) {
-                case constants.OBJECT_TYPES.topicLink:
-                    return { redirectUrl: wikiBaseUrl + '/topic/link/' + entry.ownerId };
-                case constants.OBJECT_TYPES.argumentLink:
-                    return { redirectUrl: wikiBaseUrl + '/argument/link/' + entry.ownerId };
-                default:
-                    return { redirectUrl: wikiBaseUrl + '/' + constants.OBJECT_ID_NAME_MAP[entry.ownerType] + '/' + entry.ownerId};
-            }
-        };
 
         if(req.user.isAdmin()) {
             switch (type) {
@@ -117,17 +103,17 @@ module.exports = function (router) {
                     db.Topic.findByIdAndRemove(id, function (err, entry) {
                         if (entry.parentId) {
                             flowUtils.updateChildrenCount(entry.parentId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, function () {
-                                res.send({ redirectUrl: getBaseUrl(entry) + '/topic/' + entry.parentId });
+                                res.send({ redirectUrl: flowUtils.buildParentUrl(req, entry) });
                             });
                         } else {
-                            res.send({ redirectUrl: getBaseUrl(entry) + '/' });
+                            res.send({ redirectUrl: flowUtils.buildParentUrl(req, entry) });
                         }
                     });
                     break;
                 case constants.OBJECT_TYPES.topicLink:
                         db.TopicLink.findByIdAndRemove(id, function (err, entry) {
                             flowUtils.updateChildrenCount(entry.parentId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, function () {
-                                res.send({ redirectUrl: getBaseUrl(entry) + '/topic/' + entry.parentId });
+                                res.send({ redirectUrl: flowUtils.buildParentUrl(req, entry) });
                             });
                         });
                     break;
@@ -135,11 +121,11 @@ module.exports = function (router) {
                     db.Argument.findByIdAndRemove(id, function (err, entry) {
                         if (entry.parentId) {
                             flowUtils.updateChildrenCount(entry.parentId, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.argument, function () {
-                                res.send({ redirectUrl: getBaseUrl(entry) + '/argument/' + entry.parentId });
+                                res.send({ redirectUrl: flowUtils.buildParentUrl(req, entry) });
                             });
                         } else {
                             flowUtils.updateChildrenCount(entry.ownerId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.argument, function () {
-                                res.send(buildRedirectUrl(entry));
+                                res.send({ redirectUrl: flowUtils.buildParentUrl(req, entry) });
                             });
                         }
                     });
@@ -148,11 +134,11 @@ module.exports = function (router) {
                     db.ArgumentLink.findByIdAndRemove(id, function (err, entry) {
                         if (entry.parentId) {
                             flowUtils.updateChildrenCount(entry.parentId, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.argument, function () {
-                                res.send({ redirectUrl: getBaseUrl(entry) + '/argument/' + entry.parentId });
+                                res.send({ redirectUrl: flowUtils.buildParentUrl(req, entry) });
                             });
                         } else {
                             flowUtils.updateChildrenCount(entry.ownerId, entry.ownerType, constants.OBJECT_TYPES.argument, function () {
-                                res.send(buildRedirectUrl(entry));
+                                res.send({ redirectUrl: flowUtils.buildParentUrl(req, entry) });
                             });
                         }
                     });
@@ -160,21 +146,21 @@ module.exports = function (router) {
                 case constants.OBJECT_TYPES.question:
                     db.Question.findByIdAndRemove(id, function (err, entry) {
                         flowUtils.updateChildrenCount(entry.ownerId, entry.ownerType, constants.OBJECT_TYPES.question, function () {
-                            res.send(buildRedirectUrl(entry));
+                            res.send({ redirectUrl: flowUtils.buildParentUrl(req, entry) });
                         });
                     });
                     break;
                 case constants.OBJECT_TYPES.issue:
                     db.Issue.findByIdAndRemove(id, function (err, entry) {
                         flowUtils.updateChildrenCount(entry.ownerId, entry.ownerType, constants.OBJECT_TYPES.issue, function () {
-                            res.send(buildRedirectUrl(entry));
+                            res.send({ redirectUrl: flowUtils.buildParentUrl(req, entry) });
                         });
                     });
                     break;
                 case constants.OBJECT_TYPES.opinion:
                     db.Opinion.findByIdAndRemove(id, function (err, entry) {
                         flowUtils.updateChildrenCount(entry.ownerId, entry.ownerType, constants.OBJECT_TYPES.opinion, function () {
-                            res.send(buildRedirectUrl(entry));
+                            res.send({ redirectUrl: flowUtils.buildParentUrl(req, entry) });
                         });
                     });
                     break;
