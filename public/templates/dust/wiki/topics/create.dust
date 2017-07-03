@@ -163,19 +163,9 @@
     <script type="text/javascript">
         $(function() {
             $('#inputName,#inputParent,#contextTitle').textareaAutoSize();
-            $('#inputContent').summernote({
-                height: WT_CONSTANTS.summernote.contentHeight,
-                toolbar: WT_CONSTANTS.summernote.contentToolbar
-            });
-            $('#inputReferences').summernote({
-                height: WT_CONSTANTS.summernote.referenceHeight,
-                toolbar: WT_CONSTANTS.summernote.referenceToolbar,
-                callbacks: {
-                    onInit: function () {
-                        disableEditorTooltipsOnTouchDevice();
-                    }
-                }
-            });
+
+            setupTextEditor('#inputContent', 'form');
+            setupTextEditor('#inputReferences', 'form', { compact: true, disableEditorTooltipsOnTouchDevice: true });
 
             var topicTags = [{?topic.tags}{topic.tags}{/topic.tags}];
             if(topicTags.length > 0) {

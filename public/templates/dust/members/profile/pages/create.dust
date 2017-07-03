@@ -43,10 +43,8 @@
     <script type="text/javascript">
         $(function() {
             $('#inputTitle,#inputId').textareaAutoSize();
-            $('#inputContent').summernote({
-                height: WT_CONSTANTS.summernote.contentHeight,
-                toolbar: WT_CONSTANTS.summernote.contentToolbar
-            });
+
+            setupTextEditor('#inputContent', 'form', { compact: false, disableEditorTooltipsOnTouchDevice: true });
         });
     </script>
 {/footer}

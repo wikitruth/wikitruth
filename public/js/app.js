@@ -1,7 +1,7 @@
 var WT_CONSTANTS = {
     summernote: {
-        contentHeight: 250,
-        contentToolbar: [
+        standardHeight: 250,
+        standardToolbar: [
             ['style', ['style']],
             ['font', ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
             /*['fontname', ['fontname']],*/
@@ -14,8 +14,8 @@ var WT_CONSTANTS = {
             ['view2', ['codeview']],
             ['help', ['help']]
         ],
-        referenceHeight: 100,
-        referenceToolbar: [
+        compactHeight: 100,
+        compactToolbar: [
             ['font', ['bold', 'underline', 'strikethrough', 'clear']],
             ['list', ['ul', 'ol']],
             ['para', ['paragraph']],
@@ -38,6 +38,35 @@ function disableEditorTooltipsOnTouchDevice() {
     if($('.note-editor').length > 0 && ('ontouchstart' in document.documentElement)) {
         $('.note-editor .note-btn').tooltip('disable');
     }
+}
+
+function setupTextEditor(editorSelector, formSelector, options) {
+    var editorOptions = {
+        height: WT_CONSTANTS.summernote.standardHeight,
+        toolbar: WT_CONSTANTS.summernote.standardToolbar
+    };
+    if(!options) options = {};
+
+    if(options.compact) {
+        editorOptions.height = WT_CONSTANTS.summernote.compactHeight;
+        editorOptions.toolbar = WT_CONSTANTS.summernote.compactToolbar;
+    }
+
+    if(options.disableEditorTooltipsOnTouchDevice) {
+        editorOptions.callbacks = {
+            onInit: function () {
+                disableEditorTooltipsOnTouchDevice();
+            }
+        }
+    }
+
+    $(editorSelector).summernote(editorOptions);
+
+    $(formSelector).on("submit", function(){
+        if ($(editorSelector).summernote('codeview.isActivated')) {
+            $(editorSelector).summernote('codeview.deactivate');
+        }
+    });
 }
 
 /* Off Canvas */
