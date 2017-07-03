@@ -223,19 +223,9 @@
     <script type="text/javascript">
         $(function() {
             $('#inputName,#inputParent').textareaAutoSize();
-            $('#inputContent').summernote({
-                height: WT_CONSTANTS.summernote.contentHeight,
-                toolbar: WT_CONSTANTS.summernote.contentToolbar
-            });
-            $('#inputReferences').summernote({
-                height: WT_CONSTANTS.summernote.referenceHeight,
-                toolbar: WT_CONSTANTS.summernote.referenceToolbar,
-                callbacks: {
-                    onInit: function () {
-                        disableEditorTooltipsOnTouchDevice();
-                    }
-                }
-            });
+
+            setupTextEditor('#inputContent', 'form');
+            setupTextEditor('#inputReferences', 'form', { compact: true, disableEditorTooltipsOnTouchDevice: true });
 
             var typeId = '{?argument}{argument.typeId}{:else}{argumentTypes.factual}{/argument}';
             $('#radioTypeId' + typeId).prop('checked', true);

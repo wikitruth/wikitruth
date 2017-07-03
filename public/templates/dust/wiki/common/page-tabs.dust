@@ -7,7 +7,7 @@
                         {^argument}
                             <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
                                 <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}" role="tab">
-                                    <span class="glyphicon glyphicon-home text-muted-x" aria-hidden="true"></span><span class="hidden-xxs-x"> Overview</span></a>
+                                    <span class="glyphicon glyphicon-home text-muted-x" aria-hidden="true"></span><span class="hidden-xxs-x"> Details</span></a>
                             </li>
                             {@gt key=entry.childrenCount.topics.total value="0"}
                                 <li role="presentation"{@eq key=tab value="topics"} class="active"{/eq}>
@@ -18,7 +18,7 @@
                         {:else}
                             <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
                                 <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argument.friendlyUrl}/{argument._id}" role="tab">
-                                    <span class="glyphicon glyphicon-home text-muted-x" aria-hidden="true"></span> Overview</a>
+                                    <span class="glyphicon glyphicon-home text-muted-x" aria-hidden="true"></span> Details</a>
                             </li>
                         {/argument}
                         <li role="presentation"{@eq key=tab value="arguments"} class="active"{/eq}>
@@ -36,20 +36,20 @@
                     {:else}
                         <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
                             <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topicLink.topic.friendlyUrl}/link/{topicLink._id}" role="tab">
-                                <span class="glyphicon glyphicon-home text-muted-x" aria-hidden="true"></span> Overview</a>
+                                <span class="glyphicon glyphicon-home text-muted-x" aria-hidden="true"></span> Details</a>
                         </li>
                     {/topicLink}
                 {:else}
                     <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
                         <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/link/{argumentLink._id}" role="tab">
-                            <span class="glyphicon glyphicon-home text-muted-x" aria-hidden="true"></span> Overview</a>
+                            <span class="glyphicon glyphicon-home text-muted-x" aria-hidden="true"></span> Details</a>
                     </li>
                 {/argumentLink}
             {:else}
                 {^answer}
                     <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
                         <a href="{wikiBaseUrl}{paths.wiki.questions.entry}/{question.friendlyUrl}/{question._id}" role="tab">
-                            <span class="glyphicon glyphicon-home text-muted-x" aria-hidden="true"></span> Overview</a>
+                            <span class="glyphicon glyphicon-home text-muted-x" aria-hidden="true"></span> Details</a>
                     </li>
                     <li role="presentation"{@eq key=tab value="answers"} class="active"{/eq}>
                         {@gt key=entry.childrenCount.answers.total value="0"}
@@ -60,7 +60,7 @@
                 {:else}
                     <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
                         <a href="{wikiBaseUrl}{paths.wiki.answers.entry}/{answer.friendlyUrl}/{answer._id}" role="tab">
-                            <span class="glyphicon glyphicon-home text-muted-x" aria-hidden="true"></span> Overview</a>
+                            <span class="glyphicon glyphicon-home text-muted-x" aria-hidden="true"></span> Details</a>
                     </li>
                 {/answer}
             {/question}
@@ -79,13 +79,13 @@
         {:else}
             <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
                 <a href="{wikiBaseUrl}{paths.wiki.issues.entry}/{issue.friendlyUrl}/{issue._id}" role="tab">
-                    <span class="glyphicon glyphicon-home" aria-hidden="true"></span> Overview</a>
+                    <span class="glyphicon glyphicon-home" aria-hidden="true"></span> Details</a>
             </li>
         {/issue}
     {:else}
         <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
             <a href="{wikiBaseUrl}{paths.wiki.opinions.entry}/{opinion.friendlyUrl}/{opinion._id}" role="tab">
-                <span class="glyphicon glyphicon-home" aria-hidden="true"></span> Overview</a>
+                <span class="glyphicon glyphicon-home" aria-hidden="true"></span> Details</a>
         </li>
     {/isOpinionEntry}
 

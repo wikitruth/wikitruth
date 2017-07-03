@@ -143,6 +143,25 @@ ARGUMENT_TYPES.getUXInfo = function (typeId) {
     };
 };
 
+var PARENT_RELATIONSHIP = {
+    rel0: {
+        value: 0,
+        text: 'Child'
+    },
+    rel1: {
+        value: 1,
+        text: 'For'
+    },
+    rel2: {
+        value: 2,
+        text: 'Against'
+    },
+    rel3: {
+        value: 3,
+        text: 'Related'
+    }
+};
+
 var SCREENING_STATUS = {
     /***
      * Pending
@@ -332,6 +351,7 @@ module.exports = {
         contentPreviewLength: 250,
         TILE_MAX_SUB_ENTRY_LEN: 30
     },
+    PARENT_RELATIONSHIP: PARENT_RELATIONSHIP,
     OBJECT_NAMES_MAP: {
         1: 'topics',
         2: 'arguments',

@@ -1,9 +1,14 @@
 'use strict';
 
-var wikitruthDomains = [
+/*var wikitruthDomains = [
     'wikitruth.co',
-    'www.wikitruth.co'
-];
+    'wikitruth.me',
+    'wikitruthproject.org',
+
+    'www.wikitruth.co',
+    'www.wikitruth.me',
+    'www.wikitruthproject.org'
+];*/
 
 var APPLICATIONS = [
     {
@@ -61,14 +66,14 @@ function getApplications() {
 
 function getApplication(req) {
     var domainName = req.hostname, application = null;
-    if(wikitruthDomains.indexOf(domainName) === -1) {
-        APPLICATIONS.some(function (app) {
-            if(app.domains.indexOf(domainName) > -1) {
-                application = app;
-                return true;
-            }
-        });
-    }
+    APPLICATIONS.some(function (app) {
+        if(app.domains.indexOf(domainName) > -1) {
+            application = app;
+            return true;
+        }
+    });
+    /* TODO: put this code back when
+    if(wikitruthDomains.indexOf(domainName) === -1) {}*/
     return application;
 }
 

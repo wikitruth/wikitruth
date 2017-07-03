@@ -121,19 +121,9 @@
     <script type="text/javascript">
         $(function() {
             $('#inputName').textareaAutoSize();
-            $('#inputContent').summernote({
-                height: WT_CONSTANTS.summernote.contentHeight,
-                toolbar: WT_CONSTANTS.summernote.contentToolbar
-            });
-            $('#inputReferences').summernote({
-                height: WT_CONSTANTS.summernote.referenceHeight,
-                toolbar: WT_CONSTANTS.summernote.referenceToolbar,
-                callbacks: {
-                    onInit: function () {
-                        disableEditorTooltipsOnTouchDevice();
-                    }
-                }
-            });
+
+            setupTextEditor('#inputContent', 'form');
+            setupTextEditor('#inputReferences', 'form', { compact: true, disableEditorTooltipsOnTouchDevice: true });
 
             var issueType = '{?issue}{issue.issueType}{:else}{ISSUE_TYPES.type100.code}{/issue}';
             $('#radioType' + issueType).prop('checked', true);
