@@ -1453,6 +1453,7 @@ function syncCategoryId(entry, options, callback) {
                 }
             });*/
             break;
+
         case constants.OBJECT_TYPES.topicLink:
             db.Topic.findOne({_id: entry.parentId}, function (err, parent) {
                 if(!parent.parentId || isCategoryTopic(parent)) {
@@ -1463,10 +1464,17 @@ function syncCategoryId(entry, options, callback) {
                 callback();
             });
             break;
+
+        case constants.OBJECT_TYPES.answer:
+            db.Question.findOne({_id: entry.questionId}, function (err, question) {
+                entry.categoryId = question.categoryId;
+                callback();
+            });
+            break;
+
         case constants.OBJECT_TYPES.argument:
         case constants.OBJECT_TYPES.argumentLink:
         case constants.OBJECT_TYPES.question:
-        case constants.OBJECT_TYPES.answer:
         case constants.OBJECT_TYPES.issue:
         case constants.OBJECT_TYPES.opinion:
             db.Topic.findOne({_id: entry.ownerId}, function (err, owner) {
@@ -1478,6 +1486,7 @@ function syncCategoryId(entry, options, callback) {
                 callback();
             });
             break;
+
         default:
             callback();
     }
