@@ -8,7 +8,7 @@ module.exports = function(app, mongoose) {
     argumentId: { type: mongoose.Schema.ObjectId, ref: 'Argument' }, // the original Argument it links to
     parentId: { type: mongoose.Schema.ObjectId, default: null }, // always an Argument
     categoryId: { type: mongoose.Schema.ObjectId, ref: 'Topic' }, // the root topic where this entry belong
-    ownerId: { type: mongoose.Schema.ObjectId }, // usually a Topic but can be a different object
+    ownerId: { type: mongoose.Schema.ObjectId }, // usually a Topic but can be a different object (Argument, etc)
     ownerType: { type: Number }, // OBJECT_TYPES
     createDate: { type: Date, default: Date.now },
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },

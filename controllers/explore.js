@@ -9,6 +9,12 @@ var templates   = require('../models/templates'),
 module.exports = function (router) {
 
     router.get('/', function (req, res) {
+        var injectCategoryId = function (query) {
+            if(res.locals.application) {
+                query.categoryId = res.locals.application.exploreTopicId;
+            }
+        };
+
         var LIMIT = req.query.tab ? 25 : 15;
         var allTabs = !req.query.tab;
         var tab = req.query.tab ? req.query.tab : 'all';
@@ -23,6 +29,7 @@ module.exports = function (router) {
                     return callback();
                 }
                 var query = { parentId: {$ne: null}, private: false, 'screening.status': model.screening.status };
+                injectCategoryId(query);
                 //db.Topic.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
                 db.Topic
                     .find(query)
@@ -57,6 +64,7 @@ module.exports = function (router) {
                     private: false,
                     'screening.status': model.screening.status
                 };
+                injectCategoryId(query);
                 //db.Topic.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
                 db.Argument
                     .find(query)
@@ -91,6 +99,7 @@ module.exports = function (router) {
                     private: false,
                     'screening.status': model.screening.status
                 };
+                injectCategoryId(query);
                 //db.Question.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
                 db.Question
                     .find(query)
@@ -120,8 +129,10 @@ module.exports = function (router) {
                     return callback();
                 }
                 //db.Answer.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
+                var query = { private: false, 'screening.status': model.screening.status };
+                injectCategoryId(query);
                 db.Answer
-                    .find({ private: false, 'screening.status': model.screening.status })
+                    .find(query)
                     .sort({editDate: -1})
                     .limit(LIMIT)
                     .lean()
@@ -147,8 +158,10 @@ module.exports = function (router) {
                 if(!allTabs && model.tab !== 'issues') {
                     return callback();
                 }
+                var query = { private: false, 'screening.status': model.screening.status };
+                injectCategoryId(query);
                 db.Issue
-                    .find({ private: false, 'screening.status': model.screening.status })
+                    .find(query)
                     .sort({editDate: -1})
                     .limit(LIMIT)
                     .lean()
@@ -175,8 +188,10 @@ module.exports = function (router) {
                 if(!allTabs && model.tab !== 'opinions') {
                     return callback();
                 }
+                var query = { private: false, 'screening.status': model.screening.status };
+                injectCategoryId(query);
                 db.Opinion
-                    .find({ private: false, 'screening.status': model.screening.status })
+                    .find(query)
                     .sort({editDate: -1})
                     .limit(LIMIT)
                     .lean()

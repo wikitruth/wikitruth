@@ -5,7 +5,7 @@ var constants   = require('../../constants');
 module.exports = function(app, mongoose) {
   var schema = new mongoose.Schema({
     title: { type: String, default: '' }, // Contextual Title
-    parentId: { type: mongoose.Schema.ObjectId, default: null, ref: 'Topic' }, // Used when the parent is also a topic
+    parentId: { type: mongoose.Schema.ObjectId, default: null, ref: 'Topic' }, // Used when the parent is a topic
     topicId: { type: mongoose.Schema.ObjectId, ref: 'Topic' },
     createDate: { type: Date, default: Date.now },
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },

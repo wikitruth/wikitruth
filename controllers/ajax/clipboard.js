@@ -15,11 +15,11 @@ function setupClipboard(req) {
     return clipboard;
 }
 
-function createNewArrayExcludeId(sourceIds, removeId) {
+function createNewArrayExcludeId(sourceIds, excludeId) {
     var ids = [];
     for (var i = 0; i < sourceIds.length; ++i) { // remove self if included
         var id = sourceIds[i];
-        if (!removeId || removeId != id) {
+        if (!excludeId || excludeId != id) {
             ids.push(id);
         }
     }
@@ -189,6 +189,7 @@ module.exports = function (router) {
 
         if(!id || type == constants.OBJECT_TYPES.topic) {
             async.parallel({
+
                 topics: function (callback) { // move topics as children
                     if (topics.length === 0 || !username && !req.user.isAdmin()) { // if moving to root but user is not admin, deny
                         return callback();
@@ -200,28 +201,40 @@ module.exports = function (router) {
                         .exec(function (err, results) {
                             // Update each moved entry and their parent count
                             async.each(results, function(result, callback){
-
                                 // FIXME: for now, prevent moving from Diary to public and vice versa
                                 if(result.private && !username || !result.private && username) {
                                     return callback();
                                 }
 
+                                var updatedResult;
                                 var parentId = result.parentId;
                                 // Update entry parent
                                 result.parentId = id;
-                                flowUtils.syncCategoryId(result, { entryType: constants.OBJECT_TYPES.topic, update: false, recursive: true }, function () {
-                                    db.Topic.findOneAndUpdate({_id: result._id}, result, {
-                                        upsert: true,
-                                        new: true,
-                                        setDefaultsOnInsert: true
-                                    }, function (err, updatedEntity) {
+
+                                async.series({
+                                    syncCategoryId: function (callback) {
+                                        flowUtils.syncCategoryId(result, { entryType: constants.OBJECT_TYPES.topic, update: false, recursive: true }, callback);
+                                    },
+                                    findOneAndUpdate: function (callback) {
+                                        db.Topic.findOneAndUpdate({_id: result._id}, result, { upsert: true, new: true, setDefaultsOnInsert: true }, function (err, updatedEntity) {
+                                            updatedResult = updatedEntity;
+                                            callback();
+                                        });
+                                    },
+                                    syncChildren: function (callback) {
+                                        flowUtils.syncChildren(updatedResult, { entryType: constants.OBJECT_TYPES.topic }, callback);
+                                    },
+                                    updateChildrenCount: function (callback) {
+                                        // FIXME: is this needed per id? or can we batch this at the end by collecting all parentId/ownerId and doing it once?
                                         if (parentId) {
                                             // Update old parent's children
                                             flowUtils.updateChildrenCount(parentId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, callback);
                                         } else {
                                             callback();
                                         }
-                                    });
+                                    }
+                                }, function (err, results) {
+                                    callback();
                                 });
                             }, function () {
                                 if(id) {
@@ -232,15 +245,11 @@ module.exports = function (router) {
                                 }
                             });
                     });
-                    /*db.Topic.update({_id: {$in: ids}}, {$set: {parentId: id}}, {multi: true}, function (err, num) {
-                        // FIXME: update the old parents count
-                        flowUtils.updateChildrenCount(id, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, callback);
-                    });*/
                 },
+
                 arguments: function (callback) {
-                    if (args.length === 0 || !id) {
-                        return callback();
-                    }
+                    if (args.length === 0 || !id) return callback();
+
                     var ids = createNewArrayExcludeId(args, id);
                     db.Argument
                         .find({_id: {$in: ids}})
@@ -248,6 +257,7 @@ module.exports = function (router) {
                         .exec(function (err, results) {
                             // Update each moved entry and their parent count
                             async.each(results, function(result, callback){
+                                var updatedResult;
                                 var parentId = result.parentId;
                                 var ownerId = result.ownerId;
                                 // Update entry
@@ -255,41 +265,36 @@ module.exports = function (router) {
                                 result.ownerId = id; // TODO: how about children ???
                                 result.ownerType = constants.OBJECT_TYPES.topic;
                                 result.threadId = null; // TODO: should set to self._id ???
-                                flowUtils.syncCategoryId(result, { entryType: constants.OBJECT_TYPES.argument, update: false, recursive: true }, function () {
-                                    db.Argument.findOneAndUpdate({_id: result._id}, result, {
-                                        upsert: true,
-                                        new: true,
-                                        setDefaultsOnInsert: true
-                                    }, function (err, updatedEntity) {
+
+                                async.series({
+                                    syncCategoryId: function (callback) {
+                                        flowUtils.syncCategoryId(result, { entryType: constants.OBJECT_TYPES.argument, update: false, recursive: true }, callback);
+                                    },
+                                    findOneAndUpdate: function (callback) {
+                                        db.Argument.findOneAndUpdate({_id: result._id}, result, { upsert: true, new: true, setDefaultsOnInsert: true }, function (err, updatedEntity) {
+                                            updatedResult = updatedEntity;
+                                            callback();
+                                        });
+                                    },
+                                    syncChildren: function (callback) {
+                                        flowUtils.syncChildren(updatedResult, { entryType: constants.OBJECT_TYPES.argument }, callback);
+                                    },
+                                    updateChildrenCount: function (callback) {
+                                        // FIXME: is this needed per id? or can we batch this at the end by collecting all parentId/ownerId and doing it once?
                                         if (parentId) {
                                             flowUtils.updateChildrenCount(parentId, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.argument, callback);
                                         } else {
                                             flowUtils.updateChildrenCount(ownerId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.argument, callback);
                                         }
-                                    });
-                                });
-                            }, function () {
-                                async.parallel([
-                                    function (callback) {
-                                        flowUtils.syncChildren(ids, constants.OBJECT_TYPES.argument, callback);
-                                    },
-                                    function (callback) {
-                                        flowUtils.updateChildrenCount(id, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.argument, callback);
                                     }
-                                ], function () {
+                                }, function (err, results) {
                                     callback();
                                 });
+
+                            }, function () {
+                                flowUtils.updateChildrenCount(id, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.argument, callback);
                             });
                     });
-                    /*db.Argument.update({_id: {$in: ids}}, {
-                        $set: {
-                            parentId: null,
-                            ownerId: id, // TODO: how about children ???
-                            ownerType: constants.OBJECT_TYPES.topic,
-                            threadId: null // TODO: should set to self._id ???
-                        }
-                    }, {multi: true}, function (err, num) {
-                    });*/
                 }
             }, function () {
                 res.send({});
@@ -306,6 +311,7 @@ module.exports = function (router) {
                     .exec(function (err, results) {
                         // Update each and their parent count
                         async.each(results, function(result, callback){
+                            var updatedResult;
                             var parentId = result.parentId;
                             var ownerId = result.ownerId;
                             // Update entry
@@ -313,32 +319,39 @@ module.exports = function (router) {
                             result.ownerId = parent.parentId; // TODO: how about children ???
                             result.ownerType = parent.ownerType;
                             result.threadId = parent.threadId ? parent.threadId : id;
-                            flowUtils.syncCategoryId(result, { entryType: constants.OBJECT_TYPES.argument, update: false, recursive: true }, function () {
-                                db.Argument.findOneAndUpdate({_id: result._id}, result, {
-                                    upsert: true,
-                                    new: true,
-                                    setDefaultsOnInsert: true
-                                }, function (err, updatedEntity) {
+
+                            async.series({
+                                syncCategoryId: function (callback) {
+                                    flowUtils.syncCategoryId(result, { entryType: constants.OBJECT_TYPES.argument, update: false, recursive: true }, callback);
+                                },
+                                findOneAndUpdate: function (callback) {
+                                    db.Argument.findOneAndUpdate({_id: result._id}, result, { upsert: true, new: true, setDefaultsOnInsert: true }, function (err, updatedEntity) {
+                                        updatedResult = updatedEntity;
+                                        callback();
+                                    });
+                                },
+                                syncChildren: function (callback) {
+                                    flowUtils.syncChildren(updatedResult, { entryType: constants.OBJECT_TYPES.argument }, callback);
+                                },
+                                updateChildrenCount: function (callback) {
+                                    // FIXME: is this needed per id? or can we batch this at the end by collecting all parentId/ownerId and doing it once?
                                     if (parentId) {
                                         flowUtils.updateChildrenCount(parentId, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.argument, callback);
                                     } else {
                                         flowUtils.updateChildrenCount(ownerId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.argument, callback);
                                     }
-                                });
-                            });
-                        }, function () {
-                            async.parallel([
-                                function (callback) {
-                                    flowUtils.syncChildren(ids, constants.OBJECT_TYPES.argument, callback);
-                                },
-                                function (callback) {
-                                    flowUtils.updateChildrenCount(id, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.argument, callback);
                                 }
-                            ], function () {
+                            }, function (err, results) {
+                                callback();
+                            });
+
+                        }, function () {
+                            flowUtils.updateChildrenCount(id, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.argument, function() {
                                 res.send({});
                             });
                         });
                 });
+
                 /*db.Argument.update({_id: {$in: ids}}, {
                     $set: {
                         parentId: id,

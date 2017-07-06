@@ -17,6 +17,11 @@ var argumentController  = require('./arguments'),
 module.exports = function (router) {
 
     router.get('/', function (req, res) {
+        var injectCategoryId = function (query) {
+            if(res.locals.application) {
+                query.categoryId = res.locals.application.exploreTopicId;
+            }
+        };
         var MAX_RESULT = 5;
         var model = {};
         db.User.findOne({}, function(err, result) {
@@ -28,6 +33,7 @@ module.exports = function (router) {
                 async.parallel({
                     topics: function(callback) {
                         var query = { parentId: {$ne: null}, private: false, 'screening.status': model.screening.status };
+                        injectCategoryId(query);
                         db.Topic
                             .find(query)
                             .sort({editDate: -1})
@@ -54,6 +60,7 @@ module.exports = function (router) {
                             private: false,
                             'screening.status': model.screening.status
                         };
+                        injectCategoryId(query);
                         db.Argument
                             .find(query)
                             .sort({editDate: -1})
@@ -81,6 +88,7 @@ module.exports = function (router) {
                             private: false,
                             'screening.status': model.screening.status
                         };
+                        injectCategoryId(query);
                         db.Question
                             .find(query)
                             .sort({editDate: -1})
@@ -102,8 +110,10 @@ module.exports = function (router) {
                             });
                     },
                     answers: function(callback) {
+                        var query = { private: false, 'screening.status': model.screening.status };
+                        injectCategoryId(query);
                         db.Answer
-                            .find({ private: false, 'screening.status': model.screening.status })
+                            .find(query)
                             .sort({editDate: -1})
                             .limit(MAX_RESULT)
                             .lean()
@@ -123,8 +133,10 @@ module.exports = function (router) {
                             });
                     },
                     issues: function (callback) {
+                        var query = { private: false, 'screening.status': model.screening.status };
+                        injectCategoryId(query);
                         db.Issue
-                            .find({ private: false, 'screening.status': model.screening.status })
+                            .find(query)
                             .sort({editDate: -1})
                             .limit(MAX_RESULT)
                             .lean()
@@ -145,8 +157,10 @@ module.exports = function (router) {
                             });
                     },
                     opinions: function (callback) {
+                        var query = { private: false, 'screening.status': model.screening.status };
+                        injectCategoryId(query);
                         db.Opinion
-                            .find({ private: false, 'screening.status': model.screening.status })
+                            .find(query)
                             .sort({editDate: -1})
                             .limit(MAX_RESULT)
                             .lean()
