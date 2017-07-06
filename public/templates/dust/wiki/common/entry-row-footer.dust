@@ -6,6 +6,7 @@
     {@gt key=childrenCount.topics.accepted value="0"}<span><i class="fa fa-folder-open-o" aria-hidden="true"></i> {childrenCount.topics.accepted}</span>{/gt}
     {@gt key=childrenCount.arguments.accepted value="0"}<span><i class="fa fa-flash" aria-hidden="true"></i> {childrenCount.arguments.accepted}</span>{/gt}
     {@gt key=childrenCount.questions.accepted value="0"}<span><i class="fa fa-question-circle-o" aria-hidden="true"></i> {childrenCount.questions.accepted}</span>{/gt}
+    {@gt key=childrenCount.answers.accepted value="0"}<span><i class="fa fa-check-circle" aria-hidden="true"></i> {childrenCount.answers.accepted}</span>{/gt}
     {@gt key=childrenCount.issues.accepted value="0"}<span><i class="fa fa-exclamation-circle" aria-hidden="true"></i> {childrenCount.issues.accepted}</span>{/gt}
     {@gt key=childrenCount.opinions.accepted value="0"}<span><i class="fa fa-comments-o" aria-hidden="true"></i> {childrenCount.opinions.accepted}</span>{/gt}
     {?referenceDate}

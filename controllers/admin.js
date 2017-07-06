@@ -5,7 +5,6 @@ var backup          = require('mongodb-backup'),
     path            = require("path"),
     async           = require('async'),
     Git             = require("nodegit"),
-    //htmlToText    = require('html-to-text'),
     templates       = require('../models/templates'),
     config          = require('../config/config'),
     constants       = require('../models/constants'),
@@ -238,8 +237,41 @@ module.exports = function (router) {
             });
 
         } else if(action === 'fix') {
+
+            async.series({
+                updateOwner: function (callback) {
+                    db.ArgumentLink.find({ ownerId: null }).exec(function(err, results) {
+                        async.eachSeries(results, function (result, callback) {
+                            result.ownerId = result.parentId;
+                            result.ownerType = constants.OBJECT_TYPES.argument;
+                            db.ArgumentLink.update({ _id: result._id }, result, {}, callback);
+                        }, function (err) {
+                            callback();
+                        });
+                    });
+                }
+            }, function (err, results) {
+                async.parallel({
+                    updateCategory: function (callback) {
+                        db.Topic.find({ parentId: null }).exec((err, results) => {
+                            async.eachSeries(results, function (result, callback) {
+                                flowUtils.syncCategoryId(result, { entryType: constants.OBJECT_TYPES.topic }, function () {
+                                    db.Topic.update({_id: result._id}, result, {}, function () {
+                                        flowUtils.syncChildren(result, { entryType: constants.OBJECT_TYPES.topic }, callback);
+                                    });
+                                });
+                            }, function (err) {
+                                callback();
+                            });
+                        });
+                    }
+                }, function (err, results) {
+                    res.render(templates.admin.mongoBackup, model);
+                });
+            });
+
             // this will set the default values in every doc
-            async.parallel({
+            //async.parallel({
                 /*topics: function (callback) {
                     db.Topic.find({}).exec((err, results) => {
                         async.eachSeries(results, function (result, callback) {
@@ -258,6 +290,7 @@ module.exports = function (router) {
                         });
                     });
                 },*/
+                /*
                 topicLinks: function (callback) {
                     db.TopicLink.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
@@ -269,7 +302,7 @@ module.exports = function (router) {
                             callback();
                         });
                     });
-                }
+                }*/
                 /*arguments: function (callback) {
                     db.Argument.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
@@ -379,9 +412,9 @@ module.exports = function (router) {
                         });
                     });
                 }*/
-            }, function (err, results) {
+            /*}, function (err, results) {
                 res.render(templates.admin.mongoBackup, model);
-            });
+            });*/
         } else if(action === 'restore') {
             var dir = backupDir + '/' + config.mongodb.dbname;
             privateBackupDir += '/' + privateDirName;

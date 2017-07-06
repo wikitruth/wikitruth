@@ -1374,38 +1374,319 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
     }
 }
 
-function syncChildren(parentIds, entryType, callback) {
-    if(entryType === constants.OBJECT_TYPES.topic) {
-        callback();
-    } else if(entryType === constants.OBJECT_TYPES.argument) {
-        var processArgumentsRecursive = function (parent, callback) {
-            db.Argument.find({parentId: parent._id}, function (err, children) {
-                if(children.length > 0) {
-                    async.each(children, function (child, callback) {
-                        child.ownerId = parent.ownerId;
-                        child.ownerType = parent.ownerType;
-                        child.threadId = parent.parentId ? parent.threadId : parent._id;
-                        db.Argument.update({_id: child._id}, child, {upsert: true}, function(err, writeResult) {
-                            processArgumentsRecursive(child, callback);
-                        });
-                    }, function (err) {
-                        callback();
-                    });
-                } else {
-                    callback();
-                }
-            });
-        };
+// SUMMARY: updates the children of parent including the categoryId, does not touch the parent
+function syncChildren(parent, options, callback) {
 
-        async.each(parentIds, function (parentId, callback) {
-            db.Argument.findOne({_id: parentId}, function (err, parent) {
-                processArgumentsRecursive(parent, callback);
+    var syncChildTopics = function (callback) {
+        db.Topic.find( { parentId: parent._id }, function (err, children) {
+            if(children.length === 0) return callback();
+            async.each(children, function (child, callback) {
+                var categoryChanged = false, oldCategoryId = child.categoryId;
+                async.series({
+                    syncCategoryId: function (callback) {
+                        syncCategoryId(child, { entryType: constants.OBJECT_TYPES.topic }, callback);
+                    },
+                    update: function (callback) {
+                        categoryChanged = oldCategoryId !== child.categoryId;
+                        if(categoryChanged) {
+                            return db.Topic.update({_id: child._id}, child, { upsert: true }, function (err, writeResult) {
+                                callback();
+                            });
+                        }
+                        callback();
+                    },
+                    syncChildren: function (callback) {
+                        if(categoryChanged) {
+                            return syncChildren(child, { entryType: constants.OBJECT_TYPES.topic }, callback);
+                        }
+                        callback();
+                    }
+                }, function (err, results) {
+                    callback();
+                });
+            }, function () {
+                callback();
             });
-        }, function () {
-            callback();
         });
-    } else {
-        callback();
+    };
+
+    var syncChildTopicLinks = function (callback) {
+        db.TopicLink.find( { parentId: parent._id }, function (err, children) {
+            if(children.length === 0) return callback();
+            async.each(children, function (child, callback) {
+                var categoryChanged = false, oldCategoryId = child.categoryId;
+                async.series({
+                    syncCategoryId: function (callback) {
+                        syncCategoryId(child, { entryType: constants.OBJECT_TYPES.topicLink }, callback);
+                    },
+                    update: function (callback) {
+                        categoryChanged = oldCategoryId !== child.categoryId;
+                        if(categoryChanged) {
+                            return db.TopicLink.update({_id: child._id}, child, { upsert: true }, function (err, writeResult) {
+                                callback();
+                            });
+                        }
+                        callback();
+                    },
+                    syncChildren: function (callback) {
+                        if(categoryChanged) {
+                            return syncChildren(child, { entryType: constants.OBJECT_TYPES.topicLink }, callback);
+                        }
+                        callback();
+                    }
+                }, function (err, results) {
+                    callback();
+                });
+            }, function () {
+                callback();
+            });
+        });
+    };
+
+    var syncChildArguments = function (callback) {
+        var parentIsTopic = options.entryType === constants.OBJECT_TYPES.topic;
+        var query = parentIsTopic ? { ownerId: parent._id, ownerType: constants.OBJECT_TYPES.topic } : { parentId: parent._id };
+        db.Argument.find(query, function (err, children) {
+            if(children.length === 0) return callback();
+            async.each(children, function (child, callback) {
+                var categoryChanged = false, oldCategoryId = child.categoryId;
+                if(!parentIsTopic) {
+                    child.ownerId = parent.ownerId;
+                    child.ownerType = parent.ownerType;
+                    child.threadId = parent.parentId ? parent.threadId : parent._id;
+                }
+                async.series({
+                    syncCategoryId: function (callback) {
+                        syncCategoryId(child, { entryType: constants.OBJECT_TYPES.argument }, callback);
+                    },
+                    update: function (callback) {
+                        categoryChanged = oldCategoryId !== child.categoryId;
+                        if(categoryChanged || !parentIsTopic) {
+                            return db.Argument.update({_id: child._id}, child, {upsert: true}, function (err, writeResult) {
+                                callback();
+                            });
+                        }
+                        callback();
+                    },
+                    syncChildren: function (callback) {
+                        if(categoryChanged || !parentIsTopic) {
+                            return syncChildren(child, {entryType: constants.OBJECT_TYPES.argument}, callback);
+                        }
+                        callback();
+                    }
+                }, function (err, results) {
+                    callback();
+                });
+            }, function () {
+                callback();
+            });
+        });
+    };
+
+    var syncChildArgumentLinks = function (callback) {
+        db.ArgumentLink.find({ ownerId: parent._id, ownerType: options.entryType }, function (err, children) {
+            if(children.length === 0) return callback();
+            async.each(children, function (child, callback) {
+                var categoryChanged = false, oldCategoryId = child.categoryId;
+                /*
+                child.ownerId = parent.ownerId;
+                child.ownerType = parent.ownerType;
+                child.threadId = parent.parentId ? parent.threadId : parent._id;
+                */
+                async.series({
+                    syncCategoryId: function (callback) {
+                        syncCategoryId(child, { entryType: constants.OBJECT_TYPES.argumentLink }, callback);
+                    },
+                    update: function (callback) {
+                        categoryChanged = oldCategoryId !== child.categoryId;
+                        if(categoryChanged) {
+                            return db.ArgumentLink.update({_id: child._id}, child, {upsert: true}, function (err, writeResult) {
+                                callback();
+                            });
+                        }
+                        callback();
+                    },
+                    syncChildren: function (callback) {
+                        if(categoryChanged) {
+                            return syncChildren(child, {entryType: constants.OBJECT_TYPES.argumentLink}, callback);
+                        }
+                        callback();
+                    }
+                }, function (err, results) {
+                    callback();
+                });
+            }, function () {
+                callback();
+            });
+        });
+    };
+
+    var syncChildAnswers = function (callback) {
+        db.Answer.find( { questionId: parent._id }, function (err, children) {
+            if(children.length === 0) return callback();
+            async.each(children, function (child, callback) {
+                var categoryChanged = false, oldCategoryId = child.categoryId;
+                async.series({
+                    syncCategoryId: function (callback) {
+                        syncCategoryId(child, { entryType: constants.OBJECT_TYPES.answer }, callback);
+                    },
+                    update: function (callback) {
+                        categoryChanged = oldCategoryId !== child.categoryId;
+                        if(categoryChanged) {
+                            return db.Answer.update({_id: child._id}, child, {upsert: true}, function (err, writeResult) {
+                                callback();
+                            });
+                        }
+                        callback();
+                    },
+                    syncChildren: function (callback) {
+                        if(categoryChanged) {
+                            return syncChildren(child, {entryType: constants.OBJECT_TYPES.answer}, callback);
+                        }
+                        callback();
+                    }
+                }, function (err, results) {
+                    callback();
+                });
+            }, function () {
+                callback();
+            });
+        });
+    };
+
+    var syncOwnerChildren = function (childrenEntryType, callback) {
+        var dbModel = getDbModelByObjectType(childrenEntryType);
+        dbModel.find({ ownerId: parent._id, ownerType: options.entryType }, function (err, children) {
+            if(children.length === 0) return callback();
+            async.each(children, function (child, callback) {
+                var categoryChanged = false, oldCategoryId = child.categoryId;
+                async.series({
+                    syncCategoryId: function (callback) {
+                        syncCategoryId(child, { entryType: childrenEntryType }, callback);
+                    },
+                    update: function (callback) {
+                        categoryChanged = oldCategoryId !== child.categoryId;
+                        if(categoryChanged) {
+                            return dbModel.update({_id: child._id}, child, {upsert: true}, function (err, writeResult) {
+                                callback();
+                            });
+                        }
+                        callback();
+                    },
+                    syncChildren: function (callback) {
+                        if(categoryChanged) {
+                            return syncChildren(child, { entryType: childrenEntryType }, callback);
+                        }
+                        callback();
+                    }
+                }, function (err, results) {
+                    callback();
+                });
+            }, function () {
+                callback();
+            });
+        });
+    };
+
+    switch (options.entryType) { // type of the parent
+
+        case constants.OBJECT_TYPES.topic:
+            async.parallel({
+                topics: function(callback) {
+                    syncChildTopics(callback);
+                },
+                topicLinks: function(callback) {
+                    syncChildTopicLinks(callback);
+                },
+                arguments: function(callback) {
+                    syncChildArguments(callback);
+                },
+                argumentLinks: function(callback) {
+                    syncChildArgumentLinks(callback);
+                },
+                questions: function(callback) {
+                    syncOwnerChildren(constants.OBJECT_TYPES.question, callback);
+                },
+                issues: function(callback) {
+                    syncOwnerChildren(constants.OBJECT_TYPES.issue, callback);
+                },
+                opinions: function(callback) {
+                    syncOwnerChildren(constants.OBJECT_TYPES.opinion, callback);
+                }
+            }, function (err, results) {
+                callback();
+            });
+            break;
+
+        case constants.OBJECT_TYPES.argument:
+            async.parallel({
+                arguments: function(callback) {
+                    syncChildArguments(callback);
+                },
+                argumentLinks: function(callback) {
+                    syncChildArgumentLinks(callback);
+                },
+                questions: function(callback) {
+                    syncOwnerChildren(constants.OBJECT_TYPES.question, callback);
+                },
+                issues: function(callback) {
+                    syncOwnerChildren(constants.OBJECT_TYPES.issue, callback);
+                },
+                opinions: function(callback) {
+                    syncOwnerChildren(constants.OBJECT_TYPES.opinion, callback);
+                }
+            }, function (err, results) {
+                callback();
+            });
+            break;
+
+        case constants.OBJECT_TYPES.question:
+            async.parallel({
+                answers: function(callback) {
+                    syncChildAnswers(callback);
+                },
+                issues: function(callback) {
+                    syncOwnerChildren(constants.OBJECT_TYPES.issue, callback);
+                },
+                opinions: function(callback) {
+                    syncOwnerChildren(constants.OBJECT_TYPES.opinion, callback);
+                }
+            }, function (err, results) {
+                callback();
+            });
+            break;
+
+        case constants.OBJECT_TYPES.answer:
+            async.parallel({
+                issues: function(callback) {
+                    syncOwnerChildren(constants.OBJECT_TYPES.issue, callback);
+                },
+                opinions: function(callback) {
+                    syncOwnerChildren(constants.OBJECT_TYPES.opinion, callback);
+                }
+            }, function (err, results) {
+                callback();
+            });
+            break;
+
+        case constants.OBJECT_TYPES.topicLink:
+        case constants.OBJECT_TYPES.argumentLink:
+        case constants.OBJECT_TYPES.issue:
+        case constants.OBJECT_TYPES.opinion:
+            async.parallel({
+                issues: function(callback) {
+                    syncOwnerChildren(constants.OBJECT_TYPES.issue, callback);
+                },
+                opinions: function(callback) {
+                    syncOwnerChildren(constants.OBJECT_TYPES.opinion, callback);
+                }
+            }, function (err, results) {
+                callback();
+            });
+            break;
+
+        default:
+            callback();
     }
 }
 
@@ -1417,7 +1698,8 @@ function syncCategoryId(entry, options, callback) {
             recursive: false
         };
     }*/
-    switch (options.entryType) {
+    switch (options.entryType) { // type of the entry
+
         case constants.OBJECT_TYPES.topic:
             if(!entry.parentId) { // A root category, set category to null
                 entry.categoryId = null;
@@ -1433,25 +1715,6 @@ function syncCategoryId(entry, options, callback) {
                     callback();
                 });
             }
-
-            /*db.Opinion.update({_id: entryId}, {
-                $set: countNode
-            }, function (err, num) {
-                callback();
-            });
-            db.Topic.findOneAndUpdate(query, entity, { new: true }, function(err, updatedEntity) {
-                var updateRedirect = function () {
-                    var model = {};
-                    flowUtils.setModelContext(req, model);
-                    var url = model.wikiBaseUrl + paths.wiki.topics.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
-                    res.redirect(url);
-                };
-                if(entity.parentId && !result) { // update parent count on create only
-                    flowUtils.updateChildrenCount(updatedEntity.parentId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, function () {
-                        updateRedirect();
-                    });
-                }
-            });*/
             break;
 
         case constants.OBJECT_TYPES.topicLink:
@@ -1459,7 +1722,7 @@ function syncCategoryId(entry, options, callback) {
                 if(!parent.parentId || isCategoryTopic(parent)) {
                     entry.categoryId = parent._id;
                 } else {
-                    entry.categoryId = entry.categoryId;
+                    entry.categoryId = parent.categoryId;
                 }
                 callback();
             });
@@ -1477,8 +1740,8 @@ function syncCategoryId(entry, options, callback) {
         case constants.OBJECT_TYPES.question:
         case constants.OBJECT_TYPES.issue:
         case constants.OBJECT_TYPES.opinion:
-            db.Topic.findOne({_id: entry.ownerId}, function (err, owner) {
-                if(!owner.parentId || isCategoryTopic(owner)) {
+            getDbModelByObjectType(entry.ownerType).findOne({_id: entry.ownerId}, function (err, owner) {
+                if(entry.ownerType === constants.OBJECT_TYPES.topic && (!owner.parentId || isCategoryTopic(owner))) {
                     entry.categoryId = owner._id;
                 } else {
                     entry.categoryId = owner.categoryId;
