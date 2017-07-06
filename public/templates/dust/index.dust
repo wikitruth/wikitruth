@@ -13,7 +13,7 @@
             <p class="lead">A systematic way of discussion and knowledge contribution using dialectics and a vetting mechanism to verify between knowledge that is true or false, right or wrong, good or bad.</p>
         {/application}
         <p>
-            <a class="btn btn-lg btn-success wt-btn-explore" href="{?application}{application.exploreUrl}{:else}{paths.wiki.index}{/application}" role="button"><i class="fa fa-globe"></i> Explore</a>
+            <a class="btn btn-lg btn-success wt-btn-explore" href="{paths.wiki.index}" role="button"><i class="fa fa-globe"></i> Explore</a>
             <a class="btn btn-lg btn-info wt-btn-visualize" href="{paths.wiki.visualize}{?topic}/topic/{topic._id}{:else}{?application}/topic/{application.exploreTopicId}{/application}{/topic}" role="button"><i class="fa fa-snowflake-o"></i> Visualize</a>
             <a class="btn btn-lg btn-warning" href="{?application}{application.aboutUrl}{:else}{paths.about}{/application}" role="button">Learn more</a>
         </p>
