@@ -1,5 +1,5 @@
-<hr class="wt-dotted-line" />
-<div style="font-style-x: italic; font-size: smaller;" class="text-muted">
+{!<hr class="wt-dotted-line" />!}
+<div style="font-style-x: italic; font-size: smaller; display: inline-block; margin-right: 10px;" class="text-muted">
     {?isOpinionEntry}
         <i class="fa fa-comments-o"></i> A comment on {>"dust/wiki/common/entry-link-opinion" /}
     {:else}

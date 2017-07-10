@@ -10,6 +10,10 @@ var templates   = require('../models/templates'),
 
 function GET_index(req, res) {
     flowUtils.ensureEntryIdParam(req, 'topic');
+    /*if(!req.query.topic && res.locals.application) {
+        req.query.topic = res.locals.application.exploreTopicId;
+    }*/
+
     var model = {}, nodes = [], edges = [], node, rootId;
     var textSize = 25, nodeSize = 12, ROOT_ID = '0', rootLabel = 'Wikitruth'; // from nodeSize = 15 is producing an error
     var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);

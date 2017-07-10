@@ -6,15 +6,10 @@
 
 {<body}
     {>"dust/wiki/common/entry-header" tab="overview" /}
-    <div class="entry-header">
-        <span class="label label-{?issueType.critical}danger{:else}warning{/issueType.critical}">{issueType.text}</span>&nbsp;
-        {>"dust/wiki/common/entry-verdict" /}
-    </div>
     <div class="text-body">
         {!<p><span class="label label-danger">{issueType}</span></p>!}
         <p>{entry.content|s}</p>
     </div>
-    {>"dust/wiki/common/entry-options" /}
     {>"dust/wiki/opinions/list-preview" /}
     {>"dust/wiki/common/entry-footer" /}
 {/body}

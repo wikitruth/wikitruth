@@ -1,5 +1,5 @@
-<div style="margin-bottom: 20px">
-    <h1 class="page-header wt-header" style="margin-bottom: 0; padding-bottom: 0">
+<div class="wt-header-container">
+    <h1 class="page-header wt-header" style="padding-bottom: 0">
         {?entry}
             {entry.title}
             {!{?argument.against} <span class="label label-primary wt-subtitle">opposing</span>{/argument.against}!}
@@ -28,6 +28,10 @@
         {!{@eq key=tab value="visualize"} <span class="label label-warning wt-subtitle">Visualize</span>{/eq}!}
     </h1>
     {>"dust/wiki/common/subtitle-edit" /}
+    {?entry.referenceDate}
+        <div style="display: inline-block"><small class="text-muted" title="Reference Date"><i class="fa fa-clock-o"></i> {entry.referenceDateSimple}</small></div>
+    {/entry.referenceDate}
+    {>"dust/wiki/common/entry-verdict" /}
     {@eq key=entry.screening.status value=0}
         <br/>
         <div class="alert alert-warning" role="alert">

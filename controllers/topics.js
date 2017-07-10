@@ -44,8 +44,6 @@ function GET_index(req, res) {
             return res.redirect('/');
         }
         flowUtils.setScreeningModelCount(model, model.topic.childrenCount.topics);
-        //console.log('model.childrenCount: ' + JSON.stringify(model.childrenCount));
-        //console.log('model.screening.hidden: ' + model.screening.hidden);
         flowUtils.setModelOwnerEntry(model);
         flowUtils.setModelContext(req, model);
         res.render(templates.wiki.topics.index, model);
