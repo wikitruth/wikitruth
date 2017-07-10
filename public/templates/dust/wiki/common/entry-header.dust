@@ -1,5 +1,6 @@
 {>"dust/wiki/common/breadcrumb" /}
 {>"dust/wiki/common/page-header" /}
+{>"dust/wiki/common/entry-options" /}
 {?tab}
     {>"dust/wiki/common/page-tabs" /}
 {/tab}

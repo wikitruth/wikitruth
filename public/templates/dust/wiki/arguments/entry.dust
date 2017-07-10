@@ -6,13 +6,7 @@
 
 {<body}
     {>"dust/wiki/common/entry-header" tab="overview" /}
-    <div class="entry-header">
-        {>"dust/wiki/common/entry-verdict" /}
-    </div>
     <div class="text-body collapsible">
-        {?argument.referenceDate}
-            <p><small class="text-muted" title="Reference Date"><i class="fa fa-clock-o"></i> {argument.referenceDateSimple}</small></p>
-        {/argument.referenceDate}
         {argument.content|s}
         <a href="#" onclick="return contentSeeMore()" class="content-see-more hidden">
             <div class="content-see-more-gradient"></div>
@@ -28,7 +22,6 @@
             {/topicLinks}
         </div>
     {/topic}
-    {>"dust/wiki/common/entry-options" /}
     {?arguments}
         <div class="wt-list">
             {?proArguments}
