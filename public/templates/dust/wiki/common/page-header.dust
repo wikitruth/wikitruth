@@ -15,57 +15,66 @@
             {:else}
                 {@eq key=tab value="visualize"}
                     Visualize
-                {:else}
-                    Explore
+                {/eq}
+                {@eq key=tab value="clipboard"}
+                    Clipboard
                 {/eq}
             {/username}
         {/entry}
         {@eq key=tab value="link-to"} <span class="label label-warning wt-subtitle">Links</span>{/eq}
         {@eq key=tab value="update-verdict"} <span class="label label-warning wt-subtitle">Verdict</span>{/eq}
-        {@eq key=tab value="clipboard"}Clipboard{/eq}
         {@eq key=tab value="screening"} <span class="label label-warning wt-subtitle">Screening</span>{/eq}
         {@eq key=argument.typeId value=constants.ARGUMENT_TYPES.artifact} <span class="label label-info wt-subtitle"><i class="fa fa-bolt"></i> {constants.ARGUMENT_TYPES.artifactLabel}</span>{/eq}
         {!{@eq key=tab value="visualize"} <span class="label label-warning wt-subtitle">Visualize</span>{/eq}!}
     </h1>
-    {>"dust/wiki/common/subtitle-edit" /}
-    {?entry.referenceDate}
-        <div style="display: inline-block"><small class="text-muted" title="Reference Date"><i class="fa fa-clock-o"></i> {entry.referenceDateSimple}</small></div>
-    {/entry.referenceDate}
-    {>"dust/wiki/common/entry-verdict" /}
-    {@eq key=entry.screening.status value=0}
-        <br/>
-        <div class="alert alert-warning" role="alert">
-            {?isEntryOwner}
-                Your post is <strong>Pending Screening</strong> and has not been checked for its quality or potential issues and will be screened soon.
-            {:else}
-                <strong>Warning!</strong> This post is pending for screening and has not been checked for its quality or potential issues, please take caution.
-            {/isEntryOwner}
-        </div>
-    {/eq}
-    {@eq key=entry.screening.status value=2}
-        <br/>
-        <div class="alert alert-danger" role="alert">
-            {?isEntryOwner}
-                Sorry! Your post was <strong>Rejected</strong> due to its quality or issues, please check the screening comment for more details.
-            {:else}
-                <strong>Beware!</strong> This post was rejected due to its quality or issues, please take caution.
-            {/isEntryOwner}
-        </div>
-    {/eq}
-    {^issue}
-        {^comment}
-            {?topicLink}
-                <br/>
-                <div class="alert alert-warning" role="alert">
-                    <i class="fa fa-share"></i> This is a link to topic <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topicLink.topic.friendlyUrl}/{topicLink.topic._id}">{topicLink.topic.title}</a>
-                </div>
-            {/topicLink}
-            {?argumentLink}
-                <br/>
-                <div class="alert alert-warning" role="alert">
-                    <i class="fa fa-share"></i> This is a link to {contents.argument.entryL} <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/{argumentLink.argument._id}">{argumentLink.argument.title}</a>
-                </div>
-            {/argumentLink}
-        {/comment}
-    {/issue}
+    {?entry}
+        {>"dust/wiki/common/subtitle-edit" /}
+        {?entry.referenceDate}
+            <div style="display: inline-block"><small class="text-muted" title="Reference Date"><i class="fa fa-clock-o"></i> {entry.referenceDateSimple}</small></div>
+        {/entry.referenceDate}
+        {>"dust/wiki/common/entry-verdict" /}
+        {^hideEntryOptions}
+            {>"dust/wiki/common/entry-options" /}
+        {:else}
+            <hr class="wt-dotted-line" style="margin-bottom: 15px"/>
+        {/hideEntryOptions}
+        {@eq key=entry.screening.status value=0}
+            <br/>
+            <div class="alert alert-warning" role="alert">
+                {?isEntryOwner}
+                    Your post is <strong>Pending Screening</strong> and has not been checked for its quality or potential issues and will be screened soon.
+                {:else}
+                    <strong>Warning!</strong> This post is pending for screening and has not been checked for its quality or potential issues, please take caution.
+                {/isEntryOwner}
+            </div>
+        {/eq}
+        {@eq key=entry.screening.status value=2}
+            <br/>
+            <div class="alert alert-danger" role="alert">
+                {?isEntryOwner}
+                    Sorry! Your post was <strong>Rejected</strong> due to its quality or issues, please check the screening comment for more details.
+                {:else}
+                    <strong>Beware!</strong> This post was rejected due to its quality or issues, please take caution.
+                {/isEntryOwner}
+            </div>
+        {/eq}
+        {^issue}
+            {^comment}
+                {?topicLink}
+                    <br/>
+                    <div class="alert alert-warning" role="alert">
+                        <i class="fa fa-share"></i> This is a link to topic <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topicLink.topic.friendlyUrl}/{topicLink.topic._id}">{topicLink.topic.title}</a>
+                    </div>
+                {/topicLink}
+                {?argumentLink}
+                    <br/>
+                    <div class="alert alert-warning" role="alert">
+                        <i class="fa fa-share"></i> This is a link to {contents.argument.entryL} <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/{argumentLink.argument._id}">{argumentLink.argument.title}</a>
+                    </div>
+                {/argumentLink}
+            {/comment}
+        {/issue}
+    {:else}
+        <hr class="wt-dotted-line" style="margin-bottom: 15px"/>
+    {/entry}
 </div>

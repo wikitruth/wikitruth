@@ -199,13 +199,13 @@ function GET_index(req, res) {
                     });
             }
         }, function (err, results) {
+            model.hideEntryOptions = true;
             model.visualize = {
                 nodes: nodes,
                 edges: edges,
                 rootId: rootId
             };
-            flowUtils.setModelOwnerEntry(model);
-            flowUtils.setModelContext(req, model);
+            flowUtils.setModelOwnerEntry(req, model);
             res.render(templates.wiki.visualize, model);
         });
     });

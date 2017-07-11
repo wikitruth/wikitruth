@@ -1,4 +1,4 @@
-<div class="clearfix">
+<div class="wt-entry-options-container clearfix">
     <div class="dropdown pull-left entry-options">
         <a href="#" class="text-muted no-underline dropdown-toggle" title="Reply" data-toggle="dropdown" aria-controls="wtDropdownReply" aria-haspopup="true" aria-expanded="false"><i class="fa fa-reply" aria-hidden="true"></i><span> Reply</span></a>
         <ul class="dropdown-menu dropdown-menu-right-x" aria-labelledby="wtTabMore" id="wtDropdownReply">

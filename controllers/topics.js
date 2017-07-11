@@ -44,8 +44,7 @@ function GET_index(req, res) {
             return res.redirect('/');
         }
         flowUtils.setScreeningModelCount(model, model.topic.childrenCount.topics);
-        flowUtils.setModelOwnerEntry(model);
-        flowUtils.setModelContext(req, model);
+        flowUtils.setModelOwnerEntry(req, model);
         res.render(templates.wiki.topics.index, model);
     });
 }
@@ -55,34 +54,8 @@ function GET_entry(req, res) {
     var model = {};
     flowUtils.ensureEntryIdParam(req, 'topic');
     flowUtils.setTopicModels(req, model, function () {
-        if(!model.topic || !flowUtils.isEntryOnIntendedUrl(req, model.topic)) {
-            return res.redirect('/');
-        }
-        if(!req.query.topic) {
-            req.query.topic = model.topic._id;
-        }
-
-        // Topic Tags
-        var tags = model.topic.tags;
-        if(tags && tags.length > 0) {
-            var tagLabels = [];
-            if(model.topic.ethicalStatus.hasValue) {
-                tagLabels.push(constants.TOPIC_TAGS.tag10);
-                model.hasValue = true;
-            }
-            tags.forEach(function (tag) {
-                tagLabels.push(constants.TOPIC_TAGS['tag' + tag]);
-                if(tag === constants.TOPIC_TAGS.tag520.code) {
-                    model.mainTopic = true;
-                }
-                if(!model.hasValue && tag === constants.ARGUMENT_TAGS.tag10.code) {
-                    model.hasValue = true;
-                }
-            });
-            model.tagLabels = tagLabels;
-        } else if(model.topic.ethicalStatus.hasValue) {
-            model.hasValue = true;
-        }
+        if(!model.topic || !flowUtils.isEntryOnIntendedUrl(req, model.topic)) return res.redirect('/');
+        if(!req.query.topic) req.query.topic = model.topic._id;
 
         async.parallel({
             categories: function(callback) {
@@ -241,10 +214,7 @@ function GET_entry(req, res) {
                 flowUtils.getTopOpinions(query, model, callback);
             }
         }, function (err, results) {
-            flowUtils.setVerdictModel(model.topic);
-            flowUtils.setModelOwnerEntry(model);
-            flowUtils.setModelContext(req, model);
-            flowUtils.setClipboardModel(req, model, constants.OBJECT_TYPES.topic);
+            flowUtils.setModelOwnerEntry(req, model);
             res.render(templates.wiki.topics.entry, model);
         });
     });
@@ -386,9 +356,7 @@ function GET_link_entry(req, res) {
                 flowUtils.getTopOpinions(query, model, callback);
             }
         }, function (err, results) {
-            flowUtils.setModelOwnerEntry(model);
-            flowUtils.setModelContext(req, model);
-            flowUtils.setClipboardModel(req, model, constants.OBJECT_TYPES.topicLink);
+            flowUtils.setModelOwnerEntry(req, model);
             res.render(templates.wiki.topics.link.entry, model);
         });
     });
@@ -438,8 +406,7 @@ function GET_link_edit(req, res) {
             }
         }
         model.cancelUrl = createCancelUrl(req);
-        flowUtils.setModelOwnerEntry(model);
-        flowUtils.setModelContext(req, model);
+        flowUtils.setModelOwnerEntry(req, model);
         res.render(templates.wiki.topics.link.edit, model);
     });
     /*async.series({

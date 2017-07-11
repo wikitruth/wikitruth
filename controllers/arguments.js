@@ -123,31 +123,7 @@ function GET_entry(req, res) {
                 flowUtils.getTopOpinions(query, model, callback);
             }
         }, function (err, results) {
-            flowUtils.setVerdictModel(model.argument);
-
-            // Argument Tags
-            var tags = model.argument.tags;
-            if(tags && tags.length > 0) {
-                var tagLabels = [];
-                if(model.argument.ethicalStatus.hasValue) {
-                    tagLabels.push(constants.ARGUMENT_TAGS.tag10);
-                    model.hasValue = true;
-                }
-                tags.forEach(function (tag) {
-                    tagLabels.push(constants.ARGUMENT_TAGS['tag' + tag]);
-                    if(!model.hasValue && tag === constants.ARGUMENT_TAGS.tag10.code) {
-                        model.hasValue = true;
-                    }
-                });
-                model.tagLabels = tagLabels;
-            }
-
-            if(!model.hasValue && (model.argument.ethicalStatus.hasValue || model.argument.typeId === constants.ARGUMENT_TYPES.ethical)) {
-                model.hasValue = true;
-            }
-            flowUtils.setModelOwnerEntry(model);
-            flowUtils.setModelContext(req, model);
-            flowUtils.setClipboardModel(req, model, constants.OBJECT_TYPES.argument);
+            flowUtils.setModelOwnerEntry(req, model);
             res.render(templates.wiki.arguments.entry, model);
         });
     });
@@ -188,8 +164,7 @@ function GET_index(req, res) {
                         flowUtils.setVerdictModel(result);
                     });
                     flowUtils.sortArguments(results);
-                    flowUtils.setModelContext(req, model);
-                    flowUtils.setModelOwnerEntry(model);
+                    flowUtils.setModelOwnerEntry(req, model);
 
                     // screening and children count
                     flowUtils.setScreeningModelCount(model, model.entry.childrenCount['arguments']);
@@ -412,9 +387,7 @@ function GET_link_entry(req, res) {
                 flowUtils.getTopOpinions(query, model, callback);
             }
         }, function (err, results) {
-            flowUtils.setModelOwnerEntry(model);
-            flowUtils.setModelContext(req, model);
-            flowUtils.setClipboardModel(req, model, constants.OBJECT_TYPES.argumentLink);
+            flowUtils.setModelOwnerEntry(req, model);
             res.render(templates.wiki.arguments.link.entry, model);
         });
     });
@@ -428,8 +401,7 @@ function GET_link_edit(req, res) {
             return res.redirect(createCancelUrl(req));
         }
         model.cancelUrl = createCancelUrl(req);
-        flowUtils.setModelOwnerEntry(model);
-        flowUtils.setModelContext(req, model);
+        flowUtils.setModelOwnerEntry(req, model);
         res.render(templates.wiki.arguments.link.edit, model);
     });
 }

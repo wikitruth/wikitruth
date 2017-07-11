@@ -1892,7 +1892,9 @@ function createOwnerQueryFromQuery(req) {
     return {};
 }
 
-function setModelOwnerEntry(model) {
+function setModelOwnerEntry(req, model, options) {
+    if(!options) options = {};
+
     if(model.opinion && (!model.issue || model.opinion.ownerType === constants.OBJECT_TYPES.issue)) {
         model.entry = model.opinion;
         model.entryType = constants.OBJECT_TYPES.opinion;
@@ -1908,6 +1910,7 @@ function setModelOwnerEntry(model) {
         model.entryType = constants.OBJECT_TYPES.issue;
         model.isEntryOwner = model.isIssueOwner;
         model.isIssueEntry = true;
+        model.issueType = constants.ISSUE_TYPES['type' + model.issue.issueType];
     } else if(model.answer) {
         model.entry = model.answer;
         model.entryType = constants.OBJECT_TYPES.answer;
@@ -1920,19 +1923,71 @@ function setModelOwnerEntry(model) {
         model.entry = model.argumentLink;
         model.entryType = constants.OBJECT_TYPES.argumentLink;
         model.isEntryOwner = model.isArgumentLinkOwner;
+        if(!options.hideClipboard)
+            setClipboardModel(req, model, constants.OBJECT_TYPES.argumentLink);
     } else if(model.argument) {
         model.entry = model.argument;
         model.entryType = constants.OBJECT_TYPES.argument;
         model.isEntryOwner = model.isArgumentOwner;
+        if(!options.hideClipboard)
+            setClipboardModel(req, model, constants.OBJECT_TYPES.argument);
+        setVerdictModel(model.argument);
+        // Argument Tags
+        var tags = model.argument.tags;
+        if(tags && tags.length > 0) {
+            var tagLabels = [];
+            if(model.argument.ethicalStatus.hasValue) {
+                tagLabels.push(constants.ARGUMENT_TAGS.tag10);
+                model.hasValue = true;
+            }
+            tags.forEach(function (tag) {
+                tagLabels.push(constants.ARGUMENT_TAGS['tag' + tag]);
+                if(!model.hasValue && tag === constants.ARGUMENT_TAGS.tag10.code) {
+                    model.hasValue = true;
+                }
+            });
+            model.tagLabels = tagLabels;
+        }
+        if(!model.hasValue && (model.argument.ethicalStatus.hasValue || model.argument.typeId === constants.ARGUMENT_TYPES.ethical)) {
+            model.hasValue = true;
+        }
     } else if(model.topicLink) {
         model.entry = model.topicLink;
         model.entryType = constants.OBJECT_TYPES.topicLink;
         model.isEntryOwner = model.isTopicLinkOwner;
+        if(!options.hideClipboard)
+            setClipboardModel(req, model, constants.OBJECT_TYPES.topicLink);
     } else if(model.topic) {
         model.entry = model.topic;
         model.entryType = constants.OBJECT_TYPES.topic;
         model.isEntryOwner = model.isTopicOwner;
+        if(!options.hideClipboard)
+            setClipboardModel(req, model, constants.OBJECT_TYPES.topic);
+        setVerdictModel(model.topic);
+        // Topic Tags
+        var topicTags = model.topic.tags;
+        if(topicTags && topicTags.length > 0) {
+            var topicTagLabels = [];
+            if(model.topic.ethicalStatus.hasValue) {
+                topicTagLabels.push(constants.TOPIC_TAGS.tag10);
+                model.hasValue = true;
+            }
+            topicTags.forEach(function (tag) {
+                topicTagLabels.push(constants.TOPIC_TAGS['tag' + tag]);
+                if(tag === constants.TOPIC_TAGS.tag520.code) {
+                    model.mainTopic = true;
+                }
+                if(!model.hasValue && tag === constants.ARGUMENT_TAGS.tag10.code) {
+                    model.hasValue = true;
+                }
+            });
+            model.tagLabels = topicTagLabels;
+        } else if(model.topic.ethicalStatus.hasValue) {
+            model.hasValue = true;
+        }
     }
+
+    setModelContext(req, model);
 }
 
 function getDbModelByObjectType(type) {
@@ -1998,14 +2053,14 @@ function createOwnerQueryFromModel(model) {
 }
 
 function setModelContext(req, model) {
-    if(req.params.username) {
-        model.username = req.params.username;
+    if(req.params.username || (model.entry && model.entry.private)) {
+        model.username = req.params.username || req.user.username;
         model.profileBaseUrl = "/members/" + model.username;
         model.wikiBaseUrl = model.profileBaseUrl + "/diary";
     } else {
-        model.username = "";
-        model.profileBaseUrl = "";
-        model.wikiBaseUrl = "";
+        model.username = '';
+        model.profileBaseUrl = '';
+        model.wikiBaseUrl = '';
     }
 }
 
