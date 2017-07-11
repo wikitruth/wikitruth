@@ -42,8 +42,7 @@ function GET_entry(req, res) {
                 flowUtils.getTopOpinions(query, model, callback);
             }
         }, function (err, results) {
-            flowUtils.setModelOwnerEntry(model);
-            flowUtils.setModelContext(req, model);
+            flowUtils.setModelOwnerEntry(req, model);
             res.render(templates.wiki.questions.entry, model);
         });
     });
@@ -65,8 +64,7 @@ function GET_index(req, res) {
                             flowUtils.appendEntryExtra(result);
                         });
                         model.questions = results;
-                        flowUtils.setModelOwnerEntry(model);
-                        flowUtils.setModelContext(req, model);
+                        flowUtils.setModelOwnerEntry(req, model);
 
                         // screening and children count
                         flowUtils.setScreeningModelCount(model, model.entry.childrenCount.questions);

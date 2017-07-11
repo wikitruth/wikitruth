@@ -28,12 +28,12 @@ module.exports = function (router) {
         };
         var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
         flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
-            flowUtils.setModelOwnerEntry(model);
-            flowUtils.setModelContext(req, model);
+            flowUtils.setModelOwnerEntry(req, model, { hideClipboard: true });
             if(model.entry && model.entry.verdict && model.entry.verdict.status) {
                 model.verdictStatus = model.entry.verdict.status;
             }
             model.cancelUrl = createReturnUrl(req, model);
+            model.hideEntryOptions = true;
             res.render(templates.wiki.verdict.update, model);
         });
     });
@@ -42,8 +42,7 @@ module.exports = function (router) {
         var model = {};
         var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
         flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
-            flowUtils.setModelOwnerEntry(model);
-            flowUtils.setModelContext(req, model);
+            flowUtils.setModelOwnerEntry(req, model);
             var updateQuery = {
                 $set: {
                     verdict: {

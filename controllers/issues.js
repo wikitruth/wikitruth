@@ -21,9 +21,7 @@ function GET_entry(req, res) {
                 flowUtils.getTopOpinions(ownerQuery, model, callback);
             }
         }, function (err, results) {
-            model.issueType = constants.ISSUE_TYPES['type' + model.issue.issueType];
-            flowUtils.setModelOwnerEntry(model);
-            flowUtils.setModelContext(req, model);
+            flowUtils.setModelOwnerEntry(req, model);
             res.render(templates.wiki.issues.entry, model);
         });
     });
@@ -48,8 +46,7 @@ function GET_index(req, res) {
                         flowUtils.appendEntryExtra(result);
                     });
                     model.issues = results;
-                    flowUtils.setModelOwnerEntry(model);
-                    flowUtils.setModelContext(req, model);
+                    flowUtils.setModelOwnerEntry(req, model);
 
                     // screening and children count
                     flowUtils.setScreeningModelCount(model, model.entry.childrenCount.issues);
@@ -84,8 +81,7 @@ function GET_create(req, res) {
     var model = {};
     flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
         model.ISSUE_TYPES = constants.ISSUE_TYPES;
-        flowUtils.setModelOwnerEntry(model);
-        flowUtils.setModelContext(req, model);
+        flowUtils.setModelOwnerEntry(req, model);
         res.render(templates.wiki.issues.create, model);
     });
 }

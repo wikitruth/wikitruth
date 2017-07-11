@@ -41,8 +41,7 @@ function GET_entry(req, res) {
                 flowUtils.getTopOpinions(query, model, callback);
             }
         }, function (err, results) {
-            flowUtils.setModelOwnerEntry(model);
-            flowUtils.setModelContext(req, model);
+            flowUtils.setModelOwnerEntry(req, model);
             res.render(templates.wiki.opinions.entry, model);
         });
     });
@@ -65,9 +64,8 @@ function GET_index(req, res) {
                     results.forEach(function (result) {
                         flowUtils.appendEntryExtra(result);
                     });
-                    flowUtils.setModelOwnerEntry(model);
-                    flowUtils.setModelContext(req, model);
                     model.opinions = results;
+                    flowUtils.setModelOwnerEntry(req, model);
 
                     // screening and children count
                     flowUtils.setScreeningModelCount(model, model.entry.childrenCount.opinions);
@@ -105,8 +103,7 @@ function GET_create(req, res) {
         if(model.opinion && !flowUtils.isEntryOwner(req, model.opinion)){
             return res.redirect('/');
         }
-        flowUtils.setModelOwnerEntry(model);
-        flowUtils.setModelContext(req, model);
+        flowUtils.setModelOwnerEntry(req, model);
         res.render(templates.wiki.opinions.create, model);
     });
 }

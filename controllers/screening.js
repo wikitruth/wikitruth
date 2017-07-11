@@ -7,11 +7,6 @@ var flowUtils   = require('../utils/flowUtils'),
     paths       = require('../models/paths');
 
 function createReturnUrl(req, model) {
-    if(model.entry.private) {
-        model.wikiBaseUrl = '/members/' + req.user.username + '/diary';
-    } else {
-        model.wikiBaseUrl = '';
-    }
     switch (model.ownerType) {
         case constants.OBJECT_TYPES.topicLink:
             return model.wikiBaseUrl + paths.wiki.topics.entry + '/' + utils.urlify(model.entry.title2) + '/link/' + model.entry._id;
@@ -28,7 +23,7 @@ module.exports = function (router) {
         var model = {};
         var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
         flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
-            flowUtils.setModelOwnerEntry(model);
+            flowUtils.setModelOwnerEntry(req, model);
             model.ownerType = ownerQuery.ownerType;
             model.cancelUrl = createReturnUrl(req, model);
             res.render(templates.wiki.screening, model);
@@ -39,7 +34,7 @@ module.exports = function (router) {
         var model = {};
         var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
         flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
-            flowUtils.setModelOwnerEntry(model);
+            flowUtils.setModelOwnerEntry(req, model);
             model.ownerType = ownerQuery.ownerType;
             var screeningStatus = req.body.screeningStatus;
             var dbModel = flowUtils.getDbModelByObjectType(ownerQuery.ownerType);

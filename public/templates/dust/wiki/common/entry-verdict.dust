@@ -72,30 +72,20 @@
             &nbsp;<i class="fa fa-close text-danger-x"></i> 7</span>!}
         {/argument.verdict.label}
     {:else}
-        {?verdict}
         {! Topic !}
+        {?entry.verdict}
             <a href="{paths.wiki.verdict.update}?{?topic}topic={topic._id}{/topic}{?question}&amp;question={question._id}{/question}" title="Update Verdict" class="no-underline">
                 <span class="label label-{entry.verdict.theme}" title="This content is not yet reviewed, please take caution.">
                     <i class="fa fa-{entry.verdict.icon}" aria-hidden="true"></i> {entry.verdict.label}
                 </span>
-            </a>&nbsp;
-            {?verdict.counts.true}
-                <span class="label label-success" title="verified"><i class="fa fa-check-circle"></i> {verdict.counts.true}</span>&nbsp;
-            {/verdict.counts.true}
-            {?verdict.counts.pending}
-                <span class="label label-warning" title="unverified"><i class="fa fa-question-circle"></i> {verdict.counts.pending}</span>&nbsp;
-            {/verdict.counts.pending}
-            {?verdict.counts.false}
-                <span class="label label-danger" title="false"><i class="fa fa-close"></i> {verdict.counts.false}</span>&nbsp;
-            {/verdict.counts.false}
-        {/verdict}
+            </a>
+            {?verdict.counts.true} <span class="label label-success" title="verified"><i class="fa fa-check-circle"></i> {verdict.counts.true}</span>{/verdict.counts.true}
+            {?verdict.counts.pending} <span class="label label-warning" title="unverified"><i class="fa fa-question-circle"></i> {verdict.counts.pending}</span> {/verdict.counts.pending}
+            {?verdict.counts.false} <span class="label label-danger" title="false"><i class="fa fa-close"></i> {verdict.counts.false}</span>{/verdict.counts.false}
+        {/entry.verdict}
     {/argument}
-    {#tagLabels}
-        <span class="label label-info"><i class="fa fa-tag"></i> {text}</span>&nbsp;
-    {/tagLabels}
-    {?linkCount}
-        <span class="label label-info pull-right-x"><i class="fa fa-link"></i> {linkCount}</span>&nbsp;
-    {/linkCount}
+    {#tagLabels} <span class="label label-info"><i class="fa fa-tag"></i> {text}</span>{/tagLabels}
+    {?linkCount} <span class="label label-info pull-right-x"><i class="fa fa-link"></i> {linkCount}</span>{/linkCount}
     {^username}
         {?entry.screening.status}
             <a href="{paths.wiki.screening}?{?topic}topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}{?answer}&amp;answer={answer._id}{/answer}{?issue}&amp;issue={issue._id}{/issue}{?opinion}&amp;opinion={opinion._id}{/opinion}" title="Click to change screening status" class="no-underline">

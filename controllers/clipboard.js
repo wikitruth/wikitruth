@@ -14,9 +14,10 @@ module.exports = function (router) {
         var topicIds = clipboard['object' + constants.OBJECT_TYPES.topic];
         var argumentIds = clipboard['object' + constants.OBJECT_TYPES.argument];
 
+        /* FIXME: why is this here?
         if(req.user) {
             req.params.username = req.user.username;
-        }
+        }*/
         flowUtils.setModelContext(req, model);
 
         async.parallel({
