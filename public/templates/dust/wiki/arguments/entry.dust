@@ -40,11 +40,11 @@
                     {/conArguments}
                 </ul>
                 {@gt key=conArgumentCount value="15"}
-                    <div class="top-list-items-more"><a href="{wikiBaseUrl}{paths.wiki.arguments.index}?topic={topic._id}&amp;argument={argument._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{conArgumentCount}</span></a></div>
+                    <div class="top-list-items-more"><a href="{wikiBaseUrl}{paths.wiki.arguments.index}?{entry.objectName}={entry._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{conArgumentCount}</span></a></div>
                 {/gt}
             {:else}
                 {@gt key=proArgumentCount value="15"}
-                    <div class="top-list-items-more"><a href="{wikiBaseUrl}{paths.wiki.arguments.index}?topic={topic._id}&amp;argument={argument._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{proArgumentCount}</span></a></div>
+                    <div class="top-list-items-more"><a href="{wikiBaseUrl}{paths.wiki.arguments.index}?{entry.objectName}={entry._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{proArgumentCount}</span></a></div>
                 {/gt}
             {/conArguments}
         </div>

@@ -1,0 +1,27 @@
+{^issue}
+    {^opinion}
+        {^topicLink}
+            {^argumentLink}
+                {^question}
+                    {^argument}
+                        <li><a href="#{wikiBaseUrl}{paths.wiki.topics.create}?topic={topic._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Topic</a></li>
+                    {/argument}
+                    <li><a href="#{wikiBaseUrl}{paths.wiki.arguments.create}?{entry.objectName}={entry._id}" role="tab"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> New {contents.argument.entry}</a></li>
+                    <li><a href="#{wikiBaseUrl}{paths.wiki.questions.create}?{entry.objectName}={entry._id}" role="tab">
+                        <span class="fa fa-question-circle" aria-hidden="true"></span> New Question</a></li>
+                    <li role="separator" class="divider"></li>
+                {:else}
+                    {^answer}
+                        <li><a href="#{wikiBaseUrl}{paths.wiki.answers.create}?{entry.objectName}={entry._id}" role="tab">
+                            <span class="fa fa-question-circle" aria-hidden="true"></span> New Answer</a></li>
+                        <li role="separator" class="divider"></li>
+                    {/answer}
+                {/question}
+            {/argumentLink}
+        {/topicLink}
+    {/opinion}
+    <li><a href="#{wikiBaseUrl}{paths.wiki.issues.create}?{entry.objectName}={entry._id}" role="tab">
+        <span class="fa fa-exclamation-circle" aria-hidden="true"></span> New Issue</a></li>
+{/issue}
+<li><a href="#{wikiBaseUrl}{paths.wiki.opinions.create}?{^isIssueEntry}{?opinion}opinion={opinion._id}{:else}{entry.objectName}={entry._id}{/opinion}{:else}{entry.objectName}={entry._id}{/isIssueEntry}" role="tab">
+    <span class="fa fa-comments-o" aria-hidden="true"></span> New Comment</a></li>

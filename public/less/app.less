@@ -426,6 +426,51 @@ a.no-underline:hover, a.no-underline:focus, .wt-list a:hover, .wt-list a:focus {
   }
 }
 
+.wt-popover {
+  .popover-title {
+    /*font-size: 16px;*/
+  }
+
+  .popover-content {
+    padding: 0;
+
+    .nav {
+      /* border */
+      padding-top: 5px;
+      padding-bottom: 5px;
+
+      .divider {
+        height: 1px;
+        margin: 9px 0;
+        overflow: hidden;
+        background-color: #e5e5e5;
+        margin-left: 12px;
+        margin-right: 12px;
+
+        &.light {
+          background-color: transparent;
+          margin-top: 4px;
+          margin-bottom: 4px;
+        }
+      }
+
+      >li {
+        a {
+          display: block;
+          padding: 3px 20px;
+          clear: both;
+          font-weight: normal;
+          line-height: 1.42857143;
+          color: #333;
+          /*white-space: nowrap;*/
+          /*font-size: 16px;*/
+          text-overflow: ellipsis;
+        }
+      }
+    }
+  }
+}
+
 .highlight {
   background-color: #f8f8f8;
   font-weight: bold;
@@ -554,6 +599,14 @@ a.no-underline:hover, a.no-underline:focus, .wt-list a:hover, .wt-list a:focus {
 
       > div.wt-entry-row-footer {
         font-size: 12px;
+
+        a {
+          cursor: pointer;
+        }
+
+        a:focus {
+          outline: none;
+        }
       }
     }
   }

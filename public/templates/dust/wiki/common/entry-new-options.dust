@@ -6,13 +6,13 @@
                     {^argument}
                         <li><a href="{wikiBaseUrl}{paths.wiki.topics.create}?topic={topic._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> New Topic</a></li>
                     {/argument}
-                    <li><a href="{wikiBaseUrl}{paths.wiki.arguments.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> New {contents.argument.entry}</a></li>
-                    <li><a href="{wikiBaseUrl}{paths.wiki.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
+                    <li><a href="{wikiBaseUrl}{paths.wiki.arguments.create}?{entry.objectName}={entry._id}" role="tab"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> New {contents.argument.entry}</a></li>
+                    <li><a href="{wikiBaseUrl}{paths.wiki.questions.create}?{entry.objectName}={entry._id}" role="tab">
                         <span class="fa fa-question-circle" aria-hidden="true"></span> New Question</a></li>
                     <li role="separator" class="divider"></li>
                 {:else}
                     {^answer}
-                        <li><a href="{wikiBaseUrl}{paths.wiki.answers.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}" role="tab">
+                        <li><a href="{wikiBaseUrl}{paths.wiki.answers.create}?{entry.objectName}={entry._id}" role="tab">
                             <span class="fa fa-question-circle" aria-hidden="true"></span> New Answer</a></li>
                         <li role="separator" class="divider"></li>
                     {/answer}
@@ -20,8 +20,8 @@
             {/argumentLink}
         {/topicLink}
     {/opinion}
-    <li><a href="{wikiBaseUrl}{paths.wiki.issues.create}?topic={topic._id}{?topicLink}&amp;topicLink={topicLink._id}{/topicLink}{?argumentLink}&amp;argumentLink={argumentLink._id}{/argumentLink}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}{?answer}&amp;answer={answer._id}{/answer}{?opinion}&amp;opinion={opinion._id}{/opinion}" role="tab">
+    <li><a href="{wikiBaseUrl}{paths.wiki.issues.create}?{entry.objectName}={entry._id}" role="tab">
         <span class="fa fa-exclamation-circle" aria-hidden="true"></span> New Issue</a></li>
 {/issue}
-<li><a href="{wikiBaseUrl}{paths.wiki.opinions.create}?topic={topic._id}{?topicLink}&amp;topicLink={topicLink._id}{/topicLink}{?argumentLink}&amp;argumentLink={argumentLink._id}{/argumentLink}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}{?answer}&amp;answer={answer._id}{/answer}{?issue}&amp;issue={issue._id}{/issue}{^isIssueEntry}{?opinion}&amp;opinion={opinion._id}{/opinion}{/isIssueEntry}" role="tab">
+<li><a href="{wikiBaseUrl}{paths.wiki.opinions.create}?{^isIssueEntry}{?opinion}opinion={opinion._id}{:else}{entry.objectName}={entry._id}{/opinion}{:else}{entry.objectName}={entry._id}{/isIssueEntry}" role="tab">
     <span class="fa fa-comments-o" aria-hidden="true"></span> New Comment</a></li>

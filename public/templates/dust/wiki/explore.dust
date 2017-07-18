@@ -28,6 +28,7 @@
         </div>
         &nbsp;&nbsp;
         <div class="btn-group" role="group" aria-label="Screening Filter" style="margin-bottom: 5px">
+            <a href="{screening.allUrl}#browse" class="btn btn-{?screening.all}success{:else}default{/screening.all} btn-sm" role="button">All</a>
             <a href="{screening.approvedUrl}#browse" class="btn btn-{?screening.approved}info{:else}default{/screening.approved} btn-sm" role="button">Accepted</a>
             <a href="{screening.pendingUrl}#browse" class="btn btn-{?screening.pending}warning{:else}default{/screening.pending} btn-sm" role="button">Pending</a>
             <a href="{screening.rejectedUrl}#browse" class="btn btn-{?screening.rejected}danger{:else}default{/screening.rejected} btn-sm" role="button">Rejected</a>
