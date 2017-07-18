@@ -62,6 +62,7 @@
             <a href="#" class="text-muted no-underline" title="Good - something that is good or has ethical value" style="margin-right: 10px"><i class="fa fa-thumbs-o-up" aria-hidden="true"></i> <span>Good</span></a>
             <a href="#" class="text-muted no-underline" title="Bad - something that is bad or unethical" style="margin-right: 10px"><i class="fa fa-thumbs-o-down" aria-hidden="true"></i> <span>Bad</span></a>
         {/hasValue}
+        <a href="{wikiBaseUrl}{paths.wiki.visualize}{?topic}/topic/{topic.friendlyUrl}/{topic._id}{:else}{?application}/topic/{application.exploreTopicId}{/application}{/topic}" class="text-muted no-underline" title="Visualize" style="margin-right: 10px"><i class="fa fa-snowflake-o" aria-hidden="true"></i> <span>Visualize</span></a>
         {!<a href="#" class="text-muted no-underline" title="Timeline"><i class="fa fa-home" aria-hidden="true"></i><span class="hidden-xxs"> Timeline</span></a>!}
         {!<a href="#" class="text-muted no-underline"><i class="fa fa-comments" aria-hidden="true"></i><span class="hidden-xxs"> Discussions</span></a>
         <a href="#" class="text-muted no-underline"><i class="fa fa-exclamation-circle" aria-hidden="true"></i><span class="hidden-xxs"> Issues</span></a>
@@ -70,7 +71,10 @@
     </div>
     <div class="dropdown pull-left entry-options">
         <a href="#" class="text-muted dropdown-toggle no-underline" title="See more options"  data-toggle="dropdown" aria-controls="wtTabEntryMore-contents" aria-haspopup="true" aria-expanded="false"><i class="glyphicon glyphicon-option-horizontal" aria-hidden="true"></i><span> more</span></a>
-        {>"dust/wiki/common/entry-more-options" /}
+        <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="wtTabMore" id="wtTabMore-contents">
+            <li class="dropdown-header">More options...</li>
+            {>"dust/wiki/common/entry-more-options" /}
+        </ul>
     </div>
 </div>
 {!<hr class="wt-dotted-line" style="margin-bottom: 15px"/>!}

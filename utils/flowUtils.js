@@ -42,6 +42,9 @@ function appendListExtra(item) {
         item.friendlyUrl = utils.urlify(item.title);
         item.shortTitle = utils.getShortText(item.title);
     }
+    if(item.getType) {
+        item.objectName = getObjectName(item.getType());
+    }
 }
 
 function appendEntryExtra(item) {
@@ -2012,6 +2015,28 @@ function getDbModelByObjectType(type) {
     return null;
 }
 
+function getObjectName(type) {
+    switch (type) {
+        case constants.OBJECT_TYPES.topic:
+            return 'topic';
+        case constants.OBJECT_TYPES.topicLink:
+            return 'topicLink';
+        case constants.OBJECT_TYPES.argument:
+            return 'argument';
+        case constants.OBJECT_TYPES.argumentLink:
+            return 'argumentLink';
+        case constants.OBJECT_TYPES.question:
+            return 'question';
+        case constants.OBJECT_TYPES.answer:
+            return 'answer';
+        case constants.OBJECT_TYPES.issue:
+            return 'issue';
+        case constants.OBJECT_TYPES.opinion:
+            return 'opinion';
+    }
+    return '';
+}
+
 function createOwnerQueryFromModel(model) {
     if(model.issue) {
         return {
@@ -2376,6 +2401,7 @@ module.exports = {
     buildCancelUrl: buildCancelUrl,
     buildParentUrl: buildParentUrl,
     getDbModelByObjectType: getDbModelByObjectType,
+    getObjectName: getObjectName,
     getParent: getParent,
     getCategories: getCategories
 };

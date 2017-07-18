@@ -172,7 +172,7 @@ module.exports = function (router) {
         var model = {};
         setMemberModel(model, req, function () {
             var tab = req.query.tab ? req.query.tab : 'all';
-            var LIMIT = tab === 'all' ? 15 : 0;
+            var LIMIT = tab === 'all' ? 15 : 0; //var LIMIT = req.query.tab ? 25 : 15;
             model.tab = tab;
             model.results = tab !== 'all';
             model.url = '/members/' + model.member.username + '/contributions';

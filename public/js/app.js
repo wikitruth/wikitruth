@@ -85,4 +85,21 @@ $(document).ready(function () {
             }
         });
     }
+
+    $('.wt-entry-reply').popover({
+        placement: 'auto',
+        title: 'Reply with...',
+        html: true,
+        content: $('#entryReplyContent').html(),
+        container: 'body',
+        template: $('#popoverTemplate').html()
+    });
+    $('.wt-entry-options').popover({
+        placement: 'auto',
+        title: 'More options',
+        html: true,
+        content: $('#entryOptionsContent').html(),
+        container: 'body',
+        template: $('#popoverTemplate').html()
+    });
 });

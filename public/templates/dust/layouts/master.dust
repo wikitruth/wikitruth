@@ -76,9 +76,9 @@
                     <li><a href="#/switch?content=1">{?showVerified}<i class="fa fa-circle"></i>{:else}<i class="fa fa-check-circle-o"></i>{/showVerified} Verified</a></li>
                     <li><a href="#/switch?content=2">{^showVerified}<i class="fa fa-star-o"></i>{:else}<i class="fa fa-circle-o"></i>{/showVerified} Latest</a></li>
                     {!<li><a href="#/switch?content=3">{?showEverything}<i class="fa fa-circle"></i>{:else}<i class="fa fa-check-square-o"></i>{/showEverything} Everything</a></li>!}
-                    <li role="separator" class="divider light"></li>
+                    {!<li role="separator" class="divider light"></li>!}
                     {!<li><a href="#"><i class="fa fa-folder-o"></i> <strong>Structured</strong></a></li>!}
-                    <li><a href="{wikiBaseUrl}{paths.wiki.visualize}{?topic}/topic/{topic.friendlyUrl}/{topic._id}{:else}{?application}/topic/{application.exploreTopicId}{/application}{/topic}"><i class="fa fa-snowflake-o"></i> Visualize</a></li>
+                    {!<li><a href="{wikiBaseUrl}{paths.wiki.visualize}{?topic}/topic/{topic.friendlyUrl}/{topic._id}{:else}{?application}/topic/{application.exploreTopicId}{/application}{/topic}"><i class="fa fa-snowflake-o"></i> Visualize</a></li>!}
                     <li role="separator" class="divider"></li>
                     <li class="dropdown-header">Categories</li>
                     {#appCategories}
@@ -93,6 +93,25 @@
                 </ul>
             </div><!--/.sidebar-offcanvas-->
         </div><!--/row-->
+    </div>
+    <div class="wt-popovers hide">
+        <div id="entryReplyContent">
+            <ul class="nav">
+                {>"dust/wiki/common/entry-popover-new-options" /}
+            </ul>
+        </div>
+        <div id="entryOptionsContent">
+            <ul class="nav">
+                {>"dust/wiki/common/entry-popover-more-options" /}
+            </ul>
+        </div>
+        <div id="popoverTemplate">
+            <div class="wt-popover popover" role="tooltip">
+                <div class="arrow"></div>
+                <h3 class="popover-title"></h3>
+                <div class="popover-content"></div>
+            </div>
+        </div>
     </div>
     {>"dust/layouts/footer" /}
 

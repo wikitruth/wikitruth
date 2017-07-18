@@ -39,7 +39,6 @@
             <hr class="wt-dotted-line" style="margin-bottom: 15px"/>
         {/hideEntryOptions}
         {@eq key=entry.screening.status value=0}
-            <br/>
             <div class="alert alert-warning" role="alert">
                 {?isEntryOwner}
                     Your post is <strong>Pending Screening</strong> and has not been checked for its quality or potential issues and will be screened soon.
@@ -49,7 +48,6 @@
             </div>
         {/eq}
         {@eq key=entry.screening.status value=2}
-            <br/>
             <div class="alert alert-danger" role="alert">
                 {?isEntryOwner}
                     Sorry! Your post was <strong>Rejected</strong> due to its quality or issues, please check the screening comment for more details.
@@ -61,13 +59,11 @@
         {^issue}
             {^comment}
                 {?topicLink}
-                    <br/>
                     <div class="alert alert-warning" role="alert">
                         <i class="fa fa-share"></i> This is a link to topic <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topicLink.topic.friendlyUrl}/{topicLink.topic._id}">{topicLink.topic.title}</a>
                     </div>
                 {/topicLink}
                 {?argumentLink}
-                    <br/>
                     <div class="alert alert-warning" role="alert">
                         <i class="fa fa-share"></i> This is a link to {contents.argument.entryL} <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/{argumentLink.argument._id}">{argumentLink.argument.title}</a>
                     </div>
