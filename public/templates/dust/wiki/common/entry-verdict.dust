@@ -14,20 +14,36 @@
             &nbsp;<a href="{paths.wiki.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}" title="Edit Outline" class="no-underline"><span class="label label-primary"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit</span></a>
         {/isQuestionOwner}
     {/isContributor}!}
+    {?entry.verdict}
+        {?entry.verdict.label}
+            <a href="{paths.wiki.verdict.update}?{?topic}topic={topic._id}{/topic}{?topicLink}&amp;topicLink={topicLink._id}{/topicLink}{?argument}&amp;argument={argument._id}{/argument}{?argumentLink}&amp;argumentLink={argumentLink._id}{/argumentLink}{?question}&amp;question={question._id}{/question}" title="Update Verdict" class="no-underline">
+                    <span class="label label-{entry.verdict.theme}" title="This content is not yet reviewed, please take caution.">
+                        <i class="fa fa-{entry.verdict.icon}" aria-hidden="true"></i> {entry.verdict.label}
+                    </span>
+            </a>
+        {/entry.verdict.label}
+        {! Topic !}
+        {?verdict.counts.true} <span class="label label-success" title="verified"><i class="fa fa-check-circle"></i> {verdict.counts.true}</span>{/verdict.counts.true}
+        {?verdict.counts.pending} <span class="label label-warning" title="unverified"><i class="fa fa-question-circle"></i> {verdict.counts.pending}</span> {/verdict.counts.pending}
+        {?verdict.counts.false} <span class="label label-danger" title="false"><i class="fa fa-close"></i> {verdict.counts.false}</span>{/verdict.counts.false}
+        {?proArgumentCount}
+            <span class="label label-primary pull-right-x" title="The number of supporting arguments."><i class="fa fa-plus-square"></i> {proArgumentCount} {@eq key=proArgumentCount value=1}pros{:else}pros{/eq}</span>&nbsp;
+        {/proArgumentCount}
+        {?conArgumentCount}
+            <span class="label label-primary pull-right-x" title="The number of opposing arguments."><i class="fa fa-minus-square"></i> {conArgumentCount} {@eq key=conArgumentCount value=1}cons{:else}cons{/eq}</span>&nbsp;
+        {/conArgumentCount}
+        {?argument.typeUX}
+            <span class="label label-{argument.typeUX.theme}"><i class="fa fa-bolt"></i> {argument.typeUX.label}</span>&nbsp;
+        {/argument.typeUX}
+    {/entry.verdict}
+
     {?argument}
         {?argument.verdict.label}
-            <a href="{paths.wiki.verdict.update}?{?argument}argument={argument._id}{/argument}{?question}topic={topic._id}&amp;question={question._id}{/question}" title="Update Verdict" class="no-underline">
+            {!<a href="{paths.wiki.verdict.update}?{?argument}argument={argument._id}{/argument}{?question}topic={topic._id}&amp;question={question._id}{/question}" title="Update Verdict" class="no-underline">
                 <span class="label label-{argument.verdict.theme}" title="This content is not yet reviewed, please take caution.">
                     <i class="fa fa-{argument.verdict.icon}" aria-hidden="true"></i> {argument.verdict.label}
                 </span>
-            </a>&nbsp;
-            {?proArgumentCount}
-                <span class="label label-primary pull-right-x" title="The number of supporting arguments."><i class="fa fa-plus-square"></i> {proArgumentCount} {@eq key=proArgumentCount value=1}pros{:else}pros{/eq}</span>&nbsp;
-            {/proArgumentCount}
-            {?conArgumentCount}
-                <span class="label label-primary pull-right-x" title="The number of opposing arguments."><i class="fa fa-minus-square"></i> {conArgumentCount} {@eq key=conArgumentCount value=1}cons{:else}cons{/eq}</span>&nbsp;
-            {/conArgumentCount}
-
+            </a>&nbsp;!}
             {!&nbsp;<span class="label label-primary"><i class="fa fa-flash"></i>
                 {?proArgumentCount}
                     &nbsp;<i class="fa fa-thumbs-up"></i>{proArgumentCount}
@@ -36,10 +52,6 @@
                     &nbsp;<i class="fa fa-thumbs-down"></i>{conArgumentCount}
                 {/conArgumentCount}
             </span>!}
-
-            {?argument.typeUX}
-                <span class="label label-{argument.typeUX.theme}"><i class="fa fa-bolt"></i> {argument.typeUX.label}</span>&nbsp;
-            {/argument.typeUX}
 
             {!&nbsp;
             <div style="display: inline-block; border-bottom: solid 1px #337ab7; padding-bottom: 1px; border-radius: 3px">
@@ -71,19 +83,8 @@
             &nbsp;<i class="fa fa-question text-warning-x"></i> 1 |
             &nbsp;<i class="fa fa-close text-danger-x"></i> 7</span>!}
         {/argument.verdict.label}
-    {:else}
-        {! Topic !}
-        {?entry.verdict}
-            <a href="{paths.wiki.verdict.update}?{?topic}topic={topic._id}{/topic}{?question}&amp;question={question._id}{/question}" title="Update Verdict" class="no-underline">
-                <span class="label label-{entry.verdict.theme}" title="This content is not yet reviewed, please take caution.">
-                    <i class="fa fa-{entry.verdict.icon}" aria-hidden="true"></i> {entry.verdict.label}
-                </span>
-            </a>
-            {?verdict.counts.true} <span class="label label-success" title="verified"><i class="fa fa-check-circle"></i> {verdict.counts.true}</span>{/verdict.counts.true}
-            {?verdict.counts.pending} <span class="label label-warning" title="unverified"><i class="fa fa-question-circle"></i> {verdict.counts.pending}</span> {/verdict.counts.pending}
-            {?verdict.counts.false} <span class="label label-danger" title="false"><i class="fa fa-close"></i> {verdict.counts.false}</span>{/verdict.counts.false}
-        {/entry.verdict}
     {/argument}
+
     {#tagLabels} <span class="label label-info"><i class="fa fa-tag"></i> {text}</span>{/tagLabels}
     {?linkCount} <span class="label label-info pull-right-x"><i class="fa fa-link"></i> {linkCount}</span>{/linkCount}
     {^username}
