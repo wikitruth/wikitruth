@@ -1,11 +1,11 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    MongoDB Backup & Restore - {titleSlogan}
+    Data Management - {titleSlogan}
 {/title}
 
 {<body}
-    <div class="page-header"><h1>MongoDB Backup & Restore</h1></div>
+    <div class="page-header"><h1>Data Management</h1></div>
     <h4>Backup Dir:<br/>{dirname}<br/><br/>Private Backup Dir:<br/>{privateDirname}</h4>
     <br/>
     <form method="post">

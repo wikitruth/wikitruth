@@ -56,55 +56,54 @@ function GET_entry(req, res) {
     flowUtils.setTopicModels(req, model, function () {
         if(!model.topic || !flowUtils.isEntryOnIntendedUrl(req, model.topic)) return res.redirect('/');
         if(!req.query.topic) req.query.topic = model.topic._id;
-
+        flowUtils.setModelOwnerEntry(req, model);
         async.parallel({
             categories: function(callback) {
                 if(model.mainTopic) {
-                db.Topic
-                    .find({parentId: model.topic._id, 'screening.status': constants.SCREENING_STATUS.status1.code })
-                    .sort({title: 1})
-                    .lean()
-                    .exec(function (err, results) {
-                        async.each(results, function(result, callback) {
-                            result.friendlyUrl = utils.urlify(result.title);
-                            //result.comments = utils.numberWithCommas(utils.randomInt(1, 100000));
-                            db.Topic
-                                .find( { parentId: result._id } )
-                                .limit(3)
-                                .sort({ title: 1 })
-                                .lean()
-                                .exec(function(err, subtopics) {
-                                    if(subtopics.length > 0) {
-                                        subtopics.forEach(function (subtopic) {
-                                            subtopic.friendlyUrl = utils.urlify(subtopic.title);
-                                            subtopic.shortTitle = utils.getShortText(subtopic.contextTitle ? subtopic.contextTitle : subtopic.title, constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN);
-                                        });
-                                        result.subtopics = subtopics;
-                                        callback();
-                                    } else {
-                                        // if subtopics are less than 3, get some arguments
-                                        var query = {
-                                            parentId: null,
-                                            ownerId: result._id,
-                                            ownerType: constants.OBJECT_TYPES.topic,
-                                            'screening.status': constants.SCREENING_STATUS.status1.code
-                                        };
-                                        flowUtils.getArguments(query, 3, function (err, subarguments) {
-                                            subarguments.forEach(function (subargument) {
-                                                flowUtils.setVerdictModel(subargument);
-                                                subargument.shortTitle = utils.getShortText(subargument.contextTitle ? subargument.contextTitle : subargument.title, constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN);
+                    db.Topic
+                        .find({parentId: model.topic._id, 'screening.status': constants.SCREENING_STATUS.status1.code })
+                        .sort({title: 1})
+                        .lean()
+                        .exec(function (err, results) {
+                            async.each(results, function(result, callback) {
+                                result.friendlyUrl = utils.urlify(result.title);
+                                db.Topic
+                                    .find( { parentId: result._id } )
+                                    .limit(3)
+                                    .sort({ title: 1 })
+                                    .lean()
+                                    .exec(function(err, subtopics) {
+                                        if(subtopics.length > 0) {
+                                            subtopics.forEach(function (subtopic) {
+                                                subtopic.friendlyUrl = utils.urlify(subtopic.title);
+                                                subtopic.shortTitle = utils.getShortText(subtopic.contextTitle ? subtopic.contextTitle : subtopic.title, constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN);
                                             });
-                                            flowUtils.sortArguments(subarguments);
-                                            result.subarguments = subarguments;
+                                            result.subtopics = subtopics;
                                             callback();
-                                        });
-                                    }
-                                });
-                        }, function(err) {
-                            model.categories = results;
-                            callback();
+                                        } else {
+                                            // if subtopics are less than 3, get some arguments
+                                            var query = {
+                                                parentId: null,
+                                                ownerId: result._id,
+                                                ownerType: constants.OBJECT_TYPES.topic,
+                                                'screening.status': constants.SCREENING_STATUS.status1.code
+                                            };
+                                            flowUtils.getArguments(query, 3, function (err, subarguments) {
+                                                subarguments.forEach(function (subargument) {
+                                                    flowUtils.setVerdictModel(subargument);
+                                                    subargument.shortTitle = utils.getShortText(subargument.contextTitle ? subargument.contextTitle : subargument.title, constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN);
+                                                });
+                                                flowUtils.sortArguments(subarguments);
+                                                result.subarguments = subarguments;
+                                                callback();
+                                            });
+                                        }
+                                    });
+                            }, function(err) {
+                                model.categories = results;
+                                callback();
+                            });
                         });
-                    });
                 } else {
                     callback();
                 }
@@ -214,7 +213,6 @@ function GET_entry(req, res) {
                 flowUtils.getTopOpinions(query, model, callback);
             }
         }, function (err, results) {
-            flowUtils.setModelOwnerEntry(req, model);
             res.render(templates.wiki.topics.entry, model);
         });
     });
@@ -345,6 +343,100 @@ function GET_link_entry(req, res) {
         }
 
         async.parallel({
+            topics: function(callback) {
+                // Top Subtopics
+                var query = { parentId: model.topicLink.topicId, 'screening.status': constants.SCREENING_STATUS.status1.code };
+                flowUtils.getTopics(query, 15, function (err, results) {
+                    model.topics = results;
+                    model.keyTopics = results.filter(function (result) {
+                        return result.tags.indexOf(constants.TOPIC_TAGS.tag20.code) >= 0;
+                    });
+                    if(model.keyTopics.length > 0) {
+                        model.hasKeyEntries = true;
+                    }
+                    callback();
+                });
+            },
+            links: function (callback) {
+                // Top Linked Topics
+                var query = { topicId: model.topicLink.topicId, 'screening.status': constants.SCREENING_STATUS.status1.code };
+                db.TopicLink
+                    .find(query)
+                    .lean()
+                    .exec(function(err, links) {
+                        if(links.length > 0) {
+                            model.linkCount = links.length + 1;
+                            var ids = links.map(function (link) {
+                                return link.parentId;
+                            });
+                            var query = {
+                                _id: {
+                                    $in: ids
+                                }
+                            };
+                            db.Topic
+                                .find(query)
+                                .sort({title: 1})
+                                .lean()
+                                .exec(function (err, results) {
+                                    if (results.length > 0) {
+                                        model.topicLinks = results;
+                                        results.forEach(function (result) {
+                                            result.friendlyUrl = utils.urlify(result.title);
+                                            var link = links.find(function (link) {
+                                                return link.topicId.equals(result._id);
+                                            });
+                                            if (link) {
+                                                result.link = link;
+                                            }
+                                        });
+                                    }
+                                    callback();
+                                });
+                        } else {
+                            callback();
+                        }
+                    });
+            },
+            arguments: function(callback) {
+                // Top Arguments
+                var query = {
+                    parentId: null,
+                    ownerId: model.topicLink.topicId,
+                    ownerType: constants.OBJECT_TYPES.topic,
+                    'screening.status': constants.SCREENING_STATUS.status1.code
+                };
+                flowUtils.getArguments(query, 0, function (err, results) {
+                    results.forEach(function (result) {
+                        flowUtils.setVerdictModel(result);
+                    });
+                    flowUtils.sortArguments(results);
+                    model.arguments = results.slice(0, 15);
+                    model.keyArguments = results.filter(function (result) {
+                        return result.tags.indexOf(constants.ARGUMENT_TAGS.tag20.code) >= 0;
+                    });
+                    if(model.keyArguments.length > 0) {
+                        model.hasKeyEntries = true;
+                    }
+                    model.verdict = {
+                        counts: flowUtils.getVerdictCount(results)
+                    };
+                    callback(null, results);
+                });
+            },
+            questions: function (callback) {
+                // Top Questions
+                var query = { ownerId: model.topicLink.topicId, ownerType: constants.OBJECT_TYPES.topic, 'screening.status': constants.SCREENING_STATUS.status1.code };
+                db.Question.find(query).limit(15).exec(function(err, results) {
+                    flowUtils.setEditorsUsername(results, function() {
+                        results.forEach(function (result) {
+                            flowUtils.appendEntryExtra(result);
+                        });
+                        model.questions = results;
+                        callback();
+                    });
+                });
+            },
             issues: function (callback) {
                 // Top Issues
                 var query = { ownerId: ownerQuery.ownerId, ownerType: ownerQuery.ownerType, 'screening.status': constants.SCREENING_STATUS.status1.code };

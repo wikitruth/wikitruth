@@ -617,7 +617,6 @@ function setTopicLinkModel(req, model, callback) {
             topicLink: function (callback) {
                 db.TopicLink.findOne({_id: req.query.topicLink}, function(err, result) {
                     model.topicLink = result;
-                    appendEntryExtra(result);
                     if(isEntryOwner(req, result)) {
                         model.isTopicLinkOwner = true;
                     }
@@ -628,11 +627,13 @@ function setTopicLinkModel(req, model, callback) {
                 if(model.topicLink) {
                     db.Topic.findOne({_id: model.topicLink.topicId}, function (err, result) {
                         if (result) {
-                            appendEntryExtra(result);
                             model.topicLink.topic = result;
                             model.topicLink.references = result.references;
+                            model.topicLink.referenceDate = result.referenceDate;
                             model.topicLink.title2 = model.topicLink.title ? model.topicLink.title : result.title;
                             model.topicLink.content2 = result.content;
+                            appendEntryExtra(result);
+                            appendEntryExtra(model.topicLink);
                         }
                         callback();
                     });
@@ -1926,14 +1927,12 @@ function setModelOwnerEntry(req, model, options) {
         model.entry = model.argumentLink;
         model.entryType = constants.OBJECT_TYPES.argumentLink;
         model.isEntryOwner = model.isArgumentLinkOwner;
-        if(!options.hideClipboard)
-            setClipboardModel(req, model, constants.OBJECT_TYPES.argumentLink);
+        if(!options.hideClipboard) setClipboardModel(req, model, constants.OBJECT_TYPES.argumentLink);
     } else if(model.argument) {
         model.entry = model.argument;
         model.entryType = constants.OBJECT_TYPES.argument;
         model.isEntryOwner = model.isArgumentOwner;
-        if(!options.hideClipboard)
-            setClipboardModel(req, model, constants.OBJECT_TYPES.argument);
+        if(!options.hideClipboard) setClipboardModel(req, model, constants.OBJECT_TYPES.argument);
         setVerdictModel(model.argument);
         // Argument Tags
         var tags = model.argument.tags;
@@ -1958,14 +1957,34 @@ function setModelOwnerEntry(req, model, options) {
         model.entry = model.topicLink;
         model.entryType = constants.OBJECT_TYPES.topicLink;
         model.isEntryOwner = model.isTopicLinkOwner;
-        if(!options.hideClipboard)
-            setClipboardModel(req, model, constants.OBJECT_TYPES.topicLink);
+        if(!options.hideClipboard) setClipboardModel(req, model, constants.OBJECT_TYPES.topicLink);
+        setVerdictModel(model.topicLink);
+        // Topic Tags
+        var topicLinkTags = model.topicLink.topic.tags;
+        if(topicLinkTags && topicLinkTags.length > 0) {
+            var topicLinkTagLabels = [];
+            if(model.topicLink.topic.ethicalStatus.hasValue) {
+                topicLinkTagLabels.push(constants.TOPIC_TAGS.tag10);
+                model.hasValue = true;
+            }
+            topicLinkTags.forEach(function (tag) {
+                topicLinkTagLabels.push(constants.TOPIC_TAGS['tag' + tag]);
+                if(tag === constants.TOPIC_TAGS.tag520.code) {
+                    model.mainTopic = true;
+                }
+                if(!model.hasValue && tag === constants.ARGUMENT_TAGS.tag10.code) {
+                    model.hasValue = true;
+                }
+            });
+            model.tagLabels = topicLinkTagLabels;
+        } else if(model.topicLink.topic.ethicalStatus.hasValue) {
+            model.hasValue = true;
+        }
     } else if(model.topic) {
         model.entry = model.topic;
         model.entryType = constants.OBJECT_TYPES.topic;
         model.isEntryOwner = model.isTopicOwner;
-        if(!options.hideClipboard)
-            setClipboardModel(req, model, constants.OBJECT_TYPES.topic);
+        if(!options.hideClipboard) setClipboardModel(req, model, constants.OBJECT_TYPES.topic);
         setVerdictModel(model.topic);
         // Topic Tags
         var topicTags = model.topic.tags;

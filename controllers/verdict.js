@@ -11,8 +11,12 @@ function createReturnUrl(req, model) {
     switch (model.entryType) {
         case constants.OBJECT_TYPES.topic:
             return model.wikiBaseUrl + paths.wiki.topics.entry + '/' + utils.urlify(model.entry.title) + '/' + model.entry._id;
+        case constants.OBJECT_TYPES.topicLink:
+            return model.wikiBaseUrl + paths.wiki.topics.entry + '/' + utils.urlify(model.entry.topic.title) + '/link/' + model.entry._id;
         case constants.OBJECT_TYPES.argument:
             return model.wikiBaseUrl + paths.wiki.arguments.entry + '/' + utils.urlify(model.entry.title) + '/' + req.query.argument;
+        case constants.OBJECT_TYPES.argumentLink:
+            return model.wikiBaseUrl + paths.wiki.arguments.entry + '/' + utils.urlify(model.entry.argument.title) + '/link/' + req.query.argument;
         default:
             return model.wikiBaseUrl + paths.wiki[constants.OBJECT_NAMES_MAP[model.ownerType]].entry + '/' + utils.urlify(model.entry.title) + '/' + model.entry._id;
     }
