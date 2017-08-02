@@ -132,6 +132,13 @@
                 </div>
                 <div class="checkbox">
                     <label>
+                        <input type="checkbox" class="topicTag" name="topicTags" value="567">
+                        <span class="text-info"><strong>List</strong></span><br/>
+                        A list of topics or facts
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
                         <input type="checkbox" class="topicTag" name="topicTags" value="570">
                         <span class="text-info"><strong>Source</strong></span><br/>
                         A public material (a popular claim) or a reference material (source)

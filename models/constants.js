@@ -304,9 +304,13 @@ var TOPIC_TAGS = {
         code: 565,
         text: "Idea"
     },
+    tag567: {
+        code: 567,
+        text: "List" // FIXME: a list of topics, facts, or both?
+    },
     tag570: {
         code: 570,
-        text: "Source"
+        text: "Source" // FIXME: still needed or should remove this?
     }
 };
 
