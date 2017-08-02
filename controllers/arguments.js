@@ -359,13 +359,6 @@ function GET_link_entry(req, res) {
             return res.redirect('/');
         }
 
-        if (model.argumentLink) {
-            if (!flowUtils.isEntryOwner(req, model.argumentLink)) {
-                // VALIDATION: non-owners cannot update other's entry
-                return res.redirect(createCancelUrl(req));
-            }
-        }
-
         async.parallel({
             issues: function (callback) {
                 // Top Issues

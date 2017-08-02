@@ -40,9 +40,7 @@ function GET_index(req, res) {
             });
         }
     }, function (err, results) {
-        if(!model.topic || !flowUtils.isEntryOnIntendedUrl(req, model.topic)) {
-            return res.redirect('/');
-        }
+        if(!model.topic || !flowUtils.isEntryOnIntendedUrl(req, model.topic)) return res.redirect('/');
         flowUtils.setScreeningModelCount(model, model.topic.childrenCount.topics);
         flowUtils.setModelOwnerEntry(req, model);
         res.render(templates.wiki.topics.index, model);
@@ -54,9 +52,11 @@ function GET_entry(req, res) {
     var model = {};
     flowUtils.ensureEntryIdParam(req, 'topic');
     flowUtils.setTopicModels(req, model, function () {
+
         if(!model.topic || !flowUtils.isEntryOnIntendedUrl(req, model.topic)) return res.redirect('/');
         if(!req.query.topic) req.query.topic = model.topic._id;
         flowUtils.setModelOwnerEntry(req, model);
+
         async.parallel({
             categories: function(callback) {
                 if(model.mainTopic) {
@@ -333,13 +333,6 @@ function GET_link_entry(req, res) {
     flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
         if (!flowUtils.isEntryOnIntendedUrl(req, model.topicLink)) {
             return res.redirect('/');
-        }
-
-        if(model.topicLink) {
-            if(!flowUtils.isEntryOwner(req, model.topicLink)) {
-                // VALIDATION: non-owners cannot update other's entry
-                return res.redirect(createCancelUrl(req));
-            }
         }
 
         async.parallel({

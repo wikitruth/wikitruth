@@ -56,20 +56,16 @@
                 {/isEntryOwner}
             </div>
         {/eq}
-        {^issue}
-            {^comment}
-                {?topicLink}
-                    <div class="alert alert-warning" role="alert">
-                        <i class="fa fa-share"></i> This is a link to topic <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topicLink.topic.friendlyUrl}/{topicLink.topic._id}">{topicLink.topic.title}</a>
-                    </div>
-                {/topicLink}
-                {?argumentLink}
-                    <div class="alert alert-warning" role="alert">
-                        <i class="fa fa-share"></i> This is a link to {contents.argument.entryL} <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/{argumentLink.argument._id}">{argumentLink.argument.title}</a>
-                    </div>
-                {/argumentLink}
-            {/comment}
-        {/issue}
+        {?entry.topic}
+            <div class="alert alert-warning" role="alert">
+                <i class="fa fa-share"></i> This is a link to topic <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topicLink.topic.friendlyUrl}/{topicLink.topic._id}">{topicLink.topic.title}</a>
+            </div>
+        {/entry.topic}
+        {?entry.argument}
+            <div class="alert alert-warning" role="alert">
+                <i class="fa fa-share"></i> This is a link to {contents.argument.entryL} <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/{argumentLink.argument._id}">{argumentLink.argument.title}</a>
+            </div>
+        {/entry.argument}
     {:else}
         <hr class="wt-dotted-line" style="margin-bottom: 15px"/>
     {/entry}

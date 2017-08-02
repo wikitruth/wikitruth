@@ -1928,6 +1928,7 @@ function setModelOwnerEntry(req, model, options) {
         model.entryType = constants.OBJECT_TYPES.argumentLink;
         model.isEntryOwner = model.isArgumentLinkOwner;
         if(!options.hideClipboard) setClipboardModel(req, model, constants.OBJECT_TYPES.argumentLink);
+        setVerdictModel(model.argumentLink);
     } else if(model.argument) {
         model.entry = model.argument;
         model.entryType = constants.OBJECT_TYPES.argument;
