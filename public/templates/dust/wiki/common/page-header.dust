@@ -4,10 +4,10 @@
             {entry.title}
             {!{?argument.against} <span class="label label-primary wt-subtitle">opposing</span>{/argument.against}!}
             {?entry.topic}
-                {^entry.title}{entry.topic.title}{/entry.title} <span class="label-x label-warning-x wt-subtitle-x" style="padding: 0; font-size: 18px;"><i class="fa fa-link wt-text-warning"></i></span>
+                {^entry.title}{entry.topic.title}{/entry.title}{! <span class="label-x label-warning-x wt-subtitle-x" style="padding: 0; font-size: 18px;"><i class="fa fa-link wt-text-warning"></i></span>!}
             {/entry.topic}
             {?entry.argument}
-                {^entry.title}{entry.argument.title}{/entry.title} <span class="label-x label-warning-x wt-subtitle-x" style="padding: 0; font-size: 18px;"><i class="fa fa-link wt-text-warning"></i></span>
+                {^entry.title}{entry.argument.title}{/entry.title}{! <span class="label-x label-warning-x wt-subtitle-x" style="padding: 0; font-size: 18px;"><i class="fa fa-link wt-text-warning"></i></span>!}
             {/entry.argument}
         {:else}
             {?username}
