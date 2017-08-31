@@ -598,18 +598,6 @@ module.exports = function (router) {
         topicController.GET_index(req, res);
     });
 
-    router.get('/:username/diary/topics/:friendlyUrl/:id', function (req, res) {
-        topicController.GET_index(req, res);
-    });
-
-    router.get('/:username/diary/topic/:friendlyUrl/link/:id', function (req, res) {
-        topicController.GET_link_entry(req, res);
-    });
-
-    router.get('/:username/diary/topic(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
-        topicController.GET_entry(req, res);
-    });
-
     router.get('/:username/diary/topics/create', function (req, res) {
         topicController.GET_create(req, res);
     });
@@ -626,19 +614,23 @@ module.exports = function (router) {
         topicController.POST_link_edit(req, res);
     });
 
+    router.get('/:username/diary/topics/:friendlyUrl/:id', function (req, res) {
+        topicController.GET_index(req, res);
+    });
+
+    router.get('/:username/diary/topic/:friendlyUrl/link/:id', function (req, res) {
+        topicController.GET_link_entry(req, res);
+    });
+
+    router.get('/:username/diary/topic(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        topicController.GET_entry(req, res);
+    });
+
 
     /* Diary Arguments */
 
     router.get('/:username/diary/arguments', function (req, res) {
         argumentController.GET_index(req, res);
-    });
-
-    router.get('/:username/diary/argument/:friendlyUrl/link/:id', function (req, res) {
-        argumentController.GET_link_entry(req, res);
-    });
-
-    router.get('/:username/diary/argument(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
-        argumentController.GET_entry(req, res);
     });
 
     router.get('/:username/diary/arguments/create', function (req, res) {
@@ -657,15 +649,19 @@ module.exports = function (router) {
         argumentController.POST_link_edit(req, res);
     });
 
+    router.get('/:username/diary/argument/:friendlyUrl/link/:id', function (req, res) {
+        argumentController.GET_link_entry(req, res);
+    });
+
+    router.get('/:username/diary/argument(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        argumentController.GET_entry(req, res);
+    });
+
 
     /* Diary Questions */
 
     router.get('/:username/diary/questions', function (req, res) {
         questionController.GET_index(req, res);
-    });
-
-    router.get('/:username/diary/question(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
-        questionController.GET_entry(req, res);
     });
 
     router.get('/:username/diary/questions/create', function (req, res) {
@@ -676,15 +672,15 @@ module.exports = function (router) {
         questionController.POST_create(req, res);
     });
 
+    router.get('/:username/diary/question(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        questionController.GET_entry(req, res);
+    });
+
 
     /* Diary Answers */
 
     router.get('/:username/diary/answers', function (req, res) {
         answerController.GET_index(req, res);
-    });
-
-    router.get('/:username/diary/answer(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
-        answerController.GET_entry(req, res);
     });
 
     router.get('/:username/diary/answers/create', function (req, res) {
@@ -695,15 +691,15 @@ module.exports = function (router) {
         answerController.POST_create(req, res);
     });
 
+    router.get('/:username/diary/answer(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        answerController.GET_entry(req, res);
+    });
+
 
     /* Diary Issues */
 
     router.get('/:username/diary/issues', function (req, res) {
         issueController.GET_index(req, res);
-    });
-
-    router.get('/:username/diary/issue(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
-        issueController.GET_entry(req, res);
     });
 
     router.get('/:username/diary/issues/create', function (req, res) {
@@ -714,15 +710,15 @@ module.exports = function (router) {
         issueController.POST_create(req, res);
     });
 
+    router.get('/:username/diary/issue(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        issueController.GET_entry(req, res);
+    });
+
 
     /* Diary Opinions */
 
     router.get('/:username/diary/opinions', function (req, res) {
         opinionController.GET_index(req, res);
-    });
-
-    router.get('/:username/diary/opinion(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
-        opinionController.GET_entry(req, res);
     });
 
     router.get('/:username/diary/opinions/create', function (req, res) {
@@ -731,5 +727,9 @@ module.exports = function (router) {
 
     router.post('/:username/diary/opinions/create', function (req, res) {
         opinionController.POST_create(req, res);
+    });
+
+    router.get('/:username/diary/opinion(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        opinionController.GET_entry(req, res);
     });
 };
