@@ -52,11 +52,11 @@ exports.mongodb = {
   },
   gitBackupX: {
     signature: {
-      name: 'Daniel Salunga',
-      email: 'dsalunga@live.com'
+      name: 'FirstName LastName',
+      email: 'your@email.com'
     },
     branch: 'test',
-    remote: 'dsalunga'
+    remote: 'origin'
   },
   privateGitBackupX: { // private data won't be committed if this is not present
     signature: {
