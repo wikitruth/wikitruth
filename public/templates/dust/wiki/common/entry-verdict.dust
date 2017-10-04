@@ -24,17 +24,11 @@
         {/entry.verdict.label}
         {! Topic !}
         {?verdict.counts.true} <span class="label label-success" title="verified"><i class="fa fa-check-circle"></i> {verdict.counts.true}</span>{/verdict.counts.true}
-        {?verdict.counts.pending} <span class="label label-warning" title="unverified"><i class="fa fa-question-circle"></i> {verdict.counts.pending}</span> {/verdict.counts.pending}
+        {?verdict.counts.pending} <span class="label label-warning" title="unverified"><i class="fa fa-question-circle"></i> {verdict.counts.pending}</span>{/verdict.counts.pending}
         {?verdict.counts.false} <span class="label label-danger" title="false"><i class="fa fa-close"></i> {verdict.counts.false}</span>{/verdict.counts.false}
-        {?proArgumentCount}
-            <span class="label label-primary pull-right-x" title="The number of supporting arguments."><i class="fa fa-plus-square"></i> {proArgumentCount} {@eq key=proArgumentCount value=1}pros{:else}pros{/eq}</span>&nbsp;
-        {/proArgumentCount}
-        {?conArgumentCount}
-            <span class="label label-primary pull-right-x" title="The number of opposing arguments."><i class="fa fa-minus-square"></i> {conArgumentCount} {@eq key=conArgumentCount value=1}cons{:else}cons{/eq}</span>&nbsp;
-        {/conArgumentCount}
-        {?argument.typeUX}
-            <span class="label label-{argument.typeUX.theme}"><i class="fa fa-bolt"></i> {argument.typeUX.label}</span>&nbsp;
-        {/argument.typeUX}
+        {?proArgumentCount} <span class="label label-primary pull-right-x" title="The number of supporting arguments."><i class="fa fa-plus-square"></i> {proArgumentCount} {@eq key=proArgumentCount value=1}pros{:else}pros{/eq}</span>{/proArgumentCount}
+        {?conArgumentCount} <span class="label label-primary pull-right-x" title="The number of opposing arguments."><i class="fa fa-minus-square"></i> {conArgumentCount} {@eq key=conArgumentCount value=1}cons{:else}cons{/eq}</span>{/conArgumentCount}
+        {?argument.typeUX} <span class="label label-{argument.typeUX.theme}"><i class="fa fa-bolt"></i> {argument.typeUX.label}</span>{/argument.typeUX}
     {/entry.verdict}
 
     {?argument}
