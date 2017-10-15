@@ -25,12 +25,12 @@
     {?arguments}
         <div class="wt-list">
             {?proArguments}
-            <ul class="list-group top-list-items">
-                <li class="list-group-item highlight text-primary"><i class="glyphicon glyphicon-flash" aria-hidden="true"></i> Supporting {contents.argument.shortList} <span class="wt-label label label-default">{proArgumentCount}</span></li>
-                {#proArguments}
-                    {>"dust/wiki/arguments/entry-row" /}
-                {/proArguments}
-            </ul>
+                <ul class="list-group top-list-items">
+                    <li class="list-group-item highlight text-primary"><i class="glyphicon glyphicon-flash" aria-hidden="true"></i> Supporting {contents.argument.shortList} <span class="wt-label label label-default">{proArgumentCount}</span></li>
+                    {#proArguments}
+                        {>"dust/wiki/arguments/entry-row" /}
+                    {/proArguments}
+                </ul>
             {/proArguments}
             {?conArguments}
                 <ul class="list-group top-list-items">

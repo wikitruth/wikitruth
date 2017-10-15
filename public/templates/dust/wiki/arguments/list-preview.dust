@@ -1,0 +1,13 @@
+{?arguments}
+    <div class="wt-list">
+        <ul class="list-group top-list-items">
+            <li class="list-group-item highlight text-primary-x text-muted-x"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> {contents.argument.longList} <span class="wt-label label label-default">{entry.childrenCount.arguments.accepted}</span></li>
+            {#arguments}
+                {>"dust/wiki/arguments/entry-row" /}
+            {/arguments}
+        </ul>
+        {@gt key=entry.childrenCount.arguments.accepted value="15"}
+            <div class="top-list-items-more"><a href="{wikiBaseUrl}{paths.wiki.arguments.index}?topic={topic._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{entry.childrenCount.arguments.accepted}</span></a></div>
+        {/gt}
+    </div>
+{/arguments}
