@@ -13,22 +13,22 @@
         {/pageTitle}
     </title>
 
-    <link rel="apple-touch-icon" sizes="57x57" href="/img/{application.resPath}favicons/apple-icon-57x57.png">
-    <link rel="apple-touch-icon" sizes="60x60" href="/img/{application.resPath}favicons/apple-icon-60x60.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="/img/{application.resPath}favicons/apple-icon-72x72.png">
-    <link rel="apple-touch-icon" sizes="76x76" href="/img/{application.resPath}favicons/apple-icon-76x76.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="/img/{application.resPath}favicons/apple-icon-114x114.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="/img/{application.resPath}favicons/apple-icon-120x120.png">
-    <link rel="apple-touch-icon" sizes="144x144" href="/img/{application.resPath}favicons/apple-icon-144x144.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="/img/{application.resPath}favicons/apple-icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/img/{application.resPath}favicons/apple-icon-180x180.png">
-    <link rel="icon" type="image/png" sizes="192x192"  href="/img/{application.resPath}favicons/android-icon-192x192.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/img/{application.resPath}favicons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="/img/{application.resPath}favicons/favicon-96x96.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/img/{application.resPath}favicons/favicon-16x16.png">
-    <link rel="manifest" href="/img/{application.resPath}favicons/manifest.json">
+    <link rel="apple-touch-icon" sizes="57x57" href="/img{application.resPath}/favicons/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/img{application.resPath}/favicons/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/img{application.resPath}/favicons/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/img{application.resPath}/favicons/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/img{application.resPath}/favicons/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/img{application.resPath}/favicons/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/img{application.resPath}/favicons/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/img{application.resPath}/favicons/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/img{application.resPath}/favicons/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="/img{application.resPath}/favicons/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/img{application.resPath}/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/img{application.resPath}/favicons/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img{application.resPath}/favicons/favicon-16x16.png">
+    <link rel="manifest" href="/img{application.resPath}/favicons/manifest.json">
     <meta name="msapplication-TileColor" content="#ffffff">
-    <meta name="msapplication-TileImage" content="/img/{application.resPath}favicons/ms-icon-144x144.png">
+    <meta name="msapplication-TileImage" content="/img{application.resPath}/favicons/ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">
 
     <!-- Bootstrap -->
@@ -60,11 +60,11 @@
     <div class="container-fluid">
         <div class="row row-offcanvas row-offcanvas-right">
 
-            <div class="col-sm-12 col-md-9">
+            <div class="col-sm-12 col-md-9 col-lg-9-x">
                 {+body /}
             </div><!--/.col-xs-12.col-sm-9-->
 
-            <div class="col-xs-7-x col-sm-4 col-md-3 visible-md visible-lg sidebar-offcanvas" id="sidebar">
+            <div class="col-xs-7-x col-sm-4 col-md-3 col-lg-3-x visible-md visible-lg sidebar-offcanvas" id="sidebar">
                 {!<div class="list-group">
                     <a href="{?application}{application.exploreUrl}{:else}{paths.wiki.index}{/application}" class="list-group-item active">Explore</a>
                     {#appCategories}
@@ -79,6 +79,29 @@
                     {!<li role="separator" class="divider light"></li>!}
                     {!<li><a href="#"><i class="fa fa-folder-o"></i> <strong>Structured</strong></a></li>!}
                     {!<li><a href="{wikiBaseUrl}{paths.wiki.visualize}{?topic}/topic/{topic.friendlyUrl}/{topic._id}{:else}{?application}/topic/{application.exploreTopicId}{/application}{/topic}"><i class="fa fa-snowflake-o"></i> Visualize</a></li>!}
+                    <li role="separator" class="divider"></li>
+                    <li class="dropdown-header">In this section</li>
+                    <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent topic</a></li>
+                    <li>
+                        <ul class="nav">
+                            <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent child 1</a></li>
+                            <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> <strong>Parent child 2  (current)</strong></a></li>
+                            <li>
+                                <ul class="nav">
+                                    <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent subchild 1</a></li>
+                                    <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent subchild 2</a></li>
+                                    <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> more...</a></li>
+                                </ul>
+                            </li>
+                            <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent child 3</a></li>
+                            <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent child 4</a></li>
+                            <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> more...</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent sibling 1</a></li>
+                    <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent sibling 2</a></li>
+                    <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent sibling 3</a></li>
+                    <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> more...</a></li>
                     <li role="separator" class="divider"></li>
                     <li class="dropdown-header">Categories</li>
                     {#appCategories}
