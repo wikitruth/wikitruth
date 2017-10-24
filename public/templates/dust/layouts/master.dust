@@ -80,29 +80,35 @@
                     {!<li><a href="#"><i class="fa fa-folder-o"></i> <strong>Structured</strong></a></li>!}
                     {!<li><a href="{wikiBaseUrl}{paths.wiki.visualize}{?topic}/topic/{topic.friendlyUrl}/{topic._id}{:else}{?application}/topic/{application.exploreTopicId}{/application}{/topic}"><i class="fa fa-snowflake-o"></i> Visualize</a></li>!}
                     <li role="separator" class="divider"></li>
-                    <li class="dropdown-header">In this section</li>
-                    <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent topic</a></li>
-                    <li>
-                        <ul class="nav">
-                            <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent child 1</a></li>
-                            <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> <strong>Parent child 2  (current)</strong></a></li>
-                            <li>
-                                <ul class="nav">
-                                    <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent subchild 1</a></li>
-                                    <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent subchild 2</a></li>
-                                    <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> more...</a></li>
-                                </ul>
-                            </li>
-                            <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent child 3</a></li>
-                            <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent child 4</a></li>
-                            <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> more...</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent sibling 1</a></li>
-                    <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent sibling 2</a></li>
-                    <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent sibling 3</a></li>
-                    <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> more...</a></li>
-                    <li role="separator" class="divider"></li>
+                    {?topic}
+                        <li class="dropdown-header">In this section</li>
+                    {?parentTopic}
+                        <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> {parentTopic.title}</a></li>
+                    {:else}
+                        <li><a href="{paths.wiki.index}"><i class="fa fa-globe text-color-3-x" aria-hidden="true"></i> Explore</a></li>
+                    {/parentTopic}
+                        <li>
+                            <ul class="nav">
+                                <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent child 1</a></li>
+                                <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> <strong>{topic.title}</strong></a></li>
+                                <li>
+                                    <ul class="nav">
+                                        <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent subchild 1</a></li>
+                                        <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent subchild 2</a></li>
+                                        <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> more...</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent child 3</a></li>
+                                <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent child 4</a></li>
+                                <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> more...</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent sibling 1</a></li>
+                        <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent sibling 2</a></li>
+                        <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent sibling 3</a></li>
+                        <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> more...</a></li>
+                        <li role="separator" class="divider"></li>
+                    {/topic}
                     <li class="dropdown-header">Categories</li>
                     {#appCategories}
                         <li><a href="{paths.wiki.topics.entry}/{friendlyUrl}/{_id}"><i class="fa fa-{?icon}{icon}{:else}folder-open{/icon} text-color-3-x" aria-hidden="true"></i> {?contextTitle}{contextTitle}{:else}{title}{/contextTitle}</a></li>
