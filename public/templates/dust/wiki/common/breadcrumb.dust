@@ -55,6 +55,10 @@
         {!<li><a href="{paths.wiki.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">Questions</a></li>!}
         <li><i class="fa fa-question-circle-o text-muted"></i> <a href="{wikiBaseUrl}{paths.wiki.questions.entry}/{question.friendlyUrl}/{question._id}">{question.shortTitle}</a></li>
     {/question}
+    {?artifact}
+    {!<li><a href="{paths.wiki.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">Questions</a></li>!}
+        <li><i class="fa fa-puzzle-piece text-muted"></i> <a href="{wikiBaseUrl}{paths.wiki.artifacts.entry}/{artifact.friendlyUrl}/{artifact._id}">{artifact.shortTitle}</a></li>
+    {/artifact}
     {?answer}
     {!<li><a href="{paths.wiki.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}">Questions</a></li>!}
         <li><i class="fa fa-check-circle-o text-muted"></i> <a href="{wikiBaseUrl}{paths.wiki.answers.entry}/{answer.friendlyUrl}/{answer._id}">{answer.shortTitle}</a></li>

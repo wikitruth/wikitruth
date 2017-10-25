@@ -1,0 +1,60 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {artifact.title} - {titleSlogan}
+{/title}
+
+{<body}
+    {>"dust/wiki/common/entry-header" tab="overview" /}
+    <div class="text-body collapsible">
+        {artifact.content|s}
+        <a href="#" onclick="return contentSeeMore()" class="content-see-more hidden">
+            <div class="content-see-more-gradient"></div>
+            <div class="content-see-more-text">See more</div>
+        </a>
+    </div>
+    {?artifact.file.name}
+        <div class="text-body">
+            {?artifact.thumbnailPath}
+                <div>
+                    <a href="{artifact.filePath}" target="_blank" title="Click to open original file">
+                        <img src="{artifact.thumbnailPath}"/>
+                    </a>
+                </div>
+            {/artifact.thumbnailPath}
+            <p class="help-block">File: {artifact.file.name}, {artifact.file.type}, {artifact.file.size}, {artifact.file.lastModifiedDate} <a href="{artifact.filePath}" class="no-underline" target="_blank" title="Click to open/download original file"><i class="fa fa-download"></i> Download</a></p>
+        </div>
+    {/artifact.file.name}
+    {?topic}
+        <div class="wt-related">
+            <span title="Related Topics">Topics</span>&nbsp;
+            <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}"><span class="wt-label label label-default">{topic.title}</span></a>&nbsp;
+            {#topicLinks}
+                <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}"><span class="wt-label label label-default">{title}</span></a>&nbsp;
+            {/topicLinks}
+        </div>
+    {/topic}
+    {>"dust/wiki/artifacts/list-preview" /}
+    {>"dust/wiki/arguments/list-preview" /}
+    {>"dust/wiki/questions/list-preview" /}
+    {>"dust/wiki/issues/list-preview" /}
+    {>"dust/wiki/opinions/list-preview" /}
+    {>"dust/wiki/common/entry-footer" /}
+{/body}
+
+{<footer}
+    <script>
+        function contentSeeMore() {
+            $('.text-body').css('max-height', 'none');
+            $('.content-see-more').css('display', 'none');
+            return false;
+        }
+
+        $(function() {
+            if($('.text-body').css('height') === $('.text-body').css('max-height')) {
+                $('.content-see-more').removeClass('hidden');
+            }
+        });
+    </script>
+    {>"dust/common/geopattern-title-scripts" /}
+{/footer}

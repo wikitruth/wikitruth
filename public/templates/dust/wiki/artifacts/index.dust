@@ -1,0 +1,22 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {?topic}{topic.title}: Artifacts{:else}Top Artifacts{/topic} - {titleSlogan}
+{/title}
+
+{<body}
+    {?topic}
+        {>"dust/wiki/common/entry-header" tab="artifacts" /}
+    {:else}
+        {>"dust/wiki/common/index-header" tab="top-artifacts" /}
+    {/topic}
+    {>"dust/wiki/common/screening-selector" /}
+    {?artifacts}
+        <ul class="list-group wt-list">
+            <li class="list-group-item highlight"><i class="fa fa-puzzle-piece text-muted" aria-hidden="true"></i> {^topic}Latest {/topic}Artifacts</li>
+            {#artifacts}
+                {>"dust/wiki/artifacts/entry-row" /}
+            {/artifacts}
+        </ul>
+    {/artifacts}
+{/body}

@@ -71,11 +71,15 @@ function appendEntryExtra(item) {
     }
 }
 
+/*
+    items: items to which to set the parents
+    typeId: the typeId of the items
+ */
 function setEntryParents(items, typeId, callback) {
     if(!items || items.length === 0) { return callback(); }
 
-    var topicIds = [], topicLinkIds = [], argumentIds = [], argumentLinkIds = [], questionIds = [], answerIds =[], issueIds = [], opinionIds = [];
-    var topics = {}, topicLinks = {}, args = {}, argumentLinks = {}, questions = {}, answers = {}, issues = {}, opinions = {};
+    var topicIds = [], topicLinkIds = [], argumentIds = [], argumentLinkIds = [], artifactIds = [], questionIds = [], answerIds =[], issueIds = [], opinionIds = [];
+    var topics = {}, topicLinks = {}, args = {}, argumentLinks = {}, artifacts={}, questions = {}, answers = {}, issues = {}, opinions = {};
     switch (typeId) {
         case constants.OBJECT_TYPES.topic:
             items.forEach(function (item) {
@@ -88,6 +92,15 @@ function setEntryParents(items, typeId, callback) {
             items.forEach(function (item) {
                 if(item.parentId && !argumentIds[item.parentId.valueOf()]) {
                     argumentIds.push(item.parentId.valueOf());
+                } else if(!topicIds[item.ownerId.valueOf()]){
+                    topicIds.push(item.ownerId.valueOf());
+                }
+            });
+            break;
+        case constants.OBJECT_TYPES.artifact:
+            items.forEach(function (item) {
+                if(item.parentId && !artifactIds[item.parentId.valueOf()]) {
+                    artifactIds.push(item.parentId.valueOf());
                 } else if(!topicIds[item.ownerId.valueOf()]){
                     topicIds.push(item.ownerId.valueOf());
                 }
@@ -252,6 +265,22 @@ function setEntryParents(items, typeId, callback) {
                 callback();
             }
         },
+        artifacts: function (callback) {
+            if(artifactIds.length > 0) {
+                var query = {_id: {$in: artifactIds}};
+                db.Artifact
+                    .find(query)
+                    .exec(function (err, results) {
+                        results.forEach(function (result) {
+                            appendListExtra(result);
+                            artifacts[result._id.valueOf()] = result;
+                        });
+                        callback();
+                    });
+            } else {
+                callback();
+            }
+        },
         issues: function (callback) {
             if(issueIds.length > 0) {
                 var query = {_id: {$in: issueIds}};
@@ -309,6 +338,7 @@ function setEntryParents(items, typeId, callback) {
                 });
                 break;
             case constants.OBJECT_TYPES.question:
+            case constants.OBJECT_TYPES.artifact:
             case constants.OBJECT_TYPES.issue:
             case constants.OBJECT_TYPES.opinion:
                 items.forEach(function (item) {
@@ -324,6 +354,9 @@ function setEntryParents(items, typeId, callback) {
                             break;
                         case constants.OBJECT_TYPES.argumentLink:
                             item.parentArgumentLink = argumentLinks[item.ownerId.valueOf()];
+                            break;
+                        case constants.OBJECT_TYPES.artifact:
+                            item.parentArtifact = artifacts[item.ownerId.valueOf()];
                             break;
                         case constants.OBJECT_TYPES.question:
                             item.parentQuestion = questions[item.ownerId.valueOf()];
@@ -409,6 +442,27 @@ function setUsername(item, callback) {
             setEditUsername(item, callback);
         }
     });
+}
+
+function setArtifactModel(req, model, callback) {
+    if(req.query.artifact) {
+        db.Artifact.findOne({_id: req.query.artifact}, function (err, result) {
+            model.artifact = result;
+            if(result.file.name) {
+                result.filePath = result.getFilePath();
+                if(result.isImage()) {
+                    result.thumbnailPath = result.getThumbnailPath();
+                }
+            }
+            appendEntryExtra(result);
+            if(isEntryOwner(req, result)) {
+                model.isArtifactOwner = true;
+            }
+            setUsername(result, callback);
+        });
+    } else {
+        callback();
+    }
 }
 
 function setQuestionModel(req, model, callback) {
@@ -737,6 +791,11 @@ function setEntryModels(query, req, model, callback) {
             var q = model.argumentLink.parentId ? { ownerType: constants.OBJECT_TYPES.argument, ownerId: model.argumentLink.parentId } : model.argumentLink;
             setEntryModels(q, req, model, callback);
         });
+    } else if(query.ownerType === constants.OBJECT_TYPES.artifact) {
+        req.query.artifact = query.ownerId;
+        setArtifactModel(req, model, function () {
+            setEntryModels(model.artifact, req, model, callback);
+        });
     } else if(query.ownerType === constants.OBJECT_TYPES.question) {
         req.query.question = query.ownerId;
         setQuestionModel(req, model, function () {
@@ -985,6 +1044,23 @@ function getArguments(query, limit, callback) {
     });
 }
 
+function getTopArtifacts(query, model, callback) {
+    db.Artifact
+        .find(query)
+        .limit(15)
+        .lean()
+        .sort({ title: 1 })
+        .exec(function(err, results) {
+            setEditorsUsername(results, function() {
+                results.forEach(function (result) {
+                    appendEntryExtra(result);
+                });
+                model.artifacts = results;
+                callback();
+            });
+        });
+}
+
 function getTopIssues(query, model, callback) {
     db.Issue
         .find(query)
@@ -1104,6 +1180,40 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
                 }
             }, function (err, results) {
                 args.total = args.accepted + args.pending + args.rejected;
+                callback();
+            });
+        } else {
+            callback();
+        }
+    };
+    var updateArtifacts = function (callback) {
+        if(!specificEntryType || specificEntryType === constants.OBJECT_TYPES.artifact) {
+            var artifacts = countNode.childrenCount.artifacts;
+            var q = { ownerId: model.artifact ? model.artifact.ownerId : entryId, parentId: model.artifact ? model.artifact._id : null };
+            async.parallel({
+                accepted: function(callback) {
+                    var query = { ownerId: q.ownerId, parentId: q.parentId, 'screening.status': constants.SCREENING_STATUS.status1.code };
+                    db.Artifact.count(query, function (err, count) {
+                        artifacts.accepted = count;
+                        callback();
+                    });
+                },
+                pending: function(callback) {
+                    var query = { ownerId: q.ownerId, parentId: q.parentId, 'screening.status': constants.SCREENING_STATUS.status0.code };
+                    db.Artifact.count(query, function (err, count) {
+                        artifacts.pending = count;
+                        callback();
+                    });
+                },
+                rejected: function(callback) {
+                    var query = { ownerId: q.ownerId, parentId: q.parentId, 'screening.status': constants.SCREENING_STATUS.status2.code };
+                    db.Artifact.count(query, function (err, count) {
+                        artifacts.rejected = count;
+                        callback();
+                    });
+                }
+            }, function (err, results) {
+                artifacts.total = artifacts.accepted + artifacts.pending + artifacts.rejected;
                 callback();
             });
         } else {
@@ -1239,6 +1349,7 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
                 async.parallel({
                     topics: updateTopics,
                     arguments: updateArguments,
+                    artifacts: updateArtifacts,
                     questions: updateQuestions,
                     issues: updateIssues,
                     opinions: updateOpinions
@@ -1297,6 +1408,26 @@ function updateChildrenCount(entryId, entryType, specificEntryType, callback) {
                     opinions: updateOpinions
                 }, function (err, results) {
                     db.ArgumentLink.update({_id: entryId}, {
+                        $set: countNode
+                    }, function (err, num) {
+                        callback();
+                    });
+                });
+            });
+            break;
+
+        case constants.OBJECT_TYPES.artifact:
+            req = { query: { artifact: entryId } };
+            setEntryModels(createOwnerQueryFromQuery(req), req, model, function () {
+                countNode = { childrenCount: model.artifact.childrenCount };
+                async.parallel({
+                    artifacts: updateArtifacts,
+                    arguments: updateArguments,
+                    questions: updateQuestions,
+                    issues: updateIssues,
+                    opinions: updateOpinions
+                }, function (err, results) {
+                    db.Artifact.update({_id: entryId}, {
                         $set: countNode
                     }, function (err, num) {
                         callback();
@@ -1487,6 +1618,45 @@ function syncChildren(parent, options, callback) {
         });
     };
 
+    var syncChildArtifacts = function (callback) {
+        var parentIsTopic = options.entryType === constants.OBJECT_TYPES.topic;
+        var query = parentIsTopic ? { ownerId: parent._id, ownerType: constants.OBJECT_TYPES.topic } : { parentId: parent._id };
+        db.Artifact.find(query, function (err, children) {
+            if(children.length === 0) return callback();
+            async.each(children, function (child, callback) {
+                var categoryChanged = false, oldCategoryId = child.categoryId;
+                if(!parentIsTopic) {
+                    child.ownerId = parent.ownerId;
+                    child.ownerType = parent.ownerType;
+                }
+                async.series({
+                    syncCategoryId: function (callback) {
+                        syncCategoryId(child, { entryType: constants.OBJECT_TYPES.artifact }, callback);
+                    },
+                    update: function (callback) {
+                        categoryChanged = oldCategoryId !== child.categoryId;
+                        if(categoryChanged || !parentIsTopic) {
+                            return db.Artifact.update({_id: child._id}, child, {upsert: true}, function (err, writeResult) {
+                                callback();
+                            });
+                        }
+                        callback();
+                    },
+                    syncChildren: function (callback) {
+                        if(categoryChanged || !parentIsTopic) {
+                            return syncChildren(child, {entryType: constants.OBJECT_TYPES.artifact}, callback);
+                        }
+                        callback();
+                    }
+                }, function (err, results) {
+                    callback();
+                });
+            }, function () {
+                callback();
+            });
+        });
+    };
+
     var syncChildArgumentLinks = function (callback) {
         db.ArgumentLink.find({ ownerId: parent._id, ownerType: options.entryType }, function (err, children) {
             if(children.length === 0) return callback();
@@ -1608,6 +1778,9 @@ function syncChildren(parent, options, callback) {
                 argumentLinks: function(callback) {
                     syncChildArgumentLinks(callback);
                 },
+                artifacts: function(callback) {
+                    syncChildArtifacts(callback);
+                },
                 questions: function(callback) {
                     syncOwnerChildren(constants.OBJECT_TYPES.question, callback);
                 },
@@ -1624,6 +1797,31 @@ function syncChildren(parent, options, callback) {
 
         case constants.OBJECT_TYPES.argument:
             async.parallel({
+                arguments: function(callback) {
+                    syncChildArguments(callback);
+                },
+                argumentLinks: function(callback) {
+                    syncChildArgumentLinks(callback);
+                },
+                questions: function(callback) {
+                    syncOwnerChildren(constants.OBJECT_TYPES.question, callback);
+                },
+                issues: function(callback) {
+                    syncOwnerChildren(constants.OBJECT_TYPES.issue, callback);
+                },
+                opinions: function(callback) {
+                    syncOwnerChildren(constants.OBJECT_TYPES.opinion, callback);
+                }
+            }, function (err, results) {
+                callback();
+            });
+            break;
+
+        case constants.OBJECT_TYPES.artifact:
+            async.parallel({
+                artifacts: function(callback) {
+                    syncChildArtifacts(callback);
+                },
                 arguments: function(callback) {
                     syncChildArguments(callback);
                 },
@@ -1739,6 +1937,7 @@ function syncCategoryId(entry, options, callback) {
             });
             break;
 
+        case constants.OBJECT_TYPES.artifact:
         case constants.OBJECT_TYPES.argument:
         case constants.OBJECT_TYPES.argumentLink:
         case constants.OBJECT_TYPES.question:
@@ -1872,6 +2071,11 @@ function createOwnerQueryFromQuery(req) {
             ownerType: constants.OBJECT_TYPES.question,
             ownerId: req.query.question
         };
+    } else if(req.query.artifact) {
+        return {
+            ownerType: constants.OBJECT_TYPES.artifact,
+            ownerId: req.query.artifact
+        };
     } else if(req.query.argumentLink) {
         return {
             ownerType: constants.OBJECT_TYPES.argumentLink,
@@ -1923,6 +2127,10 @@ function setModelOwnerEntry(req, model, options) {
         model.entry = model.question;
         model.entryType = constants.OBJECT_TYPES.question;
         model.isEntryOwner = model.isQuestionOwner;
+    } else if(model.artifact) {
+        model.entry = model.artifact;
+        model.entryType = constants.OBJECT_TYPES.artifact;
+        model.isEntryOwner = model.isArtifactOwner;
     } else if(model.argumentLink) {
         model.entry = model.argumentLink;
         model.entryType = constants.OBJECT_TYPES.argumentLink;
@@ -2023,6 +2231,8 @@ function getDbModelByObjectType(type) {
             return db.Argument;
         case constants.OBJECT_TYPES.argumentLink:
             return db.ArgumentLink;
+        case constants.OBJECT_TYPES.artifact:
+            return db.Artifact;
         case constants.OBJECT_TYPES.question:
             return db.Question;
         case constants.OBJECT_TYPES.answer:
@@ -2045,6 +2255,8 @@ function getObjectName(type) {
             return 'argument';
         case constants.OBJECT_TYPES.argumentLink:
             return 'argumentLink';
+        case constants.OBJECT_TYPES.artifact:
+            return 'artifact';
         case constants.OBJECT_TYPES.question:
             return 'question';
         case constants.OBJECT_TYPES.answer:
@@ -2072,6 +2284,11 @@ function createOwnerQueryFromModel(model) {
         return {
             ownerType: constants.OBJECT_TYPES.question,
             ownerId: model.question._id
+        };
+    } else if(model.artifact) {
+        return {
+            ownerType: constants.OBJECT_TYPES.artifact,
+            ownerId: model.artifact._id
         };
     } else if(model.argumentLink) {
         return {
@@ -2146,6 +2363,9 @@ function buildParentUrl(req, entry) {
         case constants.OBJECT_TYPES.argument:
         case constants.OBJECT_TYPES.argumentLink:
             return entry.parentId ? getBaseUrl(entry) + '/argument/' + entry.parentId : buildRedirectUrl(entry);
+
+        case constants.OBJECT_TYPES.artifact:
+            return entry.parentId ? getBaseUrl(entry) + '/artifact/' + entry.parentId : buildRedirectUrl(entry);
 
         case constants.OBJECT_TYPES.answer:
             return getBaseUrl(entry) + '/question/' + entry.questionId;
@@ -2241,6 +2461,19 @@ function getParent(entity, type) {
                 return {
                     entryId: entity.parentId,
                     entryType: constants.OBJECT_TYPES.topic
+                };
+            } else if(entity.ownerId) {
+                return {
+                    entryId: entity.ownerId,
+                    entryType: entity.ownerType
+                };
+            }
+            break;
+        case constants.OBJECT_TYPES.artifact:
+            if(entity.parentId) {
+                return {
+                    entryId: entity.parentId,
+                    entryType: constants.OBJECT_TYPES.artifact
                 };
             } else if(entity.ownerId) {
                 return {
@@ -2398,6 +2631,7 @@ module.exports = {
 
     getTopics: getTopics,
     getArguments: getArguments,
+    getTopArtifacts: getTopArtifacts,
     getTopIssues: getTopIssues,
     getTopOpinions: getTopOpinions,
 

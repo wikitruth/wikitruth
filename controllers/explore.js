@@ -154,6 +154,41 @@ module.exports = function (router) {
                         });
                     });
             },
+            artifacts: function(callback) {
+                if(!allTabs && model.tab !== 'artifacts') {
+                    return callback();
+                }
+                //var query = { parentId: {$ne: null}, private: false, 'screening.status': model.screening.status };
+                var query = {
+                    ownerType: constants.OBJECT_TYPES.topic,
+                    private: false,
+                    'screening.status': model.screening.status
+                };
+                injectCategoryId(query);
+                //db.Topic.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
+                db.Artifact
+                    .find(query)
+                    .sort({editDate: -1})
+                    .limit(LIMIT)
+                    .lean()
+                    .exec(function (err, results) {
+                        flowUtils.setEditorsUsername(results, function() {
+                            flowUtils.setEntryParents(results, constants.OBJECT_TYPES.artifact, function () {
+                                results.forEach(function (result) {
+                                    flowUtils.appendEntryExtra(result);
+                                });
+                                model.artifacts = results;
+                                if (results.length > 0) {
+                                    if (allTabs && results.length >= LIMIT) {
+                                        model.artifactsMore = true;
+                                    }
+                                    model.results = true;
+                                }
+                                callback();
+                            });
+                        });
+                    });
+            },
             issues: function (callback) {
                 if(!allTabs && model.tab !== 'issues') {
                     return callback();

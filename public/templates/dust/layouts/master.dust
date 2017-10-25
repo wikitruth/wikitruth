@@ -82,15 +82,15 @@
                     <li role="separator" class="divider"></li>
                     {?topic}
                         <li class="dropdown-header">In this section</li>
-                    {?parentTopic}
-                        <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> {parentTopic.title}</a></li>
-                    {:else}
-                        <li><a href="{paths.wiki.index}"><i class="fa fa-globe text-color-3-x" aria-hidden="true"></i> Explore</a></li>
-                    {/parentTopic}
+                        {?parentTopic}
+                            <li><a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> {?parentTopic.contextTitle}{parentTopic.contextTitle}{:else}{parentTopic.shortTitle}{/parentTopic.contextTitle}</a></li>
+                        {:else}
+                            <li><a href="{paths.wiki.index}"><i class="fa fa-globe text-color-3-x" aria-hidden="true"></i> Explore</a></li>
+                        {/parentTopic}
                         <li>
                             <ul class="nav">
                                 <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent child 1</a></li>
-                                <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> <strong>{topic.title}</strong></a></li>
+                                <li><a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> <strong>{?topic.contextTitle}{topic.contextTitle}{:else}{topic.shortTitle}{/topic.contextTitle}</strong></a></li>
                                 <li>
                                     <ul class="nav">
                                         <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent subchild 1</a></li>

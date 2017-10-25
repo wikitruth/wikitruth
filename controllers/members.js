@@ -11,6 +11,7 @@ var mongoose    = require('mongoose'),
 
 var topicController     = require('./topics'),
     argumentController  = require('./arguments'),
+    artifactController  = require('./artifacts'),
     questionController  = require('./questions'),
     answerController    = require('./answers'),
     issueController     = require('./issues'),
@@ -108,6 +109,14 @@ module.exports = function (router) {
                         .find({ createUserId: model.member._id, private: false })
                         .count(function(err, count) {
                             model.topics = count;
+                            callback();
+                        });
+                },
+                artifacts: function(callback) {
+                    db.Artifact
+                        .find({ createUserId: model.member._id, private: false })
+                        .count(function(err, count) {
+                            model.artifacts = count;
                             callback();
                         });
                 },
@@ -229,6 +238,30 @@ module.exports = function (router) {
                                         if (results.length === 15) {
                                             model.argumentsMore = true;
                                         }
+                                        model.results = true;
+                                    }
+                                    callback();
+                                });
+                            });
+                        });
+                },
+                artifacts: function (callback) {
+                    if(tab !== 'all' && tab !== 'artifacts') {
+                        return callback();
+                    }
+                    db.Artifact
+                        .find({ createUserId: model.member._id, private: false })
+                        .sort({editDate: -1})
+                        .limit(LIMIT)
+                        .lean()
+                        .exec(function(err, results) {
+                            flowUtils.setEntryParents(results, constants.OBJECT_TYPES.artifact, function() {
+                                flowUtils.setEditorsUsername(results, function () {
+                                    results.forEach(function (result) {
+                                        flowUtils.appendEntryExtra(result);
+                                    });
+                                    model.artifacts = results;
+                                    if (results.length > 0) {
                                         model.results = true;
                                     }
                                     callback();
@@ -655,6 +688,25 @@ module.exports = function (router) {
 
     router.get('/:username/diary/argument(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
         argumentController.GET_entry(req, res);
+    });
+
+
+    /* Diary Artifacts */
+
+    router.get('/:username/diary/artifacts', function (req, res) {
+        artifactController.GET_index(req, res);
+    });
+
+    router.get('/:username/diary/artifacts/create', function (req, res) {
+        artifactController.GET_create(req, res);
+    });
+
+    router.post('/:username/diary/artifacts/create', function (req, res) {
+        artifactController.POST_create(req, res);
+    });
+
+    router.get('/:username/diary/artifact(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        artifactController.GET_entry(req, res);
     });
 
 

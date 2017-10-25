@@ -24,29 +24,35 @@
                         <li><a href="#{wikiBaseUrl}{paths.wiki.questions.create}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Question</a></li>
                     {/isQuestionOwner}
                 {:else}
-                    {?argumentLink}
-                        {?isArgumentLinkOwner}
-                            <li><a href="#{wikiBaseUrl}{paths.wiki.arguments.link.edit}?id={argumentLink._id}&amp;source={wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/link/{argumentLink._id}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit {contents.argument.entry} Link</a></li>
-                        {/isArgumentLinkOwner}
+                    {?artifact}
+                        {?isArtifactOwner}
+                            <li><a href="#{wikiBaseUrl}{paths.wiki.artifacts.create}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Artifact</a></li>
+                        {/isArtifactOwner}
                     {:else}
-                        {?argument}
-                            {?isArgumentOwner}
-                                <li><a href="#{wikiBaseUrl}{paths.wiki.arguments.create}?topic={topic._id}&amp;id={argument._id}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit {contents.argument.entry}</a></li>
-                            {/isArgumentOwner}
+                        {?argumentLink}
+                            {?isArgumentLinkOwner}
+                                <li><a href="#{wikiBaseUrl}{paths.wiki.arguments.link.edit}?id={argumentLink._id}&amp;source={wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/link/{argumentLink._id}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit {contents.argument.entry} Link</a></li>
+                            {/isArgumentLinkOwner}
                         {:else}
-                            {?topicLink}
-                                {?isTopicLinkOwner}
-                                    <li><a href="#{wikiBaseUrl}{paths.wiki.topics.link.edit}?id={topicLink._id}&amp;source={wikiBaseUrl}{paths.wiki.topics.entry}/{topicLink.topic.friendlyUrl}/link/{topicLink._id}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Topic Link</a></li>
-                                {/isTopicLinkOwner}
+                            {?argument}
+                                {?isArgumentOwner}
+                                    <li><a href="#{wikiBaseUrl}{paths.wiki.arguments.create}?topic={topic._id}&amp;id={argument._id}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit {contents.argument.entry}</a></li>
+                                {/isArgumentOwner}
                             {:else}
-                                {?topic}
-                                    {?isTopicOwner}
-                                        <li><a href="#{wikiBaseUrl}{paths.wiki.topics.create}?id={topic._id}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Topic</a></li>
-                                    {/isTopicOwner}
-                                {/topic}
-                            {/topicLink}
-                        {/argument}
-                    {/argumentLink}
+                                {?topicLink}
+                                    {?isTopicLinkOwner}
+                                        <li><a href="#{wikiBaseUrl}{paths.wiki.topics.link.edit}?id={topicLink._id}&amp;source={wikiBaseUrl}{paths.wiki.topics.entry}/{topicLink.topic.friendlyUrl}/link/{topicLink._id}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Topic Link</a></li>
+                                    {/isTopicLinkOwner}
+                                {:else}
+                                    {?topic}
+                                        {?isTopicOwner}
+                                            <li><a href="#{wikiBaseUrl}{paths.wiki.topics.create}?id={topic._id}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Topic</a></li>
+                                        {/isTopicOwner}
+                                    {/topic}
+                                {/topicLink}
+                            {/argument}
+                        {/argumentLink}
+                    {/artifact}
                 {/question}
             {/isAnswerOwner}
         {/isIssueOwner}

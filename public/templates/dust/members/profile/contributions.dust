@@ -51,6 +51,11 @@
                         <i class="fa fa-check-circle" aria-hidden="true"></i><span class="hidden-xs"> Answers</span>
                     </a>
                 </li>
+                <li role="presentation"{@eq key=tab value="artifacts"} class="active"{/eq}>
+                    <a href="{url}?tab=artifacts" role="tab">
+                        <i class="fa fa-puzzle-piece" aria-hidden="true"></i><span class="hidden-xs"> Artifacts</span>
+                    </a>
+                </li>
                 <li role="presentation"{@eq key=tab value="issues"} class="active"{/eq}>
                     <a href="{url}?tab=issues" role="tab">
                         <i class="fa fa-exclamation-circle" aria-hidden="true"></i><span class="hidden-xs"> Issues</span>
@@ -118,6 +123,19 @@
                     {/answersMore}
                 </div>
             {/answers}
+            {?artifacts}
+                <div style="padding-bottom: 15px; padding-top: 5px;">
+                    <ul class="list-group top-list-items wt-list">
+                        <li class="list-group-item highlight"><span class="fa fa-puzzle-piece text-success-x" aria-hidden="true"></span> Artifacts</li>
+                        {#artifacts}
+                            {>"dust/wiki/artifacts/entry-row" subtitle="true" labels="true" /}
+                        {/artifacts}
+                    </ul>
+                    {?artifactsMore}
+                        <div class="top-list-items-more"><a href="{url}?tab=artifacts" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+                    {/artifactsMore}
+                </div>
+            {/artifacts}
             {?issues}
                 <div style="padding-bottom: 15px; padding-top: 5px;">
                     {!<h3 class="page-header-x text-muted-0"><i class="fa fa-exclamation-circle"></i> Issues</h3>!}

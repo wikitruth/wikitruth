@@ -5,16 +5,30 @@
                 {^argumentLink}
                     {^topicLink}
                         {^argument}
-                            <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
-                                <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}" role="tab">
-                                    <span class="fa fa-info-circle" aria-hidden="true"></span><span class="hidden-xxs-x"> Details</span></a>
-                            </li>
-                            {@gt key=entry.childrenCount.topics.total value="0"}
-                                <li role="presentation"{@eq key=tab value="topics"} class="active"{/eq}>
-                                    <a href="{wikiBaseUrl}{paths.wiki.topics.index}/{topic.friendlyUrl}/{topic._id}" role="tab">
-                                        <i class="fa fa-folder-open text-muted-x" aria-hidden="true"></i> Topics <span class="wt-label label label-default text-muted">{entry.childrenCount.topics.accepted}</span></a>
+                            {^artifact}
+                                {! Applies only to a Topic entry !}
+                                <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
+                                    <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}" role="tab">
+                                        <span class="fa fa-info-circle" aria-hidden="true"></span><span class="hidden-xxs-x"> Details</span></a>
                                 </li>
-                            {/gt}
+                                {@gt key=entry.childrenCount.topics.total value="0"}
+                                    <li role="presentation"{@eq key=tab value="topics"} class="active"{/eq}>
+                                        <a href="{wikiBaseUrl}{paths.wiki.topics.index}/{topic.friendlyUrl}/{topic._id}" role="tab">
+                                            <i class="fa fa-folder-open text-muted-x" aria-hidden="true"></i> Topics <span class="wt-label label label-default text-muted">{entry.childrenCount.topics.accepted}</span></a>
+                                    </li>
+                                {/gt}
+                            {:else}
+                                <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
+                                    <a href="{wikiBaseUrl}{paths.wiki.artifacts.entry}/{artifact.friendlyUrl}/{artifact._id}" role="tab">
+                                        <span class="fa fa-info-circle" aria-hidden="true"></span> Details</a>
+                                </li>
+                                {@gt key=entry.childrenCount.artifacts.total value="0"}
+                                    <li role="presentation"{@eq key=tab value="artifacts"} class="active"{/eq}>
+                                        <a href="{wikiBaseUrl}{paths.wiki.artifacts.index}/{artifact.friendlyUrl}/{artifact._id}" role="tab">
+                                            <i class="fa fa-puzzle-piece text-muted-x" aria-hidden="true"></i> Artifacts <span class="wt-label label label-default text-muted">{entry.childrenCount.artifacts.accepted}</span></a>
+                                    </li>
+                                {/gt}
+                            {/artifact}
                         {:else}
                             <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
                                 <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argument.friendlyUrl}/{argument._id}" role="tab">
