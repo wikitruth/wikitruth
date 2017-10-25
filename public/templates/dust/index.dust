@@ -170,6 +170,24 @@
                 {/opinions}
             </div>
         </div>
+        <div class="row">
+            <div class="col-md-6 col-sm-12">
+                {?artifacts}
+                    <div class="wt-list-container">
+                        {!<h3 class="page-header-x text-muted-0"><i class="fa fa-exclamation-circle"></i> Issues</h3>!}
+                        <ul class="list-group top-list-items wt-list">
+                            <li class="list-group-item highlight"><i class="fa fa-puzzle-piece text-success-x" aria-hidden="true"></i> Artifacts</li>
+                            {#artifacts}
+                                {>"dust/wiki/artifacts/entry-row" subtitle="true" /}
+                            {/artifacts}
+                        </ul>
+                        {?artifactsMore}
+                            <div class="top-list-items-more"><a href="{paths.wiki.index}?tab=artifacts#browse" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+                        {/artifactsMore}
+                    </div>
+                {/artifacts}
+            </div>
+        </div>
     </div>
 
     {!<div class="row">

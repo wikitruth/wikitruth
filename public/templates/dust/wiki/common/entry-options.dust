@@ -10,43 +10,49 @@
         {?isContributor}
             {?isOpinionEntry}
                 {?isOpinionOwner}
-                    <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.opinions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}{?issue}&amp;issue={issue._id}{/issue}&amp;id={opinion._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> <span>Edit</span></a>
+                    <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.opinions.create}?id={opinion._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> <span>Edit</span></a>
                 {/isOpinionOwner}
             {:else}
                 {?isIssueOwner}
-                    <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.issues.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}&amp;issue={issue._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
+                    <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.issues.create}?issue={issue._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
                 {:else}
                     {?isAnswerOwner}
-                        <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.answers.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}&amp;answer={answer._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
+                        <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.answers.create}?answer={answer._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
                     {:else}
                         {?question}
                             {?isQuestionOwner}
-                                <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
+                                <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.questions.create}?question={question._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
                             {/isQuestionOwner}
                         {:else}
-                            {?argumentLink}
-                                {?isArgumentLinkOwner}
-                                    <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.arguments.link.edit}?id={argumentLink._id}&amp;source={wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/link/{argumentLink._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
-                                {/isArgumentLinkOwner}
+                            {?artifact}
+                                {?isArtifactOwner}
+                                        <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.artifacts.create}?artifact={artifact._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
+                                {/isArtifactOwner}
                             {:else}
-                                {?argument}
-                                    {?isArgumentOwner}
-                                        <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.arguments.create}?topic={topic._id}&amp;id={argument._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
-                                    {/isArgumentOwner}
+                                {?argumentLink}
+                                    {?isArgumentLinkOwner}
+                                        <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.arguments.link.edit}?id={argumentLink._id}&amp;source={wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/link/{argumentLink._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
+                                    {/isArgumentLinkOwner}
                                 {:else}
-                                    {?topicLink}
-                                        {?isTopicLinkOwner}
-                                            <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.topics.link.edit}?id={topicLink._id}&amp;source={wikiBaseUrl}{paths.wiki.topics.entry}/{topicLink.topic.friendlyUrl}/link/{topicLink._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
-                                        {/isTopicLinkOwner}
+                                    {?argument}
+                                        {?isArgumentOwner}
+                                            <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.arguments.create}?id={argument._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
+                                        {/isArgumentOwner}
                                     {:else}
-                                        {?topic}
-                                            {?isTopicOwner}
-                                                <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.topics.create}?id={topic._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
-                                            {/isTopicOwner}
-                                        {/topic}
-                                    {/topicLink}
-                                {/argument}
-                            {/argumentLink}
+                                        {?topicLink}
+                                            {?isTopicLinkOwner}
+                                                <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.topics.link.edit}?id={topicLink._id}&amp;source={wikiBaseUrl}{paths.wiki.topics.entry}/{topicLink.topic.friendlyUrl}/link/{topicLink._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
+                                            {/isTopicLinkOwner}
+                                        {:else}
+                                            {?topic}
+                                                {?isTopicOwner}
+                                                    <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.topics.create}?id={topic._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
+                                                {/isTopicOwner}
+                                            {/topic}
+                                        {/topicLink}
+                                    {/argument}
+                                {/argumentLink}
+                            {/artifact}
                         {/question}
                     {/isAnswerOwner}
                 {!<li><a href="{paths.wiki.outline.link}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="tab"><span class="glyphicon glyphicon-link" aria-hidden="true"></span> Manage Links</a></li>!}

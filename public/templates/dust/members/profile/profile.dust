@@ -56,6 +56,14 @@
                         </div>
                     </div>
                 </a>
+                <a href="{url}?tab=artifacts">
+                    <div class="col-sm-4">
+                        <div class="well stat">
+                            <div class="stat-value week-of-year">{artifacts}</div>
+                            <div class="stat-label">Artifacts</div>
+                        </div>
+                    </div>
+                </a>
                 <a href="{url}?tab=issues">
                     <div class="col-sm-4">
                         <div class="well stat">
@@ -64,6 +72,8 @@
                         </div>
                     </div>
                 </a>
+            </div>
+            <div class="row">
                 <a href="{url}?tab=opinions">
                     <div class="col-sm-4">
                         <div class="well stat">

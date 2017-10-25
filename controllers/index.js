@@ -7,8 +7,9 @@ var templates   = require('../models/templates'),
     db          = require('../app').db.models,
     async       = require('async');
 
-var argumentController  = require('./arguments'),
-    topicController     = require('./topics'),
+var topicController     = require('./topics'),
+    argumentController  = require('./arguments'),
+    artifactController  = require('./artifacts'),
     opinionController     = require('./opinions'),
     questionController     = require('./questions'),
     answerController     = require('./answers'),
@@ -109,6 +110,34 @@ module.exports = function (router) {
                                 });
                             });
                     },
+                    artifacts: function(callback) {
+                        var query = {
+                            ownerType: constants.OBJECT_TYPES.topic,
+                            private: false,
+                            'screening.status': model.screening.status
+                        };
+                        injectCategoryId(query);
+                        db.Artifact
+                            .find(query)
+                            .sort({editDate: -1})
+                            .limit(MAX_RESULT)
+                            .lean()
+                            .exec(function (err, results) {
+                                flowUtils.setEntryParents(results, constants.OBJECT_TYPES.artifact, function() {
+                                    flowUtils.setEditorsUsername(results, function () {
+                                        results.forEach(function (result) {
+                                            flowUtils.appendEntryExtra(result);
+                                        });
+                                        model.artifacts = results;
+                                        console.log(results);
+                                        if (results.length === MAX_RESULT) {
+                                            model.artifactsMore = true;
+                                        }
+                                        callback();
+                                    });
+                                });
+                            });
+                    },
                     answers: function(callback) {
                         var query = { private: false, 'screening.status': model.screening.status };
                         injectCategoryId(query);
@@ -202,6 +231,10 @@ module.exports = function (router) {
 
     router.get('/argument(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
         argumentController.GET_entry(req, res);
+    });
+
+    router.get('/artifact(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        artifactController.GET_entry(req, res);
     });
 
     router.get('/question(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {

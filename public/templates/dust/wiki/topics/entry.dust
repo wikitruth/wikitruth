@@ -46,6 +46,7 @@
     {/topics}
     {>"dust/wiki/arguments/list-preview" /}
     {>"dust/wiki/questions/list-preview" /}
+    {>"dust/wiki/artifacts/list-preview" /}
     {>"dust/wiki/issues/list-preview" /}
     {>"dust/wiki/opinions/list-preview" /}
     {>"dust/wiki/common/entry-footer" /}

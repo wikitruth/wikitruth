@@ -60,6 +60,12 @@ module.exports = function(app, mongoose) {
         pending: { type: Number, default: 0 },
         rejected: { type: Number, default: 0 }
       },
+      artifacts: {
+        total: { type: Number, default: 0 },
+        accepted: { type: Number, default: 0 },
+        pending: { type: Number, default: 0 },
+        rejected: { type: Number, default: 0 }
+      },
       arguments: {
         total: { type: Number, default: 0 },
         accepted: { type: Number, default: 0 },

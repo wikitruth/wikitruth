@@ -202,6 +202,11 @@ function GET_entry(req, res) {
                     });
                 });
             },
+            artifacts: function (callback) {
+                // Top Issues
+                var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, 'screening.status': constants.SCREENING_STATUS.status1.code };
+                flowUtils.getTopArtifacts(query, model, callback);
+            },
             issues: function (callback) {
                 // Top Issues
                 var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, 'screening.status': constants.SCREENING_STATUS.status1.code };

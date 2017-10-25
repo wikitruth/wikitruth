@@ -51,6 +51,11 @@ module.exports = {
                 entry: 'dust/wiki/arguments/link/entry'
             }
         },
+        artifacts: {
+            index: 'dust/wiki/artifacts/index',
+            create: 'dust/wiki/artifacts/create',
+            entry: 'dust/wiki/artifacts/entry'
+        },
         questions: {
             index: 'dust/wiki/questions/index',
             create: 'dust/wiki/questions/create',

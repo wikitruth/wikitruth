@@ -150,6 +150,13 @@ module.exports = function (router) {
                         });
                     });
                     break;
+                case constants.OBJECT_TYPES.artifact:
+                    db.Artifact.findByIdAndRemove(id, function (err, entry) {
+                        flowUtils.updateChildrenCount(entry.ownerId, entry.ownerType, constants.OBJECT_TYPES.artifact, function () {
+                            res.send({ redirectUrl: flowUtils.buildParentUrl(req, entry) });
+                        });
+                    });
+                    break;
                 case constants.OBJECT_TYPES.issue:
                     db.Issue.findByIdAndRemove(id, function (err, entry) {
                         flowUtils.updateChildrenCount(entry.ownerId, entry.ownerType, constants.OBJECT_TYPES.issue, function () {

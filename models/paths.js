@@ -49,6 +49,11 @@ module.exports = {
                 edit: '/arguments/link/edit'
             }
         },
+        artifacts: {
+            index:  '/artifacts',
+            entry:  '/artifact',
+            create: '/artifacts/create'
+        },
         questions: {
             create: '/questions/create',
             index:  '/questions',

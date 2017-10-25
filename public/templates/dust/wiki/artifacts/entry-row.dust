@@ -1,0 +1,19 @@
+<li class="list-group-item">
+    <i class="fa fa-puzzle-piece text-primary" aria-hidden="true"></i>
+    <div>
+        <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.artifacts.entry}/{friendlyUrl}/{_id}">{title}
+            {?labels}
+                {?private} <span class="label label-default">private</span>{/private}
+                {>"dust/wiki/common/entry-row-screening-label" /}
+            {/labels}
+        </a>
+        {?subtitle}
+            {>"dust/wiki/common/entry-row-subtitle" /}
+        {/subtitle}
+        {?contentPreview}
+            <div class="wt-entry-row-content">{contentPreview}</div>
+        {/contentPreview}
+        {>"dust/wiki/common/entry-row-footer" /}
+    </div>
+    <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>
+</li>

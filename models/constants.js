@@ -322,6 +322,7 @@ var OBJECT_TYPES = {
     question: 3,
     comment: 4,
     definition: 5,
+    artifact: 6,
     issue: 10,
     opinion: 11,
     answer: 12,

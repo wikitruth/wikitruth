@@ -2,7 +2,6 @@
 
 //dependencies
 var config          = require('./config/config'),
-    //applications    = require('./models/applications'),
     paths           = require('./models/paths'),
     constants       = require('./models/constants'),
     contents        = require('./models/contents'),
@@ -15,10 +14,10 @@ var config          = require('./config/config'),
     mongoStore      = require('connect-mongo')(session),
     passport        = require('passport'),
     mongoose        = require('mongoose'),
-    bluebird       = require('bluebird'),
+    bluebird        = require('bluebird'),
     helmet          = require('helmet'),
     cons            = require('consolidate'),
-    //csrf            = require('csurf'),
+    //csrf          = require('csurf'),
     kraken          = require('kraken-js');
 
 var options, app;

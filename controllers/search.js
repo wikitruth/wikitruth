@@ -142,6 +142,33 @@ module.exports = function (router) {
                         });
                     });
             },
+            artifacts: function (callback) {
+                if(!allTabs && tab !== 'artifacts') {
+                    return callback();
+                }
+                db.Artifact
+                    .find({ $text : { $search : keyword }, $or: privacyFilter }, { score: { $meta: "textScore" } })
+                    .sort({ score: { $meta: "textScore" } })
+                    .limit(limit)
+                    .lean()
+                    .exec(function(err, results) {
+                        flowUtils.setEditorsUsername(results, function() {
+                            flowUtils.setEntryParents(results, constants.OBJECT_TYPES.artifact, function () {
+                                results.forEach(function (result) {
+                                    flowUtils.appendEntryExtra(result);
+                                });
+                                model.artifacts = results;
+                                if (results.length > 0) {
+                                    if (allTabs && results.length >= MAX_RESULT) {
+                                        model.artifactsMore = true;
+                                    }
+                                    model.results = true;
+                                }
+                                callback();
+                            });
+                        });
+                    });
+            },
             issues: function (callback) {
                 if(!allTabs && tab !== 'issues') {
                     return callback();
