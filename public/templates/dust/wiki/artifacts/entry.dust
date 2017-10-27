@@ -39,6 +39,14 @@
     {>"dust/wiki/questions/list-preview" /}
     {>"dust/wiki/issues/list-preview" /}
     {>"dust/wiki/opinions/list-preview" /}
+    <br/>
+    {?entry.source}
+        <small class="text-muted">
+            <i class="fa fa-bookmark"></i> <span class="text-uppercase">Source</span>
+            <p>{entry.source|s}</p>
+        </small>
+        <hr class="wt-dotted-line" style="margin: 0.7rem 0 1.7rem"/>
+    {/entry.source}
     {>"dust/wiki/common/entry-footer" /}
 {/body}
 

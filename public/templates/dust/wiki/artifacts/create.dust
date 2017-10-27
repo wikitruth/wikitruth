@@ -24,8 +24,16 @@
             <textarea name="title" id="inputName" class="form-control" rows="1">{artifact.title}</textarea>
         </div>
         <div class="form-group">
-            <label for="inputContent">Summary</label>
+            <label for="inputContent">Content</label>
             <textarea class="form-control" id="inputContent" name="content" rows="12">{artifact.content}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="inputReferences">
+                <a role="button" data-toggle="collapse" href="#collapseReferences" aria-expanded="true" aria-controls="collapseReferences" class="wt-collapse-toggle">Source</a>
+            </label>
+            <div class="collapse in" id="collapseReferences">
+                <textarea class="form-control" id="inputReferences" name="references" rows="3">{artifact.source}</textarea>
+            </div>
         </div>
         <div class="form-group">
             <label for="exampleInputFile">Inline File</label>
@@ -39,14 +47,6 @@
             {/artifact.file.name}
             <input type="file" id="inlineFile" name="inlineFile">
             <p class="help-block">Upload the file if artifact is not externally sourced.</p>
-        </div>
-        <div class="form-group">
-            <label for="inputReferences">
-                <a role="button" data-toggle="collapse" href="#collapseReferences" aria-expanded="false" aria-controls="collapseReferences" class="wt-collapse-toggle{^artifact.source} collapsed{/artifact.source}">Source</a>
-            </label>
-            <div class="collapse{?artifact.source} in{/artifact.source}" id="collapseReferences">
-                <textarea class="form-control" id="inputReferences" name="references" rows="3">{artifact.source}</textarea>
-            </div>
         </div>
         <div class="form-group">
             <label for="inputParent">Artifact Type</label>

@@ -13,7 +13,10 @@
     {>"dust/wiki/common/screening-selector" /}
     {?answers}
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight"><i class="fa fa-answer-circle text-success-x" aria-hidden="true"></i> {^topic}Latest {/topic}Answers</li>
+            <li class="list-group-item highlight">
+                <i class="fa fa-answer-circle text-success-x" aria-hidden="true"></i>
+                <div>{^topic}Latest {/topic}Answers</div>
+            </li>
             {#answers}
                 {>"dust/wiki/answers/entry-row" /}
             {/answers}

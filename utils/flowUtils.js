@@ -122,6 +122,9 @@ function setEntryParents(items, typeId, callback) {
                     case constants.OBJECT_TYPES.topicLink:
                         topicLinkIds.push(item.ownerId.valueOf());
                         break;
+                    case constants.OBJECT_TYPES.artifact:
+                        artifactIds.push(item.ownerId.valueOf());
+                        break;
                     case constants.OBJECT_TYPES.argument:
                         argumentIds.push(item.ownerId.valueOf());
                         break;

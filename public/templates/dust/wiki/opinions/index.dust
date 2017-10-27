@@ -9,7 +9,10 @@
     {>"dust/wiki/common/screening-selector" /}
     {?opinions}
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight"><i class="fa fa-comments-o text-muted" aria-hidden="true"></i> Comments</li>
+            <li class="list-group-item highlight">
+                <i class="fa fa-comments-o text-muted" aria-hidden="true"></i>
+                <div>Comments</div>
+            </li>
             {#opinions}
                 {>"dust/wiki/opinions/entry-row" /}
             {/opinions}

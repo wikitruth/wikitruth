@@ -9,7 +9,10 @@
     {>"dust/wiki/common/screening-selector" /}
     {?topics}
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight"><i class="fa fa-folder-open text-success-x" aria-hidden="true"></i>&nbsp;&nbsp;Topics</li>
+            <li class="list-group-item highlight">
+                <i class="fa fa-folder-open text-success-x" aria-hidden="true"></i>
+                <div>Topics</div>
+            </li>
             {#topics}
                 {>"dust/wiki/topics/entry-row" /}
             {/topics}

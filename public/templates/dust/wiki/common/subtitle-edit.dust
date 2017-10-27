@@ -12,18 +12,18 @@
                 {?question}
                     <i class="fa fa-question-circle-o"></i> A question on {>"dust/wiki/common/entry-link-argument" /}
                 {:else}
-                    {?artifact}
-                        <i class="fa fa-puzzle-piece"></i> An artifact under the topic <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
+                    {?argumentLink}
+                        <i class="fa fa-link"></i> {contents.argument.entry} <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/{argumentLink.argument._id}">{argumentLink.argument.title}</a> linked to {>"dust/wiki/common/entry-link-argument" /}
                     {:else}
-                        {?argumentLink}
-                            <i class="fa fa-link"></i> {contents.argument.entry} <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/{argumentLink.argument._id}">{argumentLink.argument.title}</a> linked to {>"dust/wiki/common/entry-link-argument" /}
+                        {?argument}
+                            {?parentArgument}
+                                <i class="fa fa-bolt"></i> A sub-{contents.argument.entryL} {?argument.against}<span class="text-danger">against</span>{:else}in support for{/argument.against} <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
+                            {:else}
+                                <i class="fa fa-bolt"></i> A {contents.argument.entryL} under the topic <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
+                            {/parentArgument}
                         {:else}
-                            {?argument}
-                                {?parentArgument}
-                                    <i class="fa fa-bolt"></i> A sub-{contents.argument.entryL} {?argument.against}<span class="text-danger">against</span>{:else}in support for{/argument.against} <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
-                                {:else}
-                                    <i class="fa fa-bolt"></i> A {contents.argument.entryL} under the topic <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
-                                {/parentArgument}
+                            {?artifact}
+                                <i class="fa fa-puzzle-piece"></i> An artifact under the topic <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
                             {:else}
                                 {?topicLink}
                                     <i class="fa fa-link"></i> Topic <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topicLink.topic.friendlyUrl}/{topicLink.topic._id}">{topicLink.topic.title}</a> linked to <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
@@ -36,9 +36,9 @@
                                         {/parentTopic}
                                     {/topic}
                                 {/topicLink}
-                            {/argument}
-                        {/argumentLink}
-                    {/artifact}
+                            {/artifact}
+                        {/argument}
+                    {/argumentLink}
                 {/question}
             {/answer}
         {/isIssueEntry}
