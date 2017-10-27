@@ -111,7 +111,7 @@
                     {/topic}
                     <li class="dropdown-header">Categories</li>
                     {#appCategories}
-                        <li><a href="{paths.wiki.topics.entry}/{friendlyUrl}/{_id}"><i class="fa fa-{?icon}{icon}{:else}folder-open{/icon} text-color-3-x" aria-hidden="true"></i> {?contextTitle}{contextTitle}{:else}{title}{/contextTitle}</a></li>
+                        <li><a href="{paths.wiki.topics.entry}/{friendlyUrl}/{_id}"><i class="fa fa-{?icon}{icon}{:else}folder-open{/icon} text-color-3-x" aria-hidden="true"></i> {?contextTitle}{contextTitle}{:else}{title}{/contextTitle}{?childrenCount.topics.accepted} <span class="wt-label label label-default">{childrenCount.topics.accepted}</span>{/childrenCount.topics.accepted}</a></li>
                     {/appCategories}
                     <li role="separator" class="divider"></li>
                     <li class="dropdown-header">Apps</li>

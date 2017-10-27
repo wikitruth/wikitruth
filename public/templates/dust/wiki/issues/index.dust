@@ -9,7 +9,10 @@
     {>"dust/wiki/common/screening-selector" /}
     {?issues}
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight"><i class="fa fa-exclamation-circle text-success-x" aria-hidden="true"></i> Issues</li>
+            <li class="list-group-item highlight">
+                <i class="fa fa-exclamation-circle text-success-x" aria-hidden="true"></i>
+                <div>Issues</div>
+            </li>
             {#issues}
                 {>"dust/wiki/issues/entry-row" /}
             {/issues}

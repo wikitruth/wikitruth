@@ -13,7 +13,10 @@
     {>"dust/wiki/common/screening-selector" /}
     {?artifacts}
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight"><i class="fa fa-puzzle-piece text-muted" aria-hidden="true"></i> {^topic}Latest {/topic}Artifacts</li>
+            <li class="list-group-item highlight">
+                <i class="fa fa-puzzle-piece text-muted" aria-hidden="true"></i>
+                <div>{^topic}Latest {/topic}Artifacts</div>
+            </li>
             {#artifacts}
                 {>"dust/wiki/artifacts/entry-row" /}
             {/artifacts}

@@ -17,15 +17,19 @@
                         {?parentArgument}
                             {?argument.against}<span class="text-danger">Against</span>{:else}On{/argument.against} {contents.argument.entryL} <a href="{?parentArgument.private}{wikiBaseUrl}{/parentArgument.private}{paths.wiki.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
                         {:else}
-                            {?parentTopicLink}
-                                On topic link <a href="{?parentTopicLink.private}{wikiBaseUrl}{/parentTopicLink.private}{paths.wiki.topics.entry}/{parentTopicLink.topic.friendlyUrl}/link/{parentTopicLink._id}">{parentTopicLink.title2}</a>
+                            {?parentArtifact}
+                                On artifact <a href="{?parentArtifact.private}{wikiBaseUrl}{/parentArtifact.private}{paths.wiki.artifacts.entry}/{parentArtifact.friendlyUrl}/{parentArtifact._id}">{parentArtifact.title}</a>
                             {:else}
-                                {?parentTopic}
-                                    On topic <a href="{?parentTopic.private}{wikiBaseUrl}{/parentTopic.private}{paths.wiki.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}">{parentTopic.title}</a>
+                                {?parentTopicLink}
+                                    On topic link <a href="{?parentTopicLink.private}{wikiBaseUrl}{/parentTopicLink.private}{paths.wiki.topics.entry}/{parentTopicLink.topic.friendlyUrl}/link/{parentTopicLink._id}">{parentTopicLink.title2}</a>
                                 {:else}
-                                    A topic category
-                                {/parentTopic}
-                            {/parentTopicLink}
+                                    {?parentTopic}
+                                        On topic <a href="{?parentTopic.private}{wikiBaseUrl}{/parentTopic.private}{paths.wiki.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}">{parentTopic.title}</a>
+                                    {:else}
+                                        A topic category
+                                    {/parentTopic}
+                                {/parentTopicLink}
+                            {/parentArtifact}
                         {/parentArgument}
                     {/parentArgumentLink}
                 {/parentQuestion}

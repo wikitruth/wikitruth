@@ -13,7 +13,10 @@
     {>"dust/wiki/common/screening-selector" /}
     {?proArguments}
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight text-primary-x"><i class="glyphicon glyphicon-flash" aria-hidden="true"></i> {^topic}Latest {contents.argument.shortList}{:else}{?argument}Supporting {contents.argument.shortList}{:else}{contents.argument.longList}{/argument}{/topic}</li>
+            <li class="list-group-item highlight text-primary-x">
+                <i class="glyphicon glyphicon-flash" aria-hidden="true"></i>
+                <div>{^topic}Latest {contents.argument.shortList}{:else}{?argument}Supporting {contents.argument.shortList}{:else}{contents.argument.longList}{/argument}{/topic}</div>
+            </li>
             {#proArguments}
                 {>"dust/wiki/arguments/entry-row" /}
             {/proArguments}

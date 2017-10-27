@@ -71,10 +71,10 @@ module.exports = function(app, mongoose) {
     return constants.OBJECT_TYPES.artifact;
   };
   schema.methods.getFilePath = function() {
-    return '/artifacts/' + this._id + '_' + this.file.name;
+    return '/media/artifacts/' + this._id + '_' + this.file.name;
   };
   schema.methods.getThumbnailPath = function() {
-    return '/artifacts/' + this._id + '_thumbnail_' + this.file.name;
+    return '/media/artifacts/' + this._id + '_thumbnail_' + this.file.name;
   };
   schema.methods.isImage = function() {
     return this.file.type.startsWith('image');

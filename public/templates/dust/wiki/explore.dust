@@ -91,7 +91,9 @@
         {?topics}
             <div class="wt-list-container">
                 <ul class="list-group wt-list">
-                    <li class="list-group-item highlight"><i class="fa fa-folder-open text-muted-x" aria-hidden="true"></i> Topics</li>
+                    <li class="list-group-item highlight"><i class="fa fa-folder-open text-muted-x" aria-hidden="true"></i>
+                        <div>Topics</div>
+                    </li>
                     {#topics}
                         {>"dust/wiki/topics/entry-row" standalone="true" subtitle="true" /}
                     {/topics}
@@ -104,7 +106,9 @@
         {?arguments}
             <div class="wt-list-container">
                 <ul class="list-group wt-list">
-                    <li class="list-group-item highlight"><i class="glyphicon glyphicon-flash text-muted-x" aria-hidden="true"></i> Arguments</li>
+                    <li class="list-group-item highlight"><i class="glyphicon glyphicon-flash text-muted-x" aria-hidden="true"></i>
+                        <div>Facts</div>
+                    </li>
                     {#arguments}
                         {>"dust/wiki/arguments/entry-row" subtitle="true" /}
                     {/arguments}
@@ -117,7 +121,9 @@
         {?questions}
             <div class="wt-list-container">
                 <ul class="list-group wt-list">
-                    <li class="list-group-item highlight"><i class="fa fa-question-circle text-muted-x" aria-hidden="true"></i> Questions</li>
+                    <li class="list-group-item highlight"><i class="fa fa-question-circle text-muted-x" aria-hidden="true"></i>
+                        <div>Questions</div>
+                    </li>
                     {#questions}
                         {>"dust/wiki/questions/entry-row" subtitle="true" /}
                     {/questions}
@@ -130,7 +136,9 @@
         {?answers}
             <div class="wt-list-container">
                 <ul class="list-group wt-list">
-                    <li class="list-group-item highlight"><i class="fa fa-answer-circle text-success-x" aria-hidden="true"></i> Answers</li>
+                    <li class="list-group-item highlight"><i class="fa fa-answer-circle text-success-x" aria-hidden="true"></i>
+                        <div>Answers</div>
+                    </li>
                     {#answers}
                         {>"dust/wiki/answers/entry-row" subtitle="true" /}
                     {/answers}
@@ -143,7 +151,9 @@
         {?artifacts}
             <div class="wt-list-container">
                 <ul class="list-group wt-list">
-                    <li class="list-group-item highlight"><i class="fa fa-puzzle-piece text-muted-x" aria-hidden="true"></i> Artifacts</li>
+                    <li class="list-group-item highlight"><i class="fa fa-puzzle-piece text-muted-x" aria-hidden="true"></i>
+                        <div>Artifacts</div>
+                    </li>
                     {#artifacts}
                         {>"dust/wiki/artifacts/entry-row" subtitle="true" /}
                     {/artifacts}
@@ -156,7 +166,9 @@
         {?issues}
             <div class="wt-list-container">
                 <ul class="list-group wt-list">
-                    <li class="list-group-item highlight"><span class="fa fa-exclamation-circle text-success-x" aria-hidden="true"></span> Issues</li>
+                    <li class="list-group-item highlight"><span class="fa fa-exclamation-circle text-success-x" aria-hidden="true"></span>
+                        <div>Issues</div>
+                    </li>
                     {#issues}
                         {>"dust/wiki/issues/entry-row" subtitle="true" /}
                     {/issues}
@@ -169,7 +181,9 @@
         {?opinions}
             <div class="wt-list-container">
                 <ul class="list-group wt-list">
-                    <li class="list-group-item highlight"><span class="fa fa-comments-o text-success-x" aria-hidden="true"></span> Comments</li>
+                    <li class="list-group-item highlight"><span class="fa fa-comments-o text-success-x" aria-hidden="true"></span>
+                        <div>Comments</div>
+                    </li>
                     {#opinions}
                         {>"dust/wiki/opinions/entry-row" subtitle="true" /}
                     {/opinions}

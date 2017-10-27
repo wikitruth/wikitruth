@@ -22,13 +22,13 @@
                                     <a href="{wikiBaseUrl}{paths.wiki.artifacts.entry}/{artifact.friendlyUrl}/{artifact._id}" role="tab">
                                         <span class="fa fa-info-circle" aria-hidden="true"></span> Details</a>
                                 </li>
-                                {@gt key=entry.childrenCount.artifacts.total value="0"}
-                                    <li role="presentation"{@eq key=tab value="artifacts"} class="active"{/eq}>
-                                        <a href="{wikiBaseUrl}{paths.wiki.artifacts.index}/{artifact.friendlyUrl}/{artifact._id}" role="tab">
-                                            <i class="fa fa-puzzle-piece text-muted-x" aria-hidden="true"></i> Artifacts <span class="wt-label label label-default text-muted">{entry.childrenCount.artifacts.accepted}</span></a>
-                                    </li>
-                                {/gt}
                             {/artifact}
+                            {@gt key=entry.childrenCount.artifacts.total value="0"}
+                                <li role="presentation"{@eq key=tab value="artifacts"} class="active"{/eq}>
+                                    <a href="{wikiBaseUrl}{paths.wiki.artifacts.index}?{entry.objectName}={entry._id}" role="tab">
+                                        <i class="fa fa-puzzle-piece text-muted-x" aria-hidden="true"></i> Artifacts <span class="wt-label label label-default text-muted">{entry.childrenCount.artifacts.accepted}</span></a>
+                                </li>
+                            {/gt}
                         {:else}
                             <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
                                 <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argument.friendlyUrl}/{argument._id}" role="tab">
