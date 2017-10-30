@@ -15,7 +15,10 @@
             {/categories}
         </div>
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight"><i class="fa fa-folder-open text-success-x" aria-hidden="true"></i> Topics</li>
+            <li class="list-group-item highlight">
+                <i class="fa fa-folder-open text-success-x" aria-hidden="true"></i>
+                <div>Topics</div>
+            </li>
             {#topics}
                 <li class="list-group-item">
                     {?link}

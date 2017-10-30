@@ -13,7 +13,10 @@
 
     {?pages}
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> Pages</li>
+            <li class="list-group-item highlight">
+                <span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>
+                <div>Pages</div>
+            </li>
         {#pages}
             <li class="list-group-item">
                 <span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>
@@ -26,7 +29,9 @@
     {:else}
         {?pageNodes}
             <ul class="list-group wt-list">
-                <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span> {?page}Child Pages{:else}Pages{/page}</li>
+                <li class="list-group-item highlight"><span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>
+                    <div>{?page}Child Pages{:else}Pages{/page}</div>
+                </li>
                 {#pageNodes}
                     <li class="list-group-item">
                         <span class="glyphicon glyphicon-file text-success" aria-hidden="true"></span>

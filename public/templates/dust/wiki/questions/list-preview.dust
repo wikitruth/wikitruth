@@ -1,9 +1,12 @@
 {?questions}
     <div class="wt-list">
         <ul class="list-group top-list-items">
-            <li class="list-group-item highlight"><span class="glyphicon glyphicon-question-sign text-muted" aria-hidden="true"></span> Questions <span class="wt-label label label-default">{entry.childrenCount.questions.accepted}</span>
-                {?entry.topic} <i class="fa fa-external-link" title="Linked Questions" style="font-size: smaller" aria-hidden="true"></i>{/entry.topic}
-                {?entry.argument} <i class="fa fa-external-link" title="Linked Questions" style="font-size: smaller" aria-hidden="true"></i>{/entry.argument}
+            <li class="list-group-item highlight">
+                <span class="glyphicon glyphicon-question-sign text-muted" aria-hidden="true"></span>
+                <div>Questions <span class="wt-label label label-default">{entry.childrenCount.questions.accepted}</span>
+                    {?entry.topic} <i class="fa fa-external-link" title="Linked Questions" style="font-size: smaller" aria-hidden="true"></i>{/entry.topic}
+                    {?entry.argument} <i class="fa fa-external-link" title="Linked Questions" style="font-size: smaller" aria-hidden="true"></i>{/entry.argument}
+                </div>
             </li>
             {#questions}
                 {>"dust/wiki/questions/entry-row" /}
