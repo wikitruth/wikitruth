@@ -1,7 +1,10 @@
 {?issues}
     <div class="wt-list">
         <ul class="list-group top-list-items">
-            <li class="list-group-item highlight"><i class="fa fa-exclamation-circle text-success-x" aria-hidden="true"></i> Issues <span class="wt-label label label-default">{entry.childrenCount.issues.accepted}</span></li>
+            <li class="list-group-item highlight">
+                <i class="fa fa-exclamation-circle text-success-x" aria-hidden="true"></i>
+                <div>Issues <span class="wt-label label label-default">{entry.childrenCount.issues.accepted}</span></div>
+            </li>
             {#issues}
                 {>"dust/wiki/issues/entry-row" /}
             {/issues}

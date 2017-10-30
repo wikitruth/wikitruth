@@ -34,7 +34,10 @@
     {?topics}
         <div class="wt-list">
             <ul class="list-group top-list-items">
-                <li class="list-group-item highlight text-muted"><i class="fa fa-folder-open text-success-x" aria-hidden="true"></i>&nbsp; Topics <span class="wt-label label label-default">{entry.childrenCount.topics.accepted}</span></li>
+                <li class="list-group-item highlight text-muted">
+                    <i class="fa fa-folder-open text-success-x" aria-hidden="true"></i>
+                    <div>Topics <span class="wt-label label label-default">{entry.childrenCount.topics.accepted}</span></div>
+                </li>
                 {#topics}
                     {>"dust/wiki/topics/entry-row" /}
                 {/topics}

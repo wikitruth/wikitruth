@@ -1,8 +1,11 @@
 {?artifacts}
     <div class="wt-list">
         <ul class="list-group top-list-items">
-            <li class="list-group-item highlight"><span class="fa fa-puzzle-piece text-muted" aria-hidden="true"></span> Artifacts <span class="wt-label label label-default">{entry.childrenCount.artifacts.accepted}</span>
-                {?entry.topic} <i class="fa fa-external-link" title="Linked Artifacts" style="font-size: smaller" aria-hidden="true"></i>{/entry.topic}
+            <li class="list-group-item highlight">
+                <span class="fa fa-puzzle-piece text-muted" aria-hidden="true"></span>
+                <div>Artifacts <span class="wt-label label label-default">{entry.childrenCount.artifacts.accepted}</span>
+                    {?entry.topic} <i class="fa fa-external-link" title="Linked Artifacts" style="font-size: smaller" aria-hidden="true"></i>{/entry.topic}
+                </div>
             </li>
             {#artifacts}
                 {>"dust/wiki/artifacts/entry-row" /}

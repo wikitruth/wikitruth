@@ -1,7 +1,10 @@
 {?answers}
     <div class="wt-list">
         <ul class="list-group top-list-items">
-            <li class="list-group-item highlight"><span class="glyphicon glyphicon-answer-sign text-success-x" aria-hidden="true"></span> Answers <span class="wt-label label label-default">{entry.childrenCount.answers.accepted}</span></li>
+            <li class="list-group-item highlight">
+                <span class="glyphicon glyphicon-answer-sign text-success-x" aria-hidden="true"></span>
+                <div>Answers <span class="wt-label label label-default">{entry.childrenCount.answers.accepted}</span></div>
+            </li>
             {#answers}
                 {>"dust/wiki/answers/entry-row" /}
             {/answers}

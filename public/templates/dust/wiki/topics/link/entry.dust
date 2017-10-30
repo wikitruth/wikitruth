@@ -27,7 +27,10 @@
     {?topics}
         <div class="wt-list">
             <ul class="list-group top-list-items">
-                <li class="list-group-item highlight text-muted"><i class="fa fa-folder-open text-success-x" aria-hidden="true"></i>&nbsp; Topics <span class="wt-label label label-default">{entry.childrenCount.topics.accepted}</span> <i class="fa fa-external-link" title="Linked Topics" style="font-size: smaller" aria-hidden="true"></i></li>
+                <li class="list-group-item highlight text-muted">
+                    <i class="fa fa-folder-open text-success-x" aria-hidden="true"></i>
+                    <div>Topics <span class="wt-label label label-default">{entry.childrenCount.topics.accepted}</span> <i class="fa fa-external-link" title="Linked Topics" style="font-size: smaller" aria-hidden="true"></i></div>
+                </li>
                 {#topics}
                     {>"dust/wiki/topics/entry-row" /}
                 {/topics}
@@ -40,7 +43,10 @@
     {?arguments}
         <div class="wt-list">
             <ul class="list-group top-list-items">
-                <li class="list-group-item highlight text-primary-x text-muted-x"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span> {contents.argument.longList} <span class="wt-label label label-default">{entry.topic.childrenCount.arguments.accepted}</span> <i class="fa fa-external-link" title="Linked Facts" style="font-size: smaller" aria-hidden="true"></i></li>
+                <li class="list-group-item highlight text-primary-x text-muted-x">
+                    <span class="glyphicon glyphicon-flash" aria-hidden="true"></span>
+                    <div>{contents.argument.longList} <span class="wt-label label label-default">{entry.topic.childrenCount.arguments.accepted}</span> <i class="fa fa-external-link" title="Linked Facts" style="font-size: smaller" aria-hidden="true"></i></div>
+                </li>
                 {#arguments}
                     {>"dust/wiki/arguments/entry-row" /}
                 {/arguments}
