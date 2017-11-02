@@ -130,7 +130,7 @@ function GET_entry(req, res) {
 }
 
 function GET_index(req, res) {
-    var model = {};
+    var model = {}, query = {};
     var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
     flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
         if(model.topic) {
@@ -138,7 +138,7 @@ function GET_index(req, res) {
             if(model.argument && !flowUtils.isEntryOnIntendedUrl(req, model.argument) || model.topic && !flowUtils.isEntryOnIntendedUrl(req, model.topic)) {
                 return res.redirect('/');
             }
-            var query = { 'screening.status': model.screening.status };
+            query = { 'screening.status': model.screening.status };
             if(req.query.argument) {
                 query.parentId = model.argument._id;
             } else {
@@ -172,7 +172,7 @@ function GET_index(req, res) {
             });
         } else {
             // Top Arguments
-            var query = {
+            query = {
                 ownerType: constants.OBJECT_TYPES.topic,
                 private: false,
                 'screening.status': constants.SCREENING_STATUS.status1.code

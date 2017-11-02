@@ -49,12 +49,12 @@ function GET_entry(req, res) {
 }
 
 function GET_index(req, res) {
-    var model = {};
+    var model = {}, query = {};
     var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
     flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
         if(model.topic) {
             flowUtils.setScreeningModel(req, model);
-            var query = req.query.argument ?
+            query = req.query.argument ?
             { ownerId: model.argument._id, ownerType: constants.OBJECT_TYPES.argument } :
             { ownerId: model.topic._id, ownerType: constants.OBJECT_TYPES.topic };
             query['screening.status'] = model.screening.status;
@@ -74,7 +74,7 @@ function GET_index(req, res) {
             });
         } else {
             // Top Questions
-            var query = { ownerType: constants.OBJECT_TYPES.topic, private: false, 'screening.status': constants.SCREENING_STATUS.status1.code };
+            query = { ownerType: constants.OBJECT_TYPES.topic, private: false, 'screening.status': constants.SCREENING_STATUS.status1.code };
             //db.Question.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
             db.Question
                 .find(query)
