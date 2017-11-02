@@ -108,6 +108,12 @@
                         <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent sibling 3</a></li>
                         <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> more...</a></li>
                         <li role="separator" class="divider"></li>
+                        <li class="dropdown-header">Related</li>
+                        <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Related topic</a></li>
+                        <li><a href="#"><i class="glyphicon glyphicon-flash text-color-3-x" aria-hidden="true"></i> Related fact</a></li>
+                        <li><a href="#"><i class="fa fa-question-circle text-color-3-x" aria-hidden="true"></i> Related question</a></li>
+                        <li><a href="#"><i class="fa fa-arrow-circle-right text-color-3-x" aria-hidden="true"></i> more...</a></li>
+                        <li role="separator" class="divider"></li>
                     {/topic}
                     <li class="dropdown-header">Categories</li>
                     {#appCategories}

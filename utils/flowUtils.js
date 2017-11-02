@@ -69,6 +69,19 @@ function appendEntryExtra(item) {
             item.referenceDateSimple = item.referenceDateSimple.substring(0, item.referenceDateSimple.length - mn.length);
         }
     }
+    if(item.childrenCount) {
+        var hasChildren = function(objectName) {
+            return item.childrenCount[objectName] && item.childrenCount[objectName].accepted > 0;
+        };
+        if(hasChildren('topics')
+            || hasChildren('arguments')
+            || hasChildren('questions')
+            || hasChildren('answers')
+            || hasChildren('issues')
+            || hasChildren('opinions')) {
+            item.hasChildren = true;
+        }
+    }
 }
 
 /*
@@ -865,6 +878,7 @@ function getTopics(query, limit, callback) {
                     setEditorsUsername(results, function() {
                         results.forEach(function (result) {
                             appendEntryExtra(result);
+                            result.objectName = getObjectName(constants.OBJECT_TYPES.topic);
                             //result.link = false;
                         });
                         callback(null, results);
@@ -947,6 +961,7 @@ function getArguments(query, limit, callback) {
                     setEditorsUsername(results, function() {
                         results.forEach(function (result) {
                             appendEntryExtra(result);
+                            result.objectName = getObjectName(constants.OBJECT_TYPES.argument);
                             //result.link = false;
                             //result.against = false;
                         });

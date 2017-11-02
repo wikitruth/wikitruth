@@ -131,77 +131,76 @@ function GET_entry(req, res) {
 
 function GET_index(req, res) {
     var model = {};
-    if(req.query.topic) {
-        flowUtils.setTopicModels(req, model, function () {
+    var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
+    flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
+        if(model.topic) {
             flowUtils.setScreeningModel(req, model);
-            flowUtils.setArgumentModels(req, model, function () {
-                if(model.argument && !flowUtils.isEntryOnIntendedUrl(req, model.argument) || model.topic && !flowUtils.isEntryOnIntendedUrl(req, model.topic)) {
-                    return res.redirect('/');
+            if(model.argument && !flowUtils.isEntryOnIntendedUrl(req, model.argument) || model.topic && !flowUtils.isEntryOnIntendedUrl(req, model.topic)) {
+                return res.redirect('/');
+            }
+            var query = { 'screening.status': model.screening.status };
+            if(req.query.argument) {
+                query.parentId = model.argument._id;
+            } else {
+                query.parentId = null;
+                query.ownerId = model.topic._id;
+                query.ownerType = constants.OBJECT_TYPES.topic;
+            }
+            flowUtils.getArguments(query, 0, function (err, results) {
+                var support = results.filter(function (arg) {
+                    return !arg.against;
+                });
+                var contra = results.filter(function (arg) {
+                    return arg.against;
+                });
+                model.arguments = results;
+                if(support.length > 0) {
+                    model.proArguments = support;
                 }
-                var query = { 'screening.status': model.screening.status };
-                if(req.query.argument) {
-                    query.parentId = model.argument._id;
-                } else {
-                    query.parentId = null;
-                    query.ownerId = model.topic._id;
-                    query.ownerType = constants.OBJECT_TYPES.topic;
+                if(contra.length > 0) {
+                    model.conArguments = contra;
                 }
-                flowUtils.getArguments(query, 0, function (err, results) {
-                    var support = results.filter(function (arg) {
-                        return !arg.against;
-                    });
-                    var contra = results.filter(function (arg) {
-                        return arg.against;
-                    });
-                    model.arguments = results;
-                    if(support.length > 0) {
-                        model.proArguments = support;
-                    }
-                    if(contra.length > 0) {
-                        model.conArguments = contra;
-                    }
-                    results.forEach(function (result) {
-                        flowUtils.setVerdictModel(result);
-                    });
-                    flowUtils.sortArguments(results);
-                    flowUtils.setModelOwnerEntry(req, model);
+                results.forEach(function (result) {
+                    flowUtils.setVerdictModel(result);
+                });
+                flowUtils.sortArguments(results);
+                flowUtils.setModelOwnerEntry(req, model);
 
-                    // screening and children count
-                    flowUtils.setScreeningModelCount(model, model.entry.childrenCount['arguments']);
-                    res.render(templates.wiki.arguments.index, model);
-                });
+                // screening and children count
+                flowUtils.setScreeningModelCount(model, model.entry.childrenCount['arguments']);
+                res.render(templates.wiki.arguments.index, model);
             });
-        });
-    } else {
-        // Top Arguments
-        var query = {
-            ownerType: constants.OBJECT_TYPES.topic,
-            private: false,
-            'screening.status': constants.SCREENING_STATUS.status1.code
-        };
-        //db.Argument.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
-        db.Argument
-            .find(query)
-            .sort({editDate: -1})
-            .limit(25)
-            .lean()
-            .exec(function (err, results) {
-                flowUtils.setEditorsUsername(results, function() {
-                    results.forEach(function (result) {
-                        result.topic = {
-                            _id: result.ownerId
-                        };
-                        flowUtils.appendEntryExtra(result);
-                        flowUtils.setVerdictModel(result);
+        } else {
+            // Top Arguments
+            var query = {
+                ownerType: constants.OBJECT_TYPES.topic,
+                private: false,
+                'screening.status': constants.SCREENING_STATUS.status1.code
+            };
+            //db.Argument.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
+            db.Argument
+                .find(query)
+                .sort({editDate: -1})
+                .limit(25)
+                .lean()
+                .exec(function (err, results) {
+                    flowUtils.setEditorsUsername(results, function() {
+                        results.forEach(function (result) {
+                            result.topic = {
+                                _id: result.ownerId
+                            };
+                            flowUtils.appendEntryExtra(result);
+                            flowUtils.setVerdictModel(result);
+                        });
+                        //flowUtils.sortArguments(results);
+                        model.arguments = results;
+                        model.proArguments = results;
+                        flowUtils.setModelContext(req, model);
+                        res.render(templates.wiki.arguments.index, model);
                     });
-                    //flowUtils.sortArguments(results);
-                    model.arguments = results;
-                    model.proArguments = results;
-                    flowUtils.setModelContext(req, model);
-                    res.render(templates.wiki.arguments.index, model);
                 });
-            });
-    }
+        }
+    });
 }
 
 function GET_create(req, res) {
