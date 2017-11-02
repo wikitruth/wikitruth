@@ -16,7 +16,7 @@
             {>"dust/wiki/common/subtitle-create" /}
         {/artifact}
     </div>
-    <div class="alert alert-success" role="alert">An artifact entry is a representation of an external material (source) to allow easy discussion and referencing within the system. It also helps in archiving the external material in case the original source gets deleted or modified.</div>
+    <div class="alert alert-success" role="alert">An artifact represents source material (internal or external) to allow easy discussion and referencing within the system. It also helps in archiving the external material in case the original source gets deleted or modified.</div>
     <form method="post" encType="multipart/form-data">
         <input type="hidden" name="_csrf" value="{_csrf}">
         <div class="form-group">
@@ -32,7 +32,7 @@
                 <a role="button" data-toggle="collapse" href="#collapseReferences" aria-expanded="true" aria-controls="collapseReferences" class="wt-collapse-toggle">Source</a>
             </label>
             <div class="collapse in" id="collapseReferences">
-                <textarea class="form-control" id="inputReferences" name="references" rows="3">{artifact.source}</textarea>
+                <textarea class="form-control" id="inputReferences" name="source" rows="3">{artifact.source}</textarea>
             </div>
         </div>
         <div class="form-group">

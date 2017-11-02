@@ -53,7 +53,7 @@ function GET_index(req, res) {
     if(query.ownerId) {
         flowUtils.setScreeningModel(req, model);
         flowUtils.setEntryModels(query, req, model, function (err) {
-            query = flowUtils.createOwnerQueryFromModel(model);
+            //query = flowUtils.createOwnerQueryFromModel(model);
             query['screening.status'] = model.screening.status;
             db.Opinion
                 .find(query)

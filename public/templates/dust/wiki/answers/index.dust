@@ -14,7 +14,7 @@
     {?answers}
         <ul class="list-group wt-list">
             <li class="list-group-item highlight">
-                <i class="fa fa-answer-circle text-success-x" aria-hidden="true"></i>
+                <i class="fa fa-check-circle text-success-x" aria-hidden="true"></i>
                 <div>{^topic}Latest {/topic}Answers</div>
             </li>
             {#answers}

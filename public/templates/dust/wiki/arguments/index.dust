@@ -25,7 +25,9 @@
     {/proArguments}
     {?conArguments}
         <ul class="list-group wt-list">
-            <li class="list-group-item highlight text-primary-x"><i class="glyphicon glyphicon-flash" aria-hidden="true"></i> Opposing {contents.argument.shortList}</li>
+            <li class="list-group-item highlight text-primary-x"><i class="glyphicon glyphicon-flash" aria-hidden="true"></i>
+                <div>Opposing {contents.argument.shortList}</div>
+            </li>
             {#conArguments}
                 {>"dust/wiki/arguments/entry-row" /}
             {/conArguments}

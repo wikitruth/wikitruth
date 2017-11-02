@@ -50,52 +50,53 @@ function GET_entry(req, res) {
 
 function GET_index(req, res) {
     var model = {};
-    if(req.query.topic) {
-        flowUtils.setScreeningModel(req, model);
-        flowUtils.setTopicModels(req, model, function () {
-            flowUtils.setArgumentModels(req, model, function () {
-                var query = req.query.argument ?
-                    { ownerId: model.argument._id, ownerType: constants.OBJECT_TYPES.argument } :
-                    { ownerId: model.topic._id, ownerType: constants.OBJECT_TYPES.topic };
-                query['screening.status'] = model.screening.status;
-                db.Question.find(query).sort({ title: 1 }).lean().exec(function(err, results) {
-                    flowUtils.setEditorsUsername(results, function() {
-                        results.forEach(function (result) {
-                            flowUtils.appendEntryExtra(result);
-                        });
-                        model.questions = results;
-                        flowUtils.setModelOwnerEntry(req, model);
-
-                        // screening and children count
-                        flowUtils.setScreeningModelCount(model, model.entry.childrenCount.questions);
-                        res.render(templates.wiki.questions.index, model);
-                    });
-                });
-            });
-        });
-    } else {
-        // Top Questions
-        var query = { ownerType: constants.OBJECT_TYPES.topic, private: false, 'screening.status': constants.SCREENING_STATUS.status1.code };
-        //db.Question.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
-        db.Question
-            .find(query)
-            .sort({editDate: -1})
-            .limit(25)
-            .lean()
-            .exec(function (err, results) {
+    var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
+    flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
+        if(model.topic) {
+            flowUtils.setScreeningModel(req, model);
+            var query = req.query.argument ?
+            { ownerId: model.argument._id, ownerType: constants.OBJECT_TYPES.argument } :
+            { ownerId: model.topic._id, ownerType: constants.OBJECT_TYPES.topic };
+            query['screening.status'] = model.screening.status;
+            db.Question.find(query).sort({ title: 1 }).lean().exec(function(err, results) {
                 flowUtils.setEditorsUsername(results, function() {
                     results.forEach(function (result) {
-                        result.topic = {
-                            _id: result.ownerId
-                        };
                         flowUtils.appendEntryExtra(result);
+                        result.objectName = flowUtils.getObjectName(constants.OBJECT_TYPES.question);
                     });
                     model.questions = results;
-                    flowUtils.setModelContext(req, model);
+                    flowUtils.setModelOwnerEntry(req, model);
+
+                    // screening and children count
+                    flowUtils.setScreeningModelCount(model, model.entry.childrenCount.questions);
                     res.render(templates.wiki.questions.index, model);
                 });
             });
-    }
+        } else {
+            // Top Questions
+            var query = { ownerType: constants.OBJECT_TYPES.topic, private: false, 'screening.status': constants.SCREENING_STATUS.status1.code };
+            //db.Question.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
+            db.Question
+                .find(query)
+                .sort({editDate: -1})
+                .limit(25)
+                .lean()
+                .exec(function (err, results) {
+                    flowUtils.setEditorsUsername(results, function() {
+                        results.forEach(function (result) {
+                            result.topic = {
+                                _id: result.ownerId
+                            };
+                            flowUtils.appendEntryExtra(result);
+                            result.objectName = flowUtils.getObjectName(constants.OBJECT_TYPES.question);
+                        });
+                        model.questions = results;
+                        flowUtils.setModelContext(req, model);
+                        res.render(templates.wiki.questions.index, model);
+                    });
+                });
+        }
+    });
 }
 
 function GET_create(req, res) {
