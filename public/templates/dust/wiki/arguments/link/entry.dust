@@ -36,7 +36,6 @@
             {/topicLinks}
         </div>
     {/topic}
-    {>"dust/wiki/common/entry-options" /}
     {>"dust/wiki/issues/list-preview" /}
     {>"dust/wiki/opinions/list-preview" /}
     {>"dust/wiki/common/entry-footer" /}
