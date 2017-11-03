@@ -30,7 +30,7 @@ module.exports = function (router) {
                     };
                     db.Topic.find(query, function(err, results) {
                         results.forEach(function (result) {
-                            flowUtils.appendEntryExtra(result);
+                            flowUtils.appendEntryExtras(result);
                         });
                         model.topics = results;
                         callback();
@@ -48,7 +48,7 @@ module.exports = function (router) {
                     };
                     db.Argument.find(query, function(err, results) {
                         results.forEach(function (result) {
-                            flowUtils.appendEntryExtra(result);
+                            flowUtils.appendEntryExtras(result);
                         });
                         model.arguments = results;
                         callback();

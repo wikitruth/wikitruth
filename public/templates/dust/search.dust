@@ -46,7 +46,7 @@
                 </li>
                 <li role="presentation"{@eq key=tab value="arguments"} class="active"{/eq}>
                     <a href="{paths.search}?q={keyword}&amp;tab=arguments" role="tab">
-                        <i class="fa fa-flash" aria-hidden="true"></i> <span class="hidden-xs">Arguments</span>
+                        <i class="fa fa-flash" aria-hidden="true"></i> <span class="hidden-xs">Facts</span>
                     </a>
                 </li>
                 <li role="presentation"{@eq key=tab value="questions"} class="active"{/eq}>

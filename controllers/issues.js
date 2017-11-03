@@ -43,7 +43,7 @@ function GET_index(req, res) {
                 flowUtils.setEditorsUsername(results, function() {
                     results.forEach(function (result) {
                         result.issueType = constants.ISSUE_TYPES['type' + result.issueType];
-                        flowUtils.appendEntryExtra(result);
+                        flowUtils.appendEntryExtras(result);
                     });
                     model.issues = results;
                     flowUtils.setModelOwnerEntry(req, model);
@@ -67,7 +67,7 @@ function GET_index(req, res) {
                         result.topic = {
                             _id: result.ownerId
                         };
-                        flowUtils.appendEntryExtra(result);
+                        flowUtils.appendEntryExtras(result);
                     });
                     model.issues = results;
                     flowUtils.setModelContext(req, model);

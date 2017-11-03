@@ -26,7 +26,7 @@ function GET_entry(req, res) {
                     .exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
-                            flowUtils.appendEntryExtra(result);
+                            flowUtils.appendEntryExtras(result);
                         });
                         model.answers = results;
                         callback();
@@ -61,8 +61,7 @@ function GET_index(req, res) {
             db.Question.find(query).sort({ title: 1 }).lean().exec(function(err, results) {
                 flowUtils.setEditorsUsername(results, function() {
                     results.forEach(function (result) {
-                        flowUtils.appendEntryExtra(result);
-                        result.objectName = flowUtils.getObjectName(constants.OBJECT_TYPES.question);
+                        flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.question);
                     });
                     model.questions = results;
                     flowUtils.setModelOwnerEntry(req, model);
@@ -87,8 +86,7 @@ function GET_index(req, res) {
                             result.topic = {
                                 _id: result.ownerId
                             };
-                            flowUtils.appendEntryExtra(result);
-                            result.objectName = flowUtils.getObjectName(constants.OBJECT_TYPES.question);
+                            flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.question);
                         });
                         model.questions = results;
                         flowUtils.setModelContext(req, model);

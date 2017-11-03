@@ -34,7 +34,7 @@
                     <div class="col-sm-4">
                         <div class="well stat">
                             <div class="stat-value">{arguments}</div>
-                            <div class="stat-label">Arguments</div>
+                            <div class="stat-label">Facts</div>
                         </div>
                     </div>
                 </a>
