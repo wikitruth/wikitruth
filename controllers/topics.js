@@ -195,7 +195,7 @@ function GET_entry(req, res) {
                 db.Question.find(query).limit(15).exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
-                            flowUtils.appendEntryExtra(result);
+                            flowUtils.appendEntryExtras(result);
                         });
                         model.questions = results;
                         callback();
@@ -229,7 +229,7 @@ function GET_create(req, res) {
         topic: function(callback){
             if(req.query.id) {
                 db.Topic.findOne({_id: req.query.id}, function (err, result) {
-                    flowUtils.appendEntryExtra(result);
+                    flowUtils.appendEntryExtras(result);
                     model.topic = result;
                     callback();
                 });
@@ -241,7 +241,7 @@ function GET_create(req, res) {
             var query = { _id: req.query.topic ? req.query.topic : model.topic && model.topic.parentId ? model.topic.parentId : null };
             if(query._id) {
                 db.Topic.findOne(query, function (err, result) {
-                    flowUtils.appendEntryExtra(result);
+                    flowUtils.appendEntryExtras(result);
                     model.parentTopic = result;
                     callback();
                 });
@@ -428,7 +428,7 @@ function GET_link_entry(req, res) {
                 db.Question.find(query).limit(15).exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
-                            flowUtils.appendEntryExtra(result);
+                            flowUtils.appendEntryExtras(result);
                         });
                         model.questions = results;
                         callback();

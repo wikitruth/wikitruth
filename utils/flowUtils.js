@@ -37,18 +37,20 @@ function isCategoryTopic(entry) {
     return entry.tags.indexOf(constants.TOPIC_TAGS.tag510.code) > -1;
 }
 
-function appendListExtra(item) {
+function appendListExtras(item, objectType) {
     if(item.title) {
         item.friendlyUrl = utils.urlify(item.title);
         item.shortTitle = utils.getShortText(item.title);
     }
-    if(item.getType) {
+    if(objectType) {
+        item.objectName = getObjectName(objectType);
+    } else if(item.getType) {
         item.objectName = getObjectName(item.getType());
     }
 }
 
-function appendEntryExtra(item) {
-    appendListExtra(item);
+function appendEntryExtras(item, objectType) {
+    appendListExtras(item, objectType);
     item.comments = utils.randomInt(0,999);
     item.points = utils.randomInt(0,9999);
 
@@ -168,7 +170,7 @@ function setEntryParents(items, typeId, callback) {
                     .find({ _id: { $in: topicIds }})
                     .exec(function (err, results) {
                         results.forEach(function (result) {
-                            appendListExtra(result);
+                            appendListExtras(result);
                             topics[result._id.valueOf()] = result;
                         });
                         callback();
@@ -190,7 +192,7 @@ function setEntryParents(items, typeId, callback) {
                             .find({ _id: { $in: topicIds2 }})
                             .exec(function (err, topicResults) {
                                 topicResults.forEach(function (result) {
-                                    appendListExtra(result);
+                                    appendListExtras(result);
                                     topics2[result._id.valueOf()] = result;
                                 });
                                 linkResults.forEach(function (result) {
@@ -212,7 +214,7 @@ function setEntryParents(items, typeId, callback) {
                     .find(query)
                     .exec(function (err, results) {
                         results.forEach(function (result) {
-                            appendListExtra(result);
+                            appendListExtras(result);
                             args[result._id.valueOf()] = result;
                         });
                         callback();
@@ -234,7 +236,7 @@ function setEntryParents(items, typeId, callback) {
                             .find({ _id: { $in: argumentIds2 }})
                             .exec(function (err, results2) {
                                 results2.forEach(function (result) {
-                                    appendListExtra(result);
+                                    appendListExtras(result);
                                     arguments2[result._id.valueOf()] = result;
                                 });
                                 results.forEach(function (result) {
@@ -256,7 +258,7 @@ function setEntryParents(items, typeId, callback) {
                     .find(query)
                     .exec(function (err, results) {
                         results.forEach(function (result) {
-                            appendListExtra(result);
+                            appendListExtras(result);
                             questions[result._id.valueOf()] = result;
                         });
                         callback();
@@ -272,7 +274,7 @@ function setEntryParents(items, typeId, callback) {
                     .find(query)
                     .exec(function (err, results) {
                         results.forEach(function (result) {
-                            appendListExtra(result);
+                            appendListExtras(result);
                             answers[result._id.valueOf()] = result;
                         });
                         callback();
@@ -288,7 +290,7 @@ function setEntryParents(items, typeId, callback) {
                     .find(query)
                     .exec(function (err, results) {
                         results.forEach(function (result) {
-                            appendListExtra(result);
+                            appendListExtras(result);
                             artifacts[result._id.valueOf()] = result;
                         });
                         callback();
@@ -304,7 +306,7 @@ function setEntryParents(items, typeId, callback) {
                     .find(query)
                     .exec(function (err, results) {
                         results.forEach(function (result) {
-                            appendListExtra(result);
+                            appendListExtras(result);
                             issues[result._id.valueOf()] = result;
                         });
                         callback();
@@ -320,7 +322,7 @@ function setEntryParents(items, typeId, callback) {
                     .find(query)
                     .exec(function (err, results) {
                         results.forEach(function (result) {
-                            appendListExtra(result);
+                            appendListExtras(result);
                             opinions[result._id.valueOf()] = result;
                         });
                         callback();
@@ -470,7 +472,7 @@ function setArtifactModel(req, model, callback) {
                     result.thumbnailPath = result.getThumbnailPath();
                 }
             }
-            appendEntryExtra(result);
+            appendEntryExtras(result);
             if(isEntryOwner(req, result)) {
                 model.isArtifactOwner = true;
             }
@@ -485,7 +487,7 @@ function setQuestionModel(req, model, callback) {
     if(req.query.question) {
         db.Question.findOne({_id: req.query.question}, function (err, result) {
             model.question = result;
-            appendEntryExtra(result);
+            appendEntryExtras(result);
             if(isEntryOwner(req, result)) {
                 model.isQuestionOwner = true;
             }
@@ -500,7 +502,7 @@ function setAnswerModel(req, model, callback) {
     if(req.query.answer) {
         db.Answer.findOne({_id: req.query.answer}, function (err, result) {
             model.answer = result;
-            appendEntryExtra(result);
+            appendEntryExtras(result);
             if(isEntryOwner(req, result)) {
                 model.isAnswerOwner = true;
             }
@@ -515,7 +517,7 @@ function setIssueModel(req, model, callback) {
     if(req.query.issue) {
         db.Issue.findOne({_id: req.query.issue}, function (err, result) {
             model.issue = result;
-            appendEntryExtra(result);
+            appendEntryExtras(result);
             if(isEntryOwner(req, result)) {
                 model.isIssueOwner = true;
             }
@@ -539,7 +541,7 @@ function setOpinionModel(req, model, callback) {
                     } else {
                         model.opinion = result;
                     }
-                    appendEntryExtra(result);
+                    appendEntryExtras(result);
                     if (isEntryOwner(req, result)) {
                         if(model.opinion2) {
                             model.isOpinionOwner2 = true;
@@ -555,7 +557,7 @@ function setOpinionModel(req, model, callback) {
                 if(opinion && opinion.parentId) {
                     db.Opinion.findOne({_id: opinion.parentId}, function (err, result) {
                         if (result) {
-                            appendEntryExtra(result);
+                            appendEntryExtras(result);
                             if(model.opinion2) {
                                 model.parentOpinion2 = result;
                             } else {
@@ -573,7 +575,7 @@ function setOpinionModel(req, model, callback) {
                 if(parentOpinion && parentOpinion.parentId) {
                     db.Opinion.findOne({_id: parentOpinion.parentId}, function (err, result) {
                         if (result) {
-                            appendEntryExtra(result);
+                            appendEntryExtras(result);
                             if(model.opinion2) {
                                 model.grandParentOpinion2 = result;
                             } else {
@@ -600,7 +602,7 @@ function setArgumentLinkModel(req, model, callback) {
             argumentLink: function (callback) {
                 db.ArgumentLink.findOne({_id: req.query.argumentLink}, function(err, result) {
                     model.argumentLink = result;
-                    appendEntryExtra(result);
+                    appendEntryExtras(result);
                     if(isEntryOwner(req, result)) {
                         model.isArgumentLinkOwner = true;
                     }
@@ -611,7 +613,7 @@ function setArgumentLinkModel(req, model, callback) {
                 if(model.argumentLink) {
                     db.Argument.findOne({_id: model.argumentLink.argumentId}, function (err, result) {
                         if (result) {
-                            appendEntryExtra(result);
+                            appendEntryExtras(result);
                             model.argumentLink.argument = result;
                             model.argumentLink.references = result.references;
                             model.argumentLink.title2 = model.argumentLink.title ? model.argumentLink.title : result.title;
@@ -640,7 +642,7 @@ function setArgumentModels(req, model, callback) {
                         return callback(err);
                     }
                     model.argument = result;
-                    appendEntryExtra(result);
+                    appendEntryExtras(result);
                     if (isEntryOwner(req, result)) {
                         model.isArgumentOwner = true;
                     }
@@ -651,7 +653,7 @@ function setArgumentModels(req, model, callback) {
                 if(model.argument && model.argument.parentId) {
                     db.Argument.findOne({_id: model.argument.parentId}, function (err, result) {
                         if (result) {
-                            appendEntryExtra(result);
+                            appendEntryExtras(result);
                             model.parentArgument = result;
                         }
                         callback();
@@ -664,7 +666,7 @@ function setArgumentModels(req, model, callback) {
                 if(model.parentArgument && model.parentArgument.parentId) {
                     db.Argument.findOne({_id: model.parentArgument.parentId}, function (err, result) {
                         if (result) {
-                            appendEntryExtra(result);
+                            appendEntryExtras(result);
                             model.grandParentArgument = result;
                         }
                         callback();
@@ -702,8 +704,8 @@ function setTopicLinkModel(req, model, callback) {
                             model.topicLink.referenceDate = result.referenceDate;
                             model.topicLink.title2 = model.topicLink.title ? model.topicLink.title : result.title;
                             model.topicLink.content2 = result.content;
-                            appendEntryExtra(result);
-                            appendEntryExtra(model.topicLink);
+                            appendEntryExtras(result);
+                            appendEntryExtras(model.topicLink);
                         }
                         callback();
                     });
@@ -733,7 +735,7 @@ function setTopicModels(req, model, callback) {
                         return callback(err);
                     }
                     model.topic = result;
-                    appendEntryExtra(result);
+                    appendEntryExtras(result);
                     if(isEntryOwner(req, result)) {
                         model.isTopicOwner = true;
                     }
@@ -744,7 +746,7 @@ function setTopicModels(req, model, callback) {
                 if(model.topic && model.topic.parentId) {
                     db.Topic.findOne({_id: model.topic.parentId}, function (err, result) {
                         if (result) {
-                            appendEntryExtra(result);
+                            appendEntryExtras(result);
                             model.parentTopic = result;
                         }
                         callback();
@@ -757,7 +759,7 @@ function setTopicModels(req, model, callback) {
                 if(model.parentTopic && model.parentTopic.parentId) {
                     db.Topic.findOne({_id: model.parentTopic.parentId}, function (err, result) {
                         if (result) {
-                            appendEntryExtra(result);
+                            appendEntryExtras(result);
                             model.grandParentTopic = result;
                         }
                         callback();
@@ -877,7 +879,7 @@ function getTopics(query, limit, callback) {
                 .exec(function(err, results) {
                     setEditorsUsername(results, function() {
                         results.forEach(function (result) {
-                            appendEntryExtra(result);
+                            appendEntryExtras(result);
                             result.objectName = getObjectName(constants.OBJECT_TYPES.topic);
                             //result.link = false;
                         });
@@ -916,7 +918,7 @@ function getTopics(query, limit, callback) {
                                         .exec(function (err, linkParents) {
                                             setEditorsUsername(results, function () {
                                                 results.forEach(function (result) {
-                                                    appendEntryExtra(result);
+                                                    appendEntryExtras(result);
                                                     var link = links.find(function (link) {
                                                         return link.topicId.equals(result._id);
                                                     });
@@ -925,7 +927,7 @@ function getTopics(query, limit, callback) {
                                                             return linkParent._id.equals(result.parentId);
                                                         });
                                                         if(linkParent) {
-                                                            appendListExtra(linkParent);
+                                                            appendListExtras(linkParent);
                                                         }
                                                         result.parentTopic = linkParent;
                                                         result.link = link;
@@ -960,7 +962,7 @@ function getArguments(query, limit, callback) {
                 .exec(function(err, results) {
                     setEditorsUsername(results, function() {
                         results.forEach(function (result) {
-                            appendEntryExtra(result);
+                            appendEntryExtras(result);
                             result.objectName = getObjectName(constants.OBJECT_TYPES.argument);
                             //result.link = false;
                             //result.against = false;
@@ -1018,7 +1020,7 @@ function getArguments(query, limit, callback) {
                                     }, function (err, linkParents) {
                                         setEditorsUsername(results, function () {
                                             results.forEach(function (result) {
-                                                appendEntryExtra(result);
+                                                appendEntryExtras(result);
                                                 var link = links.find(function (link) {
                                                     return link.argumentId.equals(result._id);
                                                 });
@@ -1028,7 +1030,7 @@ function getArguments(query, limit, callback) {
                                                             return linkParent._id.equals(result.parentId);
                                                         });
                                                         if(parentArgument) {
-                                                            appendListExtra(parentArgument);
+                                                            appendListExtras(parentArgument);
                                                         }
                                                         result.parentArgument = parentArgument;
                                                     } else if(result.ownerType === constants.OBJECT_TYPES.topic && result.ownerId) {
@@ -1036,7 +1038,7 @@ function getArguments(query, limit, callback) {
                                                             return linkParent._id.equals(result.ownerId);
                                                         });
                                                         if(linkParent) {
-                                                            appendListExtra(linkParent);
+                                                            appendListExtras(linkParent);
                                                         }
                                                         result.parentTopic = linkParent;
                                                     }
@@ -1071,7 +1073,7 @@ function getTopArtifacts(query, model, callback) {
         .exec(function(err, results) {
             setEditorsUsername(results, function() {
                 results.forEach(function (result) {
-                    appendEntryExtra(result);
+                    appendEntryExtras(result);
                 });
                 model.artifacts = results;
                 callback();
@@ -1089,7 +1091,7 @@ function getTopIssues(query, model, callback) {
             setEditorsUsername(results, function() {
                 results.forEach(function (result) {
                     result.issueType = constants.ISSUE_TYPES['type' + result.issueType];
-                    appendEntryExtra(result);
+                    appendEntryExtras(result);
                 });
                 model.issues = results;
                 callback();
@@ -1106,7 +1108,7 @@ function getTopOpinions(query, model, callback) {
         .exec(function(err, results) {
             setEditorsUsername(results, function() {
                 results.forEach(function (result) {
-                    appendEntryExtra(result);
+                    appendEntryExtras(result);
                 });
                 model.opinions = results;
                 callback();
@@ -2635,7 +2637,7 @@ module.exports = {
     isEntryOnIntendedUrl: isEntryOnIntendedUrl,
     isCategoryTopic: isCategoryTopic,
     appendOwnerFlag: appendOwnerFlag,
-    appendEntryExtra: appendEntryExtra,
+    appendEntryExtras: appendEntryExtras,
 
     setArgumentModels: setArgumentModels,
     setTopicModels: setTopicModels,

@@ -102,7 +102,7 @@ function GET_entry(req, res) {
                 db.Question.find(query).limit(15).sort({ title: 1 }).lean().exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
-                            flowUtils.appendEntryExtra(result);
+                            flowUtils.appendEntryExtras(result);
                         });
                         model.questions = results;
                         if(results.length >= 15) {
@@ -131,8 +131,7 @@ function GET_entry(req, res) {
 
 function GET_index(req, res) {
     var model = {}, query = {};
-    var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
-    flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
+    flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
         if(model.topic) {
             flowUtils.setScreeningModel(req, model);
             if(model.argument && !flowUtils.isEntryOnIntendedUrl(req, model.argument) || model.topic && !flowUtils.isEntryOnIntendedUrl(req, model.topic)) {
@@ -189,7 +188,7 @@ function GET_index(req, res) {
                             result.topic = {
                                 _id: result.ownerId
                             };
-                            flowUtils.appendEntryExtra(result);
+                            flowUtils.appendEntryExtras(result);
                             flowUtils.setVerdictModel(result);
                         });
                         //flowUtils.sortArguments(results);
@@ -207,12 +206,20 @@ function GET_create(req, res) {
     var model = {
         argumentTypes: constants.ARGUMENT_TYPES
     };
-    flowUtils.setTopicModels(req, model, function () {
+    if(req.query.id) {
+        req.query.argument = req.query.id;
+    }
+    flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function () {
+        if(req.query.id) {
+            delete req.query.argument;
+        } else {
+            delete model.argument;
+        }
         async.series({
             argument: function (callback) {
                 if(req.query.id) {
                     db.Argument.findOne({_id: req.query.id}, function (err, result) {
-                        flowUtils.appendEntryExtra(result);
+                        flowUtils.appendEntryExtras(result);
                         model.argument = result;
                         callback();
                     });
@@ -224,7 +231,7 @@ function GET_create(req, res) {
                 var query = { _id: req.query.argument ? req.query.argument : model.argument && model.argument.parentId ? model.argument.parentId : null };
                 if(query._id) {
                     db.Argument.findOne(query, function (err, result) {
-                        flowUtils.appendEntryExtra(result);
+                        flowUtils.appendEntryExtras(result);
                         model.parentArgument = result;
                         callback();
                     });

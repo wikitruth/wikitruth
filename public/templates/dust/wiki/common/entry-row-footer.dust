@@ -4,12 +4,12 @@
     <a class="text-muted-2" href="/members/{editUsername}">{!<i class="fa fa-user"></i>!}<i class="fa fa-user-circle-o text-muted-3"></i> {editUsername}</a>
     <a class="text-muted-2 wt-entry-reply" data-toggle="popover" data-trigger="focus" tabindex="0"><i class="fa fa-reply"></i> reply</a>
     {!<span><i class="fa fa-smile-o"></i> {points}</span>!}
-    {@gt key=childrenCount.topics.accepted value="0"}<a class="text-muted-2" href="{wikiBaseUrl}{paths.wiki.topics.index}/{friendlyUrl}/{_id}"><i class="fa fa-folder-open-o" aria-hidden="true"></i> {childrenCount.topics.accepted}</a>{/gt}
-    {@gt key=childrenCount.arguments.accepted value="0"}<a class="text-muted-2" href="{wikiBaseUrl}{paths.wiki.arguments.index}?{objectName}={_id}"><i class="fa fa-flash" aria-hidden="true"></i> {childrenCount.arguments.accepted}</a>{/gt}
-    {@gt key=childrenCount.questions.accepted value="0"}<a class="text-muted-2" href="{wikiBaseUrl}{paths.wiki.questions.index}?{objectName}={_id}"><i class="fa fa-question-circle-o" aria-hidden="true"></i> {childrenCount.questions.accepted}</a>{/gt}
-    {@gt key=childrenCount.answers.accepted value="0"}<a class="text-muted-2" href="{wikiBaseUrl}{paths.wiki.answers.index}?{objectName}={_id}"><i class="fa fa-check-circle" aria-hidden="true"></i> {childrenCount.answers.accepted}</a>{/gt}
-    {@gt key=childrenCount.issues.accepted value="0"}<a class="text-muted-2" href="{wikiBaseUrl}{paths.wiki.issues.index}?{objectName}={_id}"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> {childrenCount.issues.accepted}</a>{/gt}
-    {@gt key=childrenCount.opinions.accepted value="0"}<a class="text-muted-2" href="{wikiBaseUrl}{paths.wiki.opinions.index}?{objectName}={_id}"><i class="fa fa-comments-o" aria-hidden="true"></i> {childrenCount.opinions.accepted}</a>{/gt}
+    {@gt key=childrenCount.topics.accepted value="0"}<a class="text-muted-2" href="{?private}{wikiBaseUrl}{/private}{paths.wiki.topics.index}/{friendlyUrl}/{_id}"><i class="fa fa-folder-open-o" aria-hidden="true"></i> {childrenCount.topics.accepted}</a>{/gt}
+    {@gt key=childrenCount.arguments.accepted value="0"}<a class="text-muted-2" href="{?private}{wikiBaseUrl}{/private}{paths.wiki.arguments.index}?{objectName}={_id}"><i class="fa fa-flash" aria-hidden="true"></i> {childrenCount.arguments.accepted}</a>{/gt}
+    {@gt key=childrenCount.questions.accepted value="0"}<a class="text-muted-2" href="{?private}{wikiBaseUrl}{/private}{paths.wiki.questions.index}?{objectName}={_id}"><i class="fa fa-question-circle-o" aria-hidden="true"></i> {childrenCount.questions.accepted}</a>{/gt}
+    {@gt key=childrenCount.answers.accepted value="0"}<a class="text-muted-2" href="{?private}{wikiBaseUrl}{/private}{paths.wiki.answers.index}?{objectName}={_id}"><i class="fa fa-check-circle" aria-hidden="true"></i> {childrenCount.answers.accepted}</a>{/gt}
+    {@gt key=childrenCount.issues.accepted value="0"}<a class="text-muted-2" href="{?private}{wikiBaseUrl}{/private}{paths.wiki.issues.index}?{objectName}={_id}"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> {childrenCount.issues.accepted}</a>{/gt}
+    {@gt key=childrenCount.opinions.accepted value="0"}<a class="text-muted-2" href="{?private}{wikiBaseUrl}{/private}{paths.wiki.opinions.index}?{objectName}={_id}"><i class="fa fa-comments-o" aria-hidden="true"></i> {childrenCount.opinions.accepted}</a>{/gt}
     {?referenceDate}
         <span title="Reference Date"><i class="fa fa-clock-o"></i> {referenceDateSimple}</span>
     {/referenceDate}

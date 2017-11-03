@@ -202,7 +202,7 @@ module.exports = function (router) {
                             flowUtils.setEntryParents(results, constants.OBJECT_TYPES.topic, function() {
                                 flowUtils.setEditorsUsername(results, function () {
                                     results.forEach(function (result) {
-                                        flowUtils.appendEntryExtra(result);
+                                        flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.topic);
                                     });
                                     model.topics = results;
                                     if (results.length > 0) {
@@ -229,7 +229,7 @@ module.exports = function (router) {
                             flowUtils.setEntryParents(results, constants.OBJECT_TYPES.argument, function() {
                                 flowUtils.setEditorsUsername(results, function () {
                                     results.forEach(function (result) {
-                                        flowUtils.appendEntryExtra(result);
+                                        flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.argument);
                                         flowUtils.setVerdictModel(result);
                                     });
                                     flowUtils.sortArguments(results);
@@ -258,7 +258,7 @@ module.exports = function (router) {
                             flowUtils.setEntryParents(results, constants.OBJECT_TYPES.artifact, function() {
                                 flowUtils.setEditorsUsername(results, function () {
                                     results.forEach(function (result) {
-                                        flowUtils.appendEntryExtra(result);
+                                        flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.artifact);
                                     });
                                     model.artifacts = results;
                                     if (results.length > 0) {
@@ -282,7 +282,7 @@ module.exports = function (router) {
                             flowUtils.setEntryParents(results, constants.OBJECT_TYPES.question, function() {
                                 flowUtils.setEditorsUsername(results, function () {
                                     results.forEach(function (result) {
-                                        flowUtils.appendEntryExtra(result);
+                                        flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.question);
                                     });
                                     model.questions = results;
                                     if (results.length > 0) {
@@ -306,7 +306,7 @@ module.exports = function (router) {
                             flowUtils.setEntryParents(results, constants.OBJECT_TYPES.answer, function() {
                                 flowUtils.setEditorsUsername(results, function () {
                                     results.forEach(function (result) {
-                                        flowUtils.appendEntryExtra(result);
+                                        flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.answer);
                                     });
                                     model.answers = results;
                                     if (results.length > 0) {
@@ -330,7 +330,7 @@ module.exports = function (router) {
                             flowUtils.setEntryParents(results, constants.OBJECT_TYPES.issue, function() {
                                 flowUtils.setEditorsUsername(results, function () {
                                     results.forEach(function (result) {
-                                        flowUtils.appendEntryExtra(result);
+                                        flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.issue);
                                     });
                                     model.issues = results;
                                     if (results.length > 0) {
@@ -357,7 +357,7 @@ module.exports = function (router) {
                             flowUtils.setEntryParents(results, constants.OBJECT_TYPES.opinion, function() {
                                 flowUtils.setEditorsUsername(results, function () {
                                     results.forEach(function (result) {
-                                        flowUtils.appendEntryExtra(result);
+                                        flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.opinion);
                                     });
                                     model.opinions = results;
                                     if (results.length > 0) {

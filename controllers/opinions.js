@@ -62,7 +62,7 @@ function GET_index(req, res) {
                 .exec(function (err, results) {
                 flowUtils.setEditorsUsername(results, function() {
                     results.forEach(function (result) {
-                        flowUtils.appendEntryExtra(result);
+                        flowUtils.appendEntryExtras(result);
                     });
                     model.opinions = results;
                     flowUtils.setModelOwnerEntry(req, model);
@@ -85,7 +85,7 @@ function GET_index(req, res) {
                     result.topic = {
                         _id: result.ownerId
                     };
-                    flowUtils.appendEntryExtra(result);
+                    flowUtils.appendEntryExtras(result);
                 });
                 model.opinions = results;
                 flowUtils.setModelContext(req, model);
