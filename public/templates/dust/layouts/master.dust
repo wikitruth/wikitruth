@@ -13,22 +13,22 @@
         {/pageTitle}
     </title>
 
-    <link rel="apple-touch-icon" sizes="57x57" href="/img{application.resPath}/favicons/apple-icon-57x57.png">
-    <link rel="apple-touch-icon" sizes="60x60" href="/img{application.resPath}/favicons/apple-icon-60x60.png">
-    <link rel="apple-touch-icon" sizes="72x72" href="/img{application.resPath}/favicons/apple-icon-72x72.png">
-    <link rel="apple-touch-icon" sizes="76x76" href="/img{application.resPath}/favicons/apple-icon-76x76.png">
-    <link rel="apple-touch-icon" sizes="114x114" href="/img{application.resPath}/favicons/apple-icon-114x114.png">
-    <link rel="apple-touch-icon" sizes="120x120" href="/img{application.resPath}/favicons/apple-icon-120x120.png">
-    <link rel="apple-touch-icon" sizes="144x144" href="/img{application.resPath}/favicons/apple-icon-144x144.png">
-    <link rel="apple-touch-icon" sizes="152x152" href="/img{application.resPath}/favicons/apple-icon-152x152.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/img{application.resPath}/favicons/apple-icon-180x180.png">
-    <link rel="icon" type="image/png" sizes="192x192"  href="/img{application.resPath}/favicons/android-icon-192x192.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/img{application.resPath}/favicons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="/img{application.resPath}/favicons/favicon-96x96.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/img{application.resPath}/favicons/favicon-16x16.png">
-    <link rel="manifest" href="/img{application.resPath}/favicons/manifest.json">
+    <link rel="apple-touch-icon" sizes="57x57" href="/img/{application.resPath}favicons/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/img/{application.resPath}favicons/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/img/{application.resPath}favicons/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/img/{application.resPath}favicons/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/img/{application.resPath}favicons/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/img/{application.resPath}favicons/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/img/{application.resPath}favicons/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/img/{application.resPath}favicons/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/{application.resPath}favicons/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="/img/{application.resPath}favicons/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/{application.resPath}favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/img/{application.resPath}favicons/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/{application.resPath}favicons/favicon-16x16.png">
+    <link rel="manifest" href="/img/{application.resPath}favicons/manifest.json">
     <meta name="msapplication-TileColor" content="#ffffff">
-    <meta name="msapplication-TileImage" content="/img{application.resPath}/favicons/ms-icon-144x144.png">
+    <meta name="msapplication-TileImage" content="/img/{application.resPath}favicons/ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">
 
     <!-- Bootstrap -->
@@ -80,6 +80,12 @@
                     {!<li><a href="#"><i class="fa fa-folder-o"></i> <strong>Structured</strong></a></li>!}
                     {!<li><a href="{wikiBaseUrl}{paths.wiki.visualize}{?topic}/topic/{topic.friendlyUrl}/{topic._id}{:else}{?application}/topic/{application.exploreTopicId}{/application}{/topic}"><i class="fa fa-snowflake-o"></i> Visualize</a></li>!}
                     <li role="separator" class="divider"></li>
+                    <li class="dropdown-header">Apps</li>
+                    <li><a href="{wikitruth.homeUrl}"><img src="/img/logo-64x64.png" title="Logo" style="width: 16px; height: 16px;" /> {wikitruth.projectName}</a></li>
+                    {#applications}
+                        <li><a href="{homeUrl}">{!<i class="fa fa-book text-color-3-x" aria-hidden="true"></i>!}<img src="{logoIcon}" title="Logo" style="width: 16px; height: 16px;" /> {title}</a></li>
+                    {/applications}
+                    <li role="separator" class="divider"></li>
                     {?topic}
                         <li class="dropdown-header">In this section</li>
                         {?parentTopic}
@@ -119,12 +125,6 @@
                     {#appCategories}
                         <li><a href="{paths.wiki.topics.entry}/{friendlyUrl}/{_id}"><i class="fa fa-{?icon}{icon}{:else}folder-open{/icon} text-color-3-x" aria-hidden="true"></i> {?contextTitle}{contextTitle}{:else}{title}{/contextTitle}{?childrenCount.topics.accepted} <span class="wt-label label label-default">{childrenCount.topics.accepted}</span>{/childrenCount.topics.accepted}</a></li>
                     {/appCategories}
-                    <li role="separator" class="divider"></li>
-                    <li class="dropdown-header">Apps</li>
-                    <li><a href="{wikitruth.homeUrl}"><img src="/img/logo-64x64.png" title="Logo" style="width: 16px; height: 16px;" /> {wikitruth.projectName}</a></li>
-                    {#applications}
-                        <li><a href="{homeUrl}">{!<i class="fa fa-book text-color-3-x" aria-hidden="true"></i>!}<img src="{logoIcon}" title="Logo" style="width: 16px; height: 16px;" /> {title}</a></li>
-                    {/applications}
                 </ul>
             </div><!--/.sidebar-offcanvas-->
         </div><!--/row-->
