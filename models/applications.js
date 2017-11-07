@@ -54,7 +54,13 @@ var APPLICATIONS = [
                 title: 'Organizations',
                 iconClass: 'fa fa-bank',
                 url: '/topic/organizations-in-the-philippines',
-                description: 'The Government of the Philippines, public or private businesses, charities, nonprofit, religions or any movement or group that impact us.'
+                description: 'The Government of the Philippines, public or private businesses, charities, nonprofit, religions, or any movement or group that impact us.'
+            },
+            {
+                title: 'Election',
+                iconClass: 'fa fa-check-square-o',
+                url: '/topic/philippine-election',
+                description: 'Get factual information about the running candidates, their public service history, and any information that would help you vote wisely.'
             }
         ]
     }
