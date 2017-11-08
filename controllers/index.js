@@ -290,6 +290,11 @@ module.exports = function (router) {
         });
     });
 
+    router.get('/test', function (req, res) {
+        var model = {};
+        res.render('dust/test/index', model);
+    });
+
     router.get('/vash', function (req, res) {
         var model = {
             message: 'hello world!'

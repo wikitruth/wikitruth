@@ -13,3 +13,4 @@ public/views/**/*.min.css
 public/views/**/*.min.js
 public/views/**/*.min.js.map
 public/components
+public/js/react

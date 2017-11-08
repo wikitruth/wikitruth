@@ -14,6 +14,7 @@ module.exports = function (grunt) {
             ]
           }
         },*/
+
         concurrent: {
           dev: {
             tasks: ['nodemon', 'watch'],
@@ -22,6 +23,7 @@ module.exports = function (grunt) {
             }
           }
         },
+
         nodemon: {
           dev: {
             script: 'server.js',
@@ -33,6 +35,17 @@ module.exports = function (grunt) {
               ext: 'js'
             }
           }
+        },
+
+        babel: {
+            options: {
+                sourceMap: true
+            },
+            dist: {
+                files: {
+                    "public/js/react/hello-world.js": "public/templates/react/hello-world.js"
+                }
+            }
         }
     });
 
@@ -41,6 +54,8 @@ module.exports = function (grunt) {
         configDir: require('path').resolve('tasks')
     });
 
+    require("load-grunt-tasks")(grunt, {pattern: ['grunt-*', '@*/grunt-*', '!grunt-config-dir']});
+
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-concurrent');
     grunt.loadNpmTasks('grunt-nodemon');
@@ -48,6 +63,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('lint', ['jshint']);
     grunt.registerTask('test', [ 'jshint', 'mochacli' ]);
-    grunt.registerTask('build', [ 'jshint', /*'copy:components',*/ 'newer:uglify', 'newer:less', 'requirejs', 'i18n', 'copyto', 'clean:css' ]);
+    grunt.registerTask('build-babel', [ 'babel', 'newer:uglify', 'copyto' ]);
+    grunt.registerTask('build', [ 'jshint', 'babel', /*'copy:components',*/ 'newer:uglify', 'newer:less', 'requirejs', 'i18n', 'copyto', 'clean:css' ]);
     grunt.registerTask('default', ['concurrent']); //['copy:components', 'newer:uglify', 'less', 'concurrent']);
 };
