@@ -18,7 +18,7 @@
             {?artifact.thumbnailPath}
                 <div>
                     <a href="{artifact.filePath}" target="_blank" title="Click to open original file">
-                        <img src="{artifact.thumbnailPath}"/>
+                        <img src="{artifact.thumbnailPath}" class="img-responsive" />
                     </a>
                 </div>
             {/artifact.thumbnailPath}

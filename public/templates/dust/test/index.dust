@@ -1,0 +1,18 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    Test page - {titleSlogan}
+{/title}
+
+{<body}
+    <div id="root"></div>
+
+    <div id="root1"></div>
+    <div id="root2"></div>
+    <div id="root3"></div>
+{/body}
+
+{<footer}
+    <script src="/js/react.min.js?{cacheBreaker}"></script>
+    <script src="/js/react/hello-world.js?{cacheBreaker}"></script>
+{/footer}}
