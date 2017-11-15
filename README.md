@@ -122,8 +122,8 @@ Now just use the reset password feature to set a password.
  - `http://localhost:8000/login/reset/:email/:token/`
  - Set a new password.
 
-Login, customize, and enjoy!
+Login and enjoy!
 
 ## Connect and discuss
 
-Feel free to send feedback to wikitruthproject@gmail.com or join the discussion on [Facebook](https://www.facebook.com/wikitruth.co).
+Feel free to send feedback to wikitruthproject@gmail.com or join the discussion on [Facebook](https://www.facebook.com/wikitruth.project).

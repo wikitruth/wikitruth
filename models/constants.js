@@ -320,7 +320,6 @@ var OBJECT_TYPES = {
     argument: 2,
     argumentLink: 31,
     question: 3,
-    comment: 4,
     definition: 5,
     artifact: 6,
     issue: 10,
@@ -361,7 +360,7 @@ module.exports = {
         1: 'topics',
         2: 'arguments',
         3: 'questions',
-        4: 'comments',
+        6: 'artifacts',
         10: 'issues',
         11: 'opinions',
         12: 'answers'
@@ -370,10 +369,19 @@ module.exports = {
         1: 'topic',
         2: 'argument',
         3: 'question',
-        4: 'comment',
+        6: 'artifact',
         10: 'issue',
         11: 'opinion',
         12: 'answer'
+    },
+    OBJECT_FORMAL_NAME_MAP: {
+        1: 'Topic',
+        2: 'Fact',
+        3: 'Question',
+        6: 'Artifact',
+        10: 'Issue',
+        11: 'Opinion',
+        12: 'Answer'
     },
     LINK_TYPES: LINK_TYPES
 };

@@ -43,7 +43,8 @@ module.exports = function (grunt) {
             },
             dist: {
                 files: {
-                    "public/js/react/hello-world.js": "public/templates/react/hello-world.js"
+                    'public/js/react/hello-world.js': 'public/templates/react/hello-world.js',
+                    'public/js/react/entry-options-popover.js': 'public/templates/react/entry-options-popover.js'
                 }
             }
         }
@@ -63,6 +64,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('lint', ['jshint']);
     grunt.registerTask('test', [ 'jshint', 'mochacli' ]);
+    grunt.registerTask('build-js', [ 'newer:uglify' ]);
     grunt.registerTask('build-babel', [ 'babel', 'newer:uglify', 'copyto' ]);
     grunt.registerTask('build', [ 'jshint', 'babel', /*'copy:components',*/ 'newer:uglify', 'newer:less', 'requirejs', 'i18n', 'copyto', 'clean:css' ]);
     grunt.registerTask('default', ['concurrent']); //['copy:components', 'newer:uglify', 'less', 'concurrent']);
