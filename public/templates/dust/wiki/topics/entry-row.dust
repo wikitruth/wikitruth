@@ -1,4 +1,4 @@
-<li class="list-group-item">
+<li class="list-group-item" data-id="{?link}{link._id}{:else}{_id}{/link}" data-type="{?link}{link.objectType}{:else}{objectType}{/link}">
     <i class="fa fa-folder-open text-color-3" aria-hidden="true"></i>
     <div>
         {?link}

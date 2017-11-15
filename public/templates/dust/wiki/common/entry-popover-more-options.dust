@@ -113,8 +113,8 @@
     <li role="separator" class="divider"></li>
 {/user.isAdmin}
 <li><a href="#"><i class="fa fa-rss" aria-hidden="true"></i> Follow</a></li>
+<li><a href="#" role="tab"><i class="fa fa-share" aria-hidden="true"></i> Share</a></li>
 {!<li role="separator" class="divider"></li>!}
-{!<li><a href="#" role="tab"><i class="fa fa-share" aria-hidden="true"></i> Share</a></li>!}
 {!<li><a href="#" role="tab"><i class="fa fa-copy" aria-hidden="true"></i> Copy text</a></li>!}
 {!{>"dust/wiki/common/clipboard" /}!}
 <li><a href="#"><i class="fa fa-flag" aria-hidden="true"></i> Report</a></li>

@@ -94,12 +94,8 @@ $(document).ready(function () {
         container: 'body',
         template: $('#popoverTemplate').html()
     });
-    $('.wt-entry-options').popover({
-        placement: 'auto',
-        title: 'More options',
-        html: true,
-        content: $('#entryOptionsContent').html(),
-        container: 'body',
-        template: $('#popoverTemplate').html()
+
+    $('.wt-entry-reply').on('show.bs.popover', function () {
+        //console.log('wt-entry-reply showing...');
     });
 });

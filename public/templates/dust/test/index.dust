@@ -13,6 +13,5 @@
 {/body}
 
 {<footer}
-    <script src="/js/react.min.js?{cacheBreaker}"></script>
     <script src="/js/react/hello-world.js?{cacheBreaker}"></script>
 {/footer}}

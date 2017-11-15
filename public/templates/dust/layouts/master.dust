@@ -136,9 +136,9 @@
             </ul>
         </div>
         <div id="entryOptionsContent">
-            <ul class="nav">
+            {!<ul class="nav">
                 {>"dust/wiki/common/entry-popover-more-options" /}
-            </ul>
+            </ul>!}
         </div>
         <div id="popoverTemplate">
             <div class="wt-popover popover" role="tooltip">
@@ -153,7 +153,13 @@
     {!<script data-main="/js/requirejs/app" src="/components/requirejs/require.js"></script>!}
     <script src="/components/jquery/dist/jquery.min.js?{cacheBreaker}"></script>
     <script src="/components/bootstrap/dist/js/bootstrap.min.js?{cacheBreaker}"></script>
+    <script src="/js/react.min.js?{cacheBreaker}"></script>
     <script src="/js/app.min.js?{cacheBreaker}"></script>
+    <script>
+        WT_CONSTANTS.OBJECT_TYPES = {constants.OBJECT_TYPES|js|s};
+        WT_CONSTANTS.OBJECT_FORMAL_NAME_MAP = {constants.OBJECT_FORMAL_NAME_MAP|js|s};
+    </script>
+    <script src="/js/react/entry-options-popover.js?{cacheBreaker}"></script>
     {+footer /}
 </body>
 </html>

@@ -43,9 +43,12 @@ function appendListExtras(item, objectType) {
         item.shortTitle = utils.getShortText(item.title);
     }
     if(objectType) {
+        item.objectType = objectType;
         item.objectName = getObjectName(objectType);
     } else if(item.getType) {
-        item.objectName = getObjectName(item.getType());
+        objectType = item.getType();
+        item.objectType = objectType;
+        item.objectName = getObjectName(objectType);
     }
 }
 
@@ -879,8 +882,7 @@ function getTopics(query, limit, callback) {
                 .exec(function(err, results) {
                     setEditorsUsername(results, function() {
                         results.forEach(function (result) {
-                            appendEntryExtras(result);
-                            result.objectName = getObjectName(constants.OBJECT_TYPES.topic);
+                            appendEntryExtras(result, constants.OBJECT_TYPES.topic);
                             //result.link = false;
                         });
                         callback(null, results);
@@ -927,8 +929,9 @@ function getTopics(query, limit, callback) {
                                                             return linkParent._id.equals(result.parentId);
                                                         });
                                                         if(linkParent) {
-                                                            appendListExtras(linkParent);
+                                                            appendListExtras(linkParent, constants.OBJECT_TYPES.topic);
                                                         }
+                                                        appendListExtras(link, constants.OBJECT_TYPES.topicLink);
                                                         result.parentTopic = linkParent;
                                                         result.link = link;
                                                     }
@@ -962,8 +965,7 @@ function getArguments(query, limit, callback) {
                 .exec(function(err, results) {
                     setEditorsUsername(results, function() {
                         results.forEach(function (result) {
-                            appendEntryExtras(result);
-                            result.objectName = getObjectName(constants.OBJECT_TYPES.argument);
+                            appendEntryExtras(result, constants.OBJECT_TYPES.argument);
                             //result.link = false;
                             //result.against = false;
                         });
@@ -1038,10 +1040,11 @@ function getArguments(query, limit, callback) {
                                                             return linkParent._id.equals(result.ownerId);
                                                         });
                                                         if(linkParent) {
-                                                            appendListExtras(linkParent);
+                                                            appendListExtras(linkParent, constants.OBJECT_TYPES.argument);
                                                         }
                                                         result.parentTopic = linkParent;
                                                     }
+                                                    appendEntryExtras(link, constants.OBJECT_TYPES.argumentLink);
                                                     result.link = link;
                                                     result.against = link.against;
                                                 }

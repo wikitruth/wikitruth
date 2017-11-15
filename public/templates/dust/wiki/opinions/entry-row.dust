@@ -1,4 +1,4 @@
-<li class="list-group-item">
+<li class="list-group-item" data-id="{_id}" data-type="{objectType}">
     <span class="fa fa-comments-o text-primary" aria-hidden="true"></span>
     <div>
         <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.opinions.entry}/{friendlyUrl}/{_id}">{title}
