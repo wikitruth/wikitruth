@@ -850,9 +850,30 @@ function setEntryModels(query, req, model, callback) {
     }
 }
 
+function setupClipboard(req, type) {
+    var clipboard = req.session.clipboard;
+    if(!clipboard) {
+        clipboard = {};
+        clipboard['object' + constants.OBJECT_TYPES.topic] = [];
+        clipboard['object' + constants.OBJECT_TYPES.argument] = [];
+    }
+    if(!clipboard['object' + type]) {
+        clipboard['object' + type] = [];
+    }
+    return clipboard;
+}
+
+function getClipboard(req) {
+    var clipboard = req.session.clipboard;
+    if(clipboard && !clipboard['object' + constants.OBJECT_TYPES.artifact]) {
+        clipboard['object' + constants.OBJECT_TYPES.artifact] = [];
+    }
+    return clipboard;
+}
+
 function setClipboardModel(req, model, entryType) {
     model.clipboard = {};
-    var clipboard = req.session.clipboard;
+    var clipboard = getClipboard(req);
     if(clipboard) {
         var topics = clipboard['object' + constants.OBJECT_TYPES.topic];
         var args = clipboard['object' + constants.OBJECT_TYPES.argument];
@@ -2671,6 +2692,8 @@ module.exports = {
     setEntryParents: setEntryParents,
     setEditorsUsername: setEditorsUsername,
     setClipboardModel: setClipboardModel,
+    setupClipboard: setupClipboard,
+    getClipboard: getClipboard,
 
     getTopics: getTopics,
     getArguments: getArguments,
