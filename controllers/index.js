@@ -121,12 +121,13 @@ module.exports = function (router) {
                             .find(query)
                             .sort({editDate: -1})
                             .limit(MAX_RESULT)
-                            .lean()
+                            //.lean()
                             .exec(function (err, results) {
                                 flowUtils.setEntryParents(results, constants.OBJECT_TYPES.artifact, function() {
                                     flowUtils.setEditorsUsername(results, function () {
                                         results.forEach(function (result) {
                                             flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.artifact, req);
+                                            result.setThumbnailPath(req.params.username);
                                         });
                                         model.artifacts = results;
                                         //console.log(results);

@@ -46,11 +46,12 @@ function GET_index(req, res) {
             db.Artifact
                 .find(query)
                 .sort({ title: 1 })
-                .lean()
+                //.lean()
                 .exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
                             flowUtils.appendEntryExtras(result);
+                            result.setThumbnailPath(req.params.username);
                         });
                         model.artifacts = results;
                         flowUtils.setModelOwnerEntry(req, model);

@@ -476,12 +476,7 @@ function setArtifactModel(req, model, callback) {
     if(req.query.artifact) {
         db.Artifact.findOne({_id: req.query.artifact}, function (err, result) {
             model.artifact = result;
-            if(result.file.name) {
-                result.filePath = result.getFilePath(req.params.username);
-                if(result.isImage()) {
-                    result.thumbnailPath = result.getThumbnailPath(req.params.username);
-                }
-            }
+            result.setThumbnailPath(req.params.username);
             appendEntryExtras(result);
             if(isEntryOwner(req, result)) {
                 model.isArtifactOwner = true;
