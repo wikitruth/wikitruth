@@ -13,6 +13,15 @@
         {?contentPreview}
             <div class="wt-entry-row-content">{contentPreview}</div>
         {/contentPreview}
+        {?file.name}
+            {?thumbnailPath}
+                <div style="margin-bottom: 5px">
+                    <a href="{filePath}" target="_blank" title="Click to open original file">
+                        <img src="{thumbnailPath}" class="img-responsive" />
+                    </a>
+                </div>
+            {/thumbnailPath}
+        {/file.name}
         {>"dust/wiki/common/entry-row-footer" /}
     </div>
     <span class="pull-right text-muted hidden-xxs"><span class="glyphicon glyphicon-comment" aria-hidden="true"></span> {comments}</span>

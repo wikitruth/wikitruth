@@ -163,12 +163,13 @@ module.exports = function (router) {
                     .find({ $text : { $search : keyword }, $or: privacyFilter }, { score: { $meta: "textScore" } })
                     .sort({ score: { $meta: "textScore" } })
                     .limit(limit)
-                    .lean()
+                    //.lean()
                     .exec(function(err, results) {
                         flowUtils.setEditorsUsername(results, function() {
                             flowUtils.setEntryParents(results, constants.OBJECT_TYPES.artifact, function () {
                                 results.forEach(function (result) {
                                     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.artifact);
+                                    result.setThumbnailPath(req.params.username);
                                 });
                                 model.artifacts = results;
                                 if (results.length > 0) {

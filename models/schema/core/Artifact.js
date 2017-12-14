@@ -83,6 +83,14 @@ module.exports = function(app, mongoose) {
   schema.methods.isImage = function() {
     return this.file.type.startsWith('image');
   };
+  schema.methods.setThumbnailPath = function (username) {
+    if(this.file.name) {
+      this.filePath = this.getFilePath(username);
+      if(this.isImage()) {
+        this.thumbnailPath = this.getThumbnailPath(username);
+      }
+    }
+  };
   schema.plugin(require('../plugins/pagedFind'));
   schema.index({ title: 1 });
   schema.index({
