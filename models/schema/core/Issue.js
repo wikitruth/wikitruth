@@ -28,6 +28,7 @@ module.exports = function(app, mongoose) {
         rejected: { type: Number, default: 0 }
       }
     },
+    extras: { type: mongoose.Schema.Types.Mixed },
     createDate: { type: Date, default: Date.now },
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     editDate: { type: Date, default: Date.now },

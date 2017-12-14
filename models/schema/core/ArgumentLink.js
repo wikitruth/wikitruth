@@ -43,7 +43,8 @@ module.exports = function(app, mongoose) {
         pending: { type: Number, default: 0 },
         rejected: { type: Number, default: 0 }
       }
-    }
+    },
+    extras: { type: mongoose.Schema.Types.Mixed }
   });
   schema.methods.getType = function() {
     return constants.OBJECT_TYPES.argumentLink;

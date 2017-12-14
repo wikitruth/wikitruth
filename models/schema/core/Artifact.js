@@ -65,16 +65,20 @@ module.exports = function(app, mongoose) {
         pending: { type: Number, default: 0 },
         rejected: { type: Number, default: 0 }
       }
-    }
+    },
+    extras: { type: mongoose.Schema.Types.Mixed }
   });
   schema.methods.getType = function() {
     return constants.OBJECT_TYPES.artifact;
   };
-  schema.methods.getFilePath = function() {
-    return '/media/artifacts/' + this._id + '_' + this.file.name;
+  schema.methods.getFolder = function(username) {
+    return '/media/artifacts/' + (username ? 'users/' + username + '/' : '');
   };
-  schema.methods.getThumbnailPath = function() {
-    return '/media/artifacts/' + this._id + '_thumbnail_' + this.file.name;
+  schema.methods.getFilePath = function(username) {
+    return '/media/artifacts/' + (username ? 'users/' + username + '/' : '') + this._id + '_' + this.file.name;
+  };
+  schema.methods.getThumbnailPath = function(username) {
+    return '/media/artifacts/' + (username ? 'users/' + username + '/' : '') + this._id + '_thumbnail_' + this.file.name;
   };
   schema.methods.isImage = function() {
     return this.file.type.startsWith('image');

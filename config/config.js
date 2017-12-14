@@ -21,6 +21,7 @@ exports.mongodb = {
     ],
     privateBackupList: [
       'answers',
+      'artifacts',
       'arguments',
       'argumentlinks',
       'issues',
@@ -41,6 +42,7 @@ exports.mongodb = {
       issues: 'Issue',
       loginattempts: 'LoginAttempt',
       opinions: 'Opinion',
+      artifacts: 'Artifact',
       pages: 'Page',
       questions: 'Question',
       status: 'Status',

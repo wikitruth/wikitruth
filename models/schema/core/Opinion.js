@@ -39,7 +39,8 @@ module.exports = function(app, mongoose) {
     createDate: { type: Date, default: Date.now },
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     editDate: { type: Date, default: Date.now },
-    editUserId: { type: mongoose.Schema.ObjectId, ref: 'User'}
+    editUserId: { type: mongoose.Schema.ObjectId, ref: 'User'},
+    extras: { type: mongoose.Schema.Types.Mixed }
   });
   schema.methods.getType = function() {
     return constants.OBJECT_TYPES.opinion;

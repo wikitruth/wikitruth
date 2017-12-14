@@ -143,12 +143,16 @@ function POST_create(req, res) {
             },
             moveFile: function (callback) {
                 if(inlineFile && updatedEntity.isImage()) {
-                    var newAbsPath = path.join(__dirname, '/../public', updatedEntity.getFilePath());
+                    var artifactFolder = path.join(__dirname, '/../public', updatedEntity.getFolder(req.params.username));
+                    if (!fs.existsSync(artifactFolder)){
+                        fs.mkdirSync(artifactFolder);
+                    }
+                    var newAbsPath = path.join(__dirname, '/../public', updatedEntity.getFilePath(req.params.username));
                     fs.rename(inlineFile.path, newAbsPath, function (err) {
                         if (err) {
                             console.log('An error has occurred moving the file: \n' + err);
                         }
-                        var newAbsThumbnailPath = path.join(__dirname, '/../public', updatedEntity.getThumbnailPath());
+                        var newAbsThumbnailPath = path.join(__dirname, '/../public', updatedEntity.getThumbnailPath(req.params.username));
                         imagemagick.resize({
                             srcPath: newAbsPath,
                             dstPath: newAbsThumbnailPath,

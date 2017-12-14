@@ -80,5 +80,5 @@
   "white"         : false,    // true: Check against strict whitespace and indentation rules
 
   // Custom Globals
-  "predef"        : [ ]       // additional predefined global variables
+  "predef"        : [ "window" ]       // additional predefined global variables
 }
