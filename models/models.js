@@ -1,13 +1,13 @@
 'use strict';
 
 module.exports = function(app, mongoose) {
-  //embeddable docs first
+  // embeddable docs first
   require('./schema/account/Note')(app, mongoose);
   require('./schema/account/Status')(app, mongoose);
   require('./schema/account/StatusLog')(app, mongoose);
   require('./schema/account/AccountCategory')(app, mongoose);
 
-  //then regular docs
+  // then regular docs
   require('./schema/account/User')(app, mongoose);
   require('./schema/account/Admin')(app, mongoose);
   require('./schema/account/AdminGroup')(app, mongoose);
@@ -19,6 +19,7 @@ module.exports = function(app, mongoose) {
   require('./schema/core/TopicLink')(app, mongoose);
   require('./schema/core/Argument')(app, mongoose);
   require('./schema/core/ArgumentLink')(app, mongoose);
+  require('./schema/core/ObjectLink')(app, mongoose);
   require('./schema/core/Category')(app, mongoose);
   require('./schema/core/Question')(app, mongoose);
   require('./schema/core/Answer')(app, mongoose);

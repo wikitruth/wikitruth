@@ -5,12 +5,15 @@ var constants   = require('../../models/constants'),
     db          = require('../../app').db.models,
     async       = require('async');
 
-function setupClipboard(req) {
+function setupClipboard(req, type) {
     var clipboard = req.session.clipboard;
     if(!clipboard) {
         clipboard = {};
         clipboard['object' + constants.OBJECT_TYPES.topic] = [];
         clipboard['object' + constants.OBJECT_TYPES.argument] = [];
+    }
+    if(!clipboard['object' + type]) {
+        clipboard['object' + type] = [];
     }
     return clipboard;
 }
@@ -32,7 +35,7 @@ module.exports = function (router) {
         var id = req.body.id;
         var type = req.body.type;
 
-        var clipboard = setupClipboard(req);
+        var clipboard = setupClipboard(req, type);
         if(clipboard['object' + type].indexOf(id) < 0) {
             clipboard['object' + type].push(id);
         }
@@ -50,7 +53,7 @@ module.exports = function (router) {
         }
 
         var dateNow = Date.now();
-        var clipboard = setupClipboard(req);
+        var clipboard = setupClipboard(req, type);
         var topics = clipboard['object' + constants.OBJECT_TYPES.topic];
         var args = clipboard['object' + constants.OBJECT_TYPES.argument];
         if(type == constants.OBJECT_TYPES.topic) {
@@ -137,9 +140,9 @@ module.exports = function (router) {
             if (args.length === 0) {
                 return res.send({});
             }
-            db.Argument.findOne({_id: id}, function(err, parent) {
+            db.Argument.findOne({_id: id}, function (err, parent) {
                 var ids = createNewArrayExcludeId(args, id);
-                async.each(ids, function(argumentId, callback){
+                async.each(ids, function (argumentId, callback) {
                     var entity = {};
                     entity.editUserId = req.user.id;
                     entity.editDate = dateNow;
@@ -153,7 +156,7 @@ module.exports = function (router) {
                     entity.createUserId = req.user.id;
                     entity.createDate = dateNow;
                     flowUtils.initScreeningStatus(req, entity);
-                    flowUtils.syncCategoryId(entity, { entryType: constants.OBJECT_TYPES.argumentLink }, function () {
+                    flowUtils.syncCategoryId(entity, {entryType: constants.OBJECT_TYPES.argumentLink}, function () {
                         db.ArgumentLink.findOneAndUpdate({
                             argumentId: argumentId,
                             parentId: parent._id
@@ -167,6 +170,12 @@ module.exports = function (router) {
                     });
                 });
             });
+        } else if(type == constants.OBJECT_TYPES.artifact) {
+            var artifacts = clipboard['object' + constants.OBJECT_TYPES.artifact];
+            if (artifacts.length === 0) {
+                return res.send({});
+            }
+            return res.send({});
         } else {
             res.send({});
         }
@@ -178,7 +187,7 @@ module.exports = function (router) {
         var type = req.body.type;
         var username = req.body.username;
 
-        var clipboard = setupClipboard(req);
+        var clipboard = setupClipboard(req, type);
         var topics = clipboard['object' + constants.OBJECT_TYPES.topic];
         var args = clipboard['object' + constants.OBJECT_TYPES.argument];
 

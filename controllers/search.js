@@ -12,17 +12,30 @@ module.exports = function (router) {
         var MAX_RESULT = 15;
         var keyword = req.query.q;
         var allTabs = !req.query.tab;
+        var searchContent = (req.query.content ? req.query.content : 'all').toLowerCase();
         var limit = allTabs ? MAX_RESULT : 0;
         var tab = req.query.tab ? req.query.tab : 'all';
         var model = {
             tab: tab,
             keyword: keyword,
+            content: searchContent,
             results: !allTabs // this is to allow the user to switch to other tabs if the current is empty
         };
         if(!keyword) {
             return res.render(templates.search, model);
         }
-        var privacyFilter = req.user ? [ { private: false }, { private: true, createUserId: req.user.id } ] : [ { private: false } ];
+        var privacyFilter = [ { private: false } ];
+        switch (searchContent) {
+            case 'wiki':
+                privacyFilter = [ { private: false } ];
+                break;
+            case 'diary':
+                privacyFilter = req.user ? [ { private: true, createUserId: req.user.id } ] : [ { private: false } ];
+                break;
+            //case 'all':
+            default:
+                privacyFilter = req.user ? [ { private: false }, { private: true, createUserId: req.user.id } ] : [ { private: false } ];
+        }
         if(req.user) {
             req.params.username = req.user.username;
         }

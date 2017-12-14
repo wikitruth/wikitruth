@@ -29,6 +29,9 @@ function isEntryOwner(req, item) {
 
 function appendOwnerFlag(req, item, model) {
     if(isEntryOwner(req, item)) {
+        if(!model) {
+            model = item;
+        }
         model.isItemOwner = true;
     }
 }
@@ -52,7 +55,7 @@ function appendListExtras(item, objectType) {
     }
 }
 
-function appendEntryExtras(item, objectType) {
+function appendEntryExtras(item, objectType, req) {
     appendListExtras(item, objectType);
     item.comments = utils.randomInt(0,999);
     item.points = utils.randomInt(0,9999);
@@ -86,6 +89,10 @@ function appendEntryExtras(item, objectType) {
             || hasChildren('opinions')) {
             item.hasChildren = true;
         }
+    }
+
+    if(req) {
+        appendOwnerFlag(req, item);
     }
 }
 
@@ -470,9 +477,9 @@ function setArtifactModel(req, model, callback) {
         db.Artifact.findOne({_id: req.query.artifact}, function (err, result) {
             model.artifact = result;
             if(result.file.name) {
-                result.filePath = result.getFilePath();
+                result.filePath = result.getFilePath(req.params.username);
                 if(result.isImage()) {
-                    result.thumbnailPath = result.getThumbnailPath();
+                    result.thumbnailPath = result.getThumbnailPath(req.params.username);
                 }
             }
             appendEntryExtras(result);
@@ -849,13 +856,17 @@ function setClipboardModel(req, model, entryType) {
     if(clipboard) {
         var topics = clipboard['object' + constants.OBJECT_TYPES.topic];
         var args = clipboard['object' + constants.OBJECT_TYPES.argument];
-        var count = topics.length + args.length;
+        var artifacts = clipboard['object' + constants.OBJECT_TYPES.artifact];
+        var count = topics.length + args.length + artifacts.length;
         if (count > 0) {
             model.clipboard.count = count;
             var marked = false;
             if(entryType) {
-                if ((entryType === constants.OBJECT_TYPES.topic && model.topic && topics.indexOf(model.topic._id.toString()) > -1) ||
-                    (entryType === constants.OBJECT_TYPES.argument && model.argument && args.indexOf(model.argument._id.toString()) > -1)) {
+                if (
+                    (entryType === constants.OBJECT_TYPES.topic && model.topic && topics.indexOf(model.topic._id.toString()) > -1) ||
+                    (entryType === constants.OBJECT_TYPES.argument && model.argument && args.indexOf(model.argument._id.toString()) > -1) ||
+                    (entryType === constants.OBJECT_TYPES.artifact && model.artifact && artifacts.indexOf(model.artifact._id.toString()) > -1)
+                ) {
                     model.clipboard.marked = true;
                     marked = true;
                 }
@@ -2154,17 +2165,24 @@ function setModelOwnerEntry(req, model, options) {
         model.entry = model.artifact;
         model.entryType = constants.OBJECT_TYPES.artifact;
         model.isEntryOwner = model.isArtifactOwner;
+        if(!options.hideClipboard) {
+            setClipboardModel(req, model, constants.OBJECT_TYPES.artifact);
+        }
     } else if(model.argumentLink) {
         model.entry = model.argumentLink;
         model.entryType = constants.OBJECT_TYPES.argumentLink;
         model.isEntryOwner = model.isArgumentLinkOwner;
-        if(!options.hideClipboard) setClipboardModel(req, model, constants.OBJECT_TYPES.argumentLink);
+        if(!options.hideClipboard) {
+            setClipboardModel(req, model, constants.OBJECT_TYPES.argumentLink);
+        }
         setVerdictModel(model.argumentLink);
     } else if(model.argument) {
         model.entry = model.argument;
         model.entryType = constants.OBJECT_TYPES.argument;
         model.isEntryOwner = model.isArgumentOwner;
-        if(!options.hideClipboard) setClipboardModel(req, model, constants.OBJECT_TYPES.argument);
+        if(!options.hideClipboard) {
+            setClipboardModel(req, model, constants.OBJECT_TYPES.argument);
+        }
         setVerdictModel(model.argument);
         // Argument Tags
         var tags = model.argument.tags;
@@ -2189,7 +2207,9 @@ function setModelOwnerEntry(req, model, options) {
         model.entry = model.topicLink;
         model.entryType = constants.OBJECT_TYPES.topicLink;
         model.isEntryOwner = model.isTopicLinkOwner;
-        if(!options.hideClipboard) setClipboardModel(req, model, constants.OBJECT_TYPES.topicLink);
+        if(!options.hideClipboard) {
+            setClipboardModel(req, model, constants.OBJECT_TYPES.topicLink);
+        }
         setVerdictModel(model.topicLink);
         // Topic Tags
         var topicLinkTags = model.topicLink.topic.tags;

@@ -15,6 +15,19 @@
                         <button type="submit" class="btn btn-default">Search</button>
                     </span>
                 </div>
+                {?user.username}
+                    <div class="form-group">
+                        <label class="radio-inline">
+                            <input type="radio" name="content" value="all"{@eq key=content value="all"} checked{/eq}> All Content
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="content" value="wiki"{@eq key=content value="wiki"} checked{/eq}> Public Wiki
+                        </label>
+                        <label class="radio-inline">
+                            <input type="radio" name="content" value="diary"{@eq key=content value="diary"} checked{/eq}> My Diary
+                        </label>
+                    </div>
+                {/user.username}
             </div>
         </div>
     </form>

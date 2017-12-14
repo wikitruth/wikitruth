@@ -41,7 +41,11 @@ module.exports = function uglify(grunt) {
                     'public/layouts/ie-sucks.js'
                 ],
                 'public/layouts/admin.min.js': ['public/layouts/admin.js'],
-                'public/js/app.min.js': ['public/js/app.js'],
+                'public/js/app.min.js': [
+                    'models/constants.js',
+                    'models/paths.js',
+                    'public/js/app.js'
+                ],
                 'public/js/react.min.js': [
                     'node_modules/react/umd/react.production.min.js',
                     'node_modules/react-dom/umd/react-dom.production.min.js'
