@@ -17,47 +17,47 @@
         <h1 class="page-header wt-header" id="browse">Latest Posts</h1>
         <ul class="nav nav-tabs wt-tabs" role="tablist">
             <li role="presentation"{@eq key=tab value="all"} class="active"{/eq}>
-                <a href="{url}{?query.screening}?screening={query.screening}{/query.screening}#browse" role="tab">
+                <a href="{url}#browse" role="tab">
                     <i class="fa fa-globe" aria-hidden="true"></i> All
                 </a>
             </li>
             {!<li role="presentation"{@eq key=tab value="categories"} class="active"{/eq}>
-                <a href="{url}?tab=categories{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="tab">
+                <a href="{url}?tab=categories#browse" role="tab">
                     <i class="fa fa-folder-open" aria-hidden="true"></i> <span class="hidden-xxs">Categories</span>
                 </a>
             </li>!}
             <li role="presentation"{@eq key=tab value="topics"} class="active"{/eq}>
-                <a href="{url}?tab=topics{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="tab">
+                <a href="{url}?tab=topics#browse" role="tab">
                     <i class="fa fa-folder-open" aria-hidden="true"></i> <span class="hidden-xxs">Topics</span>
                 </a>
             </li>
             <li role="presentation"{@eq key=tab value="arguments"} class="active"{/eq}>
-                <a href="{url}?tab=arguments{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="tab">
+                <a href="{url}?tab=arguments#browse" role="tab">
                     <i class="fa fa-flash" aria-hidden="true"></i> <span class="hidden-xs">Facts</span>
                 </a>
             </li>
             <li role="presentation"{@eq key=tab value="questions"} class="active"{/eq}>
-                <a href="{url}?tab=questions{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="tab">
+                <a href="{url}?tab=questions#browse" role="tab">
                     <i class="fa fa-question-circle" aria-hidden="true"></i><span class="hidden-xs"> Questions</span>
                 </a>
             </li>
             <li role="presentation"{@eq key=tab value="answers"} class="active"{/eq}>
-                <a href="{url}?tab=answers{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="tab">
+                <a href="{url}?tab=answers#browse" role="tab">
                     <i class="fa fa-check-circle" aria-hidden="true"></i><span class="hidden-xs"> Answers</span>
                 </a>
             </li>
             <li role="presentation"{@eq key=tab value="artifacts"} class="active"{/eq}>
-                <a href="{url}?tab=artifacts{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="tab">
+                <a href="{url}?tab=artifacts#browse" role="tab">
                     <i class="fa fa-puzzle-piece" aria-hidden="true"></i> <span class="hidden-xs">Artifacts</span>
                 </a>
             </li>
             <li role="presentation"{@eq key=tab value="issues"} class="active"{/eq}>
-                <a href="{url}?tab=issues{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="tab">
+                <a href="{url}?tab=issues#browse" role="tab">
                     <i class="fa fa-exclamation-circle" aria-hidden="true"></i><span class="hidden-xs"> Issues</span>
                 </a>
             </li>
             <li role="presentation"{@eq key=tab value="opinions"} class="active"{/eq}>
-                <a href="{url}?tab=opinions{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="tab">
+                <a href="{url}?tab=opinions#browse" role="tab">
                     <i class="fa fa-comments-o" aria-hidden="true"></i><span class="hidden-xs"> Comments</span>
                 </a>
             </li>
@@ -110,7 +110,7 @@
                         {/topics}
                     </ul>
                     {?topicsMore}
-                        <div class="top-list-items-more"><a href="{paths.wiki.index}?tab=topics{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+                        <div class="top-list-items-more"><a href="{url}?tab=topics#browse" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
                     {/topicsMore}
                 </div>
             {/topics}
@@ -125,7 +125,7 @@
                         {/arguments}
                     </ul>
                     {?argumentsMore}
-                        <div class="top-list-items-more"><a href="{paths.wiki.index}?tab=arguments{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+                        <div class="top-list-items-more"><a href="{url}?tab=arguments#browse" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
                     {/argumentsMore}
                 </div>
             {/arguments}
@@ -140,7 +140,7 @@
                         {/questions}
                     </ul>
                     {?questionsMore}
-                        <div class="top-list-items-more"><a href="{paths.wiki.index}?tab=questions{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+                        <div class="top-list-items-more"><a href="{url}?tab=questions#browse" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
                     {/questionsMore}
                 </div>
             {/questions}
@@ -155,7 +155,7 @@
                         {/answers}
                     </ul>
                     {?answersMore}
-                        <div class="top-list-items-more"><a href="{paths.wiki.index}?tab=answers{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+                        <div class="top-list-items-more"><a href="{url}?tab=answers#browse" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
                     {/answersMore}
                 </div>
             {/answers}
@@ -170,7 +170,7 @@
                         {/artifacts}
                     </ul>
                     {?artifactsMore}
-                        <div class="top-list-items-more"><a href="{paths.wiki.index}?tab=artifacts{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+                        <div class="top-list-items-more"><a href="{url}?tab=artifacts#browse" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
                     {/artifactsMore}
                 </div>
             {/artifacts}
@@ -185,7 +185,7 @@
                         {/issues}
                     </ul>
                     {?issuesMore}
-                        <div class="top-list-items-more"><a href="{paths.wiki.index}?tab=issues{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+                        <div class="top-list-items-more"><a href="{url}?tab=issues#browse" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
                     {/issuesMore}
                 </div>
             {/issues}
@@ -200,7 +200,7 @@
                         {/opinions}
                     </ul>
                     {?opinionsMore}
-                        <div class="top-list-items-more"><a href="{paths.wiki.index}?tab=opinions{?query.screening}&amp;screening={query.screening}{/query.screening}#browse" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+                        <div class="top-list-items-more"><a href="{url}?tab=opinions#browse" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
                     {/opinionsMore}
                 </div>
             {/opinions}
