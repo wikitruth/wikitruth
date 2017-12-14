@@ -5,19 +5,6 @@ var constants   = require('../../models/constants'),
     db          = require('../../app').db.models,
     async       = require('async');
 
-function setupClipboard(req, type) {
-    var clipboard = req.session.clipboard;
-    if(!clipboard) {
-        clipboard = {};
-        clipboard['object' + constants.OBJECT_TYPES.topic] = [];
-        clipboard['object' + constants.OBJECT_TYPES.argument] = [];
-    }
-    if(!clipboard['object' + type]) {
-        clipboard['object' + type] = [];
-    }
-    return clipboard;
-}
-
 function createNewArrayExcludeId(sourceIds, excludeId) {
     var ids = [];
     for (var i = 0; i < sourceIds.length; ++i) { // remove self if included
@@ -35,7 +22,7 @@ module.exports = function (router) {
         var id = req.body.id;
         var type = req.body.type;
 
-        var clipboard = setupClipboard(req, type);
+        var clipboard = flowUtils.setupClipboard(req, type);
         if(clipboard['object' + type].indexOf(id) < 0) {
             clipboard['object' + type].push(id);
         }
@@ -53,7 +40,7 @@ module.exports = function (router) {
         }
 
         var dateNow = Date.now();
-        var clipboard = setupClipboard(req, type);
+        var clipboard = flowUtils.setupClipboard(req, type);
         var topics = clipboard['object' + constants.OBJECT_TYPES.topic];
         var args = clipboard['object' + constants.OBJECT_TYPES.argument];
         if(type == constants.OBJECT_TYPES.topic) {
@@ -187,7 +174,7 @@ module.exports = function (router) {
         var type = req.body.type;
         var username = req.body.username;
 
-        var clipboard = setupClipboard(req, type);
+        var clipboard = flowUtils.setupClipboard(req, type);
         var topics = clipboard['object' + constants.OBJECT_TYPES.topic];
         var args = clipboard['object' + constants.OBJECT_TYPES.argument];
 
@@ -393,7 +380,6 @@ module.exports = function (router) {
     });
 
     router.get('/list', function (req, res) {
-        //delete req.session.clipboard;
         res.send(req.session.clipboard);
     });
 };
