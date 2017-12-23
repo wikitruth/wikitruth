@@ -3,7 +3,7 @@
         <li role="separator" class="divider" id="entry-clipboard"></li>
         <li class="dropdown-header">Clipboard</li>
         {?clipboard.count}
-            <li><a href="{paths.wiki.clipboard}" role="tab"><i class="fa fa-clipboard" aria-hidden="true"></i> View marked ({clipboard.count})</a></li>
+            <li><a href="{paths.wiki.clipboard}{?entry}?{entry.objectName}={entry._id}{/entry}" role="tab"><i class="fa fa-clipboard" aria-hidden="true"></i> View marked ({clipboard.count})</a></li>
         {/clipboard.count}
         {^clipboard.marked}
             {?isEntryOwner}

@@ -1094,15 +1094,16 @@ function getArguments(query, limit, callback) {
     });
 }
 
-function getTopArtifacts(query, model, callback) {
+function getTopArtifacts(query, model, req, callback) {
     db.Artifact
         .find(query)
         .limit(15)
-        .lean()
+        //.lean()
         .sort({ title: 1 })
         .exec(function(err, results) {
             setEditorsUsername(results, function() {
                 results.forEach(function (result) {
+                    result.setThumbnailPath(req.params.username);
                     appendEntryExtras(result);
                 });
                 model.artifacts = results;

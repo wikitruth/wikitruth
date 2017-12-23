@@ -92,6 +92,13 @@ module.exports = function(app, mongoose) {
         rejected: { type: Number, default: 0 }
       }
     },
+    sharing: {
+      users: [{
+        userId: { type: mongoose.Schema.ObjectId, ref: 'User'},
+        grantDate: { type: Date, default: Date.now },
+        permission: { type: Number, default: 1 } // 1 read, 2 read/write
+      }]
+    },
     extras: { type: mongoose.Schema.Types.Mixed }
   });
   schema.methods.getType = function() {

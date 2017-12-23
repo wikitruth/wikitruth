@@ -20,6 +20,7 @@ exports = module.exports = function(app, mongoose) {
     facebook: {},
     google: {},
     tumblr: {},
+    preferences: { type: mongoose.Schema.Types.Mixed },
     search: [String]
   });
   userSchema.methods.canPlayRoleOf = function(role) {

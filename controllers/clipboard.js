@@ -13,6 +13,7 @@ module.exports = function (router) {
         var clipboard = req.session.clipboard || {};
         var topicIds = clipboard['object' + constants.OBJECT_TYPES.topic];
         var argumentIds = clipboard['object' + constants.OBJECT_TYPES.argument];
+        var artifactIds = clipboard['object' + constants.OBJECT_TYPES.artifact];
 
         /* FIXME: why is this here?
         if(req.user) {
@@ -56,6 +57,24 @@ module.exports = function (router) {
                 } else {
                     callback();
                 }
+            },
+            artifacts: function (callback) {
+                if(artifactIds && artifactIds.length > 0) {
+                    var query = {
+                        _id: {
+                            $in: artifactIds
+                        }
+                    };
+                    db.Artifact.find(query, function(err, results) {
+                        results.forEach(function (result) {
+                            flowUtils.appendEntryExtras(result);
+                        });
+                        model.artifacts = results;
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
             }
         }, function (err) {
             res.render(templates.wiki.clipboard, model);
@@ -68,6 +87,7 @@ module.exports = function (router) {
             //var clipboard = req.session.clipboard;
             var topics = req.body.topics;
             var args = req.body.arguments;
+            //var artifacts = req.body.artifacts;
             if(topics) {
                 //var topicIds = clipboard['object' + constants.OBJECT_TYPES.topic];
                 if( typeof topics === 'string' ) {
