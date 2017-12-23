@@ -97,7 +97,9 @@ function GET_create(req, res) {
 function POST_create(req, res) {
     var query = { _id: req.query.artifact || new mongoose.Types.ObjectId() };
     db.Artifact.findOne(query, function (err, result) {
-        var inlineFile = null, updatedEntity = null;
+        var inlineFile, updatedEntity;
+        var oldFilePath, oldThumbnailPath;
+
         var dateNow = Date.now();
         var entity = result ? result : {};
         entity.title = req.body.title;
@@ -119,6 +121,11 @@ function POST_create(req, res) {
         }
 
         if (req.files.inlineFile.name && req.files.inlineFile.size > 0) {
+            if(result) {
+                oldFilePath = entity.getFilePath(req.params.username);
+                oldThumbnailPath = entity.getThumbnailPath(req.params.username);
+            }
+
             inlineFile = req.files.inlineFile;
             entity.file = {
                 name: inlineFile.name,
@@ -143,28 +150,54 @@ function POST_create(req, res) {
                 });
             },
             moveFile: function (callback) {
-                if(inlineFile && updatedEntity.isImage()) {
-                    var artifactFolder = path.join(__dirname, '/../public', updatedEntity.getFolder(req.params.username));
-                    if (!fs.existsSync(artifactFolder)){
-                        fs.mkdirSync(artifactFolder);
+                if(inlineFile) {
+                    // Create directory if not exists
+                    var artifactFolderAbs = path.join(__dirname, '/../public', updatedEntity.getFolder(req.params.username));
+                    if (!fs.existsSync(artifactFolderAbs)){
+                        fs.mkdirSync(artifactFolderAbs);
                     }
-                    var newAbsPath = path.join(__dirname, '/../public', updatedEntity.getFilePath(req.params.username));
-                    fs.rename(inlineFile.path, newAbsPath, function (err) {
+
+                    var filePath = updatedEntity.getFilePath(req.params.username);
+                    var thumbnailPath = updatedEntity.getThumbnailPath(req.params.username);
+
+                    // Delete old file if exists and different filename
+                    if(result) {
+                        console.log('old path: ' + oldFilePath);
+                        if (oldFilePath && oldFilePath != filePath) {
+                            var oldFilePathAbs = path.join(__dirname, '/../public', oldFilePath);
+                            var oldThumbnailPathAbs = path.join(__dirname, '/../public', oldThumbnailPath);
+                            if(fs.existsSync(oldFilePathAbs)) {
+                                fs.unlinkSync(oldFilePathAbs);
+                            }
+                            if (oldThumbnailPath && fs.existsSync(oldThumbnailPathAbs)) {
+                                fs.unlinkSync(oldThumbnailPathAbs);
+                            }
+                        }
+                    }
+
+                    var newPathAbs = path.join(__dirname, '/../public', filePath);
+                    fs.rename(inlineFile.path, newPathAbs, function (err) {
                         if (err) {
                             console.log('An error has occurred moving the file: \n' + err);
                         }
-                        var newAbsThumbnailPath = path.join(__dirname, '/../public', updatedEntity.getThumbnailPath(req.params.username));
-                        imagemagick.resize({
-                            srcPath: newAbsPath,
-                            dstPath: newAbsThumbnailPath,
-                            width: 500
-                        }, function (err, stdout, stderr) {
-                            if (err) {
-                                console.log('An error has occurred resizing the file: \n' + err);
-                            }
-                            console.log('Resized image to fit within 500x500');
+
+                        if(updatedEntity.isImage()) {
+                            // Create thumbnail
+                            var newThumbnailPathAbs = path.join(__dirname, '/../public', thumbnailPath);
+                            imagemagick.resize({
+                                srcPath: newPathAbs,
+                                dstPath: newThumbnailPathAbs,
+                                width: 500
+                            }, function (err, stdout, stderr) {
+                                if (err) {
+                                    console.log('An error has occurred resizing the file: \n' + err);
+                                }
+                                //console.log('Resized image to fit within 500x500');
+                                callback();
+                            });
+                        } else {
                             callback();
-                        });
+                        }
                     });
                 } else {
                     callback();

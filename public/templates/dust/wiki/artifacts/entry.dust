@@ -16,13 +16,17 @@
     {?artifact.file.name}
         <div class="text-body">
             {?artifact.thumbnailPath}
-                <div>
+                <div class="artifact-img">
                     <a href="{artifact.filePath}" target="_blank" title="Click to open original file">
                         <img src="{artifact.thumbnailPath}" class="img-responsive" />
                     </a>
                 </div>
             {/artifact.thumbnailPath}
-            <p class="help-block">File: {artifact.file.name}, {artifact.file.type}, {artifact.file.size}, {artifact.file.lastModifiedDate} <a href="{artifact.filePath}" class="no-underline" target="_blank" title="Click to open/download original file"><i class="fa fa-download"></i> Download</a></p>
+            <p class="help-block">
+                {artifact.file.name} <a href="{artifact.filePath}" class="no-underline" target="_blank" title="Click to open/download original file"><i class="fa fa-download"></i> Download</a>
+                <br/>
+                <small style="margin-bottom: 10px; display: inline-block;" class="text-muted-2">{artifact.file.type}, {artifact.file.size}, {artifact.file.lastModifiedDate}</small>
+            </p>
         </div>
     {/artifact.file.name}
     {?topic}

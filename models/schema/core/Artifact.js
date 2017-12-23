@@ -75,10 +75,13 @@ module.exports = function(app, mongoose) {
     return '/media/artifacts/' + (username ? 'users/' + username + '/' : '');
   };
   schema.methods.getFilePath = function(username) {
-    return '/media/artifacts/' + (username ? 'users/' + username + '/' : '') + this._id + '_' + this.file.name;
+    return this.getFolder(username) + this._id + '_' + this.file.name;
   };
   schema.methods.getThumbnailPath = function(username) {
-    return '/media/artifacts/' + (username ? 'users/' + username + '/' : '') + this._id + '_thumbnail_' + this.file.name;
+    if(this.isImage()) {
+      return this.getFolder(username) + this._id + '_thumbnail_' + this.file.name;
+    }
+    return null;
   };
   schema.methods.isImage = function() {
     return this.file.type.startsWith('image');

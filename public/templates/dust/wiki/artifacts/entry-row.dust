@@ -15,7 +15,7 @@
         {/contentPreview}
         {?file.name}
             {?thumbnailPath}
-                <div style="margin-bottom: 5px">
+                <div style="margin-bottom: 5px" class="artifact-img">
                     <a href="{filePath}" target="_blank" title="Click to open original file">
                         <img src="{thumbnailPath}" class="img-responsive" />
                     </a>

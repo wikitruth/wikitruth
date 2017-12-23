@@ -34,36 +34,30 @@
 
     "middleware": {
 
-        "static": {
-            "module": {
-                "arguments": [ "path:./.build" ]
-            }
-        }
-
-        ,"router": {
+        "router": {
             "module": {
                 "arguments": [{ "directory": "path:./controllers" }]
             }
-        }
+        },
 
-        ,"expressView": {
+        "expressView": {
             "priority": 100,
             "enabled": true,
             "module": {
                 "name": "engine-munger/lib/expressView"
             }
-        }
+        },
 
-        ,"fileNotFound": {
+        "fileNotFound": {
             "enabled": true,
             "priority": 130,
             "module": {
                 "name": "kraken-js/middleware/404",
                 "arguments": [ "dust/errors/404" ]
             }
-        }
+        },
 
-        ,"serverError": {
+        "serverError": {
             "enabled": true,
             "priority": 140,
             "module": {

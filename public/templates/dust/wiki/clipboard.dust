@@ -10,8 +10,8 @@
     <form method="post">
         <input type="hidden" name="_csrf" value="{_csrf}">
         {?topics}
-            <div class="form-group">
-                <label for="inputReferences" class="text-muted-0">Marked Topics <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a></label>
+            <div class="form-group" style="margin-bottom: 20px">
+                <label for="inputReferences" style="margin-bottom: 0" class="text-muted-0">Marked Topics <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a></label>
                 {#topics}
                     <div class="checkbox">
                         <label>
@@ -24,12 +24,11 @@
                         </label>
                     </div>
                 {/topics}
-                <br/>
             </div>
         {/topics}
         {?arguments}
-            <div class="form-group">
-                <label for="inputReferences" class="text-muted-0">Marked Arguments <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a></label>
+            <div class="form-group" style="margin-bottom: 20px">
+                <label for="inputReferences" style="margin-bottom: 0" class="text-muted-0">Marked Arguments <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><i class="fa fa-puzzle-piece"></i></a></label>
                 {#arguments}
                     <div class="checkbox">
                         <label>
@@ -42,9 +41,25 @@
                         </label>
                     </div>
                 {/arguments}
-                <br/>
             </div>
         {/arguments}
+        {?artifacts}
+            <div class="form-group" style="margin-bottom: 20px">
+                <label for="inputReferences" style="margin-bottom: 0" class="text-muted-0">Marked Artifacts</label>
+                {#artifacts}
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="artifacts" value="{_id}">
+                            <strong>{title}</strong>{?private} <span class="label label-default">private</span>{/private}{>"dust/wiki/common/entry-row-screening-label" /}
+                            &nbsp;<a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.artifacts.entry}/{friendlyUrl}/{_id}" title="Open Artifact"><i class="fa fa-external-link"></i></a>
+                            {?contentPreview}
+                                <div>{contentPreview}</div>
+                            {/contentPreview}
+                        </label>
+                    </div>
+                {/artifacts}
+            </div>
+        {/artifacts}
         <button type="submit" name="action" value="delete" class="btn btn-danger">Delete</button>&nbsp;
         {?topic}
             <a class="btn btn-default" href="{wikiBaseUrl}{paths.wiki.topics.entry}?topic={topic._id}" role="button">Cancel</a>

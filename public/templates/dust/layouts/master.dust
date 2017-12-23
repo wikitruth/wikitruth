@@ -72,14 +72,14 @@
                     {/appCategories}
                 </div>!}
                 <ul class="wt-nav nav dropdown-menu-x dropdown-menu-right-x">
-                    <li class="dropdown-header">Content View</li>
+                    {!<li class="dropdown-header">Content View</li>
                     <li><a href="#/switch?content=1">{?showVerified}<i class="fa fa-circle"></i>{:else}<i class="fa fa-check-circle-o"></i>{/showVerified} Verified</a></li>
                     <li><a href="#/switch?content=2">{^showVerified}<i class="fa fa-star-o"></i>{:else}<i class="fa fa-circle-o"></i>{/showVerified} Latest</a></li>
+                    <li role="separator" class="divider"></li>!}
                     {!<li><a href="#/switch?content=3">{?showEverything}<i class="fa fa-circle"></i>{:else}<i class="fa fa-check-square-o"></i>{/showEverything} Everything</a></li>!}
                     {!<li role="separator" class="divider light"></li>!}
                     {!<li><a href="#"><i class="fa fa-folder-o"></i> <strong>Structured</strong></a></li>!}
                     {!<li><a href="{wikiBaseUrl}{paths.wiki.visualize}{?topic}/topic/{topic.friendlyUrl}/{topic._id}{:else}{?application}/topic/{application.exploreTopicId}{/application}{/topic}"><i class="fa fa-snowflake-o"></i> Visualize</a></li>!}
-                    <li role="separator" class="divider"></li>
                     <li class="dropdown-header">Apps</li>
                     <li><a href="{wikitruth.homeUrl}"><img src="/img/logo-64x64.png" title="Logo" style="width: 16px; height: 16px;" /> {wikitruth.projectName}</a></li>
                     {#applications}
@@ -121,10 +121,12 @@
                         <li><a href="#"><i class="fa fa-arrow-circle-right text-color-3-x" aria-hidden="true"></i> more...</a></li>
                         <li role="separator" class="divider"></li>
                     {/topic}
-                    <li class="dropdown-header">Categories</li>
+                    <li class="dropdown-header">Explore</li>
                     {#appCategories}
                         <li><a href="{paths.wiki.topics.entry}/{friendlyUrl}/{_id}"><i class="fa fa-{?icon}{icon}{:else}folder-open{/icon} text-color-3-x" aria-hidden="true"></i> {?contextTitle}{contextTitle}{:else}{title}{/contextTitle}{?childrenCount.topics.accepted} <span class="wt-label label label-default">{childrenCount.topics.accepted}</span>{/childrenCount.topics.accepted}</a></li>
                     {/appCategories}
+                    <li>&nbsp;</li>
+                    <li><a href="#"><i class="fa fa-group text-color-3-x" aria-hidden="true"></i> Groups</a></li>
                 </ul>
             </div><!--/.sidebar-offcanvas-->
         </div><!--/row-->

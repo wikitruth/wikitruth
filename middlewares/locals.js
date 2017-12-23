@@ -34,6 +34,7 @@ module.exports = function(app, passport) {
             res.locals.projectName = application.navTitle;
             res.locals.titleSlogan = application.slogan;
             res.locals.googleAnalyticsTrackingId = application.googleAnalyticsTrackingId;
+
             if(!application.appCategories) {
                 flowUtils.getCategories(model, application.exploreTopicId, function () {
                     application.appCategories = model.categories;
