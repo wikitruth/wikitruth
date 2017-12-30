@@ -176,7 +176,7 @@ module.exports = function (router) {
 
         var clipboard = flowUtils.setupClipboard(req, type);
         var topics = clipboard['object' + constants.OBJECT_TYPES.topic];
-        var args = clipboard['object' + constants.OBJECT_TYPES.argument];
+        var facts = clipboard['object' + constants.OBJECT_TYPES.argument];
 
         if(!id) { // if moving to root
             id = null;
@@ -244,9 +244,9 @@ module.exports = function (router) {
                 },
 
                 arguments: function (callback) {
-                    if (args.length === 0 || !id) return callback();
+                    if (facts.length === 0 || !id) return callback();
 
-                    var ids = createNewArrayExcludeId(args, id);
+                    var ids = createNewArrayExcludeId(facts, id);
                     db.Argument
                         .find({_id: {$in: ids}})
                         .lean()
@@ -296,11 +296,11 @@ module.exports = function (router) {
                 res.send({});
             });
         } else if(type == constants.OBJECT_TYPES.argument) {
-            if (args.length === 0) {
+            if (facts.length === 0) {
                 return res.send({});
             }
             db.Argument.findOne({_id: id}, function(err, parent) {
-                var ids = createNewArrayExcludeId(args, id);
+                var ids = createNewArrayExcludeId(facts, id);
                 db.Argument
                     .find({_id: {$in: ids}})
                     .lean()
@@ -312,7 +312,7 @@ module.exports = function (router) {
                             var ownerId = result.ownerId;
                             // Update entry
                             result.parentId = id;
-                            result.ownerId = parent.parentId; // TODO: how about children ???
+                            result.ownerId = parent.ownerId; // TODO: how about children ???
                             result.ownerType = parent.ownerType;
                             result.threadId = parent.threadId ? parent.threadId : id;
 
