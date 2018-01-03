@@ -66,6 +66,6 @@ module.exports = function (grunt) {
     grunt.registerTask('test', [ 'jshint', 'mochacli' ]);
     grunt.registerTask('build-js', [ 'uglify' ]);
     grunt.registerTask('build-babel', [ 'babel', 'uglify', 'copyto' ]);
-    grunt.registerTask('build', [ 'jshint', 'babel', /*'copy:components',*/ 'uglify', 'less', 'requirejs', 'i18n', 'copyto', 'clean:css' ]);
+    grunt.registerTask('build', [ 'jshint', 'babel', /*'copy:components',*/ 'uglify', 'less', 'requirejs', 'i18n', 'copyto'/*, 'clean:css'*/ ]);
     grunt.registerTask('default', ['concurrent']); //['copy:components', 'newer:uglify', 'less', 'concurrent']);
 };
