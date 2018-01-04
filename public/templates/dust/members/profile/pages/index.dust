@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {member.username}: {?loggedIn}My {/loggedIn}Pages - {titleSlogan}
+    {member.username} | {?loggedIn}My {/loggedIn}Pages - {titleSlogan}
 {/title}
 
 {<body}

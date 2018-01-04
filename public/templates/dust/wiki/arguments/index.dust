@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {?topic}{topic.title}: {contents.argument.shortList}{:else}Top {contents.argument.shortList}{/topic} - {titleSlogan}
+    {?topic}{topic.title} | {contents.argument.shortList}{:else}Top {contents.argument.shortList}{/topic} - {titleSlogan}
 {/title}
 
 {<body}

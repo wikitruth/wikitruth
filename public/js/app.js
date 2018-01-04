@@ -86,6 +86,19 @@ $(document).ready(function () {
         });
     }
 
+    var showMore = $('.wt-show-more');
+    if(showMore.length > 0) {
+        showMore.click(function () {
+            var contentContainer = $(this).parents('.wt-entry-row-content');
+            var content = contentContainer.data('content');
+            if(content) {
+                // FIXME: this is an XSS vulnerability, fix it.
+                contentContainer.html($("<div/>").html(content).text());
+            }
+            return false;
+        });
+    }
+
     $('.wt-entry-reply').popover({
         placement: 'auto',
         title: 'Reply with...',

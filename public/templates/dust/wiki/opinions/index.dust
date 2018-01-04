@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {?argument}{argument.title}{:else}{topic.title}{/argument}: Comments - {titleSlogan}
+    {?argument}{argument.title}{:else}{topic.title}{/argument} | Comments - {titleSlogan}
 {/title}
 
 {<body}
