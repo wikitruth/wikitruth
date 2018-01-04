@@ -11,7 +11,7 @@
             {>"dust/wiki/common/entry-row-subtitle" /}
         {/subtitle}
         {?contentPreview}
-            <div class="wt-entry-row-content">{contentPreview}</div>
+            <div class="wt-entry-row-content"{?content} data-content="{content|h}"{/content}>{contentPreview} {?showMore}<a href="#" class="wt-show-more">Show More</a>{/showMore}</div>
         {/contentPreview}
         {>"dust/wiki/common/entry-row-footer" /}
     </div>

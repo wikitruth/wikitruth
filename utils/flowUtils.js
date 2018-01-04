@@ -53,6 +53,9 @@ function appendListExtras(item, objectType) {
         item.objectType = objectType;
         item.objectName = getObjectName(objectType);
     }
+    if(item.content && item.contentPreview && item.content.length > constants.SETTINGS.contentPreviewLength && item.contentPreview !== item.content) {
+        item.showMore = true;
+    }
 }
 
 function appendEntryExtras(item, objectType, req) {

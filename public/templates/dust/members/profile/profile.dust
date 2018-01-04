@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {member.username}: Profile - {titleSlogan}
+    {member.username} | Profile - {titleSlogan}
 {/title}
 
 {<header}

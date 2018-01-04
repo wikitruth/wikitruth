@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {?entry}{entry.title}: {:else}Top {/entry}Questions - {titleSlogan}
+    {?entry}{entry.title} | {:else}Top {/entry}Questions - {titleSlogan}
 {/title}
 
 {<body}

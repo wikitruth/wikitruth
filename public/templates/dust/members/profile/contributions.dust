@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {member.username}: Contributions - {titleSlogan}
+    {member.username} | Contributions - {titleSlogan}
 {/title}
 
 {<body}

@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {?topic}{topic.title}: Artifacts{:else}Top Artifacts{/topic} - {titleSlogan}
+    {?topic}{topic.title} | Artifacts{:else}Top Artifacts{/topic} - {titleSlogan}
 {/title}
 
 {<body}
