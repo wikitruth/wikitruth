@@ -55,6 +55,10 @@
         </script>
     {/googleAnalyticsTrackingId}
 </head>
+{!
+    body.data-username: set on setModelContext() when rendering screens from user's profile, diary
+    body.data-entry-*: set when an entry is loaded
+!}
 <body data-entry-id="{entry._id}" data-entry-type="{entryType}" data-csrf="{_csrf}"{?username} data-username="{username}"{/username}{?application} class="app-{application.id}"{/application}>
     {>"dust/layouts/header" /}
     <div class="container-fluid">
@@ -157,9 +161,12 @@
     <script src="/components/bootstrap/dist/js/bootstrap.min.js?{cacheBreaker}"></script>
     <script src="/js/react.min.js?{cacheBreaker}"></script>
     <script src="/js/app.min.js?{cacheBreaker}"></script>
+    {! details about logged in user !}
     <script>
-        WT_CONSTANTS.OBJECT_TYPES = {constants.OBJECT_TYPES|js|s};
-        WT_CONSTANTS.OBJECT_FORMAL_NAME_MAP = {constants.OBJECT_FORMAL_NAME_MAP|js|s};
+        window.WT_USER = {
+            username: '{user.username}',
+            isAdmin: '{user.isAdmin}' === 'true'
+        };
     </script>
     <script src="/js/react/entry-options-popover.js?{cacheBreaker}"></script>
     {+footer /}

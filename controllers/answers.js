@@ -17,11 +17,11 @@ function GET_entry(req, res) {
         ownerQuery['screening.status'] = constants.SCREENING_STATUS.status1.code;
         async.parallel({
             issues: function (callback) {
-                flowUtils.getTopIssues(ownerQuery, model, callback);
+                flowUtils.getTopIssues(ownerQuery, model, req, callback);
             },
             opinions: function (callback) {
                 var query = { parentId: null, ownerId: req.query.answer, ownerType: constants.OBJECT_TYPES.answer, 'screening.status': constants.SCREENING_STATUS.status1.code };
-                flowUtils.getTopOpinions(query, model, callback);
+                flowUtils.getTopOpinions(query, model, req, callback);
             }
         }, function (err, results) {
             flowUtils.setModelOwnerEntry(req, model);
@@ -43,7 +43,7 @@ function GET_index(req, res) {
                 .exec(function (err, results) {
                     flowUtils.setEditorsUsername(results, function () {
                         results.forEach(function (result) {
-                            flowUtils.appendEntryExtras(result);
+                            flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.answer, req);
                         });
                         model.answers = results;
                         flowUtils.setModelOwnerEntry(req, model);
@@ -69,7 +69,7 @@ function GET_index(req, res) {
                         result.topic = {
                             _id: result.ownerId
                         };
-                        flowUtils.appendEntryExtras(result);
+                        flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.answer, req);
                     });
                     model.answers = results;
                     flowUtils.setModelContext(req, model);

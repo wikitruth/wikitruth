@@ -1,42 +1,36 @@
 function EntryOptionsPopover(props) {
 
-    /*var editElement;
-    switch (props.type) {
-        case WT_CONSTANTS.OBJECT_TYPES.topic:
-            editElement = <li><a href="#"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Topic</a></li>;
-            break;
-        case WT_CONSTANTS.OBJECT_TYPES.argument:
-            editElement = <li><a href="#"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Fact</a></li>;
-            break;
-        default:
-            editElement = <li><a href="#"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Entry</a></li>;
-    }*/
+    var idparam = (props.type == WT_CONSTANTS.OBJECT_TYPES.topic || props.type == WT_CONSTANTS.OBJECT_TYPES.argument || props.type == WT_CONSTANTS.OBJECT_TYPES.opinion ? 'id' : WT_CONSTANTS.OBJECT_ID_NAME_MAP[props.type]);
+    var editUrl = '/' + WT_CONSTANTS.OBJECT_NAMES_MAP[props.type] + '/create?' + idparam + '=' + props.id;
+    var screeningUrl = WT_PATHS.wiki.screening + '?' + WT_CONSTANTS.OBJECT_ID_NAME_MAP[props.type] + '=' + props.id;
+    var renderDivider = props.isOwner || WT_USER.isAdmin;
+
+    if(props.private) {
+        editUrl = WT_PATHS.members.index + '/' + WT_USER.username + WT_PATHS.members.profile.diary + editUrl;
+    }
 
     return (
         <ul class="nav">
-            {/*<li><a href="#"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Comment</a></li>
-            <li><a href="#"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Issue</a></li>
-            <li><a href="#"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Answer</a></li>
-            <li><a href="#"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Question</a></li>
-            <li><a href="#"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Artifact</a></li>
-            <li><a href="#"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Fact Link</a></li>
-            <li><a href="#"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Fact</a></li>
-            <li><a href="#"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Topic Link</a></li>
-            <li><a href="#"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Topic</a></li>
-            <li><a href="#"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Entry</a></li>
-            {editElement}*/}
-            <li><a href="#"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit {WT_CONSTANTS.OBJECT_FORMAL_NAME_MAP[props.type]}</a></li>
-            <li><a href="#" onclick="return entryTakeOwnership2()"><i class="fa fa-hand-grab-o" aria-hidden="true"></i> Take Ownership</a></li>
-            <li><a href="#" onclick="return entryDelete2()"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</a></li>
-            <li role="separator" class="divider"></li>
+            {props.isOwner ? (
+                <li><a href={editUrl}><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit {WT_CONSTANTS.OBJECT_FORMAL_NAME_MAP[props.type]}</a></li>
+            ):(null)}
+            {WT_USER.username && WT_USER.isAdmin ? (
+                <li><a href="#" onclick="return entryTakeOwnership2()"><i class="fa fa-hand-grab-o" aria-hidden="true"></i> Take Ownership</a></li>
+            ):(null)}
+            {props.isOwner ? (
+                <li><a href="#" onclick="return entryDelete2()"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</a></li>
+            ):(null)}
+            {renderDivider ? (
+                <li role="separator" class="divider"></li>
+            ):(null)}
             <li><a href="#"><i class="fa fa-rss" aria-hidden="true"></i> Follow</a></li>
             <li><a href="#"><i class="fa fa-share" aria-hidden="true"></i> Share</a></li>
             <li><a href="#"><i class="fa fa-flag" aria-hidden="true"></i> Report</a></li>
             <li><a href="#"><i class="fa fa-info-circle" aria-hidden="true"></i> Details</a></li>
             <li role="separator" class="divider"></li>
-            <li class="dropdown-header">Screener</li>
-            <li><a href="" title="Set screening status" class="no-underline">
-                <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Screening Status</a></li>
+            {/*<li class="dropdown-header">Screener</li>*/}
+            <li><a href={screeningUrl} title="View or set screening status" class="no-underline">
+                <i class="fa fa-check-square-o" aria-hidden="true"></i> Screening Status</a></li>
         </ul>
     );
 }
@@ -89,10 +83,12 @@ function generateOptionsContentMenu() {
     var listGroupItem = $(this).parents('.list-group-item');
     var objectId = $(listGroupItem).data('id');
     var objectType = $(listGroupItem).data('type');
+    var isOwner = $(listGroupItem).data('is-owner');
+    var isPrivate = $(listGroupItem).data('private');
 
     //console.log('id=' + objectId + ',type=' + objectType);
     ReactDOM.render(
-        <EntryOptionsPopover id={objectId} type={objectType} />,
+        <EntryOptionsPopover id={objectId} type={objectType} isOwner={isOwner} private={isPrivate} />,
         document.getElementById('entryOptionsContent')
     );
     return $('#entryOptionsContent').html();

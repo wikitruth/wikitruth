@@ -35,10 +35,10 @@ function GET_entry(req, res) {
             issues: function (callback) {
                 // Top Issues
                 ownerQuery['screening.status'] = constants.SCREENING_STATUS.status1.code;
-                flowUtils.getTopIssues(ownerQuery, model, callback);
+                flowUtils.getTopIssues(ownerQuery, model, req, callback);
             },
             opinions: function (callback) {
-                flowUtils.getTopOpinions(query, model, callback);
+                flowUtils.getTopOpinions(query, model, req, callback);
             }
         }, function (err, results) {
             flowUtils.setModelOwnerEntry(req, model);
@@ -62,7 +62,7 @@ function GET_index(req, res) {
                 .exec(function (err, results) {
                 flowUtils.setEditorsUsername(results, function() {
                     results.forEach(function (result) {
-                        flowUtils.appendEntryExtras(result);
+                        flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.opinion, req);
                     });
                     model.opinions = results;
                     flowUtils.setModelOwnerEntry(req, model);
@@ -85,7 +85,7 @@ function GET_index(req, res) {
                     result.topic = {
                         _id: result.ownerId
                     };
-                    flowUtils.appendEntryExtras(result);
+                    flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.opinion, req);
                 });
                 model.opinions = results;
                 flowUtils.setModelContext(req, model);

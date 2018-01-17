@@ -18,7 +18,7 @@ function GET_entry(req, res) {
         ownerQuery.parentId = null;
         async.parallel({
             opinions: function (callback) {
-                flowUtils.getTopOpinions(ownerQuery, model, callback);
+                flowUtils.getTopOpinions(ownerQuery, model, req, callback);
             }
         }, function (err, results) {
             flowUtils.setModelOwnerEntry(req, model);
@@ -43,7 +43,7 @@ function GET_index(req, res) {
                 flowUtils.setEditorsUsername(results, function() {
                     results.forEach(function (result) {
                         result.issueType = constants.ISSUE_TYPES['type' + result.issueType];
-                        flowUtils.appendEntryExtras(result);
+                        flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.issue, req);
                     });
                     model.issues = results;
                     flowUtils.setModelOwnerEntry(req, model);
@@ -67,7 +67,7 @@ function GET_index(req, res) {
                         result.topic = {
                             _id: result.ownerId
                         };
-                        flowUtils.appendEntryExtras(result);
+                        flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.issue, req);
                     });
                     model.issues = results;
                     flowUtils.setModelContext(req, model);

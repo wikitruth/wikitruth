@@ -21,11 +21,11 @@ function GET_entry(req, res) {
         async.parallel({
             issues: function (callback) {
                 // Top Issues
-                flowUtils.getTopIssues(ownerQuery, model, callback);
+                flowUtils.getTopIssues(ownerQuery, model, req, callback);
             },
             opinions: function (callback) {
                 var query = { parentId: null, ownerId: req.query.artifact, ownerType: constants.OBJECT_TYPES.artifact, 'screening.status': constants.SCREENING_STATUS.status1.code };
-                flowUtils.getTopOpinions(query, model, callback);
+                flowUtils.getTopOpinions(query, model, req, callback);
             }
         }, function (err, results) {
             flowUtils.setModelOwnerEntry(req, model);
@@ -50,7 +50,7 @@ function GET_index(req, res) {
                 .exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
-                            flowUtils.appendEntryExtras(result);
+                            flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.artifact, req);
                             result.setThumbnailPath(req.params.username);
                         });
                         model.artifacts = results;
@@ -76,7 +76,7 @@ function GET_index(req, res) {
                         result.topic = {
                             _id: result.ownerId
                         };
-                        flowUtils.appendEntryExtras(result);
+                        flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.artifact, req);
                     });
                     model.artifacts = results;
                     flowUtils.setModelContext(req, model);

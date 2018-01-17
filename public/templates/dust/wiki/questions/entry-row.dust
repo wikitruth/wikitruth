@@ -1,4 +1,4 @@
-<li class="list-group-item" data-id="{_id}" data-type="{objectType}">
+<li class="list-group-item" data-id="{_id}" data-type="{objectType}" data-is-owner="{isItemOwner}" data-private="{private}">
     <i class="fa fa-question-circle text-color-1" aria-hidden="true"></i>
     <div>
         <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.questions.entry}/{friendlyUrl}/{_id}">{title}

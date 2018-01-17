@@ -1,37 +1,30 @@
-var WT_CONSTANTS = {
-    summernote: {
-        standardHeight: 250,
-        standardToolbar: [
-            ['style', ['style']],
-            ['font', ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
-            /*['fontname', ['fontname']],*/
-            ['color', ['color']],
-            ['list', ['ul', 'ol']],
-            ['para', ['paragraph']],
-            ['table', ['table']],
-            ['insert', ['link', 'picture', 'video']],
-            ['view', ['fullscreen']],
-            ['view2', ['codeview']],
-            ['help', ['help']]
-        ],
-        compactHeight: 100,
-        compactToolbar: [
-            ['font', ['bold', 'underline', 'strikethrough', 'clear']],
-            ['list', ['ul', 'ol']],
-            ['para', ['paragraph']],
-            ['insert', ['link']],
-            ['view', ['codeview']]
-        ]
-    },
-    OBJECT_TYPES: {
-        topic: 1,
-        argument: 2,
-        question: 3,
-        comment: 4,
-        definition: 5,
-        issue: 10,
-        opinion: 11
-    }
+if(typeof window.WT_CONSTANTS == 'undefined') {
+    window.WT_CONSTANTS = {};
+}
+
+window.WT_CONSTANTS.summernote = {
+    standardHeight: 250,
+    standardToolbar: [
+        ['style', ['style']],
+        ['font', ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
+        /*['fontname', ['fontname']],*/
+        ['color', ['color']],
+        ['list', ['ul', 'ol']],
+        ['para', ['paragraph']],
+        ['table', ['table']],
+        ['insert', ['link', 'picture', 'video']],
+        ['view', ['fullscreen']],
+        ['view2', ['codeview']],
+        ['help', ['help']]
+    ],
+    compactHeight: 100,
+    compactToolbar: [
+        ['font', ['bold', 'underline', 'strikethrough', 'clear']],
+        ['list', ['ul', 'ol']],
+        ['para', ['paragraph']],
+        ['insert', ['link']],
+        ['view', ['codeview']]
+    ]
 };
 
 function disableEditorTooltipsOnTouchDevice() {

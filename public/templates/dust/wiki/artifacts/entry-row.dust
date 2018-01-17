@@ -1,4 +1,4 @@
-<li class="list-group-item" data-id="{_id}" data-type="{objectType}">
+<li class="list-group-item" data-id="{_id}" data-type="{objectType}" data-is-owner="{isItemOwner}" data-private="{private}">
     <i class="fa fa-puzzle-piece text-primary" aria-hidden="true"></i>
     <div>
         <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.artifacts.entry}/{friendlyUrl}/{_id}">{title}
