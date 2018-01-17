@@ -36,7 +36,7 @@ module.exports = function(app, passport) {
             res.locals.googleAnalyticsTrackingId = application.googleAnalyticsTrackingId;
 
             if(!application.appCategories) {
-                flowUtils.getCategories(model, application.exploreTopicId, function () {
+                flowUtils.getCategories(model, application.exploreTopicId, req, function () {
                     application.appCategories = model.categories;
                     res.locals.appCategories = model.categories;
                     next();
@@ -47,7 +47,7 @@ module.exports = function(app, passport) {
             }
         } else {
             if(!app.locals.appCategories) {
-                flowUtils.getCategories(model, null, function () {
+                flowUtils.getCategories(model, null, req, function () {
                     app.locals.appCategories = model.categories;
                     next();
                 });

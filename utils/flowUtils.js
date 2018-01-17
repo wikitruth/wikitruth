@@ -3,6 +3,7 @@
 var db          = require('../app').db.models,
     utils       = require('./utils'),
     constants   = require('../models/constants'),
+    paths       = require('../models/paths'),
     config      = require('../config/config'),
     url         = require('url'),
     querystring = require('querystring'),
@@ -901,7 +902,7 @@ function setClipboardModel(req, model, entryType) {
     }
 }
 
-function getTopics(query, limit, callback) {
+function getTopics(query, limit, req, callback) {
     async.parallel({
         children: function (callback) {
             db.Topic
@@ -912,7 +913,7 @@ function getTopics(query, limit, callback) {
                 .exec(function(err, results) {
                     setEditorsUsername(results, function() {
                         results.forEach(function (result) {
-                            appendEntryExtras(result, constants.OBJECT_TYPES.topic);
+                            appendEntryExtras(result, constants.OBJECT_TYPES.topic, req);
                             //result.link = false;
                         });
                         callback(null, results);
@@ -984,7 +985,7 @@ function getTopics(query, limit, callback) {
     });
 }
 
-function getArguments(query, limit, callback) {
+function getArguments(query, limit, req, callback) {
     async.parallel({
         children: function (callback) {
             db.Argument
@@ -995,7 +996,7 @@ function getArguments(query, limit, callback) {
                 .exec(function(err, results) {
                     setEditorsUsername(results, function() {
                         results.forEach(function (result) {
-                            appendEntryExtras(result, constants.OBJECT_TYPES.argument);
+                            appendEntryExtras(result, constants.OBJECT_TYPES.argument, req);
                             //result.link = false;
                             //result.against = false;
                         });
@@ -1107,7 +1108,7 @@ function getTopArtifacts(query, model, req, callback) {
             setEditorsUsername(results, function() {
                 results.forEach(function (result) {
                     result.setThumbnailPath(req.params.username);
-                    appendEntryExtras(result);
+                    appendEntryExtras(result, constants.OBJECT_TYPES.artifact, req);
                 });
                 model.artifacts = results;
                 callback();
@@ -1115,7 +1116,7 @@ function getTopArtifacts(query, model, req, callback) {
         });
 }
 
-function getTopIssues(query, model, callback) {
+function getTopIssues(query, model, req, callback) {
     db.Issue
         .find(query)
         .limit(15)
@@ -1125,7 +1126,7 @@ function getTopIssues(query, model, callback) {
             setEditorsUsername(results, function() {
                 results.forEach(function (result) {
                     result.issueType = constants.ISSUE_TYPES['type' + result.issueType];
-                    appendEntryExtras(result);
+                    appendEntryExtras(result, constants.OBJECT_TYPES.issue, req);
                 });
                 model.issues = results;
                 callback();
@@ -1133,7 +1134,7 @@ function getTopIssues(query, model, callback) {
         });
 }
 
-function getTopOpinions(query, model, callback) {
+function getTopOpinions(query, model, req, callback) {
     db.Opinion
         .find(query)
         .limit(15)
@@ -1142,7 +1143,7 @@ function getTopOpinions(query, model, callback) {
         .exec(function(err, results) {
             setEditorsUsername(results, function() {
                 results.forEach(function (result) {
-                    appendEntryExtras(result);
+                    appendEntryExtras(result, constants.OBJECT_TYPES.opinion, req);
                 });
                 model.opinions = results;
                 callback();
@@ -2380,8 +2381,8 @@ function createOwnerQueryFromModel(model) {
 function setModelContext(req, model) {
     if(req.params.username || (model.entry && model.entry.private)) {
         model.username = req.params.username || req.user.username;
-        model.profileBaseUrl = "/members/" + model.username;
-        model.wikiBaseUrl = model.profileBaseUrl + "/diary";
+        model.profileBaseUrl = paths.members.index + '/' + model.username;
+        model.wikiBaseUrl = model.profileBaseUrl + paths.members.profile.diary;
     } else {
         model.username = '';
         model.profileBaseUrl = '';
@@ -2402,7 +2403,7 @@ function buildCancelUrl(model, cancelBaseUrl, entry, parent) {
 
 function buildParentUrl(req, entry) {
     var getBaseUrl = function (entry) {
-        return entry.private ? '/members/' + req.user.username + '/diary' : '';
+        return entry.private ? paths.members.index + '/' + req.user.username + paths.members.profile.diary : '';
     };
     var buildRedirectUrl = function (entry) {
         var wikiBaseUrl = getBaseUrl(entry);
@@ -2625,7 +2626,7 @@ function createContentPreview(content) {
     );
 }
 
-function getCategories(model, topicId, callback) {
+function getCategories(model, topicId, req, callback) {
     db.Topic
         .find({parentId: topicId, private: false, 'screening.status': constants.SCREENING_STATUS.status1.code })
         .sort({title: 1})
@@ -2636,7 +2637,7 @@ function getCategories(model, topicId, callback) {
                 result.comments = utils.numberWithCommas(utils.randomInt(1, 100000));
                 db.Topic
                     .find( { parentId: result._id } )
-                    .limit(3)
+                    .limit(constants.SETTINGS.SUBCATEGORY_LIST_SIZE)
                     .sort({ title: 1 })
                     .lean()
                     .exec(function(err, subtopics) {
@@ -2655,7 +2656,7 @@ function getCategories(model, topicId, callback) {
                                 ownerType: constants.OBJECT_TYPES.topic,
                                 'screening.status': constants.SCREENING_STATUS.status1.code
                             };
-                            getArguments(query, 3, function (err, subarguments) {
+                            getArguments(query, constants.SETTINGS.SUBCATEGORY_LIST_SIZE, req, function (err, subarguments) {
                                 subarguments.forEach(function (subargument) {
                                     setVerdictModel(subargument);
                                     subargument.shortTitle = utils.getShortText(subargument.contextTitle ? subargument.contextTitle : subargument.title, constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN);

@@ -16,7 +16,7 @@
                     </span>
                 </div>
                 {?user.username}
-                    <div class="form-group">
+                    <div class="form-group" style="margin-top: 5px">
                         <label class="radio-inline">
                             <input type="radio" name="content" value="all"{@eq key=content value="all"} checked{/eq}> All Content
                         </label>

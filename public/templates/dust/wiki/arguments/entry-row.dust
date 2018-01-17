@@ -1,4 +1,4 @@
-<li class="list-group-item" data-id="{_id}" data-type="{objectType}">
+<li class="list-group-item" data-id="{_id}" data-type="{objectType}" data-is-owner="{isItemOwner}" data-private="{private}">
     <i class="glyphicon glyphicon-flash text-{verdict.theme}" aria-hidden="true"></i>
     <div>
         {?link}

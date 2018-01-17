@@ -28,7 +28,8 @@
                     index: '/pages',
                     page: '/pages/page',
                     create: '/pages/create'
-                }
+                },
+                diary: '/diary'
             }
         },
         wiki: {

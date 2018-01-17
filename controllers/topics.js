@@ -34,7 +34,7 @@ function GET_index(req, res) {
         },
         topics: function(callback) {
             // display 15 if top topics, all if has topic parameter
-            flowUtils.getTopics({ parentId: req.query.topic, 'screening.status': model.screening.status }, 0, function (err, results) {
+            flowUtils.getTopics({ parentId: req.query.topic, 'screening.status': model.screening.status }, 0, req, function (err, results) {
                 model.topics = results;
                 callback();
             });
@@ -69,7 +69,7 @@ function GET_entry(req, res) {
                                 result.friendlyUrl = utils.urlify(result.title);
                                 db.Topic
                                     .find( { parentId: result._id } )
-                                    .limit(3)
+                                    .limit(constants.SETTINGS.SUBCATEGORY_LIST_SIZE)
                                     .sort({ title: 1 })
                                     .lean()
                                     .exec(function(err, subtopics) {
@@ -88,7 +88,7 @@ function GET_entry(req, res) {
                                                 ownerType: constants.OBJECT_TYPES.topic,
                                                 'screening.status': constants.SCREENING_STATUS.status1.code
                                             };
-                                            flowUtils.getArguments(query, 3, function (err, subarguments) {
+                                            flowUtils.getArguments(query, constants.SETTINGS.SUBCATEGORY_LIST_SIZE, req, function (err, subarguments) {
                                                 subarguments.forEach(function (subargument) {
                                                     flowUtils.setVerdictModel(subargument);
                                                     subargument.shortTitle = utils.getShortText(subargument.contextTitle ? subargument.contextTitle : subargument.title, constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN);
@@ -111,7 +111,7 @@ function GET_entry(req, res) {
             topics: function(callback) {
                 // Top Subtopics
                 var query = { parentId: req.query.topic, 'screening.status': constants.SCREENING_STATUS.status1.code };
-                flowUtils.getTopics(query, 15, function (err, results) {
+                flowUtils.getTopics(query, 15, req, function (err, results) {
                     model.topics = results;
                     model.keyTopics = results.filter(function (result) {
                         return result.tags.indexOf(constants.TOPIC_TAGS.tag20.code) >= 0;
@@ -171,7 +171,7 @@ function GET_entry(req, res) {
                     ownerType: constants.OBJECT_TYPES.topic,
                     'screening.status': constants.SCREENING_STATUS.status1.code
                 };
-                flowUtils.getArguments(query, 0, function (err, results) {
+                flowUtils.getArguments(query, 0, req, function (err, results) {
                     results.forEach(function (result) {
                         flowUtils.setVerdictModel(result);
                     });
@@ -210,12 +210,12 @@ function GET_entry(req, res) {
             issues: function (callback) {
                 // Top Issues
                 var query = { ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, 'screening.status': constants.SCREENING_STATUS.status1.code };
-                flowUtils.getTopIssues(query, model, callback);
+                flowUtils.getTopIssues(query, model, req, callback);
             },
             opinions: function (callback) {
                 // Top Opinions
                 var query = { parentId: null, ownerId: req.query.topic, ownerType: constants.OBJECT_TYPES.topic, 'screening.status': constants.SCREENING_STATUS.status1.code };
-                flowUtils.getTopOpinions(query, model, callback);
+                flowUtils.getTopOpinions(query, model, req, callback);
             }
         }, function (err, results) {
             res.render(templates.wiki.topics.entry, model);
@@ -344,7 +344,7 @@ function GET_link_entry(req, res) {
             topics: function(callback) {
                 // Top Subtopics
                 var query = { parentId: model.topicLink.topicId, 'screening.status': constants.SCREENING_STATUS.status1.code };
-                flowUtils.getTopics(query, 15, function (err, results) {
+                flowUtils.getTopics(query, 15, req, function (err, results) {
                     model.topics = results;
                     model.keyTopics = results.filter(function (result) {
                         return result.tags.indexOf(constants.TOPIC_TAGS.tag20.code) >= 0;
@@ -404,7 +404,7 @@ function GET_link_entry(req, res) {
                     ownerType: constants.OBJECT_TYPES.topic,
                     'screening.status': constants.SCREENING_STATUS.status1.code
                 };
-                flowUtils.getArguments(query, 0, function (err, results) {
+                flowUtils.getArguments(query, 0, req, function (err, results) {
                     results.forEach(function (result) {
                         flowUtils.setVerdictModel(result);
                     });
@@ -428,7 +428,7 @@ function GET_link_entry(req, res) {
                 db.Question.find(query).limit(15).exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
-                            flowUtils.appendEntryExtras(result);
+                            flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.question, req);
                         });
                         model.questions = results;
                         callback();
@@ -438,12 +438,12 @@ function GET_link_entry(req, res) {
             issues: function (callback) {
                 // Top Issues
                 var query = { ownerId: ownerQuery.ownerId, ownerType: ownerQuery.ownerType, 'screening.status': constants.SCREENING_STATUS.status1.code };
-                flowUtils.getTopIssues(query, model, callback);
+                flowUtils.getTopIssues(query, model, req, callback);
             },
             opinions: function (callback) {
                 // Top Opinions
                 var query = { parentId: null, ownerId: ownerQuery.ownerId, ownerType: ownerQuery.ownerType, 'screening.status': constants.SCREENING_STATUS.status1.code };
-                flowUtils.getTopOpinions(query, model, callback);
+                flowUtils.getTopOpinions(query, model, req, callback);
             }
         }, function (err, results) {
             flowUtils.setModelOwnerEntry(req, model);

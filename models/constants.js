@@ -354,7 +354,8 @@
         VERDICT_STATUS: VERDICT_STATUS,
         SETTINGS: {
             contentPreviewLength: 250,
-            TILE_MAX_SUB_ENTRY_LEN: 30
+            TILE_MAX_SUB_ENTRY_LEN: 30,
+            SUBCATEGORY_LIST_SIZE: 5
         },
         PARENT_RELATIONSHIP: PARENT_RELATIONSHIP,
         OBJECT_NAMES_MAP: {
