@@ -128,7 +128,7 @@ function GET_index(req, res) {
                                                         ownerType: constants.OBJECT_TYPES.topic,
                                                         'screening.status': constants.SCREENING_STATUS.status1.code
                                                     };
-                                                    flowUtils.getArguments(query, nodesNeeded, function (err, subarguments) {
+                                                    flowUtils.getArguments(query, nodesNeeded, req, function (err, subarguments) {
                                                         subarguments.forEach(function (subargument) {
                                                             if (!nodes.find(function (item) {
                                                                     return subargument._id.equals(item.id);
@@ -169,7 +169,7 @@ function GET_index(req, res) {
                                         ownerType: constants.OBJECT_TYPES.topic,
                                         'screening.status': constants.SCREENING_STATUS.status1.code
                                     };
-                                    flowUtils.getArguments(query, nodesNeeded, function (err, subarguments) {
+                                    flowUtils.getArguments(query, nodesNeeded, req, function (err, subarguments) {
                                         subarguments.forEach(function (subargument) {
                                             if (!nodes.find(function (item) {
                                                     return subargument._id.equals(item.id);
