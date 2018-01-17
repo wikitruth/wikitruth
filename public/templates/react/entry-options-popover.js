@@ -14,7 +14,7 @@ function EntryOptionsPopover(props) {
             {props.isOwner ? (
                 <li><a href={editUrl}><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit {WT_CONSTANTS.OBJECT_FORMAL_NAME_MAP[props.type]}</a></li>
             ):(null)}
-            {WT_USER.username && WT_USER.isAdmin ? (
+            {WT_USER.username && WT_USER.isAdmin && !props.isOwner ? (
                 <li><a href="#" onclick="return entryTakeOwnership2()"><i class="fa fa-hand-grab-o" aria-hidden="true"></i> Take Ownership</a></li>
             ):(null)}
             {props.isOwner ? (
