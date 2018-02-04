@@ -52,6 +52,9 @@ module.exports = function (router) {
 
             async.eachSeries(cols.backupList, function (col, callback) {
                 var coldir = dir + '/' + col;
+                if (!fs.existsSync(coldir)){
+                    return callback();
+                }
                 var jsons = fs.readdirSync(coldir);
                 //console.log('restore:', col);
                 //console.log(jsons);
