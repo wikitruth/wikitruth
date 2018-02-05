@@ -104,4 +104,10 @@ $(document).ready(function () {
     $('.wt-entry-reply').on('show.bs.popover', function () {
         //console.log('wt-entry-reply showing...');
     });
+
+    var containerHeight = $("body > .container-fluid").height();
+    var targetContainerHeight = $(window).height() - ($("body > .footer").height() + $("body > .navbar").height() + 11);
+    if(containerHeight < targetContainerHeight) {
+        $("body > .container-fluid").height(targetContainerHeight)
+    }
 });

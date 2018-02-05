@@ -1,6 +1,7 @@
 .build
 .idea
 .vscode
+.vs
 .nodemonignore
 node_modules
 public/css

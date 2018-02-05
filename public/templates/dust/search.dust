@@ -6,7 +6,7 @@
 
 {<body}
     <h1 class="page-header wt-header"><i class="fa fa-search"></i> Search</h1>
-    <form method="get">
+    <form method="get" class="wt-search">
         <div class="row">
             <div class="col-lg-6 col-md-8 col-sm-8">
                 <div class="input-group">
@@ -16,7 +16,7 @@
                     </span>
                 </div>
                 {?user.username}
-                    <div class="form-group" style="margin-top: 5px">
+                    <div class="form-group" style="margin-top: 8px">
                         <label class="radio-inline">
                             <input type="radio" name="content" value="all"{@eq key=content value="all"} checked{/eq}> All Content
                         </label>
