@@ -35,7 +35,7 @@ exports.mongodb = {
       accountcategories: 'AccountCategory',
       accounts: 'Account',
       admingroups: 'AdminGroup',
-      admin: 'Admin',
+      admins: 'Admin',
       arguments: 'Argument',
       argumentlinks: 'ArgumentLink',
       categories: 'Category',

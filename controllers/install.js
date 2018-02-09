@@ -44,44 +44,60 @@ module.exports = function (router) {
 
     router.post('/', function (req, res) {
         var model = {};
+        model.dirname = flowUtils.getBackupDir();
 
-        var next = function () {
-            model.dirname = flowUtils.getBackupDir();
+        var restoreTask = function (col, callback) {
             var dir = flowUtils.getBackupDir() + '/wikitruth';
-            //console.log(cols.backupList);
-
-            async.eachSeries(cols.backupList, function (col, callback) {
-                var coldir = dir + '/' + col;
-                if (!fs.existsSync(coldir)){
-                    return callback();
-                }
-                var jsons = fs.readdirSync(coldir);
-                //console.log('restore:', col);
-                //console.log(jsons);
-                if (cols.modelMapping[col]) {
-                    var collection = db[cols.modelMapping[col]];
-                    if (collection) {
-                        collection.remove({}, function (err) {
-                            async.eachSeries(jsons, function (json, callback) {
-                                var file = coldir + '/' + json;
-                                var obj = JSON.parse(fs.readFileSync(file, 'utf8'));
-                                collection.create(obj, function (err, newObj) {
-                                    if (err) {
-                                        console.error(err);
-                                    }
-                                    callback();
-                                });
-                            }, function (err) {
+            var coldir = dir + '/' + col;
+            if (!fs.existsSync(coldir)){
+                return callback();
+            }
+            var jsons = fs.readdirSync(coldir);
+            if (cols.modelMapping[col]) {
+                var collection = db[cols.modelMapping[col]];
+                if (collection) {
+                    collection.remove({}, function (err) {
+                        async.eachSeries(jsons, function (json, callback) {
+                            var file = coldir + '/' + json;
+                            var obj = JSON.parse(fs.readFileSync(file, 'utf8'));
+                            collection.create(obj, function (err, newObj) {
+                                if (err) {
+                                    console.error(err);
+                                }
                                 callback();
                             });
+                        }, function (err) {
+                            callback();
                         });
-                    } else {
-                        callback();
-                    }
+                    });
                 } else {
                     callback();
                 }
-            }, function (err) {
+            } else {
+                callback();
+            }
+        };
+
+        var next = function () {
+            async.series({
+                backupSystemData: function (callback) {
+                    async.eachSeries(cols.backupList, function (col, callback) {
+                        restoreTask(col, callback);
+                    }, function (err) {
+                        callback();
+                    });
+                },
+                backupPublicData: function (callback) {
+                    async.eachSeries(cols.privateBackupList, function (col, callback) {
+                        restoreTask(col, callback);
+                    }, function (err) {
+                        callback();
+                    });
+                },
+                backupPrivateData: function (callback) {
+                    callback();
+                }
+            }, function (){
                 model.done = true;
                 res.render(templates.install, model);
             });

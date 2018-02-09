@@ -195,7 +195,7 @@ function GET_entry(req, res) {
                 db.Question.find(query).limit(15).exec(function(err, results) {
                     flowUtils.setEditorsUsername(results, function() {
                         results.forEach(function (result) {
-                            flowUtils.appendEntryExtras(result);
+                            flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.question, req);
                         });
                         model.questions = results;
                         callback();
