@@ -751,6 +751,54 @@ function setTopicModels(req, model, callback) {
                     setUsername(result, callback);
                 });
             },
+            topicChildren: function (callback) {
+                if(model.topic) {
+                    db.Topic
+                        .find({parentId: model.topic._id, private: model.topic.private, 'screening.status': constants.SCREENING_STATUS.status1.code})
+                        .limit(8)
+                        .sort({ title: 1 })
+                        .lean()
+                        .exec(function(err, results) {
+                            if(results.length == 8) {
+                                results.splice(6);
+                                model.topicChildrenMore = true;
+                            }
+                            setEditorsUsername(results, function() {
+                                results.forEach(function (result) {
+                                    appendEntryExtras(result, constants.OBJECT_TYPES.topic, req);
+                                });
+                                model.topicChildren = results;
+                                callback();
+                            });
+                        });
+                } else {
+                    callback();
+                }
+            },
+            topicSiblings: function (callback) {
+                if(model.topic) {
+                    db.Topic
+                        .find({parentId: model.topic.parentId, _id: {$ne: model.topic._id}, private: model.topic.private, 'screening.status': constants.SCREENING_STATUS.status1.code})
+                        .limit(8)
+                        .sort({ title: 1 })
+                        .lean()
+                        .exec(function(err, results) {
+                            if(results.length == 8) {
+                                results.splice(6);
+                                model.topicSiblingsMore = true;
+                            }
+                            setEditorsUsername(results, function() {
+                                results.forEach(function (result) {
+                                    appendEntryExtras(result, constants.OBJECT_TYPES.topic, req);
+                                });
+                                model.topicSiblings = results;
+                                callback();
+                            });
+                        });
+                } else {
+                    callback();
+                }
+            },
             parentTopic: function (callback) {
                 if(model.topic && model.topic.parentId) {
                     db.Topic.findOne({_id: model.topic.parentId}, function (err, result) {
@@ -760,6 +808,30 @@ function setTopicModels(req, model, callback) {
                         }
                         callback();
                     });
+                } else {
+                    callback();
+                }
+            },
+            parentSiblings: function (callback) {
+                if(model.parentTopic) {
+                    db.Topic
+                        .find({ parentId: model.parentTopic.parentId, _id: {$ne: model.parentTopic._id}, private: model.parentTopic.private, 'screening.status': constants.SCREENING_STATUS.status1.code})
+                        .limit(8)
+                        .sort({ title: 1 })
+                        .lean()
+                        .exec(function(err, results) {
+                            if(results.length == 8) {
+                                results.splice(6);
+                                model.parentSiblingsMore = true;
+                            }
+                            setEditorsUsername(results, function() {
+                                results.forEach(function (result) {
+                                    appendEntryExtras(result, constants.OBJECT_TYPES.topic, req);
+                                });
+                                model.parentSiblings = results;
+                                callback();
+                            });
+                        });
                 } else {
                     callback();
                 }

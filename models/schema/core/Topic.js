@@ -22,6 +22,7 @@ module.exports = function(app, mongoose) {
     icon: { type: String }, // ex: "fa fa-plane"
     typeId: { type: Number }, // TOPIC_TYPES
     tags: [ { type: Number } ], // OBJECT_TAGS
+    coverId: { type: mongoose.Schema.ObjectId, ref: 'Artifact' },
     screening: {
       status: { type: Number, default: constants.SCREENING_STATUS.status0.code}, // SCREENING_STATUS
       history: [{
