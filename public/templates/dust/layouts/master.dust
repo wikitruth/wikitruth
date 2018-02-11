@@ -99,24 +99,39 @@
                         {/parentTopic}
                         <li>
                             <ul class="nav">
-                                <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent child 1</a></li>
                                 <li><a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> <strong>{?topic.contextTitle}{topic.contextTitle}{:else}{topic.shortTitle}{/topic.contextTitle}</strong></a></li>
-                                <li>
-                                    <ul class="nav">
-                                        <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent subchild 1</a></li>
-                                        <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent subchild 2</a></li>
-                                        <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> more...</a></li>
-                                    </ul>
-                                </li>
-                                <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent child 3</a></li>
-                                <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent child 4</a></li>
-                                <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> more...</a></li>
+                                {?topicChildren}
+                                    <li>
+                                        <ul class="nav">
+                                            {#topicChildren}
+                                                <li><a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}"><i class="fa fa-folder text-color-3-x" aria-hidden="true"></i> {?contextTitle}{contextTitle}{:else}{shortTitle}{/contextTitle}</a></li>
+                                            {/topicChildren}
+                                            {?topicChildrenMore}
+                                                <li><a href="{wikiBaseUrl}{paths.wiki.topics.index}/{topic.friendlyUrl}/{topic._id}"><i class="fa fa-folder text-color-3-x" aria-hidden="true"></i> more...</a></li>
+                                            {/topicChildrenMore}
+                                        </ul>
+                                    </li>
+                                {/topicChildren}
+                                {?topicSiblings}
+                                    {#topicSiblings}
+                                        <li><a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}"><i class="fa fa-folder text-color-3-x" aria-hidden="true"></i> {?contextTitle}{contextTitle}{:else}{shortTitle}{/contextTitle}</a></li>
+                                    {/topicSiblings}
+                                    {?topicSiblingsMore}
+                                        {?parentTopic}
+                                            <li><a href="{wikiBaseUrl}{paths.wiki.topics.index}/{parentTopic.friendlyUrl}/{parentTopic._id}"><i class="fa fa-folder text-color-3-x" aria-hidden="true"></i> more...</a></li>
+                                        {/parentTopic}
+                                    {/topicSiblingsMore}
+                                {/topicSiblings}
                             </ul>
                         </li>
-                        <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent sibling 1</a></li>
-                        <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent sibling 2</a></li>
-                        <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Parent sibling 3</a></li>
-                        <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> more...</a></li>
+                        {#parentSiblings}
+                            <li><a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}"><i class="fa fa-folder text-color-3-x" aria-hidden="true"></i> {?contextTitle}{contextTitle}{:else}{shortTitle}{/contextTitle}</a></li>
+                        {/parentSiblings}
+                        {?grandParentTopic}
+                            {?parentSiblingsMore}
+                                <li><a href="{wikiBaseUrl}{paths.wiki.topics.index}/{grandParentTopic.friendlyUrl}/{grandParentTopic._id}"><i class="fa fa-folder text-color-3-x" aria-hidden="true"></i> more...</a></li>
+                            {/parentSiblingsMore}
+                        {/grandParentTopic}
                         <li role="separator" class="divider"></li>
                         <li class="dropdown-header">Related</li>
                         <li><a href="#"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> Related topic</a></li>

@@ -41,8 +41,10 @@
             </div>
         </div>
         <div class="form-group">
-            <label for="inputParent"><a role="button" data-toggle="collapse" href="#collapseParent" aria-expanded="false" aria-controls="collapseParent" class="wt-collapse-toggle collapsed">Parent</a></label>
-            <div class="collapse" id="collapseParent">
+            <label for="inputParent">
+                <a role="button" data-toggle="collapse" href="#collapseParent" aria-expanded="false" aria-controls="collapseParent" class="wt-collapse-toggle{^topic.parentId} collapsed{:else}{^parentTopic._id} collapsed{/parentTopic._id}{/topic.parentId}">Parent</a>
+            </label>
+            <div class="collapse{?topic.parentId} in{:else}{?parentTopic._id} in{/parentTopic._id}{/topic.parentId}" id="collapseParent">
                 <textarea name="parent" id="inputParent" class="form-control" rows="1">{?topic}{topic.parentId}{:else}{parentTopic._id}{/topic}</textarea>
             </div>
         </div>
