@@ -72,7 +72,7 @@ module.exports = function(app, mongoose) {
     return constants.OBJECT_TYPES.artifact;
   };
   schema.methods.getFolder = function(username) {
-    return '/media/artifacts/' + (username ? 'users/' + username + '/' : '');
+    return '/media/artifacts/' + (username && this.private ? 'users/' + username + '/' : '');
   };
   schema.methods.getFilePath = function(username) {
     return this.getFolder(username) + this._id + '_' + this.file.name;
