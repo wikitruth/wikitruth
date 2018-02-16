@@ -134,10 +134,10 @@ function POST_create(req, res) {
             entity.parentId = parent._id;
             entity.ownerId = parent.ownerId;
             entity.ownerType = parent.ownerType;
-        } else {
+        } else if(!entity.ownerId) {
+            // A new root opinion.
             delete req.query.opinion;
             var q = flowUtils.createOwnerQueryFromQuery(req);
-            // A root argument.
             entity.parentId = null;
             entity.ownerId = q.ownerId;
             entity.ownerType = q.ownerType;
