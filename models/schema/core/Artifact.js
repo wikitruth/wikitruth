@@ -68,11 +68,18 @@ module.exports = function(app, mongoose) {
     },
     extras: { type: mongoose.Schema.Types.Mixed }
   });
+
+  // schema statics
+  schema.statics.getFolder = function(username, isPrivate) {
+    return '/media/artifacts/' + (username && isPrivate ? 'users/' + username + '/' : '');
+  };
+
+  // schema methods
   schema.methods.getType = function() {
     return constants.OBJECT_TYPES.artifact;
   };
   schema.methods.getFolder = function(username) {
-    return '/media/artifacts/' + (username && this.private ? 'users/' + username + '/' : '');
+    return this.constructor.getFolder(username, this.private);
   };
   schema.methods.getFilePath = function(username) {
     return this.getFolder(username) + this._id + '_' + this.file.name;
@@ -94,6 +101,7 @@ module.exports = function(app, mongoose) {
       }
     }
   };
+
   schema.plugin(require('../plugins/pagedFind'));
   schema.index({ title: 1 });
   schema.index({

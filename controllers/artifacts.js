@@ -5,6 +5,7 @@ var mongoose    = require('mongoose'),
     path        = require('path'),
     fs          = require('fs'),
     imagemagick = require('imagemagick'),
+    mv          = require('mv'),
     utils       = require('../utils/utils'),
     flowUtils   = require('../utils/flowUtils'),
     paths       = require('../models/paths'),
@@ -162,7 +163,6 @@ function POST_create(req, res) {
 
                     // Delete old file if exists and different filename
                     if(result) {
-                        console.log('old path: ' + oldFilePath);
                         if (oldFilePath && oldFilePath != filePath) {
                             var oldFilePathAbs = path.join(__dirname, '/../public', oldFilePath);
                             var oldThumbnailPathAbs = path.join(__dirname, '/../public', oldThumbnailPath);
@@ -176,28 +176,60 @@ function POST_create(req, res) {
                     }
 
                     var newPathAbs = path.join(__dirname, '/../public', filePath);
-                    fs.rename(inlineFile.path, newPathAbs, function (err) {
+                    // replaced fs.rename() due to error "EXDEV: cross-device link not permitted"
+                    mv(inlineFile.path, newPathAbs, function (err) {
                         if (err) {
-                            console.log('An error has occurred moving the file: \n' + err);
+                            console.log('An error has occurred moving the file: ' + inlineFile.path + '\n' + err);
+                            return callback();
                         }
 
                         if(updatedEntity.isImage()) {
-                            // Create thumbnail
-                            var newThumbnailPathAbs = path.join(__dirname, '/../public', thumbnailPath);
-                            imagemagick.resize({
-                                srcPath: newPathAbs,
-                                dstPath: newThumbnailPathAbs,
-                                width: 500
-                            }, function (err, stdout, stderr) {
+                            // Identify image properties
+                            imagemagick.identify(newPathAbs, function(err, features){
                                 if (err) {
-                                    console.log('An error has occurred resizing the file: \n' + err);
+                                    console.log('An error has occurred identifying the file: ' + inlineFile.path + '\n' + err);
+                                    return callback();
                                 }
-                                //console.log('Resized image to fit within 500x500');
-                                callback();
+
+                                // save image attributes
+                                if(!updatedEntity.extras) updatedEntity.extras = {};
+                                updatedEntity.extras.details = {
+                                    format: features.format,
+                                    width: features.width,
+                                    height: features.height
+                                };
+
+                                // create a thumbnail that fits within 500x500
+                                var thumbnailWidth = features.width > 500 ? 500 : features.width;
+                                var thumbnailPathAbs = path.join(__dirname, '/../public', thumbnailPath);
+                                imagemagick.resize({
+                                    srcPath: newPathAbs,
+                                    dstPath: thumbnailPathAbs,
+                                    width: thumbnailWidth
+                                }, function (err, stdout, stderr) {
+                                    if (err) {
+                                        console.log('An error has occurred resizing the file: ' + newPathAbs + '\n' + err);
+                                    }
+                                    callback();
+                                });
                             });
                         } else {
                             callback();
                         }
+                    });
+                } else {
+                    callback();
+                }
+            },
+            updateExtras: function (callback) {
+                if(inlineFile && updatedEntity.isImage()) {
+                    db.Artifact.findOneAndUpdate(query, updatedEntity, {
+                        upsert: true,
+                        new: true,
+                        setDefaultsOnInsert: true
+                    }, function (err, updated) {
+                        updatedEntity = updated;
+                        callback();
                     });
                 } else {
                     callback();
