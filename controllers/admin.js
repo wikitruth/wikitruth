@@ -13,7 +13,7 @@ var backup          = require('mongodb-backup'),
     //utils         = require('../utils/utils'),
     db              = require('../app').db.models;
 
-var cols = config.mongodb.collections,
+var collectionsConfig = config.mongodb.collections,
     privateDirName = 'users';
 
 /**
@@ -162,7 +162,7 @@ module.exports = function (router) {
     router.get('/db-backup', function (req, res) {
         var model = {};
         model.dirname = flowUtils.getBackupDir();
-        model.privateDirname = flowUtils.getBackupDir(true);
+        model.privateDirName = flowUtils.getBackupDir(true);
         if(config.mongodb.gitBackup) {
             model.gitBackup = true;
         }
@@ -173,17 +173,17 @@ module.exports = function (router) {
         var action = req.body.buttonAction;
         var backupDir = flowUtils.getBackupDir();
         var privateBackupDir = flowUtils.getBackupDir(true);
-        //console.info('action: ', req.body.buttonAction);
+        privateBackupDir += '/' + privateDirName;
+
         var model = {};
         model.action = action;
         model.dirname = backupDir;
-        model.privateDirname = privateBackupDir;
+        model.privateDirName = privateBackupDir;
         if(config.mongodb.gitBackup) {
             model.gitBackup = true;
         }
 
         if(action === 'backup') {
-            privateBackupDir += '/' + privateDirName;
             async.series({
                 createPublicDir: function (callback) {
                     makeDir(backupDir, function () { callback(); });
@@ -195,7 +195,7 @@ module.exports = function (router) {
                     backup({
                         uri: config.mongodb.uri, // mongodb://<dbuser>:<dbpassword>@<dbdomain>.mongolab.com:<dbport>/<dbdatabase>
                         root: backupDir, // write files into this dir
-                        collections: cols.backupList, // save this collection only
+                        collections: collectionsConfig.backupList, // save this collection only
                         parser: 'json'
                     });
                     callback();
@@ -204,7 +204,7 @@ module.exports = function (router) {
                     backup({
                         uri: config.mongodb.uri,
                         root: backupDir,
-                        collections: cols.privateBackupList,
+                        collections: collectionsConfig.privateBackupList,
                         parser: 'json',
                         query: { private: false }
                     });
@@ -213,7 +213,7 @@ module.exports = function (router) {
                 backupPrivateData: function (callback) {
                     db.User
                         .find({})
-                        .sort({title: 1})
+                        .sort({username: 1})
                         .lean()
                         .exec(function (err, users) {
                             async.eachSeries(users, function (user, callback) {
@@ -221,7 +221,7 @@ module.exports = function (router) {
                                 backup({
                                     uri: config.mongodb.uri,
                                     root: privateBackupDir + '/' + user.username,
-                                    collections: cols.privateBackupList,
+                                    collections: collectionsConfig.privateBackupList,
                                     parser: 'json',
                                     query: { private: true, createUserId: user._id }
                                 });
@@ -229,7 +229,6 @@ module.exports = function (router) {
                             }, function (err) {
                                 callback();
                             });
-
                     });
                 }
             }, function (){
@@ -237,7 +236,6 @@ module.exports = function (router) {
             });
 
         } else if(action === 'fix') {
-
             async.series({
                 updateOwner: function (callback) {
                     db.ArgumentLink.find({ ownerId: null }).exec(function(err, results) {
@@ -271,8 +269,8 @@ module.exports = function (router) {
             });
 
             // this will set the default values in every doc
-            //async.parallel({
-                /*topics: function (callback) {
+            /*async.parallel({
+                topics: function (callback) {
                     db.Topic.find({}).exec((err, results) => {
                         async.eachSeries(results, function (result, callback) {
                             if(result.content && !result.contentPreview) {
@@ -289,8 +287,7 @@ module.exports = function (router) {
                             callback();
                         });
                     });
-                },*/
-                /*
+                },
                 topicLinks: function (callback) {
                     db.TopicLink.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
@@ -302,8 +299,8 @@ module.exports = function (router) {
                             callback();
                         });
                     });
-                }*/
-                /*arguments: function (callback) {
+                },
+                arguments: function (callback) {
                     db.Argument.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
                             if(result.content && !result.contentPreview) {
@@ -320,8 +317,8 @@ module.exports = function (router) {
                             callback();
                         });
                     });
-                },*/
-                /*argumentLinks: function (callback) {
+                },
+                argumentLinks: function (callback) {
                     db.ArgumentLink.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
                             result.screening.status = constants.SCREENING_STATUS.status1.code;
@@ -330,8 +327,8 @@ module.exports = function (router) {
                             callback();
                         });
                     });
-                },*/
-                /*questions: function (callback) {
+                },
+                questions: function (callback) {
                     db.Question.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
                             if(result.content && !result.contentPreview) {
@@ -402,8 +399,8 @@ module.exports = function (router) {
                             callback();
                         });
                     });
-                }*/
-                /*users: function (callback) {
+                },
+                users: function (callback) {
                     db.User.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
                             db.User.update({ _id: result._id }, result, {}, callback);
@@ -411,39 +408,41 @@ module.exports = function (router) {
                             callback();
                         });
                     });
-                }*/
-            /*}, function (err, results) {
+                }
+            }, function (err, results) {
                 res.render(templates.admin.mongoBackup, model);
             });*/
         } else if(action === 'restore') {
             var dir = backupDir + '/' + config.mongodb.dbname;
-            privateBackupDir += '/' + privateDirName;
-            //console.log(cols.backupList);
             async.series({
                 restorePublicData: function (callback) {
-                    async.eachSeries( cols.backupList.concat(cols.privateBackupList), function (collectionName, callback) {
+                    async.eachSeries( collectionsConfig.backupList.concat(collectionsConfig.privateBackupList), function (collectionName, callback) {
+                        // each collection
                         var collectionDir = dir + '/' + collectionName;
-                        var jsons = fs.readdirSync(collectionDir);
-                        //console.log('restore:', col);
-                        //console.log(jsons);
-                        var modelName = cols.modelMapping[collectionName];
-                        if (modelName) {
-                            var collection = db[modelName];
-                            if (collection) {
-                                collection.remove({}, function (err) { // truncate collection before restore
-                                    async.eachSeries(jsons, function (json, callback) {
-                                        var file = collectionDir + '/' + json;
-                                        var obj = JSON.parse(fs.readFileSync(file, 'utf8'));
-                                        collection.create(obj, function (err, newObj) {
-                                            if (err) {
-                                                console.error(err);
-                                            }
+                        if (fs.existsSync(collectionDir)){
+                            var jsons = fs.readdirSync(collectionDir);
+                            var modelName = collectionsConfig.modelMapping[collectionName];
+                            if (modelName) {
+                                var collection = db[modelName];
+                                if (collection) {
+                                    collection.remove({}, function (err) { // truncate collection before restore
+                                        async.eachSeries(jsons, function (json, callback) {
+                                            // each entry
+                                            var file = collectionDir + '/' + json;
+                                            var obj = JSON.parse(fs.readFileSync(file, 'utf8'));
+                                            collection.create(obj, function (err, newObj) {
+                                                if (err) {
+                                                    console.error(err);
+                                                }
+                                                callback();
+                                            });
+                                        }, function (err) {
                                             callback();
                                         });
-                                    }, function (err) {
-                                        callback();
                                     });
-                                });
+                                } else {
+                                    callback();
+                                }
                             } else {
                                 callback();
                             }
@@ -457,29 +456,40 @@ module.exports = function (router) {
                 restorePrivateData: function (callback) {
                     db.User
                         .find({})
-                        .sort({title: 1})
+                        .sort({username: 1})
                         .lean()
                         .exec(function (err, users) {
                             async.eachSeries(users, function (user, callback) {
-                                async.eachSeries( cols.privateBackupList, function (collectionName, callback) {
-                                    var collectionDir = privateBackupDir + '/' + user.username + '/' + config.mongodb.dbname;
-                                    var modelName = cols.modelMapping[collectionName];
-                                    var jsons = fs.readdirSync(collectionDir);
-                                    if (modelName && jsons.length > 0) {
-                                        var collection = db[modelName];
-                                        if (collection) {
-                                            async.eachSeries(jsons, function (json, callback) {
-                                                var file = collectionDir + '/' + json;
-                                                var obj = JSON.parse(fs.readFileSync(file, 'utf8'));
-                                                collection.create(obj, function (err, newObj) {
-                                                    if (err) {
-                                                        console.error(err);
-                                                    }
-                                                    callback();
+                                // each user
+                                var privateUserBackupDir = privateBackupDir + '/' + user.username + '/' + config.mongodb.dbname;
+                                async.eachSeries( collectionsConfig.privateBackupList, function (collectionName, callback) {
+                                    // each collection
+                                    var collectionDir = privateUserBackupDir + '/' + collectionName;
+                                    if(fs.existsSync(collectionDir)) {
+                                        var jsons = fs.readdirSync(collectionDir);
+                                        var modelName = collectionsConfig.modelMapping[collectionName];
+                                        if (modelName && jsons.length > 0) {
+                                            var collection = db[modelName];
+                                            if (collection) {
+                                                collection.remove({private: true, createUserId: user._id }, function (err) { // truncate collection before restore
+                                                    async.eachSeries(jsons, function (json, callback) {
+                                                        // each entry
+                                                        var file = collectionDir + '/' + json;
+                                                        console.log('file: ' + file);
+                                                        var obj = JSON.parse(fs.readFileSync(file, 'utf8'));
+                                                        collection.create(obj, function (err, newObj) {
+                                                            if (err) {
+                                                                console.error(err);
+                                                            }
+                                                            callback();
+                                                        });
+                                                    }, function (err) {
+                                                        callback();
+                                                    });
                                                 });
-                                            }, function (err) {
+                                            } else {
                                                 callback();
-                                            });
+                                            }
                                         } else {
                                             callback();
                                         }

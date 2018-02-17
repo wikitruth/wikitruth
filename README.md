@@ -1,4 +1,4 @@
-# wikitruth
+# The Wikitruth Project
 
 The project aims to make a better world by finding the truth and facts of reality in all aspect of human knowledge, and present them in a way that is easy to search and understand by laypeople. It aims to do this by finding the truth using a systematic way of contribution and organization of arguments and evidences contrasted with reality and known facts.
 
@@ -41,38 +41,33 @@ If someone wanted to find information about different topics or explore the vast
 
 ## Requirements
 
-You need [Node.js](http://nodejs.org/download/) and
-[MongoDB](http://www.mongodb.org/downloads) installed and running.
+You need [Node.js](http://nodejs.org/download/) and [MongoDB](http://www.mongodb.org/downloads) installed and running. MongoDB version `~3.6` has been found to have [an issue](https://github.com/Automattic/mongoose/issues/5973) working with the npm module `mongoose`, so I would recommend using `~v3.4` which has been tested.
 
-We use [`bcrypt`](https://github.com/ncb000gt/node.bcrypt.js) for hashing
-secrets. If you have issues during installation related to `bcrypt` then [refer
-to this wiki
-page](https://github.com/jedireza/drywall/wiki/bcrypt-Installation-Trouble).
+The project uses [ImageMagick](https://www.imagemagick.org) to manipulate image assets. The latest version (`v7.0.7-22` as of the time of writing) has been tested to work fine.
 
-We use [`emailjs`](https://github.com/eleith/emailjs) for email transport. If
-you have issues sending email [refer to this wiki
-page](https://github.com/jedireza/drywall/wiki/Trouble-sending-email).
+We use [`bcrypt`](https://github.com/ncb000gt/node.bcrypt.js) for hashing secrets. If you have issues during installation related to `bcrypt` then refer to [this wiki page](https://github.com/jedireza/drywall/wiki/bcrypt-Installation-Trouble).
 
+We use [`emailjs`](https://github.com/eleith/emailjs) for email transport. If you have issues sending email refer to [this wiki page](https://github.com/jedireza/drywall/wiki/Trouble-sending-email).
 
-## Installation
+## Setup
 
-Install nodejs
+First, build the project.
 
 ```bash
 $ git clone git@github.com:wikitruth/wikitruth.git && cd ./wikitruth
-$ npm install -g yo generator-kraken bower grunt-cli
 $ npm install
 $ bower install
 $ grunt build
 ```
 
-## Setup
-
-First you need to edit your config file.
+Next, you need to edit your config file. Set your mongodb instance and SMTP email credentials used for sending notification emails.
 
 ```bash
-$ vi ./config.js #set mongodb and email credentials
+$ vi ./config.js
 ```
+<!-- $ npm install -g yo generator-kraken bower grunt-cli -->
+<!--
+## Setup
 
 Next, you need a few records in the database to start using the user system.
 
@@ -92,28 +87,28 @@ var rootUser = db.users.findOne();
 rootAdmin.user = { id: rootUser._id, name: rootUser.username };
 db.admins.save(rootAdmin);
 ```
-
+-->
 
 ## Running the app
 
 ```bash
 $ npm start
 
-# > wikitruth@0.0.0 start .../wikitruth
-# > grunt
-# Running "copy:vendor" (copy) task
-# ...
-# Running "concurrent:dev" (concurrent) task
-# Running "watch" task
-# Running "nodemon:dev" (nodemon) task
-# Waiting...
-# [nodemon] v1.3.7
-# [nodemon] to restart at any time, enter `rs`
-# [nodemon] watching: *.*
-# [nodemon] starting `node app.js`
-# Server is running on port 8000
+> wikitruth@0.5.0 start .../wikitruth
+> grunt
+> ...
+Server listening on http://localhost:8000
 ```
 
+Open your favourite browser and go to `http://localhost:8000`.
+
+Since there is no existing data in your mongodb instance, you will be prompted with the "Install: MongoDB Restore" page to install the sample data that comes with the project.
+
+Click the Install button and click Continue once the restore process is completed. Login with the following user credentials:
+* Username: `root`
+* Password: `dev123`
+
+<!--
 Now just use the reset password feature to set a password.
 
  - Go to `http://localhost:8000/login/forgot/`
@@ -121,9 +116,10 @@ Now just use the reset password feature to set a password.
  - Go check your email and get the reset link.
  - `http://localhost:8000/login/reset/:email/:token/`
  - Set a new password.
+-->
 
-Login and enjoy!
+Explore the project and enjoy!
 
 ## Connect and discuss
 
-Feel free to send feedback to wikitruthproject@gmail.com or join the discussion on [Facebook](https://www.facebook.com/wikitruth.project).
+Feel free to send feedback to wikitruth.project@gmail.com or start a discussion on [Facebook](https://www.facebook.com/wikitruth.project).
