@@ -975,7 +975,7 @@ function setClipboardModel(req, model, entryType) {
 }
 
 function getTopics(query, options, callback) {
-    var children, topicLinks;
+    var children = [], topicLinks = [];
     //limit, shortTitleLength, req
     if(!options) options = {};
     async.series({
@@ -1057,7 +1057,6 @@ function getTopics(query, options, callback) {
                                 }
                             });
                     } else {
-                        topicLinks = [];
                         callback();
                     }
             });
@@ -1069,7 +1068,7 @@ function getTopics(query, options, callback) {
 }
 
 function getArguments(query, options, callback) {
-    var children, argumentLinks;
+    var children = [], argumentLinks = [];
     if(!options) options = {};
     async.series({
         children: function (callback) {
@@ -1178,7 +1177,6 @@ function getArguments(query, options, callback) {
                                 }
                             });
                     } else {
-                        argumentLinks = [];
                         callback();
                     }
             });
@@ -2265,14 +2263,23 @@ function setModelOwnerEntry(req, model, options) {
         model.isEntryOwner = model.isIssueOwner;
         model.isIssueEntry = true;
         model.issueType = constants.ISSUE_TYPES['type' + model.issue.issueType];
+        if(!options.hideClipboard) {
+            setClipboardModel(req, model, constants.OBJECT_TYPES.issue);
+        }
     } else if(model.answer) {
         model.entry = model.answer;
         model.entryType = constants.OBJECT_TYPES.answer;
         model.isEntryOwner = model.isAnswerOwner;
+        if(!options.hideClipboard) {
+            setClipboardModel(req, model, constants.OBJECT_TYPES.answer);
+        }
     } else if(model.question) {
         model.entry = model.question;
         model.entryType = constants.OBJECT_TYPES.question;
         model.isEntryOwner = model.isQuestionOwner;
+        if(!options.hideClipboard) {
+            setClipboardModel(req, model, constants.OBJECT_TYPES.question);
+        }
     } else if(model.artifact) {
         model.entry = model.artifact;
         model.entryType = constants.OBJECT_TYPES.artifact;
