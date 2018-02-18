@@ -583,23 +583,10 @@ module.exports = function (router) {
                     .exec(function (err, results) {
                         async.each(results, function(result, callback) {
                             result.friendlyUrl = utils.urlify(result.title);
-                            //result.comments = utils.numberWithCommas(utils.randomInt(1, 100000));
-                            flowUtils.getTopics({ parentId: result._id }, constants.SETTINGS.SUBCATEGORY_LIST_SIZE, req, function (err, subtopics) {
-                            /*db.Topic
-                                .find( { parentId: result._id } )
-                                .limit(constants.SETTINGS.SUBCATEGORY_LIST_SIZE)
-                                .sort({ title: 1 })
-                                .lean()
-                                .exec(function(err, subtopics) {*/
+                            flowUtils.getTopics({ parentId: result._id }, { limit: constants.SETTINGS.SUBCATEGORY_LIST_SIZE, req: req, shortTitleLength: constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN }, function (err, subtopics) {
                                 if(subtopics.length > 0) {
-                                    subtopics.forEach(function(subtopic){
-                                        subtopic.friendlyUrl = utils.urlify(subtopic.title);
-                                        subtopic.shortTitle = utils.getShortText(subtopic.contextTitle ? subtopic.contextTitle : subtopic.title, constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN);
-                                    });
                                     result.subtopics = subtopics;
-                                    //callback();
                                 }
-
                                 // if subtopics are less than SUBCATEGORY_LIST_SIZE, get some arguments
                                 if(subtopics.length < constants.SETTINGS.SUBCATEGORY_LIST_SIZE) {
                                     var query = {
@@ -607,10 +594,9 @@ module.exports = function (router) {
                                         ownerId: result._id,
                                         ownerType: constants.OBJECT_TYPES.topic
                                     };
-                                    flowUtils.getArguments(query, constants.SETTINGS.SUBCATEGORY_LIST_SIZE - subtopics.length, req, function (err, subarguments) {
+                                    flowUtils.getArguments(query, { limit: constants.SETTINGS.SUBCATEGORY_LIST_SIZE - subtopics.length, req: req, shortTitleLength: constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN }, function (err, subarguments) {
                                         subarguments.forEach(function (subargument) {
                                             flowUtils.setVerdictModel(subargument);
-                                            subargument.shortTitle = utils.getShortText(subargument.contextTitle ? subargument.contextTitle : subargument.title, constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN);
                                         });
                                         flowUtils.sortArguments(subarguments);
                                         result.subarguments = subarguments;
@@ -628,11 +614,8 @@ module.exports = function (router) {
             },
             rootTopics: function(callback) {
                 // display 15 if top topics, all if has topic parameter
-                flowUtils.getTopics({ parentId: null, ownerType: constants.OBJECT_TYPES.user, ownerId: model.member._id }, 0, req, function (err, results) {
+                flowUtils.getTopics({ parentId: null, ownerType: constants.OBJECT_TYPES.user, ownerId: model.member._id }, { limit: 0, req: req }, function (err, results) {
                     model.rootTopics = results;
-                    /*if(results.length > 0 && model.tab == 'categories') {
-                        model.results = true;
-                    }*/
                     callback();
                 });
             }

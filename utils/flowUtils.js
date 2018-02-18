@@ -41,10 +41,10 @@ function isCategoryTopic(entry) {
     return entry.tags.indexOf(constants.TOPIC_TAGS.tag510.code) > -1;
 }
 
-function appendListExtras(item, objectType) {
+function appendListExtras(item, objectType, shortTitleLength) {
     if(item.title) {
         item.friendlyUrl = utils.urlify(item.title);
-        item.shortTitle = utils.getShortText(item.title);
+        item.shortTitle = utils.getShortText(item.contextTitle || item.title, shortTitleLength || constants.SETTINGS.TILE_MAX_ENTRY_LEN);
     }
     if(objectType) {
         item.objectType = objectType;
@@ -59,8 +59,8 @@ function appendListExtras(item, objectType) {
     }
 }
 
-function appendEntryExtras(item, objectType, req) {
-    appendListExtras(item, objectType);
+function appendEntryExtras(item, objectType, req, shortTitleLength) {
+    appendListExtras(item, objectType, shortTitleLength);
     item.comments = utils.randomInt(0,999);
     item.points = utils.randomInt(0,9999);
 
@@ -974,28 +974,34 @@ function setClipboardModel(req, model, entryType) {
     }
 }
 
-function getTopics(query, limit, req, callback) {
-    async.parallel({
+function getTopics(query, options, callback) {
+    var children, topicLinks;
+    //limit, shortTitleLength, req
+    if(!options) options = {};
+    async.series({
         children: function (callback) {
             db.Topic
                 .find(query)
-                .limit(limit)
+                .limit(options.limit)
                 .sort({ title: 1 })
                 .lean()
                 .exec(function(err, results) {
                     setEditorsUsername(results, function() {
                         results.forEach(function (result) {
-                            appendEntryExtras(result, constants.OBJECT_TYPES.topic, req);
-                            //result.link = false;
+                            appendEntryExtras(result, constants.OBJECT_TYPES.topic, options.req, options.shortTitleLength);
                         });
-                        callback(null, results);
+                        children = results;
+                        callback();
                     });
             });
         },
         links: function (callback) {
+            if(options.limit > 0 && options.limit == children.length) return callback();
+
+            var newLimit = options.limit > 0 ? options.limit - children.length : options.limit;
             db.TopicLink
                 .find(query)
-                .limit(limit)
+                .limit(newLimit)
                 .lean()
                 .exec(function(err, links) {
                     if(links.length > 0) {
@@ -1003,9 +1009,10 @@ function getTopics(query, limit, req, callback) {
                             return link.topicId;
                         });
                         var query = { _id: { $in: ids } };
+                        // query the actual topics being linked to
                         db.Topic
                             .find(query)
-                            .limit(limit)
+                            .limit(newLimit)
                             .sort({title: 1})
                             .lean()
                             .exec(function (err, results) {
@@ -1017,13 +1024,14 @@ function getTopics(query, limit, req, callback) {
                                             return result.parentId;
                                         });
                                     query = { _id: { $in: parentIds } };
+                                    // query the parents of the actual topics
                                     db.Topic
                                         .find(query)
                                         .lean()
                                         .exec(function (err, linkParents) {
                                             setEditorsUsername(results, function () {
                                                 results.forEach(function (result) {
-                                                    appendEntryExtras(result);
+                                                    appendEntryExtras(result, constants.OBJECT_TYPES.topic, options.req, options.shortTitleLength);
                                                     var link = links.find(function (link) {
                                                         return link.topicId.equals(result._id);
                                                     });
@@ -1032,54 +1040,62 @@ function getTopics(query, limit, req, callback) {
                                                             return linkParent._id.equals(result.parentId);
                                                         });
                                                         if(linkParent) {
-                                                            appendListExtras(linkParent, constants.OBJECT_TYPES.topic);
+                                                            appendListExtras(linkParent, constants.OBJECT_TYPES.topic, options.req, options.shortTitleLength);
                                                         }
-                                                        appendListExtras(link, constants.OBJECT_TYPES.topicLink);
+                                                        appendListExtras(link, constants.OBJECT_TYPES.topicLink, options.req, options.shortTitleLength);
                                                         result.parentTopic = linkParent;
                                                         result.link = link;
                                                     }
                                                 });
-                                                callback(null, results);
+                                                topicLinks = results;
+                                                callback();
                                             });
                                         });
                                 } else {
-                                    callback(null, results);
+                                    topicLinks = results;
+                                    callback();
                                 }
                             });
                     } else {
-                        callback(null, []);
+                        topicLinks = [];
+                        callback();
                     }
             });
         }
     }, function (err, results) {
-        var topics = results.children.concat(results.links).sort(utils.titleCompare);
+        var topics = children.concat(topicLinks).sort(utils.titleCompare);
         callback(null, topics);
     });
 }
 
-function getArguments(query, limit, req, callback) {
-    async.parallel({
+function getArguments(query, options, callback) {
+    var children, argumentLinks;
+    if(!options) options = {};
+    async.series({
         children: function (callback) {
             db.Argument
                 .find(query)
-                .limit(limit)
+                .limit(options.limit)
                 .sort({ title: 1 })
                 .lean()
                 .exec(function(err, results) {
                     setEditorsUsername(results, function() {
                         results.forEach(function (result) {
-                            appendEntryExtras(result, constants.OBJECT_TYPES.argument, req);
-                            //result.link = false;
+                            appendEntryExtras(result, constants.OBJECT_TYPES.argument, options.req, options.shortTitleLength);
                             //result.against = false;
                         });
-                        callback(null, results);
+                        children = results;
+                        callback();
                     });
             });
         },
         links: function (callback) {
+            if(options.limit > 0 && options.limit == children.length) return callback();
+
+            var newLimit = options.limit > 0 ? options.limit - children.length : options.limit;
             db.ArgumentLink
                 .find(query)
-                .limit(limit)
+                .limit(newLimit)
                 .lean()
                 .exec(function(err, links) {
                     if(links.length > 0) {
@@ -1089,7 +1105,7 @@ function getArguments(query, limit, req, callback) {
                         var query = { _id: { $in: ids } };
                         db.Argument
                             .find(query)
-                            .limit(limit)
+                            .limit(newLimit)
                             .sort({title: 1})
                             .lean()
                             .exec(function (err, results) {
@@ -1125,7 +1141,7 @@ function getArguments(query, limit, req, callback) {
                                     }, function (err, linkParents) {
                                         setEditorsUsername(results, function () {
                                             results.forEach(function (result) {
-                                                appendEntryExtras(result);
+                                                appendEntryExtras(result, constants.OBJECT_TYPES.argument, options.req, options.shortTitleLength);
                                                 var link = links.find(function (link) {
                                                     return link.argumentId.equals(result._id);
                                                 });
@@ -1143,29 +1159,32 @@ function getArguments(query, limit, req, callback) {
                                                             return linkParent._id.equals(result.ownerId);
                                                         });
                                                         if(linkParent) {
-                                                            appendListExtras(linkParent, constants.OBJECT_TYPES.argument);
+                                                            appendListExtras(linkParent, constants.OBJECT_TYPES.argument, options.req, options.shortTitleLength);
                                                         }
                                                         result.parentTopic = linkParent;
                                                     }
-                                                    appendEntryExtras(link, constants.OBJECT_TYPES.argumentLink);
+                                                    appendEntryExtras(link, constants.OBJECT_TYPES.argumentLink, options.req, options.shortTitleLength);
                                                     result.link = link;
                                                     result.against = link.against;
                                                 }
                                             });
-                                            callback(null, results);
+                                            argumentLinks = results;
+                                            callback();
                                         });
                                     });
                                 } else {
-                                    callback(null, results);
+                                    argumentLinks = results;
+                                    callback();
                                 }
                             });
                     } else {
-                        callback(null, []);
+                        argumentLinks = [];
+                        callback();
                     }
             });
         }
     }, function (err, results) {
-        var args = results.children.concat(results.links).sort(utils.titleCompare);
+        var args = children.concat(argumentLinks).sort(utils.titleCompare);
         callback(null, args);
     });
 }
@@ -2699,46 +2718,30 @@ function createContentPreview(content) {
 }
 
 function getCategories(model, topicId, req, callback) {
-    db.Topic
-        .find({parentId: topicId, private: false, 'screening.status': constants.SCREENING_STATUS.status1.code })
-        .sort({title: 1})
-        .lean()
-        .exec(function (err, results) {
+    getTopics({parentId: topicId, private: false, 'screening.status': constants.SCREENING_STATUS.status1.code }, { limit: 0, shortTitleLength: constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN, req: req }, function (err, results) {
             async.each(results, function(result, callback) {
-                result.friendlyUrl = utils.urlify(result.title);
-                result.comments = utils.numberWithCommas(utils.randomInt(1, 100000));
-                db.Topic
-                    .find( { parentId: result._id } )
-                    .limit(constants.SETTINGS.SUBCATEGORY_LIST_SIZE)
-                    .sort({ title: 1 })
-                    .lean()
-                    .exec(function(err, subtopics) {
-                        if(subtopics.length > 0) {
-                            subtopics.forEach(function (subtopic) {
-                                subtopic.friendlyUrl = utils.urlify(subtopic.title);
-                                subtopic.shortTitle = utils.getShortText(subtopic.contextTitle ? subtopic.contextTitle : subtopic.title, constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN);
+                getTopics({ parentId: result._id }, { limit: constants.SETTINGS.SUBCATEGORY_LIST_SIZE, shortTitleLength: constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN, req: req }, function (err, subtopics) {
+                    result.subtopics = subtopics;
+                    if(subtopics.length < constants.SETTINGS.SUBCATEGORY_LIST_SIZE) {
+                        // if subtopics are less than 3, get some arguments
+                        var query = {
+                            parentId: null,
+                            ownerId: result._id,
+                            ownerType: constants.OBJECT_TYPES.topic,
+                            'screening.status': constants.SCREENING_STATUS.status1.code
+                        };
+                        getArguments(query, { limit: constants.SETTINGS.SUBCATEGORY_LIST_SIZE, rq: req, shortTitleLength: constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN }, function (err, subarguments) {
+                            subarguments.forEach(function (subargument) {
+                                setVerdictModel(subargument);
                             });
-                            result.subtopics = subtopics;
+                            sortArguments(subarguments);
+                            result.subarguments = subarguments;
                             callback();
-                        } else {
-                            // if subtopics are less than 3, get some arguments
-                            var query = {
-                                parentId: null,
-                                ownerId: result._id,
-                                ownerType: constants.OBJECT_TYPES.topic,
-                                'screening.status': constants.SCREENING_STATUS.status1.code
-                            };
-                            getArguments(query, constants.SETTINGS.SUBCATEGORY_LIST_SIZE, req, function (err, subarguments) {
-                                subarguments.forEach(function (subargument) {
-                                    setVerdictModel(subargument);
-                                    subargument.shortTitle = utils.getShortText(subargument.contextTitle ? subargument.contextTitle : subargument.title, constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN);
-                                });
-                                sortArguments(subarguments);
-                                result.subarguments = subarguments;
-                                callback();
-                            });
-                        }
-                    });
+                        });
+                    } else {
+                        callback();
+                    }
+                });
             }, function(err) {
                 model.categories = results;
                 callback();
