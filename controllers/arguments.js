@@ -37,7 +37,7 @@ function GET_entry(req, res) {
                     parentId: req.query.argument,
                     'screening.status': constants.SCREENING_STATUS.status1.code
                 };
-                flowUtils.getArguments(query, 0, req, function (err, results) {
+                flowUtils.getArguments(query, { limit: 0, req: req }, function (err, results) {
                     results.forEach(function (result) {
                         flowUtils.setVerdictModel(result);
                     });
@@ -145,7 +145,7 @@ function GET_index(req, res) {
                 query.ownerId = model.topic._id;
                 query.ownerType = constants.OBJECT_TYPES.topic;
             }
-            flowUtils.getArguments(query, 0, req, function (err, results) {
+            flowUtils.getArguments(query, { limit: 0, req: req }, function (err, results) {
                 var support = results.filter(function (arg) {
                     return !arg.against;
                 });

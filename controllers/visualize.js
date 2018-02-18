@@ -81,7 +81,7 @@ function GET_index(req, res) {
                                             return callback();
                                         }
                                         result.friendlyUrl = utils.urlify(result.title);
-                                        result.shortTitle = utils.getShortText(result.contextTitle ? result.contextTitle : result.title, textSize);
+                                        result.shortTitle = utils.getShortText(result.contextTitle || result.title, textSize);
                                         nodes.push({id: result._id, label: result.shortTitle, value: 6, color: '#FB7E81'});
                                         edges.push({from: topicId, to: result._id, width: 4});
                                         db.Topic
@@ -107,7 +107,7 @@ function GET_index(req, res) {
                                                             return;
                                                         }
                                                         subtopic.friendlyUrl = utils.urlify(subtopic.title);
-                                                        subtopic.shortTitle = utils.getShortText(subtopic.contextTitle ? subtopic.contextTitle : subtopic.title, textSize);
+                                                        subtopic.shortTitle = utils.getShortText(subtopic.contextTitle || subtopic.title, textSize);
                                                         node = {id: subtopic._id, label: subtopic.shortTitle, value: 4};
                                                         if (subtopic.childrenCount.topics.accepted > 0) {
                                                             node.originalLabel = node.label;
@@ -128,13 +128,12 @@ function GET_index(req, res) {
                                                         ownerType: constants.OBJECT_TYPES.topic,
                                                         'screening.status': constants.SCREENING_STATUS.status1.code
                                                     };
-                                                    flowUtils.getArguments(query, nodesNeeded, req, function (err, subarguments) {
+                                                    flowUtils.getArguments(query, { limit: nodesNeeded, req: req, shortTitleLength: textSize }, function (err, subarguments) {
                                                         subarguments.forEach(function (subargument) {
                                                             if (!nodes.find(function (item) {
                                                                     return subargument._id.equals(item.id);
                                                                 })) {
                                                                 flowUtils.setVerdictModel(subargument);
-                                                                subargument.shortTitle = utils.getShortText(subargument.contextTitle ? subargument.contextTitle : subargument.title, textSize);
                                                                 nodes.push({
                                                                     id: subargument._id,
                                                                     label: subargument.shortTitle,
@@ -169,13 +168,12 @@ function GET_index(req, res) {
                                         ownerType: constants.OBJECT_TYPES.topic,
                                         'screening.status': constants.SCREENING_STATUS.status1.code
                                     };
-                                    flowUtils.getArguments(query, nodesNeeded, req, function (err, subarguments) {
+                                    flowUtils.getArguments(query, { limit: nodesNeeded, req: req, shortTitleLength: textSize }, function (err, subarguments) {
                                         subarguments.forEach(function (subargument) {
                                             if (!nodes.find(function (item) {
                                                     return subargument._id.equals(item.id);
                                                 })) {
                                                 flowUtils.setVerdictModel(subargument);
-                                                subargument.shortTitle = utils.getShortText(subargument.contextTitle ? subargument.contextTitle : subargument.title, textSize);
                                                 nodes.push({
                                                     id: subargument._id,
                                                     label: subargument.shortTitle,

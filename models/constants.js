@@ -354,6 +354,7 @@
         VERDICT_STATUS: VERDICT_STATUS,
         SETTINGS: {
             contentPreviewLength: 250,
+            TILE_MAX_ENTRY_LEN: 45,
             TILE_MAX_SUB_ENTRY_LEN: 30,
             SUBCATEGORY_LIST_SIZE: 5
         },

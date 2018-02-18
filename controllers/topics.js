@@ -34,7 +34,7 @@ function GET_index(req, res) {
         },
         topics: function(callback) {
             // display 15 if top topics, all if has topic parameter
-            flowUtils.getTopics({ parentId: req.query.topic, 'screening.status': model.screening.status }, 0, req, function (err, results) {
+            flowUtils.getTopics({ parentId: req.query.topic, 'screening.status': model.screening.status }, { limit: 0, req: req }, function (err, results) {
                 model.topics = results;
                 callback();
             });
@@ -60,50 +60,35 @@ function GET_entry(req, res) {
         async.parallel({
             categories: function(callback) {
                 if(model.mainTopic) {
-                    db.Topic
-                        .find({parentId: model.topic._id, 'screening.status': constants.SCREENING_STATUS.status1.code })
-                        .sort({title: 1})
-                        .lean()
-                        .exec(function (err, results) {
-                            async.each(results, function(result, callback) {
-                                result.friendlyUrl = utils.urlify(result.title);
-                                db.Topic
-                                    .find( { parentId: result._id } )
-                                    .limit(constants.SETTINGS.SUBCATEGORY_LIST_SIZE)
-                                    .sort({ title: 1 })
-                                    .lean()
-                                    .exec(function(err, subtopics) {
-                                        if(subtopics.length > 0) {
-                                            subtopics.forEach(function (subtopic) {
-                                                subtopic.friendlyUrl = utils.urlify(subtopic.title);
-                                                subtopic.shortTitle = utils.getShortText(subtopic.contextTitle ? subtopic.contextTitle : subtopic.title, constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN);
-                                            });
-                                            result.subtopics = subtopics;
-                                            callback();
-                                        } else {
-                                            // if subtopics are less than 3, get some arguments
-                                            var query = {
-                                                parentId: null,
-                                                ownerId: result._id,
-                                                ownerType: constants.OBJECT_TYPES.topic,
-                                                'screening.status': constants.SCREENING_STATUS.status1.code
-                                            };
-                                            flowUtils.getArguments(query, constants.SETTINGS.SUBCATEGORY_LIST_SIZE, req, function (err, subarguments) {
-                                                subarguments.forEach(function (subargument) {
-                                                    flowUtils.setVerdictModel(subargument);
-                                                    subargument.shortTitle = utils.getShortText(subargument.contextTitle ? subargument.contextTitle : subargument.title, constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN);
-                                                });
-                                                flowUtils.sortArguments(subarguments);
-                                                result.subarguments = subarguments;
-                                                callback();
-                                            });
-                                        }
+                    flowUtils.getTopics({parentId: model.topic._id, 'screening.status': constants.SCREENING_STATUS.status1.code }, { limit: 0, shortTitleLength: constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN, req: req }, function (err, results) {
+                        async.each(results, function(result, callback) {
+                            flowUtils.getTopics({ parentId: result._id, 'screening.status': constants.SCREENING_STATUS.status1.code }, { limit: constants.SETTINGS.SUBCATEGORY_LIST_SIZE, shortTitleLength: constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN, req: req }, function (err, subtopics) {
+                                result.subtopics = subtopics;
+                                // if subtopics are less than 3, get some arguments
+                                if(subtopics.length < constants.SETTINGS.SUBCATEGORY_LIST_SIZE) {
+                                    var query = {
+                                        parentId: null,
+                                        ownerId: result._id,
+                                        ownerType: constants.OBJECT_TYPES.topic,
+                                        'screening.status': constants.SCREENING_STATUS.status1.code
+                                    };
+                                    flowUtils.getArguments(query, { limit: constants.SETTINGS.SUBCATEGORY_LIST_SIZE - subtopics.length, req: req, shortTitleLength: constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN }, function (err, subarguments) {
+                                        subarguments.forEach(function (subargument) {
+                                            flowUtils.setVerdictModel(subargument);
+                                        });
+                                        flowUtils.sortArguments(subarguments);
+                                        result.subarguments = subarguments;
+                                        callback();
                                     });
-                            }, function(err) {
-                                model.categories = results;
-                                callback();
+                                } else {
+                                    callback();
+                                }
                             });
+                        }, function(err) {
+                            model.categories = results;
+                            callback();
                         });
+                    });
                 } else {
                     callback();
                 }
@@ -111,7 +96,7 @@ function GET_entry(req, res) {
             topics: function(callback) {
                 // Top Subtopics
                 var query = { parentId: req.query.topic, 'screening.status': constants.SCREENING_STATUS.status1.code };
-                flowUtils.getTopics(query, 15, req, function (err, results) {
+                flowUtils.getTopics(query, { limit: 15, req: req }, function (err, results) {
                     model.topics = results;
                     model.keyTopics = results.filter(function (result) {
                         return result.tags.indexOf(constants.TOPIC_TAGS.tag20.code) >= 0;
@@ -171,7 +156,7 @@ function GET_entry(req, res) {
                     ownerType: constants.OBJECT_TYPES.topic,
                     'screening.status': constants.SCREENING_STATUS.status1.code
                 };
-                flowUtils.getArguments(query, 0, req, function (err, results) {
+                flowUtils.getArguments(query, { limit: 0, req: req }, function (err, results) {
                     results.forEach(function (result) {
                         flowUtils.setVerdictModel(result);
                     });
@@ -344,7 +329,7 @@ function GET_link_entry(req, res) {
             topics: function(callback) {
                 // Top Subtopics
                 var query = { parentId: model.topicLink.topicId, 'screening.status': constants.SCREENING_STATUS.status1.code };
-                flowUtils.getTopics(query, 15, req, function (err, results) {
+                flowUtils.getTopics(query, { limit: 15, req: req }, function (err, results) {
                     model.topics = results;
                     model.keyTopics = results.filter(function (result) {
                         return result.tags.indexOf(constants.TOPIC_TAGS.tag20.code) >= 0;
@@ -404,7 +389,7 @@ function GET_link_entry(req, res) {
                     ownerType: constants.OBJECT_TYPES.topic,
                     'screening.status': constants.SCREENING_STATUS.status1.code
                 };
-                flowUtils.getArguments(query, 0, req, function (err, results) {
+                flowUtils.getArguments(query, { limit: 0, req: req }, function (err, results) {
                     results.forEach(function (result) {
                         flowUtils.setVerdictModel(result);
                     });

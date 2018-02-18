@@ -60,10 +60,10 @@ $ bower install
 $ grunt build
 ```
 
-Next, you need to edit your config file. Set your mongodb instance and SMTP email credentials used for sending notification emails.
+Next, you need to edit your config file. Set your mongodb instance and SMTP email credentials to use for sending notification emails.
 
 ```bash
-$ vi ./config.js
+$ vi ./config.js # do the edit
 ```
 <!-- $ npm install -g yo generator-kraken bower grunt-cli -->
 <!--
@@ -102,9 +102,9 @@ Server listening on http://localhost:8000
 
 Open your favourite browser and go to `http://localhost:8000`.
 
-Since there is no existing data in your mongodb instance, you will be prompted with the "Install: MongoDB Restore" page to install the sample data that comes with the project.
+Since there is no existing data in your mongodb instance, you will be prompted with the `Install: MongoDB Restore` page to install the sample data that comes with the project.
 
-Click the Install button and click Continue once the restore process is completed. Login with the following user credentials:
+Click the `Install` button and click `Continue` once the restore process is completed. Login with the following user credentials:
 * Username: `root`
 * Password: `dev123`
 
