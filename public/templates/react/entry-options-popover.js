@@ -44,7 +44,7 @@ function entryTakeOwnership2() {
 
         $.ajax({
             type: "POST",
-            url: "/ajax/entry/take-ownership",
+            url: "/async/entry/take-ownership",
             data: JSON.stringify({id: id, type: type, _csrf: csrf}),
             contentType: 'application/json',
             success: function (data) {
@@ -65,7 +65,7 @@ function entryDelete2() {
 
         $.ajax({
             type: "POST",
-            url: "/ajax/entry/delete",
+            url: "/async/entry/delete",
             data: JSON.stringify({id: id, type: type, _csrf: csrf}),
             contentType: 'application/json',
             success: function (data) {

@@ -40,7 +40,7 @@
 
                 $.ajax({
                     type: "POST",
-                    url: "/ajax/clipboard/mark",
+                    url: "/async/clipboard/mark",
                     data: JSON.stringify({ id: id, type: type, _csrf: csrf }),
                     contentType: 'application/json',
                     success: function (data) {
@@ -54,7 +54,7 @@
                 var csrf = $('body').data('csrf');
                 $.ajax({
                     type: "POST",
-                    url: "/ajax/clipboard/clear",
+                    url: "/async/clipboard/clear",
                     data: JSON.stringify({ _csrf: csrf }),
                     contentType: 'application/json',
                     success: function (data) {
@@ -72,7 +72,7 @@
                     var username = $('body').data('username');
                     $.ajax({
                         type: "POST",
-                        url: "/ajax/clipboard/move",
+                        url: "/async/clipboard/move",
                         data: JSON.stringify({ id: id, type: type, _csrf: csrf, username: username }),
                         contentType: 'application/json',
                         success: function (data) {
@@ -91,7 +91,7 @@
                     var username = $('body').data('username');
                     $.ajax({
                         type: "POST",
-                        url: "/ajax/clipboard/paste-link",
+                        url: "/async/clipboard/paste-link",
                         data: JSON.stringify({ id: id, type: type, _csrf: csrf, username: username }),
                         contentType: 'application/json',
                         success: function (data) {

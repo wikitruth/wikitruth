@@ -118,7 +118,7 @@
             var csrf = $('body').data('csrf');
             $.ajax({
                 type: "POST",
-                url: "/ajax/preferences/update",
+                url: "/async/preferences/update",
                 data: JSON.stringify({ _csrf: csrf, fullscreen: fullscreen }),
                 contentType: 'application/json',
                 success: function (data) {}
