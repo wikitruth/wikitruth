@@ -6,9 +6,11 @@
 
 {<body}
     {>"dust/wiki/common/entry-header" tab="overview" /}
-    <div class="text-body">
-        <p>{answer.content|s}</p>
-    </div>
+    {?entry.content}
+        <div class="text-body">
+            <p>{answer.content|s}</p>
+        </div>
+    {/entry.content}
     {>"dust/wiki/issues/list-preview" /}
     {>"dust/wiki/opinions/list-preview" /}
     {>"dust/wiki/common/entry-footer" /}

@@ -6,13 +6,15 @@
 
 {<body}
     {>"dust/wiki/common/entry-header" tab="overview" /}
-    <div class="text-body collapsible">
-        {argument.content|s}
-        <a href="#" onclick="return contentSeeMore()" class="content-see-more hidden">
-            <div class="content-see-more-gradient"></div>
-            <div class="content-see-more-text">See more</div>
-        </a>
-    </div>
+    {?entry.content}
+        <div class="text-body collapsible">
+            {entry.content|s}
+            <a href="#" onclick="return contentSeeMore()" class="content-see-more hidden">
+                <div class="content-see-more-gradient"></div>
+                <div class="content-see-more-text">See more</div>
+            </a>
+        </div>
+    {/entry.content}
     {?topic}
         <div class="wt-related">
             <span title="Related Topics">Topics</span>&nbsp;
