@@ -1,4 +1,9 @@
-<h1 class="page-header wt-header-2"><i class="fa fa-globe"></i> Explore <a class="pull-right" href="{paths.wiki.visualize}{?topic}/topic/{topic.friendlyUrl}/{topic._id}{:else}{?application}/topic/{application.exploreTopicId}{/application}{/topic}" title="Visualize"><i class="fa fa-snowflake-o text-muted-2" style="font-size: 28px;"></i></a></h1>
+<h1 class="page-header wt-header-2"><i class="fa fa-globe"></i> Explore
+    <div class="pull-right" style="padding-top: 8px; padding-bottom: 8px; font-size: 28px;">
+        <a href="#browse" class="text-muted-2 no-underline"><i class="fa fa-arrow-down"></i></a>
+        <a href="{paths.wiki.visualize}{?topic}/topic/{topic.friendlyUrl}/{topic._id}{:else}{?application}/topic/{application.exploreTopicId}{/application}{/topic}" title="Visualize" class="text-muted-2 no-underline" style="margin-left: 15px"><i class="fa fa-snowflake-o"></i></a>
+    </div>
+</h1>
 {!<ul class="nav nav-tabs wt-tabs" role="tablist">
     {<a class="btn btn-{@eq key=tab value="top-topics"}primary{:else}default{/eq}" href="/wiki">
         <span class="glyphicon glyphicon-file" aria-hidden="true"></span> Top Topics<span class="hidden-xs hidden"> (122)</span>
