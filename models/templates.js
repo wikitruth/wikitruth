@@ -86,6 +86,7 @@ module.exports = {
         screening: 'dust/wiki/screening',
         visualize: 'dust/wiki/visualize',
         related: 'dust/wiki/related',
-        clipboard: 'dust/wiki/clipboard'
+        clipboard: 'dust/wiki/clipboard',
+        convert: 'dust/wiki/convert'
     }
 };

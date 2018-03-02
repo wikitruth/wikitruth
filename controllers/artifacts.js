@@ -100,14 +100,17 @@ function POST_create(req, res) {
     db.Artifact.findOne(query, function (err, result) {
         var inlineFile, updatedEntity;
         var oldFilePath, oldThumbnailPath;
-
         var dateNow = Date.now();
         var entity = result ? result : {};
+
         entity.title = req.body.title;
         entity.content = req.body.content;
-        entity.contentPreview = flowUtils.createContentPreview(req.body.content);
         entity.source = req.body.source;
-        entity.friendlyUrl = utils.urlify(req.body.title);
+
+        // evaluated properties
+        entity.contentPreview = flowUtils.createContentPreview(entity.content);
+        entity.friendlyUrl = utils.urlify(entity.title);
+
         entity.editUserId = req.user.id;
         entity.editDate = dateNow;
         if (!result) {
@@ -176,7 +179,7 @@ function POST_create(req, res) {
                     }
 
                     var newPathAbs = path.join(__dirname, '/../public', filePath);
-                    // replaced fs.rename() due to error "EXDEV: cross-device link not permitted"
+                    // INFO: replaced fs.rename() due to error "EXDEV: cross-device link not permitted"
                     mv(inlineFile.path, newPathAbs, function (err) {
                         if (err) {
                             console.log('An error has occurred moving the file: ' + inlineFile.path + '\n' + err);
@@ -223,6 +226,7 @@ function POST_create(req, res) {
             },
             updateExtras: function (callback) {
                 if(inlineFile && updatedEntity.isImage()) {
+                    // update new image details in entity's extras
                     db.Artifact.findOneAndUpdate(query, updatedEntity, {
                         upsert: true,
                         new: true,
@@ -234,22 +238,21 @@ function POST_create(req, res) {
                 } else {
                     callback();
                 }
+            },
+            updateChildrenCount: function (callback) {
+                if (!result) { // if new entry, update parent children count
+                    flowUtils.updateChildrenCount(entity.ownerId, entity.ownerType, constants.OBJECT_TYPES.artifact, function () {
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
             }
         }, function () {
-            var updateRedirect = function () {
-                var model = {};
-                flowUtils.setModelContext(req, model);
-                var url = model.wikiBaseUrl + paths.wiki.artifacts.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
-                res.redirect(url);
-                //res.end({});
-            };
-            if (!result) { // if new entry, update parent children count
-                flowUtils.updateChildrenCount(entity.ownerId, entity.ownerType, constants.OBJECT_TYPES.artifact, function () {
-                    updateRedirect();
-                });
-            } else {
-                updateRedirect();
-            }
+            var model = {};
+            flowUtils.setModelContext(req, model);
+            var url = model.wikiBaseUrl + paths.wiki.artifacts.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
+            res.redirect(url);
         });
     });
 }

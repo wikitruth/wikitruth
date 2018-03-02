@@ -70,16 +70,19 @@ module.exports = function(app, mongoose) {
   });
 
   // schema statics
-  schema.statics.getFolder = function(username, isPrivate) {
-    return '/media/artifacts/' + (username && isPrivate ? 'users/' + username + '/' : '');
+  schema.statics.getFolder = function(username, entity) {
+    return '/media/artifacts/' + (username && entity.private ? 'users/' + username + '/' : '');
+  };
+  schema.statics.isImage = function(entity) {
+    return entity.file.type.startsWith('image');
   };
 
   // schema methods
   schema.methods.getType = function() {
     return constants.OBJECT_TYPES.artifact;
   };
-  schema.methods.getFolder = function(username) {
-    return this.constructor.getFolder(username, this.private);
+  schema.methods.getFolder = function(username) { // router
+    return this.constructor.getFolder(username, this);
   };
   schema.methods.getFilePath = function(username) {
     return this.getFolder(username) + this._id + '_' + this.file.name;
@@ -90,8 +93,8 @@ module.exports = function(app, mongoose) {
     }
     return null;
   };
-  schema.methods.isImage = function() {
-    return this.file.type.startsWith('image');
+  schema.methods.isImage = function() { // router
+    return this.constructor.isImage(this);
   };
   schema.methods.setThumbnailPath = function (username) {
     if(this.file.name) {

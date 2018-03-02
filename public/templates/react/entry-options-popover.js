@@ -96,7 +96,7 @@ function generateOptionsContentMenu() {
 
 $('.wt-entry-options').popover({
     placement: 'auto',
-    title: 'More options',
+    title: 'MORE OPTIONS',
     html: true,
     content: generateOptionsContentMenu,
     container: 'body',

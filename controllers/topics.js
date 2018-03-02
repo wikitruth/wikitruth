@@ -251,6 +251,8 @@ function GET_create(req, res) {
 }
 
 function POST_create(req, res) {
+    // https://stackoverflow.com/questions/17899750/how-can-i-generate-an-objectid-with-mongoose
+
     var query = { _id: req.query.id || new mongoose.Types.ObjectId() };
     db.Topic.findOne(query, function(err, result) {
         if(result && !flowUtils.isEntryOwner(req, result)) {

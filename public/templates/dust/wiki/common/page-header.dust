@@ -24,6 +24,9 @@
         {@eq key=tab value="link-to"} <span class="label label-warning wt-subtitle">Links</span>{/eq}
         {@eq key=tab value="update-verdict"} <span class="label label-warning wt-subtitle">Verdict</span>{/eq}
         {@eq key=tab value="screening"} <span class="label label-warning wt-subtitle">Screening</span>{/eq}
+        {?subtitle}
+            &#32;<span class="label label-warning wt-subtitle">{subtitle}</span>
+        {/subtitle}
         {@eq key=argument.typeId value=constants.ARGUMENT_TYPES.artifact} <span class="label label-info wt-subtitle"><i class="fa fa-bolt"></i> {constants.ARGUMENT_TYPES.artifactLabel}</span>{/eq}
         {!{@eq key=tab value="visualize"} <span class="label label-warning wt-subtitle">Visualize</span>{/eq}!}
     </h1>
