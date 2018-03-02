@@ -7,29 +7,26 @@ var flowUtils   = require('../utils/flowUtils'),
 
 module.exports = function (router) {
 
-    /* Verdict */
-
-    router.get('/update', function (req, res) {
-        var model = {
-            verdictStatus: constants.VERDICT_STATUS.pending
-        };
+    router.get('/', function (req, res) {
+        var model = {};
         var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
         flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
             flowUtils.setModelOwnerEntry(req, model, { hideClipboard: true });
-            if(model.entry && model.entry.verdict && model.entry.verdict.status) {
-                model.verdictStatus = model.entry.verdict.status;
-            }
             model.cancelUrl = flowUtils.createReturnUrl(req, model);
             model.hideEntryOptions = true;
-            res.render(templates.wiki.verdict.update, model);
+            res.render(templates.wiki.convert, model);
         });
     });
 
-    router.post('/update', function (req, res) {
+    router.post('/', function (req, res) {
         var model = {};
         var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
         flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
             flowUtils.setModelOwnerEntry(req, model);
+
+            var redirectCallback = function (err, num) {
+                res.redirect(flowUtils.createReturnUrl(req, model));
+            };
             var updateQuery = {
                 $set: {
                     verdict: {
@@ -38,9 +35,6 @@ module.exports = function (router) {
                         editUserId: req.user.id
                     }
                 }
-            };
-            var redirectCallback = function (err, num) {
-                res.redirect(flowUtils.createReturnUrl(req, model));
             };
             switch (model.entryType) {
                 case constants.OBJECT_TYPES.topic:

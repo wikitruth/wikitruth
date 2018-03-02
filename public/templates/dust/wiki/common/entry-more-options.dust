@@ -59,6 +59,10 @@
     {^isEntryOwner}
         <li><a href="#" onclick="return entryTakeOwnership()"><i class="fa fa-hand-grab-o" aria-hidden="true"></i> Take Ownership</a></li>
     {/isEntryOwner}
+    <li><a href="#"><i class="fa fa-cut" aria-hidden="true"></i> Move / Link...</a></li>
+    <li><a href="{paths.wiki.convert}?{entry.objectName}={entry._id}"><i class="fa fa-recycle" aria-hidden="true"></i> Convert...</a></li>
+    <!-- applies only to linked entry -->
+    <li><a href="#"><i class="fa fa-refresh" aria-hidden="true"></i> Swap Link</a></li>
     <li><a href="#" onclick="return entryDelete()"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete</a></li>
     <script>
         function entryTakeOwnership() {

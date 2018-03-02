@@ -84,7 +84,8 @@
             screening: '/screening',
             visualize: '/visualize',
             related: '/related',
-            clipboard: '/clipboard'
+            clipboard: '/clipboard',
+            convert: '/convert'
         }
     };
 
