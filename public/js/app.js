@@ -12,14 +12,14 @@ window.WT_CONSTANTS.summernote = {
         ['list', ['ul', 'ol']],
         ['para', ['paragraph']],
         ['table', ['table']],
-        ['insert', ['link', 'picture', 'video']],
+        ['insert', ['link'/*, 'picture', 'video'*/]],
         ['view', ['fullscreen']],
         ['view2', ['codeview']],
         ['help', ['help']]
     ],
     compactHeight: 100,
     compactToolbar: [
-        ['font', ['bold', 'underline', 'strikethrough', 'clear']],
+        ['font', ['bold', 'underline',/*'strikethrough',*/ 'clear']],
         ['list', ['ul', 'ol']],
         ['para', ['paragraph']],
         ['insert', ['link']],

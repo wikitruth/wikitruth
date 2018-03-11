@@ -1102,6 +1102,7 @@ function getArguments(query, options, callback) {
                             return link.argumentId;
                         });
                         var query = { _id: { $in: ids } };
+                        // get actual arguments from links
                         db.Argument
                             .find(query)
                             .limit(newLimit)
@@ -1116,6 +1117,7 @@ function getArguments(query, options, callback) {
                                             }).map(function (result) {
                                                 return result.ownerId;
                                             });
+                                            // get the topics of actual arguments
                                             db.Topic
                                                 .find({ _id: { $in: topicIds } })
                                                 .lean()
@@ -2476,8 +2478,14 @@ function createOwnerQueryFromModel(model) {
     return {};
 }
 
-function setModelContext(req, model) {
-    if(req.params.username || (model.entry && model.entry.private)) {
+/**
+ *
+ * @param req
+ * @param model
+ * @param mixedMode The place this is called may display both public and private entries (e.g. clipboard)
+ */
+function setModelContext(req, model, mixedMode) {
+    if(req.params.username || (req.user.username && mixedMode) || (model.entry && model.entry.private)) {
         model.username = req.params.username || req.user.username;
         model.profileBaseUrl = paths.members.index + '/' + model.username;
         model.wikiBaseUrl = model.profileBaseUrl + paths.members.profile.diary;
@@ -2771,6 +2779,33 @@ function createReturnUrl(req, model) {
     }
 }
 
+function createEntrySet(model) {
+    var entries = []
+        .concat(model.topics)
+        .concat(model.arguments)
+        .concat(model.questions)
+        .concat(model.answers)
+        .concat(model.issues)
+        .concat(model.opinions)
+        .concat(model.artifacts)
+        .sort(function (a,b) {
+            if (a.editDate < b.editDate) {
+                return 1;
+            }
+            if (a.editDate > b.editDate) {
+                return -1;
+            }
+            return 0;
+        });
+    if(entries.length > 1) {
+        var midIndex = Math.floor(entries.length / 2);
+        model.entrySet = [{entries: entries.slice(0, midIndex - 1)}];
+        model.entrySet.push({entries: entries.slice(midIndex)});
+    } else {
+        model.entrySet = [{entries: entries}];
+    }
+}
+
 module.exports = {
     getBackupDir: getBackupDir,
     createContentPreview: createContentPreview,
@@ -2821,5 +2856,6 @@ module.exports = {
     getObjectName: getObjectName,
     getParent: getParent,
     getCategories: getCategories,
-    createReturnUrl: createReturnUrl
+    createReturnUrl: createReturnUrl,
+    createEntrySet: createEntrySet
 };

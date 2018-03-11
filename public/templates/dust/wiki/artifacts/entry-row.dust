@@ -17,7 +17,7 @@
             {?thumbnailPath}
                 <div style="margin-bottom: 5px" class="artifact-img">
                     <a href="{filePath}" target="_blank" title="Click to open original file">
-                        <img src="{thumbnailPath}" class="img-responsive" />
+                        <img src="{thumbnailPath}" class="img-responsive"{?extras.details.height}{@gt key=extras.details.height value=128} style="height: 128px;"{/gt}{/extras.details.height} />
                     </a>
                 </div>
             {/thumbnailPath}

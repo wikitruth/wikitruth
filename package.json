@@ -1,6 +1,6 @@
 {
   "name": "wikitruth",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Wikipedia and Quora-like system with a vetting mechanism to classify facts from opinions",
   "author": "Wikitruth Foundation",
   "main": "app.js",

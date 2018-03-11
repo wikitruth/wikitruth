@@ -839,6 +839,7 @@ module.exports = function (router) {
                         });
                 }
             }, function (err, results) {
+                flowUtils.createEntrySet(model);
                 res.render(templates.members.profile.topics, model);
             });
         });

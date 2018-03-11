@@ -1,0 +1,38 @@
+{?entrySet}
+    <div class="row">
+        {#entrySet}
+            <div class="col-md-6 col-sm-12">
+                <div class="wt-list-container">
+                    <ul class="list-group top-list-items wt-list">
+                        {#entries}
+                            {@eq key=objectName value="topic"}
+                                {>"dust/wiki/topics/entry-row" standalone="true" subtitle="true" /}
+                            {/eq}
+                            {@eq key=objectName value="argument"}
+                                {>"dust/wiki/arguments/entry-row" subtitle="true" /}
+                            {/eq}
+                            {@eq key=objectName value="question"}
+                                {>"dust/wiki/questions/entry-row" subtitle="true" /}
+                            {/eq}
+                            {@eq key=objectName value="answer"}
+                                {>"dust/wiki/answers/entry-row" subtitle="true" /}
+                            {/eq}
+                            {@eq key=objectName value="issue"}
+                                {>"dust/wiki/issues/entry-row" subtitle="true" /}
+                            {/eq}
+                            {@eq key=objectName value="opinion"}
+                                {>"dust/wiki/opinions/entry-row" subtitle="true" /}
+                            {/eq}
+                            {@eq key=objectName value="artifact"}
+                                {>"dust/wiki/artifacts/entry-row" subtitle="true" /}
+                            {/eq}
+                        {/entries}
+                    </ul>
+                    {?viewMoreLink}
+                        <div class="top-list-items-more"><a href="{viewMoreLink}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more</a></div>
+                    {/viewMoreLink}
+                </div>
+            </div>
+        {/entrySet}
+    </div>
+{/entrySet}
