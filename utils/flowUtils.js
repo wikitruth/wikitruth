@@ -2485,7 +2485,7 @@ function createOwnerQueryFromModel(model) {
  * @param mixedMode The place this is called may display both public and private entries (e.g. clipboard)
  */
 function setModelContext(req, model, mixedMode) {
-    if(req.params.username || (req.user.username && mixedMode) || (model.entry && model.entry.private)) {
+    if(req.params.username || (mixedMode && req.user && req.user.username) || (model.entry && model.entry.private)) {
         model.username = req.params.username || req.user.username;
         model.profileBaseUrl = paths.members.index + '/' + model.username;
         model.wikiBaseUrl = model.profileBaseUrl + paths.members.profile.diary;
