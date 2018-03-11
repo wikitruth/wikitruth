@@ -19,7 +19,7 @@ module.exports = function (router) {
         if(req.user) {
             req.params.username = req.user.username;
         }*/
-        flowUtils.setModelContext(req, model);
+        flowUtils.setModelContext(req, model, true);
 
         async.parallel({
             topics: function (callback) {

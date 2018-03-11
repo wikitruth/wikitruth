@@ -210,6 +210,7 @@ module.exports = function (router) {
                             });
                     }
                 }, function (err, results) {
+                    flowUtils.createEntrySet(model);
                     res.render(templates.index, model);
                 });
             }

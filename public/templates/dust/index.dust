@@ -10,7 +10,7 @@
             <p class="lead">{application.jumbotron.description}</p>
         {:else}
             <h1>The Wikitruth Project</h1>
-            <p class="lead">A systematic way of discussion and knowledge contribution using dialectics and a vetting mechanism to verify between knowledge that is true or false, right or wrong, good or bad.</p>
+            <p class="lead">A systematic discourse and knowledge contribution using dialectics and vetting to verify knowledge that is true or false, right or wrong, and good or bad.</p>
         {/application}
         <p>
             <a class="btn btn-lg btn-success wt-btn-explore" href="{paths.wiki.index}" role="button"><i class="fa fa-globe"></i> Explore</a>
@@ -34,10 +34,9 @@
         </div>
     </div>!}
 
-    <!-- Example row of columns -->
-    <div class="row">
-        {?application}
-            {#application.sections}
+    {?application}
+        {#application.sections}
+            <div class="row">
                 <div class="col-lg-4 col-md-6 col-sm-6 wt-section-col text-body">
                     <h2 class="wt-feature-header" data-title="{title}"><i class="{iconClass}"></i> {title}</h2>
                     <p>{description}</p>
@@ -45,33 +44,38 @@
                         <p><a class="btn btn-default btn-block" href="{url}" role="button">Explore &raquo;</a></p>
                     {/url}
                 </div>
-            {/application.sections}
-        {:else}
-            <div class="col-lg-4 col-md-6 col-sm-6 wt-section-col text-body">
-                <h2 class="wt-feature-header" data-title="Truth &amp; Reality"><i class="fa fa-globe"></i> Truth &amp; Reality</h2>
-                <p>Find out the truth and reality on important topics that impact the society including controversies around politics, environment, culture and conspiracy theories which divide the society and result to conflict.</p>
-                {!<p><a class="btn btn-default btn-block" href="{paths.wiki.index}" role="button">Explore &raquo;</a></p>!}
             </div>
-            <div class="col-lg-4 col-md-6 col-sm-6 wt-section-col text-body">
-                <h2 class="wt-feature-header" data-title="Religion &amp; Worldviews"><i class="fa fa-book"></i> Religion &amp; Worldviews</h2>
-                <p>Compilation of world religions, ideologies, philosophies and worldviews with details on their achievements or issues, their primary belief or doctrines categorized by good, bad, and dangerous.</p>
-                {!<p><a class="btn btn-default btn-block" href="{paths.wiki.index}" role="button">Explore &raquo;</a></p>!}
+        {/application.sections}
+    {:else}
+        {^user.username}
+            <div class="row">
+                <div class="col-lg-4 col-md-6 col-sm-6 wt-section-col text-body">
+                    <h2 class="wt-feature-header" data-title="Truth &amp; Reality"><i class="fa fa-globe"></i> Truth &amp; Reality</h2>
+                    <p>Find out the truth and reality on important topics that impact the society including controversies around politics, environment, culture and conspiracy theories which divide the society and result to conflict.</p>
+                    {!<p><a class="btn btn-default btn-block" href="{paths.wiki.index}" role="button">Explore &raquo;</a></p>!}
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-6 wt-section-col text-body">
+                    <h2 class="wt-feature-header" data-title="Religion &amp; Worldviews"><i class="fa fa-book"></i> Religion &amp; Worldviews</h2>
+                    <p>Compilation of world religions, ideologies, philosophies and worldviews with details on their achievements or issues, their primary belief or doctrines categorized by good, bad, and dangerous.</p>
+                    {!<p><a class="btn btn-default btn-block" href="{paths.wiki.index}" role="button">Explore &raquo;</a></p>!}
+                </div>
+                <div class="col-lg-4 col-md-6 col-sm-6 wt-section-col text-body">
+                    <h2 class="wt-feature-header" data-title="Morality &amp; Ethics"><i class="fa fa-balance-scale"></i> Morality &amp; Ethics</h2>
+                    <p>Virtues, morally right and wrong acts supported by reason, facts and human consensus under the notion that there are right and wrong that most people can agree with and find them fair, logical and reasonable.</p>
+                    {!<p><a class="btn btn-default btn-block" href="{paths.wiki.index}" role="button">Explore &raquo;</a></p>!}
+                </div>
             </div>
-            <div class="col-lg-4 col-md-6 col-sm-6 wt-section-col text-body">
-                <h2 class="wt-feature-header" data-title="Morality &amp; Ethics"><i class="fa fa-balance-scale"></i> Morality &amp; Ethics</h2>
-                <p>Virtues, morally right and wrong acts supported by reason, facts and human consensus under the notion that there are right and wrong that most people can agree with and find them fair, logical and reasonable.</p>
-                {!<p><a class="btn btn-default btn-block" href="{paths.wiki.index}" role="button">Explore &raquo;</a></p>!}
-            </div>
-        {/application}
-    </div>
-
+        {/user.username}
+    {/application}
     <h1 class="page-header wt-header"><i class="fa fa-globe"></i> Latest Posts</h1>
-    <div class="wt-search">
+    {>"dust/wiki/common/entry-set" viewMoreLink="{paths.wiki.index}#browse" /}
+
+    {!<div class="wt-search">
         <div class="row">
             <div class="col-md-6 col-sm-12">
                 {?topics}
                     <div class="wt-list-container">
-                        {!<h3 class="page-header-x text-muted-0"><i class="fa fa-folder-open"></i> Topics</h3>!}
+                        {!<h3 class="page-header-x text-muted-0"><i class="fa fa-folder-open"></i> Topics</h3>!
                         <ul class="list-group top-list-items wt-list">
                             <li class="list-group-item highlight">
                                 <i class="fa fa-folder-open text-success-x" aria-hidden="true"></i>
@@ -90,7 +94,7 @@
             <div class="col-md-6 col-sm-12">
                 {?arguments}
                     <div class="wt-list-container">
-                        {!<h3 class="page-header-x text-muted-0"><i class="fa fa-flash"></i> Arguments</h3>!}
+                        {!<h3 class="page-header-x text-muted-0"><i class="fa fa-flash"></i> Arguments</h3>!
                         <ul class="list-group top-list-items wt-list">
                             <li class="list-group-item highlight text-primary">
                                 <span class="glyphicon glyphicon-flash" aria-hidden="true"></span>
@@ -112,7 +116,7 @@
             <div class="col-md-6 col-sm-12">
                 {?questions}
                     <div class="wt-list-container">
-                        {!<h3 class="page-header-x text-muted-0"><i class="fa fa-question-circle"></i> Questions</h3>!}
+                        {!<h3 class="page-header-x text-muted-0"><i class="fa fa-question-circle"></i> Questions</h3>!
                         <ul class="list-group top-list-items wt-list">
                             <li class="list-group-item highlight">
                                 <span class="glyphicon glyphicon-question-sign text-success-x" aria-hidden="true"></span>
@@ -131,7 +135,7 @@
             <div class="col-md-6 col-sm-12">
                 {?answers}
                     <div class="wt-list-container">
-                        {!<h3 class="page-header-x text-muted-0"><i class="fa fa-check-circle-o"></i> Answers</h3>!}
+                        {!<h3 class="page-header-x text-muted-0"><i class="fa fa-check-circle-o"></i> Answers</h3>!
                         <ul class="list-group top-list-items wt-list">
                             <li class="list-group-item highlight">
                                 <i class="fa fa-check-circle-o text-success-x" aria-hidden="true"></i>
@@ -152,7 +156,7 @@
             <div class="col-md-6 col-sm-12">
                 {?issues}
                     <div class="wt-list-container">
-                        {!<h3 class="page-header-x text-muted-0"><i class="fa fa-exclamation-circle"></i> Issues</h3>!}
+                        {!<h3 class="page-header-x text-muted-0"><i class="fa fa-exclamation-circle"></i> Issues</h3>!
                         <ul class="list-group top-list-items wt-list">
                             <li class="list-group-item highlight">
                                 <i class="fa fa-exclamation-circle text-success-x" aria-hidden="true"></i>
@@ -171,7 +175,7 @@
             <div class="col-md-6 col-sm-12">
                 {?opinions}
                     <div class="wt-list-container">
-                        {!<h3 class="page-header-x text-muted-0"><i class="fa fa-comments-o"></i> Comments</h3>!}
+                        {!<h3 class="page-header-x text-muted-0"><i class="fa fa-comments-o"></i> Comments</h3>!
                         <ul class="list-group top-list-items wt-list">
                             <li class="list-group-item highlight">
                                 <span class="fa fa-comments-o text-success-x" aria-hidden="true"></span>
@@ -192,7 +196,7 @@
             <div class="col-md-6 col-sm-12">
                 {?artifacts}
                     <div class="wt-list-container">
-                        {!<h3 class="page-header-x text-muted-0"><i class="fa fa-exclamation-circle"></i> Issues</h3>!}
+                        {!<h3 class="page-header-x text-muted-0"><i class="fa fa-exclamation-circle"></i> Issues</h3>!
                         <ul class="list-group top-list-items wt-list">
                             <li class="list-group-item highlight">
                                 <i class="fa fa-puzzle-piece text-success-x" aria-hidden="true"></i>
@@ -209,8 +213,7 @@
                 {/artifacts}
             </div>
         </div>
-    </div>
-
+    </div>!}
     {!<div class="row">
         <div class="col-lg-4 col-md-6 col-sm-6 wt-section-col">
             <h4 class="page-header">Topics in Truth</h4>
