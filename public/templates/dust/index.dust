@@ -35,8 +35,8 @@
     </div>!}
 
     {?application}
-        {#application.sections}
-            <div class="row">
+        <div class="row">
+            {#application.sections}
                 <div class="col-lg-4 col-md-6 col-sm-6 wt-section-col text-body">
                     <h2 class="wt-feature-header" data-title="{title}"><i class="{iconClass}"></i> {title}</h2>
                     <p>{description}</p>
@@ -44,8 +44,8 @@
                         <p><a class="btn btn-default btn-block" href="{url}" role="button">Explore &raquo;</a></p>
                     {/url}
                 </div>
-            </div>
-        {/application.sections}
+            {/application.sections}
+        </div>
     {:else}
         {^user.username}
             <div class="row">
