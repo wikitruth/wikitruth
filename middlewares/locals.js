@@ -1,6 +1,7 @@
 'use strict';
 
-var flowUtils       = require('../utils/flowUtils'),
+var async           = require('async'),
+    flowUtils       = require('../utils/flowUtils'),
     applications    = require('../models/applications');
 
 module.exports = function(app, passport) {
@@ -17,6 +18,7 @@ module.exports = function(app, passport) {
             res.locals.user.isAdmin = req.user.isAdmin();
             res.locals.user.roles = req.user.roles;
             res.locals.isContributor = req.user.username;
+            res.locals.diaryBaseUrl = flowUtils.getDiaryBaseUrl(req.user.username);
         } else if(res.locals.user) {
             delete res.locals.user;
         }
@@ -25,35 +27,59 @@ module.exports = function(app, passport) {
         res.locals.query = req.query;
         res.locals.preferences = req.session.preferences;
 
-        // set the application
-        var model = {};
-        var application = applications.getApplication(req);
-        res.locals.application = application;
-        if(application) {
-            application.resPath = application.id + '/';
-            res.locals.projectName = application.navTitle;
-            res.locals.titleSlogan = application.slogan;
-            res.locals.googleAnalyticsTrackingId = application.googleAnalyticsTrackingId;
+        async.parallel({
+            setApplication: function (callback) {
+                // set the application
+                var model = {};
+                var application = applications.getApplication(req);
+                res.locals.application = application;
+                if(application) {
+                    application.resPath = application.id + '/';
+                    res.locals.projectName = application.navTitle;
+                    res.locals.titleSlogan = application.slogan;
+                    res.locals.googleAnalyticsTrackingId = application.googleAnalyticsTrackingId;
 
-            if(!application.appCategories) {
-                flowUtils.getCategories(model, application.exploreTopicId, req, function () {
-                    application.appCategories = model.categories;
-                    res.locals.appCategories = model.categories;
-                    next();
-                });
-            } else {
-                res.locals.appCategories = application.appCategories;
-                next();
+                    if(!application.appCategories) {
+                        flowUtils.getCategories(model, application.exploreTopicId, req, function () {
+                            application.appCategories = model.categories;
+                            res.locals.appCategories = model.categories;
+                            callback();
+                        });
+                    } else {
+                        res.locals.appCategories = application.appCategories;
+                        callback();
+                    }
+                } else {
+                    if(!app.locals.appCategories) {
+                        flowUtils.getCategories(model, null, req, function () {
+                            app.locals.appCategories = model.categories;
+                            callback();
+                        });
+                    } else {
+                        callback();
+                    }
+                }
+            },
+            diaryCategories: function (callback) {
+                // Diary Categories
+                if(req.user) {
+                    if (!app.locals.diaryCategories) {
+                        flowUtils.getDiaryCategories(req, function (err, results) {
+                            app.locals.diaryCategories = results;
+                            callback();
+                        });
+                    } else {
+                        callback();
+                    }
+                } else {
+                    if(app.locals.diaryCategories) {
+                        delete app.locals.diaryCategories;
+                    }
+                    callback();
+                }
             }
-        } else {
-            if(!app.locals.appCategories) {
-                flowUtils.getCategories(model, null, req, function () {
-                    app.locals.appCategories = model.categories;
-                    next();
-                });
-            } else {
-                next();
-            }
-        }
+        }, function () {
+            next();
+        });
     });
 };

@@ -13,7 +13,19 @@
             <label for="inputReferences">Convert To:</label>
             <div class="radio">
                 <label>
-                    <input type="radio" name="convert" value="{constants.OBJECT_TYPES.artifact}" checked>
+                    <input type="radio" name="convert" value="{constants.OBJECT_TYPES.topic}" checked>
+                    Topic
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="convert" value="{constants.OBJECT_TYPES.argument}">
+                    Fact
+                </label>
+            </div>
+            <div class="radio">
+                <label>
+                    <input type="radio" name="convert" value="{constants.OBJECT_TYPES.artifact}">
                     Artifact
                 </label>
             </div>
