@@ -2500,6 +2500,10 @@ function buildEntryUrl(baseUrl, entry) {
     return baseUrl + '/' + entry.friendlyUrl + '/' + entry._id;
 }
 
+function getDiaryBaseUrl(username) {
+    return paths.members.index + '/' + username + paths.members.profile.diary;
+}
+
 function buildCancelUrl(model, cancelBaseUrl, entry, parent) {
     var cancelUrl = entry ? buildEntryUrl(cancelBaseUrl, entry) :
         parent ? buildEntryUrl(cancelBaseUrl, parent) :
@@ -2764,6 +2768,21 @@ function getCategories(model, topicId, req, callback) {
         });
 }
 
+function getDiaryCategories(req, callback) {
+    db.Topic
+        .find({ parentId: null, ownerType: constants.OBJECT_TYPES.user, ownerId: req.user.id })
+        .sort({title: 1})
+        .lean()
+        .exec(function (err, results) {
+            async.each(results, function(result, callback) {
+                result.friendlyUrl = utils.urlify(result.title);
+                callback();
+            }, function() {
+                callback(err, results);
+            });
+        });
+}
+
 function createReturnUrl(req, model) {
     switch (model.entryType) {
         case constants.OBJECT_TYPES.topic:
@@ -2852,10 +2871,12 @@ module.exports = {
     buildEntryUrl: buildEntryUrl,
     buildCancelUrl: buildCancelUrl,
     buildParentUrl: buildParentUrl,
+    getDiaryBaseUrl: getDiaryBaseUrl,
     getDbModelByObjectType: getDbModelByObjectType,
     getObjectName: getObjectName,
     getParent: getParent,
     getCategories: getCategories,
+    getDiaryCategories: getDiaryCategories,
     createReturnUrl: createReturnUrl,
     createEntrySet: createEntrySet
 };
