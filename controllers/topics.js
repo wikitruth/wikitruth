@@ -412,15 +412,7 @@ function GET_link_entry(req, res) {
             questions: function (callback) {
                 // Top Questions
                 var query = { ownerId: model.topicLink.topicId, ownerType: constants.OBJECT_TYPES.topic, 'screening.status': constants.SCREENING_STATUS.status1.code };
-                db.Question.find(query).limit(15).exec(function(err, results) {
-                    flowUtils.setEditorsUsername(results, function() {
-                        results.forEach(function (result) {
-                            flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.question, req);
-                        });
-                        model.questions = results;
-                        callback();
-                    });
-                });
+                flowUtils.getTopQuestions(query, model, req, callback);
             },
             issues: function (callback) {
                 // Top Issues

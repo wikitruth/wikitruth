@@ -1,7 +1,23 @@
 function EntryOptionsPopover(props) {
 
-    var idparam = (props.type == WT_CONSTANTS.OBJECT_TYPES.topic || props.type == WT_CONSTANTS.OBJECT_TYPES.argument || props.type == WT_CONSTANTS.OBJECT_TYPES.opinion ? 'id' : WT_CONSTANTS.OBJECT_ID_NAME_MAP[props.type]);
-    var editUrl = '/' + WT_CONSTANTS.OBJECT_NAMES_MAP[props.type] + '/create?' + idparam + '=' + props.id;
+    var idparam = props.type == WT_CONSTANTS.OBJECT_TYPES.topic
+                || props.type == WT_CONSTANTS.OBJECT_TYPES.topicLink
+                || props.type == WT_CONSTANTS.OBJECT_TYPES.argument
+                || props.type == WT_CONSTANTS.OBJECT_TYPES.argumentLink
+                || props.type == WT_CONSTANTS.OBJECT_TYPES.opinion ? 'id' : WT_CONSTANTS.OBJECT_ID_NAME_MAP[props.type];
+    var editUrl;
+    switch (props.type) {
+        case WT_CONSTANTS.OBJECT_TYPES.topicLink:
+            editUrl = '/topics/link/edit?' + idparam + '=' + props.id + '&source=' + location.pathname;
+            break;
+        case WT_CONSTANTS.OBJECT_TYPES.argumentLink:
+            editUrl = '/arguments/link/edit?' + idparam + '=' + props.id + '&source=' + location.pathname;
+            break;
+        default:
+            editUrl = '/' + WT_CONSTANTS.OBJECT_NAMES_MAP[props.type] + '/create?' + idparam + '=' + props.id;
+            break;
+    }
+
     var screeningUrl = WT_PATHS.wiki.screening + '?' + WT_CONSTANTS.OBJECT_ID_NAME_MAP[props.type] + '=' + props.id;
     var renderDivider = props.isOwner || WT_USER.isAdmin;
 

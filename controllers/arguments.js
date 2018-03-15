@@ -61,7 +61,6 @@ function GET_entry(req, res) {
                 });
             },
             links: function (callback) {
-                // Top Questions
                 var query = { argumentId: req.query.argument, 'screening.status': constants.SCREENING_STATUS.status1.code };
                 db.ArgumentLink.find(query, function(err, links) {
                     if(links.length > 0) {
@@ -359,13 +358,18 @@ function POST_create(req, res) {
 
 function GET_link_entry(req, res) {
     var model = {};
-    var ownerQuery = {ownerId: req.params.id, ownerType: constants.OBJECT_TYPES.argumentLink};
+    var ownerQuery = { ownerId: req.params.id, ownerType: constants.OBJECT_TYPES.argumentLink };
     flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
         if (!flowUtils.isEntryOnIntendedUrl(req, model.argumentLink)) {
             return res.redirect('/');
         }
 
         async.parallel({
+            questions: function (callback) {
+                // Top Questions
+                var query = { ownerId: model.argumentLink.argumentId, ownerType: constants.OBJECT_TYPES.argument, 'screening.status': constants.SCREENING_STATUS.status1.code };
+                flowUtils.getTopQuestions(query, model, req, callback);
+            },
             issues: function (callback) {
                 // Top Issues
                 var query = {
