@@ -1189,6 +1189,22 @@ function getArguments(query, options, callback) {
     });
 }
 
+function getTopQuestions(query, model, req, callback) {
+    db.Question
+        .find(query)
+        .limit(15)
+        .lean()
+        .exec(function(err, results) {
+            setEditorsUsername(results, function() {
+                results.forEach(function (result) {
+                    appendEntryExtras(result, constants.OBJECT_TYPES.question, req);
+                });
+                model.questions = results;
+                callback();
+            });
+    });
+}
+
 function getTopArtifacts(query, model, req, callback) {
     db.Artifact
         .find(query)
@@ -2848,6 +2864,7 @@ module.exports = {
 
     getTopics: getTopics,
     getArguments: getArguments,
+    getTopQuestions: getTopQuestions,
     getTopArtifacts: getTopArtifacts,
     getTopIssues: getTopIssues,
     getTopOpinions: getTopOpinions,
