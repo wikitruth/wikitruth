@@ -179,7 +179,7 @@
             code: 2,
             text: "Rejected"
         },
-        status3: {
+        status3: { /* An entry can only be archived after it was accepted. */
             code: 3,
             text: "Archived"
         }
@@ -230,6 +230,32 @@
             code: 100,
             critical: false,
             text: "Other issue (warning)"
+        }
+    };
+
+    var GROUP_ROLE_TYPES = {
+        type10: {
+            code: 10,
+            text: "Member"
+        },
+        type20: {
+            code: 20,
+            text: "Administrator"
+        }
+    };
+
+    var GROUP_PRIVACY_TYPES = {
+        type10: {
+            code: 10,
+            text: "Public"
+        },
+        type20: {
+            code: 20,
+            text: "Closed"
+        },
+        type30: {
+            code: 30,
+            text: "Secret"
         }
     };
 
@@ -326,7 +352,8 @@
         issue: 10,
         opinion: 11,
         answer: 12,
-        user: 21
+        user: 21,
+        group: 30
     };
 
     var LINK_TYPES = {
@@ -339,6 +366,8 @@
         OBJECT_TYPES: OBJECT_TYPES,
         ARGUMENT_TYPES: ARGUMENT_TYPES,
         ISSUE_TYPES: ISSUE_TYPES,
+        GROUP_ROLE_TYPES: GROUP_ROLE_TYPES,
+        GROUP_PRIVACY_TYPES: GROUP_PRIVACY_TYPES,
         ARGUMENT_TAGS: ARGUMENT_TAGS,
         TOPIC_TAGS: TOPIC_TAGS,
         ETHICAL_STATUS: {

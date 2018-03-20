@@ -1,0 +1,33 @@
+{!<br/>
+<ol class="breadcrumb wt-bc">
+    <li><i class="fa fa-user-circle text-muted"></i> <a href="{paths.members.index}">Members</a></li>
+    <li><i class="fa fa-user-circle text-muted"></i> <a href="{paths.members.index}/{group.username}">{group.username}</a></li>
+</ol>!}
+<h1 class="page-header wt-header wt-geopattern-title wt-profile-header" title="{group.title}">
+    <i class="fa fa-group fa-2x"></i><br/>{group.title}
+    <div>
+        {@eq key=group.privacyType value=10}
+            Public Group
+        {:else}
+            Private Group
+        {/eq}
+    </div>
+</h1>
+
+<ul class="nav nav-tabs wt-tabs" role="tablist">
+    <li role="presentation"{@eq key=profileTab value="overview"} class="active"{/eq}>
+        <a href="{paths.groups.index}/{group.friendlyUrl}/{group._id}" role="tab">
+            <i class="fa fa-user-circle"></i> About
+        </a>
+    </li>
+    <li role="presentation"{@eq key=profileTab value="topics"} class="active"{/eq}>
+        <a href="{paths.groups.index}/{group.friendlyUrl}/{group._id}{paths.groups.group.posts}" role="tab">
+            <i class="fa fa-folder-open"></i> Posts
+        </a>
+    </li>
+    <li role="presentation"{@eq key=profileTab value="following"} class="active"{/eq}>
+        <a href="{paths.groups.index}/{group.friendlyUrl}/{group._id}/members" role="tab">
+            <i class="fa fa-rss"></i> Members
+        </a>
+    </li>
+</ul>

@@ -34,6 +34,7 @@
                         <li><a href="{paths.members.administrators}"><i class="fa fa-user"></i> Administrators</a></li>
                         <li role="separator" class="divider"></li>!}
                         <li class="dropdown-header">more</li>
+                        <li><a href="{paths.groups.index}"><i class="fa fa-group"></i> Groups</a></li>
                         <li><a href="{paths.members.index}"><i class="fa fa-user-circle"></i> Members</a></li>
                         <li role="separator" class="divider"></li>
                         {?application}

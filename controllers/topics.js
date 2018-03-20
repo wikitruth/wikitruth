@@ -2,8 +2,6 @@
 
 var mongoose    = require('mongoose'),
     async       = require('async'),
-    url         = require('url'),
-    querystring = require('querystring'),
     paths       = require('../models/paths'),
     templates   = require('../models/templates'),
     utils       = require('../utils/utils'),
@@ -11,16 +9,56 @@ var mongoose    = require('mongoose'),
     constants   = require('../models/constants'),
     db          = require('../app').db.models;
 
-function createCancelUrl(req) {
-    var nextUrl = url.parse(req.originalUrl);
-    var nextQuery = querystring.parse(nextUrl.query);
-    nextUrl.pathname = nextQuery.source;
-    delete nextQuery.id;
-    delete nextQuery.source;
-    nextUrl.query = nextQuery;
-    nextUrl.search = null; // important, ensures new 'query' to take effect
-    return url.format(nextUrl);
-}
+
+module.exports = function (router) {
+
+    router.get('/', function (req, res) {
+        GET_index(req, res);
+    });
+
+    router.get('/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        GET_entry(req, res);
+    });
+
+    /**
+     * basic rule: id is the entry, query.topic or topic.parentId is the parent.
+     */
+    router.get('/create', function (req, res) {
+        GET_create(req, res);
+    });
+
+    router.post('/create', function (req, res) {
+        POST_create(req, res);
+    });
+
+
+    router.get('/entry(/:friendlyUrl)?/link/:id', function (req, res) {
+        GET_link_entry(req, res);
+    });
+
+    router.get('/link/edit', function (req, res) {
+        GET_link_edit(req, res);
+    });
+
+    router.post('/link/edit', function (req, res) {
+        POST_link_edit(req, res);
+    });
+
+    /**
+     * Place this here to prevent it from overriding /link/* paths
+     */
+    router.get('/:friendlyUrl/:id', function (req, res) {
+        GET_index(req, res);
+    });
+};
+
+module.exports.GET_index = GET_index;
+module.exports.GET_entry = GET_entry;
+module.exports.GET_create = GET_create;
+module.exports.POST_create = POST_create;
+module.exports.GET_link_entry = GET_link_entry;
+module.exports.GET_link_edit = GET_link_edit;
+module.exports.POST_link_edit = POST_link_edit;
 
 function GET_index(req, res) {
     var model = {};
@@ -244,8 +282,7 @@ function GET_create(req, res) {
             // A public create on root topics but not an admin
             return res.redirect(model.wikiBaseUrl);
         }
-        model.TOPIC_TAGS = constants.TOPIC_TAGS;
-        model.cancelUrl = flowUtils.buildCancelUrl(model, model.wikiBaseUrl + paths.wiki.topics.entry, model.topic, model.parentTopic);
+        model.cancelUrl = flowUtils.buildTopicReturnUrl(model, model.wikiBaseUrl + paths.wiki.topics.entry, model.topic, model.parentTopic);
         res.render(templates.wiki.topics.create, model);
     });
 }
@@ -471,10 +508,10 @@ function GET_link_edit(req, res) {
         if(model.topicLink) {
             if(!flowUtils.isEntryOwner(req, model.topicLink)) {
                 // VALIDATION: non-owners cannot update other's entry
-                return res.redirect(createCancelUrl(req));
+                return res.redirect(flowUtils.buildReturnUrl(req));
             }
         }
-        model.cancelUrl = createCancelUrl(req);
+        model.cancelUrl = flowUtils.buildReturnUrl(req);
         flowUtils.setModelOwnerEntry(req, model);
         res.render(templates.wiki.topics.link.edit, model);
     });
@@ -517,7 +554,7 @@ function POST_link_edit(req, res) {
     if(action === 'delete') {
         if(!req.user.isAdmin()) {
             // VALIDATION: only admin can delete a link
-            return res.redirect(createCancelUrl(req));
+            return res.redirect(flowUtils.buildReturnUrl(req));
         }
         db.TopicLink.findByIdAndRemove(req.query.id, function(err, link) {
             flowUtils.updateChildrenCount(link.parentId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, function () {
@@ -529,7 +566,7 @@ function POST_link_edit(req, res) {
         db.TopicLink.findOne(query, function (err, result) {
             if(result && !flowUtils.isEntryOwner(req, result)) {
                 // VALIDATION: non-owners cannot update other's entry
-                return res.redirect(createCancelUrl(req));
+                return res.redirect(flowUtils.buildReturnUrl(req));
             }
             var entity = result ? result : {};
             entity.title = req.body.title;
@@ -539,58 +576,8 @@ function POST_link_edit(req, res) {
                 flowUtils.initScreeningStatus(req, entity);
             }
             db.TopicLink.findOneAndUpdate(query, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function (err, updatedEntity) {
-                res.redirect(createCancelUrl(req));
+                res.redirect(flowUtils.buildReturnUrl(req));
             });
         });
     }
 }
-
-module.exports = function (router) {
-
-    router.get('/', function (req, res) {
-        GET_index(req, res);
-    });
-
-    router.get('/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
-        GET_entry(req, res);
-    });
-
-    /**
-     * basic rule: id is the entry, query.topic or topic.parentId is the parent.
-     */
-    router.get('/create', function (req, res) {
-        GET_create(req, res);
-    });
-
-    router.post('/create', function (req, res) {
-        POST_create(req, res);
-    });
-
-
-    router.get('/entry(/:friendlyUrl)?/link/:id', function (req, res) {
-        GET_link_entry(req, res);
-    });
-
-    router.get('/link/edit', function (req, res) {
-        GET_link_edit(req, res);
-    });
-
-    router.post('/link/edit', function (req, res) {
-        POST_link_edit(req, res);
-    });
-
-    /**
-     * Place this here to prevent it from overriding /link/* paths
-     */
-    router.get('/:friendlyUrl/:id', function (req, res) {
-        GET_index(req, res);
-    });
-};
-
-module.exports.GET_index = GET_index;
-module.exports.GET_entry = GET_entry;
-module.exports.GET_create = GET_create;
-module.exports.POST_create = POST_create;
-module.exports.GET_link_entry = GET_link_entry;
-module.exports.GET_link_edit = GET_link_edit;
-module.exports.POST_link_edit = POST_link_edit;

@@ -5,8 +5,6 @@ var flowUtils   = require('../utils/flowUtils'),
 
 module.exports = function (router) {
 
-    /* Outline */
-
     router.get('/link', function (req, res) {
         var model = {};
         flowUtils.setArgumentModels(req, model, function () {

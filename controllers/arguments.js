@@ -7,20 +7,49 @@ var mongoose    = require('mongoose'),
     paths       = require('../models/paths'),
     templates   = require('../models/templates'),
     constants   = require('../models/constants'),
-    url         = require('url'),
-    querystring = require('querystring'),
     db          = require('../app').db.models;
 
-function createCancelUrl(req) {
-    var nextUrl = url.parse(req.originalUrl);
-    var nextQuery = querystring.parse(nextUrl.query);
-    nextUrl.pathname = nextQuery.source;
-    delete nextQuery.id;
-    delete nextQuery.source;
-    nextUrl.query = nextQuery;
-    nextUrl.search = null;
-    return url.format(nextUrl);
-}
+module.exports = function (router) {
+
+    /* Arguments */
+
+    router.get('/', function (req, res) {
+        GET_index(req, res);
+    });
+
+    router.get('/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        GET_entry(req, res);
+    });
+
+    router.get('/create', function (req, res) {
+        GET_create(req, res);
+    });
+
+    router.post('/create', function (req, res) {
+        POST_create(req, res);
+    });
+
+
+    router.get('/entry(/:friendlyUrl)?/link/:id', function (req, res) {
+        GET_link_entry(req, res);
+    });
+
+    router.get('/link/edit', function (req, res) {
+        GET_link_edit(req, res);
+    });
+
+    router.post('/link/edit', function (req, res) {
+        POST_link_edit(req, res);
+    });
+};
+
+module.exports.GET_entry = GET_entry;
+module.exports.GET_index = GET_index;
+module.exports.GET_create = GET_create;
+module.exports.POST_create = POST_create;
+module.exports.GET_link_entry = GET_link_entry;
+module.exports.GET_link_edit = GET_link_edit;
+module.exports.POST_link_edit = POST_link_edit;
 
 function GET_entry(req, res) {
     var model = {};
@@ -401,9 +430,9 @@ function GET_link_edit(req, res) {
     var ownerQuery = { ownerId: req.query.id, ownerType: constants.OBJECT_TYPES.argumentLink };
     flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
         if(model.argumentLink && !flowUtils.isEntryOwner(req, model.argumentLink)) {
-            return res.redirect(createCancelUrl(req));
+            return res.redirect(flowUtils.buildReturnUrl(req));
         }
-        model.cancelUrl = createCancelUrl(req);
+        model.cancelUrl = flowUtils.buildReturnUrl(req);
         flowUtils.setModelOwnerEntry(req, model);
         res.render(templates.wiki.arguments.link.edit, model);
     });
@@ -414,7 +443,7 @@ function POST_link_edit(req, res) {
     if(action === 'delete') {
         if(!req.user.isAdmin()) {
             // VALIDATION: only admin can delete a link
-            return res.redirect(createCancelUrl(req));
+            return res.redirect(flowUtils.buildReturnUrl(req));
         }
         db.ArgumentLink.findByIdAndRemove(req.query.id, function(err, link) {
             if(link.parentId) {
@@ -432,7 +461,7 @@ function POST_link_edit(req, res) {
         db.ArgumentLink.findOne(query, function (err, result) {
             if(result && !flowUtils.isEntryOwner(req, result)) {
                 // VALIDATION: non-owners cannot update other's entry
-                return res.redirect(createCancelUrl(req));
+                return res.redirect(flowUtils.buildReturnUrl(req));
             }
             var entity = result ? result : {};
             entity.title = req.body.title;
@@ -443,50 +472,8 @@ function POST_link_edit(req, res) {
                 flowUtils.initScreeningStatus(req, entity);
             }
             db.ArgumentLink.findOneAndUpdate(query, entity, { upsert: true, new: true, setDefaultsOnInsert: true }, function (err, updatedEntity) {
-                res.redirect(createCancelUrl(req));
+                res.redirect(flowUtils.buildReturnUrl(req));
             });
         });
     }
 }
-
-module.exports = function (router) {
-
-    /* Arguments */
-
-    router.get('/', function (req, res) {
-        GET_index(req, res);
-    });
-
-    router.get('/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
-        GET_entry(req, res);
-    });
-
-    router.get('/create', function (req, res) {
-        GET_create(req, res);
-    });
-
-    router.post('/create', function (req, res) {
-        POST_create(req, res);
-    });
-
-
-    router.get('/entry(/:friendlyUrl)?/link/:id', function (req, res) {
-        GET_link_entry(req, res);
-    });
-
-    router.get('/link/edit', function (req, res) {
-        GET_link_edit(req, res);
-    });
-
-    router.post('/link/edit', function (req, res) {
-        POST_link_edit(req, res);
-    });
-};
-
-module.exports.GET_entry = GET_entry;
-module.exports.GET_index = GET_index;
-module.exports.GET_create = GET_create;
-module.exports.POST_create = POST_create;
-module.exports.GET_link_entry = GET_link_entry;
-module.exports.GET_link_edit = GET_link_edit;
-module.exports.POST_link_edit = POST_link_edit;

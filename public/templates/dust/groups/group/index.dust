@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {member.username} | Profile – {titleSlogan}
+    {group.title} | Groups – {titleSlogan}
 {/title}
 
 {<header}
@@ -9,7 +9,7 @@
 {/header}
 
 {<body}
-    {>"dust/members/profile/profile-header" profileTab="overview" /}
+    {>"dust/groups/group/group-header" profileTab="overview" /}
 
     <div class="row">
         <div class="col-sm-6">
@@ -85,15 +85,11 @@
             </div>
         </div>
     </div>
-    {?loggedIn}
-        <p><a href="/account/settings" class="no-underline"><i class="fa fa-pencil-square-o"></i> Edit Profile</a></p>
-    {:else}
-        {?user.username}
-            <p><a href="#" class="no-underline"><i class="fa fa-rss" aria-hidden="true"></i> Follow</a></p>
-        {/user.username}
-    {/loggedIn}
-    <p>Account Details</p>
-    <p>Reputation</p>
+    {?user.username}
+        <p><a href="{paths.groups.create}?id={group._id}" class="no-underline"><i class="fa fa-pencil-square-o"></i> Edit Group</a></p>
+        <p><a href="#" class="no-underline"><i class="fa fa-rss" aria-hidden="true"></i> Follow</a></p>
+    {/user.username}
+    <p>Group Details</p>
     <p>Timeline &amp; Activities</p>
 {/body}
 

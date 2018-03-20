@@ -1,0 +1,20 @@
+<div class="col-lg-4 col-md-6 col-sm-6">{! 73px !}
+    <div class="media wt-category">
+        <div class="media-left media-top">
+            <a href="{paths.groups.index}/{group.friendlyUrl}/{group._id}">
+                <div class="photo-placeholder wt-geopattern-title" title="{title}"></div>
+            </a>
+        </div>
+        <div class="media-body">
+            <h4 class="media-heading">
+                <a href="{paths.groups.index}/{friendlyUrl}/{_id}">{title}</a>
+                <div><span style="font-size: 16px" class="text-muted">{description|s}</span></div>
+            </h4>
+            <div>
+                <div>
+                    <i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.groups.index}/{friendlyUrl}/{_id}" role="button">view group</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

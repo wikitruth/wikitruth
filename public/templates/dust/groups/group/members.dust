@@ -1,0 +1,36 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    Members | Groups – {titleSlogan}
+{/title}
+
+{<body}
+    <h1 class="page-header wt-header-2">
+        <i class="fa fa-user-circle"></i> Members
+        <div class="pull-right" style="padding-top: 8px; padding-bottom: 8px; font-size: 28px;">
+            <a href="{paths.groups.create}" class="text-muted-2 no-underline"><i class="fa fa-plus"></i> Add</a>
+        </div>
+    </h1>
+    {?administrators}
+        <h3 class="page-header">Administrators</h3>
+        <div class="row">
+            {#administrators}
+                {>"dust/members/common/member-item" /}
+            {/administrators}
+        </div>
+        <br/>
+    {/administrators}
+    {?members}
+        <h3 class="page-header">All Members</h3>
+        <div class="row">
+            {#members}
+                {>"dust/members/common/member-item" /}
+            {/members}
+        </div>
+        <br/>
+    {/members}
+{/body}
+
+{<footer}
+    {>"dust/common/geopattern-title-scripts" /}
+{/footer}

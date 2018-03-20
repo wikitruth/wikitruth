@@ -7,8 +7,6 @@ var flowUtils   = require('../utils/flowUtils'),
 
 module.exports = function (router) {
 
-    /* Verdict */
-
     router.get('/update', function (req, res) {
         var model = {
             verdictStatus: constants.VERDICT_STATUS.pending
@@ -19,7 +17,7 @@ module.exports = function (router) {
             if(model.entry && model.entry.verdict && model.entry.verdict.status) {
                 model.verdictStatus = model.entry.verdict.status;
             }
-            model.cancelUrl = flowUtils.createReturnUrl(req, model);
+            model.cancelUrl = flowUtils.buildEntryReturnUrl(req, model);
             model.hideEntryOptions = true;
             res.render(templates.wiki.verdict.update, model);
         });
@@ -40,7 +38,7 @@ module.exports = function (router) {
                 }
             };
             var redirectCallback = function (err, num) {
-                res.redirect(flowUtils.createReturnUrl(req, model));
+                res.redirect(flowUtils.buildEntryReturnUrl(req, model));
             };
             switch (model.entryType) {
                 case constants.OBJECT_TYPES.topic:

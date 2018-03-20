@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    Data Management - {titleSlogan}
+    Data Management – {titleSlogan}
 {/title}
 
 {<body}

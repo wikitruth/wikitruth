@@ -476,6 +476,22 @@ function setUsername(item, callback) {
     });
 }
 
+function buildGroupUrl(group) {
+    return paths.groups.index + '/' + group.friendlyUrl + '/' + group._id;
+}
+
+function setGroupModel(req, model, callback) {
+    if(req.query.group) {
+        db.Group.findOne({_id: req.query.group}, function (err, result) {
+            model.group = result;
+            model.groupBaseUrl = buildGroupUrl(result);
+            setUsername(result, callback);
+        });
+    } else {
+        callback();
+    }
+}
+
 function setArtifactModel(req, model, callback) {
     if(req.query.artifact) {
         db.Artifact.findOne({_id: req.query.artifact}, function (err, result) {
@@ -2520,11 +2536,26 @@ function getDiaryBaseUrl(username) {
     return paths.members.index + '/' + username + paths.members.profile.diary;
 }
 
-function buildCancelUrl(model, cancelBaseUrl, entry, parent) {
-    var cancelUrl = entry ? buildEntryUrl(cancelBaseUrl, entry) :
+function buildReturnUrl(req, defaultBaseUrl) {
+    var nextUrl = url.parse(req.originalUrl);
+    var nextQuery = querystring.parse(nextUrl.query);
+    delete nextQuery.id;
+    if(nextQuery.source) {
+        nextUrl.pathname = nextQuery.source;
+        delete nextQuery.source;
+    } else if(defaultBaseUrl) {
+        nextUrl.pathname = defaultBaseUrl;
+    }
+    nextUrl.query = nextQuery;
+    nextUrl.search = null; // important, ensures new 'query' to take effect
+    return url.format(nextUrl);
+}
+
+function buildTopicReturnUrl(model, cancelBaseUrl, entry, parent) {
+    var returnUrl = entry ? buildEntryUrl(cancelBaseUrl, entry) :
         parent ? buildEntryUrl(cancelBaseUrl, parent) :
             model.username ? model.wikiBaseUrl : '/';
-    return cancelUrl;
+    return returnUrl;
 }
 
 function buildParentUrl(req, entry) {
@@ -2567,6 +2598,21 @@ function buildParentUrl(req, entry) {
     }
 
     return '/';
+}
+
+function buildEntryReturnUrl(req, model) {
+    switch (model.entryType) {
+        case constants.OBJECT_TYPES.topic:
+            return model.wikiBaseUrl + paths.wiki.topics.entry + '/' + utils.urlify(model.entry.title) + '/' + model.entry._id;
+        case constants.OBJECT_TYPES.topicLink:
+            return model.wikiBaseUrl + paths.wiki.topics.entry + '/' + utils.urlify(model.entry.topic.title) + '/link/' + model.entry._id;
+        case constants.OBJECT_TYPES.argument:
+            return model.wikiBaseUrl + paths.wiki.arguments.entry + '/' + utils.urlify(model.entry.title) + '/' + req.query.argument;
+        case constants.OBJECT_TYPES.argumentLink:
+            return model.wikiBaseUrl + paths.wiki.arguments.entry + '/' + utils.urlify(model.entry.argument.title) + '/link/' + req.query.argument;
+        default:
+            return model.wikiBaseUrl + paths.wiki[constants.OBJECT_NAMES_MAP[model.ownerType]].entry + '/' + utils.urlify(model.entry.title) + '/' + model.entry._id;
+    }
 }
 
 function setScreeningModel(req, model) {
@@ -2799,19 +2845,14 @@ function getDiaryCategories(req, callback) {
         });
 }
 
-function createReturnUrl(req, model) {
-    switch (model.entryType) {
-        case constants.OBJECT_TYPES.topic:
-            return model.wikiBaseUrl + paths.wiki.topics.entry + '/' + utils.urlify(model.entry.title) + '/' + model.entry._id;
-        case constants.OBJECT_TYPES.topicLink:
-            return model.wikiBaseUrl + paths.wiki.topics.entry + '/' + utils.urlify(model.entry.topic.title) + '/link/' + model.entry._id;
-        case constants.OBJECT_TYPES.argument:
-            return model.wikiBaseUrl + paths.wiki.arguments.entry + '/' + utils.urlify(model.entry.title) + '/' + req.query.argument;
-        case constants.OBJECT_TYPES.argumentLink:
-            return model.wikiBaseUrl + paths.wiki.arguments.entry + '/' + utils.urlify(model.entry.argument.title) + '/link/' + req.query.argument;
-        default:
-            return model.wikiBaseUrl + paths.wiki[constants.OBJECT_NAMES_MAP[model.ownerType]].entry + '/' + utils.urlify(model.entry.title) + '/' + model.entry._id;
-    }
+function getUserGroups(req, callback) {
+    db.Group
+        .find({ "members.userId": req.user.id })
+        .sort({title: 1})
+        .lean()
+        .exec(function (err, results) {
+            callback(err, results);
+        });
 }
 
 function createEntrySet(model) {
@@ -2841,6 +2882,183 @@ function createEntrySet(model) {
     }
 }
 
+function setupEntryRouters(router, prefix) {
+
+    var topicController     = require('../controllers/topics'),
+        argumentController  = require('../controllers/arguments'),
+        artifactController  = require('../controllers/artifacts'),
+        questionController  = require('../controllers/questions'),
+        answerController    = require('../controllers/answers'),
+        issueController     = require('../controllers/issues'),
+        opinionController   = require('../controllers/opinions'),
+        visualizeController = require('../controllers/visualize');
+
+    /* Visualize */
+    router.get(prefix + '/visualize(/topic)?(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        visualizeController.GET_index(req, res);
+    });
+
+    /* Topics */
+
+    router.get(prefix + '/topics', function (req, res) {
+        topicController.GET_index(req, res);
+    });
+
+    router.get(prefix + '/topics/create', function (req, res) {
+        topicController.GET_create(req, res);
+    });
+
+    router.post(prefix + '/topics/create', function (req, res) {
+        topicController.POST_create(req, res);
+    });
+
+    router.get(prefix + '/topics/link/edit', function (req, res) {
+        topicController.GET_link_edit(req, res);
+    });
+
+    router.post(prefix + '/topics/link/edit', function (req, res) {
+        topicController.POST_link_edit(req, res);
+    });
+
+    router.get(prefix + '/topics/:friendlyUrl/:id', function (req, res) {
+        topicController.GET_index(req, res);
+    });
+
+    router.get(prefix + '/topic/:friendlyUrl/link/:id', function (req, res) {
+        topicController.GET_link_entry(req, res);
+    });
+
+    router.get(prefix + '/topic(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        topicController.GET_entry(req, res);
+    });
+
+
+    /* Arguments */
+
+    router.get(prefix + '/arguments', function (req, res) {
+        argumentController.GET_index(req, res);
+    });
+
+    router.get(prefix + '/arguments/create', function (req, res) {
+        argumentController.GET_create(req, res);
+    });
+
+    router.post(prefix + '/arguments/create', function (req, res) {
+        argumentController.POST_create(req, res);
+    });
+
+    router.get(prefix + '/arguments/link/edit', function (req, res) {
+        argumentController.GET_link_edit(req, res);
+    });
+
+    router.post(prefix + '/arguments/link/edit', function (req, res) {
+        argumentController.POST_link_edit(req, res);
+    });
+
+    router.get(prefix + '/argument/:friendlyUrl/link/:id', function (req, res) {
+        argumentController.GET_link_entry(req, res);
+    });
+
+    router.get(prefix + '/argument(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        argumentController.GET_entry(req, res);
+    });
+
+
+    /* Artifacts */
+
+    router.get(prefix + '/artifacts', function (req, res) {
+        artifactController.GET_index(req, res);
+    });
+
+    router.get(prefix + '/artifacts/create', function (req, res) {
+        artifactController.GET_create(req, res);
+    });
+
+    router.post(prefix + '/artifacts/create', function (req, res) {
+        artifactController.POST_create(req, res);
+    });
+
+    router.get(prefix + '/artifact(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        artifactController.GET_entry(req, res);
+    });
+
+
+    /* Questions */
+
+    router.get(prefix + '/questions', function (req, res) {
+        questionController.GET_index(req, res);
+    });
+
+    router.get(prefix + '/questions/create', function (req, res) {
+        questionController.GET_create(req, res);
+    });
+
+    router.post(prefix + '/questions/create', function (req, res) {
+        questionController.POST_create(req, res);
+    });
+
+    router.get(prefix + '/question(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        questionController.GET_entry(req, res);
+    });
+
+
+    /* Answers */
+
+    router.get(prefix + '/answers', function (req, res) {
+        answerController.GET_index(req, res);
+    });
+
+    router.get(prefix + '/answers/create', function (req, res) {
+        answerController.GET_create(req, res);
+    });
+
+    router.post(prefix + '/answers/create', function (req, res) {
+        answerController.POST_create(req, res);
+    });
+
+    router.get(prefix + '/answer(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        answerController.GET_entry(req, res);
+    });
+
+
+    /* Issues */
+
+    router.get(prefix + '/issues', function (req, res) {
+        issueController.GET_index(req, res);
+    });
+
+    router.get(prefix + '/issues/create', function (req, res) {
+        issueController.GET_create(req, res);
+    });
+
+    router.post(prefix + '/issues/create', function (req, res) {
+        issueController.POST_create(req, res);
+    });
+
+    router.get(prefix + '/issue(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        issueController.GET_entry(req, res);
+    });
+
+
+    /* Opinions */
+
+    router.get(prefix + '/opinions', function (req, res) {
+        opinionController.GET_index(req, res);
+    });
+
+    router.get(prefix + '/opinions/create', function (req, res) {
+        opinionController.GET_create(req, res);
+    });
+
+    router.post(prefix + '/opinions/create', function (req, res) {
+        opinionController.POST_create(req, res);
+    });
+
+    router.get(prefix + '/opinion(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        opinionController.GET_entry(req, res);
+    });
+}
+
 module.exports = {
     getBackupDir: getBackupDir,
     createContentPreview: createContentPreview,
@@ -2856,6 +3074,7 @@ module.exports = {
     setIssueModel: setIssueModel,
     setOpinionModel: setOpinionModel,
     setEntryModels: setEntryModels,
+    setGroupModel: setGroupModel,
     setEntryParents: setEntryParents,
     setEditorsUsername: setEditorsUsername,
     setClipboardModel: setClipboardModel,
@@ -2886,14 +3105,19 @@ module.exports = {
     ensureEntryIdParam: ensureEntryIdParam,
 
     buildEntryUrl: buildEntryUrl,
-    buildCancelUrl: buildCancelUrl,
+    buildTopicReturnUrl: buildTopicReturnUrl,
+    buildReturnUrl: buildReturnUrl,
     buildParentUrl: buildParentUrl,
+    buildEntryReturnUrl: buildEntryReturnUrl,
+    buildGroupUrl: buildGroupUrl,
     getDiaryBaseUrl: getDiaryBaseUrl,
     getDbModelByObjectType: getDbModelByObjectType,
     getObjectName: getObjectName,
     getParent: getParent,
     getCategories: getCategories,
     getDiaryCategories: getDiaryCategories,
-    createReturnUrl: createReturnUrl,
-    createEntrySet: createEntrySet
+    getUserGroups: getUserGroups,
+    createEntrySet: createEntrySet,
+
+    setupEntryRouters: setupEntryRouters
 };

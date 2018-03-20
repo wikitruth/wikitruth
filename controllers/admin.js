@@ -531,6 +531,8 @@ module.exports = function (router) {
                 }
             });
         } else if (action === 'recache') {
+            delete req.app.locals.myGroups;
+            delete req.app.locals.diaryCategories;
             delete req.app.locals.appCategories;
             var apps = applications.getApplications();
             apps.forEach(function(app) {

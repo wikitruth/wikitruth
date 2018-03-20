@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {?keyword}Search for {keyword}{:else}Search{/keyword} - {titleSlogan}
+    {?keyword}Search for {keyword}{:else}Search{/keyword} – {titleSlogan}
 {/title}
 
 {<body}

@@ -7,6 +7,14 @@ var templates   = require('../models/templates'),
     db          = require('../app').db.models,
     async       = require('async');
 
+module.exports = function (router) {
+
+    router.get('(/topic)?(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        GET_index(req, res);
+    });
+};
+
+module.exports.GET_index = GET_index;
 
 function GET_index(req, res) {
     flowUtils.ensureEntryIdParam(req, 'topic');
@@ -208,12 +216,3 @@ function GET_index(req, res) {
         });
     });
 }
-
-module.exports = function (router) {
-
-    router.get('(/topic)?(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
-        GET_index(req, res);
-    });
-};
-
-module.exports.GET_index = GET_index;

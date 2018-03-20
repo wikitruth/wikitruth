@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {artifact.title} - {titleSlogan}
+    {artifact.title} – {titleSlogan}
 {/title}
 
 {<body}

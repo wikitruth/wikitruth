@@ -12,6 +12,15 @@ module.exports = {
         index: 'dust/about/page'
     },
     search: 'dust/search',
+    groups: {
+        index: 'dust/groups/index',
+        create: 'dust/groups/create',
+        group: {
+            index: 'dust/groups/group/index',
+            posts: 'dust/groups/group/posts',
+            members: 'dust/groups/group/members'
+        }
+    },
     members: {
         contributors: 'dust/members/contributors',
         screeners: 'dust/members/screeners',

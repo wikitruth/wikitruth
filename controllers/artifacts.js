@@ -13,6 +13,32 @@ var mongoose    = require('mongoose'),
     constants   = require('../models/constants'),
     db          = require('../app').db.models;
 
+module.exports = function (router) {
+
+    /* Artifacts */
+
+    router.get('/', function (req, res) {
+        GET_index(req, res);
+    });
+
+    router.get('/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        GET_entry(req, res);
+    });
+
+    router.get('/create', function (req, res) {
+        GET_create(req, res);
+    });
+
+    router.post('/create', function (req, res) {
+        POST_create(req, res);
+    });
+};
+
+module.exports.GET_entry = GET_entry;
+module.exports.GET_index = GET_index;
+module.exports.GET_create = GET_create;
+module.exports.POST_create = POST_create;
+
 function GET_entry(req, res) {
     var model = {};
     flowUtils.ensureEntryIdParam(req, 'artifact');
@@ -256,29 +282,3 @@ function POST_create(req, res) {
         });
     });
 }
-
-module.exports = function (router) {
-
-    /* Artifacts */
-
-    router.get('/', function (req, res) {
-        GET_index(req, res);
-    });
-
-    router.get('/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
-        GET_entry(req, res);
-    });
-
-    router.get('/create', function (req, res) {
-        GET_create(req, res);
-    });
-
-    router.post('/create', function (req, res) {
-        POST_create(req, res);
-    });
-};
-
-module.exports.GET_entry = GET_entry;
-module.exports.GET_index = GET_index;
-module.exports.GET_create = GET_create;
-module.exports.POST_create = POST_create;

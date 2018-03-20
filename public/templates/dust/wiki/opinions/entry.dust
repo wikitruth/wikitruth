@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {entry.title} - {titleSlogan}
+    {entry.title} – {titleSlogan}
 {/title}
 
 {<body}
