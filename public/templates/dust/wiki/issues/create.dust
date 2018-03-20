@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {?issue}Edit{:else}New{/issue} Issue - {titleSlogan}
+    {?issue}Edit{:else}New{/issue} Issue – {titleSlogan}
 {/title}
 
 {<body}
@@ -125,7 +125,7 @@
             setupTextEditor('#inputContent', 'form');
             setupTextEditor('#inputReferences', 'form', { compact: true, disableEditorTooltipsOnTouchDevice: true });
 
-            var issueType = '{?issue}{issue.issueType}{:else}{ISSUE_TYPES.type100.code}{/issue}';
+            var issueType = '{?issue}{issue.issueType}{:else}{constants.ISSUE_TYPES.type100.code}{/issue}';
             $('#radioType' + issueType).prop('checked', true);
 
             $('[data-toggle="popover"]').popover();

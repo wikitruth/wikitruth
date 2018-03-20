@@ -17,6 +17,14 @@
             index: '/account',
             settings: '/account/settings'
         },
+        groups: {
+            index: '/groups',
+            create: '/groups/create',
+            group: {
+                posts: '/posts',
+                members: '/members'
+            }
+        },
         members: {
             index: '/members',
             screeners: '/members/screeners',

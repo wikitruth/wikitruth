@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    {question.title} - {titleSlogan}
+    {question.title} – {titleSlogan}
 {/title}
 
 {<body}

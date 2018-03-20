@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    Convert - {titleSlogan}
+    Convert – {titleSlogan}
 {/title}
 
 {<body}

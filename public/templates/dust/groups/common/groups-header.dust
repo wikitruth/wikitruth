@@ -1,0 +1,6 @@
+<h1 class="page-header wt-header-2">
+    <i class="fa fa-group"></i> Groups
+    <div class="pull-right" style="padding-top: 8px; padding-bottom: 8px; font-size: 28px;">
+        <a href="{paths.groups.create}" class="text-muted-2 no-underline"><i class="fa fa-plus"></i> Create</a>
+    </div>
+</h1>

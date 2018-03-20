@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    Visualize - {titleSlogan}
+    Visualize – {titleSlogan}
 {/title}
 
 {<header}

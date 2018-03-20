@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    Clipboard - {titleSlogan}
+    Clipboard – {titleSlogan}
 {/title}
 
 {<body}

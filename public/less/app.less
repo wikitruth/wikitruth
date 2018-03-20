@@ -417,7 +417,7 @@ a.no-underline:hover, a.no-underline:focus, .wt-list a:hover, .wt-list a:focus {
   }
 
   >li {
-    a {
+    &:not(.dropdown-header) a {
       display: block;
       padding: 3px 20px;
       clear: both;
@@ -447,6 +447,16 @@ a.no-underline:hover, a.no-underline:focus, .wt-list a:hover, .wt-list a:focus {
         a {
           padding-left: 70px;
         }
+      }
+    }
+
+    &.dropdown-header > a {
+      color: #777;
+      padding: 0;
+      display: inline-block;
+
+      &.pull-right {
+        font-weight: normal;
       }
     }
   }

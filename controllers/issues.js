@@ -9,6 +9,30 @@ var mongoose    = require('mongoose'),
     constants   = require('../models/constants'),
     db          = require('../app').db.models;
 
+module.exports = function (router) {
+
+    router.get('/', function (req, res) {
+        GET_index(req, res);
+    });
+
+    router.get('/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
+        GET_entry(req, res);
+    });
+
+    router.get('/create', function (req, res) {
+        GET_create(req, res);
+    });
+
+    router.post('/create', function (req, res) {
+        POST_create(req, res);
+    });
+};
+
+module.exports.GET_entry = GET_entry;
+module.exports.GET_index = GET_index;
+module.exports.GET_create = GET_create;
+module.exports.POST_create = POST_create;
+
 function GET_entry(req, res) {
     var model = {};
     flowUtils.ensureEntryIdParam(req, 'issue');
@@ -33,7 +57,6 @@ function GET_index(req, res) {
     if(query.ownerId) {
         flowUtils.setScreeningModel(req, model);
         flowUtils.setEntryModels(query, req, model, function (err) {
-            //query = flowUtils.createOwnerQueryFromModel(model);
             query['screening.status'] = model.screening.status;
             db.Issue
                 .find(query)
@@ -80,7 +103,6 @@ function GET_index(req, res) {
 function GET_create(req, res) {
     var model = {};
     flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
-        model.ISSUE_TYPES = constants.ISSUE_TYPES;
         flowUtils.setModelOwnerEntry(req, model);
         res.render(templates.wiki.issues.create, model);
     });
@@ -133,29 +155,3 @@ function POST_create(req, res) {
         });
     });
 }
-
-module.exports = function (router) {
-
-    /* Issues */
-
-    router.get('/', function (req, res) {
-        GET_index(req, res);
-    });
-
-    router.get('/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', function (req, res) {
-        GET_entry(req, res);
-    });
-
-    router.get('/create', function (req, res) {
-        GET_create(req, res);
-    });
-
-    router.post('/create', function (req, res) {
-        POST_create(req, res);
-    });
-};
-
-module.exports.GET_entry = GET_entry;
-module.exports.GET_index = GET_index;
-module.exports.GET_create = GET_create;
-module.exports.POST_create = POST_create;

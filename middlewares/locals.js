@@ -77,6 +77,23 @@ module.exports = function(app, passport) {
                     }
                     callback();
                 }
+            },
+            userGroups: function (callback) {
+                if(req.user) {
+                    if (!app.locals.myGroups) {
+                        flowUtils.getUserGroups(req, function (err, results) {
+                            app.locals.myGroups = results;
+                            callback();
+                        });
+                    } else {
+                        callback();
+                    }
+                } else {
+                    if(app.locals.myGroups) {
+                        delete app.locals.myGroups;
+                    }
+                    callback();
+                }
             }
         }, function () {
             next();

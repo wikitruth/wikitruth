@@ -1,7 +1,7 @@
 {>"dust/layouts/master" /}
 
 {<title}
-    Explore - {titleSlogan}
+    Explore – {titleSlogan}
 {/title}
 
 {<body}

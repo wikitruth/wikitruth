@@ -1,0 +1,31 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    Groups – {titleSlogan}
+{/title}
+
+{<body}
+    {>"dust/groups/common/groups-header" /}
+    {?privateGroups}
+        <h3 class="page-header">My Groups</h3>
+        <div class="row">
+            {#privateGroups}
+                {>"dust/groups/common/group-item" /}
+            {/privateGroups}
+        </div>
+        <br/>
+    {/privateGroups}
+    {?publicGroups}
+        <h3 class="page-header">Public Groups</h3>
+        <div class="row">
+            {#publicGroups}
+                {>"dust/groups/common/group-item" /}
+            {/publicGroups}
+        </div>
+        <br/>
+    {/publicGroups}
+{/body}
+
+{<footer}
+    {>"dust/common/geopattern-title-scripts" /}
+{/footer}
