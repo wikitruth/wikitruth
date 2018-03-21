@@ -5,6 +5,7 @@
 {/title}
 
 {<body}
+    {>"dust/groups/group/group-header" profileTab="members" /}
     <h1 class="page-header wt-header-2">
         <i class="fa fa-user-circle"></i> Members
         <div class="pull-right" style="padding-top: 8px; padding-bottom: 8px; font-size: 28px;">

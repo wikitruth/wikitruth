@@ -12,7 +12,7 @@ var mongoose    = require('mongoose'),
 
 module.exports = function (router) {
 
-    var prefix = '/:groupTitleUrl/:id/posts';
+    var prefix = '/:groupTitleUrl/:group/posts';
 
     router.get('/', function (req, res) {
         var model = {};
@@ -52,69 +52,19 @@ module.exports = function (router) {
         req.query.group = req.params.id;
         flowUtils.setGroupModel(req, model, function() {
             var groupFilter = { ownerId: model.group._id, ownerType: constants.OBJECT_TYPES.group };
-
-            async.parallel({
-                topics: function(callback) {
-                    db.Topic
-                        .find(groupFilter)
-                        .count(function(err, count) {
-                            model.topics = count;
-                            callback();
-                        });
-                },
-                artifacts: function(callback) {
-                    db.Artifact
-                        .find(groupFilter)
-                        .count(function(err, count) {
-                            model.artifacts = count;
-                            callback();
-                        });
-                },
-                arguments: function(callback) {
-                    db.Argument
-                        .find(groupFilter)
-                        .count(function(err, count) {
-                            model.arguments = count;
-                            callback();
-                        });
-                },
-                questions: function (callback) {
-                    db.Question
-                        .find(groupFilter)
-                        .count(function(err, count) {
-                            model.questions = count;
-                            callback();
-                        });
-                },
-                answers: function (callback) {
-                    db.Answer
-                        .find(groupFilter)
-                        .count(function(err, count) {
-                            model.answers = count;
-                            callback();
-                        });
-                },
-                issues: function (callback) {
-                    db.Issue
-                        .find(groupFilter)
-                        .count(function(err, count) {
-                            model.issues = count;
-                            callback();
-                        });
-                },
-                opinions: function (callback) {
-                    db.Opinion
-                        .find(groupFilter)
-                        .count(function(err, count) {
-                            model.opinions = count;
-                            callback();
-                        });
-                }
-            }, function (err, results) {
-                model.url = flowUtils.buildGroupUrl(model.group);
-                model.contributions = model.topics + model.arguments + model.questions + model.answers + model.issues + model.opinions;
+            flowUtils.countEntries(model, groupFilter, function () {
+                model.url = flowUtils.buildGroupUrl(model.group) + paths.groups.group.posts;
+                model.contributions = model.totalCount;
                 res.render(templates.groups.group.index, model);
             });
+        });
+    });
+
+    router.get('/:friendlyUrl/:id/members', function (req, res) {
+        var model = {};
+        req.query.group = req.params.id;
+        flowUtils.setGroupModel(req, model, function () {
+            res.render(templates.groups.group.members, model);
         });
     });
 
@@ -130,6 +80,7 @@ function POST_create(req, res) {
     var query = { _id: req.query.id || new mongoose.Types.ObjectId() };
     db.Group.findOne(query, function(err, result) {
         var dateNow = Date.now();
+        var titleChanged = !result || result.title !== req.body.title;
         var entity = result ? result : {};
         entity.title = req.body.title;
         entity.description = req.body.description;
@@ -155,7 +106,9 @@ function POST_create(req, res) {
             new: true,
             setDefaultsOnInsert: true
         }, function (err, updatedEntity) {
-            var url = paths.groups.index + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id + paths.groups.group.posts;
+            // clear cache
+            if(!result || titleChanged) delete req.app.locals.myGroups;
+            var url = paths.groups.index + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
             res.redirect(url);
         });
     });
@@ -172,12 +125,17 @@ function GET_posts(req, res) {
     };
     async.series({
         group: function(callback){
-            req.query.group = req.params.id;
+            // this is handled by the middleware
+            model.group = res.locals.group;
+            callback();
+            /*
+            req.query.group = req.params.group;
             flowUtils.setGroupModel(req, model, callback);
+            */
         },
         categories: function(callback) {
             db.Topic
-                .find({ parentId: null, ownerType: constants.OBJECT_TYPES.user, ownerId: model.group._id })
+                .find({ parentId: null, ownerType: constants.OBJECT_TYPES.group, ownerId: model.group._id })
                 .sort({title: 1})
                 .lean()
                 .exec(function (err, results) {
@@ -214,7 +172,7 @@ function GET_posts(req, res) {
         },
         rootTopics: function(callback) {
             // display 15 if top topics, all if has topic parameter
-            flowUtils.getTopics({ parentId: null, ownerType: constants.OBJECT_TYPES.user, ownerId: model.group._id }, { limit: 0, req: req }, function (err, results) {
+            flowUtils.getTopics({ parentId: null, ownerType: constants.OBJECT_TYPES.group, ownerId: model.group._id }, { limit: 0, req: req }, function (err, results) {
                 model.rootTopics = results;
                 callback();
             });
@@ -228,7 +186,7 @@ function GET_posts(req, res) {
                 if(!allTabs && model.tab !== 'topics') {
                     return callback();
                 }
-                var query = { private: true, createUserId: model.group._id };
+                var query = { private: true, ownerType: constants.OBJECT_TYPES.group, ownerId: model.group._id };
                 //db.Topic.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
                 db.Topic
                     .find(query)

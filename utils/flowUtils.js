@@ -2882,6 +2882,70 @@ function createEntrySet(model) {
     }
 }
 
+function countEntries(model, groupFilter, callback) {
+    async.parallel({
+        topics: function(callback) {
+            db.Topic
+                .find(groupFilter)
+                .count(function(err, count) {
+                    model.topics = count;
+                    callback();
+                });
+        },
+        artifacts: function(callback) {
+            db.Artifact
+                .find(groupFilter)
+                .count(function(err, count) {
+                    model.artifacts = count;
+                    callback();
+                });
+        },
+        arguments: function(callback) {
+            db.Argument
+                .find(groupFilter)
+                .count(function(err, count) {
+                    model.arguments = count;
+                    callback();
+                });
+        },
+        questions: function (callback) {
+            db.Question
+                .find(groupFilter)
+                .count(function(err, count) {
+                    model.questions = count;
+                    callback();
+                });
+        },
+        answers: function (callback) {
+            db.Answer
+                .find(groupFilter)
+                .count(function(err, count) {
+                    model.answers = count;
+                    callback();
+                });
+        },
+        issues: function (callback) {
+            db.Issue
+                .find(groupFilter)
+                .count(function(err, count) {
+                    model.issues = count;
+                    callback();
+                });
+        },
+        opinions: function (callback) {
+            db.Opinion
+                .find(groupFilter)
+                .count(function(err, count) {
+                    model.opinions = count;
+                    callback();
+                });
+        }
+    }, function (err, results) {
+        model.totalCount = model.topics + model.arguments + model.questions + model.answers + model.issues + model.opinions;
+        callback();
+    });
+}
+
 function setupEntryRouters(router, prefix) {
 
     var topicController     = require('../controllers/topics'),
@@ -3118,6 +3182,7 @@ module.exports = {
     getDiaryCategories: getDiaryCategories,
     getUserGroups: getUserGroups,
     createEntrySet: createEntrySet,
+    countEntries: countEntries,
 
     setupEntryRouters: setupEntryRouters
 };

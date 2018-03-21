@@ -4,7 +4,13 @@
         <li><i class="fa fa-user-circle text-muted"></i> <a href="{paths.members.index}/{username}">{username}</a></li>
         <li><i class="fa fa-folder-open text-muted"></i> <a href="{paths.members.index}/{username}/diary">My Diary</a></li>
     {:else}
-        <li><i class="fa fa-globe text-muted"></i> <a href="{paths.wiki.index}">Explore</a></li>
+        {?group}
+            <li><i class="fa fa-group text-muted"></i> <a href="{paths.groups.index}">Groups</a></li>
+            <li><i class="fa fa-group text-muted"></i> <a href="{paths.groups.index}/{group.friendlyUrl}/{group._id}">{group.title}</a></li>
+            <li><i class="fa fa-folder-open text-muted"></i> <a href="{paths.groups.index}/{group.friendlyUrl}/{group._id}{paths.groups.group.posts}">Posts</a></li>
+        {:else}
+            <li><i class="fa fa-globe text-muted"></i> <a href="{paths.wiki.index}">Explore</a></li>
+        {/group}
     {/username}
 
     {?parentTopic}

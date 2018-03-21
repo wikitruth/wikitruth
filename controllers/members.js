@@ -10,153 +10,50 @@ var mongoose    = require('mongoose'),
     constants   = require('../models/constants'),
     db          = require('../app').db.models;
 
-function setMemberModel(model, req, callback) {
-    if(req.params.username) {
-        if (req.user && req.user.username === req.params.username) {
-            model.member = req.user;
-            model.loggedIn = true;
-        } else {
-            return db.User.findOne({username: req.params.username}, function (err, result) {
-                model.member = result;
-                callback();
-            });
-        }
-    }
-    callback();
-}
-
 module.exports = function (router) {
 
     var prefix = '/:username/diary';
 
     router.get('/', function (req, res) {
         var model = {};
-        db.User
-            .find({})
-            .populate('roles.account', 'name.full')
-            .sort({title: 1})
-            .lean()
-            .exec(function (err, results) {
-                results.forEach(function(result) {
-                    flowUtils.setMemberFullname(result);
-                });
-                model.contributors = results;
-                res.render(templates.members.contributors, model);
+        findMembers({}, function (err, results) {
+            model.contributors = results;
+            res.render(templates.members.contributors, model);
         });
     });
 
     router.get('/screeners', function (req, res) {
         var model = {};
-        db.User
-            .find({ 'roles.screener': true})
-            .populate('roles.account', 'name.full')
-            .sort({title: 1})
-            .lean()
-            .exec(function (err, results) {
-                results.forEach(function(result) {
-                    flowUtils.setMemberFullname(result);
-                });
-                model.screeners = results;
-                res.render(templates.members.screeners, model);
+        findMembers({ 'roles.screener': true}, function (err, results) {
+            model.screeners = results;
+            res.render(templates.members.screeners, model);
         });
     });
 
     router.get('/reviewers', function (req, res) {
         var model = {};
-        db.User
-            .find({ 'roles.reviewer': true})
-            .populate('roles.account', 'name.full')
-            .sort({title: 1})
-            .lean()
-            .exec(function (err, results) {
-                results.forEach(function(result) {
-                    flowUtils.setMemberFullname(result);
-                });
-                model.reviewers = results;
-                res.render(templates.members.reviewers, model);
+        findMembers({ 'roles.reviewer': true}, function (err, results) {
+            model.reviewers = results;
+            res.render(templates.members.reviewers, model);
         });
     });
 
     router.get('/administrators', function (req, res) {
         var model = {};
-        db.User
-            .find({ 'roles.admin': {$exists: true}})
-            .populate('roles.account', 'name.full')
-            .sort({title: 1})
-            .lean()
-            .exec(function (err, results) {
-                results.forEach(function(result) {
-                    flowUtils.setMemberFullname(result);
-                });
-                model.administrators = results;
-                res.render(templates.members.administrators, model);
+        findMembers({ 'roles.admin': {$exists: true}}, function (err, results) {
+            model.administrators = results;
+            res.render(templates.members.administrators, model);
         });
     });
 
     router.get('/:username', function (req, res) {
         var model = {};
         setMemberModel(model, req, function() {
-            async.parallel({
-                topics: function(callback) {
-                    db.Topic
-                        .find({ createUserId: model.member._id, private: false })
-                        .count(function(err, count) {
-                            model.topics = count;
-                            callback();
-                        });
-                },
-                artifacts: function(callback) {
-                    db.Artifact
-                        .find({ createUserId: model.member._id, private: false })
-                        .count(function(err, count) {
-                            model.artifacts = count;
-                            callback();
-                        });
-                },
-                arguments: function(callback) {
-                    db.Argument
-                        .find({ createUserId: model.member._id, private: false })
-                        .count(function(err, count) {
-                            model.arguments = count;
-                            callback();
-                        });
-                },
-                questions: function (callback) {
-                    db.Question
-                        .find({ createUserId: model.member._id, private: false })
-                        .count(function(err, count) {
-                            model.questions = count;
-                            callback();
-                        });
-                },
-                answers: function (callback) {
-                    db.Answer
-                        .find({ createUserId: model.member._id, private: false })
-                        .count(function(err, count) {
-                            model.answers = count;
-                            callback();
-                        });
-                },
-                issues: function (callback) {
-                    db.Issue
-                        .find({ createUserId: model.member._id, private: false })
-                        .count(function(err, count) {
-                            model.issues = count;
-                            callback();
-                        });
-                },
-                opinions: function (callback) {
-                    db.Opinion
-                        .find({ createUserId: model.member._id, private: false })
-                        .count(function(err, count) {
-                            model.opinions = count;
-                            callback();
-                        });
-                }
-            }, function (err, results) {
+            var groupFilter = { createUserId: model.member._id, private: false };
+            flowUtils.countEntries(model, groupFilter, function () {
                 flowUtils.setModelContext(req, model);
                 model.url = model.profileBaseUrl + '/contributions';
-                model.contributions = model.topics + model.arguments + model.questions + model.answers + model.issues + model.opinions;
+                model.contributions = model.totalCount;
                 res.render(templates.members.profile.index, model);
             });
         });
@@ -834,3 +731,32 @@ module.exports = function (router) {
 
     flowUtils.setupEntryRouters(router, prefix);
 };
+
+function findMembers(memberFilter, callback) {
+    db.User
+        .find(memberFilter)
+        .populate('roles.account', 'name.full')
+        .sort({title: 1})
+        .lean()
+        .exec(function (err, results) {
+            results.forEach(function(result) {
+                flowUtils.setMemberFullname(result);
+            });
+            callback(err, results);
+        });
+}
+
+function setMemberModel(model, req, callback) {
+    if(req.params.username) {
+        if (req.user && req.user.username === req.params.username) {
+            model.member = req.user;
+            model.loggedIn = true;
+        } else {
+            return db.User.findOne({username: req.params.username}, function (err, result) {
+                model.member = result;
+                callback();
+            });
+        }
+    }
+    callback();
+}
