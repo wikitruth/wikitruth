@@ -289,7 +289,6 @@ function GET_create(req, res) {
 
 function POST_create(req, res) {
     // https://stackoverflow.com/questions/17899750/how-can-i-generate-an-objectid-with-mongoose
-
     var query = { _id: req.query.id || new mongoose.Types.ObjectId() };
     db.Topic.findOne(query, function(err, result) {
         if(result && !flowUtils.isEntryOwner(req, result)) {
@@ -327,6 +326,10 @@ function POST_create(req, res) {
             entity.private = true;
             entity.ownerType = constants.OBJECT_TYPES.user;
             entity.ownerId = req.user.id;
+        } else if(res.locals.group) {
+            entity.private = true; // FIXME: what should I do with this?
+            entity.ownerType = constants.OBJECT_TYPES.group;
+            entity.ownerId = res.locals.group._id;
         } else if(!entity.parentId && !req.user.isAdmin()) {
             // root topic & not admin & not private - non-admins are not allowed to create categories
             return res.redirect('/');

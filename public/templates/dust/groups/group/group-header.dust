@@ -11,6 +11,7 @@
         {:else}
             Private Group
         {/eq}
+        &#32;&bull; {@size key=group.members /} {@eq key=group.members.length value=1}member{:else}members{/eq}
     </div>
 </h1>
 
@@ -25,7 +26,7 @@
             <i class="fa fa-folder-open"></i> Posts
         </a>
     </li>
-    <li role="presentation"{@eq key=profileTab value="following"} class="active"{/eq}>
+    <li role="presentation"{@eq key=profileTab value="members"} class="active"{/eq}>
         <a href="{paths.groups.index}/{group.friendlyUrl}/{group._id}/members" role="tab">
             <i class="fa fa-rss"></i> Members
         </a>

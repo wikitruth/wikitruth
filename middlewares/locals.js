@@ -1,7 +1,9 @@
 'use strict';
 
 var async           = require('async'),
+    url             = require('url'),
     flowUtils       = require('../utils/flowUtils'),
+    paths           = require('../models/paths'),
     applications    = require('../models/applications');
 
 module.exports = function(app, passport) {
@@ -92,6 +94,21 @@ module.exports = function(app, passport) {
                     if(app.locals.myGroups) {
                         delete app.locals.myGroups;
                     }
+                    callback();
+                }
+            },
+            currentGroup: function (callback) {
+                var baseUrl = url.parse(req.originalUrl);
+                var params = baseUrl.pathname.split('/');
+                if(params.length >= 4 && '/' + params[1].toLowerCase() == paths.groups.index) {
+                    var model = {};
+                    req.query.group = params[3];
+                    flowUtils.setGroupModel(req, model, function () {
+                        res.locals.group = model.group;
+                        res.locals.groupBaseUrl = model.groupBaseUrl;
+                        callback();
+                    });
+                } else {
                     callback();
                 }
             }
