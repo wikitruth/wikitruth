@@ -2528,6 +2528,15 @@ function setModelContext(req, model, mixedMode) {
     }
 }
 
+function getEditorContent(content) {
+    if(!content) return "";
+    var c = content.trim();
+    if(c == "<p><br></p>") {
+        c = "";
+    }
+    return c;
+}
+
 function buildEntryUrl(baseUrl, entry) {
     return baseUrl + '/' + entry.friendlyUrl + '/' + entry._id;
 }
@@ -3168,6 +3177,7 @@ module.exports = {
     createOwnerQueryFromModel: createOwnerQueryFromModel,
     ensureEntryIdParam: ensureEntryIdParam,
 
+    getEditorContent: getEditorContent,
     buildEntryUrl: buildEntryUrl,
     buildTopicReturnUrl: buildTopicReturnUrl,
     buildReturnUrl: buildReturnUrl,

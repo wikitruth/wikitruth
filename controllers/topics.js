@@ -301,11 +301,11 @@ function POST_create(req, res) {
         if(tags && !(tags instanceof Array)) {
             tags = [tags];
         }
-        entity.content = req.body.content;
-        entity.contentPreview = flowUtils.createContentPreview(req.body.content);
+        entity.content = flowUtils.getEditorContent(req.body.content);
+        entity.contentPreview = flowUtils.createContentPreview(entity.content);
         entity.title = req.body.title;
         entity.contextTitle = req.body.contextTitle;
-        entity.references = req.body.references;
+        entity.references = flowUtils.getEditorContent(req.body.references);
         entity.friendlyUrl = utils.urlify(req.body.title);
         entity.editUserId = req.user.id;
         entity.editDate = dateNow;

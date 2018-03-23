@@ -305,10 +305,10 @@ function POST_create(req, res) {
                 }
                 entry = result;
                 entity = result ? result : {};
-                entity.content = req.body.content;
-                entity.contentPreview = flowUtils.createContentPreview(req.body.content);
+                entity.content = flowUtils.getEditorContent(req.body.content);
+                entity.contentPreview = flowUtils.createContentPreview(entity.content);
                 entity.title = req.body.title;
-                entity.references = req.body.references;
+                entity.references = flowUtils.getEditorContent(req.body.references);
                 entity.friendlyUrl = utils.urlify(req.body.title);
                 entity.referenceDate = req.body.referenceDate ? new Date(req.body.referenceDate) : null;
                 entity.editUserId = req.user.id;

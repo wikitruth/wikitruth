@@ -143,8 +143,8 @@ function POST_create(req, res) {
         var dateNow = Date.now();
         var entity = model.opinion ? model.opinion : {};
         entity.title = req.body.title;
-        entity.content = req.body.content;
-        entity.contentPreview = flowUtils.createContentPreview(req.body.content);
+        entity.content = flowUtils.getEditorContent(req.body.content);
+        entity.contentPreview = flowUtils.createContentPreview(entity.content);
         entity.friendlyUrl = utils.urlify(req.body.title);
         entity.editUserId = req.user.id;
         entity.editDate = dateNow;

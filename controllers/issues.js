@@ -114,8 +114,8 @@ function POST_create(req, res) {
         var dateNow = Date.now();
         var entity = result ? result : {};
         entity.title = req.body.title;
-        entity.content = req.body.content;
-        entity.contentPreview = flowUtils.createContentPreview(req.body.content);
+        entity.content = flowUtils.getEditorContent(req.body.content);
+        entity.contentPreview = flowUtils.createContentPreview(entity.content);
         entity.friendlyUrl = utils.urlify(req.body.title);
         entity.issueType = req.body.issueType;
         entity.editUserId = req.user.id;

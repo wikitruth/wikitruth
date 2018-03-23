@@ -83,8 +83,8 @@ function POST_create(req, res) {
         var titleChanged = !result || result.title !== req.body.title;
         var entity = result ? result : {};
         entity.title = req.body.title;
-        entity.description = req.body.description;
-        entity.contentPreview = flowUtils.createContentPreview(req.body.description);
+        entity.description = flowUtils.getEditorContent(req.body.description);
+        entity.contentPreview = flowUtils.createContentPreview(entity.description);
         entity.friendlyUrl = utils.urlify(req.body.title);
         entity.privacyType = req.body.privacyType;
         entity.editUserId = req.user.id;
