@@ -130,8 +130,8 @@ function POST_create(req, res) {
         var entity = result ? result : {};
 
         entity.title = req.body.title;
-        entity.content = req.body.content;
-        entity.source = req.body.source;
+        entity.content = flowUtils.getEditorContent(req.body.content);
+        entity.source = flowUtils.getEditorContent(req.body.source);
 
         // evaluated properties
         entity.contentPreview = flowUtils.createContentPreview(entity.content);
