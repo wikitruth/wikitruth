@@ -1,6 +1,6 @@
 <div class="text-muted-2 wt-entry-row-footer">
     {?hasChildren}<a class="text-muted-2" href="#"><i class="fa fa-plus-square text-muted-3"></i> expand</a>{/hasChildren}
-    <span><i class="fa fa-clock-o"></i> {editDateString}</span>
+    <span title="{editDate}"><i class="fa fa-clock-o"></i> {editDateString}</span>
     <a class="text-muted-2" href="/members/{editUsername}">{!<i class="fa fa-user"></i>!}<i class="fa fa-user-circle-o text-muted-3"></i> {editUsername}</a>
     <a class="text-muted-2 wt-entry-reply" data-toggle="popover" data-trigger="focus" tabindex="0"><i class="fa fa-reply"></i> reply</a>
     {!<span><i class="fa fa-smile-o"></i> {points}</span>!}
