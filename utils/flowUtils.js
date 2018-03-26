@@ -2104,6 +2104,8 @@ function syncCategoryId(entry, options, callback) {
                 } else {
                     entry.categoryId = parent.categoryId;
                 }
+                entry.private = parent.private;
+                entry.groupId = parent.groupId;
                 callback();
             });
             break;
@@ -2111,6 +2113,8 @@ function syncCategoryId(entry, options, callback) {
         case constants.OBJECT_TYPES.answer:
             db.Question.findOne({_id: entry.questionId}, function (err, question) {
                 entry.categoryId = question.categoryId;
+                entry.private = question.private;
+                entry.groupId = question.groupId;
                 callback();
             });
             break;
@@ -2123,10 +2127,13 @@ function syncCategoryId(entry, options, callback) {
         case constants.OBJECT_TYPES.opinion:
             getDbModelByObjectType(entry.ownerType).findOne({_id: entry.ownerId}, function (err, owner) {
                 if(entry.ownerType === constants.OBJECT_TYPES.topic && (!owner.parentId || isCategoryTopic(owner))) {
+                    // owner is a root or category topic
                     entry.categoryId = owner._id;
                 } else {
                     entry.categoryId = owner.categoryId;
                 }
+                entry.private = owner.private;
+                entry.groupId = owner.groupId;
                 callback();
             });
             break;

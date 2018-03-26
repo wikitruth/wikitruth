@@ -327,9 +327,10 @@ function POST_create(req, res) {
             entity.ownerType = constants.OBJECT_TYPES.user;
             entity.ownerId = req.user.id;
         } else if(res.locals.group) {
-            entity.private = true; // FIXME: what should I do with this?
+            entity.private = true; // FIXME: what should I do with this? Probably good to retain this for data privacy safety.
             entity.ownerType = constants.OBJECT_TYPES.group;
             entity.ownerId = res.locals.group._id;
+            entity.groupId = res.locals.group._id;
         } else if(!entity.parentId && !req.user.isAdmin()) {
             // root topic & not admin & not private - non-admins are not allowed to create categories
             return res.redirect('/');

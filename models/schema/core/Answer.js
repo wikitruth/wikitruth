@@ -18,6 +18,7 @@ module.exports = function(app, mongoose) {
       }]
     },
     questionId: { type: mongoose.Schema.ObjectId },
+    groupId: { type: mongoose.Schema.ObjectId, ref: 'Group', default: null },
     categoryId: { type: mongoose.Schema.ObjectId, ref: 'Topic' }, // the root topic where this entry belong
     createDate: { type: Date, default: Date.now },
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },

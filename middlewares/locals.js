@@ -62,7 +62,7 @@ module.exports = function(app, passport) {
                     }
                 }
             },
-            diaryCategories: function (callback) {
+            diaryCategoriesCache: function (callback) {
                 // Diary Categories
                 if(req.user) {
                     if (!app.locals.diaryCategories) {
@@ -80,7 +80,7 @@ module.exports = function(app, passport) {
                     callback();
                 }
             },
-            userGroups: function (callback) {
+            userGroupsCache: function (callback) {
                 if(req.user) {
                     if (!app.locals.myGroups) {
                         flowUtils.getUserGroups(req, function (err, results) {
