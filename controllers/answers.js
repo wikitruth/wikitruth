@@ -131,7 +131,6 @@ function POST_create(req, res) {
             entity.questionId = req.query.question;
             flowUtils.initScreeningStatus(req, entity);
         }
-        entity.private = req.params.username ? true : false;
         flowUtils.syncCategoryId(entity, { entryType: constants.OBJECT_TYPES.answer }, function () {
             db.Answer.findOneAndUpdate(query, entity, {
                 upsert: true,

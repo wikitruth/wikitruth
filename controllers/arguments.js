@@ -319,7 +319,6 @@ function POST_create(req, res) {
                 if(!entity.ethicalStatus) {
                     entity.ethicalStatus = {};
                 }
-                entity.private = req.params.username ? true : false;
                 entity.ethicalStatus.hasValue = req.body.hasEthicalValue ? true : false;
                 if(parent) { // Parent is always an Argument
                     // A child argument.

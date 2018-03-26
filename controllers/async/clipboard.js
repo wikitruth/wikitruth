@@ -31,7 +31,7 @@ module.exports = function (router) {
     });
 
     router.post('/paste-link', function (req, res) {
-        // Destination
+        // destination
         var id = req.body.id;
         var type = req.body.type; // the type of destination
 
@@ -60,7 +60,6 @@ module.exports = function (router) {
                             entity.parentId = parent._id;
                             entity.ownerId = parent.ownerId;
                             entity.ownerType = parent.ownerType;
-                            entity.private = parent.private;
                             entity.createUserId = req.user.id;
                             entity.createDate = dateNow;
                             flowUtils.initScreeningStatus(req, entity);
@@ -95,7 +94,6 @@ module.exports = function (router) {
                             entity.parentId = null;
                             entity.ownerId = parent._id;
                             entity.ownerType = constants.OBJECT_TYPES.topic;
-                            entity.private = parent.private;
                             entity.threadId = null; // TODO: set to self._id
                             entity.createUserId = req.user.id;
                             entity.createDate = dateNow;
@@ -139,7 +137,6 @@ module.exports = function (router) {
                     entity.ownerId = parent.ownerId;
                     entity.ownerType = parent.ownerType;
                     entity.threadId = parent.threadId ? parent.threadId : parent._id;
-                    entity.private = parent.private;
                     entity.createUserId = req.user.id;
                     entity.createDate = dateNow;
                     flowUtils.initScreeningStatus(req, entity);
