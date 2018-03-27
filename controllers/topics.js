@@ -78,9 +78,9 @@ function GET_index(req, res) {
             });
         }
     }, function (err, results) {
-        if(!model.topic || !flowUtils.isEntryOnIntendedUrl(req, model.topic)) return res.redirect('/');
+        if(!model.topic || !flowUtils.isEntryOnIntendedUrl(req, res, model.topic)) return res.redirect('/');
         flowUtils.setScreeningModelCount(model, model.topic.childrenCount.topics);
-        flowUtils.setModelOwnerEntry(req, model);
+        flowUtils.setModelOwnerEntry(req, res, model);
         res.render(templates.wiki.topics.index, model);
     });
 }
@@ -91,9 +91,9 @@ function GET_entry(req, res) {
     flowUtils.ensureEntryIdParam(req, 'topic');
     flowUtils.setTopicModels(req, model, function () {
 
-        if(!model.topic || !flowUtils.isEntryOnIntendedUrl(req, model.topic)) return res.redirect('/');
+        if(!model.topic || !flowUtils.isEntryOnIntendedUrl(req, res, model.topic)) return res.redirect('/');
         if(!req.query.topic) req.query.topic = model.topic._id;
-        flowUtils.setModelOwnerEntry(req, model);
+        flowUtils.setModelOwnerEntry(req, res, model);
 
         async.parallel({
             categories: function(callback) {
@@ -277,7 +277,7 @@ function GET_create(req, res) {
             // not the owner, stop editing
             return res.redirect('/');
         }
-        flowUtils.setModelContext(req, model);
+        flowUtils.setModelContext(req, res, model);
         if(!model.topic && !model.parentTopic && !req.params.username && !req.user.isAdmin()) {
             // A public create on root topics but not an admin
             return res.redirect(model.wikiBaseUrl);
@@ -343,7 +343,7 @@ function POST_create(req, res) {
             }, function (err, updatedEntity) {
                 var updateRedirect = function () {
                     var model = {};
-                    flowUtils.setModelContext(req, model);
+                    flowUtils.setModelContext(req, res, model);
                     var url = model.wikiBaseUrl + paths.wiki.topics.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
                     res.redirect(url);
                 };
@@ -364,7 +364,7 @@ function GET_link_entry(req, res) {
     var model = {};
     var ownerQuery = { ownerId: req.params.id, ownerType: constants.OBJECT_TYPES.topicLink };
     flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
-        if (!flowUtils.isEntryOnIntendedUrl(req, model.topicLink)) {
+        if (!flowUtils.isEntryOnIntendedUrl(req, res, model.topicLink)) {
             return res.redirect('/');
         }
 
@@ -466,7 +466,7 @@ function GET_link_entry(req, res) {
                 flowUtils.getTopOpinions(query, model, req, callback);
             }
         }, function (err, results) {
-            flowUtils.setModelOwnerEntry(req, model);
+            flowUtils.setModelOwnerEntry(req, res, model);
             res.render(templates.wiki.topics.link.entry, model);
         });
     });
@@ -516,7 +516,7 @@ function GET_link_edit(req, res) {
             }
         }
         model.cancelUrl = flowUtils.buildReturnUrl(req);
-        flowUtils.setModelOwnerEntry(req, model);
+        flowUtils.setModelOwnerEntry(req, res, model);
         res.render(templates.wiki.topics.link.edit, model);
     });
     /*async.series({

@@ -178,7 +178,7 @@ function GET_posts(req, res) {
             });
         }
     }, function (err, results) {
-        flowUtils.setModelContext(req, model);
+        flowUtils.setModelContext(req, res, model);
         flowUtils.setClipboardModel(req, model);
 
         async.parallel({

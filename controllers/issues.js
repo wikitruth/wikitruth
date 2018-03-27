@@ -45,7 +45,7 @@ function GET_entry(req, res) {
                 flowUtils.getTopOpinions(ownerQuery, model, req, callback);
             }
         }, function (err, results) {
-            flowUtils.setModelOwnerEntry(req, model);
+            flowUtils.setModelOwnerEntry(req, res, model);
             res.render(templates.wiki.issues.entry, model);
         });
     });
@@ -69,7 +69,7 @@ function GET_index(req, res) {
                         flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.issue, req);
                     });
                     model.issues = results;
-                    flowUtils.setModelOwnerEntry(req, model);
+                    flowUtils.setModelOwnerEntry(req, res, model);
 
                     // screening and children count
                     flowUtils.setScreeningModelCount(model, model.entry.childrenCount.issues);
@@ -93,7 +93,7 @@ function GET_index(req, res) {
                         flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.issue, req);
                     });
                     model.issues = results;
-                    flowUtils.setModelContext(req, model);
+                    flowUtils.setModelContext(req, res, model);
                     res.render(templates.wiki.issues.index, model);
                 });
             });
@@ -103,7 +103,7 @@ function GET_index(req, res) {
 function GET_create(req, res) {
     var model = {};
     flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
-        flowUtils.setModelOwnerEntry(req, model);
+        flowUtils.setModelOwnerEntry(req, res, model);
         res.render(templates.wiki.issues.create, model);
     });
 }
@@ -139,7 +139,7 @@ function POST_create(req, res) {
             }, function (err, updatedEntity) {
                 var updateRedirect = function () {
                     var model = {};
-                    flowUtils.setModelContext(req, model);
+                    flowUtils.setModelContext(req, res, model);
                     var url = model.wikiBaseUrl + paths.wiki.issues.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
                     res.redirect(url);
                 };

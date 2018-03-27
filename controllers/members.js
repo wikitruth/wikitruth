@@ -51,7 +51,7 @@ module.exports = function (router) {
         setMemberModel(model, req, function() {
             var groupFilter = { createUserId: model.member._id, private: false };
             flowUtils.countEntries(model, groupFilter, function () {
-                flowUtils.setModelContext(req, model);
+                flowUtils.setModelContext(req, res, model);
                 model.url = model.profileBaseUrl + '/contributions';
                 model.contributions = model.totalCount;
                 res.render(templates.members.profile.index, model);
@@ -62,7 +62,7 @@ module.exports = function (router) {
     router.get('/:username/following', function (req, res) {
         var model = {};
         setMemberModel(model, req, function () {
-            flowUtils.setModelContext(req, model);
+            flowUtils.setModelContext(req, res, model);
             res.render(templates.members.profile.following, model);
         });
     });
@@ -262,7 +262,7 @@ module.exports = function (router) {
                         });
                 }
             }, function (err, results) {
-                flowUtils.setModelContext(req, model);
+                flowUtils.setModelContext(req, res, model);
                 res.render(templates.members.profile.contributions, model);
             });
         });
@@ -272,7 +272,7 @@ module.exports = function (router) {
 
     router.get('/:username/pages', function (req, res) {
         var model = {};
-        flowUtils.setModelContext(req, model);
+        flowUtils.setModelContext(req, res, model);
         setMemberModel(model, req, function() {
             async.parallel({
                 parent: function (callback) {
@@ -345,7 +345,7 @@ module.exports = function (router) {
 
     router.get('/:username/pages/create', function (req, res) {
         var model = {};
-        flowUtils.setModelContext(req, model);
+        flowUtils.setModelContext(req, res, model);
         setMemberModel(model, req, function() {
             if (req.user && req.user.id) {
                 async.parallel({
@@ -401,7 +401,7 @@ module.exports = function (router) {
                     });
                 }
             }, function (err, results) {
-                flowUtils.setModelContext(req, model);
+                flowUtils.setModelContext(req, res, model);
                 res.render(templates.members.profile.pages.page, model);
             });
         });
@@ -434,7 +434,7 @@ module.exports = function (router) {
                     throw err;
                 }
                 var model = {};
-                flowUtils.setModelContext(req, model);
+                flowUtils.setModelContext(req, res, model);
                 if(result) {
                     res.redirect(model.profileBaseUrl + paths.members.profile.pages.index + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id + (req.query.parent ? '?parent=' + req.query.parent : ''));
                 } else {
@@ -504,7 +504,7 @@ module.exports = function (router) {
                 });
             }
         }, function (err, results) {
-            flowUtils.setModelContext(req, model);
+            flowUtils.setModelContext(req, res, model);
             flowUtils.setClipboardModel(req, model);
 
             async.parallel({

@@ -68,7 +68,7 @@ function GET_entry(req, res) {
                 flowUtils.getTopOpinions(query, model, req, callback);
             }
         }, function (err, results) {
-            flowUtils.setModelOwnerEntry(req, model);
+            flowUtils.setModelOwnerEntry(req, res, model);
             res.render(templates.wiki.questions.entry, model);
         });
     });
@@ -90,7 +90,7 @@ function GET_index(req, res) {
                         flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.question, req);
                     });
                     model.questions = results;
-                    flowUtils.setModelOwnerEntry(req, model);
+                    flowUtils.setModelOwnerEntry(req, res, model);
 
                     // screening and children count
                     flowUtils.setScreeningModelCount(model, model.entry.childrenCount.questions);
@@ -115,7 +115,7 @@ function GET_index(req, res) {
                             flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.question, req);
                         });
                         model.questions = results;
-                        flowUtils.setModelContext(req, model);
+                        flowUtils.setModelContext(req, res, model);
                         res.render(templates.wiki.questions.index, model);
                     });
                 });
@@ -126,7 +126,7 @@ function GET_index(req, res) {
 function GET_create(req, res) {
     var model = {};
     flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function () {
-        flowUtils.setModelContext(req, model);
+        flowUtils.setModelContext(req, res, model);
         res.render(templates.wiki.questions.create, model);
     });
 }
@@ -165,7 +165,7 @@ function POST_create(req, res) {
             }, function (err, updatedEntity) {
                 var updateRedirect = function () {
                     var model = {};
-                    flowUtils.setModelContext(req, model);
+                    flowUtils.setModelContext(req, res, model);
                     var url = model.wikiBaseUrl + paths.wiki.questions.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
                     res.redirect(url);
                 };

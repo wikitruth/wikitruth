@@ -56,7 +56,7 @@ function GET_entry(req, res) {
     flowUtils.ensureEntryIdParam(req, 'argument');
     var ownerQuery = { ownerId: req.query.argument, ownerType: constants.OBJECT_TYPES.argument };
     flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
-        if(!flowUtils.isEntryOnIntendedUrl(req, model.argument)) {
+        if(!flowUtils.isEntryOnIntendedUrl(req, res, model.argument)) {
             return res.redirect('/');
         }
         async.parallel({
@@ -151,7 +151,7 @@ function GET_entry(req, res) {
                 flowUtils.getTopOpinions(query, model, req, callback);
             }
         }, function (err, results) {
-            flowUtils.setModelOwnerEntry(req, model);
+            flowUtils.setModelOwnerEntry(req, res, model);
             res.render(templates.wiki.arguments.entry, model);
         });
     });
@@ -162,7 +162,7 @@ function GET_index(req, res) {
     flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function (err) {
         if(model.topic) {
             flowUtils.setScreeningModel(req, model);
-            if(model.argument && !flowUtils.isEntryOnIntendedUrl(req, model.argument) || model.topic && !flowUtils.isEntryOnIntendedUrl(req, model.topic)) {
+            if(model.argument && !flowUtils.isEntryOnIntendedUrl(req, res, model.argument) || model.topic && !flowUtils.isEntryOnIntendedUrl(req, res, model.topic)) {
                 return res.redirect('/');
             }
             query = { 'screening.status': model.screening.status };
@@ -191,7 +191,7 @@ function GET_index(req, res) {
                     flowUtils.setVerdictModel(result);
                 });
                 flowUtils.sortArguments(results);
-                flowUtils.setModelOwnerEntry(req, model);
+                flowUtils.setModelOwnerEntry(req, res, model);
 
                 // screening and children count
                 flowUtils.setScreeningModelCount(model, model.entry.childrenCount['arguments']);
@@ -222,7 +222,7 @@ function GET_index(req, res) {
                         //flowUtils.sortArguments(results);
                         model.arguments = results;
                         model.proArguments = results;
-                        flowUtils.setModelContext(req, model);
+                        flowUtils.setModelContext(req, res, model);
                         res.render(templates.wiki.arguments.index, model);
                     });
                 });
@@ -272,7 +272,7 @@ function GET_create(req, res) {
                 return res.redirect('/');
             }
             model.ARGUMENT_TAGS = constants.ARGUMENT_TAGS;
-            flowUtils.setModelContext(req, model);
+            flowUtils.setModelContext(req, res, model);
             res.render(templates.wiki.arguments.create, model);
         });
     });
@@ -364,7 +364,7 @@ function POST_create(req, res) {
         }
         var updateRedirect = function () {
             var model = {};
-            flowUtils.setModelContext(req, model);
+            flowUtils.setModelContext(req, res, model);
             var url = model.wikiBaseUrl + paths.wiki.arguments.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
             res.redirect(url);
         };
@@ -388,7 +388,7 @@ function GET_link_entry(req, res) {
     var model = {};
     var ownerQuery = { ownerId: req.params.id, ownerType: constants.OBJECT_TYPES.argumentLink };
     flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
-        if (!flowUtils.isEntryOnIntendedUrl(req, model.argumentLink)) {
+        if (!flowUtils.isEntryOnIntendedUrl(req, res, model.argumentLink)) {
             return res.redirect('/');
         }
 
@@ -418,7 +418,7 @@ function GET_link_entry(req, res) {
                 flowUtils.getTopOpinions(query, model, req, callback);
             }
         }, function (err, results) {
-            flowUtils.setModelOwnerEntry(req, model);
+            flowUtils.setModelOwnerEntry(req, res, model);
             res.render(templates.wiki.arguments.link.entry, model);
         });
     });
@@ -432,7 +432,7 @@ function GET_link_edit(req, res) {
             return res.redirect(flowUtils.buildReturnUrl(req));
         }
         model.cancelUrl = flowUtils.buildReturnUrl(req);
-        flowUtils.setModelOwnerEntry(req, model);
+        flowUtils.setModelOwnerEntry(req, res, model);
         res.render(templates.wiki.arguments.link.edit, model);
     });
 }

@@ -67,7 +67,7 @@ function GET_entry(req, res) {
                 flowUtils.getTopOpinions(query, model, req, callback);
             }
         }, function (err, results) {
-            flowUtils.setModelOwnerEntry(req, model);
+            flowUtils.setModelOwnerEntry(req, res, model);
             res.render(templates.wiki.opinions.entry, model);
         });
     });
@@ -91,7 +91,7 @@ function GET_index(req, res) {
                         flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.opinion, req);
                     });
                     model.opinions = results;
-                    flowUtils.setModelOwnerEntry(req, model);
+                    flowUtils.setModelOwnerEntry(req, res, model);
 
                     // screening and children count
                     flowUtils.setScreeningModelCount(model, model.entry.childrenCount.opinions);
@@ -114,7 +114,7 @@ function GET_index(req, res) {
                     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.opinion, req);
                 });
                 model.opinions = results;
-                flowUtils.setModelContext(req, model);
+                flowUtils.setModelContext(req, res, model);
                 res.render(templates.wiki.opinions.index, model);
             });
         });
@@ -129,7 +129,7 @@ function GET_create(req, res) {
         if(model.opinion && !flowUtils.isEntryOwner(req, model.opinion)){
             return res.redirect('/');
         }
-        flowUtils.setModelOwnerEntry(req, model);
+        flowUtils.setModelOwnerEntry(req, res, model);
         res.render(templates.wiki.opinions.create, model);
     });
 }
@@ -176,7 +176,7 @@ function POST_create(req, res) {
             }, function (err, updatedEntity) {
                 var updateRedirect = function () {
                     var model = {};
-                    flowUtils.setModelContext(req, model);
+                    flowUtils.setModelContext(req, res, model);
                     var url = model.wikiBaseUrl + paths.wiki.opinions.entry + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
                     res.redirect(url);
                 };
