@@ -18,6 +18,7 @@ module.exports = function (app, mongoose) {
                 status: {type: Number} // SCREENING_STATUS
             }]
         },
+        topicTags: [{type: mongoose.Schema.ObjectId, ref: 'Topic'}],
         parentId: {type: mongoose.Schema.ObjectId, default: null}, // always an Argument
         groupId: {type: mongoose.Schema.ObjectId, ref: 'Group', default: null},
         categoryId: {type: mongoose.Schema.ObjectId, ref: 'Topic'}, // the root topic where this entry belong
