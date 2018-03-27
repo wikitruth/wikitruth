@@ -105,7 +105,6 @@ module.exports = function(app, passport) {
                     req.query.group = params[3];
                     flowUtils.setGroupModel(req, model, function () {
                         res.locals.group = model.group;
-                        res.locals.groupBaseUrl = model.groupBaseUrl;
                         callback();
                     });
                 } else {

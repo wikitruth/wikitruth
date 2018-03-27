@@ -13,7 +13,7 @@ module.exports = function (router) {
         };
         var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
         flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
-            flowUtils.setModelOwnerEntry(req, model, { hideClipboard: true });
+            flowUtils.setModelOwnerEntry(req, res, model, { hideClipboard: true });
             if(model.entry && model.entry.verdict && model.entry.verdict.status) {
                 model.verdictStatus = model.entry.verdict.status;
             }
@@ -27,7 +27,7 @@ module.exports = function (router) {
         var model = {};
         var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
         flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
-            flowUtils.setModelOwnerEntry(req, model);
+            flowUtils.setModelOwnerEntry(req, res, model);
             var updateQuery = {
                 $set: {
                     verdict: {

@@ -211,7 +211,7 @@ function GET_index(req, res) {
                 edges: edges,
                 rootId: rootId
             };
-            flowUtils.setModelOwnerEntry(req, model);
+            flowUtils.setModelOwnerEntry(req, res, model);
             res.render(templates.wiki.visualize, model);
         });
     });

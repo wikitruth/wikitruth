@@ -30,7 +30,7 @@ module.exports = function (router) {
                 res.redirect(paths.install);
             } else {
                 flowUtils.setScreeningModel(req, model);
-                flowUtils.setModelContext(req, model);
+                flowUtils.setModelContext(req, res, model);
                 async.parallel({
                     topics: function(callback) {
                         var query = { parentId: {$ne: null}, private: false, 'screening.status': model.screening.status };

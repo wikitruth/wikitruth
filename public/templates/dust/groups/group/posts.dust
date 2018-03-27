@@ -6,10 +6,10 @@
 
 {<body}
     {>"dust/groups/group/group-header" profileTab="topics" /}
-    <a class="btn btn-default" href="{groupBaseUrl}/posts{paths.wiki.topics.create}" role="button"><i class="fa fa-folder-open"></i> New Category</a>
+    <a class="btn btn-default" href="{wikiBaseUrl}{paths.wiki.topics.create}" role="button"><i class="fa fa-folder-open"></i> New Category</a>
     <div class="pull-right" style="padding-top: 8px; padding-bottom: 8px">
         <a href="#browse" class="text-muted-2 no-underline"><i class="fa fa-arrow-down"></i> Latest</a>
-        <a href="{groupBaseUrl}{paths.wiki.visualize}{?topic}/topic/{topic.friendlyUrl}/{topic._id}{:else}{?application}/topic/{application.exploreTopicId}{/application}{/topic}" title="Visualize" class="text-muted-2 no-underline" style="margin-left: 15px"><i class="fa fa-snowflake-o" style-x="font-size: 28px;"></i> Visualize</a>
+        <a href="{wikiBaseUrl}{paths.wiki.visualize}{?topic}/topic/{topic.friendlyUrl}/{topic._id}{:else}{?application}/topic/{application.exploreTopicId}{/application}{/topic}" title="Visualize" class="text-muted-2 no-underline" style="margin-left: 15px"><i class="fa fa-snowflake-o" style-x="font-size: 28px;"></i> Visualize</a>
     </div>
     {?rootTopics}
         <div class="row" style="margin-top: 30px">

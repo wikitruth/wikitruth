@@ -11,7 +11,7 @@ module.exports = function (router) {
         var model = {};
         var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
         flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
-            flowUtils.setModelOwnerEntry(req, model, { hideClipboard: true });
+            flowUtils.setModelOwnerEntry(req, res, model, { hideClipboard: true });
             model.cancelUrl = flowUtils.buildEntryReturnUrl(req, model);
             model.hideEntryOptions = true;
             res.render(templates.wiki.convert, model);
@@ -22,7 +22,7 @@ module.exports = function (router) {
         var model = {};
         var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
         flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
-            flowUtils.setModelOwnerEntry(req, model);
+            flowUtils.setModelOwnerEntry(req, res, model);
 
             var redirectCallback = function (err, num) {
                 res.redirect(flowUtils.buildEntryReturnUrl(req, model));

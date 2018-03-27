@@ -484,7 +484,6 @@ function setGroupModel(req, model, callback) {
     if(req.query.group) {
         db.Group.findOne({_id: req.query.group}, function (err, result) {
             model.group = result;
-            model.groupBaseUrl = buildGroupUrl(result);
             setUsername(result, callback);
         });
     } else {
@@ -2285,7 +2284,7 @@ function createOwnerQueryFromQuery(req) {
     return {};
 }
 
-function setModelOwnerEntry(req, model, options) {
+function setModelOwnerEntry(req, res, model, options) {
     if(!options) options = {};
 
     if(model.opinion && (!model.issue || model.opinion.ownerType === constants.OBJECT_TYPES.issue)) {
@@ -2421,7 +2420,7 @@ function setModelOwnerEntry(req, model, options) {
         }
     }
 
-    setModelContext(req, model);
+    setModelContext(req, res, model);
 }
 
 function getDbModelByObjectType(type) {
@@ -2523,8 +2522,11 @@ function createOwnerQueryFromModel(model) {
  * @param model
  * @param mixedMode The place this is called may display both public and private entries (e.g. clipboard)
  */
-function setModelContext(req, model, mixedMode) {
-    if(req.params.username || (mixedMode && req.user && req.user.username) || (model.entry && model.entry.private)) {
+function setModelContext(req, res, model, mixedMode) {
+    if(res.locals.group) {
+        model.group = res.locals.group;
+        model.wikiBaseUrl = buildGroupUrl(model.group) + paths.groups.group.posts;
+    } else if(req.params.username || (mixedMode && req.user && req.user.username) || (model.entry && model.entry.private)) {
         model.username = req.params.username || req.user.username;
         model.profileBaseUrl = paths.members.index + '/' + model.username;
         model.wikiBaseUrl = model.profileBaseUrl + paths.members.profile.diary;
@@ -2570,7 +2572,7 @@ function buildReturnUrl(req, defaultBaseUrl) {
 function buildTopicReturnUrl(model, cancelBaseUrl, entry, parent) {
     var returnUrl = entry ? buildEntryUrl(cancelBaseUrl, entry) :
         parent ? buildEntryUrl(cancelBaseUrl, parent) :
-            model.username ? model.wikiBaseUrl : '/';
+            (model.username || model.group) ? model.wikiBaseUrl : '/';
     return returnUrl;
 }
 
@@ -2797,8 +2799,8 @@ function setMemberFullname(member) {
     }
 }
 
-function isEntryOnIntendedUrl(req, entry) {
-    return !entry.private && !req.params.username || entry.private && req.params.username && entry.createUserId.equals(req.user.id);
+function isEntryOnIntendedUrl(req, res, entry) {
+    return !entry.private && !req.params.username || entry.private && (res.locals.group || req.params.username && entry.createUserId.equals(req.user.id));
 }
 
 function createContentPreview(content) {
