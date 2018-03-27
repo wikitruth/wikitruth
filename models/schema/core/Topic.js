@@ -11,6 +11,7 @@ module.exports = function (app, mongoose) {
         friendlyUrl: {type: String},
         referenceDate: {type: Date}, // If the entry is time/date sensitive or may become obsolete in the future, add a ref date
         references: {type: String, default: ''},
+        topicTags: [{type: mongoose.Schema.ObjectId, ref: 'Topic'}],
         parentId: {type: mongoose.Schema.ObjectId, default: null}, // Used when the parent is also a topic
         groupId: {type: mongoose.Schema.ObjectId, ref: 'Group', default: null},
         createDate: {type: Date, default: Date.now},
