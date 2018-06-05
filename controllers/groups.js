@@ -93,7 +93,7 @@ function POST_create(req, res) {
             entity.createUserId = req.user.id;
             entity.createDate = dateNow;
         }
-        if(!entity.members || entity.members.length == 0) {
+        if(!entity.members || entity.members.length === 0) {
             entity.members = [
                 {
                     userId: req.user.id,
