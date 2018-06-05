@@ -792,8 +792,12 @@ function setTopicModels(req, model, callback) {
             },
             topicSiblings: function (callback) {
                 if(model.topic) {
+                    query = { parentId: model.topic.parentId, _id: { $ne: model.topic._id }, private: model.topic.private, groupId: model.topic.groupId, 'screening.status': constants.SCREENING_STATUS.status1.code };
+                    if(!model.topic.parentId && model.topic.private){
+                        query.createUserId = model.topic.createUserId;
+                    }
                     db.Topic
-                        .find({parentId: model.topic.parentId, _id: {$ne: model.topic._id}, private: model.topic.private, 'screening.status': constants.SCREENING_STATUS.status1.code})
+                        .find(query)
                         .limit(8)
                         .sort({ title: 1 })
                         .lean()
@@ -829,8 +833,12 @@ function setTopicModels(req, model, callback) {
             },
             parentSiblings: function (callback) {
                 if(model.parentTopic) {
+                    query = { parentId: model.parentTopic.parentId, _id: {$ne: model.parentTopic._id}, private: model.parentTopic.private, groupId: model.parentTopic.groupId, 'screening.status': constants.SCREENING_STATUS.status1.code};
+                    if(!model.parentTopic.parentId && model.parentTopic.private) {
+                        query.createUserId = model.parentTopic.createUserId;
+                    }
                     db.Topic
-                        .find({ parentId: model.parentTopic.parentId, _id: {$ne: model.parentTopic._id}, private: model.parentTopic.private, 'screening.status': constants.SCREENING_STATUS.status1.code})
+                        .find(query)
                         .limit(8)
                         .sort({ title: 1 })
                         .lean()
