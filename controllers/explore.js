@@ -22,7 +22,7 @@ module.exports = function (router) {
             tab: tab
         };
         flowUtils.setScreeningModel(req, model);
-        flowUtils.setModelContext(req, model);
+        flowUtils.setModelContext(req, res, model);
         async.parallel({
             topics: function(callback) {
                 if(!allTabs && model.tab !== 'topics') {
