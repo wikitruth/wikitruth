@@ -11,7 +11,7 @@
         <input type="hidden" name="_csrf" value="{_csrf}">
         {?topics}
             <div class="form-group" style="margin-bottom: 20px">
-                <label for="inputReferences" style="margin-bottom: 0" class="text-muted-0">Marked Topics <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a></label>
+                <label for="inputReferences" style="margin-bottom: 0" class="text-muted-0">Topics <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><span class="glyphicon glyphicon-question-sign"></span></a></label>
                 {#topics}
                     <div class="checkbox">
                         <label>
@@ -28,7 +28,7 @@
         {/topics}
         {?arguments}
             <div class="form-group" style="margin-bottom: 20px">
-                <label for="inputReferences" style="margin-bottom: 0" class="text-muted-0">Marked Facts <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><i class="fa fa-puzzle-piece"></i></a></label>
+                <label for="inputReferences" style="margin-bottom: 0" class="text-muted-0">Facts <a title="Weighted/Unweighted Arguments" data-toggle="popover" data-content="And here's some amazing content. It's very engaging. Right?"><i class="fa fa-puzzle-piece"></i></a></label>
                 {#arguments}
                     <div class="checkbox">
                         <label>
@@ -43,9 +43,26 @@
                 {/arguments}
             </div>
         {/arguments}
+        {?questions}
+            <div class="form-group" style="margin-bottom: 20px">
+                <label for="inputReferences" style="margin-bottom: 0" class="text-muted-0">Questions</label>
+                {#questions}
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="questions" value="{_id}">
+                            <strong>{title}</strong>{?private} <span class="label label-default">private</span>{/private}{>"dust/wiki/common/entry-row-screening-label" /}
+                        </label>
+                        &nbsp;<a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.questions.entry}/{friendlyUrl}/{_id}" title="Open Question"><i class="fa fa-external-link"></i></a>
+                        {?contentPreview}
+                            <div style="padding-left: 20px">{contentPreview}</div>
+                        {/contentPreview}
+                    </div>
+                {/questions}
+            </div>
+        {/questions}
         {?artifacts}
             <div class="form-group" style="margin-bottom: 20px">
-                <label for="inputReferences" style="margin-bottom: 0" class="text-muted-0">Marked Artifacts</label>
+                <label for="inputReferences" style="margin-bottom: 0" class="text-muted-0">Artifacts</label>
                 {#artifacts}
                     <div class="checkbox">
                         <label>

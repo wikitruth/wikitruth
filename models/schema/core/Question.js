@@ -20,7 +20,7 @@ module.exports = function (app, mongoose) {
         groupId: {type: mongoose.Schema.ObjectId, ref: 'Group', default: null},
         categoryId: {type: mongoose.Schema.ObjectId, ref: 'Topic'}, // the root topic where this entry belong
         ownerId: {type: mongoose.Schema.ObjectId},
-        ownerType: {type: Number}, // MODEL_TYPES
+        ownerType: {type: Number}, // MODEL_TYPES of topic, argument only
         createDate: {type: Date, default: Date.now},
         createUserId: {type: mongoose.Schema.ObjectId, ref: 'User'},
         editDate: {type: Date, default: Date.now},
