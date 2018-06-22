@@ -13,6 +13,7 @@ module.exports = function (router) {
         var clipboard = req.session.clipboard || {};
         var topicIds = clipboard['object' + constants.OBJECT_TYPES.topic];
         var argumentIds = clipboard['object' + constants.OBJECT_TYPES.argument];
+        var questionIds = clipboard['object' + constants.OBJECT_TYPES.question];
         var artifactIds = clipboard['object' + constants.OBJECT_TYPES.artifact];
 
         /* FIXME: why is this here?
@@ -52,6 +53,24 @@ module.exports = function (router) {
                             flowUtils.appendEntryExtras(result);
                         });
                         model.arguments = results;
+                        callback();
+                    });
+                } else {
+                    callback();
+                }
+            },
+            questions: function (callback) {
+                if(questionIds && questionIds.length > 0) {
+                    var query = {
+                        _id: {
+                            $in: questionIds
+                        }
+                    };
+                    db.Question.find(query, function(err, results) {
+                        results.forEach(function (result) {
+                            flowUtils.appendEntryExtras(result);
+                        });
+                        model.questions = results;
                         callback();
                     });
                 } else {

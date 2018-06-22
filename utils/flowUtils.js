@@ -969,13 +969,35 @@ function setClipboardModel(req, model, entryType) {
     model.clipboard = {};
     var clipboard = getClipboard(req);
     if(clipboard) {
-        var topics = clipboard['object' + constants.OBJECT_TYPES.topic];
+        var marked = false;
+        var count = 0;
+        for (var key in clipboard) {
+            if (clipboard.hasOwnProperty(key)) {
+                var items = clipboard[key];
+                var keyType = parseInt(key.substring('object'.length - 1));
+                var keyEntry = getEntryByObjectType(model, keyType);
+                if(entryType === keyType && keyEntry && items.indexOf(keyEntry._id.toString()) > -1) {
+                    model.clipboard.marked = true;
+                    marked = true;
+                }
+                count += items.length;
+            }
+        }
+
+        if (count > 0) {
+            model.clipboard.count = count;
+            if(!(count === 1 && marked)) {
+                model.clipboard.canPaste = true;
+            }
+        }
+
+        /*var topics = clipboard['object' + constants.OBJECT_TYPES.topic];
         var args = clipboard['object' + constants.OBJECT_TYPES.argument];
         var artifacts = clipboard['object' + constants.OBJECT_TYPES.artifact];
         var count = topics.length + args.length + artifacts.length;
         if (count > 0) {
             model.clipboard.count = count;
-            var marked = false;
+
             if(entryType) {
                 if (
                     (entryType === constants.OBJECT_TYPES.topic && model.topic && topics.indexOf(model.topic._id.toString()) > -1) ||
@@ -989,7 +1011,7 @@ function setClipboardModel(req, model, entryType) {
             if(!(count === 1 && marked)) {
                 model.clipboard.canPaste = true;
             }
-        }
+        }*/
     }
 
     if(model.entry || model.clipboard.count) {
@@ -2455,6 +2477,30 @@ function getDbModelByObjectType(type) {
     return null;
 }
 
+function getEntryByObjectType(model, type) {
+    switch (type) {
+        case constants.OBJECT_TYPES.topic:
+            return model.topic;
+        case constants.OBJECT_TYPES.topicLink:
+            return model.topicLink;
+        case constants.OBJECT_TYPES.argument:
+            return model.argument;
+        case constants.OBJECT_TYPES.argumentLink:
+            return model.argumentLink;
+        case constants.OBJECT_TYPES.artifact:
+            return model.artifact;
+        case constants.OBJECT_TYPES.question:
+            return model.question;
+        case constants.OBJECT_TYPES.answer:
+            return model.answer;
+        case constants.OBJECT_TYPES.issue:
+            return model.issue;
+        case constants.OBJECT_TYPES.opinion:
+            return model.opinion;
+    }
+    return null;
+}
+
 function getObjectName(type) {
     switch (type) {
         case constants.OBJECT_TYPES.topic:
@@ -3203,6 +3249,7 @@ module.exports = {
     buildGroupUrl: buildGroupUrl,
     getDiaryBaseUrl: getDiaryBaseUrl,
     getDbModelByObjectType: getDbModelByObjectType,
+    getEntryByObjectType: getEntryByObjectType,
     getObjectName: getObjectName,
     getParent: getParent,
     getCategories: getCategories,
