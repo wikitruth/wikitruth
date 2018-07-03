@@ -23,7 +23,7 @@ module.exports = function (router) {
         var model = {};
         var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
         flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
-            flowUtils.setModelOwnerEntry(req, model);
+            flowUtils.setModelOwnerEntry(req, res, model);
             model.ownerType = ownerQuery.ownerType;
             model.cancelUrl = createReturnUrl(req, model);
             res.render(templates.wiki.screening, model);
@@ -34,7 +34,7 @@ module.exports = function (router) {
         var model = {};
         var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
         flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
-            flowUtils.setModelOwnerEntry(req, model);
+            flowUtils.setModelOwnerEntry(req, res, model);
             model.ownerType = ownerQuery.ownerType;
             var screeningStatus = req.body.screeningStatus;
             var dbModel = flowUtils.getDbModelByObjectType(ownerQuery.ownerType);
