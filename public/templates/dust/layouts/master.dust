@@ -126,7 +126,11 @@
                                         {?parentTopic}
                                             <li><a href="{wikiBaseUrl}{paths.wiki.topics.index}/{parentTopic.friendlyUrl}/{parentTopic._id}"><i class="fa fa-folder text-color-3-x" aria-hidden="true"></i> more...</a></li>
                                         {:else}
-                                            <li><a href="{paths.wiki.index}"><i class="fa fa-folder text-color-3-x" aria-hidden="true"></i> more...</a></li>
+                                            {?username}
+                                                <li><a href="{paths.members.index}/{user.username}/diary"><i class="fa fa-folder-open"></i> more...</a></li>
+                                            {:else}
+                                                <li><a href="{paths.wiki.index}"><i class="fa fa-folder text-color-3-x" aria-hidden="true"></i> more...</a></li>
+                                            {/username}
                                         {/parentTopic}
                                     {/topicSiblingsMore}
                                 {/topicSiblings}
