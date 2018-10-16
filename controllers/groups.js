@@ -107,7 +107,7 @@ function POST_create(req, res) {
             setDefaultsOnInsert: true
         }, function (err, updatedEntity) {
             // clear cache
-            if(!result || titleChanged) delete req.app.locals.myGroups;
+            if(!result || titleChanged) delete req.session.myGroups;
             var url = paths.groups.index + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
             res.redirect(url);
         });

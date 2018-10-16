@@ -65,35 +65,33 @@ module.exports = function(app, passport) {
             diaryCategoriesCache: function (callback) {
                 // Diary Categories
                 if(req.user) {
-                    if (!app.locals.diaryCategories) {
+                    if (!req.session.diaryCategories) {
                         flowUtils.getDiaryCategories(req, function (err, results) {
-                            app.locals.diaryCategories = results;
+                            req.session.diaryCategories = results;
+                            res.locals.diaryCategories = results;
                             callback();
                         });
                     } else {
+                        res.locals.diaryCategories = req.session.diaryCategories;
                         callback();
                     }
                 } else {
-                    if(app.locals.diaryCategories) {
-                        delete app.locals.diaryCategories;
-                    }
                     callback();
                 }
             },
             userGroupsCache: function (callback) {
                 if(req.user) {
-                    if (!app.locals.myGroups) {
+                    if (!req.session.myGroups) {
                         flowUtils.getUserGroups(req, function (err, results) {
-                            app.locals.myGroups = results;
+                            req.session.myGroups = results;
+                            res.locals.myGroups = results;
                             callback();
                         });
                     } else {
+                        res.locals.myGroups = req.session.myGroups;
                         callback();
                     }
                 } else {
-                    if(app.locals.myGroups) {
-                        delete app.locals.myGroups;
-                    }
                     callback();
                 }
             },
