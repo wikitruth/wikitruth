@@ -67,6 +67,14 @@ module.exports = function (router) {
         });
     });
 
+    router.get('/:username/settings', function (req, res) {
+        var model = {};
+        setMemberModel(model, req, function () {
+            flowUtils.setModelContext(req, res, model);
+            res.render(templates.members.profile.settings, model);
+        });
+    });
+
     router.get('/:username/contributions', function (req, res) {
         var model = {};
         setMemberModel(model, req, function () {
