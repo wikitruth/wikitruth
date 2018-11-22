@@ -87,6 +87,7 @@
     </div>
     {?loggedIn}
         <p><a href="/account/settings" class="no-underline"><i class="fa fa-pencil-square-o"></i> Edit Profile</a></p>
+        <p><a href="{paths.members.index}/{member.username}/settings" class="no-underline"><i class="fa fa-cog"></i> Settings</a></p>
     {:else}
         {?user.username}
             <p><a href="#" class="no-underline"><i class="fa fa-rss" aria-hidden="true"></i> Follow</a></p>

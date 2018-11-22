@@ -28,6 +28,7 @@ module.exports = {
         administrators: 'dust/members/administrators',
         profile: {
             index: 'dust/members/profile/profile',
+            settings: 'dust/members/profile/settings',
             topics: 'dust/members/profile/topics',
             contributions: 'dust/members/profile/contributions',
             following: 'dust/members/profile/following',

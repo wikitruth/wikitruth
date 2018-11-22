@@ -1,0 +1,104 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    {member.username} | Settings – {titleSlogan}
+{/title}
+
+{<header}
+    <link rel="stylesheet" href="/views/account/index.min.css?#{cacheBreaker}"/>
+{/header}
+
+{<body}
+    {>"dust/members/profile/profile-header" profileTab="overview" /}
+
+    <h1 class="page-header wt-header"><i class="fa fa-cog"></i> Settings</h1>
+    <form method="post">
+        <input type="hidden" name="_csrf" value="{_csrf}">
+        <div class="form-group">
+            <label>
+                Preferences
+            </label>
+            <div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" class="topicTag" name="topicTags" value="20">
+                        <span class="text-info"><strong>Private Profile</strong></span><br/>
+                        Hide your profile in public. If you have public posts, your public posts will still be visible.
+                    </label>
+                </div>
+                {!<hr class="wt-dotted-line" />
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" class="topicTag" name="topicTags" value="510">
+                        <span class="text-info"><strong>Topic Category</strong></span><br/>
+                        A topic category or container
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" class="topicTag" name="topicTags" value="520">
+                        <span class="text-info"><strong>Main Topic</strong></span><br/>
+                        A standalone or primary topic
+                    </label>
+                </div>
+                <hr class="wt-dotted-line" />
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" class="topicTag" name="topicTags" value="530">
+                        <span class="text-info"><strong>Person</strong></span><br/>
+                        A notable personality or figure
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" class="topicTag" name="topicTags" value="540">
+                        <span class="text-info"><strong>Territory</strong></span><br/>
+                        A country or territory
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" class="topicTag" name="topicTags" value="550">
+                        <span class="text-info"><strong>Event</strong></span><br/>
+                        A notable event or happening
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" class="topicTag" name="topicTags" value="560">
+                        <span class="text-info"><strong>Organization</strong></span><br/>
+                        An organization, institution or group
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" class="topicTag" name="topicTags" value="565">
+                        <span class="text-info"><strong>Idea</strong></span><br/>
+                        An idea or concept
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" class="topicTag" name="topicTags" value="567">
+                        <span class="text-info"><strong>List</strong></span><br/>
+                        A list of topics or facts
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" class="topicTag" name="topicTags" value="570">
+                        <span class="text-info"><strong>Source</strong></span><br/>
+                        A public material (a popular claim) or a reference material (source)
+                    </label>
+                </div>!}
+            </div>
+        </div>
+        <br/>
+        <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
+        <a class="btn btn-default" href="{paths.members.index}/{member.username}" role="button">Cancel</a>
+    </form>
+{/body}
+
+{<footer}
+    {>"dust/common/geopattern-title-scripts" /}
+{/footer}
