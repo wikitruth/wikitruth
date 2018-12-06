@@ -16,7 +16,7 @@ module.exports = function (router) {
 
     router.get('/', function (req, res) {
         var model = {};
-        findMembers({}, function (err, results) {
+        findMembers({ 'preferences.privateProfile': { $ne: true } }, function (err, results) {
             model.contributors = results;
             res.render(templates.members.contributors, model);
         });
@@ -24,7 +24,7 @@ module.exports = function (router) {
 
     router.get('/screeners', function (req, res) {
         var model = {};
-        findMembers({ 'roles.screener': true}, function (err, results) {
+        findMembers({ 'roles.screener': true, 'preferences.privateProfile': { $ne: true }}, function (err, results) {
             model.screeners = results;
             res.render(templates.members.screeners, model);
         });
@@ -32,7 +32,7 @@ module.exports = function (router) {
 
     router.get('/reviewers', function (req, res) {
         var model = {};
-        findMembers({ 'roles.reviewer': true}, function (err, results) {
+        findMembers({ 'roles.reviewer': true, 'preferences.privateProfile': { $ne: true }}, function (err, results) {
             model.reviewers = results;
             res.render(templates.members.reviewers, model);
         });
@@ -40,7 +40,7 @@ module.exports = function (router) {
 
     router.get('/administrators', function (req, res) {
         var model = {};
-        findMembers({ 'roles.admin': {$exists: true}}, function (err, results) {
+        findMembers({ 'roles.admin': {$exists: true}, 'preferences.privateProfile': { $ne: true }}, function (err, results) {
             model.administrators = results;
             res.render(templates.members.administrators, model);
         });
@@ -72,6 +72,25 @@ module.exports = function (router) {
         setMemberModel(model, req, function () {
             flowUtils.setModelContext(req, res, model);
             res.render(templates.members.profile.settings, model);
+        });
+    });
+
+    router.post('/:username/settings', function (req, res) {
+        var model = {};
+        setMemberModel(model, req, function () {
+            var preferences = model.member.preferences || {};
+            preferences.privateProfile = !!req.body.privateProfile;
+            var fieldsToSet = {
+                preferences: preferences
+              };
+          req.app.db.models.User.findByIdAndUpdate(model.member.id, fieldsToSet, function(err, user) {
+            if (err) {
+                throw err;
+            }
+      
+            flowUtils.setModelContext(req, res, model);
+            res.redirect(model.profileBaseUrl);
+          });
         });
     });
 

@@ -21,7 +21,7 @@
             <div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" class="topicTag" name="topicTags" value="20">
+                        <input type="checkbox" name="privateProfile" value="1" {?member.preferences.privateProfile}checked{/member.preferences.privateProfile}>
                         <span class="text-info"><strong>Private Profile</strong></span><br/>
                         Hide your profile in public. If you have public posts, your public posts will still be visible.
                     </label>
