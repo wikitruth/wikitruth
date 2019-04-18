@@ -47,13 +47,12 @@ exports.signup = function(req, res){
     if (workflow.hasErrors()) {
       return workflow.emit('response');
     } else {
-      request.post(
-          'https://www.google.com/recaptcha/api/siteverify',
+      request.post('https://www.google.com/recaptcha/api/siteverify',
           {
-            json: {
+            formData: {
               'secret': req.app.config.grecaptcha.secret,
               'response': req.body.recaptcha_response
-            }
+            }, json: true
           },
           function (error, response, body) {
             if (!error && response.statusCode == 200 && body && body.success) {
