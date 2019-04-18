@@ -32,7 +32,6 @@
     "engine-munger": "^0.2.9",
     "emailjs": "^2.2.0",
     "express": "^4.16.4",
-    "express-recaptcha": "^4.0.3",
     "express-session": "^1.15.3",
     "fs": "0.0.1-security",
     "handlebars": "^4.0.12",
