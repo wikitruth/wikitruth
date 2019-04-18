@@ -1,5 +1,7 @@
 'use strict';
 
+var request = require('request');
+
 exports.init = function(req, res){
   res.render('jade/contact/index.jade');
 };
@@ -20,11 +22,31 @@ exports.sendMessage = function(req, res){
       workflow.outcome.errfor.message = 'required';
     }
 
-    if (workflow.hasErrors()) {
-      return workflow.emit('response');
+    if(!req.body.recaptcha_response) {
+      workflow.outcome.errfor.recaptcha = 'required';
     }
 
-    workflow.emit('sendEmail');
+    if (workflow.hasErrors()) {
+      return workflow.emit('response');
+    } else {
+      request.post(
+          'https://www.google.com/recaptcha/api/siteverify',
+          {
+              json: {
+                  'secret': req.app.config.grecaptcha.secret,
+                  'response': req.body.recaptcha_response
+              }
+          },
+          function (error, response, body) {
+            if (!error && response.statusCode == 200 && body && body.success) {
+              workflow.emit('sendEmail');
+            } else {
+              workflow.outcome.errfor.recaptcha = 'invalid captcha';
+              return workflow.emit('response');
+            }
+          }
+      );
+    }
   });
 
   workflow.on('sendEmail', function() {

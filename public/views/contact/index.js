@@ -17,6 +17,8 @@
     }
   });
 
+  var rendered;
+
   app.ContactView = Backbone.View.extend({
     el: '#contact',
     template: _.template( $('#tmpl-contact').html() ),
@@ -32,6 +34,11 @@
     render: function() {
       this.$el.html(this.template( this.model.attributes ));
       this.$el.find('[name="name"]').focus();
+
+      if(window.grecaptcha && rendered && window.onloadCallback) {
+        window.onloadCallback();
+      }
+      rendered = true;
     },
     preventSubmit: function(event) {
       event.preventDefault();
@@ -42,7 +49,8 @@
       this.model.save({
         name: this.$el.find('[name="name"]').val(),
         email: this.$el.find('[name="email"]').val(),
-        message: this.$el.find('[name="message"]').val()
+        message: this.$el.find('[name="message"]').val(),
+        recaptcha_response: window.grecaptcha.getResponse(window.widget1)
       });
     }
   });

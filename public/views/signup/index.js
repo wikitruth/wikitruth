@@ -16,6 +16,8 @@
     }
   });
 
+  var rendered;
+
   app.SignupView = Backbone.View.extend({
     el: '#signup',
     template: _.template( $('#tmpl-signup').html() ),
@@ -32,6 +34,11 @@
     render: function() {
       this.$el.html(this.template( this.model.attributes ));
       this.$el.find('[name="username"]').focus();
+
+      if(window.grecaptcha && rendered && window.onloadCallback) {
+        window.onloadCallback();
+      }
+      rendered = true;
     },
     preventSubmit: function(event) {
       event.preventDefault();
@@ -48,7 +55,8 @@
       this.model.save({
         username: this.$el.find('[name="username"]').val(),
         email: this.$el.find('[name="email"]').val(),
-        password: this.$el.find('[name="password"]').val()
+        password: this.$el.find('[name="password"]').val(),
+        recaptcha_response: window.grecaptcha.getResponse(window.widget1)
       },{
         success: function(model, response) {
           if (response.success) {
