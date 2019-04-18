@@ -8,15 +8,14 @@ block neck
 
 block feet
   script(src='/views/contact/index.min.js?#{cacheBreaker}')
-  <% if (!success) { %>
-  script.
-    window.onloadCallback = function () {
-      window.widget1 = window.grecaptcha.render('recaptcha_id', {
-        'sitekey': '#{grecaptcha.sitekey}'
-      });
-    };
-  script(src='https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit', async, defer)
-  <% } %>
+  if !success
+    script.
+      window.onloadCallback = function () {
+        window.widget1 = window.grecaptcha.render('recaptcha_id', {
+          'sitekey': '#{grecaptcha.sitekey}'
+        });
+      };
+    script(src='https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit', async, defer)
 
 block body
   div.row
@@ -50,22 +49,21 @@ block body
           button.close(type='button', data-dismiss='alert') &times;
           | We have received your message. Thank you.
         |<% } %>
-      |<% if (!success) { %>
-      div.form-group(class!='<%- errfor.name ? "has-error" : "" %>')
-        label Your Name:
-        input.form-control(type='text', name='name', value!='<%= name %>')
-        span.help-block <%- errfor.name %>
-      div.form-group(class!='<%- errfor.email ? "has-error" : "" %>')
-        label Your Email:
-        input.form-control(type='text', name='email', value!='<%= email %>')
-        span.help-block <%- errfor.email %>
-      div.form-group(class!='<%- errfor.message ? "has-error" : "" %>')
-        label Message:
-        textarea.form-control(name='message', rows='5') <%= message %>
-        span.help-block <%- errfor.message %>
-      div.form-group.g-recaptcha(id='recaptcha_id')
-      div.form-group(class!='<%- errfor.recaptcha ? "has-error" : "hide" %>')
-        span.help-block <%- errfor.recaptcha %>
-      div.form-group
-        button.btn.btn-primary.btn-contact(type='button') Send Message
-      |<% } %>
+      if !success
+        div.form-group(class!='<%- errfor.name ? "has-error" : "" %>')
+          label Your Name:
+          input.form-control(type='text', name='name', value!='<%= name %>')
+          span.help-block <%- errfor.name %>
+        div.form-group(class!='<%- errfor.email ? "has-error" : "" %>')
+          label Your Email:
+          input.form-control(type='text', name='email', value!='<%= email %>')
+          span.help-block <%- errfor.email %>
+        div.form-group(class!='<%- errfor.message ? "has-error" : "" %>')
+          label Message:
+          textarea.form-control(name='message', rows='5') <%= message %>
+          span.help-block <%- errfor.message %>
+        div.form-group.g-recaptcha(id='recaptcha_id')
+        div.form-group(class!='<%- errfor.recaptcha ? "has-error" : "hide" %>')
+          span.help-block <%- errfor.recaptcha %>
+        div.form-group
+          button.btn.btn-primary.btn-contact(type='button') Send Message
