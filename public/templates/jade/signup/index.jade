@@ -7,9 +7,11 @@ block neck
   link(rel='stylesheet', href='/views/signup/index.min.css?#{cacheBreaker}')
   script.
     window.onloadCallback = function () {
-      window.widget1 = window.grecaptcha.render('recaptcha_id', {
-        'sitekey': '#{grecaptcha.sitekey}'
-      });
+      if ($('#recaptcha_id').length) {
+        window.widget1 = window.grecaptcha.render('recaptcha_id', {
+          'sitekey': '#{grecaptcha.sitekey}'
+        });
+      }
     };
 
 block feet
