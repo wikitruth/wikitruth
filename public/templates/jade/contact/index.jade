@@ -5,16 +5,18 @@ block head
 
 block neck
   link(rel='stylesheet', href='/views/contact/index.min.css?#{cacheBreaker}')
+
+block feet
+  script(src='/views/contact/index.min.js?#{cacheBreaker}')
+  <% if (!success) { %>
   script.
     window.onloadCallback = function () {
       window.widget1 = window.grecaptcha.render('recaptcha_id', {
         'sitekey': '#{grecaptcha.sitekey}'
       });
     };
-
-block feet
-  script(src='/views/contact/index.min.js?#{cacheBreaker}')
   script(src='https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit', async, defer)
+  |<% } %>
 
 block body
   div.row
