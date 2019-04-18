@@ -105,6 +105,7 @@ app.locals.wikitruth = {
 //app.locals.copyrightName = app.config.companyName;
 app.locals.cacheBreaker = app.config.cacheBreaker;
 app.locals.googleAnalyticsTrackingId = app.config.googleAnalyticsTrackingId;
+app.locals.grecaptcha = app.config.grecaptcha;
 app.locals.paths = paths;
 app.locals.applications = applications.getApplications();
 app.locals.templates = templates;

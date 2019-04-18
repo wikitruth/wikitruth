@@ -5,9 +5,16 @@ block head
 
 block neck
   link(rel='stylesheet', href='/views/signup/index.min.css?#{cacheBreaker}')
+  script.
+    window.onloadCallback = function () {
+      window.widget1 = window.grecaptcha.render('recaptcha_id', {
+        'sitekey': '#{grecaptcha.sitekey}'
+      });
+    };
 
 block feet
   script(src='/views/signup/index.min.js?#{cacheBreaker}')
+  script(src='https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit', async, defer)
 
 block body
   div.row
@@ -61,16 +68,19 @@ block body
           |<%- err %>
         |<% }); %>
       div.form-group(class!='<%- errfor.username ? "has-error" : "" %>')
-        label Pick a Username:
+        label Pick a username:
         input.form-control(type='text', name='username', value!='<%= username %>')
         span.help-block <%- errfor.username %>
       div.form-group(class!='<%- errfor.email ? "has-error" : "" %>')
-        label Enter Your Email:
+        label Enter your email:
         input.form-control(type='text', name='email', value!='<%= email %>')
         span.help-block <%- errfor.email %>
       div.form-group(class!='<%- errfor.password ? "has-error" : "" %>')
-        label Create a Password:
+        label Create a password:
         input.form-control(type='password', name='password', value!='<%= password %>')
         span.help-block <%- errfor.password %>
+      div.form-group.g-recaptcha(id='recaptcha_id')
+      div.form-group(class!='<%- errfor.recaptcha ? "has-error" : "hide" %>')
+        span.help-block <%- errfor.recaptcha %>
       div.form-group
         button.btn.btn-primary.btn-signup(type='button') Create My Account

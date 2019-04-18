@@ -1,5 +1,7 @@
 'use strict';
 
+var request = require('request');
+
 exports.init = function(req, res){
   if (req.isAuthenticated()) {
     res.redirect(req.user.defaultReturnUrl());
@@ -38,11 +40,31 @@ exports.signup = function(req, res){
       workflow.outcome.errfor.password = 'required';
     }
 
-    if (workflow.hasErrors()) {
-      return workflow.emit('response');
+    if(!req.body.recaptcha_response) {
+      workflow.outcome.errfor.recaptcha = 'required';
     }
 
-    workflow.emit('duplicateUsernameCheck');
+    if (workflow.hasErrors()) {
+      return workflow.emit('response');
+    } else {
+      request.post(
+          'https://www.google.com/recaptcha/api/siteverify',
+          {
+            json: {
+              'secret': req.app.config.grecaptcha.secret,
+              'response': req.body.recaptcha_response
+            }
+          },
+          function (error, response, body) {
+            if (!error && response.statusCode == 200 && body && body.success) {
+              workflow.emit('duplicateUsernameCheck');
+            } else {
+              workflow.outcome.errfor.recaptcha = 'invalid captcha';
+              return workflow.emit('response');
+            }
+          }
+      );
+    }
   });
 
   workflow.on('duplicateUsernameCheck', function() {

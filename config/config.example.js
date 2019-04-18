@@ -79,6 +79,10 @@ exports.smtp = {
     ssl: true
   }
 };
+exports.grecaptcha = {
+  'sitekey': '',
+  'secret': ''
+};
 exports.oauth = {
   twitter: {
     key: process.env.TWITTER_OAUTH_KEY || '',
