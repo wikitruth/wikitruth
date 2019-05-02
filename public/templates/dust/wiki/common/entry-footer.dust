@@ -41,19 +41,25 @@
         {/entry.sameEditDate}
     {:else}
         <div class="col-md-12">
-            <div class="media wt-category-x">
-                <div class="media-left media-top">
-                    <a href="{paths.members.index}/{entry.createUsername}">
-                        <div class="wt-photo-small wt-geopattern-title" title="{entry.createUsername}"></div>
-                    </a>
+            {?entry.private}
+                <small class="text-muted"><i class="fa fa-clock-o text-muted-2"></i> Posted <span title="{entry.createDate}">{entry.createDateString}</span>
+                    {^entry.sameEditDate} <span class="text-muted-2">|</span> <i class="fa fa-clock-o text-muted-2"></i> Edited <span title="{entry.editDate}">{entry.editDateString}</span>{/entry.sameEditDate}
+                </small>
+            {:else}
+                <div class="media wt-category-x">
+                    <div class="media-left media-top">
+                        <a href="{paths.members.index}/{entry.createUsername}">
+                            <div class="wt-photo-small wt-geopattern-title" title="{entry.createUsername}"></div>
+                        </a>
+                    </div>
+                    <div class="media-body">
+                        <h4 class="media-heading"><a href="{paths.members.index}/{entry.createUsername}">{entry.createUsername}</a></h4>
+                        <small class="text-muted"><i class="fa fa-clock-o text-muted-2"></i> Posted <span title="{entry.createDate}">{entry.createDateString}</span>
+                            {^entry.sameEditDate} <span class="text-muted-2">|</span> <i class="fa fa-clock-o text-muted-2"></i> Edited <span title="{entry.editDate}">{entry.editDateString}</span>{/entry.sameEditDate}
+                        </small>
+                    </div>
                 </div>
-                <div class="media-body">
-                    <h4 class="media-heading"><a href="{paths.members.index}/{entry.createUsername}">{entry.createUsername}</a></h4>
-                    <small class="text-muted"><i class="fa fa-clock-o text-muted-2"></i> Posted <span title="{entry.createDate}">{entry.createDateString}</span>
-                        {^entry.sameEditDate} <span class="text-muted-2">|</span> <i class="fa fa-clock-o text-muted-2"></i> Edited <span title="{entry.editDate}">{entry.editDateString}</span>{/entry.sameEditDate}
-                    </small>
-                </div>
-            </div>
+            {/entry.private}
         </div>
     {/entry.sameEditor}
 </div>
