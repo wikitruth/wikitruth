@@ -28,6 +28,8 @@ module.exports = function(app, mongoose) {
   require('./schema/core/Page')(app, mongoose);
   require('./schema/core/Artifact')(app, mongoose);
   require('./schema/core/Group')(app, mongoose);
+
+  require('./schema/core/TrustedClient')(app, mongoose);
   //require('./schema/core/Word')(app, mongoose);
   //require('./schema/core/Meaning')(app, mongoose);
   //require('./schema/core/Definition')(app, mongoose);
