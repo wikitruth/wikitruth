@@ -20,6 +20,7 @@
     template: _.template( $('#tmpl-login').html() ),
     events: {
       'submit form': 'preventSubmit',
+      'keypress [name="username"]': 'tryQuickLogin',
       'keypress [name="password"]': 'loginOnEnter',
       'click .btn-login': 'login'
     },
@@ -34,6 +35,12 @@
     },
     preventSubmit: function(event) {
       event.preventDefault();
+    },
+    tryQuickLogin: function(event) {
+      if ($(event.target).val().length !== 5 || event.keyCode === 13) { return; }
+      // check cookies if fast switch is enabled
+      //console.log('fast switch: gotcha!');
+      //event.preventDefault();
     },
     loginOnEnter: function(event) {
       if (event.keyCode !== 13) { return; }
