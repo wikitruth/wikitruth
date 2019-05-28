@@ -62,6 +62,7 @@ exports.systemEmail = 'your@email.addy';
 exports.cryptoKey = 'abc123';
 exports.cacheBreaker = 'abc123';
 exports.trustProxy = false;
+exports.googleAnalyticsTrackingId = 'UA-abc-123';
 exports.loginAttempts = {
   forIp: 50,
   forIpAndUser: 7,

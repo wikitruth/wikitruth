@@ -94,7 +94,7 @@
             </div>
         </div>
         <br/>
-        <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
+        <button type="submit" class="btn btn-primary" name="action" value="preferences">Update</button>&nbsp;
         <a class="btn btn-default" href="{paths.members.index}/{member.username}" role="button">Cancel</a>
     </form>
 {/body}
