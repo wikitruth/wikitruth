@@ -59,6 +59,7 @@ module.exports = function(app, passport) {
   app.get(paths.wiki.answers.create, ensureAuthenticated);
   app.get(paths.wiki.issues.create, ensureAuthenticated);
   app.get(paths.wiki.opinions.create, ensureAuthenticated);
+  app.get(paths.wiki.artifacts.create, ensureAuthenticated);
 
   // member diary
   app.all('/members/:username/diary*', ensureAuthenticated);
