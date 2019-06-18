@@ -8,9 +8,7 @@ var backup          = require('mongodb-backup'),
     templates       = require('../models/templates'),
     config          = require('../config/config'),
     constants       = require('../models/constants'),
-    applications    = require('../models/applications'),
     flowUtils       = require('../utils/flowUtils'),
-    //utils         = require('../utils/utils'),
     db              = require('../app').db.models;
 
 var collectionsConfig = config.mongodb.collections,
@@ -531,11 +529,7 @@ module.exports = function (router) {
                 }
             });
         } else if (action === 'recache') {
-            delete req.app.locals.appCategories;
-            var apps = applications.getApplications();
-            apps.forEach(function(app) {
-                delete app.appCategories;
-            });
+            flowUtils.resetCache(req);
             res.render(templates.admin.mongoBackup, model);
         }
     });

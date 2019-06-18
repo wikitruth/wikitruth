@@ -96,6 +96,10 @@ module.exports = function (router) {
                 },
                 backupPrivateData: function (callback) {
                     callback();
+                },
+                resetCache: function (callback) {
+                    flowUtils.resetCache(req);
+                    callback();
                 }
             }, function (){
                 model.done = true;
