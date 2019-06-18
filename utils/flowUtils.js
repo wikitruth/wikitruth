@@ -1,15 +1,16 @@
 'use strict';
 
-var db          = require('../app').db.models,
-    utils       = require('./utils'),
-    constants   = require('../models/constants'),
-    paths       = require('../models/paths'),
-    config      = require('../config/config'),
-    url         = require('url'),
-    querystring = require('querystring'),
-    htmlToText  = require('html-to-text'),
-    moment      = require('moment'),
-    async       = require('async');
+var db              = require('../app').db.models,
+    utils           = require('./utils'),
+    constants       = require('../models/constants'),
+    paths           = require('../models/paths'),
+    applications    = require('../models/applications'),
+    config          = require('../config/config'),
+    url             = require('url'),
+    querystring     = require('querystring'),
+    htmlToText      = require('html-to-text'),
+    moment          = require('moment'),
+    async           = require('async');
 
 var mn = " 12:00 AM";
 
@@ -3195,6 +3196,14 @@ function setupEntryRouters(router, prefix) {
     });
 }
 
+function resetCache(req) {
+    delete req.app.locals.appCategories;
+    var apps = applications.getApplications();
+    apps.forEach(function(app) {
+        delete app.appCategories;
+    });
+}
+
 module.exports = {
     getBackupDir: getBackupDir,
     createContentPreview: createContentPreview,
@@ -3258,5 +3267,6 @@ module.exports = {
     createEntrySet: createEntrySet,
     countEntries: countEntries,
 
-    setupEntryRouters: setupEntryRouters
+    setupEntryRouters: setupEntryRouters,
+    resetCache: resetCache
 };
