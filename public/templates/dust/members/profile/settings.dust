@@ -26,6 +26,21 @@
                         Hide your profile in public. If you have public posts, your public posts will still be visible.
                     </label>
                 </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="fastSwitch" value="1">
+                        <span class="text-info"><strong>Fast Switch</strong></span><br/>
+                        Allows you to quickly login or switch account by entering a PIN.
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        Enter your 6-digit PIN:
+                        <div>
+                            <input name="pin" type="password">
+                        </div>
+                    </label>
+                </div>
                 {!<hr class="wt-dotted-line" />
                 <div class="checkbox">
                     <label>
