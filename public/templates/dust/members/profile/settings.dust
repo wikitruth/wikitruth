@@ -26,21 +26,6 @@
                         Hide your profile in public. If you have public posts, your public posts will still be visible.
                     </label>
                 </div>
-                <div class="checkbox">
-                    <label>
-                        <input type="checkbox" name="fastSwitch" value="1">
-                        <span class="text-info"><strong>Fast Switch</strong></span><br/>
-                        Allows you to quickly login or switch account by entering a PIN.
-                    </label>
-                </div>
-                <div class="checkbox">
-                    <label>
-                        Enter your 6-digit PIN:
-                        <div>
-                            <input name="pin" type="password">
-                        </div>
-                    </label>
-                </div>
                 {!<hr class="wt-dotted-line" />
                 <div class="checkbox">
                     <label>
@@ -108,9 +93,31 @@
                 </div>!}
             </div>
         </div>
-        <br/>
         <button type="submit" class="btn btn-primary" name="action" value="preferences">Update</button>&nbsp;
         <a class="btn btn-default" href="{paths.members.index}/{member.username}" role="button">Cancel</a>
+        <div class="form-group" style="margin-top: 40px">
+            <label>
+                Fast Switch
+            </label>
+            <div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="fastSwitch" value="1">
+                        <span class="text-info"><strong>Enable</strong></span><br/>
+                        Allows you to quickly login or switch account by entering a PIN.
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        Enter your 6-digit PIN:
+                        <div>
+                            <input name="pin" type="password">
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary" name="action" value="fast-switch">Update</button>
     </form>
 {/body}
 
