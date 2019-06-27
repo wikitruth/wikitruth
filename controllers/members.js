@@ -77,20 +77,35 @@ module.exports = function (router) {
 
     router.post('/:username/settings', function (req, res) {
         var model = {};
-        setMemberModel(model, req, function () {
-            var preferences = model.member.preferences || {};
-            preferences.privateProfile = !!req.body.privateProfile;
-            var fieldsToSet = {
-                preferences: preferences
-              };
-          req.app.db.models.User.findByIdAndUpdate(model.member.id, fieldsToSet, function(err, user) {
-            if (err) {
-                throw err;
-            }
-      
+        var postUpdateAction = function () {
             flowUtils.setModelContext(req, res, model);
             res.redirect(model.profileBaseUrl);
-          });
+        };
+        setMemberModel(model, req, function () {
+            var action = req.body.action;
+            switch (action) {
+                case "preferences":
+                    var preferences = model.member.preferences || {};
+                    preferences.privateProfile = !!req.body.privateProfile;
+                    var fieldsToSet = {
+                        preferences: preferences
+                    };
+                    req.app.db.models.User.findByIdAndUpdate(model.member.id, fieldsToSet, function (err, user) {
+                        if (err) {
+                            throw err;
+                        }
+                        postUpdateAction();
+                    });
+                    break;
+                case "fast-switch":
+                    // validate pin
+                    // 
+                    postUpdateAction();
+                    break;
+
+                default:
+                    postUpdateAction();
+            }
         });
     });
 
