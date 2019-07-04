@@ -10,8 +10,14 @@ module.exports = function(app, passport) {
 
     // response locals
 
+    // this code runs for all routes
     app.use(/^[^\.]+$/, function(req, res, next) {
         //res.cookie('_csrfToken', req.csrfToken());
+
+        let cookies = req.cookies.fast_switch || [];
+        if(cookies.length > 0) {
+            res.locals.fastSwitch = true;
+        }
 
         if(req.user) {
             res.locals.user = {};

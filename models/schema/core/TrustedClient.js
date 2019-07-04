@@ -2,10 +2,10 @@
 
 module.exports = function (app, mongoose) {
     var schema = new mongoose.Schema({
-        clientId: {type: mongoose.Schema.ObjectId},
         userId: {type: mongoose.Schema.ObjectId, ref: 'User'},
+        clientIp: {type: String, default: ''},
         userAgent: {type: String, default: ''},
-        createDate: {type: Date, default: Date.now}
+        createDate: {type: Date, default: Date.now},
     });
     schema.plugin(require('../plugins/pagedFind'));
     schema.index({userId: 1});

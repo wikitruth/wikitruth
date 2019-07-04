@@ -273,8 +273,8 @@ function GET_create(req, res) {
             }
         }
     }, function (err, results) {
-        if(model.topic && !flowUtils.isEntryOwner(req, model.topic)) {
-            // not the owner, stop editing
+        if(model.topic && !flowUtils.isEntryOwner(req, model.topic) || !model.topic && req.query.id) {
+            // not the owner or doc not found, stop editing
             return res.redirect('/');
         }
         flowUtils.setModelContext(req, res, model);

@@ -3,8 +3,10 @@
 var mongoose    = require('mongoose'),
     templates   = require('../models/templates'),
     paths       = require('../models/paths'),
+    config      = require('../config/config'),
     async       = require('async'),
     url         = require('url'),
+    jwt         = require('jsonwebtoken'),
     flowUtils   = require('../utils/flowUtils'),
     utils       = require('../utils/utils'),
     constants   = require('../models/constants'),
@@ -70,37 +72,125 @@ module.exports = function (router) {
     router.get('/:username/settings', function (req, res) {
         var model = {};
         setMemberModel(model, req, function () {
-            flowUtils.setModelContext(req, res, model);
-            res.render(templates.members.profile.settings, model);
+            db.TrustedClient
+                .find({ userId: model.member._id })
+                .lean()
+                .exec(function (err, results) {
+                    let cookies = req.cookies.fast_switch || [];
+                    if(cookies.length > 0) {
+                        setcookieloop:
+                            for(let result of results) {
+                                for(let cookie of cookies) {
+                                    if (result._id.equals(cookie.id)) {
+                                        model.fastSwitch = true;
+                                        break setcookieloop;
+                                    }
+                                }
+                            }
+                    }
+                    flowUtils.setModelContext(req, res, model);
+                    res.render(templates.members.profile.settings, model);
+                });
         });
     });
 
     router.post('/:username/settings', function (req, res) {
-        var model = {};
-        var postUpdateAction = function () {
+        let model = {};
+        let postUpdateAction = function () {
             flowUtils.setModelContext(req, res, model);
             res.redirect(model.profileBaseUrl);
         };
         setMemberModel(model, req, function () {
-            var action = req.body.action;
+            let action = req.body.action;
             switch (action) {
                 case "preferences":
-                    var preferences = model.member.preferences || {};
+                    let preferences = model.member.preferences || {};
                     preferences.privateProfile = !!req.body.privateProfile;
-                    var fieldsToSet = {
+                    let fieldsToSet = {
                         preferences: preferences
                     };
-                    req.app.db.models.User.findByIdAndUpdate(model.member.id, fieldsToSet, function (err, user) {
-                        if (err) {
-                            throw err;
-                        }
+                    req.app.db.models.User.findByIdAndUpdate(model.member._id, fieldsToSet, function (err, user) {
+                        if (err) throw err;
                         postUpdateAction();
                     });
                     break;
                 case "fast-switch":
-                    // validate pin
-                    // 
-                    postUpdateAction();
+                    let cookieName = 'fast_switch';
+                    db.TrustedClient
+                        .find({ userId: model.member._id })
+                        .lean()
+                        .exec(function (err, results) {
+                            let now = new Date();
+                            let expiry = new Date(now.setMonth(now.getMonth() + 6));
+                            let cookies = req.cookies.fast_switch || [];
+                            if(req.body.fastSwitch === "1") {
+                                // validate pin
+                                // create or update trusted_client
+                                let pin = req.body.pin; // use jwt and server secret
+                                let encryptedUserId = jwt.sign({userId: model.member._id}, pin + '|' + config.jwtSecret);
+                                let cookieFound = false;
+                                if(cookies.length > 0) {
+                                    setcookieloop:
+                                    for(let result of results) {
+                                        for(let cookie of cookies) {
+                                            if (result._id.equals(cookie.id)) {
+                                                // update existing pin
+                                                cookie.data = encryptedUserId;
+                                                cookie.created = now;
+                                                cookieFound = true;
+                                                break setcookieloop;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if(!cookieFound) {
+                                    let newClient = new db.TrustedClient({
+                                        userId: model.member._id,
+                                        clientIp: req.ip,
+                                        userAgent: req.headers["user-agent"]
+                                    });
+                                    newClient.save(function (err, newClient) {
+                                        if (err) throw err;
+                                        let newCookie = {
+                                            id: newClient._id,
+                                            data: encryptedUserId,
+                                            created: now
+                                        };
+                                        cookies.push(newCookie);
+                                        res.cookie(cookieName, cookies, {expires: expiry});
+                                        postUpdateAction();
+                                    });
+                                } else {
+                                    res.cookie(cookieName, cookies, { expires: expiry });
+                                    postUpdateAction();
+                                }
+                            } else {
+                                let cookieFound = false;
+                                clearcookieloop:
+                                for(let result of results) {
+                                    for(let i=0; i<cookies.length; i++) {
+                                        let cookie = cookies[i];
+                                        if(result._id.equals(cookie.id)) {
+                                            cookieFound = true;
+                                            db.TrustedClient.findByIdAndRemove(result._id, function(err, deletedClient) {
+                                                if(cookies.length == 1) {
+                                                    res.clearCookie(cookieName);
+                                                } else {
+                                                    cookies.splice(i, 1);
+                                                    res.cookie(cookieName, cookies, { expires: expiry });
+                                                }
+                                                postUpdateAction();
+                                            });
+                                            break clearcookieloop;
+                                        }
+                                    }
+                                }
+                                if(!cookieFound) {
+                                    postUpdateAction();
+                                }
+                            }
+                        });
                     break;
 
                 default:
