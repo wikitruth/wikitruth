@@ -1,0 +1,20 @@
+ul.nav.navbar-nav
+    //li: a(href='/') Home
+    li: a(href='#{paths.wiki.index}', title='Explore')
+        i.fa.fa-globe
+        span.hidden-xs
+            |  Explore
+    li: a(href='#{paths.search}', title='Search')
+        i.fa.fa-search
+        = ' '
+        span.hidden-xxs
+            | Search
+    //li: a(href='#{paths.worldviews.index}')
+      i.fa.fa-book
+      span.hidden-xs
+        |  Religion
+    //li: a(href='#{paths.morality.index}')
+      i.fa.fa-balance-scale
+      span.hidden-xs
+        |  Morality
+    //li: a(href='/about/') About

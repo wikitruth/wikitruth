@@ -76,6 +76,7 @@ exports.homeUrl = 'https://wikitruth.co';
 exports.systemEmail = 'your@email.com';
 exports.cryptoKey = 'abc123';
 exports.cacheBreaker = 'abc123';
+exports.jwtSecret = 'abc123';
 exports.trustProxy = false;
 exports.googleAnalyticsTrackingId = 'UA-abc-123';
 exports.loginAttempts = {

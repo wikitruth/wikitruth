@@ -102,7 +102,7 @@
             <div>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" name="fastSwitch" value="1">
+                        <input type="checkbox" name="fastSwitch" value="1" {?fastSwitch}checked{/fastSwitch}>
                         <span class="text-info"><strong>Enable</strong></span><br/>
                         Allows you to quickly login or switch account by entering a PIN.
                     </label>

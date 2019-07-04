@@ -43,6 +43,7 @@ function isCategoryTopic(entry) {
 }
 
 function appendListExtras(item, objectType, shortTitleLength) {
+    if(!item) return;
     if(item.title) {
         item.friendlyUrl = utils.urlify(item.title);
         item.shortTitle = utils.getShortText(item.contextTitle || item.title, shortTitleLength || constants.SETTINGS.TILE_MAX_ENTRY_LEN);
@@ -61,6 +62,7 @@ function appendListExtras(item, objectType, shortTitleLength) {
 }
 
 function appendEntryExtras(item, objectType, req, shortTitleLength) {
+    if(!item) return;
     appendListExtras(item, objectType, shortTitleLength);
     item.comments = utils.randomInt(0,999);
     item.points = utils.randomInt(0,9999);
@@ -73,7 +75,7 @@ function appendEntryExtras(item, objectType, req, shortTitleLength) {
     item.sameEditDate = item.createDate.valueOf() === item.editDate.valueOf();
 
     if(item.referenceDate) {
-        var refDate = moment(item.referenceDate);
+        let refDate = moment(item.referenceDate);
         item.referenceDateString = item.referenceDate.toLocaleString(); // FIXME: using this on front-end might produce an issue when the locale of the server does not match the locale of the client.
         item.referenceDateUTC = item.referenceDate.toUTCString();
         //item.referenceDateSimple = item.referenceDate.toLocaleString(); // toDateString(): Tue Dec 27 2016, toLocaleString(): 12/27/2016, 8:50:00 PM, toISOString(): 2016-12-27T12:50:00.000Z
@@ -83,7 +85,7 @@ function appendEntryExtras(item, objectType, req, shortTitleLength) {
         }
     }
     if(item.childrenCount) {
-        var hasChildren = function(objectName) {
+        let hasChildren = function (objectName) {
             return item.childrenCount[objectName] && item.childrenCount[objectName].accepted > 0;
         };
         if(hasChildren('topics')
@@ -108,8 +110,10 @@ function appendEntryExtras(item, objectType, req, shortTitleLength) {
 function setEntryParents(items, typeId, callback) {
     if(!items || items.length === 0) { return callback(); }
 
-    var topicIds = [], topicLinkIds = [], argumentIds = [], argumentLinkIds = [], artifactIds = [], questionIds = [], answerIds =[], issueIds = [], opinionIds = [];
-    var topics = {}, topicLinks = {}, args = {}, argumentLinks = {}, artifacts={}, questions = {}, answers = {}, issues = {}, opinions = {};
+    let topicIds = [], topicLinkIds = [], argumentIds = [], argumentLinkIds = [], artifactIds = [], questionIds = [],
+        answerIds = [], issueIds = [], opinionIds = [];
+    let topics = {}, topicLinks = {}, args = {}, argumentLinks = {}, artifacts = {}, questions = {}, answers = {},
+        issues = {}, opinions = {};
     switch (typeId) {
         case constants.OBJECT_TYPES.topic:
             items.forEach(function (item) {
@@ -199,7 +203,7 @@ function setEntryParents(items, typeId, callback) {
                 db.TopicLink
                     .find({ _id: { $in: topicLinkIds }})
                     .exec(function (err, linkResults) {
-                        var topicIds2 = [], topics2 = {};
+                        let topicIds2 = [], topics2 = {};
                         linkResults.forEach(function (result) {
                             topicIds2.push(result.topicId.valueOf());
                         });
@@ -224,7 +228,7 @@ function setEntryParents(items, typeId, callback) {
         },
         arguments: function (callback) {
             if(argumentIds.length > 0) {
-                var query = {_id: {$in: argumentIds}};
+                let query = {_id: {$in: argumentIds}};
                 db.Argument
                     .find(query)
                     .exec(function (err, results) {
@@ -268,7 +272,7 @@ function setEntryParents(items, typeId, callback) {
         },
         questions: function (callback) {
             if(questionIds.length > 0) {
-                var query = {_id: {$in: questionIds}};
+                let query = {_id: {$in: questionIds}};
                 db.Question
                     .find(query)
                     .exec(function (err, results) {
@@ -284,7 +288,7 @@ function setEntryParents(items, typeId, callback) {
         },
         answers: function (callback) {
             if(answerIds.length > 0) {
-                var query = {_id: {$in: answerIds}};
+                let query = {_id: {$in: answerIds}};
                 db.Answer
                     .find(query)
                     .exec(function (err, results) {
@@ -2587,8 +2591,8 @@ function setModelContext(req, res, model, mixedMode) {
         model.wikiBaseUrl = model.profileBaseUrl + paths.members.profile.diary;
     } else {
         model.username = '';
-        model.profileBaseUrl = '';
-        model.wikiBaseUrl = '';
+        model.profileBaseUrl = '/';
+        model.wikiBaseUrl = '/';
     }
 }
 

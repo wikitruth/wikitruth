@@ -279,6 +279,12 @@ module.exports = function (router) {
         issueController.GET_entry(req, res);
     });
 
+    router.get('/fast-switch', function (req, res) {
+        req.session.destroy();
+        req.logout();
+        res.redirect('/login');
+    });
+
     /* Related */
 
     router.get('/related', function (req, res) {

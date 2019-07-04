@@ -268,7 +268,7 @@ function GET_create(req, res) {
                 }
             }
         }, function (err, results) {
-            if(model.argument && !flowUtils.isEntryOwner(req, model.argument)){
+            if(model.argument && !flowUtils.isEntryOwner(req, model.argument) || !model.argument && req.query.id){
                 return res.redirect('/');
             }
             model.ARGUMENT_TAGS = constants.ARGUMENT_TAGS;
