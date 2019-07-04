@@ -20,7 +20,7 @@
     template: _.template( $('#tmpl-login').html() ),
     events: {
       'submit form': 'preventSubmit',
-      'keypress [name="username"]': 'tryQuickLogin',
+      'keypress [name="username"]': 'tryFastSwitch',
       'keypress [name="password"]': 'loginOnEnter',
       'click .btn-login': 'login'
     },
@@ -32,15 +32,30 @@
     render: function() {
       this.$el.html(this.template( this.model.attributes ));
       this.$el.find('[name="username"]').focus();
+      this.$el.find('[name="username"]').select();
     },
     preventSubmit: function(event) {
       event.preventDefault();
     },
-    tryQuickLogin: function(event) {
+    tryFastSwitch: function(event) {
       if ($(event.target).val().length !== 5 || event.keyCode === 13) { return; }
       // check cookies if fast switch is enabled
-      //console.log('fast switch: gotcha!');
-      //event.preventDefault();
+      var cookie = $.cookie('fast_switch');
+      if(cookie) {
+        console.log('fast switch: gotcha!');
+        var csrf = $('body').data('csrf');
+        var pin = $(event.target).val() + String.fromCharCode(event.which);
+        $.ajax({
+          type: "POST",
+          url: "/async/app/fast-switch",
+          data: JSON.stringify({ pin: pin, cookie: cookie, _csrf: csrf }),
+          contentType: 'application/json',
+          success: function (data) {
+            location.reload();
+          }
+        });
+        //event.preventDefault();
+      }
     },
     loginOnEnter: function(event) {
       if (event.keyCode !== 13) { return; }

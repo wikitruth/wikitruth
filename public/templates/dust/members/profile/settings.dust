@@ -109,7 +109,7 @@
                 </div>
                 <div class="checkbox">
                     <label>
-                        Enter your 6-digit PIN:
+                        Enter your new 6-digit PIN:
                         <div>
                             <input name="pin" type="password">
                         </div>

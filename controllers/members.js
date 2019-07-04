@@ -166,14 +166,14 @@ module.exports = function (router) {
                                     postUpdateAction();
                                 }
                             } else {
-                                let cookieFound = false;
+                                let clientToDelete = null;
                                 clearcookieloop:
                                 for(let result of results) {
                                     for(let i=0; i<cookies.length; i++) {
                                         let cookie = cookies[i];
                                         if(result._id.equals(cookie.id)) {
-                                            cookieFound = true;
-                                            db.TrustedClient.findByIdAndRemove(result._id, function(err, deletedClient) {
+                                            clientToDelete = result;
+                                            db.TrustedClient.findByIdAndRemove(clientToDelete._id, function(err, deletedClient) {
                                                 if(cookies.length == 1) {
                                                     res.clearCookie(cookieName);
                                                 } else {
@@ -186,7 +186,7 @@ module.exports = function (router) {
                                         }
                                     }
                                 }
-                                if(!cookieFound) {
+                                if(!clientToDelete) {
                                     postUpdateAction();
                                 }
                             }
