@@ -7,7 +7,7 @@ var backup          = require('mongodb-backup'),
     Git             = require("nodegit"),
     templates       = require('../models/templates'),
     config          = require('../config/config'),
-    constants       = require('../models/constants'),
+    //constants       = require('../models/constants'),
     flowUtils       = require('../utils/flowUtils'),
     db              = require('../app').db.models;
 
@@ -234,6 +234,7 @@ module.exports = function (router) {
             });
 
         } else if(action === 'fix') {
+            /*
             async.series({
                 updateOwner: function (callback) {
                     db.ArgumentLink.find({ ownerId: null }).exec(function(err, results) {
@@ -265,22 +266,16 @@ module.exports = function (router) {
                     res.render(templates.admin.mongoBackup, model);
                 });
             });
+            */
 
             // this will set the default values in every doc
-            /*async.parallel({
+            async.parallel({
                 topics: function (callback) {
                     db.Topic.find({}).exec((err, results) => {
                         async.eachSeries(results, function (result, callback) {
-                            if(result.content && !result.contentPreview) {
-                                result.contentPreview = utils.getShortText(htmlToText.fromString(result.content, { wordwrap: false }), constants.SETTINGS.contentPreviewLength);
-                                //result.screening.status = constants.SCREENING_STATUS.status1.code;
-                                db.Topic.update({_id: result._id}, result, {}, function () {
-                                    //flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.topic, null, callback);
-                                    callback();
-                                });
-                            } else {
+                            db.Topic.update({_id: result._id}, result, {}, function () {
                                 callback();
-                            }
+                            });
                         }, function (err) {
                             callback();
                         });
@@ -289,9 +284,6 @@ module.exports = function (router) {
                 topicLinks: function (callback) {
                     db.TopicLink.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
-                            if(result.private) {
-                                result.screening.status = constants.SCREENING_STATUS.status1.code;
-                            }
                             db.TopicLink.update({ _id: result._id }, result, {}, callback);
                         }, function (err) {
                             callback();
@@ -301,16 +293,9 @@ module.exports = function (router) {
                 arguments: function (callback) {
                     db.Argument.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
-                            if(result.content && !result.contentPreview) {
-                                result.contentPreview = utils.getShortText(htmlToText.fromString(result.content, { wordwrap: false }), constants.SETTINGS.contentPreviewLength);
-                                //result.screening.status = constants.SCREENING_STATUS.status1.code;
-                                db.Argument.update({ _id: result._id }, result, {}, function () {
-                                    //flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.argument, null, callback);
-                                    callback();
-                                });
-                            } else {
+                            db.Argument.update({ _id: result._id }, result, {}, function () {
                                 callback();
-                            }
+                            });
                         }, function (err) {
                             callback();
                         });
@@ -319,7 +304,6 @@ module.exports = function (router) {
                 argumentLinks: function (callback) {
                     db.ArgumentLink.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
-                            result.screening.status = constants.SCREENING_STATUS.status1.code;
                             db.ArgumentLink.update({ _id: result._id }, result, {}, callback);
                         }, function (err) {
                             callback();
@@ -329,16 +313,9 @@ module.exports = function (router) {
                 questions: function (callback) {
                     db.Question.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
-                            if(result.content && !result.contentPreview) {
-                                result.contentPreview = utils.getShortText(htmlToText.fromString(result.content, { wordwrap: false }), constants.SETTINGS.contentPreviewLength);
-                                //result.screening.status = constants.SCREENING_STATUS.status1.code;
-                                db.Question.update({ _id: result._id }, result, {}, function () {
-                                    //flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.question, null, callback);
-                                    callback();
-                                });
-                            } else {
+                            db.Question.update({ _id: result._id }, result, {}, function () {
                                 callback();
-                            }
+                            });
                         }, function (err) {
                             callback();
                         });
@@ -347,16 +324,9 @@ module.exports = function (router) {
                 answers: function (callback) {
                     db.Answer.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
-                            if(result.content && !result.contentPreview) {
-                                result.contentPreview = utils.getShortText(htmlToText.fromString(result.content, { wordwrap: false }), constants.SETTINGS.contentPreviewLength);
-                                //result.screening.status = constants.SCREENING_STATUS.status1.code;
-                                db.Answer.update({ _id: result._id }, result, {}, function () {
-                                    //flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.answer, null, callback);
-                                    callback();
-                                });
-                            } else {
+                            db.Answer.update({ _id: result._id }, result, {}, function () {
                                 callback();
-                            }
+                            });
                         }, function (err) {
                             callback();
                         });
@@ -365,16 +335,9 @@ module.exports = function (router) {
                 issues: function (callback) {
                     db.Issue.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
-                            if(result.content && !result.contentPreview) {
-                                result.contentPreview = utils.getShortText(htmlToText.fromString(result.content, { wordwrap: false }), constants.SETTINGS.contentPreviewLength);
-                                //result.screening.status = constants.SCREENING_STATUS.status1.code;
-                                db.Issue.update({ _id: result._id }, result, {}, function () {
-                                    //flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.issue, null, callback);
-                                    callback();
-                                });
-                            } else {
+                            db.Issue.update({ _id: result._id }, result, {}, function () {
                                 callback();
-                            }
+                            });
                         }, function (err) {
                             callback();
                         });
@@ -383,16 +346,20 @@ module.exports = function (router) {
                 opinions: function (callback) {
                     db.Opinion.find({}).exec(function(err, results) {
                         async.eachSeries(results, function (result, callback) {
-                            if(result.content && !result.contentPreview) {
-                                result.contentPreview = utils.getShortText(htmlToText.fromString(result.content, { wordwrap: false }), constants.SETTINGS.contentPreviewLength);
-                                //result.screening.status = constants.SCREENING_STATUS.status1.code;
-                                db.Opinion.update({ _id: result._id }, result, {}, function () {
-                                    //flowUtils.updateChildrenCount(result._id, constants.OBJECT_TYPES.opinion, null, callback);
-                                    callback();
-                                });
-                            } else {
+                            db.Opinion.update({ _id: result._id }, result, {}, function () {
                                 callback();
-                            }
+                            });
+                        }, function (err) {
+                            callback();
+                        });
+                    });
+                },
+                artifacts: function (callback) {
+                    db.Artifact.find({}).exec(function(err, results) {
+                        async.eachSeries(results, function (result, callback) {
+                            db.Artifact.update({ _id: result._id }, result, {}, function () {
+                                callback();
+                            });
                         }, function (err) {
                             callback();
                         });
@@ -409,7 +376,7 @@ module.exports = function (router) {
                 }
             }, function (err, results) {
                 res.render(templates.admin.mongoBackup, model);
-            });*/
+            });
         } else if(action === 'restore') {
             var dir = backupDir + '/' + config.mongodb.dbname;
             async.series({
