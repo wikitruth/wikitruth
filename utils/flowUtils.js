@@ -2591,8 +2591,8 @@ function setModelContext(req, res, model, mixedMode) {
         model.wikiBaseUrl = model.profileBaseUrl + paths.members.profile.diary;
     } else {
         model.username = '';
-        model.profileBaseUrl = '/';
-        model.wikiBaseUrl = '/';
+        model.profileBaseUrl = '';
+        model.wikiBaseUrl = '';
     }
 }
 

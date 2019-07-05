@@ -12,7 +12,8 @@ module.exports = function(app, passport) {
 
     // this code runs for all routes
     app.use(/^[^\.]+$/, function(req, res, next) {
-        //res.cookie('_csrfToken', req.csrfToken());
+        res.cookie('_csrfToken', req.csrfToken());
+        res.locals._csrf = req.csrfToken(); // should be no longer needed even adding _csrf manually in forms or request body
 
         let cookies = req.cookies.fast_switch || [];
         if(cookies.length > 0) {

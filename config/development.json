@@ -51,6 +51,23 @@
                     }
                 ]
             }
+        },
+
+        "fileNotFound": {
+            "enabled": false,
+            "priority": 130,
+            "module": {
+                "name": "kraken-js/middleware/404",
+                "arguments": [ "dust/errors/404" ]
+            }
+        },
+        "serverError": {
+            "enabled": false,
+            "priority": 140,
+            "module": {
+                "name": "kraken-js/middleware/500",
+                "arguments": [ "dust/errors/500" ]
+            }
         }
     }
 }
