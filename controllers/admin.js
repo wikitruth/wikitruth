@@ -440,7 +440,7 @@ module.exports = function (router) {
                                                     async.eachSeries(jsons, function (json, callback) {
                                                         // each entry
                                                         var file = collectionDir + '/' + json;
-                                                        console.log('file: ' + file);
+                                                        //console.log('file: ' + file);
                                                         var obj = JSON.parse(fs.readFileSync(file, 'utf8'));
                                                         collection.create(obj, function (err, newObj) {
                                                             if (err) {
