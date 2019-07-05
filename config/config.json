@@ -48,6 +48,23 @@
             }
         },
 
+        "appsec": {
+            "enabled": true,
+            "priority": 110,
+            "module": {
+                "name": "lusca",
+                "arguments": [
+                    {
+                        "csrf": false,
+                        "xssProtection": true,
+                        "xframe": "SAMEORIGIN",
+                        "p3p": false,
+                        "csp": false
+                    }
+                ]
+            }
+        },
+
         "fileNotFound": {
             "enabled": true,
             "priority": 130,
@@ -56,7 +73,6 @@
                 "arguments": [ "dust/errors/404" ]
             }
         },
-
         "serverError": {
             "enabled": true,
             "priority": 140,

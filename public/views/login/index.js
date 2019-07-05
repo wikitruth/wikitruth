@@ -48,13 +48,12 @@
         $.ajax({
           type: "POST",
           url: "/async/app/fast-switch",
-          data: JSON.stringify({ pin: pin, cookie: cookie, _csrf: csrf }),
+          data: JSON.stringify({ pin: pin, cookie: cookie, _xcsrf: csrf }),
           contentType: 'application/json',
           success: function (data) {
-            location.reload();
+            //alert('success')
           }
         });
-        //event.preventDefault();
       }
     },
     loginOnEnter: function(event) {

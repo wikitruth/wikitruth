@@ -36,6 +36,7 @@ module.exports = {
         return Math.floor(seconds) + (fullWord ? " seconds": 's');
     },
     urlify: function urlify(text){
+        if(!text) return '';
         return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "-").replace(/^-+|-+$/g, '');
     },
     isObjectIdString: function (id) {

@@ -17,7 +17,7 @@ var config          = require('./config/config'),
     bluebird        = require('bluebird'),
     helmet          = require('helmet'),
     cons            = require('consolidate'),
-    //csrf          = require('csurf'),
+    csrf            = require('csurf'),
     kraken          = require('kraken-js');
 
 var options, app;
@@ -90,7 +90,7 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-//app.use(csrf({ cookie: { signed: true } }));
+app.use(csrf({ cookie: { signed: true } })); //kraken-js:lusca is already using csrf module
 helmet(app);
 
 // setup response locals
@@ -122,7 +122,7 @@ require('./middlewares/passport')(app, passport);
 require('./middlewares/routes')(app, passport);
 
 //custom (friendly) error handler
-app.use(require('./public/templates/jade/http/index').http500);
+//app.use(require('./public/templates/jade/http/index').http500);
 // check https://github.com/krakenjs/kraken-js/issues/447
 
 //setup utilities

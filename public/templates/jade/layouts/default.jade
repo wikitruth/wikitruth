@@ -16,7 +16,7 @@ html
         })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
         ga('create', '#{googleAnalyticsTrackingId}', 'auto');
         ga('send', 'pageview');
-  body
+  body(data-csrf='#{_csrf}')
     div.navbar.navbar-default.navbar-fixed-top
       div.container-fluid
         div.navbar-header
