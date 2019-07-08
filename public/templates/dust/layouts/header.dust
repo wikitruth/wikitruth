@@ -76,7 +76,7 @@
                             <li><a href="#/switch?content=3">{?showEverything}<i class="fa fa-circle"></i>{:else}<i class="fa fa-circle-o"></i>{/showEverything} Everything</a></li>!}
                             <li role="separator" class="divider"></li>
                             {?fastSwitch}
-                                <li><a href="{paths.fastSwitch}"><i class="fa fa-undo"></i> Fast Switch</a></li>
+                                <li><a href="{paths.logoutSwitch}"><i class="fa fa-undo"></i> Fast Switch</a></li>
                             {/fastSwitch}
                             <li><a href="{paths.logout}"><i class="fa fa-sign-out"></i> Sign Out</a></li>
                         </ul>

@@ -42,7 +42,7 @@
       // check cookies if fast switch is enabled
       var cookie = $.cookie('fast_switch');
       if(cookie) {
-        console.log('fast switch: gotcha!');
+        //console.log('fast switch: gotcha!');
         var csrf = $('body').data('csrf');
         var pin = $(event.target).val() + String.fromCharCode(event.which);
         $.ajax({

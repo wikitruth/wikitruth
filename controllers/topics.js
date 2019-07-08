@@ -157,11 +157,7 @@ function GET_entry(req, res) {
                             var ids = links.map(function (link) {
                                 return link.parentId;
                             });
-                            var query = {
-                                _id: {
-                                    $in: ids
-                                }
-                            };
+                            var query = {_id: {$in: ids}};
                             db.Topic
                                 .find(query)
                                 .sort({title: 1})
@@ -395,11 +391,7 @@ function GET_link_entry(req, res) {
                             var ids = links.map(function (link) {
                                 return link.parentId;
                             });
-                            var query = {
-                                _id: {
-                                    $in: ids
-                                }
-                            };
+                            var query = {_id: {$in: ids}};
                             db.Topic
                                 .find(query)
                                 .sort({title: 1})

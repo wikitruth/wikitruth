@@ -29,6 +29,7 @@ module.exports = function less(grunt) {
                 'public/layouts/core.min.css': [
                     'public/less/bootstrap-build.less',
                     'public/less/font-awesome-build.less',
+                    'public/less/components.less',
                     'public/layouts/core.less'
                 ],
                 'public/layouts/admin.min.css': ['public/layouts/admin.less']

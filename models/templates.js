@@ -12,6 +12,7 @@ module.exports = {
         index: 'dust/about/page'
     },
     search: 'dust/search',
+    fastSwitch: 'dust/fast-switch',
     groups: {
         index: 'dust/groups/index',
         create: 'dust/groups/create',

@@ -7,6 +7,7 @@
         signup: '/signup',
         login: '/login',
         logout: '/logout',
+        logoutSwitch: '/logout-switch',
         fastSwitch: '/fast-switch',
         search: '/search',
         admin: {
