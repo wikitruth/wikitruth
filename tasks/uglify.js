@@ -42,6 +42,7 @@ module.exports = function uglify(grunt) {
                 ],
                 'public/layouts/admin.min.js': ['public/layouts/admin.js'],
                 'public/js/app.min.js': [
+                    'public/components/bootstrap-pincode-input/js/bootstrap-pincode-input.js',
                     'models/constants.js',
                     'models/paths.js',
                     'public/js/app.js'

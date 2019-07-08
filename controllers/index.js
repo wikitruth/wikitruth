@@ -279,10 +279,15 @@ module.exports = function (router) {
         issueController.GET_entry(req, res);
     });
 
-    router.get('/fast-switch', function (req, res) {
+    router.get('/logout-switch', function (req, res) {
         req.session.destroy();
         req.logout();
-        res.redirect('/login');
+        res.redirect(paths.fastSwitch);
+    });
+
+    router.get('/fast-switch', function (req, res) {
+        var model = {};
+        res.render(templates.fastSwitch, model);
     });
 
     /* Related */

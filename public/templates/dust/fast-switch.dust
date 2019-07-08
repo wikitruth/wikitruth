@@ -1,0 +1,34 @@
+{>"dust/layouts/master" /}
+
+{<title}
+    Fast Switch - {titleSlogan}
+{/title}
+
+{<body}
+    <h1 class="page-header wt-header">Fast Switch</h1>
+    <ul class="nav nav-tabs wt-tabs" role="tablist">
+        <li role="presentation">
+            <a href="{paths.login}" role="tab">
+                <i class="fa fa-user"></i> Login
+            </a>
+        </li>
+        <li role="presentation" class="active">
+            <a href="{paths.fastSwitch}" role="tab">
+                <i class="fa fa-undo"></i> Fast Switch
+            </a>
+        </li>
+    </ul>
+    <div class="row">
+        <div class="col-lg-6 col-md-8 col-sm-8">
+            <input type="text" id="fastSwitch" name="fastSwitch">
+        </div>
+    </div>
+{/body}
+
+{<footer}
+    <script type="text/javascript">
+        $(function() {
+            $('#fastSwitch').pincodeInput({inputs: 6, hidedigits: true});
+        });
+    </script>
+{/footer}
