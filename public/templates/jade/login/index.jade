@@ -9,8 +9,18 @@ block feet
 block body
   div.row
     div.col-sm-6
-      div.page-header
+      div.page-header1(style='margin-top: 40px; margin-bottom: 20px')
         h1 Sign In
+      ul.nav.nav-tabs.wt-tabs(role='tablist')
+        li(role='presentation')
+          a(href='#{paths.login}', role='tab')
+            i.fa.fa-user
+            |  Login
+        li(role='presentation')
+          a(href='#{paths.fastSwitch}', role='tab')
+            i.fa.fa-undo
+            |  Fast Switch
+      br
       div#login
       if oauthTwitter || oauthGitHub || oauthFacebook || oauthGoogle || oauthTumblr
         hr
