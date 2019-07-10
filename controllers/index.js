@@ -286,7 +286,13 @@ module.exports = function (router) {
     });
 
     router.get('/fast-switch', function (req, res) {
-        var model = {};
+        let model = {};
+        res.render(templates.fastSwitch, model);
+    });
+
+    router.post('/fast-switch', function (req, res) {
+        let fastSwitch = req.body.fastSwitch;
+        let model = {};
         res.render(templates.fastSwitch, model);
     });
 

@@ -20,24 +20,37 @@
     </ul>
     <br/>
     <p><strong>Enter your PIN to continue.</strong></p>
-    <div class="row">
-        <div class="col-md-12">
-            <div class="form-group form-group-lg">
-                <input type="text" id="fastSwitch" name="fastSwitch">
+    <form method="post">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group form-group-lg">
+                    <input type="hidden" name="_csrf" value="{_csrf}">
+                    <input type="text" id="fastSwitch" name="fastSwitch">
+                </div>
             </div>
         </div>
-    </div>
+    </form>
 {/body}
 
 {<footer}
     <script type="text/javascript">
-        $(function() {
-            var pincode = $('#fastSwitch').pincodeInput({inputs: 6, hidedigits: true, complete: function(value, e, errorElement){
-                console.log("code entered: " + value);
+        $(function () {
+            var pincode = $('#fastSwitch').pincodeInput({
+                inputs: 6, hidedigits: true, complete: function (value, e, errorElement) {
+                    console.log("code entered: " + value);
 
-                /*do some code checking here
-                $(errorElement).html("I'm sorry, but the code not correct");*/
-            }});
+                    /*do some code checking here
+                    $(errorElement).html("I'm sorry, but the code not correct");*/
+
+                    /*$("form").submit(function (event) {
+                        alert("Handler for .submit() called.");
+                        event.preventDefault();
+                    });*/
+
+                    $( "form" ).submit();
+
+                }
+            });
 
             $(pincode).data('plugin_pincodeInput').focus();
         });
