@@ -43,6 +43,7 @@ module.exports = function(app, passport) {
                 var application = applications.getApplication(req);
                 res.locals.application = application;
                 if(application) {
+                    // a sub-application. set cache to req-level
                     application.resPath = application.id + '/';
                     res.locals.projectName = application.navTitle;
                     res.locals.titleSlogan = application.slogan;
@@ -59,6 +60,7 @@ module.exports = function(app, passport) {
                         callback();
                     }
                 } else {
+                    // the default Wikitruth Project application. set cache to app-level
                     if(!app.locals.appCategories) {
                         flowUtils.getCategories(model, null, req, function () {
                             app.locals.appCategories = model.categories;
