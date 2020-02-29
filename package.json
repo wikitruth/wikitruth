@@ -34,7 +34,7 @@
     "express": "^4.16.4",
     "express-session": "^1.16.1",
     "fs": "0.0.1-security",
-    "handlebars": "^4.1.2",
+    "handlebars": "^4.3.0",
     "helmet": "^3.16.0",
     "html-to-text": "^3.3.0",
     "imagemagick": "^0.1.3",
