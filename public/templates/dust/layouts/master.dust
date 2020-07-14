@@ -161,11 +161,13 @@
                         <li role="separator" class="divider"></li>
                     {/diaryCategories}
                     {! ## Groups section ## !}
-                    <li class="dropdown-header"><a href="{paths.groups.index}">Groups <i class="fa fa-group text-color-3-x" aria-hidden="true"></i></a><a href="{paths.groups.create}" class="pull-right">+ Create</a></li>
-                    {#myGroups}
-                        <li><a href="{paths.groups.index}/{friendlyUrl}/{_id}"><i class="fa fa-group text-color-3-x" aria-hidden="true"></i> {title}</a></li>
-                    {/myGroups}
-                    <li role="separator" class="divider"></li>
+                    {?username}
+                        <li class="dropdown-header"><a href="{paths.groups.index}">Groups <i class="fa fa-group text-color-3-x" aria-hidden="true"></i></a><a href="{paths.groups.create}" class="pull-right">+ Create</a></li>
+                        {#myGroups}
+                            <li><a href="{paths.groups.index}/{friendlyUrl}/{_id}"><i class="fa fa-group text-color-3-x" aria-hidden="true"></i> {title}</a></li>
+                        {/myGroups}
+                        <li role="separator" class="divider"></li>
+                    {/username}
                     {! ## Explore section ## !}
                     <li class="dropdown-header"><a href="{paths.wiki.index}">Explore</a></li>
                     {#appCategories}

@@ -24,9 +24,15 @@ module.exports = function (router) {
                 results.forEach(function (result) {
                     result.friendlyUrl = utils.urlify(result.title);
                 });
-                model.privateGroups = results.filter(function (group) {
-                    return group.privacyType !== constants.GROUP_PRIVACY_TYPES.type10.code;
-                });
+                if(req.user) {
+                    model.privateGroups = results.filter(function (group) {
+                        // FIXME: should check if the current user is a member
+                        return group.privacyType !== constants.GROUP_PRIVACY_TYPES.type10.code
+                            && group.members.filter(function (member) {
+                                return member.userId.equals(req.user.id);
+                            }) != null;
+                    });
+                }
                 model.publicGroups = results.filter(function (group) {
                     return group.privacyType == constants.GROUP_PRIVACY_TYPES.type10.code;
                 });

@@ -25,7 +25,7 @@ module.exports = function (router) {
         };
         var MAX_RESULT = 5;
         var model = {};
-        db.User.findOne({}, function(err, result) {
+        db.Topic.findOne({}, function(err, result) {
             if(!result) {
                 res.redirect(paths.install);
             } else {

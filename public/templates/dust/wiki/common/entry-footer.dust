@@ -27,11 +27,13 @@
         {^entry.sameEditDate}
             <div class="col-lg-3 col-md-6 col-sm-6 col-xs-6">
                 <div class="media wt-category-x">
-                    <div class="media-left media-top">
-                        <a href="{paths.members.index}/{entry.editUsername}">
-                            <div class="wt-photo-small wt-geopattern-title" title="{entry.editUsername}"></div>
-                        </a>
-                    </div>
+                    {?entry.editUsername}
+                        <div class="media-left media-top">
+                            <a href="{paths.members.index}/{entry.editUsername}">
+                                <div class="wt-photo-small wt-geopattern-title" title="{entry.editUsername}"></div>
+                            </a>
+                        </div>
+                    {/entry.editUsername}
                     <div class="media-body">
                         <h4 class="media-heading"><a href="{paths.members.index}/{entry.editUsername}">{entry.editUsername}</a></h4>
                         <small class="text-muted"><i class="fa fa-clock-o text-muted-2"></i> Edited <span title="{entry.editDate}">{entry.editDateString}</span></small>
@@ -47,11 +49,13 @@
                 </small>
             {:else}
                 <div class="media wt-category-x">
-                    <div class="media-left media-top">
-                        <a href="{paths.members.index}/{entry.createUsername}">
-                            <div class="wt-photo-small wt-geopattern-title" title="{entry.createUsername}"></div>
-                        </a>
-                    </div>
+                    {?entry.createUsername}
+                        <div class="media-left media-top">
+                            <a href="{paths.members.index}/{entry.createUsername}">
+                                <div class="wt-photo-small wt-geopattern-title" title="{entry.createUsername}"></div>
+                            </a>
+                        </div>
+                    {/entry.createUsername}
                     <div class="media-body">
                         <h4 class="media-heading"><a href="{paths.members.index}/{entry.createUsername}">{entry.createUsername}</a></h4>
                         <small class="text-muted"><i class="fa fa-clock-o text-muted-2"></i> Posted <span title="{entry.createDate}">{entry.createDateString}</span>

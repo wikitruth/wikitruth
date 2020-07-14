@@ -458,14 +458,18 @@ function setEditorsUsername(items, callback) {
 
 function setCreateUsername(item, callback) {
     db.User.findOne({_id: item.createUserId}, function (err, user) {
-        item.createUsername = user.username;
+        if(user) {
+            item.createUsername = user.username;
+        }
         callback(err);
     });
 }
 
 function setEditUsername(item, callback) {
     db.User.findOne({_id: item.editUserId}, function (err, user) {
-        item.editUsername = user.username;
+        if(user) {
+            item.editUsername = user.username;
+        }
         callback(err);
     });
 }
