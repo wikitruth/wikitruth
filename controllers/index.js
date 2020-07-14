@@ -1,19 +1,21 @@
 'use strict';
 
-var templates   = require('../models/templates'),
-    paths       = require('../models/paths'),
-    constants   = require('../models/constants'),
-    flowUtils   = require('../utils/flowUtils'),
-    db          = require('../app').db.models,
-    async       = require('async');
+var templates       = require('../models/templates'),
+    paths           = require('../models/paths'),
+    constants       = require('../models/constants'),
+    flowUtils       = require('../utils/flowUtils'),
+    db              = require('../app').db.models,
+    jwt             = require('jsonwebtoken'),
+    cookieParser    = require('cookie-parser'),
+    async           = require('async');
 
-var topicController     = require('./topics'),
-    argumentController  = require('./arguments'),
-    artifactController  = require('./artifacts'),
-    opinionController     = require('./opinions'),
-    questionController     = require('./questions'),
-    answerController     = require('./answers'),
-    issueController     = require('./issues');
+var topicController         = require('./topics'),
+    argumentController      = require('./arguments'),
+    artifactController      = require('./artifacts'),
+    opinionController       = require('./opinions'),
+    questionController      = require('./questions'),
+    answerController        = require('./answers'),
+    issueController         = require('./issues');
 
 module.exports = function (router) {
 
@@ -291,9 +293,33 @@ module.exports = function (router) {
     });
 
     router.post('/fast-switch', function (req, res) {
-        let fastSwitch = req.body.fastSwitch;
         let model = {};
-        res.render(templates.fastSwitch, model);
+        let cookieString = req.body.cookie;
+        let pin = req.body.pin;
+        let success = false;
+        if(cookieString && pin && pin.length == 6) {
+            let secret = pin + '|' + req.app.config.jwtSecret;
+            let cookies = cookieParser.JSONCookie(cookieString);
+            if(cookies.length > 0) {
+                for (let cookie of cookies) {
+                    jwt.verify(cookie.data, secret, function (err, decoded) {
+                        if (!err && decoded && decoded.userId) {
+                            // pin matched, auto-login the user
+                            // decoded.userId
+                            // cookie.id -- client_id
+                            success = true;
+                            // redirect
+
+                        }
+                    });
+                }
+            }
+        }
+
+        if(!success) {
+            model.error = 'Not cookies or session found.';
+            res.render(templates.fastSwitch, model);
+        }
     });
 
     /* Related */
