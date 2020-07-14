@@ -25,7 +25,7 @@
             <div class="col-md-12">
                 <div class="form-group form-group-lg">
                     <input type="hidden" name="_csrf" value="{_csrf}">
-                    <input type="text" id="fastSwitch" name="fastSwitch">
+                    <input type="text" id="pin" name="pin">
                 </div>
             </div>
         </div>
@@ -35,7 +35,7 @@
 {<footer}
     <script type="text/javascript">
         $(function () {
-            var pincode = $('#fastSwitch').pincodeInput({
+            var pincode = $('#pin').pincodeInput({
                 inputs: 6, hidedigits: true, complete: function (value, e, errorElement) {
                     console.log("code entered: " + value);
 

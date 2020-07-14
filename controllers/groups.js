@@ -30,7 +30,7 @@ module.exports = function (router) {
                         return group.privacyType !== constants.GROUP_PRIVACY_TYPES.type10.code
                             && group.members.filter(function (member) {
                                 return member.userId.equals(req.user.id);
-                            }) != null;
+                            });
                     });
                 }
                 model.publicGroups = results.filter(function (group) {
