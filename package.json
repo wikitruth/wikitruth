@@ -61,7 +61,7 @@
     "passport-oauth": "^1.x.x",
     "passport-tumblr": "^0.1.x",
     "passport-twitter": "^1.0.4",
-    "pug": "^2.0.4",
+    "pug": "^3.0.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "requirejs": "^2.3.6",
