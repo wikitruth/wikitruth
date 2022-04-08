@@ -46,7 +46,7 @@
     "localizr": "^1.1.0",
     "makara": "^2.1.0",
     "method-override": "^2.3.9",
-    "moment": "^2.27.0",
+    "moment": "^2.29.2",
     "mongodb-backup": "^1.6.9",
     "mongodb-restore": "^1.6.2",
     "mongoose": "^5.9.24",
