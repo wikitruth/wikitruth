@@ -16,7 +16,7 @@
   },
   "dependencies": {
     "adaro": "^0.1.10",
-    "async": "^2.6.3",
+    "async": "^3.2.2",
     "backbone": "^1.4.0",
     "bcrypt": "^5.0.1",
     "bluebird": "^3.7.2",
