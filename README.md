@@ -39,7 +39,7 @@ If someone wanted to find information about different topics or explore the vast
 * Citizendium
 
 ## Design Documents & Notes
-[View on Google Drive](https://drive.google.com/folderview?id=0B_bsKNkSe3qYUzVEdDVrTkhYdzA&usp=sharing)
+[View on Google Drive](https://drive.google.com/drive/folders/0B_bsKNkSe3qYUzVEdDVrTkhYdzA?resourcekey=0-W2a2MfOvcwrGFQg7Lrs4gA&usp=sharing)
 
 ## Requirements
 
