@@ -49,6 +49,12 @@ We use [`bcrypt`](https://github.com/ncb000gt/node.bcrypt.js) for hashing secret
 
 We use [`emailjs`](https://github.com/eleith/emailjs) for email transport. If you have issues sending email refer to [this wiki page](https://github.com/jedireza/drywall/wiki/Trouble-sending-email).
 
+Install global modules:
+```bash
+$ npm install -g bower
+$ npm install -g grunt-cli
+```
+
 ## Setup
 
 First, build the project.
