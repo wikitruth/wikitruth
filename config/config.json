@@ -1,6 +1,6 @@
 {
     "mongodb": {
-        "uri": "mongodb://localhost/wikitruth"
+        "uri": "mongodb://127.0.0.1/wikitruth"
     },
 
     "express": {
