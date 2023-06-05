@@ -2,7 +2,7 @@
 
 exports.port = process.env.PORT || 8000;
 exports.mongodb = {
-  uri: process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost:27017/wikitruth',
+  uri: process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://127.0.0.1:27017/wikitruth',
   dbname: 'wikitruth',
   //backupRoot: '~/../wikitruth-mongodb',
   backupRoot: '~/config/mongodb',
