@@ -52,6 +52,7 @@
     "mongoose": "^5.9.24",
     "morgan": "^1.10.0",
     "mv": "^2.1.1",
+    "nodegit": "^0.27.0",
     "passport": "^0.4.1",
     "passport-facebook": "^2.1.1",
     "passport-github": "^1.1.0",
