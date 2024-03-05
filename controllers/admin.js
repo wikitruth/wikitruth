@@ -1,6 +1,6 @@
 'use strict';
 
-var backup          = require('mongodb-backup'),
+var backup          = require('mongodb-backup-fixed'),
     fs              = require('fs'),
     path            = require("path"),
     async           = require('async'),
