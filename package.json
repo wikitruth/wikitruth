@@ -47,7 +47,7 @@
     "makara": "^2.1.0",
     "method-override": "^2.3.9",
     "moment": "^2.27.0",
-    "mongodb-backup": "^1.6.9",
+    "mongodb-backup-fixed": "^1.7.2",
     "mongodb-restore": "^1.6.2",
     "mongoose": "^5.9.25",
     "morgan": "^1.10.0",
