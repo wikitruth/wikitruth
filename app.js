@@ -51,7 +51,7 @@ app.config = config;
 
 //setup mongoose
 mongoose.Promise = bluebird;
-app.db = mongoose.createConnection(config.mongodb.uri, { useNewUrlParser: true, useCreateIndex: true });
+app.db = mongoose.createConnection(config.mongodb.uri, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true });
 app.db.on('error', console.error.bind(console, 'mongoose connection error: '));
 app.db.once('open', function () {
     //and... we have a data store
@@ -68,6 +68,7 @@ app.disable('x-powered-by');
 if(config.trustProxy) {
     app.set('trust proxy', config.trustProxy);
 }
+//app.enable('trust proxy');
 app.engine('jade', cons.jade);
 app.engine('pug', cons.pug);
 app.engine('vash', cons.vash);
