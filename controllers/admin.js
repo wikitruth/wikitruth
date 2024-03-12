@@ -4,7 +4,7 @@ var backup          = require('mongodb-backup-fixed'),
     fs              = require('fs'),
     path            = require("path"),
     async           = require('async'),
-    Git             = require("nodegit"),
+    // Git             = require("nodegit"),
     templates       = require('../models/templates'),
     config          = require('../config/config'),
     //constants       = require('../models/constants'),
@@ -54,105 +54,105 @@ function performGitBackup(backupDir, pathspec, gitConfig, callback) {
         gitConfig.remote = 'origin';
     }
 
-    Git.Repository.open(pathToRepo)
-        .then(function (repoResult) {
-            // Inside of this function we have an open repo
-            repo = repoResult;
-        })
-        .then(function() {
-            return repo.refreshIndex();
-        })
-        .then(function(indexResult) {
-            index = indexResult;
-        })
-        .then(function() {
-            return Git.Diff.indexToWorkdir(repo, null, { flags: Git.Diff.OPTION.SHOW_UNTRACKED_CONTENT | Git.Diff.OPTION.RECURSE_UNTRACKED_DIRS, pathspec: pathspec })
-                .then(function (diff) {
-                    return diff.patches()
-                        .then(function(patches) {
-                            //console.log('diff.patches(): ' + patches.length);
-                            if(patches.length > 0) {
-                                // this file is in the root of the directory and doesn't need a full path
-                                //return index.addByPath(fileName);
-                                return index.addAll(pathspec);
-                            } else {
-                                result.nothingToPush = true;
-                                // Abort the operation
-                                throw new Error("Nothing new to commit and push.");
-                            }
-                            /*patches.forEach((patch) => {
-                                patch.hunks().then((hunks) => {
-                                    console.log('diff.hunks(): ' + hunks.length);
-                                    hunks.forEach((hunk) => {
-                                        hunk.lines().then((lines) => {
-                                            console.log("diff", patch.oldFile().path(), patch.newFile().path());
-                                            console.log(hunk.header().trim());
-                                            lines.forEach((line) => {
-                                                console.log(String.fromCharCode(line.origin()) + line.content().trim());
-                                            });
-                                        });
-                                    });
-                                });
-                            });*/
-                        });
-                });
-        })
-        .then(function() {
-            // this will write both files to the index
-            return index.write();
-        })
-        .then(function() {
-            return index.writeTree();
-        })
-        .then(function(oidResult) {
-            oid = oidResult;
-            return Git.Reference.nameToId(repo, "HEAD");
-        })
-        .then(function(head) {
-            return repo.getCommit(head);
-        })
-        .then(function(parent) {
-            var author = Git.Signature.now(gitConfig.signature.name, gitConfig.signature.email);
-            var committer = author;
-            return repo.createCommit("HEAD", author, committer, "db changes backup " + (new Date()).toISOString(), oid, [parent]);
-        })
-        .then(function(commitId) {
-            console.log("New Commit: ", commitId);
-            return Git.Remote.lookup(repo, gitConfig.remote);
-        })
-        .then(function(remote) {
-            // Use remote
-            //var firstPass = true;
-            return remote.push(
-                ["refs/heads/" + gitConfig.branch + ":refs/heads/" + gitConfig.branch], {
-                    callbacks: {
-                        credentials: function(url, userName) {
-                            /*if (firstPass) {
-                                firstPass = false;
-                                if (url.indexOf("https") === -1) {
-                                    return Git.Cred.sshKeyFromAgent('XYZ');
-                                } else {
-                                    return Git.Cred.userpassPlaintextNew('XYZ', "XYZ");
-                                }
-                            } else {
-                                return Git.Cred.defaultNew();
-                            }
-                            return Git.Cred.sshKeyFromAgent(userName);*/
-                            console.log('Git is asking for username/password:', url, userName);
-                        }
-                    }
-                }
-            );
-        })
-        .catch(function (err) {
-            // failure is handled here
-            console.log('Promise catch: ' + err);
-            result.err = err;
-        })
-        .done(function() {
-            console.log('Git push done!');
-            callback(null, result);
-        });
+    // Git.Repository.open(pathToRepo)
+    //     .then(function (repoResult) {
+    //         // Inside of this function we have an open repo
+    //         repo = repoResult;
+    //     })
+    //     .then(function() {
+    //         return repo.refreshIndex();
+    //     })
+    //     .then(function(indexResult) {
+    //         index = indexResult;
+    //     })
+    //     .then(function() {
+    //         return Git.Diff.indexToWorkdir(repo, null, { flags: Git.Diff.OPTION.SHOW_UNTRACKED_CONTENT | Git.Diff.OPTION.RECURSE_UNTRACKED_DIRS, pathspec: pathspec })
+    //             .then(function (diff) {
+    //                 return diff.patches()
+    //                     .then(function(patches) {
+    //                         //console.log('diff.patches(): ' + patches.length);
+    //                         if(patches.length > 0) {
+    //                             // this file is in the root of the directory and doesn't need a full path
+    //                             //return index.addByPath(fileName);
+    //                             return index.addAll(pathspec);
+    //                         } else {
+    //                             result.nothingToPush = true;
+    //                             // Abort the operation
+    //                             throw new Error("Nothing new to commit and push.");
+    //                         }
+    //                         /*patches.forEach((patch) => {
+    //                             patch.hunks().then((hunks) => {
+    //                                 console.log('diff.hunks(): ' + hunks.length);
+    //                                 hunks.forEach((hunk) => {
+    //                                     hunk.lines().then((lines) => {
+    //                                         console.log("diff", patch.oldFile().path(), patch.newFile().path());
+    //                                         console.log(hunk.header().trim());
+    //                                         lines.forEach((line) => {
+    //                                             console.log(String.fromCharCode(line.origin()) + line.content().trim());
+    //                                         });
+    //                                     });
+    //                                 });
+    //                             });
+    //                         });*/
+    //                     });
+    //             });
+    //     })
+    //     .then(function() {
+    //         // this will write both files to the index
+    //         return index.write();
+    //     })
+    //     .then(function() {
+    //         return index.writeTree();
+    //     })
+    //     .then(function(oidResult) {
+    //         oid = oidResult;
+    //         return Git.Reference.nameToId(repo, "HEAD");
+    //     })
+    //     .then(function(head) {
+    //         return repo.getCommit(head);
+    //     })
+    //     .then(function(parent) {
+    //         var author = Git.Signature.now(gitConfig.signature.name, gitConfig.signature.email);
+    //         var committer = author;
+    //         return repo.createCommit("HEAD", author, committer, "db changes backup " + (new Date()).toISOString(), oid, [parent]);
+    //     })
+    //     .then(function(commitId) {
+    //         console.log("New Commit: ", commitId);
+    //         return Git.Remote.lookup(repo, gitConfig.remote);
+    //     })
+    //     .then(function(remote) {
+    //         // Use remote
+    //         //var firstPass = true;
+    //         return remote.push(
+    //             ["refs/heads/" + gitConfig.branch + ":refs/heads/" + gitConfig.branch], {
+    //                 callbacks: {
+    //                     credentials: function(url, userName) {
+    //                         /*if (firstPass) {
+    //                             firstPass = false;
+    //                             if (url.indexOf("https") === -1) {
+    //                                 return Git.Cred.sshKeyFromAgent('XYZ');
+    //                             } else {
+    //                                 return Git.Cred.userpassPlaintextNew('XYZ', "XYZ");
+    //                             }
+    //                         } else {
+    //                             return Git.Cred.defaultNew();
+    //                         }
+    //                         return Git.Cred.sshKeyFromAgent(userName);*/
+    //                         console.log('Git is asking for username/password:', url, userName);
+    //                     }
+    //                 }
+    //             }
+    //         );
+    //     })
+    //     .catch(function (err) {
+    //         // failure is handled here
+    //         console.log('Promise catch: ' + err);
+    //         result.err = err;
+    //     })
+    //     .done(function() {
+    //         console.log('Git push done!');
+    //         callback(null, result);
+    //     });
 }
 
 module.exports = function (router) {
