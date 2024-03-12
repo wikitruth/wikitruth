@@ -2,7 +2,7 @@
 
 exports.port = process.env.PORT || 8000;
 exports.mongodb = {
-  uri: process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost:27017/wikitruth',
+  uri: process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://127.0.0.1:27017/wikitruth',
   dbname: 'wikitruth',
   //backupRoot: '~/../wikitruth-mongodb',
   backupRoot: '~/config/mongodb',
@@ -72,7 +72,7 @@ exports.mongodb = {
 exports.companyName = 'Wikitruth Foundation';
 exports.projectName = 'Wikitruth';
 exports.titleSlogan = 'Wikitruth, the truth in totality of human knowledge';
-exports.homeUrl = 'https://wikitruth.co';
+exports.homeUrl = 'https://wikitruth.net';
 exports.systemEmail = 'your@email.com';
 exports.cryptoKey = 'abc123';
 exports.cacheBreaker = 'abc123';

@@ -1,1 +1,1 @@
-{"_id":"561b43d499a0478551eab838","__v":0,"search":[],"timeCreated":"2016-08-10T23:36:27.854Z","permissions":[],"groups":["root"],"name":{"last":"Admin","middle":"","first":"Root","full":"Root Admin"},"user":{"id":"561b43d499a0478551eab839","name":"root"}}
+{"_id":"561b43d499a0478551eab838","user":{"name":"root","id":"561b43d499a0478551eab839"},"name":{"full":"Root Admin","first":"Root","middle":"","last":"Admin"},"groups":["root"],"search":[],"__v":0,"timeCreated":"2016-08-10T23:36:27.854Z","permissions":[]}
