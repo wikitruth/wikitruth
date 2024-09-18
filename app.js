@@ -1,26 +1,26 @@
 'use strict';
 
 //dependencies
-var config          = require('./config/config'),
-    paths           = require('./models/paths'),
-    constants       = require('./models/constants'),
-    contents        = require('./models/contents'),
-    templates       = require('./models/templates'),
-    applications    = require('./models/applications'),
-    express         = require('express'),
-    cookieParser    = require('cookie-parser'),
-    bodyParser      = require('body-parser'),
-    session         = require('express-session'),
-    mongoStore      = require('connect-mongo')(session),
-    passport        = require('passport'),
-    mongoose        = require('mongoose'),
-    bluebird        = require('bluebird'),
-    helmet          = require('helmet'),
-    cons            = require('consolidate'),
-    csrf            = require('csurf'),
-    kraken          = require('kraken-js');
+const config = require('./config/config'),
+    paths = require('./models/paths'),
+    constants = require('./models/constants'),
+    contents = require('./models/contents'),
+    templates = require('./models/templates'),
+    applications = require('./models/applications'),
+    express = require('express'),
+    cookieParser = require('cookie-parser'),
+    bodyParser = require('body-parser'),
+    session = require('express-session'),
+    mongoStore = require('connect-mongo')(session),
+    passport = require('passport'),
+    mongoose = require('mongoose'),
+    bluebird = require('bluebird'),
+    helmet = require('helmet'),
+    cons = require('consolidate'),
+    csrf = require('csurf'),
+    kraken = require('kraken-js');
 
-var options, app;
+let options, app;
 
 /*
  * Create and configure application. Also exports application instance for use by tests.
@@ -40,7 +40,6 @@ app = module.exports = express();
 app.use(kraken(options));
 
 
-
 /* start of drywell routines */
 
 //keep reference to config
@@ -51,10 +50,17 @@ app.config = config;
 
 //setup mongoose
 mongoose.Promise = bluebird;
-app.db = mongoose.createConnection(config.mongodb.uri, { useNewUrlParser: true, useCreateIndex: true, useUnifiedTopology: true });
+app.db = mongoose.createConnection(config.mongodb.uri, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true
+});
 app.db.on('error', console.error.bind(console, 'mongoose connection error: '));
 app.db.once('open', function () {
-    //and... we have a data store
+    // and... we have a data store
+});
+app.db.on('disconnected', () => {
+    console.error('MongoDB disconnected. Attempting to reconnect...');
 });
 
 //config data models
@@ -65,7 +71,7 @@ app.disable('x-powered-by');
 //app.set('port', config.port);
 //app.set('views', path.join(__dirname, 'views'));
 //app.set('view engine', 'jade');
-if(config.trustProxy) {
+if (config.trustProxy) {
     app.set('trust proxy', config.trustProxy);
 }
 //app.enable('trust proxy');
@@ -81,17 +87,25 @@ app.use(require('compression')());
 //app.use(require('serve-static')(path.join(__dirname, 'public')));
 app.use(require('method-override')());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser(config.cryptoKey));
+
+let sessionStore = new mongoStore({url: config.mongodb.uri})
+sessionStore.on('error', function (error) {
+    console.error('Mongo session store error:', error);
+    // You can implement fallback logic here, like switching to a MemoryStore
+})
 app.use(session({
     resave: true,
     saveUninitialized: true,
     secret: config.cryptoKey,
-    store: new mongoStore({ url: config.mongodb.uri })
+    store: sessionStore
 }));
+
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(csrf({ cookie: { signed: true } })); //kraken-js:lusca is already using csrf module
+app.use(csrf({cookie: {signed: true}})); //kraken-js:lusca is already using csrf module
+
 helmet(app);
 
 // setup response locals
