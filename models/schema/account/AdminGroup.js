@@ -1,10 +1,10 @@
 'use strict';
 
 exports = module.exports = function(app, mongoose) {
-  var adminGroupSchema = new mongoose.Schema({
-    _id: { type: String },
-    name: { type: String, default: '' },
-    permissions: [{ name: String, permit: Boolean }]
+  const adminGroupSchema = new mongoose.Schema({
+    _id: {type: String},
+    name: {type: String, default: ''},
+    permissions: [{name: String, permit: Boolean}]
   });
   adminGroupSchema.plugin(require('../plugins/pagedFind'));
   adminGroupSchema.index({ name: 1 }, { unique: true });
