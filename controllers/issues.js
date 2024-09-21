@@ -1,13 +1,13 @@
 'use strict';
 
-var mongoose    = require('mongoose'),
-    async       = require('async'),
-    utils       = require('../utils/utils'),
-    flowUtils   = require('../utils/flowUtils'),
-    paths       = require('../models/paths'),
-    templates   = require('../models/templates'),
-    constants   = require('../models/constants'),
-    db          = require('../app').db.models;
+const mongoose = require('mongoose'),
+    async = require('async'),
+    utils = require('../utils/utils'),
+    flowUtils = require('../utils/flowUtils'),
+    paths = require('../models/paths'),
+    templates = require('../models/templates'),
+    constants = require('../models/constants'),
+    db = require('../app').db.models;
 
 module.exports = function (router) {
 

@@ -1,7 +1,7 @@
 'use strict';
 
 (function () {
-    var exports = {
+    const exports = {
         about: '/topic/the-wikitruth-project',
         contact: '/contact',
         signup: '/signup',

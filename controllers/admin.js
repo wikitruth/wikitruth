@@ -1,15 +1,15 @@
 'use strict';
 
-var backup          = require('mongodb-backup-fixed'),
-    fs              = require('fs'),
-    path            = require("path"),
-    async           = require('async'),
+var backup = require('mongodb-backup-fixed'),
+    fs = require('fs'),
+    path = require("path"),
+    async = require('async'),
     // Git             = require("nodegit"),
-    templates       = require('../models/templates'),
-    config          = require('../config/config'),
+    templates = require('../models/templates'),
+    config = require('../config/config'),
     //constants       = require('../models/constants'),
-    flowUtils       = require('../utils/flowUtils'),
-    db              = require('../app').db.models;
+    flowUtils = require('../utils/flowUtils'),
+    db = require('../app').db.models;
 
 var collectionsConfig = config.mongodb.collections,
     privateDirName = 'users';
@@ -22,17 +22,17 @@ var collectionsConfig = config.mongodb.collections,
  * @param {Function} next - callback
  */
 function makeDir(path, next) {
-    return fs.stat(path, function(err, stats) {
+    return fs.stat(path, function (err, stats) {
         if (err && err.code === 'ENOENT') {
             //logger('make dir at ' + path);
-            return fs.mkdir(path, function(err) {
+            return fs.mkdir(path, function (err) {
                 return next(err, path);
             });
         } else if (stats && stats.isDirectory() === false) {
             //logger('unlink file at ' + path);
-            return fs.unlink(path, function() {
+            return fs.unlink(path, function () {
                 //logger('make dir at ' + path);
-                return fs.mkdir(path, function(err) {
+                return fs.mkdir(path, function (err) {
                     return next(err, path);
                 });
             });
@@ -47,10 +47,10 @@ function performGitBackup(backupDir, pathspec, gitConfig, callback) {
     var result = {
         nothingToPush: false
     };
-    if(!gitConfig.branch) {
+    if (!gitConfig.branch) {
         gitConfig.branch = 'master';
     }
-    if(!gitConfig.remote) {
+    if (!gitConfig.remote) {
         gitConfig.remote = 'origin';
     }
 
@@ -161,7 +161,7 @@ module.exports = function (router) {
         var model = {};
         model.dirname = flowUtils.getBackupDir();
         model.privateDirName = flowUtils.getBackupDir(true);
-        if(config.mongodb.gitBackup) {
+        if (config.mongodb.gitBackup) {
             model.gitBackup = true;
         }
         res.render(templates.admin.mongoBackup, model);
@@ -177,17 +177,21 @@ module.exports = function (router) {
         model.action = action;
         model.dirname = backupDir;
         model.privateDirName = privateBackupDir;
-        if(config.mongodb.gitBackup) {
+        if (config.mongodb.gitBackup) {
             model.gitBackup = true;
         }
 
-        if(action === 'backup') {
+        if (action === 'backup') {
             async.series({
                 createPublicDir: function (callback) {
-                    makeDir(backupDir, function () { callback(); });
+                    makeDir(backupDir, function () {
+                        callback();
+                    });
                 },
                 createPrivateDir: function (callback) {
-                    makeDir(privateBackupDir, function () { callback(); });
+                    makeDir(privateBackupDir, function () {
+                        callback();
+                    });
                 },
                 backupSystemData: function (callback) {
                     backup({
@@ -204,36 +208,35 @@ module.exports = function (router) {
                         root: backupDir,
                         collections: collectionsConfig.privateBackupList,
                         parser: 'json',
-                        query: { private: false }
+                        query: {private: false}
                     });
                     callback();
                 },
-                backupPrivateData: function (callback) {
-                    db.User
+                backupPrivateData: async function (callback) {
+                    let users = await db.User
                         .find({})
                         .sort({username: 1})
                         .lean()
-                        .exec(function (err, users) {
-                            async.eachSeries(users, function (user, callback) {
-                                console.log('backing up for user ' + user.username);
-                                backup({
-                                    uri: config.mongodb.uri,
-                                    root: privateBackupDir + '/' + user.username,
-                                    collections: collectionsConfig.privateBackupList,
-                                    parser: 'json',
-                                    query: { private: true, createUserId: user._id }
-                                });
-                                callback();
-                            }, function (err) {
-                                callback();
-                            });
+                        .exec();
+                    async.eachSeries(users, function (user, callback) {
+                        console.log('backing up for user ' + user.username);
+                        backup({
+                            uri: config.mongodb.uri,
+                            root: privateBackupDir + '/' + user.username,
+                            collections: collectionsConfig.privateBackupList,
+                            parser: 'json',
+                            query: {private: true, createUserId: user._id}
+                        });
+                        callback();
+                    }, function (err) {
+                        callback();
                     });
                 }
-            }, function (){
+            }, function () {
                 res.render(templates.admin.mongoBackup, model);
             });
 
-        } else if(action === 'fix') {
+        } else if (action === 'fix') {
             /*
             async.series({
                 updateOwner: function (callback) {
@@ -270,131 +273,145 @@ module.exports = function (router) {
 
             // this will set the default values in every doc
             async.parallel({
-                topics: function (callback) {
-                    db.Topic.find({}).exec((err, results) => {
-                        async.eachSeries(results, function (result, callback) {
-                            db.Topic.update({_id: result._id}, result, {}, function () {
-                                callback();
-                            });
-                        }, function (err) {
+                topics: async function (callback) {
+                    let results = await db.Topic
+                        .find({})
+                        .exec();
+                    async.eachSeries(results, function (result, callback) {
+                        db.Topic.update({_id: result._id}, result, {}, function () {
                             callback();
                         });
+                    }, function (err) {
+                        callback();
                     });
                 },
-                topicLinks: function (callback) {
-                    db.TopicLink.find({}).exec(function(err, results) {
-                        async.eachSeries(results, function (result, callback) {
-                            db.TopicLink.update({ _id: result._id }, result, {}, callback);
-                        }, function (err) {
-                            callback();
-                        });
+                topicLinks: async function (callback) {
+                    let results = await db.TopicLink
+                        .find({})
+                        .exec();
+                    async.eachSeries(results, function (result, callback) {
+                        db.TopicLink.update({_id: result._id}, result, {}, callback);
+                    }, function (err) {
+                        callback();
                     });
                 },
-                arguments: function (callback) {
-                    db.Argument.find({}).exec(function(err, results) {
-                        async.eachSeries(results, function (result, callback) {
-                            db.Argument.update({ _id: result._id }, result, {}, function () {
-                                callback();
-                            });
-                        }, function (err) {
+                arguments: async function (callback) {
+                    let results = await db.Argument
+                        .find({})
+                        .exec();
+                    async.eachSeries(results, function (result, callback) {
+                        db.Argument.update({_id: result._id}, result, {}, function () {
                             callback();
                         });
+                    }, function (err) {
+                        callback();
                     });
                 },
-                argumentLinks: function (callback) {
-                    db.ArgumentLink.find({}).exec(function(err, results) {
-                        async.eachSeries(results, function (result, callback) {
-                            db.ArgumentLink.update({ _id: result._id }, result, {}, callback);
-                        }, function (err) {
-                            callback();
-                        });
+                argumentLinks: async function (callback) {
+                    let results = await db.ArgumentLink
+                        .find({})
+                        .exec();
+                    async.eachSeries(results, function (result, callback) {
+                        db.ArgumentLink.update({_id: result._id}, result, {}, callback);
+                    }, function (err) {
+                        callback();
                     });
                 },
-                questions: function (callback) {
-                    db.Question.find({}).exec(function(err, results) {
-                        async.eachSeries(results, function (result, callback) {
-                            db.Question.update({ _id: result._id }, result, {}, function () {
-                                callback();
-                            });
-                        }, function (err) {
+                questions: async function (callback) {
+                    let results = await db.Question
+                        .find({})
+                        .exec();
+                    async.eachSeries(results, function (result, callback) {
+                        db.Question.update({_id: result._id}, result, {}, function () {
                             callback();
                         });
+                    }, function (err) {
+                        callback();
                     });
                 },
-                answers: function (callback) {
-                    db.Answer.find({}).exec(function(err, results) {
-                        async.eachSeries(results, function (result, callback) {
-                            db.Answer.update({ _id: result._id }, result, {}, function () {
-                                callback();
-                            });
-                        }, function (err) {
+                answers: async function (callback) {
+                    let results = await db.Answer
+                        .find({})
+                        .exec();
+                    async.eachSeries(results, function (result, callback) {
+                        db.Answer.update({_id: result._id}, result, {}, function () {
                             callback();
                         });
+                    }, function (err) {
+                        callback();
                     });
                 },
                 issues: function (callback) {
-                    db.Issue.find({}).exec(function(err, results) {
-                        async.eachSeries(results, function (result, callback) {
-                            db.Issue.update({ _id: result._id }, result, {}, function () {
+                    db.Issue
+                        .find({})
+                        .exec(function (err, results) {
+                            async.eachSeries(results, function (result, callback) {
+                                db.Issue.update({_id: result._id}, result, {}, function () {
+                                    callback();
+                                });
+                            }, function (err) {
                                 callback();
                             });
-                        }, function (err) {
-                            callback();
                         });
-                    });
                 },
                 opinions: function (callback) {
-                    db.Opinion.find({}).exec(function(err, results) {
-                        async.eachSeries(results, function (result, callback) {
-                            db.Opinion.update({ _id: result._id }, result, {}, function () {
+                    db.Opinion
+                        .find({})
+                        .exec(function (err, results) {
+                            async.eachSeries(results, function (result, callback) {
+                                db.Opinion.update({_id: result._id}, result, {}, function () {
+                                    callback();
+                                });
+                            }, function (err) {
                                 callback();
                             });
-                        }, function (err) {
-                            callback();
                         });
-                    });
                 },
                 artifacts: function (callback) {
-                    db.Artifact.find({}).exec(function(err, results) {
-                        async.eachSeries(results, function (result, callback) {
-                            db.Artifact.update({ _id: result._id }, result, {}, function () {
+                    db.Artifact
+                        .find({})
+                        .exec(function (err, results) {
+                            async.eachSeries(results, function (result, callback) {
+                                db.Artifact.update({_id: result._id}, result, {}, function () {
+                                    callback();
+                                });
+                            }, function (err) {
                                 callback();
                             });
-                        }, function (err) {
-                            callback();
                         });
-                    });
                 },
                 users: function (callback) {
-                    db.User.find({}).exec(function(err, results) {
-                        async.eachSeries(results, function (result, callback) {
-                            db.User.update({ _id: result._id }, result, {}, callback);
-                        }, function (err) {
-                            callback();
+                    db.User
+                        .find({})
+                        .exec(function (err, results) {
+                            async.eachSeries(results, function (result, callback) {
+                                db.User.update({_id: result._id}, result, {}, callback);
+                            }, function (err) {
+                                callback();
+                            });
                         });
-                    });
                 }
             }, function (err, results) {
                 res.render(templates.admin.mongoBackup, model);
             });
-        } else if(action === 'restore') {
-            var dir = backupDir + '/' + config.mongodb.dbname;
+        } else if (action === 'restore') {
+            const dir = backupDir + '/' + config.mongodb.dbname;
             async.series({
                 restorePublicData: function (callback) {
-                    async.eachSeries( collectionsConfig.backupList.concat(collectionsConfig.privateBackupList), function (collectionName, callback) {
+                    async.eachSeries(collectionsConfig.backupList.concat(collectionsConfig.privateBackupList), function (collectionName, callback) {
                         // each collection
-                        var collectionDir = dir + '/' + collectionName;
-                        if (fs.existsSync(collectionDir)){
-                            var jsons = fs.readdirSync(collectionDir);
-                            var modelName = collectionsConfig.modelMapping[collectionName];
+                        const collectionDir = dir + '/' + collectionName;
+                        if (fs.existsSync(collectionDir)) {
+                            const jsons = fs.readdirSync(collectionDir);
+                            const modelName = collectionsConfig.modelMapping[collectionName];
                             if (modelName) {
-                                var collection = db[modelName];
+                                const collection = db[modelName];
                                 if (collection) {
                                     collection.remove({}, function (err) { // truncate collection before restore
                                         async.eachSeries(jsons, function (json, callback) {
                                             // each entry
-                                            var file = collectionDir + '/' + json;
-                                            var obj = JSON.parse(fs.readFileSync(file, 'utf8'));
+                                            const file = collectionDir + '/' + json;
+                                            const obj = JSON.parse(fs.readFileSync(file, 'utf8'));
                                             collection.create(obj, function (err, newObj) {
                                                 if (err) {
                                                     console.error(err);
@@ -426,22 +443,25 @@ module.exports = function (router) {
                         .exec(function (err, users) {
                             async.eachSeries(users, function (user, callback) {
                                 // each user
-                                var privateUserBackupDir = privateBackupDir + '/' + user.username + '/' + config.mongodb.dbname;
-                                async.eachSeries( collectionsConfig.privateBackupList, function (collectionName, callback) {
+                                const privateUserBackupDir = privateBackupDir + '/' + user.username + '/' + config.mongodb.dbname;
+                                async.eachSeries(collectionsConfig.privateBackupList, function (collectionName, callback) {
                                     // each collection
-                                    var collectionDir = privateUserBackupDir + '/' + collectionName;
-                                    if(fs.existsSync(collectionDir)) {
-                                        var jsons = fs.readdirSync(collectionDir);
-                                        var modelName = collectionsConfig.modelMapping[collectionName];
+                                    const collectionDir = privateUserBackupDir + '/' + collectionName;
+                                    if (fs.existsSync(collectionDir)) {
+                                        const jsons = fs.readdirSync(collectionDir);
+                                        const modelName = collectionsConfig.modelMapping[collectionName];
                                         if (modelName && jsons.length > 0) {
-                                            var collection = db[modelName];
+                                            const collection = db[modelName];
                                             if (collection) {
-                                                collection.remove({private: true, createUserId: user._id }, function (err) { // truncate collection before restore
+                                                collection.remove({
+                                                    private: true,
+                                                    createUserId: user._id
+                                                }, function (err) { // truncate collection before restore
                                                     async.eachSeries(jsons, function (json, callback) {
                                                         // each entry
-                                                        var file = collectionDir + '/' + json;
+                                                        const file = collectionDir + '/' + json;
                                                         //console.log('file: ' + file);
-                                                        var obj = JSON.parse(fs.readFileSync(file, 'utf8'));
+                                                        const obj = JSON.parse(fs.readFileSync(file, 'utf8'));
                                                         collection.create(obj, function (err, newObj) {
                                                             if (err) {
                                                                 console.error(err);
@@ -467,9 +487,9 @@ module.exports = function (router) {
                             }, function (err) {
                                 callback();
                             });
-                    });
+                        });
                 }
-            }, function (){
+            }, function () {
                 res.render(templates.admin.mongoBackup, model);
             });
             /*restore({
@@ -479,14 +499,14 @@ module.exports = function (router) {
                 parser: 'json',
                 drop: true
             });*/
-        } else if(action === 'push') {
+        } else if (action === 'push') {
             // FIXME: results are not returned on time
-            var render = function () {
+            const render = function () {
                 res.render(templates.admin.mongoBackup, model);
             };
             performGitBackup(backupDir, config.mongodb.dbname, config.mongodb.gitBackup, function (err, result) {
                 model.gitBackup = result;
-                if(config.mongodb.privateGitBackup) {
+                if (config.mongodb.privateGitBackup) {
                     performGitBackup(privateBackupDir, privateDirName, config.mongodb.privateGitBackup, function (err, result) {
                         model.privateGitBackup = result;
                         render();
