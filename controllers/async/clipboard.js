@@ -1,15 +1,15 @@
 'use strict';
 
-var constants   = require('../../models/constants'),
-    flowUtils   = require('../../utils/flowUtils'),
-    db          = require('../../app').db.models,
-    async       = require('async');
+const constants = require('../../models/constants'),
+    flowUtils = require('../../utils/flowUtils'),
+    db = require('../../app').db.models,
+    async = require('async');
 
 function createNewArrayExcludeId(sourceIds, excludeId) {
-    var ids = [];
-    for (var i = 0; i < sourceIds.length; ++i) { // remove self if included
-        var id = sourceIds[i];
-        if (!excludeId || excludeId != id) {
+    const ids = [];
+    for (let i = 0; i < sourceIds.length; ++i) { // remove self if included
+        const id = sourceIds[i];
+        if (!excludeId || excludeId !== id) {
             ids.push(id);
         }
     }
@@ -19,10 +19,10 @@ function createNewArrayExcludeId(sourceIds, excludeId) {
 module.exports = function (router) {
 
     router.post('/mark', function (req, res) {
-        var id = req.body.id;
-        var type = req.body.type;
+        const id = req.body.id;
+        const type = req.body.type;
 
-        var clipboard = flowUtils.setupClipboard(req, type);
+        const clipboard = flowUtils.setupClipboard(req, type);
         if(clipboard['object' + type].indexOf(id) < 0) {
             clipboard['object' + type].push(id);
         }
@@ -32,18 +32,18 @@ module.exports = function (router) {
 
     router.post('/paste-link', function (req, res) {
         // destination
-        var id = req.body.id;
-        var targetOwnerType = req.body.type; // the type of destination
+        const id = req.body.id;
+        const targetOwnerType = req.body.type; // the type of destination
 
         if(!id || !targetOwnerType) {
             return res.send({}); // linking to root, stop!
         }
 
-        var dateNow = Date.now();
-        var clipboard = flowUtils.setupClipboard(req, targetOwnerType);
-        var topics = clipboard['object' + constants.OBJECT_TYPES.topic];
-        var args = clipboard['object' + constants.OBJECT_TYPES.argument];
-        if(targetOwnerType == constants.OBJECT_TYPES.topic) {
+        const dateNow = Date.now();
+        const clipboard = flowUtils.setupClipboard(req, targetOwnerType);
+        const topics = clipboard['object' + constants.OBJECT_TYPES.topic];
+        const args = clipboard['object' + constants.OBJECT_TYPES.argument];
+        if(targetOwnerType === constants.OBJECT_TYPES.topic) {
             db.Topic.findOne({_id: id}, function(err, parent) { // parent is the target
                 async.parallel({
                     topics: function (callback) {
@@ -84,9 +84,9 @@ module.exports = function (router) {
                         if (args.length === 0) {
                             return callback();
                         }
-                        var ids = createNewArrayExcludeId(args, id);
+                        const ids = createNewArrayExcludeId(args, id);
                         async.each(ids, function(argumentId, callback){
-                            var entity = {};
+                            const entity = {};
                             entity.editUserId = req.user.id;
                             entity.editDate = dateNow;
                             // A child argument.
@@ -121,7 +121,7 @@ module.exports = function (router) {
                     });
                 });
             });
-        } else if(targetOwnerType == constants.OBJECT_TYPES.argument) {
+        } else if(targetOwnerType === constants.OBJECT_TYPES.argument) {
             if (args.length === 0) {
                 return res.send({});
             }
@@ -154,7 +154,7 @@ module.exports = function (router) {
                     });
                 });
             });
-        } else if(targetOwnerType == constants.OBJECT_TYPES.artifact) {
+        } else if(targetOwnerType === constants.OBJECT_TYPES.artifact) {
             var artifacts = clipboard['object' + constants.OBJECT_TYPES.artifact];
             if (artifacts.length === 0) {
                 return res.send({});
@@ -167,35 +167,35 @@ module.exports = function (router) {
 
     router.post('/move', function (req, res) {
         // Destination
-        var targetOwnerId = req.body.id;
-        var targetOwnerType = req.body.type;
-        var username = req.body.username;
+        let targetOwnerId = req.body.id;
+        let targetOwnerType = req.body.type;
+        const username = req.body.username;
 
-        var clipboard = flowUtils.setupClipboard(req, targetOwnerType);
-        var topics = clipboard['object' + constants.OBJECT_TYPES.topic];
+        const clipboard = flowUtils.setupClipboard(req, targetOwnerType);
+        const topics = clipboard['object' + constants.OBJECT_TYPES.topic];
 
         if(!targetOwnerId) { // if moving to root
             targetOwnerId = null;
             targetOwnerType = null;
         }
 
-        var moveChildArguments = function (parentArgument, callback) {
-            var facts = clipboard['object' + constants.OBJECT_TYPES.argument];
+        const moveChildArguments = function (parentArgument, callback) {
+            const facts = clipboard['object' + constants.OBJECT_TYPES.argument];
             if (facts.length === 0 || !targetOwnerId) {
                 return callback();
             }
-            var ids = createNewArrayExcludeId(facts, targetOwnerId);
+            const ids = createNewArrayExcludeId(facts, targetOwnerId);
             db.Argument
                 .find({_id: {$in: ids}})
                 .lean()
                 .exec(function (err, results) {
                     // Update each moved entry and their parent count
-                    async.each(results, function(result, callback){
-                        var updatedResult;
-                        var oldParentId = result.parentId;
-                        var oldOwnerId = result.ownerId;
+                    async.each(results, function (result, callback) {
+                        let updatedResult;
+                        const oldParentId = result.parentId;
+                        const oldOwnerId = result.ownerId;
                         // Update entry
-                        if(targetOwnerType == constants.OBJECT_TYPES.topic) {
+                        if (targetOwnerType === constants.OBJECT_TYPES.topic) {
                             result.parentId = null;
                             result.ownerId = targetOwnerId; // TODO: how about children ???
                             result.ownerType = targetOwnerType;
@@ -209,16 +209,24 @@ module.exports = function (router) {
 
                         async.series({
                             syncCategoryId: function (callback) {
-                                flowUtils.syncCategoryId(result, { entryType: constants.OBJECT_TYPES.argument, update: false, recursive: true }, callback);
+                                flowUtils.syncCategoryId(result, {
+                                    entryType: constants.OBJECT_TYPES.argument,
+                                    update: false,
+                                    recursive: true
+                                }, callback);
                             },
                             findOneAndUpdate: function (callback) {
-                                db.Argument.findOneAndUpdate({_id: result._id}, result, { upsert: true, new: true, setDefaultsOnInsert: true }, function (err, updatedEntity) {
+                                db.Argument.findOneAndUpdate({_id: result._id}, result, {
+                                    upsert: true,
+                                    new: true,
+                                    setDefaultsOnInsert: true
+                                }, function (err, updatedEntity) {
                                     updatedResult = updatedEntity;
                                     callback();
                                 });
                             },
                             syncChildren: function (callback) {
-                                flowUtils.syncChildren(updatedResult, { entryType: constants.OBJECT_TYPES.argument }, callback);
+                                flowUtils.syncChildren(updatedResult, {entryType: constants.OBJECT_TYPES.argument}, callback);
                             },
                             updateChildrenCount: function (callback) {
                                 // FIXME: is this needed per id? or can we batch this at the end by collecting all parentId/ownerId and doing it once?
@@ -239,7 +247,7 @@ module.exports = function (router) {
                 });
         };
 
-        var moveChildQuestions = function (callback) {
+        const moveChildQuestions = function (callback) {
             var questions = clipboard['object' + constants.OBJECT_TYPES.question];
             if (questions.length === 0 || !targetOwnerId) {
                 return callback();
@@ -250,7 +258,7 @@ module.exports = function (router) {
                 .lean()
                 .exec(function (err, results) {
                     // Update each moved entry and their parent count
-                    async.each(results, function(result, callback){
+                    async.each(results, function (result, callback) {
                         var updatedResult;
                         var oldOwnerId = result.ownerId;
                         var oldOwnerType = result.ownerType;
@@ -260,16 +268,24 @@ module.exports = function (router) {
 
                         async.series({
                             syncCategoryId: function (callback) {
-                                flowUtils.syncCategoryId(result, { entryType: constants.OBJECT_TYPES.question, update: false, recursive: true }, callback);
+                                flowUtils.syncCategoryId(result, {
+                                    entryType: constants.OBJECT_TYPES.question,
+                                    update: false,
+                                    recursive: true
+                                }, callback);
                             },
                             findOneAndUpdate: function (callback) {
-                                db.Question.findOneAndUpdate({_id: result._id}, result, { upsert: true, new: true, setDefaultsOnInsert: true }, function (err, updatedEntity) {
+                                db.Question.findOneAndUpdate({_id: result._id}, result, {
+                                    upsert: true,
+                                    new: true,
+                                    setDefaultsOnInsert: true
+                                }, function (err, updatedEntity) {
                                     updatedResult = updatedEntity;
                                     callback();
                                 });
                             },
                             syncChildren: function (callback) {
-                                flowUtils.syncChildren(updatedResult, { entryType: constants.OBJECT_TYPES.question }, callback);
+                                flowUtils.syncChildren(updatedResult, {entryType: constants.OBJECT_TYPES.question}, callback);
                             },
                             updateChildrenCount: function (callback) {
                                 // Update old owner's children count
@@ -286,7 +302,7 @@ module.exports = function (router) {
                 });
         };
 
-        if(!targetOwnerId || targetOwnerType == constants.OBJECT_TYPES.topic) {
+        if(!targetOwnerId || targetOwnerType === constants.OBJECT_TYPES.topic) {
             async.parallel({
 
                 topics: function (callback) { // move topics as children
@@ -357,19 +373,15 @@ module.exports = function (router) {
             }, function () {
                 res.send({});
             });
-        } else if(targetOwnerType == constants.OBJECT_TYPES.argument) {
+        } else if(targetOwnerType === constants.OBJECT_TYPES.argument) {
             async.parallel({
-
-                arguments: function (callback) {
-                    db.Argument.findOne({_id: targetOwnerId}, function(err, parent) {
-                        moveChildArguments(parent, callback);
-                    });
+                arguments: async function (callback) {
+                    let parent = await db.Argument.findOne({_id: targetOwnerId});
+                    moveChildArguments(parent, callback);
                 },
-
                 questions: function (callback) {
                     moveChildQuestions(callback);
                 }
-
             }, function () {
                 res.send({});
             });

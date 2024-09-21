@@ -40,7 +40,7 @@ exports = module.exports = function(app, mongoose) {
     return false;
   };
   userSchema.methods.defaultReturnUrl = function() {
-    var returnUrl = '/';
+    const returnUrl = '/';
     /*if (this.canPlayRoleOf('account')) {
       returnUrl = '/account/';
     }
@@ -55,7 +55,7 @@ exports = module.exports = function(app, mongoose) {
     return this.canPlayRoleOf('admin');
   };
   userSchema.statics.encryptPassword = function(password, done) {
-    var bcrypt = require('bcrypt');
+    const bcrypt = require('bcrypt');
     bcrypt.genSalt(10, function(err, salt) {
       if (err) {
         return done(err);

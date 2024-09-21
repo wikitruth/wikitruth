@@ -10,7 +10,7 @@
     'www.wikitruthproject.org'
 ];*/
 
-var APPLICATIONS = [
+const APPLICATIONS = [
     {
         id: 'fixtheph',
         title: 'Fix The Philippines',
@@ -71,7 +71,7 @@ function getApplications() {
 }
 
 function getApplication(req) {
-    var domainName = req.hostname, application = null;
+    let domainName = req.hostname, application = null;
     APPLICATIONS.some(function (app) {
         if(app.domains.indexOf(domainName) > -1) {
             application = app;

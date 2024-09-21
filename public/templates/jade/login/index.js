@@ -4,8 +4,8 @@
       querystring = require('querystring');*/
 
 
-var getReturnUrl = function(req) {
-  var returnUrl = req.user.defaultReturnUrl();
+const getReturnUrl = function (req) {
+  let returnUrl = req.user.defaultReturnUrl();
   if (req.session.returnUrl) {
     returnUrl = req.session.returnUrl;
     delete req.session.returnUrl;
@@ -33,7 +33,7 @@ exports.init = function(req, res){
 };
 
 exports.login = function(req, res){
-  var workflow = req.app.utility.workflow(req, res);
+  const workflow = req.app.utility.workflow(req, res);
 
   workflow.on('validate', function() {
     if (!req.body.username) {
@@ -51,30 +51,18 @@ exports.login = function(req, res){
     workflow.emit('abuseFilter');
   });
 
-  workflow.on('abuseFilter', function() {
-    var getIpCount = function(done) {
-      var conditions = { ip: req.ip };
-      req.app.db.models.LoginAttempt.count(conditions, function(err, count) {
-        if (err) {
-          return done(err);
-        }
-
-        done(null, count);
-      });
+  workflow.on('abuseFilter', async function () {
+    const getIpCount = async function () {
+      const conditions = {ip: req.ip};
+      return req.app.db.models.LoginAttempt.countDocuments(conditions);
     };
 
-    var getIpUserCount = function(done) {
-      var conditions = { ip: req.ip, user: req.body.username };
-      req.app.db.models.LoginAttempt.count(conditions, function(err, count) {
-        if (err) {
-          return done(err);
-        }
-
-        done(null, count);
-      });
+    const getIpUserCount = async function () {
+      const conditions = {ip: req.ip, user: req.body.username};
+      return req.app.db.models.LoginAttempt.countDocuments(conditions);
     };
 
-    var asyncFinally = function(err, results) {
+    const asyncFinally = function (err, results) {
       if (err) {
         return workflow.emit('exception', err);
       }
@@ -82,13 +70,12 @@ exports.login = function(req, res){
       if (results.ip >= req.app.config.loginAttempts.forIp || results.ipUser >= req.app.config.loginAttempts.forIpAndUser) {
         workflow.outcome.errors.push('You\'ve reached the maximum number of login attempts. Please try again later.');
         return workflow.emit('response');
-      }
-      else {
+      } else {
         workflow.emit('attemptLogin');
       }
     };
 
-    require('async').parallel({ ip: getIpCount, ipUser: getIpUserCount }, asyncFinally);
+    await require('async').parallel({ip: getIpCount, ipUser: getIpUserCount}, asyncFinally);
   });
 
   workflow.on('attemptLogin', function() {

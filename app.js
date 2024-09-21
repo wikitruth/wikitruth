@@ -11,7 +11,7 @@ const config = require('./config/config'),
     cookieParser = require('cookie-parser'),
     bodyParser = require('body-parser'),
     session = require('express-session'),
-    mongoStore = require('connect-mongo')(session),
+    mongoStore = require('connect-mongo'),
     passport = require('passport'),
     mongoose = require('mongoose'),
     bluebird = require('bluebird'),
@@ -51,9 +51,9 @@ app.config = config;
 //setup mongoose
 mongoose.Promise = bluebird;
 app.db = mongoose.createConnection(config.mongodb.uri, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useUnifiedTopology: true
+    // useNewUrlParser: true,
+    // useCreateIndex: true,
+    // useUnifiedTopology: true
 });
 app.db.on('error', console.error.bind(console, 'mongoose connection error: '));
 app.db.once('open', function () {
@@ -64,7 +64,7 @@ app.db.on('disconnected', () => {
 });
 
 //config data models
-require('./models/models')(app, mongoose);
+require('./models/schema/models')(app, mongoose);
 
 //settings
 app.disable('x-powered-by');
@@ -90,7 +90,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser(config.cryptoKey));
 
-let sessionStore = new mongoStore({url: config.mongodb.uri})
+let sessionStore = mongoStore.create({mongoUrl: config.mongodb.uri})
 sessionStore.on('error', function (error) {
     console.error('Mongo session store error:', error);
     // You can implement fallback logic here, like switching to a MemoryStore

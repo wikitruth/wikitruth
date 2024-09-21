@@ -10,4 +10,7 @@ exports = module.exports = function(app, mongoose) {
     }
   });
   app.db.model('Note', noteSchema);
+
+  // console.log('Note schema:', noteSchema);
+  // console.log('Note schema:', app.db.models.Note.schema);
 };

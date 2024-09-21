@@ -88,26 +88,22 @@ module.exports = function(app, passport) {
                     callback();
                 }
             },
-            userGroupsCache: function (callback) {
-                if(req.user) {
+            userGroupsCache: async function (callback) {
+                if (req.user) {
                     if (!req.session.myGroups) {
-                        flowUtils.getUserGroups(req, function (err, results) {
-                            req.session.myGroups = results;
-                            res.locals.myGroups = results;
-                            callback();
-                        });
+                        let results = await flowUtils.getUserGroups(req)
+                        req.session.myGroups = results
+                        res.locals.myGroups = results
                     } else {
                         res.locals.myGroups = req.session.myGroups;
-                        callback();
                     }
-                } else {
-                    callback();
                 }
+                callback()
             },
             currentGroup: function (callback) {
-                var baseUrl = url.parse(req.originalUrl);
-                var params = baseUrl.pathname.split('/');
-                if(params.length >= 4 && '/' + params[1].toLowerCase() == paths.groups.index) {
+                const baseUrl = url.parse(req.originalUrl);
+                const params = baseUrl.pathname.split('/');
+                if(params.length >= 4 && '/' + params[1].toLowerCase() === paths.groups.index) {
                     var model = {};
                     req.query.group = params[3];
                     flowUtils.setGroupModel(req, model, function () {

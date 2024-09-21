@@ -1,13 +1,13 @@
 'use strict';
 
-var mongoose    = require('mongoose'),
-    async       = require('async'),
-    utils       = require('../utils/utils'),
-    flowUtils   = require('../utils/flowUtils'),
-    paths       = require('../models/paths'),
-    templates   = require('../models/templates'),
-    constants   = require('../models/constants'),
-    db          = require('../app').db.models;
+var mongoose = require('mongoose'),
+    async = require('async'),
+    utils = require('../utils/utils'),
+    flowUtils = require('../utils/flowUtils'),
+    paths = require('../models/paths'),
+    templates = require('../models/templates'),
+    constants = require('../models/constants'),
+    db = require('../app').db.models;
 
 module.exports = function (router) {
 
@@ -46,7 +46,12 @@ function GET_entry(req, res) {
                 flowUtils.getTopIssues(ownerQuery, model, req, callback);
             },
             opinions: function (callback) {
-                var query = { parentId: null, ownerId: req.query.answer, ownerType: constants.OBJECT_TYPES.answer, 'screening.status': constants.SCREENING_STATUS.status1.code };
+                var query = {
+                    parentId: null,
+                    ownerId: req.query.answer,
+                    ownerType: constants.OBJECT_TYPES.answer,
+                    'screening.status': constants.SCREENING_STATUS.status1.code
+                };
                 flowUtils.getTopOpinions(query, model, req, callback);
             }
         }, function (err, results) {
@@ -56,52 +61,53 @@ function GET_entry(req, res) {
     });
 }
 
-function GET_index(req, res) {
-    var model = {};
-    var query = flowUtils.createOwnerQueryFromQuery(req);
-    if(query.ownerId) {
-        flowUtils.setScreeningModel(req, model);
-        flowUtils.setEntryModels(query, req, model, function (err) {
-            db.Answer
-                .find({ questionId: model.question._id, 'screening.status': model.screening.status })
-                .sort({ title: 1 })
+async function GET_index(req, res) {
+    const model = {};
+    let query = flowUtils.createOwnerQueryFromQuery(req);
+    if (query.ownerId) {
+        flowUtils.setScreeningModel(req, model)
+        flowUtils.setEntryModels(query, req, model, async function (err) {
+            let results = await db.Answer
+                .find({questionId: model.question._id, 'screening.status': model.screening.status})
+                .sort({title: 1})
                 .lean()
-                .exec(function (err, results) {
-                    flowUtils.setEditorsUsername(results, function () {
-                        results.forEach(function (result) {
-                            flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.answer, req);
-                        });
-                        model.answers = results;
-                        flowUtils.setModelOwnerEntry(req, res, model);
+                .exec();
+            await flowUtils.setEditorsUsername(results)
+            results.forEach(function (result) {
+                flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.answer, req);
+            });
+            model.answers = results;
+            flowUtils.setModelOwnerEntry(req, res, model);
 
-                        // screening and children count
-                        flowUtils.setScreeningModelCount(model, model.entry.childrenCount.answers);
-                        res.render(templates.wiki.answers.index, model);
-                    });
-                });
-        });
+            // screening and children count
+            flowUtils.setScreeningModelCount(model, model.entry.childrenCount.answers);
+            res.render(templates.wiki.answers.index, model)
+        })
     } else {
         // Top Answers
-        query = { ownerType: constants.OBJECT_TYPES.topic, private: false, 'screening.status': constants.SCREENING_STATUS.status1.code };
+        query = {
+            ownerType: constants.OBJECT_TYPES.topic,
+            private: false,
+            'screening.status': constants.SCREENING_STATUS.status1.code
+        };
         //db.Answer.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
-        db.Answer
+        let results = await db.Answer
             .find(query)
             .sort({editDate: -1})
             .limit(25)
             .lean()
-            .exec(function (err, results) {
-                flowUtils.setEditorsUsername(results, function () {
-                    results.forEach(function (result) {
-                        result.topic = {
-                            _id: result.ownerId
-                        };
-                        flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.answer, req);
-                    });
-                    model.answers = results;
-                    flowUtils.setModelContext(req, res, model);
-                    res.render(templates.wiki.answers.index, model);
-                });
+            .exec();
+        flowUtils.setEditorsUsername(results, function () {
+            results.forEach(function (result) {
+                result.topic = {
+                    _id: result.ownerId
+                };
+                flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.answer, req);
             });
+            model.answers = results;
+            flowUtils.setModelContext(req, res, model);
+            res.render(templates.wiki.answers.index, model);
+        });
     }
 }
 
@@ -114,8 +120,8 @@ function GET_create(req, res) {
 }
 
 function POST_create(req, res) {
-    var query = { _id: req.query.answer || new mongoose.Types.ObjectId() };
-    db.Answer.findOne(query, function(err, result) {
+    var query = {_id: req.query.answer || new mongoose.Types.ObjectId()};
+    db.Answer.findOne(query, function (err, result) {
         var entity = result ? result : {};
         var dateNow = Date.now();
         entity.title = req.body.title;
@@ -125,13 +131,13 @@ function POST_create(req, res) {
         entity.friendlyUrl = utils.urlify(req.body.title);
         entity.editUserId = req.user.id;
         entity.editDate = dateNow;
-        if(!result) {
+        if (!result) {
             entity.createUserId = req.user.id;
             entity.createDate = dateNow;
             entity.questionId = req.query.question;
             flowUtils.initScreeningStatus(req, entity);
         }
-        flowUtils.syncCategoryId(entity, { entryType: constants.OBJECT_TYPES.answer }, function () {
+        flowUtils.syncCategoryId(entity, {entryType: constants.OBJECT_TYPES.answer}, function () {
             db.Answer.findOneAndUpdate(query, entity, {
                 upsert: true,
                 new: true,

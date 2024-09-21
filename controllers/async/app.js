@@ -1,7 +1,7 @@
 'use strict';
 
-var jwt             = require('jsonwebtoken'),
-    cookieParser    = require('cookie-parser');
+const jwt = require('jsonwebtoken'),
+    cookieParser = require('cookie-parser');
 
 module.exports = function (router) {
 
@@ -9,7 +9,7 @@ module.exports = function (router) {
         let cookieString = req.body.cookie;
         let pin = req.body.pin;
         let success = false;
-        if(cookieString && pin && pin.length == 6) {
+        if(cookieString && pin && pin.length === 6) {
             let secret = pin + '|' + req.app.config.jwtSecret;
             let cookies = cookieParser.JSONCookie(cookieString);
             if(cookies.length > 0) {

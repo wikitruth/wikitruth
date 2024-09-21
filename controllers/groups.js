@@ -1,77 +1,73 @@
 'use strict';
 
-var mongoose    = require('mongoose'),
-    templates   = require('../models/templates'),
-    paths       = require('../models/paths'),
-    async       = require('async'),
-    url         = require('url'),
-    flowUtils   = require('../utils/flowUtils'),
-    utils       = require('../utils/utils'),
-    constants   = require('../models/constants'),
-    db          = require('../app').db.models;
+var mongoose = require('mongoose'),
+    templates = require('../models/templates'),
+    paths = require('../models/paths'),
+    async = require('async'),
+    url = require('url'),
+    flowUtils = require('../utils/flowUtils'),
+    utils = require('../utils/utils'),
+    constants = require('../models/constants'),
+    db = require('../app').db.models;
 
 module.exports = function (router) {
 
-    var prefix = '/:groupTitleUrl/:group/posts';
+    const prefix = '/:groupTitleUrl/:group/posts';
 
-    router.get('/', function (req, res) {
-        var model = {};
-        db.Group
+    router.get('/', async function (req, res) {
+        const model = {}
+        let results = await db.Group
             .find({})
             .sort({title: 1})
             .lean()
-            .exec(function (err, results) {
-                results.forEach(function (result) {
-                    result.friendlyUrl = utils.urlify(result.title);
-                });
-                if(req.user) {
-                    model.privateGroups = results.filter(function (group) {
-                        // FIXME: should check if the current user is a member
-                        return group.privacyType !== constants.GROUP_PRIVACY_TYPES.type10.code
-                            && group.members.filter(function (member) {
-                                return member.userId.equals(req.user.id);
-                            });
-                    });
-                }
-                model.publicGroups = results.filter(function (group) {
-                    return group.privacyType == constants.GROUP_PRIVACY_TYPES.type10.code;
-                });
-                res.render(templates.groups.index, model);
-            });
+            .exec()
+        results.forEach(function (result) {
+            result.friendlyUrl = utils.urlify(result.title);
+        })
+        if (req.user) {
+            model.privateGroups = results.filter(function (group) {
+                // FIXME: should check if the current user is a member
+                return group.privacyType !== constants.GROUP_PRIVACY_TYPES.type10.code
+                    && group.members.filter(function (member) {
+                        return member.userId.equals(req.user.id)
+                    })
+            })
+        }
+        model.publicGroups = results.filter(function (group) {
+            return group.privacyType === constants.GROUP_PRIVACY_TYPES.type10.code;
+        })
+        res.render(templates.groups.index, model)
     });
 
-    router.get('/create', function (req, res) {
-        var model = {};
+    router.get('/create', async function (req, res) {
+        const model = {};
         model.cancelUrl = flowUtils.buildReturnUrl(req, paths.groups.index);
-        if(req.query.id) req.query.group = req.query.id;
-        flowUtils.setGroupModel(req, model, function () {
-            res.render(templates.groups.create, model);
-        });
+        if (req.query.id) req.query.group = req.query.id;
+        await flowUtils.setGroupModel(req, model);
+        res.render(templates.groups.create, model);
     });
 
     router.post('/create', function (req, res) {
         POST_create(req, res);
     });
 
-    router.get('/:friendlyUrl/:id', function (req, res) {
-        var model = {};
+    router.get('/:friendlyUrl/:id', async function (req, res) {
+        const model = {};
         req.query.group = req.params.id;
-        flowUtils.setGroupModel(req, model, function() {
-            var groupFilter = { ownerId: model.group._id, ownerType: constants.OBJECT_TYPES.group };
-            flowUtils.countEntries(model, groupFilter, function () {
-                model.url = flowUtils.buildGroupUrl(model.group) + paths.groups.group.posts;
-                model.contributions = model.totalCount;
-                res.render(templates.groups.group.index, model);
-            });
+        await flowUtils.setGroupModel(req, model);
+        const groupFilter = {ownerId: model.group._id, ownerType: constants.OBJECT_TYPES.group};
+        flowUtils.countEntries(model, groupFilter, function () {
+            model.url = flowUtils.buildGroupUrl(model.group) + paths.groups.group.posts;
+            model.contributions = model.totalCount;
+            res.render(templates.groups.group.index, model);
         });
     });
 
-    router.get('/:friendlyUrl/:id/members', function (req, res) {
-        var model = {};
+    router.get('/:friendlyUrl/:id/members', async function (req, res) {
+        const model = {};
         req.query.group = req.params.id;
-        flowUtils.setGroupModel(req, model, function () {
-            res.render(templates.groups.group.members, model);
-        });
+        await flowUtils.setGroupModel(req, model);
+        res.render(templates.groups.group.members, model);
     });
 
     /* All Posts */
@@ -83,8 +79,8 @@ module.exports = function (router) {
 };
 
 function POST_create(req, res) {
-    var query = { _id: req.query.id || new mongoose.Types.ObjectId() };
-    db.Group.findOne(query, function(err, result) {
+    var query = {_id: req.query.id || new mongoose.Types.ObjectId()};
+    db.Group.findOne(query, function (err, result) {
         var dateNow = Date.now();
         var titleChanged = !result || result.title !== req.body.title;
         var entity = result ? result : {};
@@ -95,11 +91,11 @@ function POST_create(req, res) {
         entity.privacyType = req.body.privacyType;
         entity.editUserId = req.user.id;
         entity.editDate = dateNow;
-        if(!result) {
+        if (!result) {
             entity.createUserId = req.user.id;
             entity.createDate = dateNow;
         }
-        if(!entity.members || entity.members.length === 0) {
+        if (!entity.members || entity.members.length === 0) {
             entity.members = [
                 {
                     userId: req.user.id,
@@ -113,7 +109,7 @@ function POST_create(req, res) {
             setDefaultsOnInsert: true
         }, function (err, updatedEntity) {
             // clear cache
-            if(!result || titleChanged) delete req.session.myGroups;
+            if (!result || titleChanged) delete req.session.myGroups;
             var url = paths.groups.index + '/' + updatedEntity.friendlyUrl + '/' + updatedEntity._id;
             res.redirect(url);
         });
@@ -121,16 +117,16 @@ function POST_create(req, res) {
 }
 
 function GET_posts(req, res) {
-    var LIMIT = req.query.tab ? 25 : 15;
-    var allTabs = !req.query.tab;
-    var tab = req.query.tab ? req.query.tab : 'all';
-    var baseUrl = url.parse(req.originalUrl);
-    var model = {
+    const LIMIT = req.query.tab ? 25 : 15;
+    const allTabs = !req.query.tab;
+    const tab = req.query.tab ? req.query.tab : 'all';
+    const baseUrl = url.parse(req.originalUrl);
+    const model = {
         tab: tab,
         url: baseUrl.pathname
     };
     async.series({
-        group: function(callback){
+        group: function (callback) {
             // this is handled by the middleware
             model.group = res.locals.group;
             callback();
@@ -139,26 +135,34 @@ function GET_posts(req, res) {
             flowUtils.setGroupModel(req, model, callback);
             */
         },
-        categories: function(callback) {
+        categories: function (callback) {
             db.Topic
-                .find({ parentId: null, ownerType: constants.OBJECT_TYPES.group, ownerId: model.group._id })
+                .find({parentId: null, ownerType: constants.OBJECT_TYPES.group, ownerId: model.group._id})
                 .sort({title: 1})
                 .lean()
                 .exec(function (err, results) {
-                    async.each(results, function(result, callback) {
+                    async.each(results, function (result, callback) {
                         result.friendlyUrl = utils.urlify(result.title);
-                        flowUtils.getTopics({ parentId: result._id }, { limit: constants.SETTINGS.SUBCATEGORY_LIST_SIZE, req: req, shortTitleLength: constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN }, function (err, subtopics) {
-                            if(subtopics.length > 0) {
+                        flowUtils.getTopics({parentId: result._id}, {
+                            limit: constants.SETTINGS.SUBCATEGORY_LIST_SIZE,
+                            req: req,
+                            shortTitleLength: constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN
+                        }, function (err, subtopics) {
+                            if (subtopics.length > 0) {
                                 result.subtopics = subtopics;
                             }
                             // if subtopics are less than SUBCATEGORY_LIST_SIZE, get some arguments
-                            if(subtopics.length < constants.SETTINGS.SUBCATEGORY_LIST_SIZE) {
+                            if (subtopics.length < constants.SETTINGS.SUBCATEGORY_LIST_SIZE) {
                                 var query = {
                                     parentId: null,
                                     ownerId: result._id,
                                     ownerType: constants.OBJECT_TYPES.topic
                                 };
-                                flowUtils.getArguments(query, { limit: constants.SETTINGS.SUBCATEGORY_LIST_SIZE - subtopics.length, req: req, shortTitleLength: constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN }, function (err, subarguments) {
+                                flowUtils.getArguments(query, {
+                                    limit: constants.SETTINGS.SUBCATEGORY_LIST_SIZE - subtopics.length,
+                                    req: req,
+                                    shortTitleLength: constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN
+                                }, function (err, subarguments) {
                                     subarguments.forEach(function (subargument) {
                                         flowUtils.setVerdictModel(subargument);
                                     });
@@ -170,15 +174,19 @@ function GET_posts(req, res) {
                                 callback();
                             }
                         });
-                    }, function(err) {
+                    }, function (err) {
                         model.categories = results;
                         callback();
                     });
                 });
         },
-        rootTopics: function(callback) {
+        rootTopics: function (callback) {
             // display 15 if top topics, all if has topic parameter
-            flowUtils.getTopics({ parentId: null, ownerType: constants.OBJECT_TYPES.group, ownerId: model.group._id }, { limit: 0, req: req }, function (err, results) {
+            flowUtils.getTopics({
+                parentId: null,
+                ownerType: constants.OBJECT_TYPES.group,
+                ownerId: model.group._id
+            }, {limit: 0, req: req}, function (err, results) {
                 model.rootTopics = results;
                 callback();
             });
@@ -188,24 +196,24 @@ function GET_posts(req, res) {
         flowUtils.setClipboardModel(req, model);
 
         async.parallel({
-            topics: function(callback) {
-                if(!allTabs && model.tab !== 'topics') {
+            topics: function (callback) {
+                if (!allTabs && model.tab !== 'topics') {
                     return callback();
                 }
-                var query = { private: true, ownerType: constants.OBJECT_TYPES.group, ownerId: model.group._id };
+                var query = {private: true, ownerType: constants.OBJECT_TYPES.group, ownerId: model.group._id};
                 //db.Topic.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
                 db.Topic
                     .find(query)
                     .sort({editDate: -1})
                     .limit(LIMIT)
                     .exec(function (err, results) {
-                        flowUtils.setEditorsUsername(results, function() {
-                            flowUtils.setEntryParents(results, constants.OBJECT_TYPES.topic, function() {
-                                results.forEach(function(result) {
+                        flowUtils.setEditorsUsername(results, function () {
+                            flowUtils.setEntryParents(results, constants.OBJECT_TYPES.topic, function () {
+                                results.forEach(function (result) {
                                     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.topic, req);
                                 });
                                 model.topics = results;
-                                if(results.length > 0) {
+                                if (results.length > 0) {
                                     if (allTabs && results.length >= LIMIT) {
                                         model.topicsMore = true;
                                     }
@@ -216,8 +224,8 @@ function GET_posts(req, res) {
                         });
                     });
             },
-            arguments: function(callback) {
-                if(!allTabs && model.tab !== 'arguments') {
+            arguments: function (callback) {
+                if (!allTabs && model.tab !== 'arguments') {
                     return callback();
                 }
                 //var query = { parentId: {$ne: null}, private: false, 'screening.status': model.screening.status };
@@ -232,7 +240,7 @@ function GET_posts(req, res) {
                     .limit(LIMIT)
                     .lean()
                     .exec(function (err, results) {
-                        flowUtils.setEditorsUsername(results, function() {
+                        flowUtils.setEditorsUsername(results, function () {
                             flowUtils.setEntryParents(results, constants.OBJECT_TYPES.argument, function () {
                                 results.forEach(function (result) {
                                     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.argument, req);
@@ -250,8 +258,8 @@ function GET_posts(req, res) {
                         });
                     });
             },
-            questions: function(callback) {
-                if(!allTabs && model.tab !== 'questions') {
+            questions: function (callback) {
+                if (!allTabs && model.tab !== 'questions') {
                     return callback();
                 }
                 var query = {
@@ -282,12 +290,12 @@ function GET_posts(req, res) {
                         });
                     });
             },
-            answers: function(callback) {
-                if(!allTabs && model.tab !== 'answers') {
+            answers: function (callback) {
+                if (!allTabs && model.tab !== 'answers') {
                     return callback();
                 }
                 //db.Answer.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
-                var query = { private: true, createUserId: model.group._id };
+                var query = {private: true, createUserId: model.group._id};
                 db.Answer
                     .find(query)
                     .sort({editDate: -1})
@@ -311,8 +319,8 @@ function GET_posts(req, res) {
                         });
                     });
             },
-            artifacts: function(callback) {
-                if(!allTabs && model.tab !== 'artifacts') {
+            artifacts: function (callback) {
+                if (!allTabs && model.tab !== 'artifacts') {
                     return callback();
                 }
                 //var query = { parentId: {$ne: null}, private: false, 'screening.status': model.screening.status };
@@ -327,7 +335,7 @@ function GET_posts(req, res) {
                     .limit(LIMIT)
                     //.lean()
                     .exec(function (err, results) {
-                        flowUtils.setEditorsUsername(results, function() {
+                        flowUtils.setEditorsUsername(results, function () {
                             flowUtils.setEntryParents(results, constants.OBJECT_TYPES.artifact, function () {
                                 results.forEach(function (result) {
                                     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.artifact, req);
@@ -346,16 +354,16 @@ function GET_posts(req, res) {
                     });
             },
             issues: function (callback) {
-                if(!allTabs && model.tab !== 'issues') {
+                if (!allTabs && model.tab !== 'issues') {
                     return callback();
                 }
-                var query = { private: true, createUserId: model.group._id };
+                var query = {private: true, createUserId: model.group._id};
                 db.Issue
                     .find(query)
                     .sort({editDate: -1})
                     .limit(LIMIT)
                     .lean()
-                    .exec(function(err, results) {
+                    .exec(function (err, results) {
                         flowUtils.setEntryParents(results, constants.OBJECT_TYPES.issue, function () {
                             flowUtils.setEditorsUsername(results, function () {
                                 results.forEach(function (result) {
@@ -375,16 +383,16 @@ function GET_posts(req, res) {
                     });
             },
             opinions: function (callback) {
-                if(!allTabs && model.tab !== 'opinions') {
+                if (!allTabs && model.tab !== 'opinions') {
                     return callback();
                 }
-                var query = { private: true, createUserId: model.group._id };
+                var query = {private: true, createUserId: model.group._id};
                 db.Opinion
                     .find(query)
                     .sort({editDate: -1})
                     .limit(LIMIT)
                     .lean()
-                    .exec(function(err, results) {
+                    .exec(function (err, results) {
                         flowUtils.setEntryParents(results, constants.OBJECT_TYPES.opinion, function () {
                             flowUtils.setEditorsUsername(results, function () {
                                 results.forEach(function (result) {

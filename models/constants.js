@@ -1,7 +1,7 @@
 'use strict';
 
 (function () {
-    var VERDICT_STATUS = {
+    const VERDICT_STATUS = {
         pending: 0,
         status_true: 1,
         status_false: 2,
@@ -103,7 +103,7 @@
         }
     };
 
-    var ARGUMENT_TYPES = {
+    const ARGUMENT_TYPES = {
         // Types of arguments:
         // * A moral or ethical argument (something that should or should not/ought/this becomes a voting then? E.g. ought or ought not)
         // * A statement of a reality or phenomenon (current)
@@ -120,8 +120,8 @@
     };
 
     ARGUMENT_TYPES.getUXInfo = function (typeId) {
-        var label = "factual";
-        var theme = "info";
+        let label = "factual";
+        let theme = "info";
         switch (typeId) {
             case ARGUMENT_TYPES.ethical:
                 label = "value";
@@ -144,7 +144,7 @@
         };
     };
 
-    var PARENT_RELATIONSHIP = {
+    const PARENT_RELATIONSHIP = {
         rel0: {
             value: 0,
             text: 'Child'
@@ -163,7 +163,7 @@
         }
     };
 
-    var SCREENING_STATUS = {
+    const SCREENING_STATUS = {
         /***
          * Pending
          */
@@ -185,7 +185,7 @@
         }
     };
 
-    var ISSUE_TYPES = {
+    const ISSUE_TYPES = {
         type10: {
             code: 10,
             critical: true,
@@ -233,7 +233,7 @@
         }
     };
 
-    var GROUP_ROLE_TYPES = {
+    const GROUP_ROLE_TYPES = {
         type10: {
             code: 10,
             text: "Member"
@@ -244,7 +244,7 @@
         }
     };
 
-    var GROUP_PRIVACY_TYPES = {
+    const GROUP_PRIVACY_TYPES = {
         type10: {
             code: 10,
             text: "Public"
@@ -259,7 +259,7 @@
         }
     };
 
-    var ARGUMENT_TAGS = {
+    const ARGUMENT_TAGS = {
         tag10: {
             code: 10,
             text: "Value"
@@ -294,7 +294,7 @@
         }
     };
 
-    var TOPIC_TAGS = {
+    const TOPIC_TAGS = {
         tag10: {
             code: 10,
             text: "Value"
@@ -341,7 +341,7 @@
         }
     };
 
-    var OBJECT_TYPES = {
+    const OBJECT_TYPES = {
         topic: 1,
         topicLink: 32,
         argument: 2,
@@ -356,13 +356,13 @@
         group: 30
     };
 
-    var LINK_TYPES = {
+    const LINK_TYPES = {
         child: 1, // default???
         parent: 2,
         reference: 3
     };
 
-    var exports = {
+    const exports = {
         OBJECT_TYPES: OBJECT_TYPES,
         ARGUMENT_TYPES: ARGUMENT_TYPES,
         ISSUE_TYPES: ISSUE_TYPES,

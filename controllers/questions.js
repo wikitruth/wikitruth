@@ -1,13 +1,13 @@
 'use strict';
 
-var mongoose    = require('mongoose'),
-    async       = require('async'),
-    utils       = require('../utils/utils'),
-    flowUtils   = require('../utils/flowUtils'),
-    paths       = require('../models/paths'),
-    templates   = require('../models/templates'),
-    constants   = require('../models/constants'),
-    db          = require('../app').db.models;
+var mongoose = require('mongoose'),
+    async = require('async'),
+    utils = require('../utils/utils'),
+    flowUtils = require('../utils/flowUtils'),
+    paths = require('../models/paths'),
+    templates = require('../models/templates'),
+    constants = require('../models/constants'),
+    db = require('../app').db.models;
 
 module.exports = function (router) {
 
@@ -36,35 +36,37 @@ module.exports.GET_create = GET_create;
 module.exports.POST_create = POST_create;
 
 function GET_entry(req, res) {
-    var model = {};
+    const model = {};
     flowUtils.ensureEntryIdParam(req, 'question');
-    var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
-    flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
+    const ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
+    flowUtils.setEntryModels(ownerQuery, req, model, async function (err) {
         ownerQuery['screening.status'] = constants.SCREENING_STATUS.status1.code;
-        async.parallel({
-            answers: function (callback) {
+        await async.parallel({
+            answers: async function (callback) {
                 // Top Issues
-                db.Answer
-                    .find({ questionId: model.question._id, 'screening.status': constants.SCREENING_STATUS.status1.code })
+                let results = await db.Answer
+                    .find({questionId: model.question._id, 'screening.status': constants.SCREENING_STATUS.status1.code})
                     .limit(15)
                     .lean()
-                    .sort({ title: 1 })
-                    .exec(function(err, results) {
-                    flowUtils.setEditorsUsername(results, function() {
-                        results.forEach(function (result) {
-                            flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.answer, req);
-                        });
-                        model.answers = results;
-                        callback();
-                    });
-                });
+                    .sort({title: 1})
+                    .exec();
+                await flowUtils.setEditorsUsername(results)
+                results.forEach(function (result) {
+                    flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.answer, req)
+                })
+                model.answers = results
             },
             issues: function (callback) {
                 // Top Issues
                 flowUtils.getTopIssues(ownerQuery, model, req, callback);
             },
             opinions: function (callback) {
-                var query = { parentId: null, ownerId: req.query.question, ownerType: constants.OBJECT_TYPES.question, 'screening.status': constants.SCREENING_STATUS.status1.code };
+                const query = {
+                    parentId: null,
+                    ownerId: req.query.question,
+                    ownerType: constants.OBJECT_TYPES.question,
+                    'screening.status': constants.SCREENING_STATUS.status1.code
+                };
                 flowUtils.getTopOpinions(query, model, req, callback);
             }
         }, function (err, results) {
@@ -78,14 +80,14 @@ function GET_index(req, res) {
     var model = {}, query = {};
     var ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
     flowUtils.setEntryModels(ownerQuery, req, model, function (err) {
-        if(model.topic) {
+        if (model.topic) {
             flowUtils.setScreeningModel(req, model);
             query = req.query.argument ?
-            { ownerId: model.argument._id, ownerType: constants.OBJECT_TYPES.argument } :
-            { ownerId: model.topic._id, ownerType: constants.OBJECT_TYPES.topic };
+                {ownerId: model.argument._id, ownerType: constants.OBJECT_TYPES.argument} :
+                {ownerId: model.topic._id, ownerType: constants.OBJECT_TYPES.topic};
             query['screening.status'] = model.screening.status;
-            db.Question.find(query).sort({ title: 1 }).lean().exec(function(err, results) {
-                flowUtils.setEditorsUsername(results, function() {
+            db.Question.find(query).sort({title: 1}).lean().exec(function (err, results) {
+                flowUtils.setEditorsUsername(results, function () {
                     results.forEach(function (result) {
                         flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.question, req);
                     });
@@ -99,7 +101,11 @@ function GET_index(req, res) {
             });
         } else {
             // Top Questions
-            query = { ownerType: constants.OBJECT_TYPES.topic, private: false, 'screening.status': constants.SCREENING_STATUS.status1.code };
+            query = {
+                ownerType: constants.OBJECT_TYPES.topic,
+                private: false,
+                'screening.status': constants.SCREENING_STATUS.status1.code
+            };
             //db.Question.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
             db.Question
                 .find(query)
@@ -107,7 +113,7 @@ function GET_index(req, res) {
                 .limit(25)
                 .lean()
                 .exec(function (err, results) {
-                    flowUtils.setEditorsUsername(results, function() {
+                    flowUtils.setEditorsUsername(results, function () {
                         results.forEach(function (result) {
                             result.topic = {
                                 _id: result.ownerId
@@ -132,8 +138,8 @@ function GET_create(req, res) {
 }
 
 function POST_create(req, res) {
-    var query = { _id: req.query.question || new mongoose.Types.ObjectId() };
-    db.Question.findOne(query, function(err, result) {
+    var query = {_id: req.query.question || new mongoose.Types.ObjectId()};
+    db.Question.findOne(query, function (err, result) {
         var dateNow = Date.now();
         var entity = result ? result : {};
         entity.title = req.body.title;
@@ -143,21 +149,21 @@ function POST_create(req, res) {
         entity.friendlyUrl = utils.urlify(req.body.title);
         entity.editUserId = req.user.id;
         entity.editDate = dateNow;
-        if(!result) {
+        if (!result) {
             entity.createUserId = req.user.id;
             entity.createDate = dateNow;
             flowUtils.initScreeningStatus(req, entity);
         }
-        if(!entity.ownerId) {
-            if(req.query.argument) {
+        if (!entity.ownerId) {
+            if (req.query.argument) {
                 entity.ownerId = req.query.argument;
                 entity.ownerType = constants.OBJECT_TYPES.argument;
-            } else if(req.query.topic) { // parent is a topic
+            } else if (req.query.topic) { // parent is a topic
                 entity.ownerId = req.query.topic;
                 entity.ownerType = constants.OBJECT_TYPES.topic;
             }
         }
-        flowUtils.syncCategoryId(entity, { entryType: constants.OBJECT_TYPES.question }, function () {
+        flowUtils.syncCategoryId(entity, {entryType: constants.OBJECT_TYPES.question}, function () {
             db.Question.findOneAndUpdate(query, entity, {
                 upsert: true,
                 new: true,

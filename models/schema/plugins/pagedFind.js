@@ -2,7 +2,7 @@
 
 module.exports = exports = function pagedFindPlugin (schema) {
   schema.statics.pagedFind = function(options, cb) {
-    var thisSchema = this;
+    const thisSchema = this;
 
     if (!options.filters) {
       options.filters = {};
@@ -24,7 +24,7 @@ module.exports = exports = function pagedFindPlugin (schema) {
       options.sort = {};
     }
 
-    var output = {
+    const output = {
       data: null,
       pages: {
         current: options.page,
@@ -41,15 +41,15 @@ module.exports = exports = function pagedFindPlugin (schema) {
       }
     };
 
-    var countResults = function(callback) {
+    const countResults = function(callback) {
       thisSchema.count(options.filters, function(err, count) {
         output.items.total = count;
         callback(null, 'done counting');
       });
     };
 
-    var getResults = function(callback) {
-      var query = thisSchema.find(options.filters, options.keys);
+    const getResults = function(callback) {
+      const query = thisSchema.find(options.filters, options.keys);
       query.skip((options.page - 1) * options.limit);
       query.limit(options.limit);
       query.sort(options.sort);
