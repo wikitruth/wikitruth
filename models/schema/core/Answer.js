@@ -1,21 +1,23 @@
 'use strict';
 
-var constants   = require('../../constants');
+const constants = require('../../constants');
 
-module.exports = function(app, mongoose) {
-  var schema = new mongoose.Schema({
+module.exports = function (app, mongoose) {
+  const schema = new mongoose.Schema({
     title: { type: String, default: '' },
     content: { type: String, default: '' },
-    contentPreview: { type: String}, // A preview lines of text to display in list view
+    contentPreview: { type: String }, // A preview lines of text to display in list view
     references: { type: String, default: '' },
     friendlyUrl: { type: String },
     screening: {
-      status: { type: Number, default: constants.SCREENING_STATUS.status0.code}, // SCREENING_STATUS
-      history: [{
-        userId: { type: mongoose.Schema.ObjectId, ref: 'User' },
-        date: { type: Date, default: Date.now },
-        status: { type: Number } // SCREENING_STATUS
-      }]
+      status: { type: Number, default: constants.SCREENING_STATUS.status0.code }, // SCREENING_STATUS
+      history: [
+        {
+          userId: { type: mongoose.Schema.ObjectId, ref: 'User' },
+          date: { type: Date, default: Date.now },
+          status: { type: Number }, // SCREENING_STATUS
+        },
+      ],
     },
     questionId: { type: mongoose.Schema.ObjectId },
     groupId: { type: mongoose.Schema.ObjectId, ref: 'Group', default: null },
@@ -28,7 +30,7 @@ module.exports = function(app, mongoose) {
     verdict: {
       status: { type: Number },
       editDate: { type: Date },
-      editUserId: { type: mongoose.Schema.ObjectId, ref: 'User'}
+      editUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     },
     childrenCount: {
       issues: {
@@ -36,34 +38,37 @@ module.exports = function(app, mongoose) {
         accepted: { type: Number, default: 0 },
         pending: { type: Number, default: 0 },
         rejected: { type: Number, default: 0 },
-        acceptedCritical: { type: Number, default: 0 }
+        acceptedCritical: { type: Number, default: 0 },
       },
       opinions: {
         total: { type: Number, default: 0 },
         accepted: { type: Number, default: 0 },
         pending: { type: Number, default: 0 },
-        rejected: { type: Number, default: 0 }
-      }
+        rejected: { type: Number, default: 0 },
+      },
     },
-    extras: { type: mongoose.Schema.Types.Mixed }
+    extras: { type: mongoose.Schema.Types.Mixed },
   });
-  schema.methods.getType = function() {
+  schema.methods.getType = function () {
     return constants.OBJECT_TYPES.answer;
   };
   schema.plugin(require('../plugins/pagedFind'));
   schema.index({ title: 1 });
-  schema.index({
-    title: "text",
-    content: "text",
-    references: "text"
-  }, {
-    weights: {
-      title: 10,
-      content: 8,
-      references: 6
+  schema.index(
+    {
+      title: 'text',
+      content: 'text',
+      references: 'text',
     },
-    name: "TextIndex"
-  });
+    {
+      weights: {
+        title: 10,
+        content: 8,
+        references: 6,
+      },
+      name: 'TextIndex',
+    }
+  );
   schema.set('autoIndex', true);
   app.db.model('Answer', schema);
 };

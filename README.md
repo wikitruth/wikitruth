@@ -1,5 +1,7 @@
 # The Wikitruth Project
 
+[![Awesome Humane Tech](https://raw.githubusercontent.com/humanetech-community/awesome-humane-tech/main/humane-tech-badge.svg?sanitize=true)](https://github.com/humanetech-community/awesome-humane-tech)
+
 The project aims to make a better world by finding the truth and facts of reality in all aspect of human knowledge, and present them in a way that is easy to search and understand by laypeople. It aims to do this by finding the truth using a systematic way of contribution and organization of arguments and evidences contrasted with reality and known facts.
 
 An argument or a topic will be broken down into the smallest pieces necessary to rationally discuss and conclude its reliability and truthfulness. A set of contribution and discussion rules will be enforced by the system (automated) to prevent chaotic discussions, along with human critical thinking, moral intent and the collective effort of everyone wanting to find the truth.
@@ -37,7 +39,7 @@ If someone wanted to find information about different topics or explore the vast
 * Citizendium
 
 ## Design Documents & Notes
-[View on Google Drive](https://drive.google.com/folderview?id=0B_bsKNkSe3qYUzVEdDVrTkhYdzA&usp=sharing)
+[View on Google Drive](https://drive.google.com/drive/folders/0B_bsKNkSe3qYUzVEdDVrTkhYdzA?resourcekey=0-W2a2MfOvcwrGFQg7Lrs4gA&usp=sharing)
 
 ## Requirements
 
@@ -49,12 +51,27 @@ We use [`bcrypt`](https://github.com/ncb000gt/node.bcrypt.js) for hashing secret
 
 We use [`emailjs`](https://github.com/eleith/emailjs) for email transport. If you have issues sending email refer to [this wiki page](https://github.com/jedireza/drywall/wiki/Trouble-sending-email).
 
+
+
+
+
+
 ## Setup
 
-First, build the project.
+Clone the project.
 
 ```bash
 $ git clone git@github.com:wikitruth/wikitruth.git && cd ./wikitruth
+```
+
+Install global modules.
+```bash
+$ npm i -g bower grunt-cli
+```
+
+Build the project.
+
+```bash
 $ npm install
 $ bower install
 $ grunt build

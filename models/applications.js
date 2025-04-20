@@ -85,6 +85,6 @@ function getApplication(req) {
 
 
 module.exports = {
-    getApplications: getApplications,
-    getApplication: getApplication
+    getApplications,
+    getApplication
 };

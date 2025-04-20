@@ -17,7 +17,6 @@
   ],
   "dependencies": {
     "bootstrap": "^3.3.6",
-    "dustjs-linkedin-helpers": "~1.2.0",
     "dustjs-linkedin": "~2.3.0",
     "requirejs": "^2.2.0",
     "html5shiv": "^3.7.3",
@@ -28,7 +27,6 @@
     "respond": "^1.4.2",
     "summernote": "^0.8.10",
     "textarea-autosize": "^0.4.2",
-    "jquery-timeago": "^1.5.3",
     "geopattern": "^1.2.3",
     "font-awesome": "^4.7.0",
     "eonasdan-bootstrap-datetimepicker": "^4.17.43",

@@ -1,7 +1,7 @@
 'use strict';
 
 exports = module.exports = function(app, mongoose) {
-  var userSchema = new mongoose.Schema({
+  const userSchema = new mongoose.Schema({
     username: { type: String, unique: true },
     password: String,
     email: { type: String, unique: true },
@@ -9,7 +9,7 @@ exports = module.exports = function(app, mongoose) {
       admin: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },
       account: { type: mongoose.Schema.Types.ObjectId, ref: 'Account' },
       screener: { type: Boolean, default: false },
-      reviewer: { type: Boolean, default: false }
+      reviewer: { type: Boolean, default: false },
     },
     isActive: String,
     timeCreated: { type: Date, default: Date.now },
@@ -21,9 +21,9 @@ exports = module.exports = function(app, mongoose) {
     google: {},
     tumblr: {},
     preferences: { type: mongoose.Schema.Types.Mixed },
-    search: [String]
+    search: [String],
   });
-  userSchema.methods.canPlayRoleOf = function(role) {
+  userSchema.methods.canPlayRoleOf = function (role) {
     if (role === 'admin' && this.roles.admin) {
       return true;
     }
@@ -67,14 +67,14 @@ exports = module.exports = function(app, mongoose) {
     });
   };
   userSchema.statics.validatePassword = function(password, hash, done) {
-    var bcrypt = require('bcrypt');
-    bcrypt.compare(password, hash, function(err, res) {
+    const bcrypt = require('bcrypt');
+    bcrypt.compare(password, hash, function (err, res) {
       done(err, res);
     });
   };
   userSchema.plugin(require('../plugins/pagedFind'));
-  userSchema.index({ username: 1 }, { unique: true });
-  userSchema.index({ email: 1 }, { unique: true });
+  // userSchema.index({ username: 1 }, { unique: true });
+  // userSchema.index({ email: 1 }, { unique: true });
   userSchema.index({ timeCreated: 1 });
   userSchema.index({ 'twitter.id': 1 });
   userSchema.index({ 'github.id': 1 });

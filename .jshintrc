@@ -1,4 +1,6 @@
 {
+    "esversion": "12",
+
     // Whether the scan should stop on first error.
     "passfail": false,
     // Maximum errors before stopping.
@@ -8,7 +10,7 @@
     // Predefined globals
 
     // Whether the standard browser globals should be predefined.
-    "browser": false,
+    "browser": true,
     // Whether the Node.js environment globals should be predefined.
     "node": true,
     // Whether the Rhino environment globals should be predefined.
@@ -41,15 +43,15 @@
     // ECMAScript 5
 
     // Whether the "use strict"; pragma should be required.
-    "strict": true,
+    "strict": false,
     // Whether global "use strict"; should be allowed (also enables strict).
-    "globalstrict": true,
+    "globalstrict": false,
 
 
     // The Good Parts
 
     // Whether automatic semicolon insertion should be allowed.
-    "asi": false,
+    "asi": true,
     // Whether line breaks should not be checked, e.g. `return [\n] x`.
     "laxbreak": false,
     // Whether bitwise operators (&, |, ^, etc.) should be forbidden.
@@ -58,7 +60,7 @@
     // conditions and loops are for comparison, not assignments.
     "boss": true,
     // Whether curly braces around all blocks should be required.
-    "curly": true,
+    "curly": false,
     // Whether `===` and `!==` should be required (instead of `==` and `!=`).
     "eqeqeq": true,
     // Whether `== null` comparisons should be allowed, even if `eqeqeq` is `true`.
@@ -140,7 +142,7 @@
     // Whether strict whitespace rules apply.
     "white": false,
     // Quote formatting
-    "quotmark": true,
+    "quotmark": false,
 
     // Complexity
 

@@ -1,15 +1,13 @@
 'use strict';
 
-var templates   = require('../models/templates'),
-    db          = require('../app').db.models;
+const templates = require('../models/templates'),
+  db = require('../app').db.models;
 
 module.exports = function (router) {
 
-    router.get('/:id', function (req, res) {
-        var model = {};
-        db.Page.findOne({id: req.params.id}, function(err, result) {
-            model.page = result;
-            res.render(templates.about.index, model);
-        });
+    router.get('/:id', async function(req, res) {
+      const model = {};
+      model.page = await db.Page.findOne({ id: req.params.id });
+      res.render(templates.about.index, model);
     });
 };

@@ -15,7 +15,7 @@ const config = require('./config/config'),
     passport = require('passport'),
     mongoose = require('mongoose'),
     bluebird = require('bluebird'),
-    helmet = require('helmet'),
+    // helmet = require('helmet'),
     cons = require('consolidate'),
     csrf = require('csurf'),
     kraken = require('kraken-js');
@@ -90,11 +90,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser(config.cryptoKey));
 
-let sessionStore = mongoStore.create({mongoUrl: config.mongodb.uri})
+let sessionStore = mongoStore.create({mongoUrl: config.mongodb.uri});
 sessionStore.on('error', function (error) {
     console.error('Mongo session store error:', error);
     // You can implement fallback logic here, like switching to a MemoryStore
-})
+});
 app.use(session({
     resave: true,
     saveUninitialized: true,
@@ -106,7 +106,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(csrf({cookie: {signed: true}})); //kraken-js:lusca is already using csrf module
 
-helmet(app);
+// helmet(app);
 
 // setup response locals
 require('./middlewares/locals')(app, passport);
