@@ -8,8 +8,6 @@ let async = require('async'),
 
 module.exports = function(app, passport) {
 
-  // response locals
-
   // this code runs for all routes
   app.use(/^[^\.]+$/, async function(req, res, next) {
     res.cookie('_csrfToken', req.csrfToken());
