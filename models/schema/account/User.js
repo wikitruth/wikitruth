@@ -66,11 +66,9 @@ exports = module.exports = function(app, mongoose) {
       });
     });
   };
-  userSchema.statics.validatePassword = function(password, hash, done) {
+  userSchema.statics.validatePassword = async function(password, hash) {
     const bcrypt = require('bcrypt');
-    bcrypt.compare(password, hash, function (err, res) {
-      done(err, res);
-    });
+    return bcrypt.compare(password, hash);
   };
   userSchema.plugin(require('../plugins/pagedFind'));
   // userSchema.index({ username: 1 }, { unique: true });

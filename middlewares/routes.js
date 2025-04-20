@@ -1,7 +1,7 @@
 'use strict';
 
-var tmplRoot = '../public/templates/jade',
-    paths     = require('../models/paths');
+const tmplRoot = '../public/templates/jade',
+  paths = require('../models/paths');
 
 function req(code) {
   return require(tmplRoot + code);
@@ -88,8 +88,8 @@ module.exports = function(app, passport) {
   app.get('/signup/facebook/callback/', req('/signup/index').signupFacebook);
   app.get('/signup/google/', passport.authenticate('google', { callbackURL: '/signup/google/callback/', scope: ['profile email'] }));
   app.get('/signup/google/callback/', req('/signup/index').signupGoogle);
-  app.get('/signup/tumblr/', passport.authenticate('tumblr', { callbackURL: '/signup/tumblr/callback/' }));
-  app.get('/signup/tumblr/callback/', req('/signup/index').signupTumblr);
+  // app.get('/signup/tumblr/', passport.authenticate('tumblr', { callbackURL: '/signup/tumblr/callback/' }));
+  // app.get('/signup/tumblr/callback/', req('/signup/index').signupTumblr);
 
   //login/out
   app.get('/login/', req('/login/index').init);
@@ -110,8 +110,8 @@ module.exports = function(app, passport) {
   app.get('/login/facebook/callback/', req('/login/index').loginFacebook);
   app.get('/login/google/', passport.authenticate('google', { callbackURL: '/login/google/callback/', scope: ['profile email'] }));
   app.get('/login/google/callback/', req('/login/index').loginGoogle);
-  app.get('/login/tumblr/', passport.authenticate('tumblr', { callbackURL: '/login/tumblr/callback/', scope: ['profile email'] }));
-  app.get('/login/tumblr/callback/', req('/login/index').loginTumblr);
+  // app.get('/login/tumblr/', passport.authenticate('tumblr', { callbackURL: '/login/tumblr/callback/', scope: ['profile email'] }));
+  // app.get('/login/tumblr/callback/', req('/login/index').loginTumblr);
 
   //admin
   app.all('/admin*', ensureAuthenticated);
@@ -207,9 +207,9 @@ module.exports = function(app, passport) {
   app.get('/account/settings/google/', passport.authenticate('google', { callbackURL: '/account/settings/google/callback/', scope: ['profile email'] }));
   app.get('/account/settings/google/callback/', req('/account/settings/index').connectGoogle);
   app.get('/account/settings/google/disconnect/', req('/account/settings/index').disconnectGoogle);
-  app.get('/account/settings/tumblr/', passport.authenticate('tumblr', { callbackURL: '/account/settings/tumblr/callback/' }));
-  app.get('/account/settings/tumblr/callback/', req('/account/settings/index').connectTumblr);
-  app.get('/account/settings/tumblr/disconnect/', req('/account/settings/index').disconnectTumblr);
+  // app.get('/account/settings/tumblr/', passport.authenticate('tumblr', { callbackURL: '/account/settings/tumblr/callback/' }));
+  // app.get('/account/settings/tumblr/callback/', req('/account/settings/index').connectTumblr);
+  // app.get('/account/settings/tumblr/disconnect/', req('/account/settings/index').disconnectTumblr);
 
   //route not found
   //app.all('*', require(tmpl + '/http/index').http404);

@@ -1,12 +1,14 @@
 'use strict';
 
+const events = require('events');
+
 exports = module.exports = function(req, res) {
-  var workflow = new (require('events').EventEmitter)();
+  const workflow = new (events.EventEmitter)();
 
   workflow.outcome = {
     success: false,
     errors: [],
-    errfor: {}
+    errfor: {},
   };
 
   workflow.hasErrors = function() {

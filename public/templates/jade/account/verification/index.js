@@ -2,25 +2,25 @@
 
 var sendVerificationEmail = function(req, res, options) {
   req.app.utility.sendmail(req, res, {
-    from: req.app.config.smtp.from.name +' <'+ req.app.config.smtp.from.address +'>',
+    from: req.app.config.smtp.from.name + ' <' + req.app.config.smtp.from.address + '>',
     to: options.email,
-    subject: 'Verify Your '+ req.app.config.projectName +' Account',
+    subject: 'Verify Your ' + req.app.config.projectName + ' Account',
     textPath: 'jade/account/verification/email-text.jade',
     htmlPath: 'jade/account/verification/email-html.jade',
     locals: {
-      verifyURL: req.protocol +'://'+ req.headers.host +'/account/verification/' + options.verificationToken + '/',
-      projectName: req.app.config.projectName
+      verifyURL: req.protocol + '://' + req.headers.host + '/account/verification/' + options.verificationToken + '/',
+      projectName: req.app.config.projectName,
     },
     success: function() {
       options.onSuccess();
     },
     error: function(err) {
       options.onError(err);
-    }
+    },
   });
 };
 
-exports.init = function(req, res, next){
+exports.init = function(req, res, next) {
   if (req.user.roles.account.isVerified === 'yes') {
     return res.redirect(req.user.defaultReturnUrl());
   }
@@ -35,8 +35,8 @@ exports.init = function(req, res, next){
 
       res.render('jade/account/verification/index.jade', {
         data: {
-          user: JSON.stringify(user)
-        }
+          user: JSON.stringify(user),
+        },
       });
     });
   });
@@ -82,7 +82,7 @@ exports.init = function(req, res, next){
         },
         onError: function(err) {
           return next(err);
-        }
+        },
       });
     });
   });
@@ -90,7 +90,7 @@ exports.init = function(req, res, next){
   workflow.emit('generateTokenOrRender');
 };
 
-exports.resendVerification = function(req, res, next){
+exports.resendVerification = function(req, res, next) {
   if (req.user.roles.account.isVerified === 'yes') {
     return res.redirect(req.user.defaultReturnUrl());
   }
@@ -100,8 +100,7 @@ exports.resendVerification = function(req, res, next){
   workflow.on('validate', function() {
     if (!req.body.email) {
       workflow.outcome.errfor.email = 'required';
-    }
-    else if (!/^[a-zA-Z0-9\-\_\.\+]+@[a-zA-Z0-9\-\_\.]+\.[a-zA-Z0-9\-\_]+$/.test(req.body.email)) {
+    } else if (!/^[a-zA-Z0-9\-\_\.\+]+@[a-zA-Z0-9\-\_\.]+\.[a-zA-Z0-9\-\_]+$/.test(req.body.email)) {
       workflow.outcome.errfor.email = 'invalid email format';
     }
 
@@ -113,7 +112,10 @@ exports.resendVerification = function(req, res, next){
   });
 
   workflow.on('duplicateEmailCheck', function() {
-    req.app.db.models.User.findOne({ email: req.body.email.toLowerCase(), _id: { $ne: req.user.id } }, function(err, user) {
+    req.app.db.models.User.findOne({
+      email: req.body.email.toLowerCase(),
+      _id: { $ne: req.user.id },
+    }, function(err, user) {
       if (err) {
         return workflow.emit('exception', err);
       }
@@ -171,9 +173,9 @@ exports.resendVerification = function(req, res, next){
           workflow.emit('response');
         },
         onError: function(err) {
-          workflow.outcome.errors.push('Error Sending: '+ err);
+          workflow.outcome.errors.push('Error Sending: ' + err);
           workflow.emit('response');
-        }
+        },
       });
     });
   });
@@ -181,19 +183,15 @@ exports.resendVerification = function(req, res, next){
   workflow.emit('validate');
 };
 
-exports.verify = function(req, res, next){
-  req.app.db.models.User.validatePassword(req.params.token, req.user.roles.account.verificationToken, function(err, isValid) {
-    if (!isValid) {
-      return res.redirect(req.user.defaultReturnUrl());
-    }
-
-    var fieldsToSet = { isVerified: 'yes', verificationToken: '' };
-    req.app.db.models.Account.findByIdAndUpdate(req.user.roles.account._id, fieldsToSet, function(err, account) {
-      if (err) {
-        return next(err);
-      }
-
-      return res.redirect(req.user.defaultReturnUrl());
-    });
-  });
+exports.verify = async function(req, res, next) {
+  const db = req.app.db.models;
+  const isValid = await db.User.validatePassword(req.params.token, req.user.roles.account.verificationToken);
+  if (!isValid) {
+    return res.redirect(req.user.defaultReturnUrl());
+  }
+  const fieldsToSet = { isVerified: 'yes', verificationToken: '' };
+  await db.Account.findByIdAndUpdate(
+    req.user.roles.account._id,
+    fieldsToSet);
+  return res.redirect(req.user.defaultReturnUrl());
 };

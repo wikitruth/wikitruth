@@ -15,35 +15,32 @@ exports = module.exports = function(req, res, options) {
     error: Function
   } */
 
-  var renderText = function(callback) {
-    res.render(options.textPath, options.locals, function(err, text) {
+  const renderText = function (callback) {
+    res.render(options.textPath, options.locals, function (err, text) {
       if (err) {
         callback(err, null);
-      }
-      else {
+      } else {
         options.text = text;
         return callback(null, 'done');
       }
     });
   };
 
-  var renderHtml = function(callback) {
-    res.render(options.htmlPath, options.locals, function(err, html) {
+  const renderHtml = function (callback) {
+    res.render(options.htmlPath, options.locals, function (err, html) {
       if (err) {
         callback(err, null);
-      }
-      else {
+      } else {
         options.html = html;
         return callback(null, 'done');
       }
     });
   };
 
-  var renderers = [];
+  const renderers = [];
   if (options.textPath) {
     renderers.push(renderText);
   }
-
   if (options.htmlPath) {
     renderers.push(renderHtml);
   }
@@ -56,20 +53,20 @@ exports = module.exports = function(req, res, options) {
         return;
       }
 
-      var attachments = [];
+      const attachments = [];
 
       if (options.html) {
         attachments.push({ data: options.html, alternative: true });
       }
 
       if (options.attachments) {
-        for (var i = 0 ; i < options.attachments.length ; i++) {
+        for (let i = 0 ; i < options.attachments.length ; i++) {
           attachments.push(options.attachments[i]);
         }
       }
 
-      var emailjs = require('emailjs/email');
-      var emailer = emailjs.server.connect( req.app.config.smtp.credentials );
+      let emailjs = require('emailjs/email');
+      let emailer = emailjs.server.connect( req.app.config.smtp.credentials );
       emailer.send({
         from: options.from,
         to: options.to,
@@ -82,11 +79,9 @@ exports = module.exports = function(req, res, options) {
       }, function(err, message) {
         if (err) {
           options.error('Email failed to send. '+ err);
-          return;
         }
         else {
           options.success(message);
-          return;
         }
       });
     }
