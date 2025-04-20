@@ -1,13 +1,13 @@
 'use strict';
 
-var templates   = require('../models/templates'),
+let templates   = require('../models/templates'),
     config      = require('../config/config'),
     flowUtils   = require('../utils/flowUtils'),
     db          = require('../app').db.models,
     fs          = require('fs'),
     async       = require('async');
 
-var cols = config.mongodb.collections;
+let cols = config.mongodb.collections;
 
 function requestLogin(req, res) {
     // redirect to login
@@ -19,7 +19,7 @@ function requestLogin(req, res) {
 module.exports = function (router) {
 
     router.get('/', function (req, res) {
-        var model = {};
+        let model = {};
         model.dirname = flowUtils.getBackupDir();
 
         // Validate if db is already up. If yes, check if user is logged in and is admin
@@ -43,23 +43,23 @@ module.exports = function (router) {
     });
 
     router.post('/', function (req, res) {
-        var model = {};
+        let model = {};
         model.dirname = flowUtils.getBackupDir();
 
-        var restoreTask = function (col, callback) {
-            var dir = flowUtils.getBackupDir() + '/wikitruth';
-            var coldir = dir + '/' + col;
+        let restoreTask = function (col, callback) {
+            let dir = flowUtils.getBackupDir() + '/wikitruth';
+            let coldir = dir + '/' + col;
             if (!fs.existsSync(coldir)){
                 return callback();
             }
-            var jsons = fs.readdirSync(coldir);
+            let jsons = fs.readdirSync(coldir);
             if (cols.modelMapping[col]) {
-                var collection = db[cols.modelMapping[col]];
+                let collection = db[cols.modelMapping[col]];
                 if (collection) {
                     collection.remove({}, function (err) {
                         async.eachSeries(jsons, function (json, callback) {
-                            var file = coldir + '/' + json;
-                            var obj = JSON.parse(fs.readFileSync(file, 'utf8'));
+                            let file = coldir + '/' + json;
+                            let obj = JSON.parse(fs.readFileSync(file, 'utf8'));
                             collection.create(obj, function (err, newObj) {
                                 if (err) {
                                     console.error(err);
@@ -78,7 +78,7 @@ module.exports = function (router) {
             }
         };
 
-        var next = function () {
+        let next = function () {
             async.series({
                 backupSystemData: function (callback) {
                     async.eachSeries(cols.backupList, function (col, callback) {

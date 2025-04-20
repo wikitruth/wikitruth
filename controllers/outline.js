@@ -1,34 +1,27 @@
 'use strict';
 
-var flowUtils   = require('../utils/flowUtils'),
-    templates   = require('../models/templates');
+let flowUtils = require('../utils/flowUtils'),
+  templates = require('../models/templates');
 
-module.exports = function (router) {
+module.exports = function(router) {
 
-    router.get('/link', function (req, res) {
-        var model = {};
-        flowUtils.setArgumentModels(req, model, function () {
-            var query = model.argument ? { 'topic': model.argument.ownerId } : req.query;
-            flowUtils.setTopicModels({query: query}, model, function () {
-                //var item = model.argument ? model.argument : model.topic;
-                /*var parent = null;
-                if(model.argument) {
+  router.get('/link', async function(req, res) {
+    let model = {};
+    await flowUtils.setArgumentModels(req, model);
+    let query = model.argument ? { 'topic': model.argument.ownerId } : req.query;
+    await flowUtils.setTopicModels({ query: query }, model);
+    //var item = model.argument ? model.argument : model.topic;
+    /*var parent = null;
+    if(model.argument) {
+    } else if(model.topic) {
+    }*/
+    res.render(templates.wiki.outline.linkTo, model);
+  });
 
-                } else if(model.topic) {
-
-                }*/
-
-                res.render(templates.wiki.outline.linkTo, model);
-            });
-        });
-    });
-
-    router.get('/create', function (req, res) {
-        var model = {};
-        flowUtils.setTopicModels(req, model, function () {
-            flowUtils.setArgumentModels(req, model, function () {
-                res.render(templates.wiki.outline.create, model);
-            });
-        });
-    });
+  router.get('/create', async function(req, res) {
+    let model = {};
+    await flowUtils.setTopicModels(req, model);
+    await flowUtils.setArgumentModels(req, model);
+    res.render(templates.wiki.outline.create, model);
+  });
 };

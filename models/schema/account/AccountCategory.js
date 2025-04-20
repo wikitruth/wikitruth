@@ -1,10 +1,10 @@
 'use strict';
 
 exports = module.exports = function(app, mongoose) {
-  var categorySchema = new mongoose.Schema({
+  const categorySchema = new mongoose.Schema({
     _id: { type: String },
     pivot: { type: String, default: '' },
-    name: { type: String, default: '' }
+    name: { type: String, default: '' },
   });
   categorySchema.plugin(require('../plugins/pagedFind'));
   categorySchema.index({ pivot: 1 });
