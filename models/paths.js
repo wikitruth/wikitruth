@@ -99,9 +99,9 @@
         }
     };
 
-    if (typeof module != 'undefined') {
+    if (typeof module !== 'undefined') {
         module.exports = exports;
-    } else if (typeof window != 'undefined') {
+    } else if (typeof window !== 'undefined') {
         window.WT_PATHS = exports;
     }
 })();

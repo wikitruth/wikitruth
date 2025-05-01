@@ -52,6 +52,9 @@
 
     // Whether automatic semicolon insertion should be allowed.
     "asi": true,
+
+    "-W014": true,
+
     // Whether line breaks should not be checked, e.g. `return [\n] x`.
     "laxbreak": false,
     // Whether bitwise operators (&, |, ^, etc.) should be forbidden.

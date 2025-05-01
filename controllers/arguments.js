@@ -158,8 +158,7 @@ async function GET_entry(req, res) {
 }
 
 async function GET_index(req, res) {
-  let model = {},
-    query = {};
+  let model = {};
   await flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model);
   if (model.topic) {
     flowUtils.setScreeningModel(req, model);
@@ -169,7 +168,7 @@ async function GET_index(req, res) {
     ) {
       return res.redirect('/');
     }
-    query = { 'screening.status': model.screening.status };
+    const query = { 'screening.status': model.screening.status };
     if (req.query.argument) {
       query.parentId = model.argument._id;
     } else {
@@ -178,12 +177,8 @@ async function GET_index(req, res) {
       query.ownerType = constants.OBJECT_TYPES.topic;
     }
     const results = await flowUtils.getArguments(query, { limit: 0, req: req });
-    let support = results.filter(function (arg) {
-      return !arg.against;
-    });
-    let contra = results.filter(function (arg) {
-      return arg.against;
-    });
+    let support = results.filter(arg => !arg.against);
+    let contra = results.filter(arg => arg.against);
     model.arguments = results;
     if (support.length > 0) {
       model.proArguments = support;
@@ -191,7 +186,7 @@ async function GET_index(req, res) {
     if (contra.length > 0) {
       model.conArguments = contra;
     }
-    results.forEach(function (result) {
+    results.forEach(result => {
       flowUtils.setVerdictModel(result);
     });
     flowUtils.sortArguments(results);
@@ -199,10 +194,9 @@ async function GET_index(req, res) {
 
     // screening and children count
     flowUtils.setScreeningModelCount(model, model.entry.childrenCount['arguments']);
-    res.render(templates.wiki.arguments.index, model);
   } else {
     // Top Arguments
-    query = {
+    const query = {
       ownerType: constants.OBJECT_TYPES.topic,
       private: false,
       'screening.status': constants.SCREENING_STATUS.status1.code,
@@ -210,7 +204,7 @@ async function GET_index(req, res) {
     //db.Argument.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
     const results = await db.Argument.find(query).sort({ editDate: -1 }).limit(25).lean();
     await flowUtils.setEditorsUsername(results);
-    results.forEach(function (result) {
+    results.forEach(result => {
       result.topic = {
         _id: result.ownerId,
       };
@@ -221,8 +215,8 @@ async function GET_index(req, res) {
     model.arguments = results;
     model.proArguments = results;
     flowUtils.setModelContext(req, res, model);
-    res.render(templates.wiki.arguments.index, model);
   }
+  res.render(templates.wiki.arguments.index, model);
 }
 
 async function GET_create(req, res) {
@@ -246,7 +240,7 @@ async function GET_create(req, res) {
         model.argument = result;
       }
     },
-    parentArgument: async function () {
+    parentArgument: async () => {
       let query = { _id: req.query.argument || model.argument?.parentId || null };
       if (query._id) {
         const result = await db.Argument.findOne(query);

@@ -1,127 +1,110 @@
 'use strict';
 
-var templates   = require('../models/templates'),
-    constants   = require('../models/constants'),
-    flowUtils   = require('../utils/flowUtils'),
-    db          = require('../app').db.models,
-    async       = require('async');
+let templates = require('../models/templates'),
+  constants = require('../models/constants'),
+  flowUtils = require('../utils/flowUtils'),
+  db = require('../app').db.models,
+  async = require('async');
 
-module.exports = function (router) {
+module.exports = function(router) {
 
-    router.get('/', function (req, res) {
-        var model = {};
-        var clipboard = req.session.clipboard || {};
-        var topicIds = clipboard['object' + constants.OBJECT_TYPES.topic];
-        var argumentIds = clipboard['object' + constants.OBJECT_TYPES.argument];
-        var questionIds = clipboard['object' + constants.OBJECT_TYPES.question];
-        var artifactIds = clipboard['object' + constants.OBJECT_TYPES.artifact];
+  router.get('/', async function(req, res) {
+    let model = {};
+    let clipboard = req.session.clipboard || {};
+    let topicIds = clipboard['object' + constants.OBJECT_TYPES.topic];
+    let argumentIds = clipboard['object' + constants.OBJECT_TYPES.argument];
+    let questionIds = clipboard['object' + constants.OBJECT_TYPES.question];
+    let artifactIds = clipboard['object' + constants.OBJECT_TYPES.artifact];
 
-        /* FIXME: why is this here?
-        if(req.user) {
-            req.params.username = req.user.username;
-        }*/
-        flowUtils.setModelContext(req, res, model, true);
+    /* FIXME: why is this here?
+    if(req.user) {
+        req.params.username = req.user.username;
+    }*/
+    flowUtils.setModelContext(req, res, model, true);
 
-        async.parallel({
-            topics: function (callback) {
-                if(topicIds && topicIds.length > 0) {
-                    var query = {
-                        _id: {
-                            $in: topicIds
-                        }
-                    };
-                    db.Topic.find(query, function(err, results) {
-                        results.forEach(function (result) {
-                            flowUtils.appendEntryExtras(result);
-                        });
-                        model.topics = results;
-                        callback();
-                    });
-                } else {
-                    callback();
-                }
+    await async.parallel({
+      topics: async function() {
+        if (topicIds && topicIds.length > 0) {
+          let query = {
+            _id: {
+              $in: topicIds,
             },
-            arguments: function (callback) {
-                if(argumentIds && argumentIds.length > 0) {
-                    var query = {
-                        _id: {
-                            $in: argumentIds
-                        }
-                    };
-                    db.Argument.find(query, function(err, results) {
-                        results.forEach(function (result) {
-                            flowUtils.appendEntryExtras(result);
-                        });
-                        model.arguments = results;
-                        callback();
-                    });
-                } else {
-                    callback();
-                }
-            },
-            questions: function (callback) {
-                if(questionIds && questionIds.length > 0) {
-                    var query = {
-                        _id: {
-                            $in: questionIds
-                        }
-                    };
-                    db.Question.find(query, function(err, results) {
-                        results.forEach(function (result) {
-                            flowUtils.appendEntryExtras(result);
-                        });
-                        model.questions = results;
-                        callback();
-                    });
-                } else {
-                    callback();
-                }
-            },
-            artifacts: function (callback) {
-                if(artifactIds && artifactIds.length > 0) {
-                    var query = {
-                        _id: {
-                            $in: artifactIds
-                        }
-                    };
-                    db.Artifact.find(query, function(err, results) {
-                        results.forEach(function (result) {
-                            flowUtils.appendEntryExtras(result);
-                        });
-                        model.artifacts = results;
-                        callback();
-                    });
-                } else {
-                    callback();
-                }
-            }
-        }, function (err) {
-            res.render(templates.wiki.clipboard, model);
-        });
-    });
-
-    router.post('/', function (req, res) {
-        var action = req.body.action;
-        if(action === 'delete') {
-            //var clipboard = req.session.clipboard;
-            var topics = req.body.topics;
-            var args = req.body.arguments;
-            //var artifacts = req.body.artifacts;
-            if(topics) {
-                //var topicIds = clipboard['object' + constants.OBJECT_TYPES.topic];
-                if( typeof topics === 'string' ) {
-                    // single selection
-                    topics = [topics];
-                }
-            }
-            if(args) {
-                //var argumentIds = clipboard['object' + constants.OBJECT_TYPES.argument];
-                if( typeof args === 'string' ) {
-                    // single selection
-                    args = [args];
-                }
-            }
-            res.redirect(req.originalUrl);
+          };
+          const results = await db.Topic.find(query);
+          results.forEach(function(result) {
+            flowUtils.appendEntryExtras(result);
+          });
+          model.topics = results;
         }
+      },
+      arguments: async function() {
+        if (argumentIds && argumentIds.length > 0) {
+          let query = {
+            _id: {
+              $in: argumentIds,
+            },
+          };
+          const results = await db.Argument.find(query);
+          results.forEach(function(result) {
+            flowUtils.appendEntryExtras(result);
+          });
+          model.arguments = results;
+        }
+      },
+      questions: async function() {
+        if (questionIds && questionIds.length > 0) {
+          let query = {
+            _id: {
+              $in: questionIds,
+            },
+          };
+          const results = await db.Question.find(query);
+          results.forEach(function(result) {
+            flowUtils.appendEntryExtras(result);
+          });
+          model.questions = results;
+        }
+      },
+      artifacts: async function() {
+        if (artifactIds && artifactIds.length > 0) {
+          let query = {
+            _id: {
+              $in: artifactIds,
+            },
+          };
+          const results = await db.Artifact.find(query);
+          results.forEach(function(result) {
+            flowUtils.appendEntryExtras(result);
+          });
+          model.artifacts = results;
+        }
+      },
     });
+    res.render(templates.wiki.clipboard, model);
+  });
+
+  router.post('/', function(req, res) {
+    let action = req.body.action;
+    if (action === 'delete') {
+      //let clipboard = req.session.clipboard;
+      let topics = req.body.topics;
+      let args = req.body.arguments;
+      //let artifacts = req.body.artifacts;
+      if (topics) {
+        //let topicIds = clipboard['object' + constants.OBJECT_TYPES.topic];
+        if (typeof topics === 'string') {
+          // single selection
+          topics = [topics];
+        }
+      }
+      if (args) {
+        //let argumentIds = clipboard['object' + constants.OBJECT_TYPES.argument];
+        if (typeof args === 'string') {
+          // single selection
+          args = [args];
+        }
+      }
+      res.redirect(req.originalUrl);
+    }
+  });
 };

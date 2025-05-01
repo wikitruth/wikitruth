@@ -16,20 +16,20 @@ let mongoose = require('mongoose'),
 module.exports = function(router) {
   /* Artifacts */
 
-  router.get('/', function(req, res) {
-    GET_index(req, res);
+  router.get('/', async function(req, res) {
+    await GET_index(req, res);
   });
 
-  router.get('/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', function(req, res) {
-    GET_entry(req, res);
+  router.get('/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', async function(req, res) {
+    await GET_entry(req, res);
   });
 
-  router.get('/create', function(req, res) {
-    GET_create(req, res);
+  router.get('/create', async function(req, res) {
+    await GET_create(req, res);
   });
 
-  router.post('/create', function(req, res) {
-    POST_create(req, res);
+  router.post('/create', async function(req, res) {
+    await POST_create(req, res);
   });
 };
 
@@ -62,33 +62,29 @@ async function GET_entry(req, res) {
   res.render(templates.wiki.artifacts.entry, model);
 }
 
-function GET_index(req, res) {
+async function GET_index(req, res) {
   let model = {};
   if (req.query.topic) {
     flowUtils.setScreeningModel(req, model);
-    flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model, function(err) {
-      let query = req.query.artifact
-        ? { parentId: model.artifact._id }
-        : { ownerId: model.topic._id, ownerType: constants.OBJECT_TYPES.topic };
-      query['screening.status'] = model.screening.status;
-      db.Artifact.find(query)
-        .sort({ title: 1 })
-        //.lean()
-        .exec(function(err, results) {
-          flowUtils.setEditorsUsername(results, function() {
-            results.forEach(function(result) {
-              flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.artifact, req);
-              result.setThumbnailPath(req.params.username);
-            });
-            model.artifacts = results;
-            flowUtils.setModelOwnerEntry(req, res, model);
-
-            // screening and children count
-            flowUtils.setScreeningModelCount(model, model.entry.childrenCount.artifacts);
-            res.render(templates.wiki.artifacts.index, model);
-          });
-        });
+    await flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model);
+    let query = req.query.artifact
+      ? { parentId: model.artifact._id }
+      : { ownerId: model.topic._id, ownerType: constants.OBJECT_TYPES.topic };
+    query['screening.status'] = model.screening.status;
+    const results = await db.Artifact.find(query)
+      .sort({ title: 1 });
+    //.lean()
+    await flowUtils.setEditorsUsername(results);
+    results.forEach(result => {
+      flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.artifact, req);
+      result.setThumbnailPath(req.params.username);
     });
+    model.artifacts = results;
+    flowUtils.setModelOwnerEntry(req, res, model);
+
+    // screening and children count
+    flowUtils.setScreeningModelCount(model, model.entry.childrenCount.artifacts);
+    res.render(templates.wiki.artifacts.index, model);
   } else {
     // Top Artifacts
     let query = {
@@ -96,23 +92,20 @@ function GET_index(req, res) {
       private: false,
       'screening.status': constants.SCREENING_STATUS.status1.code,
     };
-    db.Artifact.find(query)
+    const results = await db.Artifact.find(query)
       .sort({ editDate: -1 })
       .limit(25)
-      .lean()
-      .exec(function(err, results) {
-        flowUtils.setEditorsUsername(results, function() {
-          results.forEach(function(result) {
-            result.topic = {
-              _id: result.ownerId,
-            };
-            flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.artifact, req);
-          });
-          model.artifacts = results;
-          flowUtils.setModelContext(req, res, model);
-          res.render(templates.wiki.artifacts.index, model);
-        });
-      });
+      .lean();
+    await flowUtils.setEditorsUsername(results);
+    results.forEach(function(result) {
+      result.topic = {
+        _id: result.ownerId,
+      };
+      flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.artifact, req);
+    });
+    model.artifacts = results;
+    flowUtils.setModelContext(req, res, model);
+    res.render(templates.wiki.artifacts.index, model);
   }
 }
 
@@ -166,101 +159,92 @@ async function POST_create(req, res) {
     };
   }
 
-  await async.series(
-    {
-      syncCategoryId: async function() {
-        await flowUtils.syncCategoryId(
-          entity,
-          { entryType: constants.OBJECT_TYPES.artifact },
+  await async.series({
+    syncCategoryId: async () => {
+      await flowUtils.syncCategoryId(entity, { entryType: constants.OBJECT_TYPES.artifact });
+    },
+    update: async () => {
+      updatedEntity = await db.Artifact.findOneAndUpdate(query, entity, {
+        upsert: true,
+        new: true,
+        setDefaultsOnInsert: true,
+      });
+    },
+    moveFile: async () => {
+      if (inlineFile) {
+        // Create directory if not exists
+        let artifactFolderAbs = path.join(
+          __dirname,
+          '/../public',
+          updatedEntity.getFolder(req.params.username)
         );
-      },
-      update: async function() {
-        updatedEntity = await db.Artifact.findOneAndUpdate(
-          query,
-          entity,
-          {
-            upsert: true,
-            new: true,
-            setDefaultsOnInsert: true,
-          });
-      },
-      moveFile: async function() {
-        if (inlineFile) {
-          // Create directory if not exists
-          let artifactFolderAbs = path.join(
-            __dirname,
-            '/../public',
-            updatedEntity.getFolder(req.params.username),
-          );
-          if (!fs.existsSync(artifactFolderAbs)) {
-            fs.mkdirSync(artifactFolderAbs);
-          }
+        if (!fs.existsSync(artifactFolderAbs)) {
+          fs.mkdirSync(artifactFolderAbs);
+        }
 
-          let filePath = updatedEntity.getFilePath(req.params.username);
-          let thumbnailPath = updatedEntity.getThumbnailPath(req.params.username);
+        let filePath = updatedEntity.getFilePath(req.params.username);
+        let thumbnailPath = updatedEntity.getThumbnailPath(req.params.username);
 
-          // Delete old file if exists and different filename
-          if (result) {
-            if (oldFilePath && oldFilePath !== filePath) {
-              let oldFilePathAbs = path.join(__dirname, '/../public', oldFilePath);
-              let oldThumbnailPathAbs = path.join(__dirname, '/../public', oldThumbnailPath);
-              if (fs.existsSync(oldFilePathAbs)) {
-                fs.unlinkSync(oldFilePathAbs);
-              }
-              if (oldThumbnailPath && fs.existsSync(oldThumbnailPathAbs)) {
-                fs.unlinkSync(oldThumbnailPathAbs);
-              }
+        // Delete old file if exists and different filename
+        if (result) {
+          if (oldFilePath && oldFilePath !== filePath) {
+            let oldFilePathAbs = path.join(__dirname, '/../public', oldFilePath);
+            let oldThumbnailPathAbs = path.join(__dirname, '/../public', oldThumbnailPath);
+            if (fs.existsSync(oldFilePathAbs)) {
+              fs.unlinkSync(oldFilePathAbs);
+            }
+            if (oldThumbnailPath && fs.existsSync(oldThumbnailPathAbs)) {
+              fs.unlinkSync(oldThumbnailPathAbs);
             }
           }
-
-          let newPathAbs = path.join(__dirname, '/../public', filePath);
-          // INFO: replaced fs.rename() due to error "EXDEV: cross-device link not permitted"
-          await mv(inlineFile.path, newPathAbs);
-          if (updatedEntity.isImage()) {
-            // Identify image properties
-            const features = await imagemagick.identify(newPathAbs);
-            // save image attributes
-            if (!updatedEntity.extras) updatedEntity.extras = {};
-            updatedEntity.extras.details = {
-              format: features.format,
-              width: features.width,
-              height: features.height,
-            };
-
-            // create a thumbnail that fits within 500x500
-            let thumbnailWidth = features.width > 500 ? 500 : features.width;
-            let thumbnailPathAbs = path.join(__dirname, '/../public', thumbnailPath);
-            await imagemagick.resize(
-              {
-                srcPath: newPathAbs,
-                dstPath: thumbnailPathAbs,
-                width: thumbnailWidth,
-              });
-          }
         }
-      },
-      updateExtras: async () => {
-        if (inlineFile && updatedEntity.isImage()) {
-          // update new image details in entity's extras
-          updatedEntity = await db.Artifact.findOneAndUpdate(query, updatedEntity, {
-            upsert: true,
-            new: true,
-            setDefaultsOnInsert: true,
+
+        let newPathAbs = path.join(__dirname, '/../public', filePath);
+        // INFO: replaced fs.rename() due to error "EXDEV: cross-device link not permitted"
+        await mv(inlineFile.path, newPathAbs);
+        if (updatedEntity.isImage()) {
+          // Identify image properties
+          const features = await imagemagick.identify(newPathAbs);
+          // save image attributes
+          if (!updatedEntity.extras) updatedEntity.extras = {};
+          updatedEntity.extras.details = {
+            format: features.format,
+            width: features.width,
+            height: features.height,
+          };
+
+          // create a thumbnail that fits within 500x500
+          let thumbnailWidth = features.width > 500 ? 500 : features.width;
+          let thumbnailPathAbs = path.join(__dirname, '/../public', thumbnailPath);
+          await imagemagick.resize({
+            srcPath: newPathAbs,
+            dstPath: thumbnailPathAbs,
+            width: thumbnailWidth,
           });
         }
-      },
-      updateChildrenCount: async () => {
-        if (!result) {
-          // if new entry, update parent children count
-          await flowUtils.updateChildrenCount(
-            entity.ownerId,
-            entity.ownerType,
-            constants.OBJECT_TYPES.artifact,
-          );
-        }
-      },
+      }
     },
-  );
+    updateExtras: async () => {
+      if (inlineFile && updatedEntity.isImage()) {
+        // update new image details in entity's extras
+        updatedEntity = await db.Artifact.findOneAndUpdate(query, updatedEntity, {
+          upsert: true,
+          new: true,
+          setDefaultsOnInsert: true,
+        });
+      }
+    },
+    updateChildrenCount: async () => {
+      if (!result) {
+        // if new entry, update parent children count
+        await flowUtils.updateChildrenCount(
+          entity.ownerId,
+          entity.ownerType,
+          constants.OBJECT_TYPES.artifact
+        );
+      }
+    },
+  });
   let model = {};
   flowUtils.setModelContext(req, res, model);
   let url =
