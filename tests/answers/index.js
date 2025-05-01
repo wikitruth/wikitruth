@@ -2,45 +2,39 @@
 
 'use strict';
 
-
-var kraken = require('kraken-js'),
-    express = require('express'),
-    request = require('supertest');
-
+const kraken = require('kraken-js'),
+  express = require('express'),
+  request = require('supertest');
 
 describe('/answers', function () {
+  let app, mock;
 
-    var app, mock;
+  beforeEach(function (done) {
+    app = express();
+    app.on('start', done);
+    app.use(
+      kraken({
+        basedir: process.cwd(),
+      })
+    );
 
+    mock = app.listen(1337);
+  });
 
-    beforeEach(function (done) {
-        app = express();
-        app.on('start', done);
-        app.use(kraken({
-            basedir: process.cwd()
-        }));
+  afterEach(function (done) {
+    mock.close(done);
+  });
 
-        mock = app.listen(1337);
+  it('should say "hello"', function (done) {
+    request(mock)
+      .get('/answers')
+      .expect(200)
+      .expect('Content-Type', /html/)
 
-    });
+      .expect(/"name": "index"/)
 
-
-    afterEach(function (done) {
-        mock.close(done);
-    });
-
-
-    it('should say "hello"', function (done) {
-        request(mock)
-            .get('/answers')
-            .expect(200)
-            .expect('Content-Type', /html/)
-            
-                .expect(/"name": "index"/)
-            
-            .end(function (err, res) {
-                done(err);
-            });
-    });
-
+      .end(function (err, res) {
+        done(err);
+      });
+  });
 });

@@ -19,8 +19,7 @@ module.exports = function (router) {
         let results = await db.Group
             .find({})
             .sort({title: 1})
-            .lean()
-            .exec()
+            .lean();
         results.forEach(function (result) {
             result.friendlyUrl = utils.urlify(result.title);
         })

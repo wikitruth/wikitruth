@@ -67,7 +67,7 @@ function appendEntryExtras(item, objectType, req, shortTitleLength) {
   item.comments = utils.randomInt(0, 999);
   item.points = utils.randomInt(0, 9999);
 
-  //var editDateString = result.editDate.toUTCString();
+  //let editDateString = result.editDate.toUTCString();
   item.editDateString = utils.timeSince(item.editDate, true) + ' ago';
   item.createDateString = utils.timeSince(item.createDate, true) + ' ago';
 
@@ -665,7 +665,7 @@ async function setTopicModels(req, model) {
   if (query._id || query.friendlyUrl) {
     await async.series({
       topic: async function() {
-        let result = await db.Topic.findOne(query).exec();
+        let result = await db.Topic.findOne(query);
         if (!result) {
           return;
         }
@@ -833,7 +833,7 @@ async function setEntryModels(query, req, model) {
 }
 
 function setupClipboard(req, type) {
-  var clipboard = req.session.clipboard;
+  let clipboard = req.session.clipboard;
   if (!clipboard) {
     clipboard = {};
     clipboard['object' + constants.OBJECT_TYPES.topic] = [];
@@ -879,10 +879,10 @@ function setClipboardModel(req, model, entryType) {
       }
     }
 
-    /*var topics = clipboard['object' + constants.OBJECT_TYPES.topic];
-        var args = clipboard['object' + constants.OBJECT_TYPES.argument];
-        var artifacts = clipboard['object' + constants.OBJECT_TYPES.artifact];
-        var count = topics.length + args.length + artifacts.length;
+    /*let topics = clipboard['object' + constants.OBJECT_TYPES.topic];
+        let args = clipboard['object' + constants.OBJECT_TYPES.argument];
+        let artifacts = clipboard['object' + constants.OBJECT_TYPES.artifact];
+        let count = topics.length + args.length + artifacts.length;
         if (count > 0) {
             model.clipboard.count = count;
 
@@ -975,11 +975,8 @@ async function getTopics(query, options) {
               result.link = link;
             }
           });
-          topicLinks = results;
-        } else {
-          topicLinks = results;
         }
-      } else {
+        topicLinks = results;
       }
     },
   });
@@ -995,8 +992,7 @@ async function getArguments(query, options) {
         .find(query)
         .limit(options.limit)
         .sort({ title: 1 })
-        .lean()
-        .exec();
+        .lean();
       await setEditorsUsername(results);
       results.forEach(function(result) {
         appendEntryExtras(result, constants.OBJECT_TYPES.argument, options.req, options.shortTitleLength);
@@ -1010,8 +1006,7 @@ async function getArguments(query, options) {
       let links = await db.ArgumentLink
         .find(query)
         .limit(newLimit)
-        .lean()
-        .exec();
+        .lean();
 
       if (links.length > 0) {
         const ids = links.map(function(link) {
@@ -1023,8 +1018,7 @@ async function getArguments(query, options) {
           .find(query)
           .limit(newLimit)
           .sort({ title: 1 })
-          .lean()
-          .exec();
+          .lean();
         if (results.length > 0) {
           const linkParents = await async.parallel({
             parentTopics: async () => {
@@ -1034,8 +1028,7 @@ async function getArguments(query, options) {
               // get the topics of actual arguments
               return await db.Topic
                 .find({ _id: { $in: topicIds } })
-                .lean()
-                .exec();
+                .lean();
             },
             parentArguments: async () => {
               const parentIds = results
@@ -1044,43 +1037,53 @@ async function getArguments(query, options) {
               query = { _id: { $in: parentIds } };
               return await db.Argument
                 .find(query)
-                .lean()
-                .exec();
+                .lean();
             },
           });
           await setEditorsUsername(results);
-          results.forEach(function(result) {
-            appendEntryExtras(result, constants.OBJECT_TYPES.argument, options.req, options.shortTitleLength);
-            const link = links.find(function(link) {
-              return link.argumentId.equals(result._id);
-            });
+          results.forEach(result => {
+            appendEntryExtras(
+              result,
+              constants.OBJECT_TYPES.argument,
+              options.req,
+              options.shortTitleLength
+            );
+            const link = links.find(link => link.argumentId.equals(result._id));
             if (link) {
               if (result.parentId) {
-                const parentArgument = linkParents.parentArguments.find(function(linkParent) {
-                  return linkParent._id.equals(result.parentId);
-                });
+                const parentArgument = linkParents.parentArguments.find(linkParent =>
+                  linkParent._id.equals(result.parentId)
+                );
                 if (parentArgument) {
                   appendListExtras(parentArgument);
                 }
                 result.parentArgument = parentArgument;
               } else if (result.ownerType === constants.OBJECT_TYPES.topic && result.ownerId) {
-                const linkParent = linkParents.parentTopics.find(function(linkParent) {
-                  return linkParent._id.equals(result.ownerId);
-                });
+                const linkParent = linkParents.parentTopics.find(linkParent =>
+                  linkParent._id.equals(result.ownerId)
+                );
                 if (linkParent) {
-                  appendListExtras(linkParent, constants.OBJECT_TYPES.argument, options.req, options.shortTitleLength);
+                  appendListExtras(
+                    linkParent,
+                    constants.OBJECT_TYPES.argument,
+                    options.req,
+                    options.shortTitleLength
+                  );
                 }
                 result.parentTopic = linkParent;
               }
-              appendEntryExtras(link, constants.OBJECT_TYPES.argumentLink, options.req, options.shortTitleLength);
+              appendEntryExtras(
+                link,
+                constants.OBJECT_TYPES.argumentLink,
+                options.req,
+                options.shortTitleLength
+              );
               result.link = link;
               result.against = link.against;
             }
           });
-          argumentLinks = results;
-        } else {
-          argumentLinks = results;
         }
+        argumentLinks = results;
       }
     },
   });
@@ -1093,7 +1096,7 @@ async function getTopQuestions(query, model, req) {
     .limit(15)
     .lean();
   await setEditorsUsername(results);
-  results.forEach(function(result) {
+  results.forEach(result => {
     appendEntryExtras(result, constants.OBJECT_TYPES.question, req);
   });
   model.questions = results;
@@ -1106,7 +1109,7 @@ async function getTopArtifacts(query, model, req) {
     //.lean()
     .sort({ title: 1 });
   await setEditorsUsername(results);
-  results.forEach(function(result) {
+  results.forEach(result => {
     result.setThumbnailPath(req.params.username);
     appendEntryExtras(result, constants.OBJECT_TYPES.artifact, req);
   });
@@ -1120,7 +1123,7 @@ async function getTopIssues(query, model, req) {
     .lean()
     .sort({ title: 1 });
   await setEditorsUsername(results);
-  results.forEach(function(result) {
+  results.forEach(result => {
     result.issueType = constants.ISSUE_TYPES['type' + result.issueType];
     appendEntryExtras(result, constants.OBJECT_TYPES.issue, req);
   });
@@ -1134,7 +1137,7 @@ async function getTopOpinions(query, model, req) {
     .sort({ title: 1 })
     .lean();
   await setEditorsUsername(results);
-  results.forEach(function(result) {
+  results.forEach(result => {
     appendEntryExtras(result, constants.OBJECT_TYPES.opinion, req);
   });
   model.opinions = results;
@@ -1493,7 +1496,7 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
 // SUMMARY: updates the children of parent including the categoryId, does not touch the parent
 async function syncChildren(parent, options) {
   const syncChildTopics = async () => {
-    const children = await db.Topic.find({ parentId: parent._id }).exec();
+    const children = await db.Topic.find({ parentId: parent._id });
     if (children.length === 0) return;
     await async.each(children, async child => {
       let categoryChanged = false,
@@ -1505,7 +1508,7 @@ async function syncChildren(parent, options) {
         update: async () => {
           categoryChanged = oldCategoryId !== child.categoryId;
           if (categoryChanged) {
-            await db.Topic.updateOne({ _id: child._id }, child, { upsert: true }).exec();
+            await db.Topic.updateOne({ _id: child._id }, child, { upsert: true });
           }
         },
         syncChildren: async () => {
@@ -1520,19 +1523,20 @@ async function syncChildren(parent, options) {
   const syncChildTopicLinks = async function() {
     const children = await db.TopicLink.find({ parentId: parent._id });
     if (children.length === 0) return;
-    await async.each(children, async function(child) {
-      let categoryChanged = false, oldCategoryId = child.categoryId;
+    await async.each(children, async child => {
+      let categoryChanged = false,
+        oldCategoryId = child.categoryId;
       await async.series({
-        syncCategoryId: async function() {
+        syncCategoryId: async () => {
           await syncCategoryId(child, { entryType: constants.OBJECT_TYPES.topicLink });
         },
-        update: async function() {
+        update: async () => {
           categoryChanged = oldCategoryId !== child.categoryId;
           if (categoryChanged) {
             await db.TopicLink.updateOne({ _id: child._id }, child, { upsert: true });
           }
         },
-        syncChildren: async function() {
+        syncChildren: async function () {
           if (categoryChanged) {
             await syncChildren(child, { entryType: constants.OBJECT_TYPES.topicLink });
           }
@@ -1581,7 +1585,7 @@ async function syncChildren(parent, options) {
       ownerId: parent._id,
       ownerType: constants.OBJECT_TYPES.topic,
     } : { parentId: parent._id };
-    const children = db.Artifact.find(query);
+    const children = await db.Artifact.find(query);
     if (children.length === 0) return;
     await async.each(children, async function(child) {
       let categoryChanged = false, oldCategoryId = child.categoryId;
@@ -1816,7 +1820,7 @@ async function syncCategoryId(entry, options) {
       if (!entry.parentId) { // A root category, set category to null
         entry.categoryId = null;
       } else {
-        let parent = await db.Topic.findOne({ _id: entry.parentId }).exec();
+        let parent = await db.Topic.findOne({ _id: entry.parentId });
         if (!parent.parentId || isCategoryTopic(parent)) {
           entry.categoryId = parent._id;
         } else {
@@ -1827,7 +1831,7 @@ async function syncCategoryId(entry, options) {
       return;
 
     case constants.OBJECT_TYPES.topicLink:
-      let parent = await db.Topic.findOne({ _id: entry.parentId }).exec();
+      let parent = await db.Topic.findOne({ _id: entry.parentId });
       if (!parent.parentId || isCategoryTopic(parent)) {
         entry.categoryId = parent._id;
       } else {
@@ -2613,8 +2617,7 @@ async function getDiaryCategories(req) {
   let results = await db.Topic
     .find({ parentId: null, ownerType: constants.OBJECT_TYPES.user, ownerId: req.user.id })
     .sort({ title: 1 })
-    .lean()
-    .exec();
+    .lean();
   await async.each(results, function(result) {
     result.friendlyUrl = utils.urlify(result.title);
   });
@@ -2622,12 +2625,7 @@ async function getDiaryCategories(req) {
 }
 
 async function getUserGroups(req) {
-  let results = await db.Group
-    .find({ 'members.userId': req.user.id })
-    .sort({ title: 1 })
-    .lean()
-    .exec();
-  return results;
+  return await db.Group.find({ 'members.userId': req.user.id }).sort({ title: 1 }).lean();
 }
 
 function createEntrySet(model) {

@@ -9,7 +9,7 @@ export default {
   output: {
     path: path.resolve(dirname, 'public/dist'),
     filename: 'bundle.js',
-    publicPath: '/dist/'
+    publicPath: '/dist/',
   },
   module: {
     rules: [
@@ -26,23 +26,19 @@ export default {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: [
-              '@babel/preset-env',
-              '@babel/preset-react',
-              '@babel/preset-typescript',
-            ],
+            presets: ['@babel/preset-env', '@babel/preset-react', '@babel/preset-typescript'],
           },
         },
       },
       {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader']
-      }
-    ]
+        use: ['style-loader', 'css-loader'],
+      },
+    ],
   },
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.jsx']
+    extensions: ['.ts', '.tsx', '.js', '.jsx'],
   },
   devtool: 'source-map',
-  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development'
-}; 
+  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+};

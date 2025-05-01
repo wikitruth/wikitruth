@@ -157,8 +157,7 @@ async function GET_entry(req, res) {
       let query = { topicId: req.query.topic, 'screening.status': constants.SCREENING_STATUS.status1.code };
       let links = await db.TopicLink
         .find(query)
-        .lean()
-        .exec();
+        .lean();
       if (links.length > 0) {
         model.linkCount = links.length + 1;
         const ids = links.map(function(link) {
@@ -168,8 +167,7 @@ async function GET_entry(req, res) {
         let results = await db.Topic
           .find(query)
           .sort({ title: 1 })
-          .lean()
-          .exec();
+          .lean();
         if (results.length > 0) {
           model.topicLinks = results;
           results.forEach(function(result) {
@@ -216,7 +214,7 @@ async function GET_entry(req, res) {
         ownerType: constants.OBJECT_TYPES.topic,
         'screening.status': constants.SCREENING_STATUS.status1.code,
       };
-      let results = await db.Question.find(query).limit(15).exec();
+      let results = await db.Question.find(query).limit(15);
       await flowUtils.setEditorsUsername(results);
       results.forEach(function(result) {
         flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.question, req);
@@ -386,8 +384,7 @@ async function GET_link_entry(req, res) {
       };
       const links = await db.TopicLink
         .find(query)
-        .lean()
-        .exec();
+        .lean();
       if (links.length > 0) {
         model.linkCount = links.length + 1;
         const ids = links.map(function(link) {
@@ -397,8 +394,7 @@ async function GET_link_entry(req, res) {
         const results = await db.Topic
           .find(query)
           .sort({ title: 1 })
-          .lean()
-          .exec();
+          .lean();
         if (results.length > 0) {
           model.topicLinks = results;
           results.forEach(function(result) {

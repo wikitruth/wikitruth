@@ -7,9 +7,8 @@ let templates = require('../models/templates'),
   db = require('../app').db.models,
   async = require('async');
 
-module.exports = function(router) {
-
-  router.get('(/topic)?(/:friendlyUrl)?(/:friendlyUrl/:id)?', async function(req, res) {
+module.exports = function (router) {
+  router.get('(/topic)?(/:friendlyUrl)?(/:friendlyUrl/:id)?', async function (req, res) {
     await GET_index(req, res);
   });
 };
@@ -22,8 +21,15 @@ async function GET_index(req, res) {
       req.query.topic = res.locals.application.exploreTopicId;
   }*/
 
-  let model = {}, nodes = [], edges = [], node, rootId;
-  let textSize = 25, nodeSize = 12, ROOT_ID = '0', rootLabel = 'Wikitruth'; // from nodeSize = 15 is producing an error
+  let model = {},
+    nodes = [],
+    edges = [],
+    node,
+    rootId;
+  let textSize = 25,
+    nodeSize = 12,
+    ROOT_ID = '0',
+    rootLabel = 'Wikitruth'; // from nodeSize = 15 is producing an error
   const ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
   await flowUtils.setEntryModels(ownerQuery, req, model);
   let topicId = model.topic ? model.topic._id : null;
@@ -44,15 +50,18 @@ async function GET_index(req, res) {
   // ownerType: constants.OBJECT_TYPES.user, ownerId: model.member._id
   await async.parallel({
     visualize: async () => {
-      const results = await db.Topic
-        .find(query)
-        .sort({ title: 1 })
-        .lean()
-        .exec();
+      const results = await db.Topic.find(query).sort({ title: 1 }).lean();
 
       if (!topicId) {
         topicId = ROOT_ID;
-        nodes.push({ id: topicId, label: rootLabel, value: 10, color: '#f0ad4e', font: { size: 16 }, current: true });
+        nodes.push({
+          id: topicId,
+          label: rootLabel,
+          value: 10,
+          color: '#f0ad4e',
+          font: { size: 16 },
+          current: true,
+        });
       } else {
         nodes.push({
           id: topicId,
@@ -107,7 +116,7 @@ async function GET_index(req, res) {
       // add children
       let resultCounter = 0;
       await async.series({
-        topics: async function() {
+        topics: async function () {
           if (results.length > 0) {
             await async.each(results, async result => {
               resultCounter++;
@@ -124,45 +133,47 @@ async function GET_index(req, res) {
               result.shortTitle = utils.getShortText(result.contextTitle || result.title, textSize);
               nodes.push({ id: result._id, label: result.shortTitle, value: 6, color: '#FB7E81' });
               edges.push({ from: topicId, to: result._id, width: 4 });
-              const subtopics = await db.Topic
-                .find({
-                  parentId: result._id,
-                  'screening.status': constants.SCREENING_STATUS.status1.code,
-                })
+              const subTopics = await db.Topic.find({
+                parentId: result._id,
+                'screening.status': constants.SCREENING_STATUS.status1.code,
+              })
                 .limit(nodeSize)
                 .sort({ title: 1 })
                 .lean()
                 .exec();
 
-              if (subtopics.length > 0) {
+              if (subTopics.length > 0) {
                 let subtopicCounter = 0;
-                subtopics.forEach(function(subtopic) {
+                subTopics.forEach(function (subTopic) {
                   subtopicCounter++;
                   if (subtopicCounter === nodeSize) {
-                    node = { id: subtopic._id, label: 'more...', value: 4, more: true };
+                    node = { id: subTopic._id, label: 'more...', value: 4, more: true };
                     node.originalLabel = node.label;
                     node.topicId = result._id;
                     node.label += ' <i>*' + result.childrenCount.topics.accepted + '</i>';
                     nodes.push(node);
-                    edges.push({ from: subtopic._id, to: result._id });
+                    edges.push({ from: subTopic._id, to: result._id });
                     return;
                   }
-                  subtopic.friendlyUrl = utils.urlify(subtopic.title);
-                  subtopic.shortTitle = utils.getShortText(subtopic.contextTitle || subtopic.title, textSize);
-                  node = { id: subtopic._id, label: subtopic.shortTitle, value: 4 };
-                  if (subtopic.childrenCount.topics.accepted > 0) {
+                  subTopic.friendlyUrl = utils.urlify(subTopic.title);
+                  subTopic.shortTitle = utils.getShortText(
+                    subTopic.contextTitle || subTopic.title,
+                    textSize
+                  );
+                  node = { id: subTopic._id, label: subTopic.shortTitle, value: 4 };
+                  if (subTopic.childrenCount.topics.accepted > 0) {
                     node.originalLabel = node.label;
-                    node.label += ' <i>*' + subtopic.childrenCount.topics.accepted + '</i>';
+                    node.label += ' <i>*' + subTopic.childrenCount.topics.accepted + '</i>';
                   }
                   nodes.push(node);
-                  edges.push({ from: subtopic._id, to: result._id });
+                  edges.push({ from: subTopic._id, to: result._id });
                 });
-                result.subtopics = subtopics;
+                result.subtopics = subTopics;
               }
 
-              if (subtopics.length < (nodeSize - 2)) {
+              if (subTopics.length < nodeSize - 2) {
                 // if subtopics are less than nodeSize, get some arguments
-                let nodesNeeded = subtopics.length === 0 ? nodeSize : subtopics.length - 2;
+                let nodesNeeded = subTopics.length === 0 ? nodeSize : subTopics.length - 2;
                 let query = {
                   parentId: null,
                   ownerId: result._id,
@@ -174,10 +185,12 @@ async function GET_index(req, res) {
                   req: req,
                   shortTitleLength: textSize,
                 });
-                subArgs.forEach(function(subArg) {
-                  if (!nodes.find(function(item) {
-                    return subArg._id.equals(item.id);
-                  })) {
+                subArgs.forEach(function (subArg) {
+                  if (
+                    !nodes.find(function (item) {
+                      return subArg._id.equals(item.id);
+                    })
+                  ) {
                     flowUtils.setVerdictModel(subArg);
                     nodes.push({
                       id: subArg._id,
@@ -194,8 +207,8 @@ async function GET_index(req, res) {
             });
           }
         },
-        arguments: async function() {
-          if (model.topic && results.length < (nodeSize - 2)) {
+        arguments: async function () {
+          if (model.topic && results.length < nodeSize - 2) {
             // if subtopics are less than nodeSize, get some arguments
             let nodesNeeded = results.length === 0 ? nodeSize : results.length - 2;
             let query = {
@@ -209,10 +222,12 @@ async function GET_index(req, res) {
               req: req,
               shortTitleLength: textSize,
             });
-            subArgs.forEach(function(subArg) {
-              if (!nodes.find(function(item) {
-                return subArg._id.equals(item.id);
-              })) {
+            subArgs.forEach(function (subArg) {
+              if (
+                !nodes.find(function (item) {
+                  return subArg._id.equals(item.id);
+                })
+              ) {
                 flowUtils.setVerdictModel(subArg);
                 nodes.push({
                   id: subArg._id,

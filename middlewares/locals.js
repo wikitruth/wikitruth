@@ -6,10 +6,9 @@ let async = require('async'),
   paths = require('../models/paths'),
   applications = require('../models/applications');
 
-module.exports = function(app, passport) {
-
+module.exports = function (app, passport) {
   // this code runs for all routes
-  app.use(/^[^\.]+$/, async function(req, res, next) {
+  app.use(/^[^.]+$/, async function (req, res, next) {
     res.cookie('_csrfToken', req.csrfToken());
     res.locals._csrf = req.csrfToken(); // should be no longer needed even adding _csrf manually in forms or request body
 
@@ -35,7 +34,7 @@ module.exports = function(app, passport) {
     res.locals.preferences = req.session.preferences;
 
     await async.parallel({
-      setApplication: async function() {
+      setApplication: async function () {
         // set the application
         let model = {};
         let application = applications.getApplication(req);
@@ -62,7 +61,7 @@ module.exports = function(app, passport) {
           }
         }
       },
-      diaryCategoriesCache: async function() {
+      diaryCategoriesCache: async function () {
         // Diary Categories
         if (req.user) {
           if (!req.session.diaryCategories) {
@@ -74,7 +73,7 @@ module.exports = function(app, passport) {
           }
         }
       },
-      userGroupsCache: async function() {
+      userGroupsCache: async function () {
         if (req.user) {
           if (!req.session.myGroups) {
             let results = await flowUtils.getUserGroups(req);
@@ -85,7 +84,7 @@ module.exports = function(app, passport) {
           }
         }
       },
-      currentGroup: async function() {
+      currentGroup: async function () {
         const baseUrl = url.parse(req.originalUrl);
         const params = baseUrl.pathname.split('/');
         if (params.length >= 4 && '/' + params[1].toLowerCase() === paths.groups.index) {
