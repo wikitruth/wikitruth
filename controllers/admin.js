@@ -330,7 +330,7 @@ module.exports = function(router) {
               if (modelName) {
                 const collection = db[modelName];
                 if (collection) {
-                  await collection.remove({});
+                  await collection.deleteMany({});
                   await async.eachSeries(jsons, async function(json) {
                     // each entry
                     const file = collectionDir + '/' + json;
@@ -359,7 +359,7 @@ module.exports = function(router) {
                 if (modelName && jsons.length > 0) {
                   const collection = db[modelName];
                   if (collection) {
-                    await collection.remove({
+                    await collection.deleteMany({
                       private: true,
                       createUserId: user._id,
                     });

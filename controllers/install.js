@@ -1,11 +1,11 @@
 'use strict';
 
-let templates   = require('../models/templates'),
-    config      = require('../config/config'),
-    flowUtils   = require('../utils/flowUtils'),
-    db          = require('../app').db.models,
-    fs          = require('fs'),
-    async       = require('async');
+let templates = require('../models/templates'),
+    config = require('../config/config'),
+    flowUtils = require('../utils/flowUtils'),
+    db = require('../app').db.models,
+    fs = require('fs'),
+    async = require('async');
 
 let cols = config.mongodb.collections;
 
@@ -18,7 +18,7 @@ function requestLogin(req, res) {
 
 module.exports = function (router) {
 
-    router.get('/', function (req, res) {
+    router.get('/', async function (req, res) {
         let model = {};
         model.dirname = flowUtils.getBackupDir();
 
@@ -30,45 +30,43 @@ module.exports = function (router) {
             // else: User won't be allowed.
             res.render(templates.install, model);
         } else {
-            db.Admin.findOne({}, function(err, result) {
-                if(!result) {
-                    // No data, allow the user to restore.
-                    model.showRestore = true;
-                    res.render(templates.install, model);
-                } else {
-                    requestLogin(req, res);
-                }
-            });
+            const result = await db.Admin.findOne({});
+            if (!result) {
+                // No data, allow the user to restore.
+                model.showRestore = true;
+                res.render(templates.install, model);
+            } else {
+                requestLogin(req, res);
+            }
         }
     });
 
-    router.post('/', function (req, res) {
+    router.post('/', async function (req, res) {
         let model = {};
         model.dirname = flowUtils.getBackupDir();
 
-        let restoreTask = function (col, callback) {
+        let restoreTask = async function (col, callback) {
             let dir = flowUtils.getBackupDir() + '/wikitruth';
             let coldir = dir + '/' + col;
-            if (!fs.existsSync(coldir)){
+            if (!fs.existsSync(coldir)) {
                 return callback();
             }
             let jsons = fs.readdirSync(coldir);
             if (cols.modelMapping[col]) {
                 let collection = db[cols.modelMapping[col]];
                 if (collection) {
-                    collection.remove({}, function (err) {
-                        async.eachSeries(jsons, function (json, callback) {
-                            let file = coldir + '/' + json;
-                            let obj = JSON.parse(fs.readFileSync(file, 'utf8'));
-                            collection.create(obj, function (err, newObj) {
-                                if (err) {
-                                    console.error(err);
-                                }
-                                callback();
-                            });
-                        }, function (err) {
-                            callback();
-                        });
+                    await collection.deleteMany({});
+                    async.eachSeries(jsons, async function (json, callback) {
+                        let file = coldir + '/' + json;
+                        let obj = JSON.parse(fs.readFileSync(file, 'utf8'));
+                        try {
+                            await collection.create(obj);
+                        } catch (err) {
+                            console.error(err);
+                        }
+                        callback();
+                    }, function (err) {
+                        callback();
                     });
                 } else {
                     callback();
@@ -101,7 +99,7 @@ module.exports = function (router) {
                     flowUtils.resetCache(req);
                     callback();
                 }
-            }, function (){
+            }, function () {
                 model.done = true;
                 res.render(templates.install, model);
             });
@@ -116,15 +114,14 @@ module.exports = function (router) {
                 return res.redirect('/');
             }
         } else {
-            db.Admin.findOne({}, function (err, result) {
-                if (!result) {
-                    // No data, allow the user to restore.
-                    model.showRestore = true;
-                    next();
-                } else {
-                    requestLogin(req, res);
-                }
-            });
+            const result = await db.Admin.findOne({});
+            if (!result) {
+                // No data, allow the user to restore.
+                model.showRestore = true;
+                next();
+            } else {
+                requestLogin(req, res);
+            }
         }
     });
 };
