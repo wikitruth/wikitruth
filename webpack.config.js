@@ -1,13 +1,9 @@
-import path from 'path';
-import { fileURLToPath } from 'url';
+const path = require('path');
 
-const __filename = fileURLToPath(import.meta.url);
-const dirname = path.dirname(__filename);
-
-export default {
+module.exports = {
   entry: './client/index.tsx',
   output: {
-    path: path.resolve(dirname, 'public/dist'),
+    path: path.resolve(__dirname, 'public/dist'),
     filename: 'bundle.js',
     publicPath: '/dist/',
   },
@@ -16,6 +12,7 @@ export default {
       {
         test: /\.(ts|tsx)$/,
         exclude: /node_modules/,
+        include: path.resolve(__dirname, 'client'),
         use: {
           loader: 'ts-loader',
         },
@@ -23,6 +20,7 @@ export default {
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
+        include: path.resolve(__dirname, 'client'),
         use: {
           loader: 'babel-loader',
           options: {

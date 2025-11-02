@@ -47,6 +47,8 @@
                             <li><a href="/topic/sacred-texts"><i class="fa fa-book"></i> Manuscripts</a></li>
                         {/application}
                         {>"dust/wiki/common/clipboard" /}
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/app"><i class="fa fa-star"></i> New UX</a></li>
                     </ul>
                 </li>
                 <!--<li class="hidden-xs"><a href="/about/">About</a></li>-->

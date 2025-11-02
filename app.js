@@ -27,6 +27,8 @@ let options, app;
  * See https://github.com/krakenjs/kraken-js#options for additional configuration options.
  */
 options = {
+    // Ensure kraken resolves basedir to the project root regardless of compiled location
+    basedir: process.cwd(),
     onconfig: function (config, next) {
         /*
          * Add any additional config setup or overrides here. `config` is an initialized
