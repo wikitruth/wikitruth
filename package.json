@@ -33,7 +33,7 @@
     "backbone": "^1.6.0",
     "bcrypt": "5.1.1",
     "bluebird": "^3.7.2",
-    "body-parser": "^2.2.0",
+    "body-parser": "^2.2.1",
     "compression": "^1.8.1",
     "connect-mongo": "5.1.0",
     "consolidate": "^0.15.1",
