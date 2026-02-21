@@ -1,14 +1,20 @@
-// @ts-nocheck
 'use strict';
 
+// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'async'.
 const async = require('async');
+// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'flowUtils'... Remove this comment to see the full error message
 const flowUtils = require('../../utils/flowUtils');
+// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'constants'... Remove this comment to see the full error message
 const constants = require('../../models/constants');
+// @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 const questionsService = require('../../services/questionsService');
+// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'db'.
 const db = require('../../app').db.models;
 
+// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports = function (router) {
   // Get questions list
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get('/', async function (req, res) {
     try {
       await GET_questions(req, res);
@@ -19,6 +25,7 @@ module.exports = function (router) {
   });
 
   // Get question entry
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get('/entry/:id', async function (req, res) {
     try {
       await GET_question_entry(req, res);
@@ -29,6 +36,7 @@ module.exports = function (router) {
   });
 };
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 async function GET_questions(req, res) {
   let model = {};
   flowUtils.setScreeningModel(req, model);
@@ -36,10 +44,12 @@ async function GET_questions(req, res) {
   const query = {
     ownerType: constants.OBJECT_TYPES.topic,
     private: false,
+    // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
     'screening.status': model.screening.status,
   };
   
   if (req.query.topic) {
+    // @ts-ignore TS(2339): Property 'ownerId' does not exist on type '{ owner... Remove this comment to see the full error message
     query.ownerId = req.query.topic;
   }
   
@@ -48,14 +58,17 @@ async function GET_questions(req, res) {
     req: req,
   });
   
+  // @ts-ignore TS(2339): Property 'questions' does not exist on type '{}'.
   model.questions = questionsList;
   
   // Remove screening model from response (it's server-side only)
+  // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
   delete model.screening;
   
   res.json(model);
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 async function GET_question_entry(req, res) {
   const question = await questionsService.getQuestionEntry(req.params.id, req);
   

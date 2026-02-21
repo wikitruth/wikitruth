@@ -19,7 +19,7 @@ Derived from `TYPE_IMPROVEMENT_PROJECT.md`.
 
 ## P2 Controllers (4-7 Weeks)
 
-- [ ] `TP-10` Remove `@ts-nocheck` from `controllers/api/*` with typed params/query/body DTOs.
+- [x] `TP-10` Remove `@ts-nocheck` from `controllers/api/*` with typed params/query/body DTOs.
 - [ ] `TP-11` Remove `@ts-nocheck` from `controllers/async/*` with typed session locals and service calls.
 - [ ] `TP-12` Remove `@ts-nocheck` from remaining non-API controllers without route behavior changes.
 

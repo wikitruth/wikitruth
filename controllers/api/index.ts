@@ -1,9 +1,11 @@
-// @ts-nocheck
 'use strict';
 
+// @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 const express = require('express');
+// @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 const { wrapAsyncRouter } = require('../../middlewares/apiError');
 
+// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports = function (router) {
   // Create sub-routers for API endpoints
   const homeRouter = wrapAsyncRouter(express.Router());
@@ -19,16 +21,27 @@ module.exports = function (router) {
   const membersRouter = wrapAsyncRouter(express.Router());
 
   // Load route handlers
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   require('./home')(homeRouter);
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   require('./topics')(topicsRouter);
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   require('./arguments')(argumentsRouter);
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   require('./questions')(questionsRouter);
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   require('./search')(searchRouter);
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   require('./issues')(issuesRouter);
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   require('./opinions')(opinionsRouter);
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   require('./answers')(answersRouter);
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   require('./artifacts')(artifactsRouter);
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   require('./groups')(groupsRouter);
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   require('./members')(membersRouter);
 
   // Mount sub-routers
