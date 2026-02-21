@@ -1,6 +1,6 @@
 'use strict';
 
-var request = require('request');
+const httpClient = require('../../../../utils/httpClient');
 
 exports.init = function(req, res){
   if (req.isAuthenticated()) {
@@ -47,22 +47,22 @@ exports.signup = function(req, res){
     if (workflow.hasErrors()) {
       return workflow.emit('response');
     } else {
-      request.post('https://www.google.com/recaptcha/api/siteverify',
-          {
-            formData: {
-              'secret': req.app.config.grecaptcha.secret,
-              'response': req.body.recaptcha_response
-            }, json: true
-          },
-          function (error, response, body) {
-            if (!error && response.statusCode == 200 && body && body.success) {
-              workflow.emit('duplicateUsernameCheck');
-            } else {
-              workflow.outcome.errfor.recaptcha = 'invalid captcha';
-              return workflow.emit('response');
-            }
-          }
-      );
+      httpClient.postForm('https://www.google.com/recaptcha/api/siteverify', {
+              secret: req.app.config.grecaptcha.secret,
+              response: req.body.recaptcha_response
+            })
+              .then(function (captchaResult) {
+                if (captchaResult.statusCode === 200 && captchaResult.body && captchaResult.body.success) {
+                  workflow.emit('duplicateUsernameCheck');
+                } else {
+                  workflow.outcome.errfor.recaptcha = 'invalid captcha';
+                  return workflow.emit('response');
+                }
+              })
+              .catch(function () {
+                workflow.outcome.errfor.recaptcha = 'invalid captcha';
+                return workflow.emit('response');
+              });
     }
   });
 
