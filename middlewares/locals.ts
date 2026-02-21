@@ -1,21 +1,23 @@
 'use strict';
 
-// @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-let async = require('async'),
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-  url = require('url'),
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-  flowUtils = require('../utils/flowUtils'),
-  // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'paths'.
-  paths = require('../models/paths'),
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-  applications = require('../models/applications');
+import type { NextFunction, Request, Response } from 'express';
+import type { AppContext, ApplicationsModule } from '../types/models';
 
-// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
-module.exports = function (app, passport) {
+const async = require('async');
+const url = require('url');
+const flowUtils = require('../utils/flowUtils') as {
+  getDiaryBaseUrl(username: string): string;
+  getCategories(model: { categories?: unknown[] }, topicId: string | null, req: Request): Promise<void>;
+  getDiaryCategories(req: Request): Promise<unknown[]>;
+  getUserGroups(req: Request): Promise<unknown[]>;
+  setGroupModel(req: Request, model: { group?: unknown }): Promise<void>;
+};
+const paths = require('../models/paths');
+const applications = require('../models/applications') as ApplicationsModule;
+
+module.exports = function (app: AppContext & { use: (...args: unknown[]) => void }, _passport: unknown) {
   // this code runs for all routes
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  app.use(/^[^.]+$/, async function (req, res, next) {
+  app.use(/^[^.]+$/, async function (req: Request, res: Response, next: NextFunction) {
     res.cookie('_csrfToken', req.csrfToken());
     res.locals._csrf = req.csrfToken(); // should be no longer needed even adding _csrf manually in forms or request body
 
@@ -25,11 +27,12 @@ module.exports = function (app, passport) {
     }
 
     if (req.user) {
-      res.locals.user = {};
-      res.locals.user.username = req.user.username;
-      res.locals.user.defaultReturnUrl = req.user.defaultReturnUrl();
-      res.locals.user.isAdmin = req.user.isAdmin();
-      res.locals.user.roles = req.user.roles;
+      res.locals.user = {
+        username: req.user.username,
+        defaultReturnUrl: req.user.defaultReturnUrl(),
+        isAdmin: req.user.isAdmin(),
+        roles: req.user.roles,
+      };
       res.locals.isContributor = req.user.username;
       res.locals.diaryBaseUrl = flowUtils.getDiaryBaseUrl(req.user.username);
     } else if (res.locals.user) {
@@ -43,7 +46,7 @@ module.exports = function (app, passport) {
     await async.parallel({
       setApplication: async function () {
         // set the application
-        let model = {};
+        const model: { categories?: unknown[] } = {};
         let application = applications.getApplication(req);
         res.locals.application = application;
         if (application) {
@@ -54,20 +57,19 @@ module.exports = function (app, passport) {
           res.locals.googleAnalyticsTrackingId = application.googleAnalyticsTrackingId;
 
           if (!application.appCategories) {
-            await flowUtils.getCategories(model, application.exploreTopicId, req);
-            // @ts-ignore TS(2339): Property 'categories' does not exist on type '{}'.
+            await flowUtils.getCategories(model, application.exploreTopicId || null, req);
             application.appCategories = model.categories;
-            // @ts-ignore TS(2339): Property 'categories' does not exist on type '{}'.
             res.locals.appCategories = model.categories;
           } else {
             res.locals.appCategories = application.appCategories;
           }
         } else {
           // the default Wikitruth Project application. set cache to app-level
-          if (!app.locals.appCategories) {
+          if (!app.locals?.appCategories) {
             await flowUtils.getCategories(model, null, req);
-            // @ts-ignore TS(2339): Property 'categories' does not exist on type '{}'.
-            app.locals.appCategories = model.categories;
+            if (app.locals) {
+              app.locals.appCategories = model.categories;
+            }
           }
         }
       },
@@ -96,12 +98,11 @@ module.exports = function (app, passport) {
       },
       currentGroup: async function () {
         const baseUrl = url.parse(req.originalUrl);
-        const params = baseUrl.pathname.split('/');
+        const params = (baseUrl.pathname || '').split('/');
         if (params.length >= 4 && '/' + params[1].toLowerCase() === paths.groups.index) {
-          let model = {};
+          const model: { group?: unknown } = {};
           req.query.group = params[3];
           await flowUtils.setGroupModel(req, model);
-          // @ts-ignore TS(2339): Property 'group' does not exist on type '{}'.
           res.locals.group = model.group;
         }
       },

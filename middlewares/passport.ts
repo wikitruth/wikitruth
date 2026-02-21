@@ -1,43 +1,69 @@
 'use strict';
 
-// @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-let LocalStrategy = require('passport-local').Strategy,
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-  TwitterStrategy = require('passport-twitter').Strategy,
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-  GitHubStrategy = require('passport-github').Strategy,
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-  FacebookStrategy = require('passport-facebook').Strategy,
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-  GoogleStrategy = require('passport-google').Strategy;
-  // TumblrStrategy = require('passport-tumblr').Strategy;
+import type { AppContext } from '../types/models';
+import type { AuthUser } from '../types/auth';
 
-// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
-module.exports = function (app, passport) {
-  const db = app.db.models;
+const LocalStrategy = require('passport-local').Strategy;
+const TwitterStrategy = require('passport-twitter').Strategy;
+const GitHubStrategy = require('passport-github').Strategy;
+const FacebookStrategy = require('passport-facebook').Strategy;
+const GoogleStrategy = require('passport-google').Strategy;
+
+interface PassportLike {
+  use(strategy: unknown): void;
+  serializeUser(cb: (user: AuthUser, done: (error: unknown, id?: unknown) => void) => void): void;
+  deserializeUser(cb: (id: string, done: (error: unknown, user?: unknown) => void) => Promise<void> | void): void;
+}
+
+interface UserModelContract {
+  findOne(query: Record<string, unknown>): {
+    populate(field: string): {
+      populate(field: string): Promise<AuthUser | null>;
+    };
+    then?: unknown;
+  } & Promise<AuthUser | null>;
+  validatePassword(password: string, hash: string): Promise<boolean>;
+}
+
+interface AppWithConfig extends AppContext {
+  config: {
+    projectName: string;
+    oauth: {
+      twitter: { key?: string; secret?: string };
+      github: { key?: string; secret?: string };
+      facebook: { key?: string; secret?: string };
+      google: { key?: string; secret?: string };
+    };
+  };
+}
+
+module.exports = function configurePassport(app: AppWithConfig, passport: PassportLike): void {
+  const db = app.db.models as unknown as {
+    User: UserModelContract;
+  };
 
   passport.use(
-    // @ts-ignore TS(7006): Parameter 'username' implicitly has an 'any' type.
-    new LocalStrategy(async function (username, password, done) {
-      let conditions = { isActive: 'yes' };
+    new LocalStrategy(async function (username: string, password: string, done: (error: unknown, user?: unknown, info?: unknown) => void) {
+      const conditions: { isActive: string; username?: string; email?: string } = { isActive: 'yes' };
       if (username.indexOf('@') === -1) {
-        // @ts-ignore TS(2339): Property 'username' does not exist on type '{ isAc... Remove this comment to see the full error message
         conditions.username = username;
       } else {
-        // @ts-ignore TS(2339): Property 'email' does not exist on type '{ isActiv... Remove this comment to see the full error message
         conditions.email = username.toLowerCase();
       }
 
       const user = await db.User.findOne(conditions);
       if (!user) {
-        return done(null, false, { message: 'Unknown user' });
+        done(null, false, { message: 'Unknown user' });
+        return;
       }
 
-      const isValid = await db.User.validatePassword(password, user.password);
+      const isValid = await db.User.validatePassword(password, (user as AuthUser & { password?: string }).password || '');
       if (!isValid) {
-        return done(null, false, { message: 'Invalid password' });
+        done(null, false, { message: 'Invalid password' });
+        return;
       }
-      return done(null, user);
+
+      done(null, user);
     })
   );
 
@@ -48,8 +74,12 @@ module.exports = function (app, passport) {
           consumerKey: app.config.oauth.twitter.key,
           consumerSecret: app.config.oauth.twitter.secret,
         },
-        // @ts-ignore TS(7006): Parameter 'token' implicitly has an 'any' type.
-        function (token, tokenSecret, profile, done) {
+        function (
+          token: string,
+          tokenSecret: string,
+          profile: unknown,
+          done: (error: unknown, user?: unknown, info?: unknown) => void
+        ) {
           done(null, false, {
             token: token,
             tokenSecret: tokenSecret,
@@ -68,8 +98,12 @@ module.exports = function (app, passport) {
           clientSecret: app.config.oauth.github.secret,
           customHeaders: { 'User-Agent': app.config.projectName },
         },
-        // @ts-ignore TS(7006): Parameter 'accessToken' implicitly has an 'any' ty... Remove this comment to see the full error message
-        function (accessToken, refreshToken, profile, done) {
+        function (
+          accessToken: string,
+          refreshToken: string,
+          profile: unknown,
+          done: (error: unknown, user?: unknown, info?: unknown) => void
+        ) {
           done(null, false, {
             accessToken: accessToken,
             refreshToken: refreshToken,
@@ -87,8 +121,12 @@ module.exports = function (app, passport) {
           clientID: app.config.oauth.facebook.key,
           clientSecret: app.config.oauth.facebook.secret,
         },
-        // @ts-ignore TS(7006): Parameter 'accessToken' implicitly has an 'any' ty... Remove this comment to see the full error message
-        function (accessToken, refreshToken, profile, done) {
+        function (
+          accessToken: string,
+          refreshToken: string,
+          profile: unknown,
+          done: (error: unknown, user?: unknown, info?: unknown) => void
+        ) {
           done(null, false, {
             accessToken: accessToken,
             refreshToken: refreshToken,
@@ -106,8 +144,12 @@ module.exports = function (app, passport) {
           clientID: app.config.oauth.google.key,
           clientSecret: app.config.oauth.google.secret,
         },
-        // @ts-ignore TS(7006): Parameter 'accessToken' implicitly has an 'any' ty... Remove this comment to see the full error message
-        function (accessToken, refreshToken, profile, done) {
+        function (
+          accessToken: string,
+          refreshToken: string,
+          profile: unknown,
+          done: (error: unknown, user?: unknown, info?: unknown) => void
+        ) {
           done(null, false, {
             accessToken: accessToken,
             refreshToken: refreshToken,
@@ -118,33 +160,16 @@ module.exports = function (app, passport) {
     );
   }
 
-  // if (app.config.oauth.tumblr.key) {
-  //   passport.use(new TumblrStrategy({
-  //       consumerKey: app.config.oauth.tumblr.key,
-  //       consumerSecret: app.config.oauth.tumblr.secret
-  //     },
-  //     function(token, tokenSecret, profile, done) {
-  //       done(null, false, {
-  //         token: token,
-  //         tokenSecret: tokenSecret,
-  //         profile: profile
-  //       });
-  //     }
-  //   ));
-  // }
-
-  // @ts-ignore TS(7006): Parameter 'user' implicitly has an 'any' type.
   passport.serializeUser(function (user, done) {
     done(null, user._id);
   });
 
-  // @ts-ignore TS(7006): Parameter 'id' implicitly has an 'any' type.
   passport.deserializeUser(async function (id, done) {
     const user = await db.User.findOne({ _id: id })
       .populate('roles.admin')
       .populate('roles.account');
     if (user?.roles?.admin) {
-      await user.roles.admin.populate('groups');
+      await (user.roles.admin as { populate?: (field: string) => Promise<unknown> }).populate?.('groups');
     }
     done(null, user);
   });

@@ -1,5 +1,6 @@
 import type { Model } from 'mongoose';
 import type { IBaseDocument } from '../types';
+import type { AppContext } from '../../types/models';
 
 export interface CoreModelRegistry {
   Topic: Model<IBaseDocument>;
@@ -11,6 +12,6 @@ export interface CoreModelRegistry {
   Artifact: Model<IBaseDocument>;
 }
 
-export function getCoreModels(app: { db: { models: Record<string, unknown> } }): CoreModelRegistry {
+export function getCoreModels(app: AppContext): CoreModelRegistry {
   return app.db.models as unknown as CoreModelRegistry;
 }

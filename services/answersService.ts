@@ -1,11 +1,10 @@
 'use strict';
 
 import type { FlowUtilsContract, LeanModel, ServiceEntry, ServiceListOptions, ServiceQuery, ServiceSort } from './serviceTypes';
+import type { WikitruthConstants } from '../types/constants';
 
 const flowUtils = require('../utils/flowUtils') as FlowUtilsContract;
-const constants = require('../models/constants') as {
-  OBJECT_TYPES: { answer: number };
-};
+const constants = require('../models/constants') as WikitruthConstants;
 const db = require('../app').db.models as {
   Answer: LeanModel<ServiceEntry>;
 };

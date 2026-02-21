@@ -1,4 +1,5 @@
 import type { Request } from 'express';
+import type { EntryBase } from '../types/domain';
 
 export type ServiceQuery = Record<string, unknown>;
 export type ServiceSort = Record<string, 1 | -1>;
@@ -9,10 +10,7 @@ export interface ServiceListOptions {
   req?: Request;
 }
 
-export interface ServiceEntry {
-  [key: string]: unknown;
-  issueType?: string | number;
-}
+export type ServiceEntry = EntryBase;
 
 export interface FlowUtilsContract {
   setEntryParents(items: ServiceEntry[], typeId: number): Promise<void>;

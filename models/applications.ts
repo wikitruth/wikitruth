@@ -1,5 +1,7 @@
 'use strict';
 
+import type { ApplicationDefinition } from '../types/domain';
+
 /*var wikitruthDomains = [
     'wikitruth.co',
     'wikitruth.me',
@@ -10,7 +12,7 @@
     'www.wikitruthproject.org'
 ];*/
 
-const APPLICATIONS = [
+const APPLICATIONS: ApplicationDefinition[] = [
   {
     id: 'fixtheph',
     title: 'Fix The Philippines',
@@ -77,11 +79,11 @@ function getApplications() {
   return APPLICATIONS;
 }
 
-function getApplication(req: { hostname?: string }) {
+function getApplication(req: { hostname?: string }): ApplicationDefinition | null {
   let domainName = req.hostname || '',
-    application = null;
+    application: ApplicationDefinition | null = null;
   APPLICATIONS.some(function (app) {
-    if (app.domains.indexOf(domainName) > -1) {
+    if ((app.domains || []).indexOf(domainName) > -1) {
       application = app;
       return true;
     }

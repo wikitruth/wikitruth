@@ -1,66 +1,63 @@
 'use strict';
 
-const tmplRoot = '../public/templates/jade',
-  // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'paths'.
-  paths = require('../models/paths');
-// @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
+import type { NextFunction, Request, Response } from 'express';
+import type { AppContext } from '../types/models';
+const tmplRoot = '../public/templates/jade';
+const paths = require('../models/paths');
 const { validateBody, schemas } = require('./requestValidation');
 
-// @ts-ignore TS(7006): Parameter 'code' implicitly has an 'any' type.
-function req(code) {
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
+function req(code: string): Record<string, (...args: unknown[]) => unknown> {
   return require(tmplRoot + code);
 }
 
-// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-function ensureAuthenticated(req, res, next) {
+function ensureAuthenticated(req: Request, res: Response, next: NextFunction): void {
   if (req.isAuthenticated()) {
-    return next();
+    next();
+    return;
   }
   res.set('X-Auth-Required', 'true');
   req.session.returnUrl = req.originalUrl;
   res.redirect('/login/');
 }
 
-// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-function ensureAdmin(req, res, next) {
-  if (req.user.canPlayRoleOf('admin')) {
-    return next();
+function ensureAdmin(req: Request, res: Response, next: NextFunction): void {
+  if (req.user?.canPlayRoleOf('admin')) {
+    next();
+    return;
   }
   res.redirect('/');
 }
 
-// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-function ensureScreener(req, res, next) {
-  if (req.user.canPlayRoleOf('screener')) {
-    return next();
+function ensureScreener(req: Request, res: Response, next: NextFunction): void {
+  if (req.user?.canPlayRoleOf('screener')) {
+    next();
+    return;
   }
   res.redirect('/');
 }
 
-// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-function ensureAccount(req, res, next) {
-  if (req.user.canPlayRoleOf('account')) {
-    if (req.app.config.requireAccountVerification) {
-      if (req.user.roles.account.isVerified !== 'yes' && !/^\/account\/verification\//.test(req.url)) {
+function ensureAccount(req: Request & { app: AppContext }, res: Response, next: NextFunction): void {
+  if (req.user?.canPlayRoleOf('account')) {
+    if (req.app.config?.requireAccountVerification) {
+      if (req.user.roles?.account?.isVerified !== 'yes' && !/^\/account\/verification\//.test(req.url)) {
         return res.redirect('/account/verification/');
       }
     }
-    return next();
+    next();
+    return;
   }
   res.redirect('/');
 }
 
-// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-function ensureAccountOwner(req, res, next) {
-  if(req.user.username === req.params.username) {
-    return next();
+function ensureAccountOwner(req: Request, res: Response, next: NextFunction): void {
+  if (req.user?.username === req.params.username) {
+    next();
+    return;
   }
   res.redirect('/');
 }
 
-// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
-module.exports = function(app, passport) {
+module.exports = function (app: AppContext & { get: (...args: unknown[]) => unknown; post: (...args: unknown[]) => unknown; put: (...args: unknown[]) => unknown; delete: (...args: unknown[]) => unknown; all: (...args: unknown[]) => unknown }, passport: { authenticate: (...args: unknown[]) => unknown }) {
 
   app.get(paths.wiki.topics.create, ensureAuthenticated);
   app.get(paths.wiki.topics.link.edit, ensureAuthenticated);
