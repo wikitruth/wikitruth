@@ -1,34 +1,66 @@
-// @ts-nocheck
 'use strict';
 
-module.exports = exports = function pagedFindPlugin(schema) {
-  schema.statics.pagedFind = function (options, cb) {
-    const self = this;
+interface PagedFindOptions {
+  filters?: Record<string, unknown>;
+  keys?: string;
+  limit?: number;
+  page?: number;
+  sort?: Record<string, 1 | -1>;
+}
 
-    if (!options.filters) {
-      options.filters = {};
-    }
+interface PagedFindOutput<TData = unknown> {
+  data: TData[] | null;
+  pages: {
+    current: number;
+    prev: number;
+    hasPrev: boolean;
+    next: number;
+    hasNext: boolean;
+    total: number;
+  };
+  items: {
+    begin: number;
+    end: number;
+    total: number;
+  };
+}
 
-    if (!options.keys) {
-      options.keys = '';
-    }
+type AsyncCallback<T = unknown> = (error: unknown, result: T | null) => void;
 
-    if (!options.limit) {
-      options.limit = 20;
-    }
+interface QueryLike<TData = unknown> {
+  skip(value: number): void;
+  limit(value: number): void;
+  sort(value: Record<string, 1 | -1>): void;
+  exec(callback: (error: unknown, results: TData[]) => void): void;
+}
 
-    if (!options.page) {
-      options.page = 1;
-    }
+interface PagedFindModel<TData = unknown> {
+  count(filters: Record<string, unknown>, callback: (error: unknown, count: number) => void): void;
+  find(filters: Record<string, unknown>, keys: string): QueryLike<TData>;
+}
 
-    if (!options.sort) {
-      options.sort = {};
-    }
+interface PagedFindSchema {
+  statics: {
+    pagedFind?: (options: PagedFindOptions, cb: AsyncCallback<PagedFindOutput>) => void;
+    [key: string]: unknown;
+  };
+}
 
-    const output = {
+module.exports = function pagedFindPlugin(schema: PagedFindSchema): void {
+  schema.statics.pagedFind = function (options: PagedFindOptions, cb: AsyncCallback<PagedFindOutput>) {
+    const self = this as unknown as PagedFindModel;
+    const normalizedOptions: Required<PagedFindOptions> = {
+      filters: options.filters ?? {},
+      keys: options.keys ?? '',
+      limit: options.limit ?? 20,
+      page: options.page ?? 1,
+      sort: options.sort ?? {},
+    };
+
+    const output: PagedFindOutput = {
       data: null,
       pages: {
-        current: options.page,
+        current: normalizedOptions.page,
         prev: 0,
         hasPrev: false,
         next: 0,
@@ -36,42 +68,47 @@ module.exports = exports = function pagedFindPlugin(schema) {
         total: 0,
       },
       items: {
-        begin: options.page * options.limit - options.limit + 1,
-        end: options.page * options.limit,
+        begin: normalizedOptions.page * normalizedOptions.limit - normalizedOptions.limit + 1,
+        end: normalizedOptions.page * normalizedOptions.limit,
         total: 0,
       },
     };
 
-    const countResults = function (callback) {
-      self.count(options.filters, function (err, count) {
+    const countResults = function (callback: AsyncCallback<string>) {
+      self.count(normalizedOptions.filters, function (_err, count) {
         output.items.total = count;
         callback(null, 'done counting');
       });
     };
 
-    const getResults = function (callback) {
-      const query = self.find(options.filters, options.keys);
-      query.skip((options.page - 1) * options.limit);
-      query.limit(options.limit);
-      query.sort(options.sort);
-      query.exec(function (err, results) {
+    const getResults = function (callback: AsyncCallback<string>) {
+      const query = self.find(normalizedOptions.filters, normalizedOptions.keys);
+      query.skip((normalizedOptions.page - 1) * normalizedOptions.limit);
+      query.limit(normalizedOptions.limit);
+      query.sort(normalizedOptions.sort);
+      query.exec(function (_err, results) {
         output.data = results;
         callback(null, 'done getting records');
       });
     };
 
-    require('async').parallel([countResults, getResults], function (err, results) {
+    const asyncLib = require('async') as {
+      parallel(tasks: Array<(callback: AsyncCallback<string>) => void>, callback: AsyncCallback<unknown>): void;
+    };
+
+    asyncLib.parallel([countResults, getResults], function (err) {
       if (err) {
         cb(err, null);
+        return;
       }
 
-      //final paging math
-      output.pages.total = Math.ceil(output.items.total / options.limit);
+      output.pages.total = Math.ceil(output.items.total / normalizedOptions.limit);
       output.pages.next =
         output.pages.current + 1 > output.pages.total ? 0 : output.pages.current + 1;
       output.pages.hasNext = output.pages.next !== 0;
       output.pages.prev = output.pages.current - 1;
       output.pages.hasPrev = output.pages.prev !== 0;
+
       if (output.items.end > output.items.total) {
         output.items.end = output.items.total;
       }

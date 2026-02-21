@@ -27,7 +27,7 @@ Derived from `TYPE_IMPROVEMENT_PROJECT.md`.
 
 - [x] `TP-13` Remove `@ts-nocheck` from non-schema model wiring files (`models/*.ts`, `models/schema/models.ts`).
 - [x] `TP-14` Remove `@ts-nocheck` from schema modules incrementally by domain (`account`, then `core`).
-- [ ] `TP-15` Remove `@ts-nocheck` from schema plugins and finalize typed plugin interfaces.
+- [x] `TP-15` Remove `@ts-nocheck` from schema plugins and finalize typed plugin interfaces.
 - [ ] `TP-16` Reach zero `@ts-nocheck`; update strictness exceptions doc and close project.
 
 ## Done Criteria
