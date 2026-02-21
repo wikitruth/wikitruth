@@ -15,7 +15,7 @@ const config = require('./config/config'),
     passport = require('passport'),
     mongoose = require('mongoose'),
     bluebird = require('bluebird'),
-    // helmet = require('helmet'),
+    helmet = require('helmet'),
     cons = require('consolidate'),
     csrf = require('csurf'),
     kraken = require('kraken-js');
@@ -92,6 +92,22 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser(config.cryptoKey));
 
+const helmetConfig = config.security && config.security.helmet ? config.security.helmet : { enabled: true };
+if (helmetConfig.enabled) {
+    app.use(helmet({
+        // Keep CSP opt-in for now to avoid breaking legacy dust/jade inline scripts during migration.
+        contentSecurityPolicy: helmetConfig.contentSecurityPolicy ? undefined : false,
+        crossOriginEmbedderPolicy: helmetConfig.crossOriginEmbedderPolicy,
+        crossOriginResourcePolicy: { policy: helmetConfig.crossOriginResourcePolicy || 'cross-origin' },
+        referrerPolicy: { policy: helmetConfig.referrerPolicy || 'no-referrer' },
+        hsts: helmetConfig.hsts && helmetConfig.hsts.enabled ? {
+            maxAge: helmetConfig.hsts.maxAge,
+            includeSubDomains: helmetConfig.hsts.includeSubDomains,
+            preload: helmetConfig.hsts.preload
+        } : false
+    }));
+}
+
 let sessionStore = mongoStore.create({mongoUrl: config.mongodb.uri});
 sessionStore.on('error', function (error) {
     console.error('Mongo session store error:', error);
@@ -107,8 +123,6 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(csrf({cookie: {signed: true}})); //kraken-js:lusca is already using csrf module
-
-// helmet(app);
 
 // setup response locals
 require('./middlewares/locals')(app, passport);

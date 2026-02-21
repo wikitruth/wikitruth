@@ -73,6 +73,27 @@ exports.cryptoKey = process.env.WIKITRUTH_CRYPTO_KEY || '';
 exports.cacheBreaker = process.env.CACHE_BREAKER || '';
 exports.jwtSecret = process.env.WIKITRUTH_JWT_SECRET || '';
 exports.trustProxy = process.env.TRUST_PROXY === 'true';
+exports.security = {
+  helmet: {
+    enabled: process.env.SECURITY_HELMET_ENABLED
+      ? process.env.SECURITY_HELMET_ENABLED === 'true'
+      : true,
+    contentSecurityPolicy: process.env.SECURITY_HELMET_CONTENT_SECURITY_POLICY === 'true',
+    crossOriginEmbedderPolicy: process.env.SECURITY_HELMET_COEP === 'true',
+    crossOriginResourcePolicy: process.env.SECURITY_HELMET_CORP || 'cross-origin',
+    referrerPolicy: process.env.SECURITY_HELMET_REFERRER_POLICY || 'no-referrer',
+    hsts: {
+      enabled: process.env.SECURITY_HELMET_HSTS_ENABLED
+        ? process.env.SECURITY_HELMET_HSTS_ENABLED === 'true'
+        : false,
+      maxAge: Number(process.env.SECURITY_HELMET_HSTS_MAX_AGE || 15552000),
+      includeSubDomains: process.env.SECURITY_HELMET_HSTS_INCLUDE_SUBDOMAINS
+        ? process.env.SECURITY_HELMET_HSTS_INCLUDE_SUBDOMAINS === 'true'
+        : true,
+      preload: process.env.SECURITY_HELMET_HSTS_PRELOAD === 'true'
+    }
+  }
+};
 exports.googleAnalyticsTrackingId = process.env.GOOGLE_ANALYTICS_TRACKING_ID || '';
 exports.loginAttempts = {
   forIp: Number(process.env.LOGIN_ATTEMPTS_FOR_IP || 50),

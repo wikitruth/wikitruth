@@ -137,6 +137,21 @@ exports.cryptoKey = secretFromEnv(['WIKITRUTH_CRYPTO_KEY', 'CRYPTO_KEY'], 'WIKIT
 exports.cacheBreaker = envWithDefault(['CACHE_BREAKER'], Date.now().toString());
 exports.jwtSecret = secretFromEnv(['WIKITRUTH_JWT_SECRET', 'JWT_SECRET'], 'WIKITRUTH_JWT_SECRET');
 exports.trustProxy = envBoolean(['TRUST_PROXY'], false);
+exports.security = {
+  helmet: {
+    enabled: envBoolean(['SECURITY_HELMET_ENABLED'], true),
+    contentSecurityPolicy: envBoolean(['SECURITY_HELMET_CONTENT_SECURITY_POLICY'], false),
+    crossOriginEmbedderPolicy: envBoolean(['SECURITY_HELMET_COEP'], false),
+    crossOriginResourcePolicy: envWithDefault(['SECURITY_HELMET_CORP'], 'cross-origin'),
+    referrerPolicy: envWithDefault(['SECURITY_HELMET_REFERRER_POLICY'], 'no-referrer'),
+    hsts: {
+      enabled: envBoolean(['SECURITY_HELMET_HSTS_ENABLED'], isProduction),
+      maxAge: Number(envWithDefault(['SECURITY_HELMET_HSTS_MAX_AGE'], '15552000')),
+      includeSubDomains: envBoolean(['SECURITY_HELMET_HSTS_INCLUDE_SUBDOMAINS'], true),
+      preload: envBoolean(['SECURITY_HELMET_HSTS_PRELOAD'], false),
+    },
+  },
+};
 exports.googleAnalyticsTrackingId = envWithDefault(['GOOGLE_ANALYTICS_TRACKING_ID'], '');
 exports.loginAttempts = {
   forIp: Number(envWithDefault(['LOGIN_ATTEMPTS_FOR_IP'], '50')),
