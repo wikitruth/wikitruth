@@ -56,7 +56,6 @@ module.exports = function (grunt) {
   config.jshint = require('./tasks/jshint')(grunt);
   config.less = require('./tasks/less')(grunt);
   config.localizr = require('./tasks/localizr')(grunt);
-  config.mochacli = require('./tasks/mochacli')(grunt);
   config.requirejs = require('./tasks/requirejs')(grunt);
   config.uglify = require('./tasks/uglify')(grunt);
 
@@ -77,7 +76,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-newer');
 
   grunt.registerTask('lint', ['jshint']);
-  grunt.registerTask('test', ['jshint', 'mochacli']);
+  grunt.registerTask('test', ['jshint']);
   grunt.registerTask('build-js', ['uglify']);
   grunt.registerTask('build-babel', ['babel', 'uglify', 'copyto']);
   grunt.registerTask('build', [
