@@ -8,7 +8,7 @@ Derived from `TYPE_IMPROVEMENT_PROJECT.md`.
 - [x] `TP-02` Guardrails: reject new file-level `@ts-nocheck` additions in scoped server TS directories.
 - [x] `TP-03` Remove `@ts-nocheck` from `types/http.ts` with strict typed request/response contracts.
 - [x] `TP-04` Remove `@ts-nocheck` from `middlewares/requestValidation.ts` and `middlewares/apiError.ts`.
-- [ ] `TP-05` Remove `@ts-nocheck` from `middlewares/requestContext.ts` and `utils/logger.ts`.
+- [x] `TP-05` Remove `@ts-nocheck` from `middlewares/requestContext.ts` and `utils/logger.ts`.
 
 ## P1 Utilities and Services (2-4 Weeks)
 

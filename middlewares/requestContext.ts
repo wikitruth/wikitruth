@@ -1,18 +1,24 @@
-// @ts-nocheck
 'use strict';
 
-const crypto = require('crypto');
-const logger = require('../utils/logger');
+import type { Request, RequestHandler } from 'express';
+const crypto = require('crypto') as typeof import('crypto');
+const logger = require('../utils/logger') as {
+  info: (event: string, fields: Record<string, unknown>) => void;
+};
 
 const KEY_PATH_PATTERNS = [/^\/home\/?$/, /^\/login\/?$/, /^\/api\/home\/?$/, /^\/app(\/|$)/];
 
-function isKeyPath(pathname) {
+interface RequestWithContext extends Request {
+  requestId?: string;
+}
+
+function isKeyPath(pathname: string): boolean {
   return KEY_PATH_PATTERNS.some(function (pattern) {
-    return pattern.test(pathname || '');
+    return pattern.test(pathname);
   });
 }
 
-function normalizeRequestId(value) {
+function normalizeRequestId(value: unknown): string {
   if (!value) {
     return '';
   }
@@ -21,16 +27,18 @@ function normalizeRequestId(value) {
   if (normalized.length < 8 || normalized.length > 128) {
     return '';
   }
+
   return normalized;
 }
 
-module.exports = function requestContext(req, res, next) {
+const requestContext: RequestHandler = function (req, res, next) {
   const incomingRequestId = normalizeRequestId(req.header('x-request-id'));
   const requestId = incomingRequestId || crypto.randomUUID();
   const startedAt = Date.now();
   const path = req.originalUrl || req.path || '/';
 
-  req.requestId = requestId;
+  const requestWithContext = req as RequestWithContext;
+  requestWithContext.requestId = requestId;
   res.locals.requestId = requestId;
   res.set('X-Request-Id', requestId);
 
@@ -56,3 +64,5 @@ module.exports = function requestContext(req, res, next) {
 
   next();
 };
+
+module.exports = requestContext;

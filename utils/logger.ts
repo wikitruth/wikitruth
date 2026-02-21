@@ -1,8 +1,16 @@
-// @ts-nocheck
 'use strict';
 
-function emit(level, event, fields) {
-  const payload = {
+type LogLevel = 'info' | 'error';
+type LogFields = Record<string, unknown>;
+
+interface LogPayload extends LogFields {
+  timestamp: string;
+  level: LogLevel;
+  event: string;
+}
+
+function emit(level: LogLevel, event: string, fields: LogFields = {}): void {
+  const payload: LogPayload = {
     timestamp: new Date().toISOString(),
     level: level,
     event: event,
@@ -14,15 +22,16 @@ function emit(level, event, fields) {
     console.error(line);
     return;
   }
+
   console.log(line);
 }
 
-function info(event, fields) {
-  emit('info', event, fields || {});
+function info(event: string, fields: LogFields = {}): void {
+  emit('info', event, fields);
 }
 
-function error(event, fields) {
-  emit('error', event, fields || {});
+function error(event: string, fields: LogFields = {}): void {
+  emit('error', event, fields);
 }
 
 module.exports = {
