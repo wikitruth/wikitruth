@@ -1,10 +1,13 @@
-// @ts-nocheck
 'use strict';
 
+// @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 const jwt = require('jsonwebtoken'),
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   cookieParser = require('cookie-parser');
 
+// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports = function (router) {
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.post('/fast-switch', async function (req, res) {
     let cookieString = req.body.cookie;
     let pin = req.body.pin;
