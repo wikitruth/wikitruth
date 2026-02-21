@@ -25,6 +25,7 @@
     "middlewares/**/*.js",
     "models/**/*.js",
     "services/**/*.js",
+    "services/**/*.ts",
     "utils/**/*.js",
     "utils/**/*.ts",
     "types/**/*.ts",
