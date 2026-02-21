@@ -52,7 +52,7 @@ This backlog is derived from `MODERNIZATION_AND_TYPESCRIPT_PROPOSAL.md` and is i
 | ID | Task | Estimate | Depends On | Done Criteria |
 |---|---|---:|---|---|
 | P2-01 ✅ | Strictness ramp step 1 (`noImplicitAny`, `strictNullChecks`) | 2.0d | P1-07 | Compiler passes with new flags; exception list minimized and documented. |
-| P2-02 | Strictness ramp step 2 (`noUncheckedIndexedAccess`, `strict`) | 2.0d | P2-01 | Server build clean under strict mode. |
+| P2-02 ✅ | Strictness ramp step 2 (`noUncheckedIndexedAccess`, `strict`) | 2.0d | P2-01 | Server build clean under strict mode. |
 | P2-03 | Disable `allowJs` for server scope | 1.5d | P2-02 | Server code compiles without JS fallback; remaining JS explicitly excluded. |
 | P2-04 | Test modernization: migrate legacy mocha/grunt tests to Jest/Supertest | 3.0d | P1-03 | Equivalent or better test coverage for migrated suites; CI simplified. |
 | P2-05 | Remove obsolete TS type packages (e.g., stale `@types/mongoose`) | 0.5d | P1-07 | Redundant/stale type deps removed with clean build/test. |
