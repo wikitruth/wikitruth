@@ -1,28 +1,29 @@
+// @ts-nocheck
 'use strict';
 
 const flowUtils = require('../../utils/flowUtils');
 const constants = require('../../models/constants');
-const answersService = require('../../services/answersService');
+const artifactsService = require('../../services/artifactsService');
 
 module.exports = function (router) {
-  // GET /api/answers - List answers
+  // GET /api/artifacts - List artifacts
   router.get('/', async function (req, res) {
     try {
       const model = {};
       flowUtils.setScreeningModel(req, model);
       
       const query = {
-        ownerType: constants.OBJECT_TYPES.question,
+        ownerType: constants.OBJECT_TYPES.topic,
         private: false,
         'screening.status': model.screening.status,
       };
       
-      if (req.query.question) {
-        query.ownerId = req.query.question;
+      if (req.query.topic) {
+        query.ownerId = req.query.topic;
       }
       
-      const results = await answersService.getAnswersList(query, { limit: 50 });
-      model.answers = results;
+      const results = await artifactsService.getArtifactsList(query, { limit: 50 });
+      model.artifacts = results;
       
       delete model.screening;
       res.json(model);
@@ -31,16 +32,16 @@ module.exports = function (router) {
     }
   });
 
-  // GET /api/answers/entry/:id - Get single answer
+  // GET /api/artifacts/entry/:id - Get single artifact
   router.get('/entry/:id', async function (req, res) {
     try {
-      const answer = await answersService.getAnswerEntry(req.params.id, req);
+      const artifact = await artifactsService.getArtifactEntry(req.params.id, req);
       
-      if (!answer) {
-        return res.status(404).json({ error: 'Answer not found' });
+      if (!artifact) {
+        return res.status(404).json({ error: 'Artifact not found' });
       }
       
-      res.json({ answer });
+      res.json({ artifact });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

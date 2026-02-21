@@ -22,6 +22,7 @@
     "server.js",
     "config/**/*.js",
     "controllers/**/*.js",
+    "controllers/**/*.ts",
     "middlewares/**/*.js",
     "middlewares/**/*.ts",
     "models/**/*.js",

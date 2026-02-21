@@ -25,7 +25,7 @@ describe('Route regression coverage for legacy + React shell', function () {
   });
 
   it('keeps required API endpoint mounted', function () {
-    const apiIndex = source('controllers/api/index.js');
+    const apiIndex = source('controllers/api/index.ts');
 
     expect(apiIndex).toContain("router.use('/home', homeRouter)"); // /api/home
   });

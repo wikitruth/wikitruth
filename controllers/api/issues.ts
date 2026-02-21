@@ -1,34 +1,33 @@
+// @ts-nocheck
 'use strict';
 
-const async = require('async');
 const flowUtils = require('../../utils/flowUtils');
 const constants = require('../../models/constants');
-const questionsService = require('../../services/questionsService');
-const db = require('../../app').db.models;
+const issuesService = require('../../services/issuesService');
 
 module.exports = function (router) {
-  // Get questions list
+  // Get issues list
   router.get('/', async function (req, res) {
     try {
-      await GET_questions(req, res);
+      await GET_issues(req, res);
     } catch (error) {
-      console.error('Error in GET /api/questions:', error);
+      console.error('Error in GET /api/issues:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
 
-  // Get question entry
+  // Get issue entry
   router.get('/entry/:id', async function (req, res) {
     try {
-      await GET_question_entry(req, res);
+      await GET_issue_entry(req, res);
     } catch (error) {
-      console.error('Error in GET /api/questions/entry/:id:', error);
+      console.error('Error in GET /api/issues/entry/:id:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
 };
 
-async function GET_questions(req, res) {
+async function GET_issues(req, res) {
   let model = {};
   flowUtils.setScreeningModel(req, model);
   
@@ -42,12 +41,9 @@ async function GET_questions(req, res) {
     query.ownerId = req.query.topic;
   }
   
-  const questionsList = await questionsService.getQuestionsList(query, {
-    limit: 50,
-    req: req,
-  });
+  const results = await issuesService.getIssuesList(query, { limit: 50 });
   
-  model.questions = questionsList;
+  model.issues = results;
   
   // Remove screening model from response (it's server-side only)
   delete model.screening;
@@ -55,12 +51,12 @@ async function GET_questions(req, res) {
   res.json(model);
 }
 
-async function GET_question_entry(req, res) {
-  const question = await questionsService.getQuestionEntry(req.params.id, req);
+async function GET_issue_entry(req, res) {
+  const issue = await issuesService.getIssueEntry(req.params.id, req);
   
-  if (!question) {
-    return res.status(404).json({ error: 'Question not found' });
+  if (!issue) {
+    return res.status(404).json({ error: 'Issue not found' });
   }
   
-  res.json({ question });
+  res.json({ issue });
 }
