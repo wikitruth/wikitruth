@@ -7,12 +7,10 @@ const constants = require('../../models/constants');
 const db = require('../../app').db.models;
 
 module.exports = function (router) {
-  router.get('/', async function (req, res) {
+  router.get('/', async function (req, res, next) {
     try {
       await GET_home(req, res);
-    } catch (error) {
-      console.error('Error in /api/home:', error);
-      res.status(500).json({ error: 'Internal server error' });
+    } catch (error) {      next(error);
     }
   });
 };

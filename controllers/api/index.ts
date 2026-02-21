@@ -2,20 +2,21 @@
 'use strict';
 
 const express = require('express');
+const { wrapAsyncRouter } = require('../../middlewares/apiError');
 
 module.exports = function (router) {
   // Create sub-routers for API endpoints
-  const homeRouter = express.Router();
-  const topicsRouter = express.Router();
-  const argumentsRouter = express.Router();
-  const questionsRouter = express.Router();
-  const searchRouter = express.Router();
-  const issuesRouter = express.Router();
-  const opinionsRouter = express.Router();
-  const answersRouter = express.Router();
-  const artifactsRouter = express.Router();
-  const groupsRouter = express.Router();
-  const membersRouter = express.Router();
+  const homeRouter = wrapAsyncRouter(express.Router());
+  const topicsRouter = wrapAsyncRouter(express.Router());
+  const argumentsRouter = wrapAsyncRouter(express.Router());
+  const questionsRouter = wrapAsyncRouter(express.Router());
+  const searchRouter = wrapAsyncRouter(express.Router());
+  const issuesRouter = wrapAsyncRouter(express.Router());
+  const opinionsRouter = wrapAsyncRouter(express.Router());
+  const answersRouter = wrapAsyncRouter(express.Router());
+  const artifactsRouter = wrapAsyncRouter(express.Router());
+  const groupsRouter = wrapAsyncRouter(express.Router());
+  const membersRouter = wrapAsyncRouter(express.Router());
 
   // Load route handlers
   require('./home')(homeRouter);

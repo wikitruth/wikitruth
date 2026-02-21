@@ -176,6 +176,9 @@ require('./middlewares/passport')(app, passport);
 //setup routes
 require('./middlewares/routes')(app, passport);
 
+const { apiErrorHandler } = require('./middlewares/apiError');
+app.use(apiErrorHandler);
+
 //custom (friendly) error handler
 //app.use(require('./public/templates/jade/http/index').http500);
 // check https://github.com/krakenjs/kraken-js/issues/447
