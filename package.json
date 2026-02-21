@@ -85,7 +85,8 @@
     "react-router-dom": "^6.20.1",
     "request": "^2.88.2",
     "rimraf": "^6.0.1",
-    "serve-static": "2.1.0"
+    "serve-static": "2.1.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@babel/core": "7.23.3",

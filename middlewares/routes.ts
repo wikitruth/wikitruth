@@ -3,6 +3,7 @@
 
 const tmplRoot = '../public/templates/jade',
   paths = require('../models/paths');
+const { validateBody, schemas } = require('./requestValidation');
 
 function req(code) {
   return require(tmplRoot + code);
@@ -73,14 +74,14 @@ module.exports = function(app, passport) {
   app.get('/home/', req('/index').init);
   app.get('/about/', req('/about/index').init);
   app.get('/contact/', req('/contact/index').init);
-  app.post('/contact/', req('/contact/index').sendMessage);
+  app.post('/contact/', validateBody(schemas.contact), req('/contact/index').sendMessage);
 
   //sign up
   app.get('/signup/', req('/signup/index').init);
-  app.post('/signup/', req('/signup/index').signup);
+  app.post('/signup/', validateBody(schemas.signup), req('/signup/index').signup);
 
   //social sign up
-  app.post('/signup/social/', req('/signup/index').signupSocial);
+  app.post('/signup/social/', validateBody(schemas.signupSocial), req('/signup/index').signupSocial);
   app.get('/signup/twitter/', passport.authenticate('twitter', { callbackURL: '/signup/twitter/callback/' }));
   app.get('/signup/twitter/callback/', req('/signup/index').signupTwitter);
   app.get('/signup/github/', passport.authenticate('github', { callbackURL: '/signup/github/callback/', scope: ['user:email'] }));
@@ -94,12 +95,12 @@ module.exports = function(app, passport) {
 
   //login/out
   app.get('/login/', req('/login/index').init);
-  app.post('/login/', req('/login/index').login);
+  app.post('/login/', validateBody(schemas.login), req('/login/index').login);
   app.get('/login/forgot/', req('/login/forgot/index').init);
-  app.post('/login/forgot/', req('/login/forgot/index').send);
+  app.post('/login/forgot/', validateBody(schemas.forgotPassword), req('/login/forgot/index').send);
   app.get('/login/reset/', req('/login/reset/index').init);
   app.get('/login/reset/:email/:token/', req('/login/reset/index').init);
-  app.put('/login/reset/:email/:token/', req('/login/reset/index').set);
+  app.put('/login/reset/:email/:token/', validateBody(schemas.resetPassword), req('/login/reset/index').set);
   app.get('/logout/', req('/logout/index').init);
 
   //social login
@@ -121,9 +122,9 @@ module.exports = function(app, passport) {
 
   //admin > users
   app.get('/admin/users/', req('/admin/users/index').find);
-  app.post('/admin/users/', req('/admin/users/index').create);
+  app.post('/admin/users/', validateBody(schemas.adminUserCreate), req('/admin/users/index').create);
   app.get('/admin/users/:id/', req('/admin/users/index').read);
-  app.put('/admin/users/:id/', req('/admin/users/index').update);
+  app.put('/admin/users/:id/', validateBody(schemas.adminUserUpdate), req('/admin/users/index').update);
   app.put('/admin/users/:id/password/', req('/admin/users/index').password);
   app.put('/admin/users/:id/role-admin/', req('/admin/users/index').linkAdmin);
   app.delete('/admin/users/:id/role-admin/', req('/admin/users/index').unlinkAdmin);
@@ -193,7 +194,7 @@ module.exports = function(app, passport) {
   app.get('/account/settings/', req('/account/settings/index').init);
   app.put('/account/settings/', req('/account/settings/index').update);
   app.put('/account/settings/identity/', req('/account/settings/index').identity);
-  app.put('/account/settings/password/', req('/account/settings/index').password);
+  app.put('/account/settings/password/', validateBody(schemas.accountPassword), req('/account/settings/index').password);
 
   //account > settings > social
   app.get('/account/settings/twitter/', passport.authenticate('twitter', { callbackURL: '/account/settings/twitter/callback/' }));
