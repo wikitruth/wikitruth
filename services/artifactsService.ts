@@ -1,9 +1,12 @@
-// @ts-nocheck
 'use strict';
 
-const flowUtils = require('../utils/flowUtils');
-const constants = require('../models/constants');
-const db = require('../app').db.models;
+import type { FlowUtilsContract, LeanModel, ServiceEntry, ServiceListOptions, ServiceQuery, ServiceSort } from './serviceTypes';
+
+const flowUtils = require('../utils/flowUtils') as FlowUtilsContract;
+const constants = require('../models/constants') as { OBJECT_TYPES: { artifact: number } };
+const db = require('../app').db.models as {
+  Artifact: LeanModel<ServiceEntry>;
+};
 
 /**
  * Get list of artifacts
@@ -11,9 +14,9 @@ const db = require('../app').db.models;
  * @param {Object} options - Options like limit, sort
  * @returns {Promise<Array>} Array of artifacts
  */
-async function getArtifactsList(query, options = {}) {
-  const limit = options.limit || 50;
-  const sort = options.sort || { editDate: -1 };
+async function getArtifactsList(query: ServiceQuery, options: ServiceListOptions = {}): Promise<ServiceEntry[]> {
+  const limit = options.limit ?? 50;
+  const sort = (options.sort ?? { editDate: -1 }) as ServiceSort;
   
   const results = await db.Artifact.find(query)
     .sort(sort)
@@ -36,7 +39,7 @@ async function getArtifactsList(query, options = {}) {
  * @param {Object} req - Express request object (for appendEntryExtras)
  * @returns {Promise<Object>} Artifact object
  */
-async function getArtifactEntry(artifactId, req) {
+async function getArtifactEntry(artifactId: string, req: ServiceListOptions['req']): Promise<ServiceEntry | null> {
   const artifact = await db.Artifact.findById(artifactId).lean();
   
   if (!artifact) {

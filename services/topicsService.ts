@@ -1,9 +1,10 @@
-// @ts-nocheck
 'use strict';
 
-const flowUtils = require('../utils/flowUtils');
-const constants = require('../models/constants');
-const db = require('../app').db.models;
+import type { FlowUtilsContract, LeanModel, ServiceEntry, ServiceListOptions, ServiceQuery } from './serviceTypes';
+
+const flowUtils = require('../utils/flowUtils') as FlowUtilsContract;
+const constants = require('../models/constants') as { OBJECT_TYPES: { topic: number } };
+const db = require('../app').db.models as Record<string, unknown>;
 const { getCoreModels } = require('../models/schema/typedModels');
 
 /**
@@ -12,12 +13,14 @@ const { getCoreModels } = require('../models/schema/typedModels');
  * @param {Object} options - Options like limit, req
  * @returns {Promise<Array>} Array of topics with enriched data
  */
-async function getTopicsList(query, options = {}) {
-  const models = getCoreModels({ db: { models: db } });
-  const limit = options.limit || 50;
+async function getTopicsList(query: ServiceQuery, options: ServiceListOptions = {}): Promise<ServiceEntry[]> {
+  const models = getCoreModels({ db: { models: db } }) as {
+    Topic: LeanModel<ServiceEntry>;
+  };
+  const limit = options.limit ?? 50;
   const req = options.req;
   
-  let results = await models.Topic.find(query)
+  const results = await models.Topic.find(query)
     .sort({ editDate: -1 })
     .limit(limit)
     .lean();
@@ -38,8 +41,10 @@ async function getTopicsList(query, options = {}) {
  * @param {Object} req - Express request object
  * @returns {Promise<Object>} Topic object with enriched data
  */
-async function getTopicEntry(topicId, req) {
-  const models = getCoreModels({ db: { models: db } });
+async function getTopicEntry(topicId: string, req: ServiceListOptions['req']): Promise<ServiceEntry | null> {
+  const models = getCoreModels({ db: { models: db } }) as {
+    Topic: LeanModel<ServiceEntry>;
+  };
   const topic = await models.Topic.findById(topicId).lean();
   
   if (!topic) {

@@ -1,9 +1,15 @@
-// @ts-nocheck
 'use strict';
 
-const flowUtils = require('../utils/flowUtils');
-const constants = require('../models/constants');
-const db = require('../app').db.models;
+import type { FlowUtilsContract, LeanModel, ServiceEntry, ServiceListOptions, ServiceQuery, ServiceSort } from './serviceTypes';
+
+const flowUtils = require('../utils/flowUtils') as FlowUtilsContract;
+const constants = require('../models/constants') as {
+  OBJECT_TYPES: { issue: number };
+  ISSUE_TYPES: Record<string, string>;
+};
+const db = require('../app').db.models as {
+  Issue: LeanModel<ServiceEntry>;
+};
 
 /**
  * Get list of issues
@@ -11,9 +17,9 @@ const db = require('../app').db.models;
  * @param {Object} options - Options like limit, sort
  * @returns {Promise<Array>} Array of issues
  */
-async function getIssuesList(query, options = {}) {
-  const limit = options.limit || 50;
-  const sort = options.sort || { editDate: -1 };
+async function getIssuesList(query: ServiceQuery, options: ServiceListOptions = {}): Promise<ServiceEntry[]> {
+  const limit = options.limit ?? 50;
+  const sort = (options.sort ?? { editDate: -1 }) as ServiceSort;
   
   const results = await db.Issue.find(query)
     .sort(sort)
@@ -24,7 +30,8 @@ async function getIssuesList(query, options = {}) {
   await flowUtils.setEditorsUsername(results);
   
   results.forEach(function (result) {
-    result.issueType = constants.ISSUE_TYPES['type' + result.issueType];
+    const issueTypeCode = String(result.issueType ?? '');
+    result.issueType = constants.ISSUE_TYPES['type' + issueTypeCode];
     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.issue);
   });
   
@@ -37,7 +44,7 @@ async function getIssuesList(query, options = {}) {
  * @param {Object} req - Express request object (for appendEntryExtras)
  * @returns {Promise<Object>} Issue object
  */
-async function getIssueEntry(issueId, req) {
+async function getIssueEntry(issueId: string, req: ServiceListOptions['req']): Promise<ServiceEntry | null> {
   const issue = await db.Issue.findById(issueId).lean();
   
   if (!issue) {
@@ -47,7 +54,7 @@ async function getIssueEntry(issueId, req) {
   await flowUtils.setUsername(issue);
   await flowUtils.setEntryParent(issue, constants.OBJECT_TYPES.issue);
   flowUtils.appendEntryExtras(issue, constants.OBJECT_TYPES.issue, req);
-  issue.issueType = constants.ISSUE_TYPES['type' + issue.issueType];
+  issue.issueType = constants.ISSUE_TYPES['type' + String(issue.issueType ?? '')];
   
   return issue;
 }

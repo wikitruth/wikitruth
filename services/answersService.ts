@@ -1,9 +1,14 @@
-// @ts-nocheck
 'use strict';
 
-const flowUtils = require('../utils/flowUtils');
-const constants = require('../models/constants');
-const db = require('../app').db.models;
+import type { FlowUtilsContract, LeanModel, ServiceEntry, ServiceListOptions, ServiceQuery, ServiceSort } from './serviceTypes';
+
+const flowUtils = require('../utils/flowUtils') as FlowUtilsContract;
+const constants = require('../models/constants') as {
+  OBJECT_TYPES: { answer: number };
+};
+const db = require('../app').db.models as {
+  Answer: LeanModel<ServiceEntry>;
+};
 
 /**
  * Get list of answers
@@ -11,9 +16,9 @@ const db = require('../app').db.models;
  * @param {Object} options - Options like limit, sort
  * @returns {Promise<Array>} Array of answers
  */
-async function getAnswersList(query, options = {}) {
-  const limit = options.limit || 50;
-  const sort = options.sort || { editDate: -1 };
+async function getAnswersList(query: ServiceQuery, options: ServiceListOptions = {}): Promise<ServiceEntry[]> {
+  const limit = options.limit ?? 50;
+  const sort = (options.sort ?? { editDate: -1 }) as ServiceSort;
   
   const results = await db.Answer.find(query)
     .sort(sort)
@@ -36,7 +41,7 @@ async function getAnswersList(query, options = {}) {
  * @param {Object} req - Express request object (for appendEntryExtras)
  * @returns {Promise<Object>} Answer object
  */
-async function getAnswerEntry(answerId, req) {
+async function getAnswerEntry(answerId: string, req: ServiceListOptions['req']): Promise<ServiceEntry | null> {
   const answer = await db.Answer.findById(answerId).lean();
   
   if (!answer) {

@@ -1,9 +1,12 @@
-// @ts-nocheck
 'use strict';
 
-const flowUtils = require('../utils/flowUtils');
-const constants = require('../models/constants');
-const db = require('../app').db.models;
+import type { FlowUtilsContract, LeanModel, ServiceEntry, ServiceListOptions, ServiceQuery } from './serviceTypes';
+
+const flowUtils = require('../utils/flowUtils') as FlowUtilsContract;
+const constants = require('../models/constants') as { OBJECT_TYPES: { argument: number } };
+const db = require('../app').db.models as {
+  Argument: LeanModel<ServiceEntry>;
+};
 
 /**
  * Get a list of arguments based on query and options
@@ -11,11 +14,11 @@ const db = require('../app').db.models;
  * @param {Object} options - Options like limit, req
  * @returns {Promise<Array>} Array of arguments with enriched data
  */
-async function getArgumentsList(query, options = {}) {
-  const limit = options.limit || 50;
+async function getArgumentsList(query: ServiceQuery, options: ServiceListOptions = {}): Promise<ServiceEntry[]> {
+  const limit = options.limit ?? 50;
   const req = options.req;
   
-  let results = await db.Argument.find(query)
+  const results = await db.Argument.find(query)
     .sort({ editDate: -1 })
     .limit(limit)
     .lean();
@@ -25,7 +28,9 @@ async function getArgumentsList(query, options = {}) {
   
   results.forEach(function (result) {
     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.argument, req);
-    flowUtils.setVerdictModel(result);
+    if (flowUtils.setVerdictModel) {
+      flowUtils.setVerdictModel(result);
+    }
   });
   
   return results;
@@ -37,7 +42,7 @@ async function getArgumentsList(query, options = {}) {
  * @param {Object} req - Express request object
  * @returns {Promise<Object>} Argument object with enriched data
  */
-async function getArgumentEntry(argumentId, req) {
+async function getArgumentEntry(argumentId: string, req: ServiceListOptions['req']): Promise<ServiceEntry | null> {
   const argument = await db.Argument.findById(argumentId).lean();
   
   if (!argument) {
@@ -47,7 +52,9 @@ async function getArgumentEntry(argumentId, req) {
   await flowUtils.setUsername(argument);
   await flowUtils.setEntryParent(argument, constants.OBJECT_TYPES.argument);
   flowUtils.appendEntryExtras(argument, constants.OBJECT_TYPES.argument, req);
-  flowUtils.setVerdictModel(argument);
+  if (flowUtils.setVerdictModel) {
+    flowUtils.setVerdictModel(argument);
+  }
   
   return argument;
 }

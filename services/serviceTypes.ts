@@ -1,0 +1,41 @@
+import type { Request } from 'express';
+
+export type ServiceQuery = Record<string, unknown>;
+export type ServiceSort = Record<string, 1 | -1>;
+
+export interface ServiceListOptions {
+  limit?: number;
+  sort?: ServiceSort;
+  req?: Request;
+}
+
+export interface ServiceEntry {
+  [key: string]: unknown;
+  issueType?: string | number;
+}
+
+export interface FlowUtilsContract {
+  setEntryParents(items: ServiceEntry[], typeId: number): Promise<void>;
+  setEditorsUsername(items: ServiceEntry[]): Promise<void>;
+  appendEntryExtras(item: ServiceEntry, objectType: number, req?: Request): void;
+  setVerdictModel?: (item: ServiceEntry) => void;
+  setUsername(item: ServiceEntry): Promise<void>;
+  setEntryParent(item: ServiceEntry, typeId: number): Promise<void>;
+}
+
+export interface LeanFindChain<TEntry> {
+  sort(sort: ServiceSort): LeanLimitChain<TEntry>;
+}
+
+export interface LeanLimitChain<TEntry> {
+  limit(limit: number): {
+    lean(): Promise<TEntry[]>;
+  };
+}
+
+export interface LeanModel<TEntry> {
+  find(query: ServiceQuery): LeanFindChain<TEntry>;
+  findById(id: string): {
+    lean(): Promise<TEntry | null>;
+  };
+}
