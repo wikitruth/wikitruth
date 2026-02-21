@@ -7,7 +7,7 @@ This directory contains the modern React-based frontend for Wikitruth.
 ```
 client/
 ├── index.tsx           # Entry point
-├── tsconfig.json       # TypeScript configuration
+├── tsconfig.json       # Client TypeScript configuration (extends ../tsconfig.base.json)
 ├── src/
 │   ├── components/     # Reusable React components
 │   │   ├── Layout/     # Layout components (Header, Footer, etc.)

@@ -1,0 +1,40 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "outDir": "./dist",
+    "rootDir": "./",
+    "strict": false,
+    "allowJs": true,
+    "checkJs": false,
+    "declaration": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "*": [
+        "node_modules/*"
+      ]
+    }
+  },
+  "include": [
+    "app.js",
+    "server.js",
+    "config/**/*.js",
+    "controllers/**/*.js",
+    "middlewares/**/*.js",
+    "models/**/*.js",
+    "services/**/*.js",
+    "utils/**/*.js",
+    "types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "public/dist",
+    "public/components",
+    "client",
+    "tests",
+    "react-tutorial"
+  ]
+}

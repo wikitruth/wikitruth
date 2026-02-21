@@ -25,7 +25,7 @@ This backlog is derived from `MODERNIZATION_AND_TYPESCRIPT_PROPOSAL.md` and is i
 | P0-04 ✅ | Re-enable and configure `helmet` safely | 1.0d | P0-01 | `helmet` enabled with explicit policy config; no breakage to `/app`, `/home/`, `/login/`, `/api/home`. |
 | P0-05 ✅ | Session/CSRF review and policy update | 1.5d | P0-04 | Session cookie settings documented and enforced by env; CSRF behavior validated for legacy forms and API endpoints. |
 | P0-06 ✅ | API route regression tests (legacy + React shell coexistence) | 1.5d | P0-03 | Automated checks for `/`, `/home/`, `/login/`, `/app`, `/app/*`, `/api/home` in CI. |
-| P0-07 | TypeScript config split (`tsconfig.base` + `tsconfig.server`) | 1.0d | P0-02 | Server/client TS configs separated; compile path deterministic; docs updated. |
+| P0-07 ✅ | TypeScript config split (`tsconfig.base` + `tsconfig.server`) | 1.0d | P0-02 | Server/client TS configs separated; compile path deterministic; docs updated. |
 | P0-08 | Introduce shared server types (`types/http`, `types/auth`) | 1.0d | P0-07 | Typed request/session/user extensions compile cleanly; used in at least one module. |
 | P0-09 | Convert `utils/*` JS -> TS | 2.0d | P0-08 | Utility modules converted with tests passing and no behavior change. |
 | P0-10 | Convert `services/*` JS -> TS | 2.0d | P0-09 | Service modules converted with tests passing and no route contract changes. |

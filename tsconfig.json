@@ -1,32 +1,3 @@
 {
-  "compilerOptions": {
-    "target": "ES2020",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "outDir": "./dist",
-    "rootDir": "./",
-    "strict": false,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "allowJs": true,
-    "checkJs": false,
-    "resolveJsonModule": true,
-    "declaration": true,
-    "sourceMap": true,
-    "baseUrl": ".",
-    "paths": {
-      "*": ["node_modules/*"]
-    }
-  },
-  "include": [
-    "**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "public/dist",
-    "public/components",
-    "client"
-  ]
-} 
+  "extends": "./tsconfig.server.json"
+}
