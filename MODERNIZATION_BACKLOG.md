@@ -30,7 +30,7 @@ This backlog is derived from `MODERNIZATION_AND_TYPESCRIPT_PROPOSAL.md` and is i
 | P0-09 ✅ | Convert `utils/*` JS -> TS | 2.0d | P0-08 | Utility modules converted with tests passing and no behavior change. |
 | P0-10 ✅ | Convert `services/*` JS -> TS | 2.0d | P0-09 | Service modules converted with tests passing and no route contract changes. |
 | P0-11 ✅ | Deprecation replacement plan PR (`request`, `jade`, auth adapters) | 1.0d | P0-03 | Written upgrade matrix with sequence, risk notes, and rollback steps committed to docs. |
-| P0-12 | Audit triage and vulnerability reduction pass #1 | 2.0d | P0-11 | Critical/high count reduced; unresolved items documented with rationale and owner. |
+| P0-12 ✅ | Audit triage and vulnerability reduction pass #1 | 2.0d | P0-11 | Critical/high count reduced; unresolved items documented with rationale and owner. |
 
 ## P1 Backlog (2-6 Weeks)
 
