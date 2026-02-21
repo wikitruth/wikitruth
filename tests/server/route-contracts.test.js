@@ -32,4 +32,12 @@ describe('Server route contracts', function () {
     expect(appSource).toContain('app.use(helmet({');
     expect(appSource).toContain('contentSecurityPolicy: helmetConfig.contentSecurityPolicy ? undefined : false');
   });
+
+  it('reads session and csrf middleware policy from config', function () {
+    const appSource = readProjectFile('app.js');
+
+    expect(appSource).toContain('const sessionConfig = config.session || {}');
+    expect(appSource).toContain('const csrfConfig = config.csrf || {}');
+    expect(appSource).toContain('app.use(csrf({');
+  });
 });

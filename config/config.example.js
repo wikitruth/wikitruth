@@ -73,6 +73,35 @@ exports.cryptoKey = process.env.WIKITRUTH_CRYPTO_KEY || '';
 exports.cacheBreaker = process.env.CACHE_BREAKER || '';
 exports.jwtSecret = process.env.WIKITRUTH_JWT_SECRET || '';
 exports.trustProxy = process.env.TRUST_PROXY === 'true';
+exports.session = {
+  name: process.env.SESSION_COOKIE_NAME || 'sid',
+  resave: process.env.SESSION_RESAVE === 'true',
+  saveUninitialized: process.env.SESSION_SAVE_UNINITIALIZED === 'true',
+  rolling: process.env.SESSION_ROLLING === 'true',
+  proxy: process.env.SESSION_PROXY === 'true',
+  cookie: {
+    httpOnly: process.env.SESSION_COOKIE_HTTP_ONLY
+      ? process.env.SESSION_COOKIE_HTTP_ONLY === 'true'
+      : true,
+    secure: process.env.SESSION_COOKIE_SECURE === 'true',
+    sameSite: process.env.SESSION_COOKIE_SAMESITE || 'lax',
+    maxAgeMs: Number(process.env.SESSION_COOKIE_MAX_AGE_MS || 1209600000)
+  }
+};
+exports.csrf = {
+  ignoreMethods: process.env.CSRF_IGNORE_METHODS
+    ? process.env.CSRF_IGNORE_METHODS.split(',').map(function (item) {
+      return item.trim();
+    }).filter(Boolean)
+    : ['GET', 'HEAD', 'OPTIONS'],
+  cookie: {
+    signed: process.env.CSRF_COOKIE_SIGNED
+      ? process.env.CSRF_COOKIE_SIGNED === 'true'
+      : true,
+    secure: process.env.CSRF_COOKIE_SECURE === 'true',
+    sameSite: process.env.CSRF_COOKIE_SAMESITE || 'lax'
+  }
+};
 exports.security = {
   helmet: {
     enabled: process.env.SECURITY_HELMET_ENABLED

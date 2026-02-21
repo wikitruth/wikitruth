@@ -23,7 +23,7 @@ This backlog is derived from `MODERNIZATION_AND_TYPESCRIPT_PROPOSAL.md` and is i
 | P0-02 ✅ | Pin runtime toolchain (`.nvmrc` + engines) | 0.5d | none | Node version pinned; `package.json` `engines` added; README setup updated. |
 | P0-03 ✅ | CI baseline pipeline (install, lint, test, build) | 1.0d | P0-02 | CI runs `npm ci`, lint, `test:client`, `build:client`, and existing server tests. |
 | P0-04 ✅ | Re-enable and configure `helmet` safely | 1.0d | P0-01 | `helmet` enabled with explicit policy config; no breakage to `/app`, `/home/`, `/login/`, `/api/home`. |
-| P0-05 | Session/CSRF review and policy update | 1.5d | P0-04 | Session cookie settings documented and enforced by env; CSRF behavior validated for legacy forms and API endpoints. |
+| P0-05 ✅ | Session/CSRF review and policy update | 1.5d | P0-04 | Session cookie settings documented and enforced by env; CSRF behavior validated for legacy forms and API endpoints. |
 | P0-06 | API route regression tests (legacy + React shell coexistence) | 1.5d | P0-03 | Automated checks for `/`, `/home/`, `/login/`, `/app`, `/app/*`, `/api/home` in CI. |
 | P0-07 | TypeScript config split (`tsconfig.base` + `tsconfig.server`) | 1.0d | P0-02 | Server/client TS configs separated; compile path deterministic; docs updated. |
 | P0-08 | Introduce shared server types (`types/http`, `types/auth`) | 1.0d | P0-07 | Typed request/session/user extensions compile cleanly; used in at least one module. |

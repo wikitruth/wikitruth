@@ -29,6 +29,28 @@ function envBoolean(names, defaultValue) {
   return ['1', 'true', 'yes', 'on'].includes(String(value).toLowerCase());
 }
 
+function envList(names, defaultValue) {
+  const value = firstDefinedEnv(names);
+  if (!value) {
+    return defaultValue;
+  }
+  return value
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function envSameSite(names, defaultValue) {
+  const value = firstDefinedEnv(names).toLowerCase();
+  if (!value) {
+    return defaultValue;
+  }
+  if (value === 'lax' || value === 'strict' || value === 'none') {
+    return value;
+  }
+  return defaultValue;
+}
+
 function requiredFromEnv(names, requiredLabel, devDefault) {
   const value = firstDefinedEnv(names);
   if (value) {
@@ -137,6 +159,27 @@ exports.cryptoKey = secretFromEnv(['WIKITRUTH_CRYPTO_KEY', 'CRYPTO_KEY'], 'WIKIT
 exports.cacheBreaker = envWithDefault(['CACHE_BREAKER'], Date.now().toString());
 exports.jwtSecret = secretFromEnv(['WIKITRUTH_JWT_SECRET', 'JWT_SECRET'], 'WIKITRUTH_JWT_SECRET');
 exports.trustProxy = envBoolean(['TRUST_PROXY'], false);
+exports.session = {
+  name: envWithDefault(['SESSION_COOKIE_NAME'], 'sid'),
+  resave: envBoolean(['SESSION_RESAVE'], false),
+  saveUninitialized: envBoolean(['SESSION_SAVE_UNINITIALIZED'], false),
+  rolling: envBoolean(['SESSION_ROLLING'], false),
+  proxy: envBoolean(['SESSION_PROXY'], exports.trustProxy),
+  cookie: {
+    httpOnly: envBoolean(['SESSION_COOKIE_HTTP_ONLY'], true),
+    secure: envBoolean(['SESSION_COOKIE_SECURE'], isProduction),
+    sameSite: envSameSite(['SESSION_COOKIE_SAMESITE'], 'lax'),
+    maxAgeMs: Number(envWithDefault(['SESSION_COOKIE_MAX_AGE_MS'], '1209600000')),
+  },
+};
+exports.csrf = {
+  ignoreMethods: envList(['CSRF_IGNORE_METHODS'], ['GET', 'HEAD', 'OPTIONS']),
+  cookie: {
+    signed: envBoolean(['CSRF_COOKIE_SIGNED'], true),
+    secure: envBoolean(['CSRF_COOKIE_SECURE'], isProduction),
+    sameSite: envSameSite(['CSRF_COOKIE_SAMESITE'], 'lax'),
+  },
+};
 exports.security = {
   helmet: {
     enabled: envBoolean(['SECURITY_HELMET_ENABLED'], true),

@@ -113,16 +113,36 @@ sessionStore.on('error', function (error) {
     console.error('Mongo session store error:', error);
     // You can implement fallback logic here, like switching to a MemoryStore
 });
+const sessionConfig = config.session || {};
+const sessionCookie = sessionConfig.cookie || {};
 app.use(session({
-    resave: true,
-    saveUninitialized: true,
+    name: sessionConfig.name || 'sid',
+    resave: !!sessionConfig.resave,
+    saveUninitialized: !!sessionConfig.saveUninitialized,
+    rolling: !!sessionConfig.rolling,
+    proxy: !!sessionConfig.proxy,
     secret: config.cryptoKey,
-    store: sessionStore
+    store: sessionStore,
+    cookie: {
+        httpOnly: sessionCookie.httpOnly !== false,
+        secure: !!sessionCookie.secure,
+        sameSite: sessionCookie.sameSite || 'lax',
+        maxAge: typeof sessionCookie.maxAgeMs === 'number' && sessionCookie.maxAgeMs > 0 ? sessionCookie.maxAgeMs : undefined
+    }
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(csrf({cookie: {signed: true}})); //kraken-js:lusca is already using csrf module
+const csrfConfig = config.csrf || {};
+const csrfCookie = csrfConfig.cookie || {};
+app.use(csrf({
+    ignoreMethods: Array.isArray(csrfConfig.ignoreMethods) ? csrfConfig.ignoreMethods : ['GET', 'HEAD', 'OPTIONS'],
+    cookie: {
+        signed: csrfCookie.signed !== false,
+        secure: !!csrfCookie.secure,
+        sameSite: csrfCookie.sameSite || 'lax'
+    }
+})); // kraken-js:lusca is already using csrf module
 
 // setup response locals
 require('./middlewares/locals')(app, passport);
