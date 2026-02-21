@@ -1,44 +1,69 @@
-// @ts-nocheck
 'use strict';
 
-exports = module.exports = function(req, res, options) {
-  /* options = {
-    from: String,
-    to: String,
-    cc: String,
-    bcc: String,
-    text: String,
-    textPath String,
-    html: String,
-    htmlPath: String,
-    attachments: [String],
-    success: Function,
-    error: Function
-  } */
+const asyncLib = require('async') as {
+  parallel: (
+    tasks: Array<(callback: (err: unknown, result: string | null) => void) => void>,
+    callback: (err: unknown, results: unknown) => void
+  ) => void;
+};
 
-  const renderText = function (callback) {
+interface MailOptions {
+  from: string;
+  to: string;
+  replyTo?: string;
+  cc?: string;
+  bcc?: string;
+  subject?: string;
+  text?: string;
+  textPath?: string;
+  html?: string;
+  htmlPath?: string;
+  locals?: Record<string, unknown>;
+  attachments?: Array<Record<string, unknown>>;
+  success: (message: unknown) => void;
+  error: (message: string) => void;
+}
+
+module.exports = function sendmail(
+  req: import('express').Request & { app: { config: { smtp: { credentials: unknown } } } },
+  res: import('express').Response,
+  options: MailOptions
+): void {
+  const renderText = function (callback: (err: unknown, result: string | null) => void) {
+    if (!options.textPath) {
+      callback(null, null);
+      return;
+    }
+
     res.render(options.textPath, options.locals, function (err, text) {
       if (err) {
         callback(err, null);
-      } else {
-        options.text = text;
-        return callback(null, 'done');
+        return;
       }
+
+      options.text = text;
+      callback(null, 'done');
     });
   };
 
-  const renderHtml = function (callback) {
+  const renderHtml = function (callback: (err: unknown, result: string | null) => void) {
+    if (!options.htmlPath) {
+      callback(null, null);
+      return;
+    }
+
     res.render(options.htmlPath, options.locals, function (err, html) {
       if (err) {
         callback(err, null);
-      } else {
-        options.html = html;
-        return callback(null, 'done');
+        return;
       }
+
+      options.html = html;
+      callback(null, 'done');
     });
   };
 
-  const renderers = [];
+  const renderers: Array<(callback: (err: unknown, result: string | null) => void) => void> = [];
   if (options.textPath) {
     renderers.push(renderText);
   }
@@ -46,29 +71,34 @@ exports = module.exports = function(req, res, options) {
     renderers.push(renderHtml);
   }
 
-  require('async').parallel(
-    renderers,
-    function(err, results){
-      if (err) {
-        options.error('Email template render failed. '+ err);
-        return;
-      }
+  asyncLib.parallel(renderers, function (err) {
+    if (err) {
+      options.error('Email template render failed. ' + String(err));
+      return;
+    }
 
-      const attachments = [];
+    const attachments: Array<Record<string, unknown>> = [];
+    if (options.html) {
+      attachments.push({ data: options.html, alternative: true });
+    }
 
-      if (options.html) {
-        attachments.push({ data: options.html, alternative: true });
-      }
+    if (options.attachments) {
+      options.attachments.forEach(function (attachment) {
+        attachments.push(attachment);
+      });
+    }
 
-      if (options.attachments) {
-        for (let i = 0 ; i < options.attachments.length ; i++) {
-          attachments.push(options.attachments[i]);
-        }
-      }
+    const emailjs = require('emailjs/email') as {
+      server: {
+        connect: (credentials: unknown) => {
+          send: (payload: Record<string, unknown>, callback: (sendError: unknown, message: unknown) => void) => void;
+        };
+      };
+    };
 
-      let emailjs = require('emailjs/email');
-      let emailer = emailjs.server.connect( req.app.config.smtp.credentials );
-      emailer.send({
+    const emailer = emailjs.server.connect(req.app.config.smtp.credentials);
+    emailer.send(
+      {
         from: options.from,
         to: options.to,
         'reply-to': options.replyTo || options.from,
@@ -76,15 +106,16 @@ exports = module.exports = function(req, res, options) {
         bcc: options.bcc,
         subject: options.subject,
         text: options.text,
-        attachment: attachments
-      }, function(err, message) {
-        if (err) {
-          options.error('Email failed to send. '+ err);
+        attachment: attachments,
+      },
+      function (sendError, message) {
+        if (sendError) {
+          options.error('Email failed to send. ' + String(sendError));
+          return;
         }
-        else {
-          options.success(message);
-        }
-      });
-    }
-  );
+
+        options.success(message);
+      }
+    );
+  });
 };

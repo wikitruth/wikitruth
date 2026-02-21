@@ -1,35 +1,50 @@
-// @ts-nocheck
 'use strict';
 
+// @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 let db = require('../app').db.models,
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   utils = require('./utils'),
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   constants = require('../models/constants'),
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   paths = require('../models/paths'),
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   applications = require('../models/applications'),
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   config = require('../config/config'),
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   url = require('url'),
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   querystring = require('querystring'),
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   htmlToText = require('html-to-text'),
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   moment = require('moment'),
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   async = require('async');
 
 let mn = ' 12:00 AM';
 
+// @ts-ignore TS(7006): Parameter 'isPrivate' implicitly has an 'any' type... Remove this comment to see the full error message
 function getBackupDir(isPrivate) {
   let backupRoot = isPrivate && config.mongodb.privateBackupRoot ? config.mongodb.privateBackupRoot : config.mongodb.backupRoot;
   if (backupRoot) {
     if (backupRoot.startsWith('~')) {
+      // @ts-ignore TS(2304): Cannot find name '__dirname'.
       return __dirname + '/..' + backupRoot.substring(1);
     }
     return backupRoot;
   }
+  // @ts-ignore TS(2304): Cannot find name '__dirname'.
   return __dirname + '/../config/mongodb' + (isPrivate ? '/users' : '');
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 function isEntryOwner(req, item) {
   return item && item.createUserId && req.user && req.user.id && item.createUserId.equals(req.user.id);
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 function appendOwnerFlag(req, item, model) {
   if (isEntryOwner(req, item)) {
     if (!model) {
@@ -39,10 +54,12 @@ function appendOwnerFlag(req, item, model) {
   }
 }
 
+// @ts-ignore TS(7006): Parameter 'entry' implicitly has an 'any' type.
 function isCategoryTopic(entry) {
   return entry.tags.indexOf(constants.TOPIC_TAGS.tag510.code) > -1;
 }
 
+// @ts-ignore TS(7006): Parameter 'item' implicitly has an 'any' type.
 function appendListExtras(item, objectType, shortTitleLength) {
   if (!item) return;
   if (item.title) {
@@ -62,6 +79,7 @@ function appendListExtras(item, objectType, shortTitleLength) {
   }
 }
 
+// @ts-ignore TS(7006): Parameter 'item' implicitly has an 'any' type.
 function appendEntryExtras(item, objectType, req, shortTitleLength) {
   if (!item) return;
   appendListExtras(item, objectType, shortTitleLength);
@@ -86,6 +104,7 @@ function appendEntryExtras(item, objectType, req, shortTitleLength) {
     }
   }
   if (item.childrenCount) {
+    // @ts-ignore TS(7006): Parameter 'objectName' implicitly has an 'any' typ... Remove this comment to see the full error message
     let hasChildren = function(objectName) {
       return item.childrenCount[objectName] && item.childrenCount[objectName].accepted > 0;
     };
@@ -100,6 +119,7 @@ function appendEntryExtras(item, objectType, req, shortTitleLength) {
   }
 
   if (req) {
+    // @ts-ignore TS(2554): Expected 3 arguments, but got 2.
     appendOwnerFlag(req, item);
   }
 }
@@ -108,42 +128,54 @@ function appendEntryExtras(item, objectType, req, shortTitleLength) {
     items: items to which to set the parents
     typeId: the typeId of the items
  */
+// @ts-ignore TS(7006): Parameter 'items' implicitly has an 'any' type.
 async function setEntryParents(items, typeId) {
   if (!items || items.length === 0) {
     return;
   }
 
+  // @ts-ignore TS(7034): Variable 'topicIds' implicitly has type 'any[]' in... Remove this comment to see the full error message
   let topicIds = [], topicLinkIds = [], argumentIds = [], argumentLinkIds = [], artifactIds = [], questionIds = [],
+    // @ts-ignore TS(7034): Variable 'answerIds' implicitly has type 'any[]' i... Remove this comment to see the full error message
     answerIds = [], issueIds = [], opinionIds = [];
   let topics = {}, topicLinks = {}, args = {}, argumentLinks = {}, artifacts = {}, questions = {}, answers = {},
     issues = {}, opinions = {};
   switch (typeId) {
     case constants.OBJECT_TYPES.topic:
+      // @ts-ignore TS(7006): Parameter 'item' implicitly has an 'any' type.
       items.forEach(function(item) {
+        // @ts-ignore TS(7005): Variable 'topicIds' implicitly has an 'any[]' type... Remove this comment to see the full error message
         if (item.parentId && !topicIds[item.parentId.valueOf()]) {
           topicIds.push(item.parentId.valueOf());
         }
       });
       break;
     case constants.OBJECT_TYPES.argument:
+      // @ts-ignore TS(7006): Parameter 'item' implicitly has an 'any' type.
       items.forEach(function(item) {
+        // @ts-ignore TS(7005): Variable 'argumentIds' implicitly has an 'any[]' t... Remove this comment to see the full error message
         if (item.parentId && !argumentIds[item.parentId.valueOf()]) {
           argumentIds.push(item.parentId.valueOf());
+        // @ts-ignore TS(7005): Variable 'topicIds' implicitly has an 'any[]' type... Remove this comment to see the full error message
         } else if (!topicIds[item.ownerId.valueOf()]) {
           topicIds.push(item.ownerId.valueOf());
         }
       });
       break;
     case constants.OBJECT_TYPES.artifact:
+      // @ts-ignore TS(7006): Parameter 'item' implicitly has an 'any' type.
       items.forEach(function(item) {
+        // @ts-ignore TS(7005): Variable 'artifactIds' implicitly has an 'any[]' t... Remove this comment to see the full error message
         if (item.parentId && !artifactIds[item.parentId.valueOf()]) {
           artifactIds.push(item.parentId.valueOf());
+        // @ts-ignore TS(7005): Variable 'topicIds' implicitly has an 'any[]' type... Remove this comment to see the full error message
         } else if (!topicIds[item.ownerId.valueOf()]) {
           topicIds.push(item.ownerId.valueOf());
         }
       });
       break;
     case constants.OBJECT_TYPES.answer:
+      // @ts-ignore TS(7006): Parameter 'item' implicitly has an 'any' type.
       items.forEach(function(item) {
         questionIds.push(item.questionId.valueOf());
       });
@@ -151,6 +183,7 @@ async function setEntryParents(items, typeId) {
     case constants.OBJECT_TYPES.question:
     case constants.OBJECT_TYPES.issue:
     case constants.OBJECT_TYPES.opinion:
+      // @ts-ignore TS(7006): Parameter 'item' implicitly has an 'any' type.
       items.forEach(function(item) {
         switch (item.ownerType) {
           case constants.OBJECT_TYPES.topic:
@@ -189,10 +222,14 @@ async function setEntryParents(items, typeId) {
     topics: async function() {
       if (topicIds.length > 0) {
         let results = await db.Topic
+          // @ts-ignore TS(7005): Variable 'topicIds' implicitly has an 'any[]' type... Remove this comment to see the full error message
           .find({ _id: { $in: topicIds } })
           .exec();
+        // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
         results.forEach(function(result) {
+          // @ts-ignore TS(2554): Expected 3 arguments, but got 1.
           appendListExtras(result);
+          // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
           topics[result._id.valueOf()] = result;
         });
       }
@@ -200,35 +237,49 @@ async function setEntryParents(items, typeId) {
     topicLinks: async function() {
       if (topicLinkIds.length > 0) {
         let linkResults = await db.TopicLink
+          // @ts-ignore TS(7005): Variable 'topicLinkIds' implicitly has an 'any[]' ... Remove this comment to see the full error message
           .find({ _id: { $in: topicLinkIds } })
           .exec();
+        // @ts-ignore TS(7034): Variable 'topicIds2' implicitly has type 'any[]' i... Remove this comment to see the full error message
         let topicIds2 = [], topics2 = {};
+        // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
         linkResults.forEach(function(result) {
           topicIds2.push(result.topicId.valueOf());
         });
 
         let topicResults = await db.Topic
+          // @ts-ignore TS(7005): Variable 'topicIds2' implicitly has an 'any[]' typ... Remove this comment to see the full error message
           .find({ _id: { $in: topicIds2 } })
           .exec();
+        // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
         topicResults.forEach(function(result) {
+          // @ts-ignore TS(2554): Expected 3 arguments, but got 1.
           appendListExtras(result);
+          // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
           topics2[result._id.valueOf()] = result;
         });
+        // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
         linkResults.forEach(function(result) {
+          // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
           result.topic = topics2[result.topicId.valueOf()];
           result.title2 = result.title ? result.title : result.topic.title;
+          // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
           topicLinks[result._id.valueOf()] = result;
         });
       }
     },
     arguments: async function() {
       if (argumentIds.length > 0) {
+        // @ts-ignore TS(7005): Variable 'argumentIds' implicitly has an 'any[]' t... Remove this comment to see the full error message
         let query = { _id: { $in: argumentIds } };
         let results = await db.Argument
           .find(query)
           .exec();
+        // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
         results.forEach(function(result) {
+          // @ts-ignore TS(2554): Expected 3 arguments, but got 1.
           appendListExtras(result);
+          // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
           args[result._id.valueOf()] = result;
         });
       }
@@ -236,89 +287,119 @@ async function setEntryParents(items, typeId) {
     argumentLinks: async function() {
       if (argumentLinkIds.length > 0) {
         let results = await db.ArgumentLink
+          // @ts-ignore TS(7005): Variable 'argumentLinkIds' implicitly has an 'any[... Remove this comment to see the full error message
           .find({ _id: { $in: argumentLinkIds } })
           .exec();
 
+        // @ts-ignore TS(7034): Variable 'argumentIds2' implicitly has type 'any[]... Remove this comment to see the full error message
         let argumentIds2 = [], arguments2 = {};
+        // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
         results.forEach(function(result) {
           argumentIds2.push(result.argumentId.valueOf());
         });
 
         let results2 = await db.Argument
+          // @ts-ignore TS(7005): Variable 'argumentIds2' implicitly has an 'any[]' ... Remove this comment to see the full error message
           .find({ _id: { $in: argumentIds2 } })
           .exec();
+        // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
         results2.forEach(function(result) {
+          // @ts-ignore TS(2554): Expected 3 arguments, but got 1.
           appendListExtras(result);
+          // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
           arguments2[result._id.valueOf()] = result;
         });
+        // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
         results.forEach(function(result) {
+          // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
           result.argument = arguments2[result.argumentId.valueOf()];
           result.title2 = result.title ? result.title : result.argument.title;
+          // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
           argumentLinks[result._id.valueOf()] = result;
         });
       }
     },
     questions: async function() {
       if (questionIds.length > 0) {
+        // @ts-ignore TS(7005): Variable 'questionIds' implicitly has an 'any[]' t... Remove this comment to see the full error message
         let query = { _id: { $in: questionIds } };
         let results = await db.Question
           .find(query)
           .exec();
 
+        // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
         results.forEach(function(result) {
+          // @ts-ignore TS(2554): Expected 3 arguments, but got 1.
           appendListExtras(result);
+          // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
           questions[result._id.valueOf()] = result;
         });
       }
     },
     answers: async function() {
       if (answerIds.length > 0) {
+        // @ts-ignore TS(7005): Variable 'answerIds' implicitly has an 'any[]' typ... Remove this comment to see the full error message
         let query = { _id: { $in: answerIds } };
         let results = await db.Answer
           .find(query)
           .exec();
 
+        // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
         results.forEach(function(result) {
+          // @ts-ignore TS(2554): Expected 3 arguments, but got 1.
           appendListExtras(result);
+          // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
           answers[result._id.valueOf()] = result;
         });
       }
     },
     artifacts: async function() {
       if (artifactIds.length > 0) {
+        // @ts-ignore TS(7005): Variable 'artifactIds' implicitly has an 'any[]' t... Remove this comment to see the full error message
         let query = { _id: { $in: artifactIds } };
         let results = await db.Artifact
           .find(query)
           .exec();
 
+        // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
         results.forEach(function(result) {
+          // @ts-ignore TS(2554): Expected 3 arguments, but got 1.
           appendListExtras(result);
+          // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
           artifacts[result._id.valueOf()] = result;
         });
       }
     },
     issues: async function() {
       if (issueIds.length > 0) {
+        // @ts-ignore TS(7005): Variable 'issueIds' implicitly has an 'any[]' type... Remove this comment to see the full error message
         let query = { _id: { $in: issueIds } };
         let results = await db.Issue
           .find(query)
           .exec();
 
+        // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
         results.forEach(function(result) {
+          // @ts-ignore TS(2554): Expected 3 arguments, but got 1.
           appendListExtras(result);
+          // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
           issues[result._id.valueOf()] = result;
         });
       }
     },
     opinions: async function() {
       if (opinionIds.length > 0) {
+        // @ts-ignore TS(7005): Variable 'opinionIds' implicitly has an 'any[]' ty... Remove this comment to see the full error message
         let query = { _id: { $in: opinionIds } };
         let results = await db.Opinion
           .find(query)
           .exec();
 
+        // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
         results.forEach(function(result) {
+          // @ts-ignore TS(2554): Expected 3 arguments, but got 1.
           appendListExtras(result);
+          // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
           opinions[result._id.valueOf()] = result;
         });
       }
@@ -327,23 +408,30 @@ async function setEntryParents(items, typeId) {
 
   switch (typeId) {
     case constants.OBJECT_TYPES.topic:
+      // @ts-ignore TS(7006): Parameter 'item' implicitly has an 'any' type.
       items.forEach(function(item) {
         if (item.parentId) {
+          // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
           item.parentTopic = topics[item.parentId.valueOf()];
         }
       });
       break;
     case constants.OBJECT_TYPES.argument:
+      // @ts-ignore TS(7006): Parameter 'item' implicitly has an 'any' type.
       items.forEach(function(item) {
         if (item.parentId) {
+          // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
           item.parentArgument = args[item.parentId.valueOf()];
         } else {
+          // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
           item.parentTopic = topics[item.ownerId.valueOf()];
         }
       });
       break;
     case constants.OBJECT_TYPES.answer:
+      // @ts-ignore TS(7006): Parameter 'item' implicitly has an 'any' type.
       items.forEach(function(item) {
+        // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
         item.parentQuestion = questions[item.questionId.valueOf()];
       });
       break;
@@ -351,33 +439,43 @@ async function setEntryParents(items, typeId) {
     case constants.OBJECT_TYPES.artifact:
     case constants.OBJECT_TYPES.issue:
     case constants.OBJECT_TYPES.opinion:
+      // @ts-ignore TS(7006): Parameter 'item' implicitly has an 'any' type.
       items.forEach(function(item) {
         switch (item.ownerType) {
           case constants.OBJECT_TYPES.topic:
+            // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
             item.parentTopic = topics[item.ownerId.valueOf()];
             break;
           case constants.OBJECT_TYPES.topicLink:
+            // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
             item.parentTopicLink = topicLinks[item.ownerId.valueOf()];
             break;
           case constants.OBJECT_TYPES.argument:
+            // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
             item.parentArgument = args[item.ownerId.valueOf()];
             break;
           case constants.OBJECT_TYPES.argumentLink:
+            // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
             item.parentArgumentLink = argumentLinks[item.ownerId.valueOf()];
             break;
           case constants.OBJECT_TYPES.artifact:
+            // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
             item.parentArtifact = artifacts[item.ownerId.valueOf()];
             break;
           case constants.OBJECT_TYPES.question:
+            // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
             item.parentQuestion = questions[item.ownerId.valueOf()];
             break;
           case constants.OBJECT_TYPES.answer:
+            // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
             item.parentAnswer = answers[item.ownerId.valueOf()];
             break;
           case constants.OBJECT_TYPES.issue:
+            // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
             item.parentIssue = issues[item.ownerId.valueOf()];
             break;
           case constants.OBJECT_TYPES.opinion:
+            // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
             item.parentOpinion = opinions[item.ownerId.valueOf()];
             break;
         }
@@ -386,18 +484,23 @@ async function setEntryParents(items, typeId) {
   }
 }
 
+// @ts-ignore TS(7006): Parameter 'items' implicitly has an 'any' type.
 async function setEditorsUsername(items) {
   if (items && items.length > 0) {
     let seen = {};
     let userIds = items
+      // @ts-ignore TS(7006): Parameter 'item' implicitly has an 'any' type.
       .filter(function(item) {
         let id = item.editUserId ? item.editUserId.valueOf() : null;
+        // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
         if (!id || seen[id]) {
           return;
         }
+        // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
         seen[id] = true;
         return item;
         //return !!item.editUserId;
+      // @ts-ignore TS(7006): Parameter 'item' implicitly has an 'any' type.
       }).map(function(item) {
           return item.editUserId;
         },
@@ -413,17 +516,22 @@ async function setEditorsUsername(items) {
       .find(query, { username: 1 })
       .exec();
     let userNames = {};
+    // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
     results.forEach(function(result) {
+      // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
       userNames[result._id.valueOf()] = result.username;
     });
+    // @ts-ignore TS(7006): Parameter 'item' implicitly has an 'any' type.
     items.forEach(function(item) {
       if (item.editUserId) {
+        // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
         item.editUsername = userNames[item.editUserId.valueOf()];
       }
     });
   }
 }
 
+// @ts-ignore TS(7006): Parameter 'item' implicitly has an 'any' type.
 async function setCreateUsername(item) {
   let user = await db.User.findOne({ _id: item.createUserId });
   if (user) {
@@ -431,6 +539,7 @@ async function setCreateUsername(item) {
   }
 }
 
+// @ts-ignore TS(7006): Parameter 'item' implicitly has an 'any' type.
 async function setEditUsername(item) {
   let user = await db.User.findOne({ _id: item.editUserId });
   if (user) {
@@ -438,6 +547,7 @@ async function setEditUsername(item) {
   }
 }
 
+// @ts-ignore TS(7006): Parameter 'item' implicitly has an 'any' type.
 async function setUsername(item) {
   await setCreateUsername(item);
   if (item.createUserId === item.editUserId) {
@@ -447,10 +557,12 @@ async function setUsername(item) {
   }
 }
 
+// @ts-ignore TS(7006): Parameter 'group' implicitly has an 'any' type.
 function buildGroupUrl(group) {
   return paths.groups.index + '/' + group.friendlyUrl + '/' + group._id;
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 async function setGroupModel(req, model) {
   if (req.query.group) {
     let result = await db.Group.findOne({ _id: req.query.group });
@@ -459,11 +571,13 @@ async function setGroupModel(req, model) {
   }
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 async function setArtifactModel(req, model) {
   if (req.query.artifact) {
     let result = await db.Artifact.findOne({ _id: req.query.artifact });
     model.artifact = result;
     result.setThumbnailPath(req.params.username);
+    // @ts-ignore TS(2554): Expected 4 arguments, but got 1.
     appendEntryExtras(result);
     if (isEntryOwner(req, result)) {
       model.isArtifactOwner = true;
@@ -472,10 +586,12 @@ async function setArtifactModel(req, model) {
   }
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 async function setQuestionModel(req, model) {
   if (req.query.question) {
     let result = await db.Question.findOne({ _id: req.query.question });
     model.question = result;
+    // @ts-ignore TS(2554): Expected 4 arguments, but got 1.
     appendEntryExtras(result);
     if (isEntryOwner(req, result)) {
       model.isQuestionOwner = true;
@@ -484,10 +600,12 @@ async function setQuestionModel(req, model) {
   }
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 async function setAnswerModel(req, model) {
   if (req.query.answer) {
     let result = await db.Answer.findOne({ _id: req.query.answer });
     model.answer = result;
+    // @ts-ignore TS(2554): Expected 4 arguments, but got 1.
     appendEntryExtras(result);
     if (isEntryOwner(req, result)) {
       model.isAnswerOwner = true;
@@ -496,10 +614,12 @@ async function setAnswerModel(req, model) {
   }
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 async function setIssueModel(req, model) {
   if (req.query.issue) {
     let result = await db.Issue.findOne({ _id: req.query.issue });
     model.issue = result;
+    // @ts-ignore TS(2554): Expected 4 arguments, but got 1.
     appendEntryExtras(result);
     if (isEntryOwner(req, result)) {
       model.isIssueOwner = true;
@@ -508,6 +628,7 @@ async function setIssueModel(req, model) {
   }
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 async function setOpinionModel(req, model) {
   if (req.query.opinion) {
     await async.series({
@@ -521,6 +642,7 @@ async function setOpinionModel(req, model) {
         } else {
           model.opinion = result;
         }
+        // @ts-ignore TS(2554): Expected 4 arguments, but got 1.
         appendEntryExtras(result);
         if (isEntryOwner(req, result)) {
           if (model.opinion2) {
@@ -536,6 +658,7 @@ async function setOpinionModel(req, model) {
         if (opinion && opinion.parentId) {
           let result = await db.Opinion.findOne({ _id: opinion.parentId });
           if (result) {
+            // @ts-ignore TS(2554): Expected 4 arguments, but got 1.
             appendEntryExtras(result);
             if (model.opinion2) {
               model.parentOpinion2 = result;
@@ -550,6 +673,7 @@ async function setOpinionModel(req, model) {
         if (parentOpinion && parentOpinion.parentId) {
           let result = await db.Opinion.findOne({ _id: parentOpinion.parentId });
           if (result) {
+            // @ts-ignore TS(2554): Expected 4 arguments, but got 1.
             appendEntryExtras(result);
             if (model.opinion2) {
               model.grandParentOpinion2 = result;
@@ -563,12 +687,14 @@ async function setOpinionModel(req, model) {
   }
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 async function setArgumentLinkModel(req, model) {
   if (req.query.argumentLink) {
     await async.series({
       argumentLink: async function() {
         let result = await db.ArgumentLink.findOne({ _id: req.query.argumentLink });
         model.argumentLink = result;
+        // @ts-ignore TS(2554): Expected 4 arguments, but got 1.
         appendEntryExtras(result);
         if (isEntryOwner(req, result)) {
           model.isArgumentLinkOwner = true;
@@ -579,6 +705,7 @@ async function setArgumentLinkModel(req, model) {
         if (model.argumentLink) {
           let result = await db.Argument.findOne({ _id: model.argumentLink.argumentId });
           if (result) {
+            // @ts-ignore TS(2554): Expected 4 arguments, but got 1.
             appendEntryExtras(result);
             model.argumentLink.argument = result;
             model.argumentLink.references = result.references;
@@ -591,6 +718,7 @@ async function setArgumentLinkModel(req, model) {
   }
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 async function setArgumentModels(req, model) {
   if (req.query.argument) {
     await async.series({
@@ -600,6 +728,7 @@ async function setArgumentModels(req, model) {
           return;
         }
         model.argument = result;
+        // @ts-ignore TS(2554): Expected 4 arguments, but got 1.
         appendEntryExtras(result);
         if (isEntryOwner(req, result)) {
           model.isArgumentOwner = true;
@@ -610,6 +739,7 @@ async function setArgumentModels(req, model) {
         if (model.argument && model.argument.parentId) {
           let result = await db.Argument.findOne({ _id: model.argument.parentId });
           if (result) {
+            // @ts-ignore TS(2554): Expected 4 arguments, but got 1.
             appendEntryExtras(result);
             model.parentArgument = result;
           }
@@ -619,6 +749,7 @@ async function setArgumentModels(req, model) {
         if (model.parentArgument && model.parentArgument.parentId) {
           let result = await db.Argument.findOne({ _id: model.parentArgument.parentId });
           if (result) {
+            // @ts-ignore TS(2554): Expected 4 arguments, but got 1.
             appendEntryExtras(result);
             model.grandParentArgument = result;
           }
@@ -628,6 +759,7 @@ async function setArgumentModels(req, model) {
   }
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 async function setTopicLinkModel(req, model) {
   if (req.query.topicLink) {
     await async.series({
@@ -648,7 +780,9 @@ async function setTopicLinkModel(req, model) {
             model.topicLink.referenceDate = result.referenceDate;
             model.topicLink.title2 = model.topicLink.title ? model.topicLink.title : result.title;
             model.topicLink.content2 = result.content;
+            // @ts-ignore TS(2554): Expected 4 arguments, but got 1.
             appendEntryExtras(result);
+            // @ts-ignore TS(2554): Expected 4 arguments, but got 1.
             appendEntryExtras(model.topicLink);
           }
         }
@@ -657,12 +791,15 @@ async function setTopicLinkModel(req, model) {
   }
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 async function setTopicModels(req, model) {
   let query = { _id: model.argument ? model.argument.ownerId : req.query.topic ? req.query.topic : null };
   if (!query._id && req.query.friendlyUrl) {
     delete query._id;
+    // @ts-ignore TS(2339): Property 'friendlyUrl' does not exist on type '{ _... Remove this comment to see the full error message
     query.friendlyUrl = req.query.friendlyUrl;
   }
+  // @ts-ignore TS(2339): Property 'friendlyUrl' does not exist on type '{ _... Remove this comment to see the full error message
   if (query._id || query.friendlyUrl) {
     await async.series({
       topic: async function() {
@@ -671,6 +808,7 @@ async function setTopicModels(req, model) {
           return;
         }
         model.topic = result;
+        // @ts-ignore TS(2554): Expected 4 arguments, but got 1.
         appendEntryExtras(result);
         if (isEntryOwner(req, result)) {
           model.isTopicOwner = true;
@@ -693,7 +831,9 @@ async function setTopicModels(req, model) {
             model.topicChildrenMore = true;
           }
           await setEditorsUsername(results);
+          // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
           results.forEach(function(result) {
+            // @ts-ignore TS(2554): Expected 4 arguments, but got 3.
             appendEntryExtras(result, constants.OBJECT_TYPES.topic, req);
           });
           model.topicChildren = results;
@@ -702,6 +842,7 @@ async function setTopicModels(req, model) {
       topicSiblings: async function() {
         if (model.topic) {
           query = {
+            // @ts-ignore TS(2322): Type '{ parentId: any; _id: { $ne: any; }; private... Remove this comment to see the full error message
             parentId: model.topic.parentId,
             _id: { $ne: model.topic._id },
             private: model.topic.private,
@@ -709,6 +850,7 @@ async function setTopicModels(req, model) {
             'screening.status': constants.SCREENING_STATUS.status1.code,
           };
           if (!model.topic.parentId && model.topic.private) {
+            // @ts-ignore TS(2339): Property 'createUserId' does not exist on type '{ ... Remove this comment to see the full error message
             query.createUserId = model.topic.createUserId;
           }
           let results = await db.Topic
@@ -721,7 +863,9 @@ async function setTopicModels(req, model) {
             model.topicSiblingsMore = true;
           }
           await setEditorsUsername(results);
+          // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
           results.forEach(function(result) {
+            // @ts-ignore TS(2554): Expected 4 arguments, but got 3.
             appendEntryExtras(result, constants.OBJECT_TYPES.topic, req);
           });
           model.topicSiblings = results;
@@ -731,6 +875,7 @@ async function setTopicModels(req, model) {
         if (model.topic && model.topic.parentId) {
           let result = await db.Topic.findOne({ _id: model.topic.parentId }).exec();
           if (result) {
+            // @ts-ignore TS(2554): Expected 4 arguments, but got 1.
             appendEntryExtras(result);
             model.parentTopic = result;
           }
@@ -739,6 +884,7 @@ async function setTopicModels(req, model) {
       parentSiblings: async function() {
         if (model.parentTopic) {
           query = {
+            // @ts-ignore TS(2322): Type '{ parentId: any; _id: { $ne: any; }; private... Remove this comment to see the full error message
             parentId: model.parentTopic.parentId,
             _id: { $ne: model.parentTopic._id },
             private: model.parentTopic.private,
@@ -746,6 +892,7 @@ async function setTopicModels(req, model) {
             'screening.status': constants.SCREENING_STATUS.status1.code,
           };
           if (!model.parentTopic.parentId && model.parentTopic.private) {
+            // @ts-ignore TS(2339): Property 'createUserId' does not exist on type '{ ... Remove this comment to see the full error message
             query.createUserId = model.parentTopic.createUserId;
           }
           let results = await db.Topic
@@ -758,7 +905,9 @@ async function setTopicModels(req, model) {
             model.parentSiblingsMore = true;
           }
           await setEditorsUsername(results);
+          // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
           results.forEach(function(result) {
+            // @ts-ignore TS(2554): Expected 4 arguments, but got 3.
             appendEntryExtras(result, constants.OBJECT_TYPES.topic, req);
           });
           model.parentSiblings = results;
@@ -768,6 +917,7 @@ async function setTopicModels(req, model) {
         if (model.parentTopic && model.parentTopic.parentId) {
           let result = await db.Topic.findOne({ _id: model.parentTopic.parentId });
           if (result) {
+            // @ts-ignore TS(2554): Expected 4 arguments, but got 1.
             appendEntryExtras(result);
             model.grandParentTopic = result;
           }
@@ -784,6 +934,7 @@ async function setTopicModels(req, model) {
  * @param model
  * @returns void
  */
+// @ts-ignore TS(7006): Parameter 'query' implicitly has an 'any' type.
 async function setEntryModels(query, req, model) {
   if (!query.ownerType || query.ownerType === -1) { // if the query or entry does not follow owner id/type concept.
     return;
@@ -833,6 +984,7 @@ async function setEntryModels(query, req, model) {
   }
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 function setupClipboard(req, type) {
   let clipboard = req.session.clipboard;
   if (!clipboard) {
@@ -846,6 +998,7 @@ function setupClipboard(req, type) {
   return clipboard;
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 function getClipboard(req) {
   const clipboard = req.session.clipboard;
   if (clipboard && !clipboard['object' + constants.OBJECT_TYPES.artifact]) {
@@ -854,6 +1007,7 @@ function getClipboard(req) {
   return clipboard;
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 function setClipboardModel(req, model, entryType) {
   model.clipboard = {};
   const clipboard = getClipboard(req);
@@ -908,7 +1062,9 @@ function setClipboardModel(req, model, entryType) {
   }
 }
 
+// @ts-ignore TS(7006): Parameter 'query' implicitly has an 'any' type.
 async function getTopics(query, options) {
+  // @ts-ignore TS(7034): Variable 'children' implicitly has type 'any[]' in... Remove this comment to see the full error message
   let children = [], topicLinks = [];
   //limit, shortTitleLength, req
   if (!options) options = {};
@@ -921,6 +1077,7 @@ async function getTopics(query, options) {
         .lean();
 
       await setEditorsUsername(results);
+      // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
       results.forEach(function(result) {
         appendEntryExtras(result, constants.OBJECT_TYPES.topic, options.req, options.shortTitleLength);
       });
@@ -936,6 +1093,7 @@ async function getTopics(query, options) {
         .lean();
 
       if (links.length > 0) {
+        // @ts-ignore TS(7006): Parameter 'link' implicitly has an 'any' type.
         const ids = links.map(function(link) {
           return link.topicId;
         });
@@ -948,8 +1106,10 @@ async function getTopics(query, options) {
           .lean();
         if (results.length > 0) {
           // Get parents for rendering the subtitle
+          // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
           const parentIds = results.filter(function(result) {
             return !!result.parentId;
+          // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
           }).map(function(result) {
             return result.parentId;
           });
@@ -959,18 +1119,23 @@ async function getTopics(query, options) {
             .find(query)
             .lean();
           await setEditorsUsername(results);
+          // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
           results.forEach(function(result) {
             appendEntryExtras(result, constants.OBJECT_TYPES.topic, options.req, options.shortTitleLength);
+            // @ts-ignore TS(7006): Parameter 'link' implicitly has an 'any' type.
             const link = links.find(function(link) {
               return link.topicId.equals(result._id);
             });
             if (link) {
+              // @ts-ignore TS(7006): Parameter 'linkParent' implicitly has an 'any' typ... Remove this comment to see the full error message
               const linkParent = linkParents.find(function(linkParent) {
                 return linkParent._id.equals(result.parentId);
               });
               if (linkParent) {
+                // @ts-ignore TS(2554): Expected 3 arguments, but got 4.
                 appendListExtras(linkParent, constants.OBJECT_TYPES.topic, options.req, options.shortTitleLength);
               }
+              // @ts-ignore TS(2554): Expected 3 arguments, but got 4.
               appendListExtras(link, constants.OBJECT_TYPES.topicLink, options.req, options.shortTitleLength);
               result.parentTopic = linkParent;
               result.link = link;
@@ -981,10 +1146,13 @@ async function getTopics(query, options) {
       }
     },
   });
+  // @ts-ignore TS(7005): Variable 'children' implicitly has an 'any[]' type... Remove this comment to see the full error message
   return children.concat(topicLinks).sort(utils.titleCompare);
 }
 
+// @ts-ignore TS(7006): Parameter 'query' implicitly has an 'any' type.
 async function getArguments(query, options) {
+  // @ts-ignore TS(7034): Variable 'children' implicitly has type 'any[]' in... Remove this comment to see the full error message
   let children = [], argumentLinks = [];
   if (!options) options = {};
   await async.series({
@@ -995,6 +1163,7 @@ async function getArguments(query, options) {
         .sort({ title: 1 })
         .lean();
       await setEditorsUsername(results);
+      // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
       results.forEach(function(result) {
         appendEntryExtras(result, constants.OBJECT_TYPES.argument, options.req, options.shortTitleLength);
         //result.against = false;
@@ -1010,6 +1179,7 @@ async function getArguments(query, options) {
         .lean();
 
       if (links.length > 0) {
+        // @ts-ignore TS(7006): Parameter 'link' implicitly has an 'any' type.
         const ids = links.map(function(link) {
           return link.argumentId;
         });
@@ -1024,7 +1194,9 @@ async function getArguments(query, options) {
           const linkParents = await async.parallel({
             parentTopics: async () => {
               const topicIds = results
+                // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
                 .filter(result => !result.parentId && result.ownerId)
+                // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
                 .map(result => result.ownerId);
               // get the topics of actual arguments
               return await db.Topic
@@ -1033,7 +1205,9 @@ async function getArguments(query, options) {
             },
             parentArguments: async () => {
               const parentIds = results
+                // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
                 .filter(result => !!result.parentId)
+                // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
                 .map(result => result.parentId);
               query = { _id: { $in: parentIds } };
               return await db.Argument
@@ -1042,6 +1216,7 @@ async function getArguments(query, options) {
             },
           });
           await setEditorsUsername(results);
+          // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
           results.forEach(result => {
             appendEntryExtras(
               result,
@@ -1049,17 +1224,21 @@ async function getArguments(query, options) {
               options.req,
               options.shortTitleLength
             );
+            // @ts-ignore TS(7006): Parameter 'link' implicitly has an 'any' type.
             const link = links.find(link => link.argumentId.equals(result._id));
             if (link) {
               if (result.parentId) {
+                // @ts-ignore TS(7006): Parameter 'linkParent' implicitly has an 'any' typ... Remove this comment to see the full error message
                 const parentArgument = linkParents.parentArguments.find(linkParent =>
                   linkParent._id.equals(result.parentId)
                 );
                 if (parentArgument) {
+                  // @ts-ignore TS(2554): Expected 3 arguments, but got 1.
                   appendListExtras(parentArgument);
                 }
                 result.parentArgument = parentArgument;
               } else if (result.ownerType === constants.OBJECT_TYPES.topic && result.ownerId) {
+                // @ts-ignore TS(7006): Parameter 'linkParent' implicitly has an 'any' typ... Remove this comment to see the full error message
                 const linkParent = linkParents.parentTopics.find(linkParent =>
                   linkParent._id.equals(result.ownerId)
                 );
@@ -1068,6 +1247,7 @@ async function getArguments(query, options) {
                     linkParent,
                     constants.OBJECT_TYPES.argument,
                     options.req,
+                    // @ts-ignore TS(2554): Expected 3 arguments, but got 4.
                     options.shortTitleLength
                   );
                 }
@@ -1088,21 +1268,26 @@ async function getArguments(query, options) {
       }
     },
   });
+  // @ts-ignore TS(7005): Variable 'children' implicitly has an 'any[]' type... Remove this comment to see the full error message
   return children.concat(argumentLinks).sort(utils.titleCompare);
 }
 
+// @ts-ignore TS(7006): Parameter 'query' implicitly has an 'any' type.
 async function getTopQuestions(query, model, req) {
   let results = await db.Question
     .find(query)
     .limit(15)
     .lean();
   await setEditorsUsername(results);
+  // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
   results.forEach(result => {
+    // @ts-ignore TS(2554): Expected 4 arguments, but got 3.
     appendEntryExtras(result, constants.OBJECT_TYPES.question, req);
   });
   model.questions = results;
 }
 
+// @ts-ignore TS(7006): Parameter 'query' implicitly has an 'any' type.
 async function getTopArtifacts(query, model, req) {
   let results = await db.Artifact
     .find(query)
@@ -1110,13 +1295,16 @@ async function getTopArtifacts(query, model, req) {
     //.lean()
     .sort({ title: 1 });
   await setEditorsUsername(results);
+  // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
   results.forEach(result => {
     result.setThumbnailPath(req.params.username);
+    // @ts-ignore TS(2554): Expected 4 arguments, but got 3.
     appendEntryExtras(result, constants.OBJECT_TYPES.artifact, req);
   });
   model.artifacts = results;
 }
 
+// @ts-ignore TS(7006): Parameter 'query' implicitly has an 'any' type.
 async function getTopIssues(query, model, req) {
   let results = await db.Issue
     .find(query)
@@ -1124,13 +1312,16 @@ async function getTopIssues(query, model, req) {
     .lean()
     .sort({ title: 1 });
   await setEditorsUsername(results);
+  // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
   results.forEach(result => {
     result.issueType = constants.ISSUE_TYPES['type' + result.issueType];
+    // @ts-ignore TS(2554): Expected 4 arguments, but got 3.
     appendEntryExtras(result, constants.OBJECT_TYPES.issue, req);
   });
   model.issues = results;
 }
 
+// @ts-ignore TS(7006): Parameter 'query' implicitly has an 'any' type.
 async function getTopOpinions(query, model, req) {
   let results = await db.Opinion
     .find(query)
@@ -1138,7 +1329,9 @@ async function getTopOpinions(query, model, req) {
     .sort({ title: 1 })
     .lean();
   await setEditorsUsername(results);
+  // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
   results.forEach(result => {
+    // @ts-ignore TS(2554): Expected 4 arguments, but got 3.
     appendEntryExtras(result, constants.OBJECT_TYPES.opinion, req);
   });
   model.opinions = results;
@@ -1150,12 +1343,14 @@ async function getTopOpinions(query, model, req) {
  * @param entryType: parent entryType
  * @param specificEntryType: specific child entries to update
  */
+// @ts-ignore TS(7006): Parameter 'entryId' implicitly has an 'any' type.
 async function updateChildrenCount(entryId, entryType, specificEntryType) {
   let countNode = {};
   let model = {}, req = {};
 
   const updateTopics = async function() {
     if (!specificEntryType || specificEntryType === constants.OBJECT_TYPES.topic) {
+      // @ts-ignore TS(2339): Property 'childrenCount' does not exist on type '{... Remove this comment to see the full error message
       const topics = countNode.childrenCount.topics;
       await async.parallel({
         accepted: async function() {
@@ -1182,9 +1377,12 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
   };
   const updateArguments = async function() {
     if (!specificEntryType || specificEntryType === constants.OBJECT_TYPES.argument) {
+      // @ts-ignore TS(2339): Property 'childrenCount' does not exist on type '{... Remove this comment to see the full error message
       const args = countNode.childrenCount['arguments'];
       const q = {
+        // @ts-ignore TS(2339): Property 'argument' does not exist on type '{}'.
         ownerId: model.argument ? model.argument.ownerId : entryId,
+        // @ts-ignore TS(2339): Property 'argument' does not exist on type '{}'.
         parentId: model.argument ? model.argument._id : null,
       };
       await async.parallel({
@@ -1224,9 +1422,12 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
   };
   const updateArtifacts = async function() {
     if (!specificEntryType || specificEntryType === constants.OBJECT_TYPES.artifact) {
+      // @ts-ignore TS(2339): Property 'childrenCount' does not exist on type '{... Remove this comment to see the full error message
       const artifacts = countNode.childrenCount.artifacts;
       const q = {
+        // @ts-ignore TS(2339): Property 'artifact' does not exist on type '{}'.
         ownerId: model.artifact ? model.artifact.ownerId : entryId,
+        // @ts-ignore TS(2339): Property 'artifact' does not exist on type '{}'.
         parentId: model.artifact ? model.artifact._id : null,
       };
       await async.parallel({
@@ -1260,6 +1461,7 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
   };
   const updateQuestions = async function() {
     if (!specificEntryType || specificEntryType === constants.OBJECT_TYPES.question) {
+      // @ts-ignore TS(2339): Property 'childrenCount' does not exist on type '{... Remove this comment to see the full error message
       const questions = countNode.childrenCount.questions;
       await async.parallel({
         accepted: async function() {
@@ -1286,6 +1488,7 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
   };
   const updateAnswers = async () => {
     if (!specificEntryType || specificEntryType === constants.OBJECT_TYPES.answer) {
+      // @ts-ignore TS(2339): Property 'childrenCount' does not exist on type '{... Remove this comment to see the full error message
       const answers = countNode.childrenCount.answers;
       await async.parallel({
         accepted: async () => {
@@ -1312,6 +1515,7 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
   };
   const updateIssues = async function() {
     if (!specificEntryType || specificEntryType === constants.OBJECT_TYPES.issue) {
+      // @ts-ignore TS(2339): Property 'childrenCount' does not exist on type '{... Remove this comment to see the full error message
       const issues = countNode.childrenCount.issues;
       await async.parallel({
         accepted: async function() {
@@ -1338,6 +1542,7 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
   };
   const updateOpinions = async function() {
     if (!specificEntryType || specificEntryType === constants.OBJECT_TYPES.opinion) {
+      // @ts-ignore TS(2339): Property 'childrenCount' does not exist on type '{... Remove this comment to see the full error message
       const opinions = countNode.childrenCount.opinions;
       await async.parallel({
         accepted: async function() {
@@ -1367,6 +1572,7 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
     case constants.OBJECT_TYPES.topic:
       req = { query: { topic: entryId } };
       await setEntryModels(createOwnerQueryFromQuery(req), req, model);
+      // @ts-ignore TS(2339): Property 'topic' does not exist on type '{}'.
       countNode = { childrenCount: model.topic.childrenCount };
       await async.parallel({
         topics: updateTopics,
@@ -1384,6 +1590,7 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
     case constants.OBJECT_TYPES.topicLink:
       req = { query: { topicLink: entryId } };
       await setEntryModels(createOwnerQueryFromQuery(req), req, model);
+      // @ts-ignore TS(2339): Property 'topicLink' does not exist on type '{}'.
       countNode = { childrenCount: model.topicLink.childrenCount };
       await async.parallel({
         issues: updateIssues,
@@ -1397,6 +1604,7 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
     case constants.OBJECT_TYPES.argument:
       req = { query: { argument: entryId } };
       await setEntryModels(createOwnerQueryFromQuery(req), req, model);
+      // @ts-ignore TS(2339): Property 'argument' does not exist on type '{}'.
       countNode = { childrenCount: model.argument.childrenCount };
       await async.parallel({
         arguments: updateArguments,
@@ -1412,6 +1620,7 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
     case constants.OBJECT_TYPES.argumentLink:
       req = { query: { argumentLink: entryId } };
       await setEntryModels(createOwnerQueryFromQuery(req), req, model);
+      // @ts-ignore TS(2339): Property 'argumentLink' does not exist on type '{}... Remove this comment to see the full error message
       countNode = { childrenCount: model.argumentLink.childrenCount };
       await async.parallel({
         issues: updateIssues,
@@ -1425,6 +1634,7 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
     case constants.OBJECT_TYPES.artifact:
       req = { query: { artifact: entryId } };
       await setEntryModels(createOwnerQueryFromQuery(req), req, model);
+      // @ts-ignore TS(2339): Property 'artifact' does not exist on type '{}'.
       countNode = { childrenCount: model.artifact.childrenCount };
       await async.parallel({
         artifacts: updateArtifacts,
@@ -1441,6 +1651,7 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
     case constants.OBJECT_TYPES.question:
       req = { query: { question: entryId } };
       await setEntryModels(createOwnerQueryFromQuery(req), req, model);
+      // @ts-ignore TS(2339): Property 'question' does not exist on type '{}'.
       countNode = { childrenCount: model.question.childrenCount };
       await async.parallel({
         answers: updateAnswers,
@@ -1455,6 +1666,7 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
     case constants.OBJECT_TYPES.answer:
       req = { query: { answer: entryId } };
       await setEntryModels(createOwnerQueryFromQuery(req), req, model);
+      // @ts-ignore TS(2339): Property 'answer' does not exist on type '{}'.
       countNode = { childrenCount: model.answer.childrenCount };
       await async.parallel({
         issues: updateIssues,
@@ -1468,6 +1680,7 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
     case constants.OBJECT_TYPES.issue:
       req = { query: { issue: entryId } };
       await setEntryModels(createOwnerQueryFromQuery(req), req, model);
+      // @ts-ignore TS(2339): Property 'issue' does not exist on type '{}'.
       countNode = { childrenCount: model.issue.childrenCount };
       await async.parallel({
         opinions: updateOpinions,
@@ -1480,6 +1693,7 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
     case constants.OBJECT_TYPES.opinion:
       req = { query: { opinion: entryId } };
       await setEntryModels(createOwnerQueryFromQuery(req), req, model);
+      // @ts-ignore TS(2339): Property 'opinion' does not exist on type '{}'.
       countNode = { childrenCount: model.opinion.childrenCount };
       await async.parallel({
         issues: updateIssues,
@@ -1495,10 +1709,12 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
 }
 
 // SUMMARY: updates the children of parent including the categoryId, does not touch the parent
+// @ts-ignore TS(7006): Parameter 'parent' implicitly has an 'any' type.
 async function syncChildren(parent, options) {
   const syncChildTopics = async () => {
     const children = await db.Topic.find({ parentId: parent._id });
     if (children.length === 0) return;
+    // @ts-ignore TS(7006): Parameter 'child' implicitly has an 'any' type.
     await async.each(children, async child => {
       let categoryChanged = false,
         oldCategoryId = child.categoryId;
@@ -1524,6 +1740,7 @@ async function syncChildren(parent, options) {
   const syncChildTopicLinks = async function() {
     const children = await db.TopicLink.find({ parentId: parent._id });
     if (children.length === 0) return;
+    // @ts-ignore TS(7006): Parameter 'child' implicitly has an 'any' type.
     await async.each(children, async child => {
       let categoryChanged = false,
         oldCategoryId = child.categoryId;
@@ -1554,6 +1771,7 @@ async function syncChildren(parent, options) {
     } : { parentId: parent._id };
     const children = await db.Argument.find(query);
     if (children.length === 0) return;
+    // @ts-ignore TS(7006): Parameter 'child' implicitly has an 'any' type.
     await async.each(children, async function(child) {
       let categoryChanged = false, oldCategoryId = child.categoryId;
       if (!parentIsTopic) {
@@ -1588,6 +1806,7 @@ async function syncChildren(parent, options) {
     } : { parentId: parent._id };
     const children = await db.Artifact.find(query);
     if (children.length === 0) return;
+    // @ts-ignore TS(7006): Parameter 'child' implicitly has an 'any' type.
     await async.each(children, async function(child) {
       let categoryChanged = false, oldCategoryId = child.categoryId;
       if (!parentIsTopic) {
@@ -1616,6 +1835,7 @@ async function syncChildren(parent, options) {
   const syncChildArgumentLinks = async function() {
     const children = await db.ArgumentLink.find({ ownerId: parent._id, ownerType: options.entryType });
     if (children.length === 0) return;
+    // @ts-ignore TS(7006): Parameter 'child' implicitly has an 'any' type.
     await async.each(children, async function(child) {
       let categoryChanged = false, oldCategoryId = child.categoryId;
       /*
@@ -1645,6 +1865,7 @@ async function syncChildren(parent, options) {
   const syncChildAnswers = async function() {
     const children = await db.Answer.find({ questionId: parent._id });
     if (children.length === 0) return;
+    // @ts-ignore TS(7006): Parameter 'child' implicitly has an 'any' type.
     await async.each(children, async function(child) {
       let categoryChanged = false, oldCategoryId = child.categoryId;
       await async.series({
@@ -1666,10 +1887,12 @@ async function syncChildren(parent, options) {
     });
   };
 
+  // @ts-ignore TS(7006): Parameter 'childrenEntryType' implicitly has an 'a... Remove this comment to see the full error message
   const syncOwnerChildren = async function(childrenEntryType) {
     const dbModel = getDbModelByObjectType(childrenEntryType);
     const children = await dbModel.find({ ownerId: parent._id, ownerType: options.entryType });
     if (children.length === 0) return;
+    // @ts-ignore TS(7006): Parameter 'child' implicitly has an 'any' type.
     await async.each(children, async function(child) {
       let categoryChanged = false, oldCategoryId = child.categoryId;
       await async.series({
@@ -1809,6 +2032,7 @@ async function syncChildren(parent, options) {
 }
 
 // Set or update categoryId
+// @ts-ignore TS(7006): Parameter 'entry' implicitly has an 'any' type.
 async function syncCategoryId(entry, options) {
   /*if(!options) {
         options = {
@@ -1871,6 +2095,7 @@ async function syncCategoryId(entry, options) {
   }
 }
 
+// @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
 function setVerdictModel(result) {
   if (!result.verdict || !result.verdict.status) {
     result.verdict = {
@@ -1901,7 +2126,9 @@ function setVerdictModel(result) {
   }
 }
 
+// @ts-ignore TS(7006): Parameter 'results' implicitly has an 'any' type.
 function sortArguments(results) {
+  // @ts-ignore TS(7006): Parameter 'a' implicitly has an 'any' type.
   results.sort(function(a, b) {
     if (a.typeId === constants.ARGUMENT_TYPES.artifact && b.typeId !== constants.ARGUMENT_TYPES.artifact) {
       return 1;
@@ -1925,12 +2152,14 @@ function sortArguments(results) {
   });
 }
 
+// @ts-ignore TS(7006): Parameter 'args' implicitly has an 'any' type.
 function getVerdictCount(args) {
   const verdictCount = {
     true: 0,
     false: 0,
     pending: 0,
   };
+  // @ts-ignore TS(7006): Parameter 'arg' implicitly has an 'any' type.
   args.forEach(function(arg) {
     const varg = arg.verdict && arg.verdict.status ? arg.verdict.status : constants.VERDICT_STATUS.pending;
     const category = constants.VERDICT_STATUS.getCategory(varg);
@@ -1947,17 +2176,21 @@ function getVerdictCount(args) {
     }
   });
   if (verdictCount.true === 0) {
+    // @ts-ignore TS(2790): The operand of a 'delete' operator must be optiona... Remove this comment to see the full error message
     delete verdictCount.true;
   }
   if (verdictCount.false === 0) {
+    // @ts-ignore TS(2790): The operand of a 'delete' operator must be optiona... Remove this comment to see the full error message
     delete verdictCount.false;
   }
   if (verdictCount.pending === 0) {
+    // @ts-ignore TS(2790): The operand of a 'delete' operator must be optiona... Remove this comment to see the full error message
     delete verdictCount.pending;
   }
   return verdictCount;
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 function ensureEntryIdParam(req, entry) {
   if (!req.query[entry]) {
     if (req.params.id) {
@@ -1975,6 +2208,7 @@ function ensureEntryIdParam(req, entry) {
   }
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 function createOwnerQueryFromQuery(req) {
   if (req.query.opinion) {
     return {
@@ -2025,6 +2259,7 @@ function createOwnerQueryFromQuery(req) {
   return {};
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 function setModelOwnerEntry(req, res, model, options) {
   if (!options) options = {};
 
@@ -2086,6 +2321,7 @@ function setModelOwnerEntry(req, res, model, options) {
         tagLabels.push(constants.ARGUMENT_TAGS.tag10);
         model.hasValue = true;
       }
+      // @ts-ignore TS(7006): Parameter 'tag' implicitly has an 'any' type.
       tags.forEach(function(tag) {
         tagLabels.push(constants.ARGUMENT_TAGS['tag' + tag]);
         if (!model.hasValue && tag === constants.ARGUMENT_TAGS.tag10.code) {
@@ -2112,6 +2348,7 @@ function setModelOwnerEntry(req, res, model, options) {
         topicLinkTagLabels.push(constants.TOPIC_TAGS.tag10);
         model.hasValue = true;
       }
+      // @ts-ignore TS(7006): Parameter 'tag' implicitly has an 'any' type.
       topicLinkTags.forEach(function(tag) {
         topicLinkTagLabels.push(constants.TOPIC_TAGS['tag' + tag]);
         if (tag === constants.TOPIC_TAGS.tag520.code) {
@@ -2140,6 +2377,7 @@ function setModelOwnerEntry(req, res, model, options) {
         topicTagLabels.push(constants.TOPIC_TAGS.tag10);
         model.hasValue = true;
       }
+      // @ts-ignore TS(7006): Parameter 'tag' implicitly has an 'any' type.
       topicTags.forEach(function(tag) {
         topicTagLabels.push(constants.TOPIC_TAGS['tag' + tag]);
         if (tag === constants.TOPIC_TAGS.tag520.code) {
@@ -2155,9 +2393,11 @@ function setModelOwnerEntry(req, res, model, options) {
     }
   }
 
+  // @ts-ignore TS(2554): Expected 4 arguments, but got 3.
   setModelContext(req, res, model);
 }
 
+// @ts-ignore TS(7006): Parameter 'type' implicitly has an 'any' type.
 function getDbModelByObjectType(type) {
   switch (type) {
     case constants.OBJECT_TYPES.topic:
@@ -2182,6 +2422,7 @@ function getDbModelByObjectType(type) {
   return null;
 }
 
+// @ts-ignore TS(7006): Parameter 'model' implicitly has an 'any' type.
 function getEntryByObjectType(model, type) {
   switch (type) {
     case constants.OBJECT_TYPES.topic:
@@ -2206,6 +2447,7 @@ function getEntryByObjectType(model, type) {
   return null;
 }
 
+// @ts-ignore TS(7006): Parameter 'type' implicitly has an 'any' type.
 function getObjectName(type) {
   switch (type) {
     case constants.OBJECT_TYPES.topic:
@@ -2230,6 +2472,7 @@ function getObjectName(type) {
   return '';
 }
 
+// @ts-ignore TS(7006): Parameter 'model' implicitly has an 'any' type.
 function createOwnerQueryFromModel(model) {
   if (model.issue) {
     return {
@@ -2281,6 +2524,7 @@ function createOwnerQueryFromModel(model) {
  * @param model
  * @param mixedMode The place this is called may display both public and private entries (e.g. clipboard)
  */
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 function setModelContext(req, res, model, mixedMode) {
   if (res.locals.group) {
     model.group = res.locals.group;
@@ -2296,6 +2540,7 @@ function setModelContext(req, res, model, mixedMode) {
   }
 }
 
+// @ts-ignore TS(7006): Parameter 'content' implicitly has an 'any' type.
 function getEditorContent(content) {
   if (!content) return '';
   let c = content.trim();
@@ -2305,14 +2550,17 @@ function getEditorContent(content) {
   return c;
 }
 
+// @ts-ignore TS(7006): Parameter 'baseUrl' implicitly has an 'any' type.
 function buildEntryUrl(baseUrl, entry) {
   return baseUrl + '/' + entry.friendlyUrl + '/' + entry._id;
 }
 
+// @ts-ignore TS(7006): Parameter 'username' implicitly has an 'any' type.
 function getDiaryBaseUrl(username) {
   return paths.members.index + '/' + username + paths.members.profile.diary;
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 function buildReturnUrl(req, defaultBaseUrl) {
   const nextUrl = url.parse(req.originalUrl);
   const nextQuery = querystring.parse(nextUrl.query);
@@ -2328,16 +2576,20 @@ function buildReturnUrl(req, defaultBaseUrl) {
   return url.format(nextUrl);
 }
 
+// @ts-ignore TS(7006): Parameter 'model' implicitly has an 'any' type.
 function buildTopicReturnUrl(model, cancelBaseUrl, entry, parent) {
   return entry ? buildEntryUrl(cancelBaseUrl, entry) :
     parent ? buildEntryUrl(cancelBaseUrl, parent) :
       (model.username || model.group) ? model.wikiBaseUrl : '/';
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 function buildParentUrl(req, entry) {
+  // @ts-ignore TS(7006): Parameter 'entry' implicitly has an 'any' type.
   const getBaseUrl = function(entry) {
     return entry.private ? paths.members.index + '/' + req.user.username + paths.members.profile.diary : '';
   };
+  // @ts-ignore TS(7006): Parameter 'entry' implicitly has an 'any' type.
   const buildRedirectUrl = function(entry) {
     const wikiBaseUrl = getBaseUrl(entry);
     switch (entry.ownerType) {
@@ -2376,6 +2628,7 @@ function buildParentUrl(req, entry) {
   return '/';
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 function buildEntryReturnUrl(req, model) {
   switch (model.entryType) {
     case constants.OBJECT_TYPES.topic:
@@ -2391,6 +2644,7 @@ function buildEntryReturnUrl(req, model) {
   }
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 function setScreeningModel(req, model) {
   if (!model.screening) {
     model.screening = {};
@@ -2435,6 +2689,7 @@ function setScreeningModel(req, model) {
   model.screening.status = constants.SCREENING_STATUS.status1.code;
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 function initScreeningStatus(req, entity) {
   if (req.user.roles.reviewer || req.params.username || req.body.username) { /* req.body.username is used by clipboard */
     entity.screening = {
@@ -2444,6 +2699,7 @@ function initScreeningStatus(req, entity) {
   }
 }
 
+// @ts-ignore TS(7006): Parameter 'model' implicitly has an 'any' type.
 function setScreeningModelCount(model, childrenCount) {
   model.childrenCount = childrenCount;
   if (model.childrenCount.pending === 0 && model.childrenCount.rejected === 0) {
@@ -2453,6 +2709,7 @@ function setScreeningModelCount(model, childrenCount) {
   }
 }
 
+// @ts-ignore TS(7006): Parameter 'entity' implicitly has an 'any' type.
 function getParent(entity, type) {
   switch (type) {
     case constants.OBJECT_TYPES.topic:
@@ -2548,6 +2805,7 @@ function getParent(entity, type) {
   return null;
 }
 
+// @ts-ignore TS(7006): Parameter 'member' implicitly has an 'any' type.
 function setMemberFullname(member) {
   if (member.roles.account) {
     const fullname = member.roles.account.name.full;
@@ -2557,10 +2815,12 @@ function setMemberFullname(member) {
   }
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 function isEntryOnIntendedUrl(req, res, entry) {
   return !entry.private && !req.params.username || entry.private && (res.locals.group || req.params.username && entry.createUserId.equals(req.user.id));
 }
 
+// @ts-ignore TS(7006): Parameter 'content' implicitly has an 'any' type.
 function createContentPreview(content) {
   return utils.getShortText(
     htmlToText.fromString(content,
@@ -2574,6 +2834,7 @@ function createContentPreview(content) {
   );
 }
 
+// @ts-ignore TS(7006): Parameter 'model' implicitly has an 'any' type.
 async function getCategories(model, topicId, req) {
   let results = await getTopics({
     parentId: topicId,
@@ -2584,6 +2845,7 @@ async function getCategories(model, topicId, req) {
     shortTitleLength: constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN,
     req: req,
   });
+  // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
   await async.each(results, async function(result) {
     let subTopics = await getTopics({ parentId: result._id }, {
       limit: constants.SETTINGS.SUBCATEGORY_LIST_SIZE,
@@ -2614,21 +2876,25 @@ async function getCategories(model, topicId, req) {
   model.categories = results;
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 async function getDiaryCategories(req) {
   let results = await db.Topic
     .find({ parentId: null, ownerType: constants.OBJECT_TYPES.user, ownerId: req.user.id })
     .sort({ title: 1 })
     .lean();
+  // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
   await async.each(results, function(result) {
     result.friendlyUrl = utils.urlify(result.title);
   });
   return results;
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 async function getUserGroups(req) {
   return await db.Group.find({ 'members.userId': req.user.id }).sort({ title: 1 }).lean();
 }
 
+// @ts-ignore TS(7006): Parameter 'model' implicitly has an 'any' type.
 function createEntrySet(model) {
   const entries = []
     .concat(model.topics)
@@ -2639,9 +2905,11 @@ function createEntrySet(model) {
     .concat(model.opinions)
     .concat(model.artifacts)
     .sort(function(a, b) {
+      // @ts-ignore TS(2339): Property 'editDate' does not exist on type 'never'... Remove this comment to see the full error message
       if (a.editDate < b.editDate) {
         return 1;
       }
+      // @ts-ignore TS(2339): Property 'editDate' does not exist on type 'never'... Remove this comment to see the full error message
       if (a.editDate > b.editDate) {
         return -1;
       }
@@ -2656,6 +2924,7 @@ function createEntrySet(model) {
   }
 }
 
+// @ts-ignore TS(7006): Parameter 'model' implicitly has an 'any' type.
 async function countEntries(model, groupFilter) {
   await async.parallel({
     topics: async function() {
@@ -2697,52 +2966,70 @@ async function countEntries(model, groupFilter) {
   model.totalCount = model.topics + model.arguments + model.questions + model.answers + model.issues + model.opinions;
 }
 
+// @ts-ignore TS(7006): Parameter 'router' implicitly has an 'any' type.
 function setupEntryRouters(router, prefix) {
 
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   const topics = require('../controllers/topics'),
+    // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
     arguments1 = require('../controllers/arguments'),
+    // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
     artifacts = require('../controllers/artifacts'),
+    // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
     questions = require('../controllers/questions'),
+    // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
     answers = require('../controllers/answers'),
+    // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
     issues = require('../controllers/issues'),
+    // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
     opinions = require('../controllers/opinions'),
+    // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
     visualize = require('../controllers/visualize');
 
   /* Visualize */
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get(prefix + '/visualize(/topic)?(/:friendlyUrl)?(/:friendlyUrl/:id)?', async function(req, res) {
     await visualize.GET_index(req, res);
   });
 
   /* Topics */
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get(prefix + '/topics', async function(req, res) {
     await topics.GET_index(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get(prefix + '/topics/create', async function(req, res) {
     await topics.GET_create(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.post(prefix + '/topics/create', async function(req, res) {
     await topics.POST_create(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get(prefix + '/topics/link/edit', async function(req, res) {
     await topics.GET_link_edit(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.post(prefix + '/topics/link/edit', async function(req, res) {
     await topics.POST_link_edit(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get(prefix + '/topics/:friendlyUrl/:id', async function(req, res) {
     await topics.GET_index(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get(prefix + '/topic/:friendlyUrl/link/:id', async function(req, res) {
     await topics.GET_link_entry(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get(prefix + '/topic(/:friendlyUrl)?(/:friendlyUrl/:id)?', async function(req, res) {
     await topics.GET_entry(req, res);
   });
@@ -2750,30 +3037,37 @@ function setupEntryRouters(router, prefix) {
 
   /* Arguments */
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get(`${prefix}/arguments`, async function(req, res) {
     await arguments1.GET_index(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get(`${prefix}/arguments/create`, async function(req, res) {
     await arguments1.GET_create(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.post(`${prefix}/arguments/create`, async function(req, res) {
     await arguments1.POST_create(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get(`${prefix}/arguments/link/edit`, async function(req, res) {
     await arguments1.GET_link_edit(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.post(`${prefix}/arguments/link/edit`, async function(req, res) {
     await arguments1.POST_link_edit(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get(`${prefix}/argument/:friendlyUrl/link/:id`, async function(req, res) {
     await arguments1.GET_link_entry(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get(`${prefix}/argument(/:friendlyUrl)?(/:friendlyUrl/:id)?`, async function(req, res) {
     await arguments1.GET_entry(req, res);
   });
@@ -2781,18 +3075,22 @@ function setupEntryRouters(router, prefix) {
 
   /* Artifacts */
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get(prefix + '/artifacts', async function(req, res) {
     await artifacts.GET_index(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get(prefix + '/artifacts/create', async function(req, res) {
     await artifacts.GET_create(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.post(prefix + '/artifacts/create', async function(req, res) {
     await artifacts.POST_create(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get(prefix + '/artifact(/:friendlyUrl)?(/:friendlyUrl/:id)?', async function(req, res) {
     await artifacts.GET_entry(req, res);
   });
@@ -2800,18 +3098,22 @@ function setupEntryRouters(router, prefix) {
 
   /* Questions */
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get(prefix + '/questions', async function(req, res) {
     await questions.GET_index(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get(prefix + '/questions/create', async function(req, res) {
     await questions.GET_create(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.post(prefix + '/questions/create', async function(req, res) {
     await questions.POST_create(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get(prefix + '/question(/:friendlyUrl)?(/:friendlyUrl/:id)?', async function(req, res) {
     await questions.GET_entry(req, res);
   });
@@ -2819,18 +3121,22 @@ function setupEntryRouters(router, prefix) {
 
   /* Answers */
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get(prefix + '/answers', async function(req, res) {
     await answers.GET_index(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get(prefix + '/answers/create', async function(req, res) {
     await answers.GET_create(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.post(prefix + '/answers/create', async function(req, res) {
     await answers.POST_create(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get(prefix + '/answer(/:friendlyUrl)?(/:friendlyUrl/:id)?', async function(req, res) {
     await answers.GET_entry(req, res);
   });
@@ -2838,18 +3144,22 @@ function setupEntryRouters(router, prefix) {
 
   /* Issues */
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get(prefix + '/issues', async function(req, res) {
     await issues.GET_index(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get(prefix + '/issues/create', async function(req, res) {
     await issues.GET_create(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.post(prefix + '/issues/create', async function(req, res) {
     await issues.POST_create(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get(prefix + '/issue(/:friendlyUrl)?(/:friendlyUrl/:id)?', async function(req, res) {
     await issues.GET_entry(req, res);
   });
@@ -2857,31 +3167,38 @@ function setupEntryRouters(router, prefix) {
 
   /* Opinions */
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get(prefix + '/opinions', async function(req, res) {
     await opinions.GET_index(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get(prefix + '/opinions/create', async function(req, res) {
     await opinions.GET_create(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.post(prefix + '/opinions/create', async function(req, res) {
     await opinions.POST_create(req, res);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get(prefix + '/opinion(/:friendlyUrl)?(/:friendlyUrl/:id)?', async function(req, res) {
     await opinions.GET_entry(req, res);
   });
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 function resetCache(req) {
   delete req.app.locals.appCategories;
   const apps = applications.getApplications();
+  // @ts-ignore TS(7006): Parameter 'app' implicitly has an 'any' type.
   apps.forEach(function(app) {
     delete app.appCategories;
   });
 }
 
+// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports = {
   getBackupDir,
   createContentPreview,

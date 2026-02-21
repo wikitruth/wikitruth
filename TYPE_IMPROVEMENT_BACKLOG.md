@@ -13,7 +13,7 @@ Derived from `TYPE_IMPROVEMENT_PROJECT.md`.
 ## P1 Utilities and Services (2-4 Weeks)
 
 - [x] `TP-06` Remove `@ts-nocheck` from `utils/httpClient.ts`, `utils/utils.ts`, `utils/mongoose.ts`.
-- [ ] `TP-07` Remove `@ts-nocheck` from `utils/flowUtils.ts`, `utils/workflow/index.ts`, `utils/sendmail/index.ts`, `utils/slugify/index.ts`.
+- [x] `TP-07` Remove `@ts-nocheck` from `utils/flowUtils.ts`, `utils/workflow/index.ts`, `utils/sendmail/index.ts`, `utils/slugify/index.ts`.
 - [ ] `TP-08` Remove `@ts-nocheck` from `services/*` with explicit return types and model boundary interfaces.
 - [ ] `TP-09` Add typed error classes/codes used by services and API envelope.
 
