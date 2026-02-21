@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use strict';
 
 /*var wikitruthDomains = [
@@ -78,8 +77,8 @@ function getApplications() {
   return APPLICATIONS;
 }
 
-function getApplication(req) {
-  let domainName = req.hostname,
+function getApplication(req: { hostname?: string }) {
+  let domainName = req.hostname || '',
     application = null;
   APPLICATIONS.some(function (app) {
     if (app.domains.indexOf(domainName) > -1) {

@@ -1,7 +1,6 @@
-// @ts-nocheck
 'use strict';
 
-module.exports = function (app, mongoose) {
+module.exports = function (app: any, mongoose: any) {
   // embeddable docs first
   require('./account/Note')(app, mongoose);
   require('./account/Status')(app, mongoose);

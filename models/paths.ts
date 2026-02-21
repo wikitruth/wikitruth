@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use strict';
 
 (function () {
@@ -103,6 +102,6 @@
     if (typeof module !== 'undefined') {
         module.exports = exports;
     } else if (typeof window !== 'undefined') {
-        window.WT_PATHS = exports;
+        (window as any).WT_PATHS = exports;
     }
 })();

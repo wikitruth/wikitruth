@@ -1,8 +1,7 @@
-// @ts-nocheck
 'use strict';
 
 (function () {
-  const VERDICT_STATUS = {
+  const VERDICT_STATUS: any = {
     pending: 0,
     status_true: 1,
     status_false: 2,
@@ -28,7 +27,7 @@
     },
   };
 
-  VERDICT_STATUS.getLabel = function (status) {
+  VERDICT_STATUS.getLabel = function (status: number) {
     switch (status) {
       case VERDICT_STATUS.status_true:
         return 'verified'; // "Reviewed" if Topic
@@ -60,7 +59,7 @@
     }
   };
 
-  VERDICT_STATUS.getTheme = function (status) {
+  VERDICT_STATUS.getTheme = function (status: number) {
     switch (status) {
       case VERDICT_STATUS.status_true:
       case VERDICT_STATUS.most_likely:
@@ -82,7 +81,7 @@
     }
   };
 
-  VERDICT_STATUS.getCategory = function (status) {
+  VERDICT_STATUS.getCategory = function (status: number) {
     switch (status) {
       case VERDICT_STATUS.status_true:
       case VERDICT_STATUS.most_likely:
@@ -104,7 +103,7 @@
     }
   };
 
-  const ARGUMENT_TYPES = {
+  const ARGUMENT_TYPES: any = {
     // Types of arguments:
     // * A moral or ethical argument (something that should or should not/ought/this becomes a voting then? E.g. ought or ought not)
     // * A statement of a reality or phenomenon (current)
@@ -120,7 +119,7 @@
     experience: 4,
   };
 
-  ARGUMENT_TYPES.getUXInfo = function (typeId) {
+  ARGUMENT_TYPES.getUXInfo = function (typeId: number) {
     let label = 'factual';
     let theme = 'info';
     switch (typeId) {
@@ -422,6 +421,6 @@
   if (typeof module !== 'undefined') {
     module.exports = exports;
   } else if (typeof window !== 'undefined') {
-    window.WT_CONSTANTS = exports;
+    (window as any).WT_CONSTANTS = exports;
   }
 })();
