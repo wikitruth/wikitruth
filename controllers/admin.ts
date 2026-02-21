@@ -1,15 +1,22 @@
-// @ts-nocheck
 'use strict';
 
+// @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 let backup = require('mongodb-backup-fixed'),
+  // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'fs'.
   fs = require('fs'),
+  // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'path'.
   path = require('path'),
+  // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'async'.
   async = require('async'),
   // Git             = require("nodegit"),
+  // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'templates'... Remove this comment to see the full error message
   templates = require('../models/templates'),
+  // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'config'.
   config = require('../config/config'),
   //constants       = require('../models/constants'),
+  // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'flowUtils'... Remove this comment to see the full error message
   flowUtils = require('../utils/flowUtils'),
+  // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'db'.
   db = require('../app').db.models;
 
 let collectionsConfig = config.mongodb.collections,
@@ -21,6 +28,7 @@ let collectionsConfig = config.mongodb.collections,
  * @function makeDir
  * @param {String} path - path of dir
  */
+// @ts-ignore TS(7006): Parameter 'path' implicitly has an 'any' type.
 function makeDir(path) {
   try {
     const stats = fs.statSync(path);
@@ -31,6 +39,7 @@ function makeDir(path) {
       return fs.mkdirSync(path);
     }
   } catch (err) {
+    // @ts-ignore TS(2571): Object is of type 'unknown'.
     if (err && err.code === 'ENOENT') {
       //logger('make dir at ' + path);
       return fs.mkdirSync(path);
@@ -39,6 +48,7 @@ function makeDir(path) {
   return path;
 }
 
+// @ts-ignore TS(7006): Parameter 'backupDir' implicitly has an 'any' type... Remove this comment to see the full error message
 function performGitBackup(backupDir, pathspec, gitConfig) {
   let pathToRepo = path.resolve(backupDir);
   let repo, index, oid;
@@ -153,18 +163,24 @@ function performGitBackup(backupDir, pathspec, gitConfig) {
   //     });
 }
 
+// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports = function(router) {
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get('/db-backup', function(req, res) {
     let model = {};
+    // @ts-ignore TS(2339): Property 'dirname' does not exist on type '{}'.
     model.dirname = flowUtils.getBackupDir();
+    // @ts-ignore TS(2339): Property 'privateDirName' does not exist on type '... Remove this comment to see the full error message
     model.privateDirName = flowUtils.getBackupDir(true);
     if (config.mongodb.gitBackup) {
+      // @ts-ignore TS(2339): Property 'gitBackup' does not exist on type '{}'.
       model.gitBackup = true;
     }
     res.render(templates.admin.mongoBackup, model);
   });
 
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.post('/db-backup', async function(req, res) {
     let action = req.body.buttonAction;
     let backupDir = flowUtils.getBackupDir();
@@ -172,10 +188,14 @@ module.exports = function(router) {
     privateBackupDir += '/' + privateDirName;
 
     let model = {};
+    // @ts-ignore TS(2339): Property 'action' does not exist on type '{}'.
     model.action = action;
+    // @ts-ignore TS(2339): Property 'dirname' does not exist on type '{}'.
     model.dirname = backupDir;
+    // @ts-ignore TS(2339): Property 'privateDirName' does not exist on type '... Remove this comment to see the full error message
     model.privateDirName = privateBackupDir;
     if (config.mongodb.gitBackup) {
+      // @ts-ignore TS(2339): Property 'gitBackup' does not exist on type '{}'.
       model.gitBackup = true;
     }
 
@@ -209,6 +229,7 @@ module.exports = function(router) {
             .find({})
             .sort({ username: 1 })
             .lean();
+          // @ts-ignore TS(7006): Parameter 'user' implicitly has an 'any' type.
           await async.eachSeries(users, function(user) {
             console.log('backing up for user ' + user.username);
             backup({
@@ -258,60 +279,70 @@ module.exports = function(router) {
       await async.parallel({
         topics: async function() {
           let results = await db.Topic.find({});
+          // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
           await async.eachSeries(results, async function(result) {
             await db.Topic.updateOne({ _id: result._id }, result, {});
           });
         },
         topicLinks: async function() {
           let results = await db.TopicLink.find({});
+          // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
           await async.eachSeries(results, async function(result) {
             await db.TopicLink.updateOne({ _id: result._id }, result, {});
           });
         },
         arguments: async function() {
           let results = await db.Argument.find({});
+          // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
           await async.eachSeries(results, async function(result) {
             await db.Argument.updateOne({ _id: result._id }, result, {});
           });
         },
         argumentLinks: async function() {
           let results = await db.ArgumentLink.find({});
+          // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
           await async.eachSeries(results, async function(result) {
             await db.ArgumentLink.updateOne({ _id: result._id }, result, {});
           });
         },
         questions: async function() {
           let results = await db.Question.find({});
+          // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
           await async.eachSeries(results, async function(result) {
             await db.Question.updateOne({ _id: result._id }, result, {});
           });
         },
         answers: async function() {
           let results = await db.Answer.find({});
+          // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
           await async.eachSeries(results, async function(result) {
             await db.Answer.updateOne({ _id: result._id }, result, {});
           });
         },
         issues: async function() {
           const results = await db.Issue.find({});
+          // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
           await async.eachSeries(results, async function(result) {
             await db.Issue.updateOne({ _id: result._id }, result, {});
           });
         },
         opinions: async function() {
           const results = await db.Opinion.find({});
+          // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
           await async.eachSeries(results, async function(result) {
             await db.Opinion.updateOne({ _id: result._id }, result, {});
           });
         },
         artifacts: async function() {
           const results = await db.Artifact.find({});
+          // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
           await async.eachSeries(results, async function(result) {
             await db.Artifact.updateOne({ _id: result._id }, result, {});
           });
         },
         users: async function() {
           const results = await db.User.find({});
+          // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
           await async.eachSeries(results, async function(result) {
             await db.User.updateOne({ _id: result._id }, result, {});
           });
@@ -322,6 +353,7 @@ module.exports = function(router) {
       const dir = backupDir + '/' + config.mongodb.dbname;
       await async.series({
         restorePublicData: async function() {
+          // @ts-ignore TS(7006): Parameter 'collectionName' implicitly has an 'any'... Remove this comment to see the full error message
           await async.eachSeries(collectionsConfig.backupList.concat(collectionsConfig.privateBackupList), async function(collectionName) {
             // each collection
             const collectionDir = dir + '/' + collectionName;
@@ -332,6 +364,7 @@ module.exports = function(router) {
                 const collection = db[modelName];
                 if (collection) {
                   await collection.deleteMany({});
+                  // @ts-ignore TS(7006): Parameter 'json' implicitly has an 'any' type.
                   await async.eachSeries(jsons, async function(json) {
                     // each entry
                     const file = collectionDir + '/' + json;
@@ -348,9 +381,11 @@ module.exports = function(router) {
             .find({})
             .sort({ username: 1 })
             .lean();
+          // @ts-ignore TS(7006): Parameter 'user' implicitly has an 'any' type.
           await async.eachSeries(users, async function(user) {
             // each user
             const privateUserBackupDir = privateBackupDir + '/' + user.username + '/' + config.mongodb.dbname;
+            // @ts-ignore TS(7006): Parameter 'collectionName' implicitly has an 'any'... Remove this comment to see the full error message
             await async.eachSeries(collectionsConfig.privateBackupList, async function(collectionName) {
               // each collection
               const collectionDir = privateUserBackupDir + '/' + collectionName;
@@ -364,6 +399,7 @@ module.exports = function(router) {
                       private: true,
                       createUserId: user._id,
                     });
+                    // @ts-ignore TS(7006): Parameter 'json' implicitly has an 'any' type.
                     await async.eachSeries(jsons, async function(json) {
                       // each entry
                       const file = collectionDir + '/' + json;
@@ -389,9 +425,11 @@ module.exports = function(router) {
     } else if (action === 'push') {
       // FIXME: results are not returned on time
       let result = await performGitBackup(backupDir, config.mongodb.dbname, config.mongodb.gitBackup);
+      // @ts-ignore TS(2339): Property 'gitBackup' does not exist on type '{}'.
       model.gitBackup = result;
       if (config.mongodb.privateGitBackup) {
         result = await performGitBackup(privateBackupDir, privateDirName, config.mongodb.privateGitBackup);
+        // @ts-ignore TS(2339): Property 'privateGitBackup' does not exist on type... Remove this comment to see the full error message
         model.privateGitBackup = result;
       }
       res.render(templates.admin.mongoBackup, model);
