@@ -29,6 +29,8 @@
     "prepare": "husky install",
     "tsc": "tsc -p tsconfig.server.json",
     "tsc:watch": "tsc -p tsconfig.server.json --watch",
+    "type:check": "tsc -p tsconfig.server.json --noEmit",
+    "type:metrics": "bash scripts/type-metrics.sh",
     "test:server": "jest --config jest.config.server.js",
     "start:legacy-grunt": "grunt"
   },

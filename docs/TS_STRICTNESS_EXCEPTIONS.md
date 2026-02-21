@@ -10,6 +10,11 @@ Strictness step 1 is enabled in `tsconfig.server.json`:
 
 Current exception mechanism is `@ts-nocheck` on migrated legacy modules while the codebase is being incrementally typed.
 
+Type-improvement project plan and backlog:
+
+- `TYPE_IMPROVEMENT_PROJECT.md`
+- `TYPE_IMPROVEMENT_BACKLOG.md`
+
 ## Exception Count
 
 - Total files with `@ts-nocheck`: `95`
@@ -36,6 +41,12 @@ Use this command to inspect current exceptions:
 
 ```bash
 rg -n "@ts-nocheck" --glob '*.ts' controllers middlewares models services utils types
+```
+
+Or use the project metrics script:
+
+```bash
+npm run type:metrics
 ```
 
 ## Reduction Plan
