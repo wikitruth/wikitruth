@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use strict';
 
 let async = require('async'),
