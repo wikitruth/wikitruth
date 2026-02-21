@@ -106,7 +106,6 @@
     "@types/jsonwebtoken": "^9.0.5",
     "@types/kraken-js": "^2.2.8",
     "@types/method-override": "^0.0.35",
-    "@types/mongoose": "^5.11.96",
     "@types/morgan": "^1.9.9",
     "@types/node": "^22.14.1",
     "@types/passport": "^1.0.17",
