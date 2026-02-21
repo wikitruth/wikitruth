@@ -4,6 +4,9 @@ Strictness step 1 is enabled in `tsconfig.server.json`:
 
 - `noImplicitAny: true`
 - `strictNullChecks: true`
+- `strict: true`
+- `noUncheckedIndexedAccess: true`
+- `allowJs: false` (server compiler scope no longer relies on JS fallback)
 
 Current exception mechanism is `@ts-nocheck` on migrated legacy modules while the codebase is being incrementally typed.
 
@@ -19,6 +22,13 @@ Current exception mechanism is `@ts-nocheck` on migrated legacy modules while th
 - `services/**` (domain service layer)
 - `utils/**` (legacy utility layer)
 - `types/http.ts` (temporary interop typing gap while strict migration is in progress)
+
+## Explicit JS Exclusions (Server Compiler Scope)
+
+- `app.js`
+- `server.js`
+- `config/**/*.js`
+- `public/templates/jade/**/*.js`
 
 ## Tracking Command
 
