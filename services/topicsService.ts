@@ -4,6 +4,7 @@
 const flowUtils = require('../utils/flowUtils');
 const constants = require('../models/constants');
 const db = require('../app').db.models;
+const { getCoreModels } = require('../models/schema/typedModels');
 
 /**
  * Get a list of topics based on query and options
@@ -12,10 +13,11 @@ const db = require('../app').db.models;
  * @returns {Promise<Array>} Array of topics with enriched data
  */
 async function getTopicsList(query, options = {}) {
+  const models = getCoreModels({ db: { models: db } });
   const limit = options.limit || 50;
   const req = options.req;
   
-  let results = await db.Topic.find(query)
+  let results = await models.Topic.find(query)
     .sort({ editDate: -1 })
     .limit(limit)
     .lean();
@@ -37,7 +39,8 @@ async function getTopicsList(query, options = {}) {
  * @returns {Promise<Object>} Topic object with enriched data
  */
 async function getTopicEntry(topicId, req) {
-  const topic = await db.Topic.findById(topicId).lean();
+  const models = getCoreModels({ db: { models: db } });
+  const topic = await models.Topic.findById(topicId).lean();
   
   if (!topic) {
     return null;

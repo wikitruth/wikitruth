@@ -42,7 +42,7 @@ This backlog is derived from `MODERNIZATION_AND_TYPESCRIPT_PROPOSAL.md` and is i
 | P1-04 ✅ | Introduce API error envelope + centralized error middleware | 2.0d | P1-03 | Consistent error response shape across `/api/*`; legacy render paths unaffected. |
 | P1-05 ✅ | Runtime request validation (`zod` or `joi`) for create/update endpoints | 2.5d | P1-03 | Validation applied to highest-risk write endpoints; tests for invalid payloads added. |
 | P1-06 ✅ | Convert non-API controllers (`controllers/*.js`) to TS | 4.0d | P1-02 | Legacy page controllers typed and behavior-preserving. |
-| P1-07 | Convert `models/*` + schema wiring to typed Mongoose | 4.0d | P0-08 | Core models typed; service/model boundaries remove `any` for migrated domains. |
+| P1-07 ✅ | Convert `models/*` + schema wiring to typed Mongoose | 4.0d | P0-08 | Core models typed; service/model boundaries remove `any` for migrated domains. |
 | P1-08 | Replace `request` usage with fetch/axios adapter | 1.5d | P1-03 | No remaining production `request` usage in server code. |
 | P1-09 | Logging modernization (structured logger + request id) | 2.0d | P1-04 | Structured logs emitted for API errors and key request paths. |
 | P1-10 | Vulnerability reduction pass #2 (major upgrades with tests) | 3.0d | P1-08 | Additional high/critical reductions with regression tests and changelog notes. |
