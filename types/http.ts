@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { NextFunction, Request, Response } from 'express';
 import type { Session, SessionData } from 'express-session';
 import type { AuthUser } from './auth';
@@ -17,3 +16,17 @@ export interface WikitruthRequest extends Request {
 
 export type WikitruthResponse = Response;
 export type WikitruthNext = NextFunction;
+
+export interface ApiErrorEnvelope {
+  code: string;
+  message: string;
+  requestId: string | null;
+}
+
+export interface ApiErrorResponse {
+  error: ApiErrorEnvelope;
+}
+
+export interface ApiSuccessResponse<T> {
+  data: T;
+}

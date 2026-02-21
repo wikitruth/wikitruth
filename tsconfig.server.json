@@ -13,12 +13,7 @@
     "checkJs": false,
     "declaration": true,
     "sourceMap": true,
-    "baseUrl": ".",
-    "paths": {
-      "*": [
-        "node_modules/*"
-      ]
-    }
+    "baseUrl": "."
   },
   "include": [
     "controllers/**/*.ts",

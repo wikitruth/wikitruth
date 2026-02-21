@@ -6,7 +6,7 @@ Derived from `TYPE_IMPROVEMENT_PROJECT.md`.
 
 - [x] `TP-01` Baseline automation: add and run type metrics command (`npm run type:metrics`).
 - [x] `TP-02` Guardrails: reject new file-level `@ts-nocheck` additions in scoped server TS directories.
-- [ ] `TP-03` Remove `@ts-nocheck` from `types/http.ts` with strict typed request/response contracts.
+- [x] `TP-03` Remove `@ts-nocheck` from `types/http.ts` with strict typed request/response contracts.
 - [ ] `TP-04` Remove `@ts-nocheck` from `middlewares/requestValidation.ts` and `middlewares/apiError.ts`.
 - [ ] `TP-05` Remove `@ts-nocheck` from `middlewares/requestContext.ts` and `utils/logger.ts`.
 
