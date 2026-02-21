@@ -9,7 +9,7 @@ function source(relativePath) {
 
 describe('Route regression coverage for legacy + React shell', function () {
   it('keeps required legacy page endpoints wired', function () {
-    const legacyRoutes = source('middlewares/routes.js');
+    const legacyRoutes = source('middlewares/routes.ts');
     const legacyRootController = source('controllers/index.js');
 
     expect(legacyRootController).toContain("router.get('/', async function (req, res)"); // /

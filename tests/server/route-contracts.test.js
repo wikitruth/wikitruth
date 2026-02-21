@@ -9,7 +9,7 @@ function readProjectFile(relativePath) {
 
 describe('Server route contracts', function () {
   it('keeps legacy entry routes mounted', function () {
-    const routesSource = readProjectFile('middlewares/routes.js');
+    const routesSource = readProjectFile('middlewares/routes.ts');
 
     expect(routesSource).toContain("app.get('/home/'");
     expect(routesSource).toContain("app.get('/login/'");

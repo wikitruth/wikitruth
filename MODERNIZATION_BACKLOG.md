@@ -37,7 +37,7 @@ This backlog is derived from `MODERNIZATION_AND_TYPESCRIPT_PROPOSAL.md` and is i
 | ID | Task | Estimate | Depends On | Done Criteria |
 |---|---|---:|---|---|
 | P1-01 ✅ | Convert `middlewares/*` JS -> TS | 1.5d | P0-08 | Guards and middleware typed; runtime parity confirmed. |
-| P1-02 | Convert route composition (`middlewares/routes.js`) to TS | 1.5d | P1-01 | Route wiring typed; no route regressions in regression suite. |
+| P1-02 ✅ | Convert route composition (`middlewares/routes.js`) to TS | 1.5d | P1-01 | Route wiring typed; no route regressions in regression suite. |
 | P1-03 | Convert API controllers (`controllers/api/*`) to TS | 3.5d | P1-02 | API controllers compile in TS; contracts unchanged unless explicitly documented. |
 | P1-04 | Introduce API error envelope + centralized error middleware | 2.0d | P1-03 | Consistent error response shape across `/api/*`; legacy render paths unaffected. |
 | P1-05 | Runtime request validation (`zod` or `joi`) for create/update endpoints | 2.5d | P1-03 | Validation applied to highest-risk write endpoints; tests for invalid payloads added. |
