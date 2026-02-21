@@ -1,6 +1,7 @@
 'use strict';
 
 const API_ROUTE_PREFIX = /^\/api(\/|$)/;
+const logger = require('../utils/logger');
 
 function isPromiseLike(value) {
   return value && typeof value.then === 'function' && typeof value.catch === 'function';
@@ -80,12 +81,21 @@ function apiErrorHandler(err, req, res, next) {
   }
 
   const normalized = normalizeError(err);
+  logger.error('api.error', {
+    requestId: req.requestId || null,
+    method: req.method,
+    path: requestPath,
+    statusCode: normalized.status,
+    code: normalized.code,
+    message: err && err.message ? err.message : 'unknown error',
+  });
   const payload = {
     success: false,
     error: {
       code: normalized.code,
       message: normalized.message,
       details: normalized.details || null,
+      requestId: req.requestId || null,
     },
   };
 

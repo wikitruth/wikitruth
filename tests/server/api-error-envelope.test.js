@@ -27,6 +27,7 @@ describe('API error envelope', function () {
         code: 'DB_UNAVAILABLE',
         message: 'Internal server error',
         details: { dependency: 'mongodb' },
+        requestId: null,
       },
     });
   });

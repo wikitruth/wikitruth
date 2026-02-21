@@ -95,6 +95,7 @@ app.use(require('method-override')());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(cookieParser(config.cryptoKey));
+app.use(require('./middlewares/requestContext'));
 
 const helmetConfig = config.security && config.security.helmet ? config.security.helmet : { enabled: true };
 if (helmetConfig.enabled) {

@@ -11,6 +11,7 @@ export type WikitruthSession = Session & Partial<WikitruthSessionData>;
 export interface WikitruthRequest extends Request {
   user?: AuthUser;
   session: WikitruthSession;
+  requestId?: string;
 }
 
 export type WikitruthResponse = Response;
