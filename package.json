@@ -28,7 +28,8 @@
     "format": "prettier --write .",
     "prepare": "husky install",
     "tsc": "tsc",
-    "tsc:watch": "tsc --watch"
+    "tsc:watch": "tsc --watch",
+    "test:server": "jest --config jest.config.server.js"
   },
   "repository": {
     "type": "git",
