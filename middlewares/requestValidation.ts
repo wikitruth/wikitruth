@@ -1,7 +1,7 @@
-// @ts-nocheck
 'use strict';
 
-const { z } = require('zod');
+import type { RequestHandler } from 'express';
+import { z, type ZodError, type ZodTypeAny } from 'zod';
 
 const usernameRegex = /^[a-zA-Z0-9\-_]+$/;
 const emailRegex = /^[a-zA-Z0-9\-_.+]+@[a-zA-Z0-9\-_.]+\.[a-zA-Z0-9\-_]+$/;
@@ -56,7 +56,16 @@ const schemas = {
   }),
 };
 
-function toValidationResponse(error) {
+interface ValidationResponse {
+  success: false;
+  error: {
+    code: 'VALIDATION_ERROR';
+    message: string;
+    details: Record<string, string[] | undefined>;
+  };
+}
+
+function toValidationResponse(error: ZodError): ValidationResponse {
   return {
     success: false,
     error: {
@@ -67,15 +76,16 @@ function toValidationResponse(error) {
   };
 }
 
-function validateBody(schema) {
+function validateBody(schema: ZodTypeAny): RequestHandler {
   return function (req, res, next) {
-    const parsed = schema.safeParse(req.body || {});
+    const parsed = schema.safeParse(req.body ?? {});
     if (parsed.success) {
       req.body = parsed.data;
-      return next();
+      next();
+      return;
     }
 
-    return res.status(400).json(toValidationResponse(parsed.error));
+    res.status(400).json(toValidationResponse(parsed.error));
   };
 }
 

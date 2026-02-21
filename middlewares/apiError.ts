@@ -1,59 +1,88 @@
-// @ts-nocheck
 'use strict';
 
-const API_ROUTE_PREFIX = /^\/api(\/|$)/;
-const logger = require('../utils/logger');
+import type { ErrorRequestHandler, NextFunction, Request, RequestHandler, Response } from 'express';
 
-function isPromiseLike(value) {
-  return value && typeof value.then === 'function' && typeof value.catch === 'function';
+const API_ROUTE_PREFIX = /^\/api(\/|$)/;
+const logger = require('../utils/logger') as {
+  error: (event: string, fields: Record<string, unknown>) => void;
+};
+
+type PromiseLikeResult = {
+  then?: unknown;
+  catch?: (next: NextFunction) => unknown;
+};
+
+type RouteHandlerLike = (req: Request, res: Response, next: NextFunction) => unknown;
+
+interface NormalizedError {
+  status: number;
+  code: string;
+  message: string;
+  details?: unknown;
 }
 
-function wrapHandler(handler) {
+interface AppErrorLike {
+  status?: number;
+  statusCode?: number;
+  code?: string;
+  message?: string;
+  details?: unknown;
+}
+
+function isPromiseLike(value: unknown): value is PromiseLikeResult {
+  const candidate = value as PromiseLikeResult;
+  return typeof candidate?.then === 'function' && typeof candidate?.catch === 'function';
+}
+
+function wrapHandler(handler: unknown): unknown {
   if (typeof handler !== 'function') {
     return handler;
   }
 
-  return function wrappedHandler(req, res, next) {
+  const typedHandler = handler as RouteHandlerLike;
+  const wrappedHandler: RequestHandler = function (req, res, next) {
     try {
-      const result = handler(req, res, next);
+      const result = typedHandler(req, res, next);
       if (isPromiseLike(result)) {
-        result.catch(next);
+        result.catch?.(next);
       }
     } catch (error) {
       next(error);
     }
   };
+
+  return wrappedHandler;
 }
 
-function looksLikePathArgument(value) {
+function looksLikePathArgument(value: unknown): boolean {
   return typeof value === 'string' || value instanceof RegExp || Array.isArray(value);
 }
 
-function wrapAsyncRouter(router) {
-  const methods = ['get', 'post', 'put', 'patch', 'delete', 'all', 'use'];
+function wrapAsyncRouter(router: Record<string, unknown>): Record<string, unknown> {
+  const methods = ['get', 'post', 'put', 'patch', 'delete', 'all', 'use'] as const;
 
   methods.forEach(function (method) {
-    if (typeof router[method] !== 'function') {
+    const candidate = router[method];
+    if (typeof candidate !== 'function') {
       return;
     }
 
-    const original = router[method].bind(router);
-    router[method] = function () {
-      const args = Array.prototype.slice.call(arguments);
+    const original = (candidate as (...args: unknown[]) => unknown).bind(router);
+    router[method] = function (...args: unknown[]) {
       const wrappedArgs = args.map(function (arg, index) {
         if (index === 0 && looksLikePathArgument(arg)) {
           return arg;
         }
         return wrapHandler(arg);
       });
-      return original.apply(null, wrappedArgs);
+      return original(...wrappedArgs);
     };
   });
 
   return router;
 }
 
-function normalizeError(error) {
+function normalizeError(error: AppErrorLike | null | undefined): NormalizedError {
   if (!error) {
     return {
       status: 500,
@@ -62,10 +91,10 @@ function normalizeError(error) {
     };
   }
 
-  const statusCandidate = Number(error.status || error.statusCode || 500);
+  const statusCandidate = Number(error.status ?? error.statusCode ?? 500);
   const status = Number.isFinite(statusCandidate) && statusCandidate >= 400 ? statusCandidate : 500;
-  const code = error.code || (status >= 500 ? 'INTERNAL_ERROR' : 'API_ERROR');
-  const message = status >= 500 ? 'Internal server error' : error.message || 'Request failed';
+  const code = error.code ?? (status >= 500 ? 'INTERNAL_ERROR' : 'API_ERROR');
+  const message = status >= 500 ? 'Internal server error' : (error.message ?? 'Request failed');
 
   return {
     status: status,
@@ -75,33 +104,37 @@ function normalizeError(error) {
   };
 }
 
-function apiErrorHandler(err, req, res, next) {
-  const requestPath = (req && (req.path || req.originalUrl)) || '';
+const apiErrorHandler: ErrorRequestHandler = function (err, req, res, next) {
+  const requestPath = req.path || req.originalUrl || '';
   if (!API_ROUTE_PREFIX.test(requestPath)) {
-    return next(err);
+    next(err);
+    return;
   }
 
-  const normalized = normalizeError(err);
+  const normalized = normalizeError(err as AppErrorLike);
+  const requestId = (req as Request & { requestId?: string }).requestId ?? null;
+
   logger.error('api.error', {
-    requestId: req.requestId || null,
+    requestId: requestId,
     method: req.method,
     path: requestPath,
     statusCode: normalized.status,
     code: normalized.code,
-    message: err && err.message ? err.message : 'unknown error',
+    message: err && typeof err === 'object' && 'message' in err ? (err as { message?: string }).message : 'unknown error',
   });
+
   const payload = {
     success: false,
     error: {
       code: normalized.code,
       message: normalized.message,
-      details: normalized.details || null,
-      requestId: req.requestId || null,
+      details: normalized.details ?? null,
+      requestId: requestId,
     },
   };
 
-  return res.status(normalized.status).json(payload);
-}
+  res.status(normalized.status).json(payload);
+};
 
 module.exports = {
   wrapAsyncRouter: wrapAsyncRouter,
