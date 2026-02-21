@@ -2,10 +2,10 @@
 
 exports.port = process.env.PORT || 8000;
 exports.mongodb = {
-  uri: process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost:27017/wikitruth',
-  dbname: 'wikitruth',
-  backupRoot: '~/config/mongodb',
-  privateBackupRoot: '~/config/mongodb/users',
+  uri: process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || process.env.MONGODB_URI || 'mongodb://localhost:27017/wikitruth',
+  dbname: process.env.MONGODB_DBNAME || 'wikitruth',
+  backupRoot: process.env.MONGODB_BACKUP_ROOT || '~/config/mongodb',
+  privateBackupRoot: process.env.MONGODB_PRIVATE_BACKUP_ROOT || '~/config/mongodb/users',
   collections: {
     backupList: [
       'users',
@@ -55,36 +55,46 @@ exports.mongodb = {
     }
   }
 };
-exports.companyName = 'Acme, Inc.';
-exports.projectName = 'Wikitruth';
-exports.titleSlogan = 'Wikitruth, the truth in totality of human knowledge';
-exports.systemEmail = 'your@email.addy';
-exports.cryptoKey = 'abc123';
-exports.cacheBreaker = 'abc123';
-exports.jwtSecret = 'abc123';
-exports.trustProxy = false;
-exports.googleAnalyticsTrackingId = 'UA-abc-123';
+
+exports.companyName = process.env.COMPANY_NAME || 'Acme, Inc.';
+exports.projectName = process.env.PROJECT_NAME || 'Wikitruth';
+exports.titleSlogan = process.env.TITLE_SLOGAN || 'Wikitruth, the truth in totality of human knowledge';
+exports.systemEmail = process.env.SYSTEM_EMAIL || 'dev@example.com';
+
+/******************************************************************************
+ * Required secrets in production:
+ * - WIKITRUTH_CRYPTO_KEY
+ * - WIKITRUTH_JWT_SECRET
+ * - SMTP_FROM_ADDRESS
+ * - SMTP_USERNAME
+ * - SMTP_PASSWORD
+ *****************************************************************************/
+exports.cryptoKey = process.env.WIKITRUTH_CRYPTO_KEY || '';
+exports.cacheBreaker = process.env.CACHE_BREAKER || '';
+exports.jwtSecret = process.env.WIKITRUTH_JWT_SECRET || '';
+exports.trustProxy = process.env.TRUST_PROXY === 'true';
+exports.googleAnalyticsTrackingId = process.env.GOOGLE_ANALYTICS_TRACKING_ID || '';
 exports.loginAttempts = {
-  forIp: 50,
-  forIpAndUser: 7,
-  logExpiration: '20m'
+  forIp: Number(process.env.LOGIN_ATTEMPTS_FOR_IP || 50),
+  forIpAndUser: Number(process.env.LOGIN_ATTEMPTS_FOR_IP_AND_USER || 7),
+  logExpiration: process.env.LOGIN_ATTEMPTS_LOG_EXPIRATION || '20m'
 };
-exports.requireAccountVerification = false;
+exports.requireAccountVerification = process.env.REQUIRE_ACCOUNT_VERIFICATION === 'true';
 exports.smtp = {
   from: {
-    name: process.env.SMTP_FROM_NAME || exports.projectName +' Website',
-    address: process.env.SMTP_FROM_ADDRESS || 'your@email.addy'
+    name: process.env.SMTP_FROM_NAME || exports.projectName + ' Website',
+    address: process.env.SMTP_FROM_ADDRESS || 'dev@example.com'
   },
   credentials: {
-    user: process.env.SMTP_USERNAME || 'your@email.addy',
-    password: process.env.SMTP_PASSWORD || 'bl4rg!',
+    user: process.env.SMTP_USERNAME || '',
+    password: process.env.SMTP_PASSWORD || '',
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    ssl: true
+    ssl: process.env.SMTP_SSL ? process.env.SMTP_SSL === 'true' : true
   }
 };
 exports.grecaptcha = {
-  'sitekey': '',
-  'secret': ''
+  sitekey: process.env.GRECAPTCHA_SITEKEY || '',
+  secret: process.env.GRECAPTCHA_SECRET || ''
 };
 exports.oauth = {
   twitter: {

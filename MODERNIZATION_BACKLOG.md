@@ -19,7 +19,7 @@ This backlog is derived from `MODERNIZATION_AND_TYPESCRIPT_PROPOSAL.md` and is i
 
 | ID | Task | Estimate | Depends On | Done Criteria |
 |---|---|---:|---|---|
-| P0-01 | Secrets/config hardening (`config/config.js` -> env-first) | 1.5d | none | No hardcoded runtime secrets in committed config; `config/config.example.js` updated; startup validation added. |
+| P0-01 ✅ | Secrets/config hardening (`config/config.js` -> env-first) | 1.5d | none | No hardcoded runtime secrets in committed config; `config/config.example.js` updated; startup validation added. |
 | P0-02 | Pin runtime toolchain (`.nvmrc` + engines) | 0.5d | none | Node version pinned; `package.json` `engines` added; README setup updated. |
 | P0-03 | CI baseline pipeline (install, lint, test, build) | 1.0d | P0-02 | CI runs `npm ci`, lint, `test:client`, `build:client`, and existing server tests. |
 | P0-04 | Re-enable and configure `helmet` safely | 1.0d | P0-01 | `helmet` enabled with explicit policy config; no breakage to `/app`, `/home/`, `/login/`, `/api/home`. |
@@ -78,4 +78,3 @@ Use this lightweight format per week:
   - Critical/high vulnerabilities: `X / Y`
   - JS->TS converted server modules: `X / Y`
   - TS strictness flags enabled: `[list]`
-
