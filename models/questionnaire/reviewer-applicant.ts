@@ -1,6 +1,6 @@
-// @ts-nocheck
 "use strict";
 
+// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports = {
     // TODO: Create 30 questions. Check all that apply for answers.
     questions: [

@@ -1,14 +1,18 @@
-// @ts-nocheck
 'use strict';
 
 const tmplRoot = '../public/templates/jade',
+  // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'paths'.
   paths = require('../models/paths');
+// @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 const { validateBody, schemas } = require('./requestValidation');
 
+// @ts-ignore TS(7006): Parameter 'code' implicitly has an 'any' type.
 function req(code) {
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   return require(tmplRoot + code);
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 function ensureAuthenticated(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
@@ -18,6 +22,7 @@ function ensureAuthenticated(req, res, next) {
   res.redirect('/login/');
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 function ensureAdmin(req, res, next) {
   if (req.user.canPlayRoleOf('admin')) {
     return next();
@@ -25,6 +30,7 @@ function ensureAdmin(req, res, next) {
   res.redirect('/');
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 function ensureScreener(req, res, next) {
   if (req.user.canPlayRoleOf('screener')) {
     return next();
@@ -32,6 +38,7 @@ function ensureScreener(req, res, next) {
   res.redirect('/');
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 function ensureAccount(req, res, next) {
   if (req.user.canPlayRoleOf('account')) {
     if (req.app.config.requireAccountVerification) {
@@ -44,6 +51,7 @@ function ensureAccount(req, res, next) {
   res.redirect('/');
 }
 
+// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 function ensureAccountOwner(req, res, next) {
   if(req.user.username === req.params.username) {
     return next();
@@ -51,6 +59,7 @@ function ensureAccountOwner(req, res, next) {
   res.redirect('/');
 }
 
+// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports = function(app, passport) {
 
   app.get(paths.wiki.topics.create, ensureAuthenticated);

@@ -1,14 +1,20 @@
-// @ts-nocheck
 'use strict';
 
+// @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 let async = require('async'),
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   url = require('url'),
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   flowUtils = require('../utils/flowUtils'),
+  // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'paths'.
   paths = require('../models/paths'),
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   applications = require('../models/applications');
 
+// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports = function (app, passport) {
   // this code runs for all routes
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   app.use(/^[^.]+$/, async function (req, res, next) {
     res.cookie('_csrfToken', req.csrfToken());
     res.locals._csrf = req.csrfToken(); // should be no longer needed even adding _csrf manually in forms or request body
@@ -49,7 +55,9 @@ module.exports = function (app, passport) {
 
           if (!application.appCategories) {
             await flowUtils.getCategories(model, application.exploreTopicId, req);
+            // @ts-ignore TS(2339): Property 'categories' does not exist on type '{}'.
             application.appCategories = model.categories;
+            // @ts-ignore TS(2339): Property 'categories' does not exist on type '{}'.
             res.locals.appCategories = model.categories;
           } else {
             res.locals.appCategories = application.appCategories;
@@ -58,6 +66,7 @@ module.exports = function (app, passport) {
           // the default Wikitruth Project application. set cache to app-level
           if (!app.locals.appCategories) {
             await flowUtils.getCategories(model, null, req);
+            // @ts-ignore TS(2339): Property 'categories' does not exist on type '{}'.
             app.locals.appCategories = model.categories;
           }
         }
@@ -92,6 +101,7 @@ module.exports = function (app, passport) {
           let model = {};
           req.query.group = params[3];
           await flowUtils.setGroupModel(req, model);
+          // @ts-ignore TS(2339): Property 'group' does not exist on type '{}'.
           res.locals.group = model.group;
         }
       },

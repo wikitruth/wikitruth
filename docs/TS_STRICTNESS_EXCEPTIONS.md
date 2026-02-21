@@ -8,7 +8,7 @@ Strictness step 1 is enabled in `tsconfig.server.json`:
 - `noUncheckedIndexedAccess: true`
 - `allowJs: false` (server compiler scope no longer relies on JS fallback)
 
-Current exception mechanism is `@ts-nocheck` on migrated legacy modules while the codebase is being incrementally typed.
+Current exception mechanism is line-level `@ts-ignore` on legacy hotspots while the codebase is being incrementally hardened.
 
 Type-improvement project plan and backlog:
 
@@ -17,16 +17,15 @@ Type-improvement project plan and backlog:
 
 ## Exception Count
 
-- Total files with `@ts-nocheck`: `95`
+- Total files with `@ts-nocheck`: `0`
+- Total `@ts-ignore` occurrences (current snapshot): `1644`
 
 ## Exception Scope
 
-- `controllers/**` (legacy route and page controllers)
-- `middlewares/**` (route wiring and policy middlewares)
-- `models/**` (schema modules and model wiring)
-- `services/**` (domain service layer)
-- `utils/**` (legacy utility layer)
-- `types/http.ts` (temporary interop typing gap while strict migration is in progress)
+- `controllers/**` (legacy route and page controller hotspots)
+- `middlewares/**` (route composition/auth edge handling)
+- `models/**` (legacy schema and plugin interoperability)
+- `utils/**` (large legacy helper surface, especially `flowUtils`)
 
 ## Explicit JS Exclusions (Server Compiler Scope)
 
@@ -40,7 +39,7 @@ Type-improvement project plan and backlog:
 Use this command to inspect current exceptions:
 
 ```bash
-rg -n "@ts-nocheck" --glob '*.ts' controllers middlewares models services utils types
+rg -n "@ts-ignore" --glob '*.ts' controllers middlewares models services utils types
 ```
 
 Or use the project metrics script:
@@ -51,7 +50,7 @@ npm run type:metrics
 
 ## Reduction Plan
 
-1. Remove `@ts-nocheck` from middleware and utility modules first.
-2. Remove `@ts-nocheck` from service modules after model interfaces are tightened.
-3. Remove `@ts-nocheck` from controllers after request/response model typing is stabilized.
-4. Keep schema plugins and legacy edge models last due highest typing surface area.
+1. Reduce `@ts-ignore` density in `utils/flowUtils.ts` and high-traffic controllers first.
+2. Replace line-level suppressions with typed DTO/model interfaces in API/controller boundaries.
+3. Add targeted tests whenever suppressions are removed from mutation-heavy flows.
+4. Track `@ts-ignore` trend weekly using `npm run type:metrics` until materially reduced.
