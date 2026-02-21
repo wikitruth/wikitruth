@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use strict';
 
 let templates = require('../models/templates'),

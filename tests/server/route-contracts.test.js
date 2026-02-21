@@ -16,9 +16,9 @@ describe('Server route contracts', function () {
   });
 
   it('keeps root and api home handlers wired', function () {
-    const indexSource = readProjectFile('controllers/index.js');
+    const indexSource = readProjectFile('controllers/index.ts');
     const apiIndexSource = readProjectFile('controllers/api/index.ts');
-    const appControllerSource = readProjectFile('controllers/app.js');
+    const appControllerSource = readProjectFile('controllers/app.ts');
 
     expect(indexSource).toContain("router.get('/', async function (req, res)");
     expect(apiIndexSource).toContain("router.use('/home', homeRouter)");
