@@ -15,7 +15,7 @@ Derived from `TYPE_IMPROVEMENT_PROJECT.md`.
 - [x] `TP-06` Remove `@ts-nocheck` from `utils/httpClient.ts`, `utils/utils.ts`, `utils/mongoose.ts`.
 - [x] `TP-07` Remove `@ts-nocheck` from `utils/flowUtils.ts`, `utils/workflow/index.ts`, `utils/sendmail/index.ts`, `utils/slugify/index.ts`.
 - [x] `TP-08` Remove `@ts-nocheck` from `services/*` with explicit return types and model boundary interfaces.
-- [ ] `TP-09` Add typed error classes/codes used by services and API envelope.
+- [x] `TP-09` Add typed error classes/codes used by services and API envelope.
 
 ## P2 Controllers (4-7 Weeks)
 

@@ -2,6 +2,7 @@
 
 import type { RequestHandler } from 'express';
 import { z, type ZodError, type ZodTypeAny } from 'zod';
+import { API_ERROR_CODES } from '../types/errors';
 
 const usernameRegex = /^[a-zA-Z0-9\-_]+$/;
 const emailRegex = /^[a-zA-Z0-9\-_.+]+@[a-zA-Z0-9\-_.]+\.[a-zA-Z0-9\-_]+$/;
@@ -59,7 +60,7 @@ const schemas = {
 interface ValidationResponse {
   success: false;
   error: {
-    code: 'VALIDATION_ERROR';
+    code: typeof API_ERROR_CODES.VALIDATION_ERROR;
     message: string;
     details: Record<string, string[] | undefined>;
   };
@@ -69,7 +70,7 @@ function toValidationResponse(error: ZodError): ValidationResponse {
   return {
     success: false,
     error: {
-      code: 'VALIDATION_ERROR',
+      code: API_ERROR_CODES.VALIDATION_ERROR,
       message: 'Invalid request payload',
       details: error.flatten().fieldErrors,
     },

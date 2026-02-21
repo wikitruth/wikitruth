@@ -1,6 +1,7 @@
 'use strict';
 
 import type { ErrorRequestHandler, NextFunction, Request, RequestHandler, Response } from 'express';
+import { API_ERROR_CODES, type ApiErrorCode, isAppError } from '../types/errors';
 
 const API_ROUTE_PREFIX = /^\/api(\/|$)/;
 const logger = require('../utils/logger') as {
@@ -16,7 +17,7 @@ type RouteHandlerLike = (req: Request, res: Response, next: NextFunction) => unk
 
 interface NormalizedError {
   status: number;
-  code: string;
+  code: ApiErrorCode | string;
   message: string;
   details?: unknown;
 }
@@ -24,7 +25,7 @@ interface NormalizedError {
 interface AppErrorLike {
   status?: number;
   statusCode?: number;
-  code?: string;
+  code?: ApiErrorCode | string;
   message?: string;
   details?: unknown;
 }
@@ -86,14 +87,14 @@ function normalizeError(error: AppErrorLike | null | undefined): NormalizedError
   if (!error) {
     return {
       status: 500,
-      code: 'INTERNAL_ERROR',
+      code: API_ERROR_CODES.INTERNAL_ERROR,
       message: 'Internal server error',
     };
   }
 
   const statusCandidate = Number(error.status ?? error.statusCode ?? 500);
   const status = Number.isFinite(statusCandidate) && statusCandidate >= 400 ? statusCandidate : 500;
-  const code = error.code ?? (status >= 500 ? 'INTERNAL_ERROR' : 'API_ERROR');
+  const code = error.code ?? (status >= 500 ? API_ERROR_CODES.INTERNAL_ERROR : API_ERROR_CODES.API_ERROR);
   const message = status >= 500 ? 'Internal server error' : (error.message ?? 'Request failed');
 
   return {
@@ -111,7 +112,7 @@ const apiErrorHandler: ErrorRequestHandler = function (err, req, res, next) {
     return;
   }
 
-  const normalized = normalizeError(err as AppErrorLike);
+  const normalized = normalizeError(isAppError(err) ? err : (err as AppErrorLike));
   const requestId = (req as Request & { requestId?: string }).requestId ?? null;
 
   logger.error('api.error', {
