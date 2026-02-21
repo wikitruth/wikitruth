@@ -8,6 +8,8 @@ const csrf = require('csurf');
 const request = require('supertest');
 const config = require('../../config/config');
 
+/** @typedef {import('../../types/http').WikitruthRequest} WikitruthRequest */
+
 function createSecurityTestApp() {
   const app = express();
   const sessionCookie = config.session.cookie;
@@ -44,7 +46,7 @@ function createSecurityTestApp() {
     })
   );
 
-  app.get('/form', function (req, res) {
+  app.get('/form', /** @param {WikitruthRequest} req */ function (req, res) {
     res.status(200).json({ csrfToken: req.csrfToken() });
   });
 

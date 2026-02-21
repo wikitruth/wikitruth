@@ -26,7 +26,8 @@
     "models/**/*.js",
     "services/**/*.js",
     "utils/**/*.js",
-    "types/**/*.ts"
+    "types/**/*.ts",
+    "types/**/*.d.ts"
   ],
   "exclude": [
     "node_modules",
