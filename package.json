@@ -31,6 +31,7 @@
     "tsc:watch": "tsc -p tsconfig.server.json --watch",
     "type:check": "tsc -p tsconfig.server.json --noEmit",
     "type:metrics": "bash scripts/type-metrics.sh",
+    "type:guardrails": "bash scripts/check-no-new-ts-nocheck.sh",
     "test:server": "jest --config jest.config.server.js",
     "start:legacy-grunt": "grunt"
   },

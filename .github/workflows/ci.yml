@@ -26,6 +26,9 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Type guardrails
+        run: npm run type:guardrails
+
       - name: Client tests
         run: npm run test:client
 
