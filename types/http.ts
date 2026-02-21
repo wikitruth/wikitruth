@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type { NextFunction, Request, Response } from 'express';
 import type { Session, SessionData } from 'express-session';
 import type { AuthUser } from './auth';

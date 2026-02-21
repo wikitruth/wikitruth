@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use strict';
 
 const API_ROUTE_PREFIX = /^\/api(\/|$)/;

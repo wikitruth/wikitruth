@@ -6,6 +6,8 @@
     "outDir": "./dist",
     "rootDir": "./",
     "strict": false,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
     "allowJs": true,
     "checkJs": false,
     "declaration": true,
