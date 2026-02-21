@@ -1,6 +1,6 @@
-// @ts-nocheck
 'use strict';
 
+// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports = function (app, mongoose) {
   const schema = new mongoose.Schema({
     wordId: { type: mongoose.Schema.ObjectId, ref: 'Word' },
@@ -11,6 +11,7 @@ module.exports = function (app, mongoose) {
     editUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     extras: { type: mongoose.Schema.Types.Mixed },
   });
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   schema.plugin(require('../plugins/pagedFind'));
   schema.index({ id: 1 });
   schema.index({ word: 1 });

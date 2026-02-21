@@ -1,6 +1,6 @@
-// @ts-nocheck
 'use strict';
 
+// @ts-ignore TS(2304): Cannot find name 'exports'.
 exports = module.exports = function(app, mongoose) {
   const attemptSchema = new mongoose.Schema({
     ip: {type: String, default: ''},

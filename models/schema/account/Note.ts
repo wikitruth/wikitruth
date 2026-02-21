@@ -1,6 +1,6 @@
-// @ts-nocheck
 'use strict';
 
+// @ts-ignore TS(2304): Cannot find name 'exports'.
 exports = module.exports = function(app, mongoose) {
   const noteSchema = new mongoose.Schema({
     data: {type: String, default: ''},

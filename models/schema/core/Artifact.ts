@@ -1,8 +1,9 @@
-// @ts-nocheck
 'use strict';
 
+// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'constants'... Remove this comment to see the full error message
 const constants = require('../../constants');
 
+// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports = function (app, mongoose) {
   const schema = new mongoose.Schema({
     title: { type: String, default: '' },
@@ -74,9 +75,11 @@ module.exports = function (app, mongoose) {
   });
 
   // schema statics
+  // @ts-ignore TS(7006): Parameter 'username' implicitly has an 'any' type.
   schema.statics.getFolder = function (username, entity) {
     return '/media/artifacts/' + (username && entity.private ? 'users/' + username + '/' : '');
   };
+  // @ts-ignore TS(7006): Parameter 'entity' implicitly has an 'any' type.
   schema.statics.isImage = function (entity) {
     return entity.file.type.startsWith('image');
   };
@@ -85,13 +88,16 @@ module.exports = function (app, mongoose) {
   schema.methods.getType = function () {
     return constants.OBJECT_TYPES.artifact;
   };
+  // @ts-ignore TS(7006): Parameter 'username' implicitly has an 'any' type.
   schema.methods.getFolder = function (username) {
     // router
     return this.constructor.getFolder(username, this);
   };
+  // @ts-ignore TS(7006): Parameter 'username' implicitly has an 'any' type.
   schema.methods.getFilePath = function (username) {
     return this.getFolder(username) + this._id + '_' + this.file.name;
   };
+  // @ts-ignore TS(7006): Parameter 'username' implicitly has an 'any' type.
   schema.methods.getThumbnailPath = function (username) {
     if (this.isImage()) {
       return this.getFolder(username) + this._id + '_thumbnail_' + this.file.name;
@@ -102,6 +108,7 @@ module.exports = function (app, mongoose) {
     // router
     return this.constructor.isImage(this);
   };
+  // @ts-ignore TS(7006): Parameter 'username' implicitly has an 'any' type.
   schema.methods.setThumbnailPath = function (username) {
     if (this.file.name) {
       this.filePath = this.getFilePath(username);
@@ -111,6 +118,7 @@ module.exports = function (app, mongoose) {
     }
   };
 
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   schema.plugin(require('../plugins/pagedFind'));
   schema.index({ title: 1 });
   schema.index(

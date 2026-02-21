@@ -1,6 +1,6 @@
-// @ts-nocheck
 'use strict';
 
+// @ts-ignore TS(2304): Cannot find name 'exports'.
 exports = module.exports = function(app, mongoose) {
   const accountSchema = new mongoose.Schema({
     user: {
@@ -36,6 +36,7 @@ exports = module.exports = function(app, mongoose) {
     },
     search: [String]
   });
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   accountSchema.plugin(require('../plugins/pagedFind'));
   accountSchema.index({ user: 1 });
   accountSchema.index({ 'status.id': 1 });

@@ -1,6 +1,6 @@
-// @ts-nocheck
 'use strict';
 
+// @ts-ignore TS(2304): Cannot find name 'exports'.
 exports = module.exports = function(app, mongoose) {
   const adminSchema = new mongoose.Schema({
     user: {
@@ -21,6 +21,7 @@ exports = module.exports = function(app, mongoose) {
     timeCreated: { type: Date, default: Date.now },
     search: [String]
   });
+  // @ts-ignore TS(7006): Parameter 'something' implicitly has an 'any' type... Remove this comment to see the full error message
   adminSchema.methods.hasPermissionTo = function(something) {
     //check group permissions
     let groupHasPermission = false;
@@ -47,6 +48,7 @@ exports = module.exports = function(app, mongoose) {
 
     return groupHasPermission;
   };
+  // @ts-ignore TS(7006): Parameter 'group' implicitly has an 'any' type.
   adminSchema.methods.isMemberOf = function(group) {
     for (let i = 0 ; i < this.groups.length ; i++) {
       if (this.groups[i]._id === group) {
@@ -56,6 +58,7 @@ exports = module.exports = function(app, mongoose) {
 
     return false;
   };
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   adminSchema.plugin(require('../plugins/pagedFind'));
   adminSchema.index({ 'user.id': 1 });
   adminSchema.index({ search: 1 });
