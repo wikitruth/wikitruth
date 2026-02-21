@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use strict';
 
 exports = module.exports = function(req, res, options) {

@@ -1,5 +1,9 @@
 'use strict';
 
+if (!/[/\\]dist$/.test(__dirname)) {
+    require('ts-node/register/transpile-only');
+}
+
 //dependencies
 const config = require('./config/config'),
     paths = require('./models/paths'),
