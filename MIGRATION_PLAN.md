@@ -92,7 +92,7 @@ Migrate community features:
 #### Infrastructure
 - [ ] Create `client/` directory structure
 - [ ] Set up TypeScript configuration for client
-- [ ] Configure ESLint/Prettier for React
+- [x] Configure ESLint/Prettier for React
 - [ ] Set up Hot Module Replacement (HMR) for development
 - [ ] Configure CSS/SCSS/CSS Modules solution
 - [ ] Set up React Router for client-side routing

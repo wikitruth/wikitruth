@@ -23,7 +23,7 @@ Quick reference checklist for the Wikitruth frontend migration from Dust.js/Jade
 - [x] Create `client/` directory structure
 - [x] Create `client/src/` subdirectories (components, pages, services, etc.)
 - [x] Set up `client/tsconfig.json` for React/TypeScript
-- [ ] Configure ESLint for React (`client/.eslintrc.json`)
+- [x] Configure ESLint for React (`client/.eslintrc.json`)
 - [x] Configure Prettier for consistent formatting
 - [x] Use root `package.json` for React/client dependencies
 
