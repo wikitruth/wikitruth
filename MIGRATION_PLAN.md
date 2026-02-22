@@ -93,7 +93,7 @@ Migrate community features:
 - [ ] Create `client/` directory structure
 - [ ] Set up TypeScript configuration for client
 - [x] Configure ESLint/Prettier for React
-- [ ] Set up Hot Module Replacement (HMR) for development
+- [x] Set up Hot Module Replacement (HMR) for development
 - [ ] Configure CSS/SCSS/CSS Modules solution
 - [ ] Set up React Router for client-side routing
 - [ ] Configure state management (Context API or Redux)
@@ -109,8 +109,8 @@ Migrate community features:
 - [ ] Set up bundle analysis tools
 
 #### Development Environment
-- [ ] Create development server setup
-- [ ] Configure proxy for API calls to backend
+- [x] Create development server setup
+- [x] Configure proxy for API calls to backend
 - [ ] Set up environment variables management
 - [x] Create npm scripts for common tasks
 - [x] Add `npm run dev:server`, `npm run dev:client`, and `npm run dev:all`

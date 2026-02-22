@@ -12,7 +12,7 @@
     "start:dist": "tsc -p tsconfig.server.json && node dist/server.js",
     "dev": "npm run dev:server",
     "dev:server": "nodemon --exec ts-node app",
-    "dev:client": "webpack --mode development --watch",
+    "dev:client": "webpack serve --mode development --hot",
     "dev:all": "npm-run-all --parallel dev:server dev:client",
     "build:server": "tsc -p tsconfig.server.json",
     "build:client": "webpack --mode production",
@@ -139,7 +139,8 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
     "webpack": "^5.99.5",
-    "webpack-cli": "5.1.4"
+    "webpack-cli": "5.1.4",
+    "webpack-dev-server": "^5.2.3"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
