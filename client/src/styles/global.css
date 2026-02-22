@@ -1,0 +1,30 @@
+body {
+  background: var(--wt-surface-muted);
+  color: var(--wt-text);
+}
+
+.wt-popover {
+  position: relative;
+  display: inline-flex;
+  cursor: pointer;
+}
+
+.wt-popover .wt-popover-content {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 20;
+  display: none;
+  min-width: 180px;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--wt-border);
+  border-radius: 4px;
+  background: var(--wt-surface);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+}
+
+.wt-popover:hover .wt-popover-content,
+.wt-popover:focus-within .wt-popover-content {
+  display: block;
+}
