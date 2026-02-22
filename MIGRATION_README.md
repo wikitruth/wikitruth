@@ -95,9 +95,9 @@ Technical reference with:
 
 ## 🚦 Current Status
 
-**Phase**: Phase 0 - Foundation Setup (In Progress)  
-**Progress**: Core React scaffold and routing are in place; migration work is active  
-**Next Milestone**: Complete remaining Phase 0 items (ESLint client config, asset loader strategy, HMR approach) and close checklist gaps
+**Phase**: Migration Closed (Legacy Comparison Mode Active)  
+**Progress**: Phases 0-6 completed with React routes and supporting APIs in place  
+**Next Milestone**: Use retained legacy templates for side-by-side comparison and targeted parity hardening
 
 ---
 
@@ -122,7 +122,7 @@ Migrate community features (23 Dust templates).
 Performance, accessibility, SEO, and final touches.
 
 ### Phase 6: Deployment (Weeks 15-16) 🚀
-Testing, staging, production deployment, and cleanup.
+Testing, rollout readiness, monitoring, and legacy comparison retention.
 
 ---
 
@@ -158,13 +158,13 @@ Testing, staging, production deployment, and cleanup.
 7. **Merge** after approval
 
 ### Code Review Checklist
-- [ ] Component follows naming conventions
-- [ ] TypeScript types are properly defined
-- [ ] Unit tests are included and passing
-- [ ] No ESLint errors
-- [ ] Accessible (WCAG compliant)
-- [ ] Responsive design
-- [ ] Documentation/comments where needed
+- Component follows naming conventions
+- TypeScript types are properly defined
+- Unit tests are included and passing
+- No ESLint errors
+- Accessible (WCAG compliant)
+- Responsive design
+- Documentation/comments where needed
 
 ---
 
@@ -251,7 +251,7 @@ Track progress using **MIGRATION_CHECKLIST.md**:
 - Staging deployment
 - Testing & validation
 - Production rollout
-- Legacy code removal
+- Legacy-vs-modern comparison readiness
 
 ---
 
@@ -271,8 +271,8 @@ Ready to begin the migration?
 
 | Document | Version | Last Updated |
 |----------|---------|--------------|
-| MIGRATION_PLAN.md | 1.0 | 2026-02-21 |
-| MIGRATION_CHECKLIST.md | 1.0 | 2026-02-21 |
+| MIGRATION_PLAN.md | 1.1 | 2026-02-22 |
+| MIGRATION_CHECKLIST.md | 1.1 | 2026-02-22 |
 | MIGRATION_QUICKSTART.md | 1.0 | 2026-02-21 |
 | MIGRATION_TECHNICAL_REFERENCE.md | 1.0 | 2026-02-21 |
 
