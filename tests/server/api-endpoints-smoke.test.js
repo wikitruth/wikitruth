@@ -27,6 +27,12 @@ describe('API endpoint smoke coverage', function () {
     ].forEach((contract) => expect(apiIndex).toContain(contract));
   });
 
+  it('keeps /api/v1 compatibility routed through the same handlers', function () {
+    const apiV1 = read('controllers/api/v1.ts');
+
+    expect(apiV1).toContain("require('./index')(router)");
+  });
+
   it('exposes auth API handlers for session flows', function () {
     const authApi = read('controllers/api/auth.ts');
 
