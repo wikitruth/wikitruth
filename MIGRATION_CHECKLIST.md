@@ -42,7 +42,7 @@ Quick reference checklist for the Wikitruth frontend migration from Dust.js/Jade
 - [x] Add `npm run test:client:watch` script
 - [x] Add `npm run test:coverage` script
 - [x] Update `.gitignore` for client build artifacts
-- [ ] Create development environment setup documentation
+- [x] Create development environment setup documentation
 
 ### Testing Setup
 - [x] Install Jest

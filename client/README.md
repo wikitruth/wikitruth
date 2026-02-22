@@ -26,6 +26,8 @@ client/
 
 ## Development
 
+For full local setup details, see [`docs/CLIENT_DEVELOPMENT_SETUP.md`](../docs/CLIENT_DEVELOPMENT_SETUP.md).
+
 ### Building the Client
 
 To build the React client for production:
