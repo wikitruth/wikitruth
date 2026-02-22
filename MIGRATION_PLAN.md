@@ -117,7 +117,7 @@ Migrate community features:
 - [x] Add `npm run test:client`, `npm run test:client:watch`, and `npm run test:coverage`
 - [x] Add dedicated client Jest config (`jest.config.client.js`)
 - [x] Add at least one client smoke test (`client/src/**/*.test.ts(x)`)
-- [ ] Update .gitignore for client build artifacts
+- [x] Update .gitignore for client build artifacts
 - [ ] Set up testing infrastructure (Jest, React Testing Library)
 - [ ] Configure Storybook for component development (optional)
 

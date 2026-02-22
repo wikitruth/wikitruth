@@ -7,6 +7,10 @@ yarn-error.log
 # Build output
 public/dist/
 coverage/
+client/dist/
+client/build/
+coverage/client/
+.webpack-cache/
 
 # Environment variables
 .env
