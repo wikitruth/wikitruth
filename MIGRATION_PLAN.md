@@ -166,32 +166,32 @@ Migrate community features:
 ### 🔐 Authentication & Admin Pages
 
 #### Authentication (Jade → React)
-- [ ] `pages/Login/LoginPage.tsx` - Login page
-- [ ] `pages/Signup/SignupPage.tsx` - Registration page
-- [ ] `pages/ForgotPassword/ForgotPasswordPage.tsx` - Password reset request
-- [ ] `pages/ResetPassword/ResetPasswordPage.tsx` - Password reset form
-- [ ] `pages/Logout/LogoutPage.tsx` - Logout handler
-- [ ] `components/SocialLogin.tsx` - Social login buttons
+- [x] `pages/Login/LoginPage.tsx` - Login page
+- [x] `pages/Signup/SignupPage.tsx` - Registration page
+- [x] `pages/ForgotPassword/ForgotPasswordPage.tsx` - Password reset request
+- [x] `pages/ResetPassword/ResetPasswordPage.tsx` - Password reset form
+- [x] `pages/Logout/LogoutPage.tsx` - Logout handler
+- [x] `components/SocialLogin.tsx` - Social login buttons
 
 #### Account Management
-- [ ] `pages/Account/AccountPage.tsx` - Account overview
-- [ ] `pages/Account/SettingsPage.tsx` - Account settings
-- [ ] `pages/Account/VerificationPage.tsx` - Email verification
+- [x] `pages/Account/AccountPage.tsx` - Account overview
+- [x] `pages/Account/SettingsPage.tsx` - Account settings
+- [x] `pages/Account/VerificationPage.tsx` - Email verification
 
 #### Admin Panel
-- [ ] `pages/Admin/AdminDashboard.tsx` - Admin home
-- [ ] `pages/Admin/Users/UsersList.tsx` - Users management
-- [ ] `pages/Admin/Users/UserDetails.tsx` - User details
-- [ ] `pages/Admin/Accounts/AccountsList.tsx` - Accounts management
-- [ ] `pages/Admin/Accounts/AccountDetails.tsx` - Account details
-- [ ] `pages/Admin/Administrators/AdminList.tsx` - Admins list
-- [ ] `pages/Admin/Administrators/AdminDetails.tsx` - Admin details
-- [ ] `pages/Admin/AdminGroups/GroupsList.tsx` - Admin groups list
-- [ ] `pages/Admin/AdminGroups/GroupDetails.tsx` - Admin group details
-- [ ] `pages/Admin/Categories/CategoriesList.tsx` - Categories management
-- [ ] `pages/Admin/Categories/CategoryDetails.tsx` - Category details
-- [ ] `pages/Admin/Statuses/StatusesList.tsx` - Statuses management
-- [ ] `pages/Admin/Statuses/StatusDetails.tsx` - Status details
+- [x] `pages/Admin/AdminDashboard.tsx` - Admin home
+- [x] `pages/Admin/Users/UsersList.tsx` - Users management
+- [x] `pages/Admin/Users/UserDetails.tsx` - User details
+- [x] `pages/Admin/Accounts/AccountsList.tsx` - Accounts management
+- [x] `pages/Admin/Accounts/AccountDetails.tsx` - Account details
+- [x] `pages/Admin/Administrators/AdminList.tsx` - Admins list
+- [x] `pages/Admin/Administrators/AdminDetails.tsx` - Admin details
+- [x] `pages/Admin/AdminGroups/GroupsList.tsx` - Admin groups list
+- [x] `pages/Admin/AdminGroups/GroupDetails.tsx` - Admin group details
+- [x] `pages/Admin/Categories/CategoriesList.tsx` - Categories management
+- [x] `pages/Admin/Categories/CategoryDetails.tsx` - Category details
+- [x] `pages/Admin/Statuses/StatusesList.tsx` - Statuses management
+- [x] `pages/Admin/Statuses/StatusDetails.tsx` - Status details
 
 ### 📖 Wiki System - Common Components
 
@@ -377,14 +377,14 @@ Migrate community features:
 - [ ] `services/api/artifacts.ts` - Artifacts API
 - [ ] `services/api/groups.ts` - Groups API
 - [ ] `services/api/members.ts` - Members API
-- [ ] `services/api/auth.ts` - Authentication API
-- [ ] `services/api/admin.ts` - Admin API
+- [x] `services/api/auth.ts` - Authentication API
+- [x] `services/api/admin.ts` - Admin API
 
 #### State Management
-- [ ] `context/AuthContext.tsx` - Authentication state
+- [x] `context/AuthContext.tsx` - Authentication state
 - [ ] `context/UserContext.tsx` - User data context
 - [ ] `context/ThemeContext.tsx` - Theme/UI context
-- [ ] `hooks/useAuth.ts` - Authentication hook
+- [x] `hooks/useAuth.ts` - Authentication hook
 - [ ] `hooks/useApi.ts` - API data fetching hook
 - [ ] `hooks/useForm.ts` - Form handling hook
 - [ ] `hooks/usePagination.ts` - Pagination hook

@@ -116,43 +116,43 @@ Quick reference checklist for the Wikitruth frontend migration from Dust.js/Jade
 *Weeks 4-5 | Priority: HIGH*
 
 ### Authentication Pages (6 pages)
-- [ ] `pages/Auth/LoginPage.tsx`
-- [ ] `pages/Auth/SignupPage.tsx`
-- [ ] `pages/Auth/ForgotPasswordPage.tsx`
-- [ ] `pages/Auth/ResetPasswordPage.tsx`
-- [ ] `pages/Auth/LogoutPage.tsx`
-- [ ] `components/Auth/SocialLoginButtons.tsx`
+- [x] `pages/Auth/LoginPage.tsx`
+- [x] `pages/Auth/SignupPage.tsx`
+- [x] `pages/Auth/ForgotPasswordPage.tsx`
+- [x] `pages/Auth/ResetPasswordPage.tsx`
+- [x] `pages/Auth/LogoutPage.tsx`
+- [x] `components/Auth/SocialLoginButtons.tsx`
 
 ### Account Pages (3 pages)
-- [ ] `pages/Account/AccountPage.tsx`
-- [ ] `pages/Account/SettingsPage.tsx`
-- [ ] `pages/Account/VerificationPage.tsx`
+- [x] `pages/Account/AccountPage.tsx`
+- [x] `pages/Account/SettingsPage.tsx`
+- [x] `pages/Account/VerificationPage.tsx`
 
 ### Admin Pages (13 pages)
-- [ ] `pages/Admin/AdminDashboard.tsx`
-- [ ] `pages/Admin/Users/UsersList.tsx`
-- [ ] `pages/Admin/Users/UserDetails.tsx`
-- [ ] `pages/Admin/Accounts/AccountsList.tsx`
-- [ ] `pages/Admin/Accounts/AccountDetails.tsx`
-- [ ] `pages/Admin/Administrators/AdminsList.tsx`
-- [ ] `pages/Admin/Administrators/AdminDetails.tsx`
-- [ ] `pages/Admin/AdminGroups/GroupsList.tsx`
-- [ ] `pages/Admin/AdminGroups/GroupDetails.tsx`
-- [ ] `pages/Admin/Categories/CategoriesList.tsx`
-- [ ] `pages/Admin/Categories/CategoryDetails.tsx`
-- [ ] `pages/Admin/Statuses/StatusesList.tsx`
-- [ ] `pages/Admin/Statuses/StatusDetails.tsx`
+- [x] `pages/Admin/AdminDashboard.tsx`
+- [x] `pages/Admin/Users/UsersList.tsx`
+- [x] `pages/Admin/Users/UserDetails.tsx`
+- [x] `pages/Admin/Accounts/AccountsList.tsx`
+- [x] `pages/Admin/Accounts/AccountDetails.tsx`
+- [x] `pages/Admin/Administrators/AdminsList.tsx`
+- [x] `pages/Admin/Administrators/AdminDetails.tsx`
+- [x] `pages/Admin/AdminGroups/GroupsList.tsx`
+- [x] `pages/Admin/AdminGroups/GroupDetails.tsx`
+- [x] `pages/Admin/Categories/CategoriesList.tsx`
+- [x] `pages/Admin/Categories/CategoryDetails.tsx`
+- [x] `pages/Admin/Statuses/StatusesList.tsx`
+- [x] `pages/Admin/Statuses/StatusDetails.tsx`
 
 ### Services
-- [ ] `services/api/auth.ts`
-- [ ] `services/api/admin.ts`
-- [ ] `context/AuthContext.tsx`
-- [ ] `hooks/useAuth.ts`
+- [x] `services/api/auth.ts`
+- [x] `services/api/admin.ts`
+- [x] `context/AuthContext.tsx`
+- [x] `hooks/useAuth.ts`
 
 ### Testing
-- [ ] Unit tests for auth components
-- [ ] Integration tests for login flow
-- [ ] Tests for admin pages
+- [x] Unit tests for auth components
+- [x] Integration tests for login flow
+- [x] Tests for admin pages
 
 ---
 
