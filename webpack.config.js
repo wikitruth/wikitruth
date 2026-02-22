@@ -4,10 +4,13 @@ module.exports = (env, argv) => {
   const isProduction = argv.mode === 'production';
 
   return {
-    entry: './client/index.tsx',
+    entry: {
+      bundle: './client/index.tsx',
+    },
     output: {
       path: path.resolve(__dirname, 'public/dist'),
-      filename: 'bundle.js',
+      filename: '[name].js',
+      chunkFilename: '[name].chunk.js',
       publicPath: '/dist/',
     },
     module: {

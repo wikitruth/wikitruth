@@ -1,63 +1,71 @@
-import React from 'react';
-import AboutPage from '../pages/AboutPage';
-import AccountPage from '../pages/Account/AccountPage';
-import SettingsPage from '../pages/Account/SettingsPage';
-import VerificationPage from '../pages/Account/VerificationPage';
-import AdminDashboard from '../pages/Admin/AdminDashboard';
-import AccountsList from '../pages/Admin/Accounts/AccountsList';
-import AccountDetails from '../pages/Admin/Accounts/AccountDetails';
-import AdminDetails from '../pages/Admin/Administrators/AdminDetails';
-import AdminsList from '../pages/Admin/Administrators/AdminsList';
-import GroupsList from '../pages/Admin/AdminGroups/GroupsList';
-import GroupDetails from '../pages/Admin/AdminGroups/GroupDetails';
-import CategoriesList from '../pages/Admin/Categories/CategoriesList';
-import CategoryDetails from '../pages/Admin/Categories/CategoryDetails';
-import StatusesList from '../pages/Admin/Statuses/StatusesList';
-import StatusDetails from '../pages/Admin/Statuses/StatusDetails';
-import UserDetails from '../pages/Admin/Users/UserDetails';
-import UsersList from '../pages/Admin/Users/UsersList';
-import AnswersPage from '../pages/AnswersPage';
-import ArgumentCreatePage from '../pages/ArgumentCreatePage';
-import ArgumentEntryPage from '../pages/ArgumentEntryPage';
-import ArgumentsPage from '../pages/ArgumentsPage';
-import ArtifactsPage from '../pages/ArtifactsPage';
-import AdministratorsPage from '../pages/Members/AdministratorsPage';
-import ContributorsPage from '../pages/Members/ContributorsPage';
-import ForgotPasswordPage from '../pages/Auth/ForgotPasswordPage';
-import GroupCreate from '../pages/Groups/GroupCreate';
-import GroupMembers from '../pages/Groups/Group/GroupMembers';
-import GroupPage from '../pages/Groups/Group/GroupPage';
-import GroupPosts from '../pages/Groups/Group/GroupPosts';
-import GroupsIndex from '../pages/Groups/GroupsIndex';
-import GroupsPage from '../pages/GroupsPage';
-import HomePage from '../pages/HomePage';
-import IssueEntryPage from '../pages/IssueEntryPage';
-import IssuesPage from '../pages/IssuesPage';
-import LoginPage from '../pages/Auth/LoginPage';
-import LogoutPage from '../pages/Auth/LogoutPage';
-import MembersPage from '../pages/MembersPage';
-import NotFoundPage from '../pages/NotFoundPage';
-import OpinionEntryPage from '../pages/OpinionEntryPage';
-import OpinionsPage from '../pages/OpinionsPage';
-import PageCreate from '../pages/Members/Profile/Pages/PageCreate';
-import PagesIndex from '../pages/Members/Profile/Pages/PagesIndex';
-import PageView from '../pages/Members/Profile/Pages/PageView';
-import ProfileContributions from '../pages/Members/Profile/ProfileContributions';
-import ProfileFollowing from '../pages/Members/Profile/ProfileFollowing';
-import ProfilePage from '../pages/Members/Profile/ProfilePage';
-import ProfileSettings from '../pages/Members/Profile/ProfileSettings';
-import ProfileTopics from '../pages/Members/Profile/ProfileTopics';
-import QuestionEntryPage from '../pages/QuestionEntryPage';
-import QuestionsPage from '../pages/QuestionsPage';
-import ResetPasswordPage from '../pages/Auth/ResetPasswordPage';
-import ReviewersPage from '../pages/Members/ReviewersPage';
-import ScreenersPage from '../pages/Members/ScreenersPage';
-import SearchPage from '../pages/SearchPage';
-import SignupPage from '../pages/Auth/SignupPage';
-import TopicCreatePage from '../pages/TopicCreatePage';
-import TopicEntryPage from '../pages/TopicEntryPage';
-import TopicsPage from '../pages/TopicsPage';
-import VisualizePage from '../pages/VisualizePage';
+import React, { lazy } from 'react';
+
+const HomePage = lazy(() => import('../pages/HomePage'));
+const LoginPage = lazy(() => import('../pages/Auth/LoginPage'));
+const SignupPage = lazy(() => import('../pages/Auth/SignupPage'));
+const ForgotPasswordPage = lazy(() => import('../pages/Auth/ForgotPasswordPage'));
+const ResetPasswordPage = lazy(() => import('../pages/Auth/ResetPasswordPage'));
+const LogoutPage = lazy(() => import('../pages/Auth/LogoutPage'));
+const AccountPage = lazy(() => import('../pages/Account/AccountPage'));
+const SettingsPage = lazy(() => import('../pages/Account/SettingsPage'));
+const VerificationPage = lazy(() => import('../pages/Account/VerificationPage'));
+const AdminDashboard = lazy(() => import('../pages/Admin/AdminDashboard'));
+const UsersList = lazy(() => import('../pages/Admin/Users/UsersList'));
+const UserDetails = lazy(() => import('../pages/Admin/Users/UserDetails'));
+const AccountsList = lazy(() => import('../pages/Admin/Accounts/AccountsList'));
+const AccountDetails = lazy(() => import('../pages/Admin/Accounts/AccountDetails'));
+const AdminsList = lazy(() => import('../pages/Admin/Administrators/AdminsList'));
+const AdminDetails = lazy(() => import('../pages/Admin/Administrators/AdminDetails'));
+const GroupsList = lazy(() => import('../pages/Admin/AdminGroups/GroupsList'));
+const GroupDetails = lazy(() => import('../pages/Admin/AdminGroups/GroupDetails'));
+const CategoriesList = lazy(() => import('../pages/Admin/Categories/CategoriesList'));
+const CategoryDetails = lazy(() => import('../pages/Admin/Categories/CategoryDetails'));
+const StatusesList = lazy(() => import('../pages/Admin/Statuses/StatusesList'));
+const StatusDetails = lazy(() => import('../pages/Admin/Statuses/StatusDetails'));
+const DBBackupPage = lazy(() => import('../pages/Admin/DBBackup/DBBackupPage'));
+const TopicsPage = lazy(() => import('../pages/TopicsPage'));
+const TopicCreatePage = lazy(() => import('../pages/TopicCreatePage'));
+const TopicEntryPage = lazy(() => import('../pages/TopicEntryPage'));
+const ArgumentsPage = lazy(() => import('../pages/ArgumentsPage'));
+const ArgumentCreatePage = lazy(() => import('../pages/ArgumentCreatePage'));
+const ArgumentEntryPage = lazy(() => import('../pages/ArgumentEntryPage'));
+const QuestionsPage = lazy(() => import('../pages/QuestionsPage'));
+const QuestionEntryPage = lazy(() => import('../pages/QuestionEntryPage'));
+const IssuesPage = lazy(() => import('../pages/IssuesPage'));
+const IssueEntryPage = lazy(() => import('../pages/IssueEntryPage'));
+const OpinionsPage = lazy(() => import('../pages/OpinionsPage'));
+const OpinionEntryPage = lazy(() => import('../pages/OpinionEntryPage'));
+const AnswersPage = lazy(() => import('../pages/AnswersPage'));
+const ArtifactsPage = lazy(() => import('../pages/ArtifactsPage'));
+const GroupsPage = lazy(() => import('../pages/GroupsPage'));
+const GroupsIndex = lazy(() => import('../pages/Groups/GroupsIndex'));
+const GroupCreate = lazy(() => import('../pages/Groups/GroupCreate'));
+const GroupPage = lazy(() => import('../pages/Groups/Group/GroupPage'));
+const GroupPosts = lazy(() => import('../pages/Groups/Group/GroupPosts'));
+const GroupMembers = lazy(() => import('../pages/Groups/Group/GroupMembers'));
+const MembersPage = lazy(() => import('../pages/MembersPage'));
+const ContributorsPage = lazy(() => import('../pages/Members/ContributorsPage'));
+const ScreenersPage = lazy(() => import('../pages/Members/ScreenersPage'));
+const ReviewersPage = lazy(() => import('../pages/Members/ReviewersPage'));
+const AdministratorsPage = lazy(() => import('../pages/Members/AdministratorsPage'));
+const ProfilePage = lazy(() => import('../pages/Members/Profile/ProfilePage'));
+const ProfileSettings = lazy(() => import('../pages/Members/Profile/ProfileSettings'));
+const ProfileTopics = lazy(() => import('../pages/Members/Profile/ProfileTopics'));
+const ProfileContributions = lazy(() => import('../pages/Members/Profile/ProfileContributions'));
+const ProfileFollowing = lazy(() => import('../pages/Members/Profile/ProfileFollowing'));
+const PagesIndex = lazy(() => import('../pages/Members/Profile/Pages/PagesIndex'));
+const PageCreate = lazy(() => import('../pages/Members/Profile/Pages/PageCreate'));
+const PageView = lazy(() => import('../pages/Members/Profile/Pages/PageView'));
+const SearchPage = lazy(() => import('../pages/SearchPage'));
+const VisualizePage = lazy(() => import('../pages/VisualizePage'));
+const AboutPage = lazy(() => import('../pages/AboutPage'));
+const ContactPage = lazy(() => import('../pages/Contact/ContactPage'));
+const HelpUsPage = lazy(() => import('../pages/HelpUs/HelpUsPage'));
+const InstallPage = lazy(() => import('../pages/Install/InstallPage'));
+const FastSwitchPage = lazy(() => import('../pages/FastSwitch/FastSwitchPage'));
+const ServerError500 = lazy(() => import('../pages/Errors/ServerError500'));
+const ServiceUnavailable503 = lazy(() => import('../pages/Errors/ServiceUnavailable503'));
+const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
 
 export interface AppRoute {
   path: string;
@@ -87,6 +95,7 @@ export const appRoutes: AppRoute[] = [
   { path: '/admin/categories/:id', element: <CategoryDetails /> },
   { path: '/admin/statuses', element: <StatusesList /> },
   { path: '/admin/statuses/:id', element: <StatusDetails /> },
+  { path: '/admin/db-backup', element: <DBBackupPage /> },
   { path: '/topics', element: <TopicsPage /> },
   { path: '/topics/create', element: <TopicCreatePage /> },
   { path: '/topics/entry/:friendlyUrl/:id', element: <TopicEntryPage /> },
@@ -124,5 +133,11 @@ export const appRoutes: AppRoute[] = [
   { path: '/search', element: <SearchPage /> },
   { path: '/visualize', element: <VisualizePage /> },
   { path: '/about', element: <AboutPage /> },
+  { path: '/contact', element: <ContactPage /> },
+  { path: '/help-us', element: <HelpUsPage /> },
+  { path: '/install', element: <InstallPage /> },
+  { path: '/fast-switch', element: <FastSwitchPage /> },
+  { path: '/500', element: <ServerError500 /> },
+  { path: '/503', element: <ServiceUnavailable503 /> },
   { path: '*', element: <NotFoundPage /> },
 ];

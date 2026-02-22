@@ -7,5 +7,11 @@ module.exports = (env = {}, argv = {}) => {
   return {
     ...configWithoutDevServer,
     mode: 'production',
+    optimization: {
+      ...configWithoutDevServer.optimization,
+      splitChunks: {
+        chunks: 'all',
+      },
+    },
   };
 };

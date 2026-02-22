@@ -2,12 +2,27 @@
 
 class ApiService {
   private baseUrl: string;
+  private cache: Map<string, { expiresAt: number; value: unknown }>;
+  private readonly cacheTtlMs: number;
 
   constructor(baseUrl: string = '/api') {
     this.baseUrl = baseUrl;
+    this.cache = new Map();
+    this.cacheTtlMs = 60_000;
   }
 
   private async request<T>(url: string, options?: RequestInit): Promise<T> {
+    const method = options?.method?.toUpperCase() ?? 'GET';
+    const cacheKey = `${method}:${url}`;
+    const now = Date.now();
+
+    if (method === 'GET') {
+      const cached = this.cache.get(cacheKey);
+      if (cached && cached.expiresAt > now) {
+        return cached.value as T;
+      }
+    }
+
     const response = await fetch(`${this.baseUrl}${url}`, {
       ...options,
       headers: {
@@ -20,7 +35,16 @@ class ApiService {
       throw new Error(`API request failed: ${response.statusText}`);
     }
 
-    return response.json();
+    const payload = (await response.json()) as T;
+
+    if (method === 'GET') {
+      this.cache.set(cacheKey, {
+        expiresAt: now + this.cacheTtlMs,
+        value: payload,
+      });
+    }
+
+    return payload;
   }
 
   // Home

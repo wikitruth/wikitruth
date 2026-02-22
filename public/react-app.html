@@ -5,6 +5,17 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Wikitruth - React App</title>
+    <meta name="description" content="Wikitruth is a collaborative platform for structured discussion, evidence review, and truth-seeking knowledge curation.">
+    <meta name="robots" content="index,follow">
+    <link rel="canonical" href="https://wikitruth.org/app">
+    <meta property="og:title" content="Wikitruth">
+    <meta property="og:description" content="Structured discourse and evidence-driven knowledge contribution.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://wikitruth.org/app">
+    <meta property="og:image" content="https://wikitruth.org/img/logo-64x64.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Wikitruth">
+    <meta name="twitter:description" content="Structured discourse and evidence-driven knowledge contribution.">
 
     <link rel="apple-touch-icon" sizes="57x57" href="/img/favicons/apple-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="/img/favicons/apple-icon-60x60.png">
@@ -26,6 +37,19 @@
     <!-- Bootstrap and existing styles -->
     <link rel="stylesheet" href="/css/app.min.css" />
     <link rel="stylesheet" href="/layouts/core.min.css" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Wikitruth",
+        "url": "https://wikitruth.org",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://wikitruth.org/app/search?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
 </head>
 <body>
     <div id="root"></div>

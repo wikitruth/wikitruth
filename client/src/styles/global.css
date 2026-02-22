@@ -28,3 +28,17 @@ body {
 .wt-popover:focus-within .wt-popover-content {
   display: block;
 }
+
+@media (max-width: 991px) {
+  .wt-entry-header .pull-left,
+  .wt-entry-header .pull-right {
+    float: none !important;
+    display: block;
+  }
+}
+
+@media (max-width: 767px) {
+  .navbar-brand-label .hidden-xxs {
+    display: inline !important;
+  }
+}
