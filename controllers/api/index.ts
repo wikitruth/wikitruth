@@ -19,6 +19,8 @@ module.exports = function (router) {
   const artifactsRouter = wrapAsyncRouter(express.Router());
   const groupsRouter = wrapAsyncRouter(express.Router());
   const membersRouter = wrapAsyncRouter(express.Router());
+  const authRouter = wrapAsyncRouter(express.Router());
+  const adminRouter = wrapAsyncRouter(express.Router());
 
   // Load route handlers
   // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
@@ -43,6 +45,10 @@ module.exports = function (router) {
   require('./groups')(groupsRouter);
   // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   require('./members')(membersRouter);
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
+  require('./auth')(authRouter);
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
+  require('./admin')(adminRouter);
 
   // Mount sub-routers
   router.use('/home', homeRouter);
@@ -56,4 +62,6 @@ module.exports = function (router) {
   router.use('/artifacts', artifactsRouter);
   router.use('/groups', groupsRouter);
   router.use('/members', membersRouter);
+  router.use('/auth', authRouter);
+  router.use('/admin', adminRouter);
 };

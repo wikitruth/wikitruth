@@ -419,20 +419,20 @@ Migrate community features:
 - [x] Set up SEO metadata handling
 
 #### API Endpoints
-- [ ] Create RESTful API endpoints for React consumption
-- [ ] Update existing controllers to support JSON responses
-- [ ] Implement proper error handling
+- [x] Create RESTful API endpoints for React consumption
+- [x] Update existing controllers to support JSON responses
+- [x] Implement proper error handling
 - [ ] Add API versioning if needed
-- [ ] Update authentication/authorization for API calls
+- [x] Update authentication/authorization for API calls
 
 #### Routing Strategy
 - [ ] Decide on routing approach (SPA vs. Hybrid)
 - [x] Configure client-side routing (React Router)
-- [ ] Update server routes to serve React app
-- [ ] Handle deep linking and browser history
-- [ ] Configure catch-all route for SPA
-- [ ] Validate `/app` and nested React routes in browser refresh scenarios
-- [ ] Add regression checks to ensure non-`/app` legacy routes are unaffected
+- [x] Update server routes to serve React app
+- [x] Handle deep linking and browser history
+- [x] Configure catch-all route for SPA
+- [x] Validate `/app` and nested React routes in browser refresh scenarios
+- [x] Add regression checks to ensure non-`/app` legacy routes are unaffected
 
 ### ✅ Testing
 
@@ -449,9 +449,9 @@ Migrate community features:
 - [ ] Test critical user journeys
 
 #### E2E Tests
-- [ ] Set up Playwright or Cypress
-- [ ] Create E2E tests for critical paths
-- [ ] Test across different browsers
+- [x] Set up Playwright or Cypress
+- [x] Create E2E tests for critical paths
+- [x] Test across different browsers
 
 ### 📊 Progress Governance
 - [ ] Update checklist status at every migration PR merge
@@ -674,7 +674,7 @@ if (req.accepts('json')) {
 
 ### Quality Requirements
 - [ ] Unit test coverage > 80%
-- [ ] No critical accessibility violations
+- [x] No critical accessibility violations
 - [x] No TypeScript errors
 - [ ] No ESLint errors
 

@@ -11,6 +11,8 @@ client/dist/
 client/build/
 coverage/client/
 .webpack-cache/
+playwright-report/
+test-results/
 
 # Environment variables
 .env

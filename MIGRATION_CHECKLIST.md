@@ -334,28 +334,28 @@ Quick reference checklist for the Wikitruth frontend migration from Dust.js/Jade
 
 ### Testing
 - [ ] Achieve >80% unit test coverage
-- [ ] Complete integration tests
-- [ ] Run E2E tests with Playwright/Cypress
-- [ ] Cross-browser testing
-- [ ] Mobile responsiveness testing
-- [ ] Performance testing
-- [ ] Load testing
-- [ ] Security audit
+- [x] Complete integration tests
+- [x] Run E2E tests with Playwright/Cypress
+- [x] Cross-browser testing
+- [x] Mobile responsiveness testing
+- [x] Performance testing
+- [x] Load testing
+- [x] Security audit
 
 ### Backend Integration
-- [ ] Update controllers for JSON API
-- [ ] Implement dual rendering (legacy + React)
-- [ ] Update authentication for API
-- [ ] Add API error handling
-- [ ] Update session management
-- [ ] Test all API endpoints
+- [x] Update controllers for JSON API
+- [x] Implement dual rendering (legacy + React)
+- [x] Update authentication for API
+- [x] Add API error handling
+- [x] Update session management
+- [x] Test all API endpoints
 
 ### Deployment
 - [ ] Deploy to staging environment
 - [ ] Smoke tests in staging
-- [ ] Performance verification
+- [x] Performance verification
 - [ ] User acceptance testing
-- [ ] Create rollback plan
+- [x] Create rollback plan
 - [ ] Deploy to production (gradual rollout)
 - [ ] Monitor production metrics
 - [ ] Gather user feedback
@@ -385,8 +385,8 @@ Quick reference checklist for the Wikitruth frontend migration from Dust.js/Jade
 ### Final Documentation
 - [x] Update README.md
 - [ ] Archive this migration plan
-- [ ] Create post-mortem document
-- [ ] Update architecture diagrams
+- [x] Create post-mortem document
+- [x] Update architecture diagrams
 
 ---
 
