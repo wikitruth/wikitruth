@@ -333,7 +333,7 @@ Quick reference checklist for the Wikitruth frontend migration from Dust.js/Jade
 *Weeks 15-16 | Priority: CRITICAL*
 
 ### Testing
-- [ ] Achieve >80% unit test coverage
+- [x] Achieve >80% unit test coverage
 - [x] Complete integration tests
 - [x] Run E2E tests with Playwright/Cypress
 - [x] Cross-browser testing

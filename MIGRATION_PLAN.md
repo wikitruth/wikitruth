@@ -440,13 +440,13 @@ Migrate community features:
 - [x] Set up Jest and React Testing Library
 - [x] Write tests for common components
 - [x] Write tests for page components
-- [ ] Write tests for utilities and hooks
-- [ ] Achieve >80% code coverage
+- [x] Write tests for utilities and hooks
+- [x] Achieve >80% code coverage
 
 #### Integration Tests
 - [x] Test API integration
 - [x] Test authentication flow
-- [ ] Test critical user journeys
+- [x] Test critical user journeys
 
 #### E2E Tests
 - [x] Set up Playwright or Cypress
@@ -673,7 +673,7 @@ if (req.accepts('json')) {
 - [ ] Lighthouse score > 90
 
 ### Quality Requirements
-- [ ] Unit test coverage > 80%
+- [x] Unit test coverage > 80%
 - [x] No critical accessibility violations
 - [x] No TypeScript errors
 - [ ] No ESLint errors
