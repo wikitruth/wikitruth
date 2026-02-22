@@ -196,119 +196,119 @@ Migrate community features:
 ### 📖 Wiki System - Common Components
 
 #### Entry Components (Shared across all entity types)
-- [ ] `components/Entry/EntryHeader.tsx` - Entry header
-- [ ] `components/Entry/EntryBody.tsx` - Entry content
-- [ ] `components/Entry/EntryFooter.tsx` - Entry footer
-- [ ] `components/Entry/EntryRow.tsx` - Entry list item
-- [ ] `components/Entry/EntryOutline.tsx` - Entry outline
-- [ ] `components/Entry/EntryOptions.tsx` - Entry options menu
-- [ ] `components/Entry/EntryOptionsPopover.tsx` - Options popover (already exists, needs integration)
-- [ ] `components/Entry/NewOptionsPopover.tsx` - New entry options
-- [ ] `components/Entry/EntrySet.tsx` - Set of entries
-- [ ] `components/Entry/EntryVerdictLabel.tsx` - Verdict label
-- [ ] `components/Entry/EntryVerdictList.tsx` - Verdict list
-- [ ] `components/Entry/EntryScreeningLabel.tsx` - Screening status label
-- [ ] `components/Entry/ScreeningSelector.tsx` - Screening status selector
+- [x] `components/Entry/EntryHeader.tsx` - Entry header
+- [x] `components/Entry/EntryBody.tsx` - Entry content
+- [x] `components/Entry/EntryFooter.tsx` - Entry footer
+- [x] `components/Entry/EntryRow.tsx` - Entry list item
+- [x] `components/Entry/EntryOutline.tsx` - Entry outline
+- [x] `components/Entry/EntryOptions.tsx` - Entry options menu
+- [x] `components/Entry/EntryOptionsPopover.tsx` - Options popover (already exists, needs integration)
+- [x] `components/Entry/NewOptionsPopover.tsx` - New entry options
+- [x] `components/Entry/EntrySet.tsx` - Set of entries
+- [x] `components/Entry/EntryVerdictLabel.tsx` - Verdict label
+- [x] `components/Entry/EntryVerdictList.tsx` - Verdict list
+- [x] `components/Entry/EntryScreeningLabel.tsx` - Screening status label
+- [x] `components/Entry/ScreeningSelector.tsx` - Screening status selector
 
 #### Common Wiki Components
-- [ ] `components/Wiki/IndexHeader.tsx` - Index page header
-- [ ] `components/Wiki/PageHeader.tsx` - Page header
-- [ ] `components/Wiki/PageTabs.tsx` - Page tabs navigation
-- [ ] `components/Wiki/Pager.tsx` - Pagination component
-- [ ] `components/Wiki/SubtitleCreate.tsx` - Create subtitle
-- [ ] `components/Wiki/SubtitleEdit.tsx` - Edit subtitle
+- [x] `components/Wiki/IndexHeader.tsx` - Index page header
+- [x] `components/Wiki/PageHeader.tsx` - Page header
+- [x] `components/Wiki/PageTabs.tsx` - Page tabs navigation
+- [x] `components/Wiki/Pager.tsx` - Pagination component
+- [x] `components/Wiki/SubtitleCreate.tsx` - Create subtitle
+- [x] `components/Wiki/SubtitleEdit.tsx` - Edit subtitle
 
 ### 📖 Wiki System - Topics
 
 #### Topic Pages
-- [ ] `pages/Wiki/Topics/TopicsIndex.tsx` - Topics listing
-- [ ] `pages/Wiki/Topics/TopicEntry.tsx` - Topic detail view
-- [ ] `pages/Wiki/Topics/TopicCreate.tsx` - Create topic form
-- [ ] `pages/Wiki/Topics/TopicTiles.tsx` - Topic tiles view
+- [x] `pages/Wiki/Topics/TopicsIndex.tsx` - Topics listing
+- [x] `pages/Wiki/Topics/TopicEntry.tsx` - Topic detail view
+- [x] `pages/Wiki/Topics/TopicCreate.tsx` - Create topic form
+- [x] `pages/Wiki/Topics/TopicTiles.tsx` - Topic tiles view
 
 #### Topic Components
-- [ ] `components/Topics/TopicRow.tsx` - Topic list row
-- [ ] `components/Topics/TopicLink/TopicLinkEntry.tsx` - Topic link entry
-- [ ] `components/Topics/TopicLink/TopicLinkEdit.tsx` - Edit topic link
+- [x] `components/Topics/TopicRow.tsx` - Topic list row
+- [x] `components/Topics/TopicLink/TopicLinkEntry.tsx` - Topic link entry
+- [x] `components/Topics/TopicLink/TopicLinkEdit.tsx` - Edit topic link
 
 ### 📖 Wiki System - Arguments
 
 #### Argument Pages
-- [ ] `pages/Wiki/Arguments/ArgumentsIndex.tsx` - Arguments listing
-- [ ] `pages/Wiki/Arguments/ArgumentEntry.tsx` - Argument detail view
-- [ ] `pages/Wiki/Arguments/ArgumentCreate.tsx` - Create argument form
-- [ ] `pages/Wiki/Arguments/ArgumentListPreview.tsx` - Arguments preview list
+- [x] `pages/Wiki/Arguments/ArgumentsIndex.tsx` - Arguments listing
+- [x] `pages/Wiki/Arguments/ArgumentEntry.tsx` - Argument detail view
+- [x] `pages/Wiki/Arguments/ArgumentCreate.tsx` - Create argument form
+- [x] `pages/Wiki/Arguments/ArgumentListPreview.tsx` - Arguments preview list
 
 #### Argument Components
-- [ ] `components/Arguments/ArgumentRow.tsx` - Argument list row
-- [ ] `components/Arguments/ArgumentLink/ArgumentLinkEntry.tsx` - Argument link entry
-- [ ] `components/Arguments/ArgumentLink/ArgumentLinkEdit.tsx` - Edit argument link
+- [x] `components/Arguments/ArgumentRow.tsx` - Argument list row
+- [x] `components/Arguments/ArgumentLink/ArgumentLinkEntry.tsx` - Argument link entry
+- [x] `components/Arguments/ArgumentLink/ArgumentLinkEdit.tsx` - Edit argument link
 
 ### 📖 Wiki System - Questions
 
 #### Question Pages
-- [ ] `pages/Wiki/Questions/QuestionsIndex.tsx` - Questions listing
-- [ ] `pages/Wiki/Questions/QuestionEntry.tsx` - Question detail view
-- [ ] `pages/Wiki/Questions/QuestionCreate.tsx` - Create question form
-- [ ] `pages/Wiki/Questions/QuestionListPreview.tsx` - Questions preview list
+- [x] `pages/Wiki/Questions/QuestionsIndex.tsx` - Questions listing
+- [x] `pages/Wiki/Questions/QuestionEntry.tsx` - Question detail view
+- [x] `pages/Wiki/Questions/QuestionCreate.tsx` - Create question form
+- [x] `pages/Wiki/Questions/QuestionListPreview.tsx` - Questions preview list
 
 #### Question Components
-- [ ] `components/Questions/QuestionRow.tsx` - Question list row
+- [x] `components/Questions/QuestionRow.tsx` - Question list row
 
 ### 📖 Wiki System - Answers
 
 #### Answer Pages
-- [ ] `pages/Wiki/Answers/AnswersIndex.tsx` - Answers listing
-- [ ] `pages/Wiki/Answers/AnswerEntry.tsx` - Answer detail view
-- [ ] `pages/Wiki/Answers/AnswerCreate.tsx` - Create answer form
-- [ ] `pages/Wiki/Answers/AnswerListPreview.tsx` - Answers preview list
+- [x] `pages/Wiki/Answers/AnswersIndex.tsx` - Answers listing
+- [x] `pages/Wiki/Answers/AnswerEntry.tsx` - Answer detail view
+- [x] `pages/Wiki/Answers/AnswerCreate.tsx` - Create answer form
+- [x] `pages/Wiki/Answers/AnswerListPreview.tsx` - Answers preview list
 
 #### Answer Components
-- [ ] `components/Answers/AnswerRow.tsx` - Answer list row
+- [x] `components/Answers/AnswerRow.tsx` - Answer list row
 
 ### 📖 Wiki System - Issues
 
 #### Issue Pages
-- [ ] `pages/Wiki/Issues/IssuesIndex.tsx` - Issues listing
-- [ ] `pages/Wiki/Issues/IssueEntry.tsx` - Issue detail view
-- [ ] `pages/Wiki/Issues/IssueCreate.tsx` - Create issue form
-- [ ] `pages/Wiki/Issues/IssueListPreview.tsx` - Issues preview list
+- [x] `pages/Wiki/Issues/IssuesIndex.tsx` - Issues listing
+- [x] `pages/Wiki/Issues/IssueEntry.tsx` - Issue detail view
+- [x] `pages/Wiki/Issues/IssueCreate.tsx` - Create issue form
+- [x] `pages/Wiki/Issues/IssueListPreview.tsx` - Issues preview list
 
 #### Issue Components
-- [ ] `components/Issues/IssueRow.tsx` - Issue list row
+- [x] `components/Issues/IssueRow.tsx` - Issue list row
 
 ### 📖 Wiki System - Opinions
 
 #### Opinion Pages
-- [ ] `pages/Wiki/Opinions/OpinionsIndex.tsx` - Opinions listing
-- [ ] `pages/Wiki/Opinions/OpinionEntry.tsx` - Opinion detail view
-- [ ] `pages/Wiki/Opinions/OpinionCreate.tsx` - Create opinion form
-- [ ] `pages/Wiki/Opinions/OpinionListPreview.tsx` - Opinions preview list
+- [x] `pages/Wiki/Opinions/OpinionsIndex.tsx` - Opinions listing
+- [x] `pages/Wiki/Opinions/OpinionEntry.tsx` - Opinion detail view
+- [x] `pages/Wiki/Opinions/OpinionCreate.tsx` - Create opinion form
+- [x] `pages/Wiki/Opinions/OpinionListPreview.tsx` - Opinions preview list
 
 #### Opinion Components
-- [ ] `components/Opinions/OpinionRow.tsx` - Opinion list row
+- [x] `components/Opinions/OpinionRow.tsx` - Opinion list row
 
 ### 📖 Wiki System - Artifacts
 
 #### Artifact Pages
-- [ ] `pages/Wiki/Artifacts/ArtifactsIndex.tsx` - Artifacts listing
-- [ ] `pages/Wiki/Artifacts/ArtifactEntry.tsx` - Artifact detail view
-- [ ] `pages/Wiki/Artifacts/ArtifactCreate.tsx` - Create artifact form
-- [ ] `pages/Wiki/Artifacts/ArtifactListPreview.tsx` - Artifacts preview list
+- [x] `pages/Wiki/Artifacts/ArtifactsIndex.tsx` - Artifacts listing
+- [x] `pages/Wiki/Artifacts/ArtifactEntry.tsx` - Artifact detail view
+- [x] `pages/Wiki/Artifacts/ArtifactCreate.tsx` - Create artifact form
+- [x] `pages/Wiki/Artifacts/ArtifactListPreview.tsx` - Artifacts preview list
 
 #### Artifact Components
-- [ ] `components/Artifacts/ArtifactRow.tsx` - Artifact list row
+- [x] `components/Artifacts/ArtifactRow.tsx` - Artifact list row
 
 ### 📖 Wiki System - Advanced Features
 
 #### Specialized Pages
-- [ ] `pages/Wiki/Screening/ScreeningPage.tsx` - Screening management
-- [ ] `pages/Wiki/Verdict/VerdictUpdate.tsx` - Update verdict
-- [ ] `pages/Wiki/Visualize/VisualizePage.tsx` - Visualization view
-- [ ] `pages/Wiki/Related/RelatedPage.tsx` - Related content
-- [ ] `pages/Wiki/Convert/ConvertPage.tsx` - Convert entries
-- [ ] `pages/Wiki/Explore/ExplorePage.tsx` - Explore page
-- [ ] `pages/Wiki/Outline/OutlineLinkTo.tsx` - Outline link creation
+- [x] `pages/Wiki/Screening/ScreeningPage.tsx` - Screening management
+- [x] `pages/Wiki/Verdict/VerdictUpdate.tsx` - Update verdict
+- [x] `pages/Wiki/Visualize/VisualizePage.tsx` - Visualization view
+- [x] `pages/Wiki/Related/RelatedPage.tsx` - Related content
+- [x] `pages/Wiki/Convert/ConvertPage.tsx` - Convert entries
+- [x] `pages/Wiki/Explore/ExplorePage.tsx` - Explore page
+- [x] `pages/Wiki/Outline/OutlineLinkTo.tsx` - Outline link creation
 
 ### 👥 Groups & Members
 
@@ -368,13 +368,13 @@ Migrate community features:
 
 #### API Layer
 - [ ] `services/api/client.ts` - API client configuration
-- [ ] `services/api/topics.ts` - Topics API
-- [ ] `services/api/arguments.ts` - Arguments API
-- [ ] `services/api/questions.ts` - Questions API
-- [ ] `services/api/answers.ts` - Answers API
-- [ ] `services/api/issues.ts` - Issues API
-- [ ] `services/api/opinions.ts` - Opinions API
-- [ ] `services/api/artifacts.ts` - Artifacts API
+- [x] `services/api/topics.ts` - Topics API
+- [x] `services/api/arguments.ts` - Arguments API
+- [x] `services/api/questions.ts` - Questions API
+- [x] `services/api/answers.ts` - Answers API
+- [x] `services/api/issues.ts` - Issues API
+- [x] `services/api/opinions.ts` - Opinions API
+- [x] `services/api/artifacts.ts` - Artifacts API
 - [ ] `services/api/groups.ts` - Groups API
 - [ ] `services/api/members.ts` - Members API
 - [x] `services/api/auth.ts` - Authentication API

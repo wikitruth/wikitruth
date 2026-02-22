@@ -160,96 +160,96 @@ Quick reference checklist for the Wikitruth frontend migration from Dust.js/Jade
 *Weeks 6-10 | Priority: MEDIUM-HIGH*
 
 ### Common Entry Components (13 components)
-- [ ] `components/Entry/EntryHeader.tsx`
-- [ ] `components/Entry/EntryBody.tsx`
-- [ ] `components/Entry/EntryFooter.tsx`
-- [ ] `components/Entry/EntryRow.tsx`
-- [ ] `components/Entry/EntryOutline.tsx`
-- [ ] `components/Entry/EntryOptions.tsx`
-- [ ] `components/Entry/EntryOptionsPopover.tsx`
-- [ ] `components/Entry/NewOptionsPopover.tsx`
-- [ ] `components/Entry/EntrySet.tsx`
-- [ ] `components/Entry/EntryVerdictLabel.tsx`
-- [ ] `components/Entry/EntryVerdictList.tsx`
-- [ ] `components/Entry/EntryScreeningLabel.tsx`
-- [ ] `components/Entry/ScreeningSelector.tsx`
+- [x] `components/Entry/EntryHeader.tsx`
+- [x] `components/Entry/EntryBody.tsx`
+- [x] `components/Entry/EntryFooter.tsx`
+- [x] `components/Entry/EntryRow.tsx`
+- [x] `components/Entry/EntryOutline.tsx`
+- [x] `components/Entry/EntryOptions.tsx`
+- [x] `components/Entry/EntryOptionsPopover.tsx`
+- [x] `components/Entry/NewOptionsPopover.tsx`
+- [x] `components/Entry/EntrySet.tsx`
+- [x] `components/Entry/EntryVerdictLabel.tsx`
+- [x] `components/Entry/EntryVerdictList.tsx`
+- [x] `components/Entry/EntryScreeningLabel.tsx`
+- [x] `components/Entry/ScreeningSelector.tsx`
 
 ### Wiki Common Components (6 components)
-- [ ] `components/Wiki/IndexHeader.tsx`
-- [ ] `components/Wiki/PageHeader.tsx`
-- [ ] `components/Wiki/PageTabs.tsx`
-- [ ] `components/Wiki/Pager.tsx`
-- [ ] `components/Wiki/SubtitleCreate.tsx`
-- [ ] `components/Wiki/SubtitleEdit.tsx`
+- [x] `components/Wiki/IndexHeader.tsx`
+- [x] `components/Wiki/PageHeader.tsx`
+- [x] `components/Wiki/PageTabs.tsx`
+- [x] `components/Wiki/Pager.tsx`
+- [x] `components/Wiki/SubtitleCreate.tsx`
+- [x] `components/Wiki/SubtitleEdit.tsx`
 
 ### Topics (6 pages + components)
-- [ ] `pages/Wiki/Topics/TopicsIndex.tsx`
-- [ ] `pages/Wiki/Topics/TopicEntry.tsx`
-- [ ] `pages/Wiki/Topics/TopicCreate.tsx`
-- [ ] `pages/Wiki/Topics/TopicTiles.tsx`
-- [ ] `components/Topics/TopicRow.tsx`
-- [ ] `components/Topics/TopicLink/*` (2 components)
+- [x] `pages/Wiki/Topics/TopicsIndex.tsx`
+- [x] `pages/Wiki/Topics/TopicEntry.tsx`
+- [x] `pages/Wiki/Topics/TopicCreate.tsx`
+- [x] `pages/Wiki/Topics/TopicTiles.tsx`
+- [x] `components/Topics/TopicRow.tsx`
+- [x] `components/Topics/TopicLink/*` (2 components)
 
 ### Arguments (5 pages + components)
-- [ ] `pages/Wiki/Arguments/ArgumentsIndex.tsx`
-- [ ] `pages/Wiki/Arguments/ArgumentEntry.tsx`
-- [ ] `pages/Wiki/Arguments/ArgumentCreate.tsx`
-- [ ] `pages/Wiki/Arguments/ArgumentListPreview.tsx`
-- [ ] `components/Arguments/ArgumentRow.tsx`
-- [ ] `components/Arguments/ArgumentLink/*` (2 components)
+- [x] `pages/Wiki/Arguments/ArgumentsIndex.tsx`
+- [x] `pages/Wiki/Arguments/ArgumentEntry.tsx`
+- [x] `pages/Wiki/Arguments/ArgumentCreate.tsx`
+- [x] `pages/Wiki/Arguments/ArgumentListPreview.tsx`
+- [x] `components/Arguments/ArgumentRow.tsx`
+- [x] `components/Arguments/ArgumentLink/*` (2 components)
 
 ### Questions (5 pages + components)
-- [ ] `pages/Wiki/Questions/QuestionsIndex.tsx`
-- [ ] `pages/Wiki/Questions/QuestionEntry.tsx`
-- [ ] `pages/Wiki/Questions/QuestionCreate.tsx`
-- [ ] `pages/Wiki/Questions/QuestionListPreview.tsx`
-- [ ] `components/Questions/QuestionRow.tsx`
+- [x] `pages/Wiki/Questions/QuestionsIndex.tsx`
+- [x] `pages/Wiki/Questions/QuestionEntry.tsx`
+- [x] `pages/Wiki/Questions/QuestionCreate.tsx`
+- [x] `pages/Wiki/Questions/QuestionListPreview.tsx`
+- [x] `components/Questions/QuestionRow.tsx`
 
 ### Answers (5 pages + components)
-- [ ] `pages/Wiki/Answers/AnswersIndex.tsx`
-- [ ] `pages/Wiki/Answers/AnswerEntry.tsx`
-- [ ] `pages/Wiki/Answers/AnswerCreate.tsx`
-- [ ] `pages/Wiki/Answers/AnswerListPreview.tsx`
-- [ ] `components/Answers/AnswerRow.tsx`
+- [x] `pages/Wiki/Answers/AnswersIndex.tsx`
+- [x] `pages/Wiki/Answers/AnswerEntry.tsx`
+- [x] `pages/Wiki/Answers/AnswerCreate.tsx`
+- [x] `pages/Wiki/Answers/AnswerListPreview.tsx`
+- [x] `components/Answers/AnswerRow.tsx`
 
 ### Issues (5 pages + components)
-- [ ] `pages/Wiki/Issues/IssuesIndex.tsx`
-- [ ] `pages/Wiki/Issues/IssueEntry.tsx`
-- [ ] `pages/Wiki/Issues/IssueCreate.tsx`
-- [ ] `pages/Wiki/Issues/IssueListPreview.tsx`
-- [ ] `components/Issues/IssueRow.tsx`
+- [x] `pages/Wiki/Issues/IssuesIndex.tsx`
+- [x] `pages/Wiki/Issues/IssueEntry.tsx`
+- [x] `pages/Wiki/Issues/IssueCreate.tsx`
+- [x] `pages/Wiki/Issues/IssueListPreview.tsx`
+- [x] `components/Issues/IssueRow.tsx`
 
 ### Opinions (5 pages + components)
-- [ ] `pages/Wiki/Opinions/OpinionsIndex.tsx`
-- [ ] `pages/Wiki/Opinions/OpinionEntry.tsx`
-- [ ] `pages/Wiki/Opinions/OpinionCreate.tsx`
-- [ ] `pages/Wiki/Opinions/OpinionListPreview.tsx`
-- [ ] `components/Opinions/OpinionRow.tsx`
+- [x] `pages/Wiki/Opinions/OpinionsIndex.tsx`
+- [x] `pages/Wiki/Opinions/OpinionEntry.tsx`
+- [x] `pages/Wiki/Opinions/OpinionCreate.tsx`
+- [x] `pages/Wiki/Opinions/OpinionListPreview.tsx`
+- [x] `components/Opinions/OpinionRow.tsx`
 
 ### Artifacts (5 pages + components)
-- [ ] `pages/Wiki/Artifacts/ArtifactsIndex.tsx`
-- [ ] `pages/Wiki/Artifacts/ArtifactEntry.tsx`
-- [ ] `pages/Wiki/Artifacts/ArtifactCreate.tsx`
-- [ ] `pages/Wiki/Artifacts/ArtifactListPreview.tsx`
-- [ ] `components/Artifacts/ArtifactRow.tsx`
+- [x] `pages/Wiki/Artifacts/ArtifactsIndex.tsx`
+- [x] `pages/Wiki/Artifacts/ArtifactEntry.tsx`
+- [x] `pages/Wiki/Artifacts/ArtifactCreate.tsx`
+- [x] `pages/Wiki/Artifacts/ArtifactListPreview.tsx`
+- [x] `components/Artifacts/ArtifactRow.tsx`
 
 ### Advanced Wiki Features (7 pages)
-- [ ] `pages/Wiki/Screening/ScreeningPage.tsx`
-- [ ] `pages/Wiki/Verdict/VerdictUpdate.tsx`
-- [ ] `pages/Wiki/Visualize/VisualizePage.tsx`
-- [ ] `pages/Wiki/Related/RelatedPage.tsx`
-- [ ] `pages/Wiki/Convert/ConvertPage.tsx`
-- [ ] `pages/Wiki/Explore/ExplorePage.tsx`
-- [ ] `pages/Wiki/Outline/OutlineLinkTo.tsx`
+- [x] `pages/Wiki/Screening/ScreeningPage.tsx`
+- [x] `pages/Wiki/Verdict/VerdictUpdate.tsx`
+- [x] `pages/Wiki/Visualize/VisualizePage.tsx`
+- [x] `pages/Wiki/Related/RelatedPage.tsx`
+- [x] `pages/Wiki/Convert/ConvertPage.tsx`
+- [x] `pages/Wiki/Explore/ExplorePage.tsx`
+- [x] `pages/Wiki/Outline/OutlineLinkTo.tsx`
 
 ### Services
-- [ ] `services/api/topics.ts`
-- [ ] `services/api/arguments.ts`
-- [ ] `services/api/questions.ts`
-- [ ] `services/api/answers.ts`
-- [ ] `services/api/issues.ts`
-- [ ] `services/api/opinions.ts`
-- [ ] `services/api/artifacts.ts`
+- [x] `services/api/topics.ts`
+- [x] `services/api/arguments.ts`
+- [x] `services/api/questions.ts`
+- [x] `services/api/answers.ts`
+- [x] `services/api/issues.ts`
+- [x] `services/api/opinions.ts`
+- [x] `services/api/artifacts.ts`
 
 ---
 
