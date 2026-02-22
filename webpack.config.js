@@ -1,7 +1,37 @@
 const path = require('path');
+const webpack = require('webpack');
+
+let BundleAnalyzerPlugin = null;
+try {
+  BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+} catch {
+  BundleAnalyzerPlugin = null;
+}
 
 module.exports = (env, argv) => {
   const isProduction = argv.mode === 'production';
+  const assetPrefixRaw = process.env.CDN_ASSET_PREFIX || '/dist/';
+  const assetPrefix = assetPrefixRaw.endsWith('/') ? assetPrefixRaw : `${assetPrefixRaw}/`;
+  const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === 'true';
+  const plugins = [
+    new webpack.DefinePlugin({
+      'process.env.REACT_APP_API_BASE_URL': JSON.stringify(process.env.REACT_APP_API_BASE_URL || '/api'),
+      'process.env.REACT_APP_ERROR_REPORT_ENDPOINT': JSON.stringify(process.env.REACT_APP_ERROR_REPORT_ENDPOINT || ''),
+      'process.env.REACT_APP_ENVIRONMENT': JSON.stringify(process.env.REACT_APP_ENVIRONMENT || (isProduction ? 'production' : 'development')),
+    }),
+  ];
+
+  if (shouldAnalyzeBundle && BundleAnalyzerPlugin) {
+    plugins.push(
+      new BundleAnalyzerPlugin({
+        analyzerMode: 'static',
+        openAnalyzer: false,
+        reportFilename: path.resolve(__dirname, 'public/dist/bundle-report.html'),
+        generateStatsFile: true,
+        statsFilename: path.resolve(__dirname, 'public/dist/bundle-stats.json'),
+      })
+    );
+  }
 
   return {
     entry: {
@@ -11,7 +41,7 @@ module.exports = (env, argv) => {
       path: path.resolve(__dirname, 'public/dist'),
       filename: '[name].js',
       chunkFilename: '[name].chunk.js',
-      publicPath: '/dist/',
+      publicPath: assetPrefix,
     },
     module: {
       rules: [
@@ -57,6 +87,7 @@ module.exports = (env, argv) => {
     resolve: {
       extensions: ['.ts', '.tsx', '.js', '.jsx'],
     },
+    plugins: plugins,
     devtool: 'source-map',
     mode: isProduction ? 'production' : 'development',
     devServer: {

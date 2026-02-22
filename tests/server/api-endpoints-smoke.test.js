@@ -24,6 +24,7 @@ describe('API endpoint smoke coverage', function () {
       "router.use('/members', membersRouter)",
       "router.use('/auth', authRouter)",
       "router.use('/admin', adminRouter)",
+      "router.use('/monitoring', monitoringRouter)",
     ].forEach((contract) => expect(apiIndex).toContain(contract));
   });
 
@@ -53,5 +54,12 @@ describe('API endpoint smoke coverage', function () {
       "router.get('/categories'",
       "router.get('/statuses'",
     ].forEach((contract) => expect(adminApi).toContain(contract));
+  });
+
+  it('exposes monitoring endpoint for client runtime error tracking', function () {
+    const monitoringApi = read('controllers/api/monitoring.ts');
+
+    expect(monitoringApi).toContain("router.post('/errors'");
+    expect(monitoringApi).toContain("logger.error('client.runtime.error'");
   });
 });

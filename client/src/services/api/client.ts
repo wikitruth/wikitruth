@@ -1,10 +1,12 @@
+import API_BASE_URL from './baseUrl';
+
 export interface ApiClientOptions {
   baseUrl?: string;
   defaultHeaders?: Record<string, string>;
 }
 
 export const createApiClient = (options: ApiClientOptions = {}) => {
-  const baseUrl = options.baseUrl ?? '/api';
+  const baseUrl = options.baseUrl ?? API_BASE_URL;
   const defaultHeaders = options.defaultHeaders ?? { 'Content-Type': 'application/json' };
 
   return async <T>(path: string, init?: RequestInit): Promise<T> => {

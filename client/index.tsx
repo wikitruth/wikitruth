@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './src/App';
 import AppProviders from './src/providers/AppProviders';
+import { initializeErrorTracking } from './src/utils/monitoring';
 import { startPerformanceMonitoring } from './src/utils/performance';
 import './src/styles/index.css';
 
@@ -18,3 +19,4 @@ root.render(
 );
 
 startPerformanceMonitoring();
+initializeErrorTracking();

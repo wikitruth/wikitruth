@@ -16,6 +16,7 @@
     "dev:all": "npm-run-all --parallel dev:server dev:client",
     "build:server": "tsc -p tsconfig.server.json",
     "build:client": "webpack --config webpack.config.prod.js --mode production",
+    "build:client:stats": "ANALYZE_BUNDLE=true webpack --config webpack.config.prod.js --mode production",
     "build:client:dev": "webpack --mode development",
     "build": "npm run build:server && npm run build:client",
     "build:dev": "npm run build:server && npm run build:client:dev",
@@ -24,6 +25,7 @@
     "test:client:watch": "jest --config jest.config.client.js --watch",
     "test:coverage": "jest --config jest.config.client.js --coverage",
     "test:e2e": "playwright test",
+    "test:ci": "npm-run-all lint type:guardrails test:server test:coverage build:client",
     "lint": "eslint client tests/server --ext .ts,.tsx,.js",
     "lint:fix": "eslint client tests/server --ext .ts,.tsx,.js --fix",
     "format": "prettier --write .",
@@ -33,6 +35,8 @@
     "type:check": "tsc -p tsconfig.server.json --noEmit",
     "type:metrics": "bash scripts/type-metrics.sh",
     "type:guardrails": "bash scripts/check-no-new-ts-nocheck.sh",
+    "docs:drift": "bash scripts/migration-doc-drift-check.sh",
+    "analyze:bundle": "npm run build:client:stats",
     "test:server": "jest --config jest.config.server.js",
     "start:legacy-grunt": "grunt"
   },
@@ -148,6 +152,7 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
     "webpack": "^5.99.5",
+    "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "5.1.4",
     "webpack-dev-server": "^5.2.3"
   },

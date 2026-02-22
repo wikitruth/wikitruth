@@ -70,10 +70,19 @@ Run client coverage:
 npm run test:coverage
 ```
 
+Generate bundle analysis artifacts:
+
+```bash
+npm run analyze:bundle
+```
+
 ## Environment Variables
 
-Use `.env` files at repo root for backend/runtime configuration.
-Client-side configuration should be introduced through webpack defines or explicit API configuration modules.
+Copy `.env.example` to `.env` and update for your environment.
+Backend/runtime configuration is read from `config/config.js`.
+Client-side configuration is injected at build time through webpack defines.
+
+See `docs/frontend/ENVIRONMENT_VARIABLES.md` for the full variable matrix.
 
 ## Troubleshooting
 

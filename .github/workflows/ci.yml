@@ -23,17 +23,20 @@ jobs:
       - name: Install
         run: npm ci
 
-      - name: Lint
-        run: npm run lint
+      - name: Validate Migration Doc Drift
+        run: npm run docs:drift
 
-      - name: Type guardrails
-        run: npm run type:guardrails
+      - name: Test and Build Pipeline
+        run: npm run test:ci
 
-      - name: Client tests
-        run: npm run test:client
+      - name: Upload Coverage Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-client
+          path: coverage/client
 
-      - name: Server tests
-        run: npm run test:server
-
-      - name: Client build
-        run: npm run build:client
+      - name: Upload Migration Drift Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: migration-drift-report
+          path: docs/frontend/MIGRATION_DRIFT_REPORT.md

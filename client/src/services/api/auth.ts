@@ -1,3 +1,5 @@
+import API_BASE_URL from './baseUrl';
+
 interface LoginRequest {
   username: string;
   password: string;
@@ -26,22 +28,22 @@ const request = async <T>(url: string, init?: RequestInit): Promise<T> => {
 
 export const authApi = {
   login: (payload: LoginRequest) =>
-    request<UserResponse>('/api/auth/login', {
+    request<UserResponse>(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       body: JSON.stringify(payload),
     }),
   logout: () =>
-    request('/api/auth/logout', {
+    request(`${API_BASE_URL}/auth/logout`, {
       method: 'POST',
     }),
-  me: () => request<UserResponse>('/api/auth/me'),
+  me: () => request<UserResponse>(`${API_BASE_URL}/auth/me`),
   forgotPassword: (email: string) =>
-    request('/api/auth/forgot-password', {
+    request(`${API_BASE_URL}/auth/forgot-password`, {
       method: 'POST',
       body: JSON.stringify({ email }),
     }),
   resetPassword: (token: string, password: string) =>
-    request('/api/auth/reset-password', {
+    request(`${API_BASE_URL}/auth/reset-password`, {
       method: 'POST',
       body: JSON.stringify({ token, password }),
     }),
