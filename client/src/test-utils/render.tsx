@@ -1,0 +1,35 @@
+import React, { ReactElement, ReactNode } from 'react';
+import { render as rtlRender, RenderOptions } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
+
+interface TestProvidersProps {
+  children: ReactNode;
+  route: string;
+}
+
+const TestProviders: React.FC<TestProvidersProps> = ({ children, route }) => {
+  return (
+    <MemoryRouter
+      initialEntries={[route]}
+      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+    >
+      {children}
+    </MemoryRouter>
+  );
+};
+
+interface CustomRenderOptions extends Omit<RenderOptions, 'wrapper'> {
+  route?: string;
+}
+
+const render = (ui: ReactElement, options: CustomRenderOptions = {}) => {
+  const { route = '/', ...renderOptions } = options;
+
+  return rtlRender(ui, {
+    wrapper: ({ children }) => <TestProviders route={route}>{children}</TestProviders>,
+    ...renderOptions,
+  });
+};
+
+export * from '@testing-library/react';
+export { render };

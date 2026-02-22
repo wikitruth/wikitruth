@@ -118,7 +118,7 @@ Migrate community features:
 - [x] Add dedicated client Jest config (`jest.config.client.js`)
 - [x] Add at least one client smoke test (`client/src/**/*.test.ts(x)`)
 - [x] Update .gitignore for client build artifacts
-- [ ] Set up testing infrastructure (Jest, React Testing Library)
+- [x] Set up testing infrastructure (Jest, React Testing Library)
 - [ ] Configure Storybook for component development (optional)
 
 #### Phase 0 Exit Criteria
