@@ -257,35 +257,35 @@ Quick reference checklist for the Wikitruth frontend migration from Dust.js/Jade
 *Weeks 11-12 | Priority: MEDIUM*
 
 ### Groups Pages (8 pages + components)
-- [ ] `pages/Groups/GroupsIndex.tsx`
-- [ ] `pages/Groups/GroupCreate.tsx`
-- [ ] `pages/Groups/Group/GroupPage.tsx`
-- [ ] `pages/Groups/Group/GroupPosts.tsx`
-- [ ] `pages/Groups/Group/GroupMembers.tsx`
-- [ ] `components/Groups/GroupHeader.tsx`
-- [ ] `components/Groups/GroupItem.tsx`
-- [ ] `components/Groups/GroupsHeader.tsx`
+- [x] `pages/Groups/GroupsIndex.tsx`
+- [x] `pages/Groups/GroupCreate.tsx`
+- [x] `pages/Groups/Group/GroupPage.tsx`
+- [x] `pages/Groups/Group/GroupPosts.tsx`
+- [x] `pages/Groups/Group/GroupMembers.tsx`
+- [x] `components/Groups/GroupHeader.tsx`
+- [x] `components/Groups/GroupItem.tsx`
+- [x] `components/Groups/GroupsHeader.tsx`
 
 ### Members Pages (12 pages + components)
-- [ ] `pages/Members/ContributorsPage.tsx`
-- [ ] `pages/Members/ScreenersPage.tsx`
-- [ ] `pages/Members/ReviewersPage.tsx`
-- [ ] `pages/Members/AdministratorsPage.tsx`
-- [ ] `pages/Members/Profile/ProfilePage.tsx`
-- [ ] `pages/Members/Profile/ProfileSettings.tsx`
-- [ ] `pages/Members/Profile/ProfileTopics.tsx`
-- [ ] `pages/Members/Profile/ProfileContributions.tsx`
-- [ ] `pages/Members/Profile/ProfileFollowing.tsx`
-- [ ] `pages/Members/Profile/Pages/PagesIndex.tsx`
-- [ ] `pages/Members/Profile/Pages/PageView.tsx`
-- [ ] `pages/Members/Profile/Pages/PageCreate.tsx`
-- [ ] `components/Members/ProfileHeader.tsx`
-- [ ] `components/Members/MemberItem.tsx`
-- [ ] `components/Members/MembersHeader.tsx`
+- [x] `pages/Members/ContributorsPage.tsx`
+- [x] `pages/Members/ScreenersPage.tsx`
+- [x] `pages/Members/ReviewersPage.tsx`
+- [x] `pages/Members/AdministratorsPage.tsx`
+- [x] `pages/Members/Profile/ProfilePage.tsx`
+- [x] `pages/Members/Profile/ProfileSettings.tsx`
+- [x] `pages/Members/Profile/ProfileTopics.tsx`
+- [x] `pages/Members/Profile/ProfileContributions.tsx`
+- [x] `pages/Members/Profile/ProfileFollowing.tsx`
+- [x] `pages/Members/Profile/Pages/PagesIndex.tsx`
+- [x] `pages/Members/Profile/Pages/PageView.tsx`
+- [x] `pages/Members/Profile/Pages/PageCreate.tsx`
+- [x] `components/Members/ProfileHeader.tsx`
+- [x] `components/Members/MemberItem.tsx`
+- [x] `components/Members/MembersHeader.tsx`
 
 ### Services
-- [ ] `services/api/groups.ts`
-- [ ] `services/api/members.ts`
+- [x] `services/api/groups.ts`
+- [x] `services/api/members.ts`
 
 ---
 

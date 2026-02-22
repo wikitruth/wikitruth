@@ -21,7 +21,14 @@ import ArgumentCreatePage from '../pages/ArgumentCreatePage';
 import ArgumentEntryPage from '../pages/ArgumentEntryPage';
 import ArgumentsPage from '../pages/ArgumentsPage';
 import ArtifactsPage from '../pages/ArtifactsPage';
+import AdministratorsPage from '../pages/Members/AdministratorsPage';
+import ContributorsPage from '../pages/Members/ContributorsPage';
 import ForgotPasswordPage from '../pages/Auth/ForgotPasswordPage';
+import GroupCreate from '../pages/Groups/GroupCreate';
+import GroupMembers from '../pages/Groups/Group/GroupMembers';
+import GroupPage from '../pages/Groups/Group/GroupPage';
+import GroupPosts from '../pages/Groups/Group/GroupPosts';
+import GroupsIndex from '../pages/Groups/GroupsIndex';
 import GroupsPage from '../pages/GroupsPage';
 import HomePage from '../pages/HomePage';
 import IssueEntryPage from '../pages/IssueEntryPage';
@@ -32,9 +39,19 @@ import MembersPage from '../pages/MembersPage';
 import NotFoundPage from '../pages/NotFoundPage';
 import OpinionEntryPage from '../pages/OpinionEntryPage';
 import OpinionsPage from '../pages/OpinionsPage';
+import PageCreate from '../pages/Members/Profile/Pages/PageCreate';
+import PagesIndex from '../pages/Members/Profile/Pages/PagesIndex';
+import PageView from '../pages/Members/Profile/Pages/PageView';
+import ProfileContributions from '../pages/Members/Profile/ProfileContributions';
+import ProfileFollowing from '../pages/Members/Profile/ProfileFollowing';
+import ProfilePage from '../pages/Members/Profile/ProfilePage';
+import ProfileSettings from '../pages/Members/Profile/ProfileSettings';
+import ProfileTopics from '../pages/Members/Profile/ProfileTopics';
 import QuestionEntryPage from '../pages/QuestionEntryPage';
 import QuestionsPage from '../pages/QuestionsPage';
 import ResetPasswordPage from '../pages/Auth/ResetPasswordPage';
+import ReviewersPage from '../pages/Members/ReviewersPage';
+import ScreenersPage from '../pages/Members/ScreenersPage';
 import SearchPage from '../pages/SearchPage';
 import SignupPage from '../pages/Auth/SignupPage';
 import TopicCreatePage from '../pages/TopicCreatePage';
@@ -86,7 +103,24 @@ export const appRoutes: AppRoute[] = [
   { path: '/answers', element: <AnswersPage /> },
   { path: '/artifacts', element: <ArtifactsPage /> },
   { path: '/groups', element: <GroupsPage /> },
+  { path: '/groups/index', element: <GroupsIndex /> },
+  { path: '/groups/create', element: <GroupCreate /> },
+  { path: '/groups/:id', element: <GroupPage /> },
+  { path: '/groups/:id/posts', element: <GroupPosts /> },
+  { path: '/groups/:id/members', element: <GroupMembers /> },
   { path: '/members', element: <MembersPage /> },
+  { path: '/members/contributors', element: <ContributorsPage /> },
+  { path: '/members/screeners', element: <ScreenersPage /> },
+  { path: '/members/reviewers', element: <ReviewersPage /> },
+  { path: '/members/administrators', element: <AdministratorsPage /> },
+  { path: '/members/profile', element: <ProfilePage /> },
+  { path: '/members/profile/settings', element: <ProfileSettings /> },
+  { path: '/members/profile/topics', element: <ProfileTopics /> },
+  { path: '/members/profile/contributions', element: <ProfileContributions /> },
+  { path: '/members/profile/following', element: <ProfileFollowing /> },
+  { path: '/members/profile/pages', element: <PagesIndex /> },
+  { path: '/members/profile/pages/create', element: <PageCreate /> },
+  { path: '/members/profile/pages/:id', element: <PageView /> },
   { path: '/search', element: <SearchPage /> },
   { path: '/visualize', element: <VisualizePage /> },
   { path: '/about', element: <AboutPage /> },

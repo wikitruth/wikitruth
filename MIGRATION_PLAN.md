@@ -313,37 +313,37 @@ Migrate community features:
 ### 👥 Groups & Members
 
 #### Groups Pages
-- [ ] `pages/Groups/GroupsIndex.tsx` - Groups listing
-- [ ] `pages/Groups/GroupCreate.tsx` - Create group form
-- [ ] `pages/Groups/Group/GroupPage.tsx` - Group detail view
-- [ ] `pages/Groups/Group/GroupPosts.tsx` - Group posts
-- [ ] `pages/Groups/Group/GroupMembers.tsx` - Group members
+- [x] `pages/Groups/GroupsIndex.tsx` - Groups listing
+- [x] `pages/Groups/GroupCreate.tsx` - Create group form
+- [x] `pages/Groups/Group/GroupPage.tsx` - Group detail view
+- [x] `pages/Groups/Group/GroupPosts.tsx` - Group posts
+- [x] `pages/Groups/Group/GroupMembers.tsx` - Group members
 
 #### Groups Components
-- [ ] `components/Groups/GroupHeader.tsx` - Group header
-- [ ] `components/Groups/GroupItem.tsx` - Group list item
-- [ ] `components/Groups/GroupsHeader.tsx` - Groups page header
+- [x] `components/Groups/GroupHeader.tsx` - Group header
+- [x] `components/Groups/GroupItem.tsx` - Group list item
+- [x] `components/Groups/GroupsHeader.tsx` - Groups page header
 
 #### Members Pages
-- [ ] `pages/Members/ContributorsPage.tsx` - Contributors listing
-- [ ] `pages/Members/ScreenersPage.tsx` - Screeners listing
-- [ ] `pages/Members/ReviewersPage.tsx` - Reviewers listing
-- [ ] `pages/Members/AdministratorsPage.tsx` - Administrators listing
+- [x] `pages/Members/ContributorsPage.tsx` - Contributors listing
+- [x] `pages/Members/ScreenersPage.tsx` - Screeners listing
+- [x] `pages/Members/ReviewersPage.tsx` - Reviewers listing
+- [x] `pages/Members/AdministratorsPage.tsx` - Administrators listing
 
 #### Member Profile Pages
-- [ ] `pages/Members/Profile/ProfilePage.tsx` - Member profile
-- [ ] `pages/Members/Profile/ProfileSettings.tsx` - Profile settings
-- [ ] `pages/Members/Profile/ProfileTopics.tsx` - Member's topics
-- [ ] `pages/Members/Profile/ProfileContributions.tsx` - Member's contributions
-- [ ] `pages/Members/Profile/ProfileFollowing.tsx` - Following list
-- [ ] `pages/Members/Profile/Pages/PagesIndex.tsx` - Member pages list
-- [ ] `pages/Members/Profile/Pages/PageView.tsx` - View member page
-- [ ] `pages/Members/Profile/Pages/PageCreate.tsx` - Create member page
+- [x] `pages/Members/Profile/ProfilePage.tsx` - Member profile
+- [x] `pages/Members/Profile/ProfileSettings.tsx` - Profile settings
+- [x] `pages/Members/Profile/ProfileTopics.tsx` - Member's topics
+- [x] `pages/Members/Profile/ProfileContributions.tsx` - Member's contributions
+- [x] `pages/Members/Profile/ProfileFollowing.tsx` - Following list
+- [x] `pages/Members/Profile/Pages/PagesIndex.tsx` - Member pages list
+- [x] `pages/Members/Profile/Pages/PageView.tsx` - View member page
+- [x] `pages/Members/Profile/Pages/PageCreate.tsx` - Create member page
 
 #### Members Components
-- [ ] `components/Members/ProfileHeader.tsx` - Profile header
-- [ ] `components/Members/MemberItem.tsx` - Member list item
-- [ ] `components/Members/MembersHeader.tsx` - Members page header
+- [x] `components/Members/ProfileHeader.tsx` - Profile header
+- [x] `components/Members/MemberItem.tsx` - Member list item
+- [x] `components/Members/MembersHeader.tsx` - Members page header
 
 ### 🔍 Search & Other Pages
 
@@ -375,8 +375,8 @@ Migrate community features:
 - [x] `services/api/issues.ts` - Issues API
 - [x] `services/api/opinions.ts` - Opinions API
 - [x] `services/api/artifacts.ts` - Artifacts API
-- [ ] `services/api/groups.ts` - Groups API
-- [ ] `services/api/members.ts` - Members API
+- [x] `services/api/groups.ts` - Groups API
+- [x] `services/api/members.ts` - Members API
 - [x] `services/api/auth.ts` - Authentication API
 - [x] `services/api/admin.ts` - Admin API
 
