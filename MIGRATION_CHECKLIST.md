@@ -30,7 +30,7 @@ Quick reference checklist for the Wikitruth frontend migration from Dust.js/Jade
 ### Build Configuration
 - [x] Update `webpack.config.js` to point to actual client directory
 - [x] Configure webpack dev server with HMR
-- [ ] Set up production webpack config
+- [x] Set up production webpack config
 - [x] Configure CSS/SCSS loader
 - [ ] Set up file loader for assets (images, fonts)
 - [x] Add source maps configuration

@@ -100,8 +100,8 @@ Migrate community features:
 - [ ] Set up API client layer (Axios or Fetch wrapper)
 
 #### Build Configuration
-- [ ] Update webpack config for proper entry points
-- [ ] Configure development and production builds
+- [x] Update webpack config for proper entry points
+- [x] Configure development and production builds
 - [ ] Set up code splitting and lazy loading
 - [ ] Configure asset handling (images, fonts)
 - [ ] Set up source maps for debugging

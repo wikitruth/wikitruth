@@ -15,7 +15,7 @@
     "dev:client": "webpack serve --mode development --hot",
     "dev:all": "npm-run-all --parallel dev:server dev:client",
     "build:server": "tsc -p tsconfig.server.json",
-    "build:client": "webpack --mode production",
+    "build:client": "webpack --config webpack.config.prod.js --mode production",
     "build:client:dev": "webpack --mode development",
     "build": "npm run build:server && npm run build:client",
     "build:dev": "npm run build:server && npm run build:client:dev",
