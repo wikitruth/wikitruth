@@ -46,7 +46,7 @@ Quick reference checklist for the Wikitruth frontend migration from Dust.js/Jade
 
 ### Testing Setup
 - [x] Install Jest
-- [ ] Install React Testing Library
+- [x] Install React Testing Library
 - [x] Configure Jest for React (`jest.config.client.js`)
 - [ ] Create test utilities and helpers
 - [x] Write sample test to verify setup
