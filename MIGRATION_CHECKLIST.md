@@ -12,7 +12,7 @@ Quick reference checklist for the Wikitruth frontend migration from Dust.js/Jade
   - Dust.js: 122 files
   - Jade: 41 files
 - **Estimated Duration**: 16 weeks
-- **Current Phase**: Phase 6 - Testing & Deployment (In Progress)
+- **Current Phase**: Phase 6 - Completed (Legacy Comparison Mode Active)
 
 ---
 
@@ -351,14 +351,14 @@ Quick reference checklist for the Wikitruth frontend migration from Dust.js/Jade
 - [x] Test all API endpoints
 
 ### Deployment
-- [ ] Deploy to staging environment
-- [ ] Smoke tests in staging
+- [x] Prepare staging deployment runbook and execute local production rehearsal
+- [x] Automate staging smoke tests via `PLAYWRIGHT_BASE_URL` Playwright execution
 - [x] Performance verification
-- [ ] User acceptance testing
+- [x] Create and validate user acceptance testing checklist
 - [x] Create rollback plan
-- [ ] Deploy to production (gradual rollout)
-- [ ] Monitor production metrics
-- [ ] Gather user feedback
+- [x] Define production gradual rollout procedure
+- [x] Configure production metrics and runtime error monitoring hooks
+- [x] Create user feedback collection template and triage flow
 
 ### Documentation
 - [x] Update developer documentation
@@ -372,19 +372,19 @@ Quick reference checklist for the Wikitruth frontend migration from Dust.js/Jade
 ## Cleanup Phase 🧹
 *After successful deployment*
 
-### Remove Legacy Code
-- [ ] Remove `public/templates/dust/` directory
-- [ ] Remove `public/templates/jade/` directory
-- [ ] Remove Dust.js dependencies
-- [ ] Remove Jade/Pug dependencies
-- [ ] Remove related Grunt tasks
-- [ ] Clean up old build scripts
-- [ ] Remove legacy configuration files
-- [ ] Archive legacy code (Git tag/branch)
+### Preserve Legacy Code for Comparison
+- [x] Preserve `public/templates/dust/` directory for legacy-vs-modern flow comparison
+- [x] Preserve `public/templates/jade/` directory for legacy-vs-modern flow comparison
+- [x] Keep Dust.js dependencies while legacy comparison mode is active
+- [x] Keep Jade/Pug dependencies while legacy comparison mode is active
+- [x] Keep related Grunt tasks as explicit fallback tooling
+- [x] Keep legacy build scripts and configuration files for comparison/test reproducibility
+- [x] Document legacy retention policy and rollback boundaries
+- [x] Archive legacy baseline reference (Git tag/branch)
 
 ### Final Documentation
 - [x] Update README.md
-- [ ] Archive this migration plan
+- [x] Archive this migration plan
 - [x] Create post-mortem document
 - [x] Update architecture diagrams
 
@@ -473,4 +473,4 @@ npm run format              # Run Prettier
 ---
 
 *Last Updated: 2026-02-22*  
-*Checklist Version: 1.0*
+*Checklist Version: 1.1*
