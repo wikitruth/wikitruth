@@ -61,6 +61,17 @@ describe('API endpoint smoke coverage', function () {
     ].forEach((contract) => expect(adminApi).toContain(contract));
   });
 
+  it('exposes profile and custom-page member APIs required by modern client', function () {
+    const membersApi = read('controllers/api/members.ts');
+
+    expect(membersApi).toContain("router.get('/me'");
+    expect(membersApi).toContain("router.put('/me/preferences'");
+    expect(membersApi).toContain("router.get('/:username/pages'");
+    expect(membersApi).toContain("router.post('/:username/pages'");
+    expect(membersApi).toContain("router.get('/:username/pages/:id'");
+    expect(membersApi).toContain("router.put('/:username/pages/:id'");
+  });
+
   it('exposes monitoring endpoint for client runtime error tracking', function () {
     const monitoringApi = read('controllers/api/monitoring.ts');
 

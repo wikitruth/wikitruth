@@ -276,6 +276,39 @@ class ApiService {
   async getMemberProfile(username: string) {
     return this.request(`/members/${username}`);
   }
+
+  async getCurrentMemberProfile() {
+    return this.request('/members/me');
+  }
+
+  async updateCurrentMemberPreferences(payload: { privateProfile: boolean }) {
+    return this.request('/members/me/preferences', {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async getMemberPages(username: string) {
+    return this.request(`/members/${encodeURIComponent(username)}/pages`);
+  }
+
+  async createMemberPage(username: string, payload: { title: string; content: string }) {
+    return this.request(`/members/${encodeURIComponent(username)}/pages`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async getMemberPage(username: string, pageId: string) {
+    return this.request(`/members/${encodeURIComponent(username)}/pages/${encodeURIComponent(pageId)}`);
+  }
+
+  async updateMemberPage(username: string, pageId: string, payload: { title?: string; content?: string }) {
+    return this.request(`/members/${encodeURIComponent(username)}/pages/${encodeURIComponent(pageId)}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  }
 }
 
 export const apiService = new ApiService();
