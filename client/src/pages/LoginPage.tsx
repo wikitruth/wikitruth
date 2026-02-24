@@ -4,6 +4,7 @@ import Input from '../components/Form/Input';
 import Checkbox from '../components/Form/Checkbox';
 import Button from '../components/common/Button';
 import Alert from '../components/common/Alert';
+import SocialLoginButtons from '../components/Auth/SocialLoginButtons';
 import useForm from '../hooks/useForm';
 import { useAuth } from '../context/AuthContext';
 
@@ -124,6 +125,9 @@ const LoginPage: React.FC = () => {
               </Button>
             </div>
           </form>
+
+          <hr />
+          <SocialLoginButtons mode="login" />
 
           <hr />
 

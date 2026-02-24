@@ -7,7 +7,7 @@ const SignupPage: React.FC = () => {
     <div className="container" style={{ maxWidth: '520px', marginTop: '60px' }}>
       <h2>Create your Wikitruth account</h2>
       <p className="text-muted">Registration form migration scaffold.</p>
-      <SocialLoginButtons />
+      <SocialLoginButtons mode="signup" />
       <hr />
       <p>
         Already registered? <Link to="/login">Sign in</Link>

@@ -32,9 +32,9 @@ Legend: `[x]` done, `[~]` partial, `[ ]` not done
 
 - [x] React login page with session-cookie auth (`/api/auth/login`, `/api/auth/me`, `/api/auth/logout`).
 - [~] React signup route exists but is scaffold-only.
-- [ ] Social login redirect wiring from React UI to backend OAuth routes.
-- [ ] Social signup redirect wiring from React signup flow.
-- [ ] Social account connect/disconnect controls in React account settings.
+- [x] Social login redirect wiring from React UI to backend OAuth routes.
+- [x] Social signup redirect wiring from React signup flow.
+- [x] Social account connect/disconnect controls in React account settings.
 - [ ] Apple OAuth provider support (backend + frontend).
 - [ ] Microsoft OAuth provider support (backend + frontend).
 - [~] Forgot/reset password API endpoints exist but currently return delegated/placeholder responses.
