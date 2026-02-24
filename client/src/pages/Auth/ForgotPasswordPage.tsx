@@ -1,20 +1,50 @@
 import React, { useState } from 'react';
 import Input from '../../components/Form/Input';
-import Button from '../../components/Form/Button';
+import Button from '../../components/common/Button';
+import Alert from '../../components/common/Alert';
+import authApi from '../../services/api/auth';
 
 const ForgotPasswordPage: React.FC = () => {
   const [email, setEmail] = useState('');
-  const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitMessage, setSubmitMessage] = useState<string | null>(null);
+  const [debugToken, setDebugToken] = useState<string | null>(null);
+
+  const onSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setSubmitError(null);
+    setSubmitMessage(null);
+    setDebugToken(null);
+
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!normalizedEmail) {
+      setSubmitError('Email is required');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const result = await authApi.forgotPassword(normalizedEmail);
+      setSubmitMessage(result.message || 'If an account exists, reset instructions were generated.');
+      if (result.debug?.token) {
+        setDebugToken(result.debug.token);
+      }
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : 'Failed to request password reset');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="container" style={{ maxWidth: '520px', marginTop: '60px' }}>
       <h2>Forgot password</h2>
-      <form
-        onSubmit={(event) => {
-          event.preventDefault();
-          setSubmitted(true);
-        }}
-      >
+
+      {submitError ? <Alert type="danger">{submitError}</Alert> : null}
+      {submitMessage ? <Alert type="success">{submitMessage}</Alert> : null}
+
+      <form onSubmit={onSubmit}>
         <Input
           name="email"
           type="email"
@@ -24,11 +54,25 @@ const ForgotPasswordPage: React.FC = () => {
           placeholder="you@example.com"
           required
         />
-        <Button type="submit" variant="primary">
-          Send reset link
+        <Button type="submit" variant="primary" disabled={isSubmitting} icon={isSubmitting ? 'spinner fa-spin' : 'envelope'}>
+          {isSubmitting ? 'Sending...' : 'Send reset link'}
         </Button>
       </form>
-      {submitted ? <p className="text-success">If an account exists, a reset email will be sent.</p> : null}
+
+      {debugToken ? (
+        <div className="well" style={{ marginTop: '20px' }}>
+          <p>
+            <strong>Dev token:</strong> <code>{debugToken}</code>
+          </p>
+          <p>
+            Use this local link:
+            {' '}
+            <a href={`/app/reset-password?email=${encodeURIComponent(email.trim().toLowerCase())}&token=${encodeURIComponent(debugToken)}`}>
+              Reset password now
+            </a>
+          </p>
+        </div>
+      ) : null}
     </div>
   );
 };

@@ -18,7 +18,7 @@ This audit answers three questions:
 
 - Social buttons exist in `client/src/components/Auth/SocialLoginButtons.tsx` but only emit callbacks; no redirect wiring to OAuth endpoints.
 - Signup page is now a validated React form wired to `/api/auth/signup`.
-- Forgot/reset pages remain partially scaffolded and need full API integration and token UX completion.
+- Forgot/reset pages now call auth APIs with token-aware UX in React.
 - Legacy server still owns OAuth routes (`/login/google`, `/login/github`, `/login/facebook`, `/login/twitter`, and signup/account variants) in `middlewares/routes.ts`.
 - No Apple/Microsoft strategies in `middlewares/passport.ts`.
 - API surface is mostly read-only for content domain controllers; `router.post/put/delete` exists mainly in auth/monitoring (`controllers/api/*`).
@@ -37,8 +37,8 @@ Legend: `[x]` done, `[~]` partial, `[ ]` not done
 - [x] Social account connect/disconnect controls in React account settings.
 - [ ] Apple OAuth provider support (backend + frontend).
 - [ ] Microsoft OAuth provider support (backend + frontend).
-- [~] Forgot/reset password API endpoints exist but currently return delegated/placeholder responses.
-- [ ] Production-grade React forgot/reset password flow with token validation and user feedback states.
+- [x] Forgot/reset password API endpoints implemented with token generation and validation.
+- [x] Production-grade React forgot/reset password flow with token validation and user feedback states.
 
 ### B. Core Content Workflows
 
@@ -100,6 +100,6 @@ Legend: `[x]` done, `[~]` partial, `[ ]` not done
 
 - [x] Wire `SocialLoginButtons` to OAuth redirect URLs and add integration tests.
 - [x] Replace `SignupPage` scaffold with real form + submit flow.
-- [ ] Decide/implement forgot-reset strategy (native API vs legacy handoff) and update UI accordingly.
+- [x] Decide/implement forgot-reset strategy (native API vs legacy handoff) and update UI accordingly.
 - [ ] Create API mutation endpoints for topic and argument create flows.
 - [ ] Replace top 10 scaffold pages in admin/account/group areas with live data implementations.
