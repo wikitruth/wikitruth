@@ -25,7 +25,7 @@
     "test:client:watch": "jest --config jest.config.client.js --watch",
     "test:coverage": "jest --config jest.config.client.js --coverage",
     "test:e2e": "playwright test",
-    "test:ci": "npm-run-all lint type:guardrails test:server test:coverage build:client",
+    "test:ci": "npm-run-all lint type:guardrails test:server test:coverage build:client build:server",
     "lint": "eslint client tests/server --ext .ts,.tsx,.js",
     "lint:fix": "eslint client tests/server --ext .ts,.tsx,.js --fix",
     "format": "prettier --write .",
