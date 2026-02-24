@@ -20,7 +20,7 @@ This proposal consolidates pending enhancement work after migration closure, bas
 - [x] E11. Add dark mode theme tokens and toggle support.
 - [x] E12. Add baseline realtime event channel (WebSocket/SSE) for React client.
 - [x] E13. Add Storybook for component catalog and visual diffing baseline.
-- [ ] E14. Ship a mobile app strategy document with API contract readiness checklist.
+- [x] E14. Ship a mobile app strategy document with API contract readiness checklist.
 
 ## Current State Snapshot
 
