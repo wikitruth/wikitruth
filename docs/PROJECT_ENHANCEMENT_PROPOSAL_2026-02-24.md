@@ -4,6 +4,10 @@
 
 This proposal consolidates pending enhancement work after migration closure, based on a full repository scan across server, client, templates, tests, and docs.
 
+## Status
+
+Program checklist completed on 2026-02-24 (`E0` through `E14`).
+
 ## Implementation Tracker
 
 - [x] E0. Archive completed migration documents into `docs/archive/migrations` with root pointer stubs.
@@ -22,7 +26,7 @@ This proposal consolidates pending enhancement work after migration closure, bas
 - [x] E13. Add Storybook for component catalog and visual diffing baseline.
 - [x] E14. Ship a mobile app strategy document with API contract readiness checklist.
 
-## Current State Snapshot
+## Current State Snapshot (Historical Baseline)
 
 - Codebase mix:
   - JavaScript files: `2170`
@@ -45,7 +49,7 @@ This proposal consolidates pending enhancement work after migration closure, bas
   - `npm audit` vulnerabilities: `80` (`11 critical`, `52 high`, `14 moderate`, `3 low`)
   - Multiple major-version upgrade opportunities remain (Express 5, React 19, ESLint 10, Jest 30, etc.).
 
-## Backlog Enhancements Pending
+## Backlog Enhancements Pending (Historical at Proposal Time)
 
 These remain functionally pending as product/program enhancements:
 

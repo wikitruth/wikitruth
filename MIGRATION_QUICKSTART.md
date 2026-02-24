@@ -1,5 +1,11 @@
-# Migration Quickstart (Archived)
+# Migration Quickstart Pointer
 
-This quickstart document has been archived.
+This root file is retained as a compatibility pointer.
 
-See `/Users/dsalunga/Projects/Wikitruth/wikitruth/docs/archive/migrations/MIGRATION_QUICKSTART.md`.
+## Canonical Archived Quickstart
+
+- `docs/archive/migrations/MIGRATION_QUICKSTART.md`
+
+## Current Documentation Index
+
+- `docs/README.md`

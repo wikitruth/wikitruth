@@ -1,11 +1,19 @@
 # Migration Docs Archive
 
-Archived migration documentation moved from repository root:
+Canonical archive for completed legacy-to-React migration documentation.
 
-- `MIGRATION_README.md`
-- `MIGRATION_PLAN.md`
-- `MIGRATION_CHECKLIST.md`
-- `MIGRATION_QUICKSTART.md`
-- `MIGRATION_TECHNICAL_REFERENCE.md`
+## Archived Files
 
-Archive location date: 2026-02-24.
+- `docs/archive/migrations/MIGRATION_README.md`
+- `docs/archive/migrations/MIGRATION_PLAN.md`
+- `docs/archive/migrations/MIGRATION_CHECKLIST.md`
+- `docs/archive/migrations/MIGRATION_QUICKSTART.md`
+- `docs/archive/migrations/MIGRATION_TECHNICAL_REFERENCE.md`
+
+## Notes
+
+- Archive date: 2026-02-24
+- Root-level `MIGRATION_*.md` files are compatibility pointers only.
+- Ongoing implementation tracking now lives in:
+  - `docs/PROJECT_ENHANCEMENT_PROPOSAL_2026-02-24.md`
+  - `docs/MODERN_CLIENT_COMPLETION_PLAN_2026-02-24.md`

@@ -1,5 +1,11 @@
-# Migration Technical Reference (Archived)
+# Migration Technical Reference Pointer
 
-This migration technical reference has been archived.
+This root file is retained as a compatibility pointer.
 
-See `/Users/dsalunga/Projects/Wikitruth/wikitruth/docs/archive/migrations/MIGRATION_TECHNICAL_REFERENCE.md`.
+## Canonical Archived Technical Reference
+
+- `docs/archive/migrations/MIGRATION_TECHNICAL_REFERENCE.md`
+
+## Current ADR Index
+
+- `docs/adr/README.md`

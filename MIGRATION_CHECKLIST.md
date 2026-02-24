@@ -1,5 +1,11 @@
-# Migration Checklist (Archived)
+# Migration Checklist Pointer
 
-This migration checklist has been archived.
+This root file is retained as a compatibility pointer.
 
-See `/Users/dsalunga/Projects/Wikitruth/wikitruth/docs/archive/migrations/MIGRATION_CHECKLIST.md`.
+## Canonical Archived Checklist
+
+- `docs/archive/migrations/MIGRATION_CHECKLIST.md`
+
+## Current Completion Checklist
+
+- `docs/MODERN_CLIENT_COMPLETION_PLAN_2026-02-24.md`
