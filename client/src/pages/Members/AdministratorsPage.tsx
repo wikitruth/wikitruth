@@ -1,11 +1,19 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+import MemberDirectoryPage from './common/MemberDirectoryPage';
+import apiService from '../../services/api';
 
 const AdministratorsPage: React.FC = () => {
+  const fetchMembers = useCallback(async () => {
+    const result: any = await apiService.getAdministrators();
+    return result.administrators || [];
+  }, []);
+
   return (
-    <div className="container">
-      <h2>Administrators</h2>
-      <p className="text-muted">Administrators directory migration scaffold.</p>
-    </div>
+    <MemberDirectoryPage
+      title="Administrators"
+      subtitle="Platform administrators"
+      fetchMembers={fetchMembers}
+    />
   );
 };
 

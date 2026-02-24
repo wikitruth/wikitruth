@@ -16,13 +16,13 @@ This audit answers three questions:
 
 ## Evidence Snapshot
 
-- Social buttons exist in `client/src/components/Auth/SocialLoginButtons.tsx` but only emit callbacks; no redirect wiring to OAuth endpoints.
+- Social buttons in `client/src/components/Auth/SocialLoginButtons.tsx` are wired to backend OAuth redirect routes for login/signup providers.
 - Signup page is now a validated React form wired to `/api/auth/signup`.
 - Forgot/reset pages now call auth APIs with token-aware UX in React.
 - Legacy server still owns OAuth routes (`/login/google`, `/login/github`, `/login/facebook`, `/login/twitter`, and signup/account variants) in `middlewares/routes.ts`.
 - Apple and Microsoft OAuth strategies are now configured in `middlewares/passport.ts` and wired through legacy auth/account routes used by the modern client redirect flow.
 - API surface now includes create/update mutations for topics, arguments, questions, answers, issues, opinions, artifacts, groups, and profile custom pages; contract standardization is still pending.
-- Migration scaffolds remain in 51 React page modules (scan using `rg "migration scaffold|scaffold" client/src/pages`).
+- Migration scaffolds remain in 20 React page modules, primarily legacy comparison pages under `client/src/pages/Wiki/*` (scan using `rg "migration scaffold|scaffold" client/src/pages`).
 
 ## Completion Checklist
 
@@ -69,7 +69,7 @@ Legend: `[x]` done, `[~]` partial, `[ ]` not done
 
 - [x] Dark mode baseline completed.
 - [x] Storybook baseline completed.
-- [ ] Remove or implement remaining scaffold pages in route surface.
+- [x] Remove or implement remaining scaffold pages in route surface.
 - [ ] Reduce `client/src` `any`/lint warnings to agreed threshold.
 - [ ] Full parity acceptance/UAT against legacy-critical flows.
 

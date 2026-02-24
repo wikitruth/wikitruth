@@ -1,11 +1,19 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+import MemberDirectoryPage from './common/MemberDirectoryPage';
+import apiService from '../../services/api';
 
 const ReviewersPage: React.FC = () => {
+  const fetchMembers = useCallback(async () => {
+    const result: any = await apiService.getReviewers();
+    return result.reviewers || [];
+  }, []);
+
   return (
-    <div className="container">
-      <h2>Reviewers</h2>
-      <p className="text-muted">Reviewers directory migration scaffold.</p>
-    </div>
+    <MemberDirectoryPage
+      title="Reviewers"
+      subtitle="Members with reviewer privileges"
+      fetchMembers={fetchMembers}
+    />
   );
 };
 
