@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import apiService from '../services/api';
+import type { Topic } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import TopicEntryRow from '../components/EntryRow/TopicEntryRow';
 import Breadcrumb from '../components/common/Breadcrumb';
@@ -8,15 +9,19 @@ import PageHeader from '../components/common/PageHeader';
 import Pagination from '../components/common/Pagination';
 import Input from '../components/Form/Input';
 import Select from '../components/Form/Select';
-import Button from '../components/common/Button';
+
+interface TopicsApiResponse {
+  topics?: Topic[];
+  topic?: Topic | null;
+}
 
 const TopicsPage: React.FC = () => {
-  const { friendlyUrl, id } = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const { id } = useParams();
+  const [searchParams] = useSearchParams();
   const topicId = searchParams.get('topic') || id;
   
-  const [topics, setTopics] = useState<any[]>([]);
-  const [topic, setTopic] = useState<any>(null);
+  const [topics, setTopics] = useState<Topic[]>([]);
+  const [topic, setTopic] = useState<Topic | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('editDate');
@@ -29,9 +34,9 @@ const TopicsPage: React.FC = () => {
 
   const fetchTopics = async () => {
     try {
-      const result: any = await apiService.getTopics(topicId);
+      const result = (await apiService.getTopics(topicId)) as TopicsApiResponse;
       setTopics(result.topics || []);
-      setTopic(result.topic);
+      setTopic(result.topic || null);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching topics:', error);
@@ -170,7 +175,7 @@ const TopicsPage: React.FC = () => {
                 )}
               </div>
             </li>
-            {paginatedTopics.map((t: any) => (
+            {paginatedTopics.map((t) => (
               <TopicEntryRow
                 key={t._id}
                 topic={t}
