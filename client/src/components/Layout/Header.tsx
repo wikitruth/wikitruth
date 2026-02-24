@@ -1,16 +1,60 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import OptimizedImage from '../common/OptimizedImage';
+import type { Application, User } from '../../types';
+import authApi from '../../services/api/auth';
+import apiService from '../../services/api';
+
+type HeaderUser = Pick<User, '_id' | 'username' | 'email'>;
+type HeaderApplication = Pick<Application, '_id' | 'name'> & {
+  logoIcon?: string;
+};
+
+interface HomePayload {
+  application?: HeaderApplication;
+}
 
 const Header: React.FC = () => {
-  const [user, setUser] = useState<any>(null);
-  const [application, setApplication] = useState<any>(null);
+  const [user, setUser] = useState<HeaderUser | null>(null);
+  const [application, setApplication] = useState<HeaderApplication | null>(null);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   useEffect(() => {
-    // TODO: Fetch user and application data from API
-    // For now, this is a placeholder
+    let isMounted = true;
+
+    const loadHeaderData = async () => {
+      const [userResult, homeResult] = await Promise.allSettled([
+        authApi.me(),
+        apiService.getHomeData() as Promise<HomePayload>,
+      ]);
+
+      if (!isMounted) {
+        return;
+      }
+
+      if (userResult.status === 'fulfilled' && userResult.value.user) {
+        setUser({
+          _id: userResult.value.user._id,
+          username: userResult.value.user.username,
+          email: userResult.value.user.email,
+        });
+      } else {
+        setUser(null);
+      }
+
+      if (homeResult.status === 'fulfilled' && homeResult.value.application) {
+        setApplication(homeResult.value.application);
+      } else {
+        setApplication(null);
+      }
+    };
+
+    void loadHeaderData();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (

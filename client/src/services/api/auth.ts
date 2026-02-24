@@ -1,4 +1,5 @@
 import API_BASE_URL from './baseUrl';
+import type { User } from '../../types';
 
 interface LoginRequest {
   username: string;
@@ -6,7 +7,8 @@ interface LoginRequest {
 }
 
 interface UserResponse {
-  user: Record<string, unknown>;
+  success?: boolean;
+  user: User | null;
 }
 
 const request = async <T>(url: string, init?: RequestInit): Promise<T> => {
