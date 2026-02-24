@@ -46,7 +46,7 @@ Legend: `[x]` done, `[~]` partial, `[ ]` not done
 - [x] Create topic flow backed by real API mutation.
 - [x] Create argument flow backed by real API mutation.
 - [~] Create flows for question/answer/issue/opinion/artifact implemented in React; edit pages still pending.
-- [ ] Group create/manage flows backed by real API mutations.
+- [x] Group create/manage flows backed by real API mutations.
 - [ ] Profile pages/create-page flows backed by real APIs.
 
 ### C. Admin and Account Parity
@@ -60,7 +60,7 @@ Legend: `[x]` done, `[~]` partial, `[ ]` not done
 
 - [x] Versioned compatibility route (`/api/v1/*`) present.
 - [x] Realtime SSE baseline present (`/api/realtime/events`).
-- [~] Mutation endpoints for modern client workflows (topics/arguments/questions/answers/issues/opinions/artifacts implemented; groups/profile parity pending).
+- [~] Mutation endpoints for modern client workflows (topics/arguments/questions/answers/issues/opinions/artifacts/groups implemented; profile parity pending).
 - [ ] Standardized success envelope and typed DTOs for high-traffic endpoints.
 - [ ] OpenAPI/contract documentation for mobile/web shared clients.
 - [ ] Contract tests for critical auth + content mutation flows.

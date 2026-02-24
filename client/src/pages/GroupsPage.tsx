@@ -53,6 +53,10 @@ const GroupsPage: React.FC = () => {
             <Link to="/" className="btn btn-default">
               <span className="glyphicon glyphicon-arrow-left"></span> Back to Home
             </Link>
+            {' '}
+            <Link to="/groups/create" className="btn btn-primary">
+              <span className="glyphicon glyphicon-plus"></span> Create Group
+            </Link>
           </div>
         </div>
 

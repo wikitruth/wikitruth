@@ -229,6 +229,33 @@ class ApiService {
     return this.request(`/groups/entry/${id}`);
   }
 
+  async createGroup(payload: { title: string; description: string; privacyType: number }) {
+    return this.request('/groups', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async updateGroup(id: string, payload: { title?: string; description?: string; privacyType?: number }) {
+    return this.request(`/groups/entry/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async joinGroup(id: string) {
+    return this.request(`/groups/entry/${id}/members`, {
+      method: 'POST',
+      body: JSON.stringify({}),
+    });
+  }
+
+  async leaveGroup(id: string, userId: string) {
+    return this.request(`/groups/entry/${id}/members/${encodeURIComponent(userId)}`, {
+      method: 'DELETE',
+    });
+  }
+
   // Members
   async getMembers() {
     return this.request('/members');

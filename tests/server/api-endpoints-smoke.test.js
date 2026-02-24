@@ -83,6 +83,7 @@ describe('API endpoint smoke coverage', function () {
     const issuesApi = read('controllers/api/issues.ts');
     const opinionsApi = read('controllers/api/opinions.ts');
     const artifactsApi = read('controllers/api/artifacts.ts');
+    const groupsApi = read('controllers/api/groups.ts');
 
     expect(topicsApi).toContain("router.post('/',");
     expect(topicsApi).toContain('POST_topic_create');
@@ -98,5 +99,9 @@ describe('API endpoint smoke coverage', function () {
     expect(opinionsApi).toContain("router.put('/entry/:id'");
     expect(artifactsApi).toContain("router.post('/',");
     expect(artifactsApi).toContain("router.put('/entry/:id'");
+    expect(groupsApi).toContain("router.post('/',");
+    expect(groupsApi).toContain("router.put('/entry/:id'");
+    expect(groupsApi).toContain("router.post('/entry/:id/members'");
+    expect(groupsApi).toContain("router.delete('/entry/:id/members/:userId'");
   });
 });
