@@ -8,6 +8,9 @@ const TwitterStrategy = require('passport-twitter').Strategy;
 const GitHubStrategy = require('passport-github').Strategy;
 const FacebookStrategy = require('passport-facebook').Strategy;
 const GoogleStrategy = require('passport-google').Strategy;
+const AppleStrategy = require('passport-apple');
+const MicrosoftStrategy = require('passport-microsoft').Strategy;
+const jwt = require('jsonwebtoken');
 
 interface PassportLike {
   use(strategy: unknown): void;
@@ -33,6 +36,13 @@ interface AppWithConfig extends AppContext {
       github: { key?: string; secret?: string };
       facebook: { key?: string; secret?: string };
       google: { key?: string; secret?: string };
+      apple: {
+        key?: string;
+        teamId?: string;
+        keyId?: string;
+        privateKeyLocation?: string;
+      };
+      microsoft: { key?: string; secret?: string; tenant?: string };
     };
   };
 }
@@ -154,6 +164,79 @@ module.exports = function configurePassport(app: AppWithConfig, passport: Passpo
             accessToken: accessToken,
             refreshToken: refreshToken,
             profile: profile,
+          });
+        }
+      )
+    );
+  }
+
+  if (
+    app.config.oauth.apple.key &&
+    app.config.oauth.apple.teamId &&
+    app.config.oauth.apple.keyId &&
+    app.config.oauth.apple.privateKeyLocation
+  ) {
+    passport.use(
+      new AppleStrategy(
+        {
+          clientID: app.config.oauth.apple.key,
+          teamID: app.config.oauth.apple.teamId,
+          keyID: app.config.oauth.apple.keyId,
+          privateKeyLocation: app.config.oauth.apple.privateKeyLocation,
+          passReqToCallback: true,
+        },
+        function (
+          req: unknown,
+          accessToken: string,
+          refreshToken: string,
+          idToken: string,
+          profile: Record<string, unknown>,
+          done: (error: unknown, user?: unknown, info?: unknown) => void
+        ) {
+          const decoded = (jwt.decode(idToken) as { sub?: string; email?: string } | null) || null;
+          const normalizedProfile = {
+            ...profile,
+            provider: 'apple',
+            id: profile?.id || decoded?.sub,
+            emails: Array.isArray((profile as { emails?: unknown[] }).emails)
+              ? (profile as { emails?: unknown[] }).emails
+              : decoded?.email
+                ? [{ value: decoded.email }]
+                : [],
+          };
+          done(null, false, {
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+            idToken: idToken,
+            profile: normalizedProfile,
+          });
+        }
+      )
+    );
+  }
+
+  if (app.config.oauth.microsoft.key && app.config.oauth.microsoft.secret) {
+    passport.use(
+      new MicrosoftStrategy(
+        {
+          clientID: app.config.oauth.microsoft.key,
+          clientSecret: app.config.oauth.microsoft.secret,
+          tenant: app.config.oauth.microsoft.tenant || 'common',
+          scope: ['user.read'],
+        },
+        function (
+          accessToken: string,
+          refreshToken: string,
+          profile: Record<string, unknown>,
+          done: (error: unknown, user?: unknown, info?: unknown) => void
+        ) {
+          done(null, false, {
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+            profile: {
+              ...profile,
+              provider: 'microsoft',
+            },
           });
         }
       )

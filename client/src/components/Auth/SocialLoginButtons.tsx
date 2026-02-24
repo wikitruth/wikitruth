@@ -1,6 +1,6 @@
 import React from 'react';
 
-type SocialProvider = 'google' | 'github' | 'facebook' | 'twitter';
+type SocialProvider = 'google' | 'github' | 'facebook' | 'twitter' | 'apple' | 'microsoft';
 
 interface SocialLoginButtonsProps {
   mode?: 'login' | 'signup';
@@ -13,6 +13,8 @@ const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({ mode = 'login',
     { key: 'github', label: 'GitHub', icon: 'github', href: `/${mode}/github/` },
     { key: 'facebook', label: 'Facebook', icon: 'facebook', href: `/${mode}/facebook/` },
     { key: 'twitter', label: 'Twitter', icon: 'twitter', href: `/${mode}/twitter/` },
+    { key: 'apple', label: 'Apple', icon: 'apple', href: `/${mode}/apple/` },
+    { key: 'microsoft', label: 'Microsoft', icon: 'windows', href: `/${mode}/microsoft/` },
   ];
 
   return (

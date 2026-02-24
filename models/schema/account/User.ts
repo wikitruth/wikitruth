@@ -20,6 +20,8 @@ exports = module.exports = function(app, mongoose) {
     github: {},
     facebook: {},
     google: {},
+    apple: {},
+    microsoft: {},
     tumblr: {},
     preferences: { type: mongoose.Schema.Types.Mixed },
     search: [String],
@@ -87,6 +89,8 @@ exports = module.exports = function(app, mongoose) {
   userSchema.index({ 'github.id': 1 });
   userSchema.index({ 'facebook.id': 1 });
   userSchema.index({ 'google.id': 1 });
+  userSchema.index({ 'apple.id': 1 });
+  userSchema.index({ 'microsoft.id': 1 });
   userSchema.index({ search: 1 });
   userSchema.set('autoIndex', (app.get('env') === 'development'));
   app.db.model('User', userSchema);

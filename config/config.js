@@ -235,6 +235,17 @@ exports.oauth = {
     key: envWithDefault(['GOOGLE_OAUTH_KEY'], ''),
     secret: envWithDefault(['GOOGLE_OAUTH_SECRET'], ''),
   },
+  apple: {
+    key: envWithDefault(['APPLE_OAUTH_KEY'], ''),
+    teamId: envWithDefault(['APPLE_OAUTH_TEAM_ID'], ''),
+    keyId: envWithDefault(['APPLE_OAUTH_KEY_ID'], ''),
+    privateKeyLocation: envWithDefault(['APPLE_OAUTH_PRIVATE_KEY_LOCATION'], ''),
+  },
+  microsoft: {
+    key: envWithDefault(['MICROSOFT_OAUTH_KEY'], ''),
+    secret: envWithDefault(['MICROSOFT_OAUTH_SECRET'], ''),
+    tenant: envWithDefault(['MICROSOFT_OAUTH_TENANT'], 'common'),
+  },
   tumblr: {
     key: envWithDefault(['TUMBLR_OAUTH_KEY'], ''),
     secret: envWithDefault(['TUMBLR_OAUTH_SECRET'], ''),

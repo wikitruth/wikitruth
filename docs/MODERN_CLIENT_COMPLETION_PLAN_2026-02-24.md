@@ -20,7 +20,7 @@ This audit answers three questions:
 - Signup page is now a validated React form wired to `/api/auth/signup`.
 - Forgot/reset pages now call auth APIs with token-aware UX in React.
 - Legacy server still owns OAuth routes (`/login/google`, `/login/github`, `/login/facebook`, `/login/twitter`, and signup/account variants) in `middlewares/routes.ts`.
-- No Apple/Microsoft strategies in `middlewares/passport.ts`.
+- Apple and Microsoft OAuth strategies are now configured in `middlewares/passport.ts` and wired through legacy auth/account routes used by the modern client redirect flow.
 - API surface is mostly read-only for content domain controllers; `router.post/put/delete` exists mainly in auth/monitoring (`controllers/api/*`).
 - Migration scaffolds remain in 51 React page modules (scan using `rg "migration scaffold|scaffold" client/src/pages`).
 
@@ -35,8 +35,8 @@ Legend: `[x]` done, `[~]` partial, `[ ]` not done
 - [x] Social login redirect wiring from React UI to backend OAuth routes.
 - [x] Social signup redirect wiring from React signup flow.
 - [x] Social account connect/disconnect controls in React account settings.
-- [ ] Apple OAuth provider support (backend + frontend).
-- [ ] Microsoft OAuth provider support (backend + frontend).
+- [x] Apple OAuth provider support (backend + frontend).
+- [x] Microsoft OAuth provider support (backend + frontend).
 - [x] Forgot/reset password API endpoints implemented with token generation and validation.
 - [x] Production-grade React forgot/reset password flow with token validation and user feedback states.
 

@@ -14,6 +14,19 @@ const getReturnUrl = function (req) {
   return returnUrl;
 };
 
+const oauthViewModel = function (req, oauthMessage) {
+  return {
+    oauthMessage: oauthMessage || '',
+    oauthTwitter: !!req.app.config.oauth.twitter.key,
+    oauthGitHub: !!req.app.config.oauth.github.key,
+    oauthFacebook: !!req.app.config.oauth.facebook.key,
+    oauthGoogle: !!req.app.config.oauth.google.key,
+    oauthApple: !!req.app.config.oauth.apple.key,
+    oauthMicrosoft: !!req.app.config.oauth.microsoft.key,
+    oauthTumblr: !!req.app.config.oauth.tumblr.key
+  };
+};
+
 exports.init = function(req, res){
   if (req.isAuthenticated()) {
     res.redirect(getReturnUrl(req));
@@ -22,14 +35,7 @@ exports.init = function(req, res){
     if(!req.session.returnUrl){
       req.session.returnUrl = req.header('Referer');
     }
-    res.render('jade/login/index.jade', {
-      oauthMessage: '',
-      oauthTwitter: !!req.app.config.oauth.twitter.key,
-      oauthGitHub: !!req.app.config.oauth.github.key,
-      oauthFacebook: !!req.app.config.oauth.facebook.key,
-      oauthGoogle: !!req.app.config.oauth.google.key,
-      oauthTumblr: !!req.app.config.oauth.tumblr.key
-    });
+    res.render('jade/login/index.jade', oauthViewModel(req, ''));
   }
 };
 
@@ -106,14 +112,7 @@ exports.loginTwitter = function(req, res, next){
 
     const dbUser = await db.User.findOne({ 'twitter.id': info.profile.id });
     if (!dbUser) {
-      res.render('jade/login/index.jade', {
-        oauthMessage: 'No users found linked to your Twitter account. You may need to create an account first.',
-        oauthTwitter: !!req.app.config.oauth.twitter.key,
-        oauthGitHub: !!req.app.config.oauth.github.key,
-        oauthFacebook: !!req.app.config.oauth.facebook.key,
-        oauthGoogle: !!req.app.config.oauth.google.key,
-        oauthTumblr: !!req.app.config.oauth.tumblr.key
-      });
+      res.render('jade/login/index.jade', oauthViewModel(req, 'No users found linked to your Twitter account. You may need to create an account first.'));
     } else {
       req.login(dbUser, function(err) {
         if (err) {
@@ -135,14 +134,7 @@ exports.loginGitHub = function(req, res, next){
 
     const dbUser = await db.User.findOne({ 'github.id': info.profile.id });
     if (!dbUser) {
-      res.render('jade/login/index.jade', {
-        oauthMessage: 'No users found linked to your GitHub account. You may need to create an account first.',
-        oauthTwitter: !!req.app.config.oauth.twitter.key,
-        oauthGitHub: !!req.app.config.oauth.github.key,
-        oauthFacebook: !!req.app.config.oauth.facebook.key,
-        oauthGoogle: !!req.app.config.oauth.google.key,
-        oauthTumblr: !!req.app.config.oauth.tumblr.key
-      });
+      res.render('jade/login/index.jade', oauthViewModel(req, 'No users found linked to your GitHub account. You may need to create an account first.'));
     } else {
       req.login(dbUser, function(err) {
         if (err) {
@@ -164,14 +156,7 @@ exports.loginFacebook = function(req, res, next){
 
     const dbUser = await db.User.findOne({ 'facebook.id': info.profile.id });
     if (!dbUser) {
-      res.render('jade/login/index.jade', {
-        oauthMessage: 'No users found linked to your Facebook account. You may need to create an account first.',
-        oauthTwitter: !!req.app.config.oauth.twitter.key,
-        oauthGitHub: !!req.app.config.oauth.github.key,
-        oauthFacebook: !!req.app.config.oauth.facebook.key,
-        oauthGoogle: !!req.app.config.oauth.google.key,
-        oauthTumblr: !!req.app.config.oauth.tumblr.key
-      });
+      res.render('jade/login/index.jade', oauthViewModel(req, 'No users found linked to your Facebook account. You may need to create an account first.'));
 
       /*var nextUrl = url.parse(req.originalUrl);
       nextUrl.pathname = '/signup/facebook/callback';
@@ -198,20 +183,58 @@ exports.loginGoogle = function(req, res, next){
 
     const dbUser = await models.User.findOne({ 'google.id': info.profile.id });
     if (!dbUser) {
-      res.render('jade/login/index.jade', {
-        oauthMessage: 'No users found linked to your Google account. You may need to create an account first.',
-        oauthTwitter: !!req.app.config.oauth.twitter.key,
-        oauthGitHub: !!req.app.config.oauth.github.key,
-        oauthFacebook: !!req.app.config.oauth.facebook.key,
-        oauthGoogle: !!req.app.config.oauth.google.key,
-        oauthTumblr: !!req.app.config.oauth.tumblr.key
-      });
+      res.render('jade/login/index.jade', oauthViewModel(req, 'No users found linked to your Google account. You may need to create an account first.'));
     } else {
       req.login(dbUser, function(err) {
         if (err) {
           return next(err);
         }
 
+        res.redirect(getReturnUrl(req));
+      });
+    }
+  })(req, res, next);
+};
+
+exports.loginApple = function(req, res, next){
+  const models = req.app.db.models;
+
+  req._passport.instance.authenticate('apple', { callbackURL: '/login/apple/callback/' }, async function(err, user, info) {
+    if (!info || !info.profile) {
+      return res.redirect('/login/');
+    }
+
+    const dbUser = await models.User.findOne({ 'apple.id': info.profile.id });
+    if (!dbUser) {
+      res.render('jade/login/index.jade', oauthViewModel(req, 'No users found linked to your Apple account. You may need to create an account first.'));
+    } else {
+      req.login(dbUser, function(err) {
+        if (err) {
+          return next(err);
+        }
+
+        res.redirect(getReturnUrl(req));
+      });
+    }
+  })(req, res, next);
+};
+
+exports.loginMicrosoft = function(req, res, next){
+  const models = req.app.db.models;
+
+  req._passport.instance.authenticate('microsoft', { callbackURL: '/login/microsoft/callback/' }, async function(err, user, info) {
+    if (!info || !info.profile) {
+      return res.redirect('/login/');
+    }
+
+    const dbUser = await models.User.findOne({ 'microsoft.id': info.profile.id });
+    if (!dbUser) {
+      res.render('jade/login/index.jade', oauthViewModel(req, 'No users found linked to your Microsoft account. You may need to create an account first.'));
+    } else {
+      req.login(dbUser, function(err) {
+        if (err) {
+          return next(err);
+        }
         res.redirect(getReturnUrl(req));
       });
     }
@@ -231,14 +254,7 @@ exports.loginTumblr = function(req, res, next){
 
     const dbUser = await models.User.findOne({ 'tumblr.id': info.profile.id });
     if (!dbUser) {
-      res.render('jade/login/index.jade', {
-        oauthMessage: 'No users found linked to your Tumblr account. You may need to create an account first.',
-        oauthTwitter: !!req.app.config.oauth.twitter.key,
-        oauthGitHub: !!req.app.config.oauth.github.key,
-        oauthFacebook: !!req.app.config.oauth.facebook.key,
-        oauthGoogle: !!req.app.config.oauth.google.key,
-        oauthTumblr: !!req.app.config.oauth.tumblr.key
-      });
+      res.render('jade/login/index.jade', oauthViewModel(req, 'No users found linked to your Tumblr account. You may need to create an account first.'));
     } else {
       req.login(dbUser, function(err) {
         if (err) {

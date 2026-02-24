@@ -15,7 +15,7 @@ var renderSettings = function(req, res, next, oauthMessage) {
   };
 
   var getUserData = function(callback) {
-    req.app.db.models.User.findById(req.user.id, 'username email twitter.id github.id facebook.id google.id tumblr.id').exec(function(err, user) {
+    req.app.db.models.User.findById(req.user.id, 'username email twitter.id github.id facebook.id google.id apple.id microsoft.id tumblr.id').exec(function(err, user) {
       if (err) {
         callback(err, null);
       }
@@ -44,6 +44,10 @@ var renderSettings = function(req, res, next, oauthMessage) {
       oauthFacebookActive: outcome.user.facebook ? !!outcome.user.facebook.id : false,
       oauthGoogle: !!req.app.config.oauth.google.key,
       oauthGoogleActive: outcome.user.google ? !!outcome.user.google.id : false,
+      oauthApple: !!req.app.config.oauth.apple.key,
+      oauthAppleActive: outcome.user.apple ? !!outcome.user.apple.id : false,
+      oauthMicrosoft: !!req.app.config.oauth.microsoft.key,
+      oauthMicrosoftActive: outcome.user.microsoft ? !!outcome.user.microsoft.id : false,
       oauthTumblr: !!req.app.config.oauth.tumblr.key,
       oauthTumblrActive: outcome.user.tumblr ? !!outcome.user.tumblr.id : false
     });
@@ -164,6 +168,60 @@ exports.connectGoogle = function(req, res, next){
   })(req, res, next);
 };
 
+exports.connectApple = function(req, res, next){
+  req._passport.instance.authenticate('apple', { callbackURL: '/account/settings/apple/callback/' }, function(err, user, info) {
+    if (!info || !info.profile) {
+      return res.redirect('/account/settings/');
+    }
+
+    req.app.db.models.User.findOne({ 'apple.id': info.profile.id, _id: { $ne: req.user.id } }, function(err, user) {
+      if (err) {
+        return next(err);
+      }
+
+      if (user) {
+        renderSettings(req, res, next, 'Another user has already connected with that Apple account.');
+      }
+      else {
+        req.app.db.models.User.findByIdAndUpdate(req.user.id, { 'apple.id': info.profile.id }, function(err, user) {
+          if (err) {
+            return next(err);
+          }
+
+          res.redirect('/account/settings/');
+        });
+      }
+    });
+  })(req, res, next);
+};
+
+exports.connectMicrosoft = function(req, res, next){
+  req._passport.instance.authenticate('microsoft', { callbackURL: '/account/settings/microsoft/callback/' }, function(err, user, info) {
+    if (!info || !info.profile) {
+      return res.redirect('/account/settings/');
+    }
+
+    req.app.db.models.User.findOne({ 'microsoft.id': info.profile.id, _id: { $ne: req.user.id } }, function(err, user) {
+      if (err) {
+        return next(err);
+      }
+
+      if (user) {
+        renderSettings(req, res, next, 'Another user has already connected with that Microsoft account.');
+      }
+      else {
+        req.app.db.models.User.findByIdAndUpdate(req.user.id, { 'microsoft.id': info.profile.id }, function(err, user) {
+          if (err) {
+            return next(err);
+          }
+
+          res.redirect('/account/settings/');
+        });
+      }
+    });
+  })(req, res, next);
+};
+
 exports.connectTumblr = function(req, res, next){
   req._passport.instance.authenticate('tumblr', { callbackURL: '/account/settings/tumblr/callback/' }, function(err, user, info) {
     if (!info || !info.profile) {
@@ -227,6 +285,26 @@ exports.disconnectFacebook = function(req, res, next){
 
 exports.disconnectGoogle = function(req, res, next){
   req.app.db.models.User.findByIdAndUpdate(req.user.id, { google: { id: undefined } }, function(err, user) {
+    if (err) {
+      return next(err);
+    }
+
+    res.redirect('/account/settings/');
+  });
+};
+
+exports.disconnectApple = function(req, res, next){
+  req.app.db.models.User.findByIdAndUpdate(req.user.id, { apple: { id: undefined } }, function(err, user) {
+    if (err) {
+      return next(err);
+    }
+
+    res.redirect('/account/settings/');
+  });
+};
+
+exports.disconnectMicrosoft = function(req, res, next){
+  req.app.db.models.User.findByIdAndUpdate(req.user.id, { microsoft: { id: undefined } }, function(err, user) {
     if (err) {
       return next(err);
     }
@@ -363,7 +441,7 @@ exports.identity = function(req, res, next){
         req.body.email
       ]
     };
-    var options = { select: 'username email twitter.id github.id facebook.id google.id' };
+    var options = { select: 'username email twitter.id github.id facebook.id google.id apple.id microsoft.id' };
 
     req.app.db.models.User.findByIdAndUpdate(req.user.id, fieldsToSet, options, function(err, user) {
       if (err) {

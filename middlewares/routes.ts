@@ -96,6 +96,11 @@ module.exports = function (app: AppContext & { get: (...args: unknown[]) => unkn
   app.get('/signup/facebook/callback/', req('/signup/index').signupFacebook);
   app.get('/signup/google/', passport.authenticate('google', { callbackURL: '/signup/google/callback/', scope: ['profile email'] }));
   app.get('/signup/google/callback/', req('/signup/index').signupGoogle);
+  app.get('/signup/apple/', passport.authenticate('apple', { callbackURL: '/signup/apple/callback/', scope: ['name', 'email'] }));
+  app.get('/signup/apple/callback/', req('/signup/index').signupApple);
+  app.post('/signup/apple/callback/', req('/signup/index').signupApple);
+  app.get('/signup/microsoft/', passport.authenticate('microsoft', { callbackURL: '/signup/microsoft/callback/', scope: ['user.read'], prompt: 'select_account' }));
+  app.get('/signup/microsoft/callback/', req('/signup/index').signupMicrosoft);
   // app.get('/signup/tumblr/', passport.authenticate('tumblr', { callbackURL: '/signup/tumblr/callback/' }));
   // app.get('/signup/tumblr/callback/', req('/signup/index').signupTumblr);
 
@@ -118,6 +123,11 @@ module.exports = function (app: AppContext & { get: (...args: unknown[]) => unkn
   app.get('/login/facebook/callback/', req('/login/index').loginFacebook);
   app.get('/login/google/', passport.authenticate('google', { callbackURL: '/login/google/callback/', scope: ['profile email'] }));
   app.get('/login/google/callback/', req('/login/index').loginGoogle);
+  app.get('/login/apple/', passport.authenticate('apple', { callbackURL: '/login/apple/callback/', scope: ['name', 'email'] }));
+  app.get('/login/apple/callback/', req('/login/index').loginApple);
+  app.post('/login/apple/callback/', req('/login/index').loginApple);
+  app.get('/login/microsoft/', passport.authenticate('microsoft', { callbackURL: '/login/microsoft/callback/', scope: ['user.read'], prompt: 'select_account' }));
+  app.get('/login/microsoft/callback/', req('/login/index').loginMicrosoft);
   // app.get('/login/tumblr/', passport.authenticate('tumblr', { callbackURL: '/login/tumblr/callback/', scope: ['profile email'] }));
   // app.get('/login/tumblr/callback/', req('/login/index').loginTumblr);
 
@@ -215,6 +225,13 @@ module.exports = function (app: AppContext & { get: (...args: unknown[]) => unkn
   app.get('/account/settings/google/', passport.authenticate('google', { callbackURL: '/account/settings/google/callback/', scope: ['profile email'] }));
   app.get('/account/settings/google/callback/', req('/account/settings/index').connectGoogle);
   app.get('/account/settings/google/disconnect/', req('/account/settings/index').disconnectGoogle);
+  app.get('/account/settings/apple/', passport.authenticate('apple', { callbackURL: '/account/settings/apple/callback/', scope: ['name', 'email'] }));
+  app.get('/account/settings/apple/callback/', req('/account/settings/index').connectApple);
+  app.post('/account/settings/apple/callback/', req('/account/settings/index').connectApple);
+  app.get('/account/settings/apple/disconnect/', req('/account/settings/index').disconnectApple);
+  app.get('/account/settings/microsoft/', passport.authenticate('microsoft', { callbackURL: '/account/settings/microsoft/callback/', scope: ['user.read'], prompt: 'select_account' }));
+  app.get('/account/settings/microsoft/callback/', req('/account/settings/index').connectMicrosoft);
+  app.get('/account/settings/microsoft/disconnect/', req('/account/settings/index').disconnectMicrosoft);
   // app.get('/account/settings/tumblr/', passport.authenticate('tumblr', { callbackURL: '/account/settings/tumblr/callback/' }));
   // app.get('/account/settings/tumblr/callback/', req('/account/settings/index').connectTumblr);
   // app.get('/account/settings/tumblr/disconnect/', req('/account/settings/index').disconnectTumblr);

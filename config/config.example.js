@@ -163,6 +163,17 @@ exports.oauth = {
     key: process.env.GOOGLE_OAUTH_KEY || '',
     secret: process.env.GOOGLE_OAUTH_SECRET || ''
   },
+  apple: {
+    key: process.env.APPLE_OAUTH_KEY || '',
+    teamId: process.env.APPLE_OAUTH_TEAM_ID || '',
+    keyId: process.env.APPLE_OAUTH_KEY_ID || '',
+    privateKeyLocation: process.env.APPLE_OAUTH_PRIVATE_KEY_LOCATION || ''
+  },
+  microsoft: {
+    key: process.env.MICROSOFT_OAUTH_KEY || '',
+    secret: process.env.MICROSOFT_OAUTH_SECRET || '',
+    tenant: process.env.MICROSOFT_OAUTH_TENANT || 'common'
+  },
   tumblr: {
     key: process.env.TUMBLR_OAUTH_KEY || '',
     secret: process.env.TUMBLR_OAUTH_SECRET || ''

@@ -6,6 +6,8 @@ const SettingsPage: React.FC = () => {
     { key: 'github', label: 'GitHub' },
     { key: 'facebook', label: 'Facebook' },
     { key: 'twitter', label: 'Twitter' },
+    { key: 'apple', label: 'Apple' },
+    { key: 'microsoft', label: 'Microsoft' },
   ];
 
   return (

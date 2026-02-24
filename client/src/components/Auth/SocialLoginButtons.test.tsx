@@ -27,5 +27,7 @@ describe('SocialLoginButtons', () => {
     render(<SocialLoginButtons mode="signup" />);
 
     expect(screen.getByRole('link', { name: /facebook/i })).toHaveAttribute('href', '/signup/facebook/');
+    expect(screen.getByRole('link', { name: /apple/i })).toHaveAttribute('href', '/signup/apple/');
+    expect(screen.getByRole('link', { name: /microsoft/i })).toHaveAttribute('href', '/signup/microsoft/');
   });
 });

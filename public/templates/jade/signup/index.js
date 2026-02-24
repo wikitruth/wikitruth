@@ -13,6 +13,8 @@ exports.init = function(req, res){
       oauthGitHub: !!req.app.config.oauth.github.key,
       oauthFacebook: !!req.app.config.oauth.facebook.key,
       oauthGoogle: !!req.app.config.oauth.google.key,
+      oauthApple: !!req.app.config.oauth.apple.key,
+      oauthMicrosoft: !!req.app.config.oauth.microsoft.key,
       oauthTumblr: !!req.app.config.oauth.tumblr.key
     });
   }
@@ -224,6 +226,8 @@ exports.signupTwitter = function(req, res, next) {
           oauthGitHub: !!req.app.config.oauth.github.key,
           oauthFacebook: !!req.app.config.oauth.facebook.key,
           oauthGoogle: !!req.app.config.oauth.google.key,
+          oauthApple: !!req.app.config.oauth.apple.key,
+          oauthMicrosoft: !!req.app.config.oauth.microsoft.key,
           oauthTumblr: !!req.app.config.oauth.tumblr.key
         });
       }
@@ -253,6 +257,8 @@ exports.signupGitHub = function(req, res, next) {
           oauthGitHub: !!req.app.config.oauth.github.key,
           oauthFacebook: !!req.app.config.oauth.facebook.key,
           oauthGoogle: !!req.app.config.oauth.google.key,
+          oauthApple: !!req.app.config.oauth.apple.key,
+          oauthMicrosoft: !!req.app.config.oauth.microsoft.key,
           oauthTumblr: !!req.app.config.oauth.tumblr.key
         });
       }
@@ -283,6 +289,8 @@ exports.signupFacebook = function(req, res, next) {
           oauthGitHub: !!req.app.config.oauth.github.key,
           oauthFacebook: !!req.app.config.oauth.facebook.key,
           oauthGoogle: !!req.app.config.oauth.google.key,
+          oauthApple: !!req.app.config.oauth.apple.key,
+          oauthMicrosoft: !!req.app.config.oauth.microsoft.key,
           oauthTumblr: !!req.app.config.oauth.tumblr.key
         });
       }
@@ -311,6 +319,68 @@ exports.signupGoogle = function(req, res, next) {
           oauthGitHub: !!req.app.config.oauth.github.key,
           oauthFacebook: !!req.app.config.oauth.facebook.key,
           oauthGoogle: !!req.app.config.oauth.google.key,
+          oauthApple: !!req.app.config.oauth.apple.key,
+          oauthMicrosoft: !!req.app.config.oauth.microsoft.key,
+          oauthTumblr: !!req.app.config.oauth.tumblr.key
+        });
+      }
+    });
+  })(req, res, next);
+};
+
+exports.signupApple = function(req, res, next) {
+  req._passport.instance.authenticate('apple', { callbackURL: '/signup/apple/callback/' }, function(err, user, info) {
+    if (!info || !info.profile) {
+      return res.redirect('/signup/');
+    }
+
+    req.app.db.models.User.findOne({ 'apple.id': info.profile.id }, function(err, user) {
+      if (err) {
+        return next(err);
+      }
+      if (!user) {
+        req.session.socialProfile = info.profile;
+        res.render('jade/signup/social.jade', { email: info.profile.emails && info.profile.emails[0].value || '' });
+      }
+      else {
+        res.render('jade/signup/index.jade', {
+          oauthMessage: 'We found a user linked to your Apple account.',
+          oauthTwitter: !!req.app.config.oauth.twitter.key,
+          oauthGitHub: !!req.app.config.oauth.github.key,
+          oauthFacebook: !!req.app.config.oauth.facebook.key,
+          oauthGoogle: !!req.app.config.oauth.google.key,
+          oauthApple: !!req.app.config.oauth.apple.key,
+          oauthMicrosoft: !!req.app.config.oauth.microsoft.key,
+          oauthTumblr: !!req.app.config.oauth.tumblr.key
+        });
+      }
+    });
+  })(req, res, next);
+};
+
+exports.signupMicrosoft = function(req, res, next) {
+  req._passport.instance.authenticate('microsoft', { callbackURL: '/signup/microsoft/callback/' }, function(err, user, info) {
+    if (!info || !info.profile) {
+      return res.redirect('/signup/');
+    }
+
+    req.app.db.models.User.findOne({ 'microsoft.id': info.profile.id }, function(err, user) {
+      if (err) {
+        return next(err);
+      }
+      if (!user) {
+        req.session.socialProfile = info.profile;
+        res.render('jade/signup/social.jade', { email: info.profile.emails && info.profile.emails[0].value || '' });
+      }
+      else {
+        res.render('jade/signup/index.jade', {
+          oauthMessage: 'We found a user linked to your Microsoft account.',
+          oauthTwitter: !!req.app.config.oauth.twitter.key,
+          oauthGitHub: !!req.app.config.oauth.github.key,
+          oauthFacebook: !!req.app.config.oauth.facebook.key,
+          oauthGoogle: !!req.app.config.oauth.google.key,
+          oauthApple: !!req.app.config.oauth.apple.key,
+          oauthMicrosoft: !!req.app.config.oauth.microsoft.key,
           oauthTumblr: !!req.app.config.oauth.tumblr.key
         });
       }
@@ -343,6 +413,8 @@ exports.signupTumblr = function(req, res, next) {
           oauthGitHub: !!req.app.config.oauth.github.key,
           oauthFacebook: !!req.app.config.oauth.facebook.key,
           oauthGoogle: !!req.app.config.oauth.google.key,
+          oauthApple: !!req.app.config.oauth.apple.key,
+          oauthMicrosoft: !!req.app.config.oauth.microsoft.key,
           oauthTumblr: !!req.app.config.oauth.tumblr.key
         });
       }
