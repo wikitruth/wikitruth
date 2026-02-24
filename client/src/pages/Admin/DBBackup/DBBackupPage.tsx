@@ -1,15 +1,86 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Alert from '../../../components/common/Alert';
+import Button from '../../../components/common/Button';
+import LoadingSpinner from '../../../components/LoadingSpinner';
+import { adminApi } from '../../../services/api/admin';
 
 const DBBackupPage: React.FC = () => {
+  const [loading, setLoading] = useState(true);
+  const [running, setRunning] = useState(false);
+  const [status, setStatus] = useState<{ backupDir: string; privateBackupDir: string; hasGitBackup: boolean } | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadStatus = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const result = await adminApi.dbBackupStatus();
+      setStatus(result.backup);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load backup status');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadStatus();
+  }, []);
+
+  const handleRunBackup = async () => {
+    try {
+      setRunning(true);
+      setError(null);
+      setMessage(null);
+      const result = await adminApi.runDbBackup();
+      setMessage(`${result.message}. Started at ${new Date(result.backup.startedAt).toLocaleString()}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to start backup');
+    } finally {
+      setRunning(false);
+    }
+  };
+
+  if (loading) {
+    return <LoadingSpinner message="Loading backup configuration..." />;
+  }
+
   return (
     <div className="container">
       <h2>Database Backup</h2>
-      <p className="text-muted">Operational backup controls are currently managed via legacy admin flow.</p>
+      <p className="text-muted">Run operational backup from the modern admin client.</p>
+
+      {error && <Alert type="danger">{error}</Alert>}
+      {message && <Alert type="success">{message}</Alert>}
+
+      {status && (
+        <div className="panel panel-default">
+          <div className="panel-body">
+            <p>
+              <strong>Public backup directory:</strong> <code>{status.backupDir}</code>
+            </p>
+            <p>
+              <strong>Private backup directory:</strong> <code>{status.privateBackupDir}</code>
+            </p>
+            <p>
+              <strong>Git backup configured:</strong> {status.hasGitBackup ? 'Yes' : 'No'}
+            </p>
+
+            <div className="form-group" style={{ marginTop: '20px' }}>
+              <Button type="button" variant="primary" onClick={handleRunBackup} disabled={running} icon={running ? 'spinner fa-spin' : 'database'}>
+                {running ? 'Starting Backup...' : 'Run Backup'}
+              </Button>{' '}
+              <Button type="button" variant="default" onClick={loadStatus} disabled={running} icon="refresh">
+                Refresh Status
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Alert type="info">
-        Use the legacy backup page for write operations:
-        {' '}
-        <a href="/admin/">Open legacy admin tools</a>
+        Legacy backup route remains available for comparison: <a href="/admin/db-backup" target="_blank" rel="noopener noreferrer">/admin/db-backup</a>
       </Alert>
     </div>
   );

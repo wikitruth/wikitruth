@@ -9,9 +9,14 @@ export type AdminRecord = Record<string, unknown> & {
   email?: string;
 };
 
-const request = async <T>(url: string): Promise<T> => {
+const request = async <T>(url: string, init?: RequestInit): Promise<T> => {
   const response = await fetch(url, {
     credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+      ...init?.headers,
+    },
+    ...init,
   });
 
   if (!response.ok) {
@@ -38,6 +43,20 @@ export const adminApi = {
   adminGroups: () => request<AdminRecord[]>(`${API_BASE_URL}/admin/groups`),
   categories: () => request<AdminRecord[]>(`${API_BASE_URL}/admin/categories`),
   statuses: () => request<AdminRecord[]>(`${API_BASE_URL}/admin/statuses`),
+  dbBackupStatus: () =>
+    request<{
+      success: boolean;
+      backup: { backupDir: string; privateBackupDir: string; hasGitBackup: boolean };
+    }>(`${API_BASE_URL}/admin/db-backup`),
+  runDbBackup: () =>
+    request<{
+      success: boolean;
+      message: string;
+      backup: { backupDir: string; privateBackupDir: string; startedAt: string };
+    }>(`${API_BASE_URL}/admin/db-backup`, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'backup' }),
+    }),
   user: (id: string) => findById(() => adminApi.users(), id),
   account: (id: string) => findById(() => adminApi.accounts(), id),
   administrator: (id: string) => findById(() => adminApi.administrators(), id),

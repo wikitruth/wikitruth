@@ -61,6 +61,8 @@ describe('API endpoint smoke coverage', function () {
       "router.get('/groups'",
       "router.get('/categories'",
       "router.get('/statuses'",
+      "router.get('/db-backup'",
+      "router.post('/db-backup'",
     ].forEach((contract) => expect(adminApi).toContain(contract));
   });
 

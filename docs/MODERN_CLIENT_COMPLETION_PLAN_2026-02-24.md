@@ -53,7 +53,7 @@ Legend: `[x]` done, `[~]` partial, `[ ]` not done
 
 - [~] Admin route shell exists in React.
 - [~] Users/admin groups/categories/statuses pages now have real data reads; write actions and full parity still pending.
-- [ ] DB backup/admin operations parity in React.
+- [x] DB backup/admin operations parity in React.
 - [x] Account verification workflow parity in React.
 
 ### D. API/Contract Readiness
