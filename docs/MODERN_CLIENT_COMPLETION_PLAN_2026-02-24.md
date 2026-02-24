@@ -17,8 +17,8 @@ This audit answers three questions:
 ## Evidence Snapshot
 
 - Social buttons exist in `client/src/components/Auth/SocialLoginButtons.tsx` but only emit callbacks; no redirect wiring to OAuth endpoints.
-- Signup page is still scaffolded in `client/src/pages/Auth/SignupPage.tsx`.
-- Forgot/reset pages are local form scaffolds (`client/src/pages/Auth/ForgotPasswordPage.tsx`, `client/src/pages/Auth/ResetPasswordPage.tsx`) and do not call `authApi`.
+- Signup page is now a validated React form wired to `/api/auth/signup`.
+- Forgot/reset pages remain partially scaffolded and need full API integration and token UX completion.
 - Legacy server still owns OAuth routes (`/login/google`, `/login/github`, `/login/facebook`, `/login/twitter`, and signup/account variants) in `middlewares/routes.ts`.
 - No Apple/Microsoft strategies in `middlewares/passport.ts`.
 - API surface is mostly read-only for content domain controllers; `router.post/put/delete` exists mainly in auth/monitoring (`controllers/api/*`).
@@ -31,7 +31,7 @@ Legend: `[x]` done, `[~]` partial, `[ ]` not done
 ### A. Auth and Identity
 
 - [x] React login page with session-cookie auth (`/api/auth/login`, `/api/auth/me`, `/api/auth/logout`).
-- [~] React signup route exists but is scaffold-only.
+- [x] React signup route implemented with backend signup integration.
 - [x] Social login redirect wiring from React UI to backend OAuth routes.
 - [x] Social signup redirect wiring from React signup flow.
 - [x] Social account connect/disconnect controls in React account settings.
@@ -98,8 +98,8 @@ Legend: `[x]` done, `[~]` partial, `[ ]` not done
 
 ## Recommended Immediate Tickets
 
-1. Wire `SocialLoginButtons` to OAuth redirect URLs and add integration tests.
-2. Replace `SignupPage` scaffold with real form + submit flow.
-3. Decide/implement forgot-reset strategy (native API vs legacy handoff) and update UI accordingly.
-4. Create API mutation endpoints for topic and argument create flows.
-5. Replace top 10 scaffold pages in admin/account/group areas with live data implementations.
+- [x] Wire `SocialLoginButtons` to OAuth redirect URLs and add integration tests.
+- [x] Replace `SignupPage` scaffold with real form + submit flow.
+- [ ] Decide/implement forgot-reset strategy (native API vs legacy handoff) and update UI accordingly.
+- [ ] Create API mutation endpoints for topic and argument create flows.
+- [ ] Replace top 10 scaffold pages in admin/account/group areas with live data implementations.

@@ -5,6 +5,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  signup: (username: string, email: string, password: string) => Promise<void>;
   login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   updateUser: (userData: Partial<User>) => void;
@@ -67,6 +68,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const signup = async (username: string, email: string, password: string) => {
+    try {
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, email, password }),
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Signup failed');
+      }
+
+      const data = await response.json();
+      setUser(data.user);
+    } catch (error) {
+      console.error('Signup error:', error);
+      throw error;
+    }
+  };
+
   const logout = async () => {
     try {
       await fetch('/api/auth/logout', {
@@ -90,6 +115,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     user,
     isAuthenticated: !!user,
     isLoading,
+    signup,
     login,
     logout,
     updateUser,
