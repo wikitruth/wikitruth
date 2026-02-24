@@ -22,6 +22,7 @@ This audit answers three questions:
 - Legacy server still owns OAuth routes (`/login/google`, `/login/github`, `/login/facebook`, `/login/twitter`, and signup/account variants) in `middlewares/routes.ts`.
 - Apple and Microsoft OAuth strategies are now configured in `middlewares/passport.ts` and wired through legacy auth/account routes used by the modern client redirect flow.
 - API surface now includes create/update mutations for topics, arguments, questions, answers, issues, opinions, artifacts, groups, and profile custom pages with documented contract DTOs.
+- Admin API + React screens now support create/update/delete actions for users, admin groups, categories, and statuses.
 - OpenAPI contract now documents auth + core content mutation request/response DTOs in `docs/api/openapi.json`.
 - Migration scaffolds remain in 20 React page modules, primarily legacy comparison pages under `client/src/pages/Wiki/*` (scan using `rg "migration scaffold|scaffold" client/src/pages`).
 
@@ -52,8 +53,8 @@ Legend: `[x]` done, `[~]` partial, `[ ]` not done
 
 ### C. Admin and Account Parity
 
-- [~] Admin route shell exists in React.
-- [~] Users/admin groups/categories/statuses pages now have real data reads; write actions and full parity still pending.
+- [x] Admin route shell exists in React.
+- [x] Users/admin groups/categories/statuses pages now have real data reads and write actions.
 - [x] DB backup/admin operations parity in React.
 - [x] Account verification workflow parity in React.
 

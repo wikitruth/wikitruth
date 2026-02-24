@@ -26,6 +26,14 @@ function ensureAdmin(req: WikitruthRequest, res: WikitruthResponse): boolean {
   return true;
 }
 
+function sanitizeMutationPayload(payload: Record<string, unknown>): Record<string, unknown> {
+  const nextPayload = { ...payload };
+  delete nextPayload._id;
+  delete nextPayload.id;
+  delete nextPayload.__v;
+  return nextPayload;
+}
+
 module.exports = function (router: Router) {
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAdmin(req, res)) {
@@ -52,6 +60,30 @@ module.exports = function (router: Router) {
 
     const users = await db.User.find().limit(100).lean();
     res.json(users);
+  });
+
+  router.put('/users/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureAdmin(req, res)) {
+      return;
+    }
+
+    const payload = sanitizeMutationPayload((req.body || {}) as Record<string, unknown>);
+    const user = await db.User.findByIdAndUpdate(req.params.id, payload, { new: true }).lean();
+    if (!user) {
+      res.status(404).json({ success: false, message: 'User not found' });
+      return;
+    }
+
+    res.json({ success: true, user });
+  });
+
+  router.delete('/users/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureAdmin(req, res)) {
+      return;
+    }
+
+    await db.User.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
   });
 
   router.get('/accounts', async function (req: WikitruthRequest, res: WikitruthResponse) {
@@ -81,6 +113,40 @@ module.exports = function (router: Router) {
     res.json(groups);
   });
 
+  router.post('/groups', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureAdmin(req, res)) {
+      return;
+    }
+
+    const payload = sanitizeMutationPayload((req.body || {}) as Record<string, unknown>);
+    const group = await db.AdminGroup.create(payload);
+    res.status(201).json({ success: true, group });
+  });
+
+  router.put('/groups/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureAdmin(req, res)) {
+      return;
+    }
+
+    const payload = sanitizeMutationPayload((req.body || {}) as Record<string, unknown>);
+    const group = await db.AdminGroup.findByIdAndUpdate(req.params.id, payload, { new: true }).lean();
+    if (!group) {
+      res.status(404).json({ success: false, message: 'Admin group not found' });
+      return;
+    }
+
+    res.json({ success: true, group });
+  });
+
+  router.delete('/groups/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureAdmin(req, res)) {
+      return;
+    }
+
+    await db.AdminGroup.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  });
+
   router.get('/categories', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAdmin(req, res)) {
       return;
@@ -90,6 +156,40 @@ module.exports = function (router: Router) {
     res.json(categories);
   });
 
+  router.post('/categories', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureAdmin(req, res)) {
+      return;
+    }
+
+    const payload = sanitizeMutationPayload((req.body || {}) as Record<string, unknown>);
+    const category = await db.Category.create(payload);
+    res.status(201).json({ success: true, category });
+  });
+
+  router.put('/categories/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureAdmin(req, res)) {
+      return;
+    }
+
+    const payload = sanitizeMutationPayload((req.body || {}) as Record<string, unknown>);
+    const category = await db.Category.findByIdAndUpdate(req.params.id, payload, { new: true }).lean();
+    if (!category) {
+      res.status(404).json({ success: false, message: 'Category not found' });
+      return;
+    }
+
+    res.json({ success: true, category });
+  });
+
+  router.delete('/categories/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureAdmin(req, res)) {
+      return;
+    }
+
+    await db.Category.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
+  });
+
   router.get('/statuses', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAdmin(req, res)) {
       return;
@@ -97,6 +197,40 @@ module.exports = function (router: Router) {
 
     const statuses = await db.Status.find().limit(100).lean();
     res.json(statuses);
+  });
+
+  router.post('/statuses', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureAdmin(req, res)) {
+      return;
+    }
+
+    const payload = sanitizeMutationPayload((req.body || {}) as Record<string, unknown>);
+    const status = await db.Status.create(payload);
+    res.status(201).json({ success: true, status });
+  });
+
+  router.put('/statuses/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureAdmin(req, res)) {
+      return;
+    }
+
+    const payload = sanitizeMutationPayload((req.body || {}) as Record<string, unknown>);
+    const status = await db.Status.findByIdAndUpdate(req.params.id, payload, { new: true }).lean();
+    if (!status) {
+      res.status(404).json({ success: false, message: 'Status not found' });
+      return;
+    }
+
+    res.json({ success: true, status });
+  });
+
+  router.delete('/statuses/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureAdmin(req, res)) {
+      return;
+    }
+
+    await db.Status.findByIdAndDelete(req.params.id);
+    res.json({ success: true });
   });
 
   router.get('/db-backup', async function (req: WikitruthRequest, res: WikitruthResponse) {

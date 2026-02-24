@@ -10,6 +10,14 @@ const GroupsList: React.FC = () => {
       emptyMessage="No admin groups found."
       detailPath="/admin/groups"
       loadItems={adminApi.adminGroups}
+      createAction={{
+        buttonLabel: 'Create admin group',
+        fields: [
+          { key: '_id', label: 'Group ID', required: true, placeholder: 'e.g. moderators' },
+          { key: 'name', label: 'Name', required: true, placeholder: 'Moderators' },
+        ],
+        onCreate: adminApi.createAdminGroup,
+      }}
     />
   );
 };

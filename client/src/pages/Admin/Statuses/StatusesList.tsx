@@ -10,6 +10,15 @@ const StatusesList: React.FC = () => {
       emptyMessage="No statuses found."
       detailPath="/admin/statuses"
       loadItems={adminApi.statuses}
+      createAction={{
+        buttonLabel: 'Create status',
+        fields: [
+          { key: '_id', label: 'Status ID', required: true, placeholder: 'e.g. active' },
+          { key: 'pivot', label: 'Pivot', required: true, placeholder: 'account' },
+          { key: 'name', label: 'Name', required: true, placeholder: 'Active' },
+        ],
+        onCreate: adminApi.createStatus,
+      }}
     />
   );
 };

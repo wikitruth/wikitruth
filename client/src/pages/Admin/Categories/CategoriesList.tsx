@@ -10,6 +10,15 @@ const CategoriesList: React.FC = () => {
       emptyMessage="No categories found."
       detailPath="/admin/categories"
       loadItems={adminApi.categories}
+      createAction={{
+        buttonLabel: 'Create category',
+        fields: [
+          { key: 'title', label: 'Title', required: true },
+          { key: 'id', label: 'Legacy ID' },
+          { key: 'parentId', label: 'Parent Category ID' },
+        ],
+        onCreate: adminApi.createCategory,
+      }}
     />
   );
 };
