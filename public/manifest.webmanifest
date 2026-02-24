@@ -1,0 +1,26 @@
+{
+  "name": "Wikitruth",
+  "short_name": "Wikitruth",
+  "description": "Structured discourse and evidence-driven knowledge contribution.",
+  "start_url": "/app",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "/img/favicons/android-icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/img/favicons/apple-icon-180x180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/img/favicons/favicon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    }
+  ]
+}

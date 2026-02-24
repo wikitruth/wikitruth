@@ -8,6 +8,7 @@ This folder tracks major technical decisions for the modernization and server Ty
 - `ADR-002`: [API Error Envelope and Request Correlation](./ADR-002-api-error-envelope-and-request-context.md)
 - `ADR-003`: [Legacy Build-Chain Reduction](./ADR-003-legacy-build-chain-reduction.md)
 - `ADR-004`: [Routing, Rendering, and API Versioning Strategy](./ADR-004-routing-rendering-and-api-versioning.md)
+- `ADR-005`: [PWA Phase 0 Baseline](./ADR-005-pwa-phase0-baseline.md)
 
 ## Status
 

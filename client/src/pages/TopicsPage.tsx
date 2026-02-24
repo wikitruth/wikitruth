@@ -28,6 +28,8 @@ const TopicsPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
+  const toTimestamp = (value?: Date) => (value ? new Date(value).getTime() : 0);
+
   useEffect(() => {
     fetchTopics();
   }, [topicId]);
@@ -64,9 +66,9 @@ const TopicsPage: React.FC = () => {
         case 'title':
           return (a.title || '').localeCompare(b.title || '');
         case 'editDate':
-          return new Date(b.editDate).getTime() - new Date(a.editDate).getTime();
+          return toTimestamp(b.editDate) - toTimestamp(a.editDate);
         case 'createDate':
-          return new Date(b.createDate).getTime() - new Date(a.createDate).getTime();
+          return toTimestamp(b.createDate) - toTimestamp(a.createDate);
         default:
           return 0;
       }
