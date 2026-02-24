@@ -16,6 +16,8 @@ This folder contains active engineering documentation and archived migration art
 ## Frontend Docs
 
 - Frontend docs folder: `docs/frontend/`
+- Legacy parity matrix: `docs/frontend/LEGACY_PARITY_MATRIX_2026-02-24.md`
+- UAT checklist: `docs/frontend/UAT_CHECKLIST.md`
 
 ## API Contracts
 

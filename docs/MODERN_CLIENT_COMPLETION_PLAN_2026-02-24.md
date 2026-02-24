@@ -26,6 +26,7 @@ This audit answers three questions:
 - OpenAPI contract now documents auth + core content mutation request/response DTOs in `docs/api/openapi.json`.
 - Migration scaffolds remain in 20 React page modules, primarily legacy comparison pages under `client/src/pages/Wiki/*` (scan using `rg "migration scaffold|scaffold" client/src/pages`).
 - Lint warning baseline is now reduced from 86 to 0 in `client/src` (`npm run lint -- --format unix`), with one remaining non-client warning in `tests/server`.
+- Route-by-route legacy parity matrix and refreshed UAT evidence are now documented in `docs/frontend/LEGACY_PARITY_MATRIX_2026-02-24.md` and `docs/frontend/UAT_CHECKLIST.md`.
 
 ## Completion Checklist
 
@@ -74,7 +75,7 @@ Legend: `[x]` done, `[~]` partial, `[ ]` not done
 - [x] Storybook baseline completed.
 - [x] Remove or implement remaining scaffold pages in route surface.
 - [x] Reduce `client/src` `any`/lint warnings to agreed threshold (`0` warnings in `client/src`).
-- [ ] Full parity acceptance/UAT against legacy-critical flows.
+- [x] Full parity acceptance/UAT against legacy-critical flows.
 
 ## Implementation Plan (Ordered)
 
