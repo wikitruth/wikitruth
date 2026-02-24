@@ -1,11 +1,16 @@
 import React from 'react';
+import adminApi from '../../../services/api/admin';
+import AdminListPage from '../common/AdminListPage';
 
 const AdminsList: React.FC = () => {
   return (
-    <div className="container">
-      <h3>Administrators</h3>
-      <p className="text-muted">Administrators listing scaffold.</p>
-    </div>
+    <AdminListPage
+      title="Administrators"
+      subtitle="Manage administrator entries"
+      emptyMessage="No administrators found."
+      detailPath="/admin/administrators"
+      loadItems={adminApi.administrators}
+    />
   );
 };
 

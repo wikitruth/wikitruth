@@ -1,12 +1,9 @@
 import React from 'react';
+import adminApi from '../../../services/api/admin';
+import AdminDetailsPage from '../common/AdminDetailsPage';
 
 const GroupDetails: React.FC = () => {
-  return (
-    <div className="container">
-      <h3>Admin Group Details</h3>
-      <p className="text-muted">Admin group detail scaffold.</p>
-    </div>
-  );
+  return <AdminDetailsPage title="Admin Group Details" backPath="/admin/groups" loadItem={adminApi.adminGroup} />;
 };
 
 export default GroupDetails;

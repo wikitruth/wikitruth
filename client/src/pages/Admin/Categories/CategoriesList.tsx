@@ -1,11 +1,16 @@
 import React from 'react';
+import adminApi from '../../../services/api/admin';
+import AdminListPage from '../common/AdminListPage';
 
 const CategoriesList: React.FC = () => {
   return (
-    <div className="container">
-      <h3>Categories</h3>
-      <p className="text-muted">Categories management scaffold.</p>
-    </div>
+    <AdminListPage
+      title="Categories"
+      subtitle="Manage account categories"
+      emptyMessage="No categories found."
+      detailPath="/admin/categories"
+      loadItems={adminApi.categories}
+    />
   );
 };
 

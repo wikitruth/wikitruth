@@ -1,11 +1,14 @@
 import React from 'react';
+import adminApi from '../../../services/api/admin';
+import AdminDetailsPage from '../common/AdminDetailsPage';
 
 const AdminDetails: React.FC = () => {
   return (
-    <div className="container">
-      <h3>Administrator Details</h3>
-      <p className="text-muted">Administrator detail scaffold.</p>
-    </div>
+    <AdminDetailsPage
+      title="Administrator Details"
+      backPath="/admin/administrators"
+      loadItem={adminApi.administrator}
+    />
   );
 };
 

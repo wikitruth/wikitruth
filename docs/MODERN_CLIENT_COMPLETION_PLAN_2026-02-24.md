@@ -52,7 +52,7 @@ Legend: `[x]` done, `[~]` partial, `[ ]` not done
 ### C. Admin and Account Parity
 
 - [~] Admin route shell exists in React.
-- [ ] Users/admin groups/categories/statuses pages implemented with real data/actions (currently scaffold-heavy).
+- [~] Users/admin groups/categories/statuses pages now have real data reads; write actions and full parity still pending.
 - [ ] DB backup/admin operations parity in React.
 - [ ] Account verification workflow parity in React.
 
@@ -102,4 +102,4 @@ Legend: `[x]` done, `[~]` partial, `[ ]` not done
 - [x] Replace `SignupPage` scaffold with real form + submit flow.
 - [x] Decide/implement forgot-reset strategy (native API vs legacy handoff) and update UI accordingly.
 - [x] Create API mutation endpoints for topic and argument create flows.
-- [ ] Replace top 10 scaffold pages in admin/account/group areas with live data implementations.
+- [x] Replace top 10 scaffold pages in admin/account/group areas with live data implementations.

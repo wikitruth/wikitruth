@@ -1,12 +1,9 @@
 import React from 'react';
+import adminApi from '../../../services/api/admin';
+import AdminDetailsPage from '../common/AdminDetailsPage';
 
 const StatusDetails: React.FC = () => {
-  return (
-    <div className="container">
-      <h3>Status Details</h3>
-      <p className="text-muted">Status details scaffold.</p>
-    </div>
-  );
+  return <AdminDetailsPage title="Status Details" backPath="/admin/statuses" loadItem={adminApi.status} />;
 };
 
 export default StatusDetails;

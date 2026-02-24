@@ -1,12 +1,9 @@
 import React from 'react';
+import adminApi from '../../../services/api/admin';
+import AdminDetailsPage from '../common/AdminDetailsPage';
 
 const CategoryDetails: React.FC = () => {
-  return (
-    <div className="container">
-      <h3>Category Details</h3>
-      <p className="text-muted">Category detail scaffold.</p>
-    </div>
-  );
+  return <AdminDetailsPage title="Category Details" backPath="/admin/categories" loadItem={adminApi.category} />;
 };
 
 export default CategoryDetails;

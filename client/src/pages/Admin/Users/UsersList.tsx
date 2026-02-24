@@ -1,11 +1,16 @@
 import React from 'react';
+import adminApi from '../../../services/api/admin';
+import AdminListPage from '../common/AdminListPage';
 
 const UsersList: React.FC = () => {
   return (
-    <div className="container">
-      <h3>Users</h3>
-      <p className="text-muted">Users management list scaffold.</p>
-    </div>
+    <AdminListPage
+      title="Users"
+      subtitle="Manage platform users"
+      emptyMessage="No users found."
+      detailPath="/admin/users"
+      loadItems={adminApi.users}
+    />
   );
 };
 

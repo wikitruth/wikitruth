@@ -1,12 +1,9 @@
 import React from 'react';
+import adminApi from '../../../services/api/admin';
+import AdminDetailsPage from '../common/AdminDetailsPage';
 
 const AccountDetails: React.FC = () => {
-  return (
-    <div className="container">
-      <h3>Account Details</h3>
-      <p className="text-muted">Account detail view scaffold.</p>
-    </div>
-  );
+  return <AdminDetailsPage title="Account Details" backPath="/admin/accounts" loadItem={adminApi.account} />;
 };
 
 export default AccountDetails;
