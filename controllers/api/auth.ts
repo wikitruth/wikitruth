@@ -29,10 +29,14 @@ type AuthUserDocument = {
 
 type AccountDocument = {
   _id: unknown;
+  isVerified?: string;
+  verificationToken?: string;
+  save: () => Promise<AccountDocument>;
 };
 
 type ModelsContract = {
   User: {
+    findById: (id: unknown) => Promise<AuthUserDocument | null>;
     findOne: (query: Record<string, unknown>) => Promise<AuthUserDocument | null>;
     create: (fields: Record<string, unknown>) => Promise<AuthUserDocument>;
     encryptPassword: (password: string, done: (err: unknown, hash?: string) => void) => void;
@@ -40,6 +44,7 @@ type ModelsContract = {
   };
   Account: {
     create: (fields: Record<string, unknown>) => Promise<AccountDocument>;
+    findById: (id: unknown) => Promise<AccountDocument | null>;
   };
 };
 
@@ -86,6 +91,28 @@ function encryptPassword(password: string): Promise<string> {
 
 function createResetToken(): string {
   return crypto.randomBytes(21).toString('hex');
+}
+
+function getAccountIdFromUser(user: { roles?: unknown } | null | undefined): unknown {
+  if (!user?.roles) {
+    return null;
+  }
+
+  const accountRole = (user.roles as Record<string, unknown>).account;
+  if (!accountRole) {
+    return null;
+  }
+
+  if (typeof accountRole === 'string') {
+    return accountRole;
+  }
+
+  if (typeof accountRole === 'object') {
+    const accountRecord = accountRole as { id?: unknown; _id?: unknown };
+    return accountRecord.id || accountRecord._id || null;
+  }
+
+  return null;
 }
 
 module.exports = function (router: Router) {
@@ -302,6 +329,169 @@ module.exports = function (router: Router) {
       await user.save();
 
       res.json({ success: true, message: 'Password updated successfully' });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get('/verification-status', async function (req: WikitruthRequest, res: WikitruthResponse, next: WikitruthNext) {
+    try {
+      if (!req.user) {
+        res.status(401).json({ success: false, message: 'Authentication required' });
+        return;
+      }
+
+      const accountId = getAccountIdFromUser(req.user);
+      if (!accountId) {
+        res.status(404).json({ success: false, message: 'Account role not found' });
+        return;
+      }
+
+      const account = await db.Account.findById(accountId);
+      if (!account) {
+        res.status(404).json({ success: false, message: 'Account not found' });
+        return;
+      }
+
+      const requireAccountVerification = Boolean(
+        (req.app as { config?: { requireAccountVerification?: boolean } }).config?.requireAccountVerification
+      );
+
+      res.json({
+        success: true,
+        verification: {
+          required: requireAccountVerification,
+          isVerified: account.isVerified === 'yes',
+          email: req.user.email || '',
+          hasPendingToken: Boolean(account.verificationToken),
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.post('/verification-resend', async function (req: WikitruthRequest, res: WikitruthResponse, next: WikitruthNext) {
+    try {
+      if (!req.user) {
+        res.status(401).json({ success: false, message: 'Authentication required' });
+        return;
+      }
+
+      const accountId = getAccountIdFromUser(req.user);
+      if (!accountId) {
+        res.status(404).json({ success: false, message: 'Account role not found' });
+        return;
+      }
+
+      const account = await db.Account.findById(accountId);
+      if (!account) {
+        res.status(404).json({ success: false, message: 'Account not found' });
+        return;
+      }
+
+      const nextEmail = String(req.body?.email || req.user.email || '').trim().toLowerCase();
+      if (!nextEmail || !isValidEmail(nextEmail)) {
+        res.status(400).json({ success: false, message: 'A valid email is required' });
+        return;
+      }
+
+      if (nextEmail !== String(req.user.email || '').toLowerCase()) {
+        const duplicate = await db.User.findOne({
+          email: nextEmail,
+          _id: { $ne: req.user._id },
+        });
+        if (duplicate) {
+          res.status(409).json({ success: false, message: 'Email is already in use' });
+          return;
+        }
+
+        const user = await db.User.findById(req.user._id || req.user.id);
+        if (!user) {
+          res.status(404).json({ success: false, message: 'User not found' });
+          return;
+        }
+        user.email = nextEmail;
+        await user.save();
+        req.user.email = nextEmail;
+      }
+
+      const token = createResetToken();
+      account.verificationToken = await encryptPassword(token);
+      account.isVerified = 'no';
+      await account.save();
+
+      const payload: Record<string, unknown> = {
+        success: true,
+        message: 'Verification token generated',
+      };
+
+      if (process.env.NODE_ENV !== 'production') {
+        payload.debug = {
+          email: req.user.email || '',
+          token: token,
+        };
+      }
+
+      res.status(202).json(payload);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.post('/verification-confirm', async function (req: WikitruthRequest, res: WikitruthResponse, next: WikitruthNext) {
+    try {
+      if (!req.user) {
+        res.status(401).json({ success: false, message: 'Authentication required' });
+        return;
+      }
+
+      const accountId = getAccountIdFromUser(req.user);
+      if (!accountId) {
+        res.status(404).json({ success: false, message: 'Account role not found' });
+        return;
+      }
+
+      const account = await db.Account.findById(accountId);
+      if (!account) {
+        res.status(404).json({ success: false, message: 'Account not found' });
+        return;
+      }
+
+      if (account.isVerified === 'yes') {
+        res.json({ success: true, message: 'Account already verified' });
+        return;
+      }
+
+      const token = String(req.body?.token || '').trim();
+      if (!token) {
+        res.status(400).json({ success: false, message: 'Verification token is required' });
+        return;
+      }
+
+      if (!account.verificationToken) {
+        res.status(400).json({ success: false, message: 'No verification token is pending' });
+        return;
+      }
+
+      const valid = await db.User.validatePassword(token, account.verificationToken);
+      if (!valid) {
+        res.status(400).json({ success: false, message: 'Invalid verification token' });
+        return;
+      }
+
+      account.isVerified = 'yes';
+      account.verificationToken = '';
+      await account.save();
+
+      const reqUserRoles = (req.user.roles || {}) as Record<string, unknown>;
+      const accountRole = reqUserRoles.account as { isVerified?: string; verificationToken?: string } | undefined;
+      if (accountRole && typeof accountRole === 'object') {
+        accountRole.isVerified = 'yes';
+        accountRole.verificationToken = '';
+      }
+
+      res.json({ success: true, message: 'Account verified successfully' });
     } catch (error) {
       next(error);
     }

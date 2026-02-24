@@ -45,6 +45,9 @@ describe('API endpoint smoke coverage', function () {
     expect(authApi).toContain("router.post('/logout'");
     expect(authApi).toContain("router.post('/forgot-password'");
     expect(authApi).toContain("router.post('/reset-password'");
+    expect(authApi).toContain("router.get('/verification-status'");
+    expect(authApi).toContain("router.post('/verification-resend'");
+    expect(authApi).toContain("router.post('/verification-confirm'");
   });
 
   it('exposes admin API handlers required by client admin services', function () {

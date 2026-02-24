@@ -17,6 +17,16 @@ interface UserResponse {
   user: User | null;
 }
 
+interface VerificationStatusResponse {
+  success: boolean;
+  verification: {
+    required: boolean;
+    isVerified: boolean;
+    email: string;
+    hasPendingToken: boolean;
+  };
+}
+
 const request = async <T>(url: string, init?: RequestInit): Promise<T> => {
   const response = await fetch(url, {
     credentials: 'include',
@@ -62,6 +72,20 @@ export const authApi = {
     request<{ success: boolean; message: string }>(`${API_BASE_URL}/auth/reset-password`, {
       method: 'POST',
       body: JSON.stringify({ email, token, password }),
+    }),
+  verificationStatus: () => request<VerificationStatusResponse>(`${API_BASE_URL}/auth/verification-status`),
+  resendVerification: (email: string) =>
+    request<{ success: boolean; message: string; debug?: { email: string; token: string } }>(
+      `${API_BASE_URL}/auth/verification-resend`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ email }),
+      }
+    ),
+  confirmVerification: (token: string) =>
+    request<{ success: boolean; message: string }>(`${API_BASE_URL}/auth/verification-confirm`, {
+      method: 'POST',
+      body: JSON.stringify({ token }),
     }),
 };
 
