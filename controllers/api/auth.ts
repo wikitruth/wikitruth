@@ -1,8 +1,12 @@
 'use strict';
 
+import type { Router } from 'express';
+import type { AuthUser } from '../../types/auth';
+import type { WikitruthNext, WikitruthRequest, WikitruthResponse } from '../../types/http';
+
 const db = require('../../app').db.models;
 
-function sanitizeUser(user) {
+function sanitizeUser(user: AuthUser | null | undefined) {
   if (!user) {
     return null;
   }
@@ -15,22 +19,24 @@ function sanitizeUser(user) {
   };
 }
 
-module.exports = function (router) {
-  router.get('/me', async function (req, res) {
+module.exports = function (router: Router) {
+  router.get('/me', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!req.user) {
-      return res.status(401).json({ success: false, user: null });
+      res.status(401).json({ success: false, user: null });
+      return;
     }
 
     res.json({ success: true, user: sanitizeUser(req.user) });
   });
 
-  router.post('/login', async function (req, res, next) {
+  router.post('/login', async function (req: WikitruthRequest, res: WikitruthResponse, next: WikitruthNext) {
     try {
       const username = String(req.body?.username || '').trim();
       const password = String(req.body?.password || '');
 
       if (!username || !password) {
-        return res.status(400).json({ success: false, message: 'Username and password are required' });
+        res.status(400).json({ success: false, message: 'Username and password are required' });
+        return;
       }
 
       const user = await db.User.findOne({
@@ -38,15 +44,17 @@ module.exports = function (router) {
       });
 
       if (!user) {
-        return res.status(401).json({ success: false, message: 'Invalid credentials' });
+        res.status(401).json({ success: false, message: 'Invalid credentials' });
+        return;
       }
 
       const isValid = await db.User.validatePassword(password, user.password);
       if (!isValid) {
-        return res.status(401).json({ success: false, message: 'Invalid credentials' });
+        res.status(401).json({ success: false, message: 'Invalid credentials' });
+        return;
       }
 
-      req.login(user, function (err) {
+      req.login(user, function (err?: unknown) {
         if (err) {
           return next(err);
         }
@@ -58,8 +66,8 @@ module.exports = function (router) {
     }
   });
 
-  router.post('/logout', function (req, res, next) {
-    req.logout(function (err) {
+  router.post('/logout', function (req: WikitruthRequest, res: WikitruthResponse, next: WikitruthNext) {
+    req.logout(function (err?: unknown) {
       if (err) {
         return next(err);
       }
@@ -71,11 +79,11 @@ module.exports = function (router) {
     });
   });
 
-  router.post('/forgot-password', function (_req, res) {
+  router.post('/forgot-password', function (_req: WikitruthRequest, res: WikitruthResponse) {
     res.status(202).json({ success: true, message: 'Password reset workflow delegated to legacy account flow' });
   });
 
-  router.post('/reset-password', function (_req, res) {
+  router.post('/reset-password', function (_req: WikitruthRequest, res: WikitruthResponse) {
     res.status(202).json({ success: true, message: 'Password reset workflow delegated to legacy account flow' });
   });
 };

@@ -8,7 +8,7 @@ This proposal consolidates pending enhancement work after migration closure, bas
 
 - [x] E0. Archive completed migration documents into `docs/archive/migrations` with root pointer stubs.
 - [x] E1. Fix TS7006 errors in `controllers/api/admin.ts`.
-- [ ] E2. Fix TS7006 errors in `controllers/api/auth.ts`.
+- [x] E2. Fix TS7006 errors in `controllers/api/auth.ts`.
 - [ ] E3. Add typed signatures to `controllers/api/monitoring.ts` and `controllers/api/v1.ts`.
 - [ ] E4. Re-enable `build:server` in `test:ci` and CI workflow.
 - [ ] E5. Patch XSS hotspot in `public/js/app.js`.
