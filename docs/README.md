@@ -4,7 +4,7 @@ This folder contains active engineering documentation and archived migration art
 
 ## Start Here
 
-- Project enhancement tracker: `docs/PROJECT_ENHANCEMENT_PROPOSAL_2026-02-24.md`
+- Completed enhancement tracker (archived): `docs/archive/plans/PROJECT_ENHANCEMENT_PROPOSAL_2026-02-24.md`
 - Modern client completion plan: `docs/MODERN_CLIENT_COMPLETION_PLAN_2026-02-24.md`
 - Dependency upgrade plan: `docs/DEPENDENCY_UPGRADE_PLAN_2026-02-24.md`
 - Mobile app strategy: `docs/MOBILE_APP_STRATEGY_2026-02-24.md`
@@ -27,6 +27,7 @@ This folder contains active engineering documentation and archived migration art
 ## Migration Archives
 
 - Archive index: `docs/archive/migrations/README.md`
+- Archived plans index: `docs/archive/plans/README.md`
 - Historical migration snapshot: `docs/archive/MIGRATION_PLAN_ARCHIVE_2026-02-22.md`
 
 ## Root `MIGRATION_*.md` Files

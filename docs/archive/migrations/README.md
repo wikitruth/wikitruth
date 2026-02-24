@@ -15,5 +15,5 @@ Canonical archive for completed legacy-to-React migration documentation.
 - Archive date: 2026-02-24
 - Root-level `MIGRATION_*.md` files are compatibility pointers only.
 - Ongoing implementation tracking now lives in:
-  - `docs/PROJECT_ENHANCEMENT_PROPOSAL_2026-02-24.md`
+  - `docs/archive/plans/PROJECT_ENHANCEMENT_PROPOSAL_2026-02-24.md`
   - `docs/MODERN_CLIENT_COMPLETION_PLAN_2026-02-24.md`
