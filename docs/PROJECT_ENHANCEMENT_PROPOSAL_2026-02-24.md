@@ -17,7 +17,7 @@ This proposal consolidates pending enhancement work after migration closure, bas
 - [x] E8. Remove unused vars and `any` in `client/src/pages/HomePage.tsx`.
 - [x] E9. Publish dependency upgrade plan by risk tier.
 - [x] E10. Start PWA Phase 0 (manifest + service worker + ADR).
-- [ ] E11. Add dark mode theme tokens and toggle support.
+- [x] E11. Add dark mode theme tokens and toggle support.
 - [ ] E12. Add baseline realtime event channel (WebSocket/SSE) for React client.
 - [ ] E13. Add Storybook for component catalog and visual diffing baseline.
 - [ ] E14. Ship a mobile app strategy document with API contract readiness checklist.

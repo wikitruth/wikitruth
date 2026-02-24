@@ -4,6 +4,7 @@ import OptimizedImage from '../common/OptimizedImage';
 import type { Application, User } from '../../types';
 import authApi from '../../services/api/auth';
 import apiService from '../../services/api';
+import { useTheme } from '../../context/ThemeContext';
 
 type HeaderUser = Pick<User, '_id' | 'username' | 'email'>;
 type HeaderApplication = Pick<Application, '_id' | 'name'> & {
@@ -15,10 +16,12 @@ interface HomePayload {
 }
 
 const Header: React.FC = () => {
+  const { theme, toggleTheme } = useTheme();
   const [user, setUser] = useState<HeaderUser | null>(null);
   const [application, setApplication] = useState<HeaderApplication | null>(null);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const isDarkTheme = theme === 'dark';
 
   useEffect(() => {
     let isMounted = true;
@@ -124,6 +127,18 @@ const Header: React.FC = () => {
           </nav>
           <nav aria-label="Account navigation">
             <ul className="nav navbar-nav navbar-right">
+            <li>
+              <button
+                type="button"
+                title={isDarkTheme ? 'Switch to light mode' : 'Switch to dark mode'}
+                className="btn btn-link navbar-btn"
+                aria-label={isDarkTheme ? 'Switch to light mode' : 'Switch to dark mode'}
+                onClick={toggleTheme}
+              >
+                <i className={`fa ${isDarkTheme ? 'fa-sun-o' : 'fa-moon-o'}`}></i>
+                <span className="hidden-xs"> Theme</span>
+              </button>
+            </li>
             {user ? (
               <>
                 <li>
