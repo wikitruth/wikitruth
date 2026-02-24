@@ -4,8 +4,8 @@ This archive snapshot records closure of the legacy-template-to-React migration 
 
 ## Source Documents
 
-- `MIGRATION_PLAN.md`
-- `MIGRATION_CHECKLIST.md`
+- `docs/archive/migrations/MIGRATION_PLAN.md`
+- `docs/archive/migrations/MIGRATION_CHECKLIST.md`
 
 ## Closure Notes
 
