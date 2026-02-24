@@ -74,4 +74,14 @@ describe('API endpoint smoke coverage', function () {
     expect(realtimeApi).toContain("router.get('/events'");
     expect(realtimeApi).toContain("res.setHeader('Content-Type', 'text/event-stream')");
   });
+
+  it('exposes topic and argument create mutation handlers for modern forms', function () {
+    const topicsApi = read('controllers/api/topics.ts');
+    const argumentsApi = read('controllers/api/arguments.ts');
+
+    expect(topicsApi).toContain("router.post('/',");
+    expect(topicsApi).toContain('POST_topic_create');
+    expect(argumentsApi).toContain("router.post('/',");
+    expect(argumentsApi).toContain('POST_argument_create');
+  });
 });

@@ -53,11 +53,13 @@ const TopicCreatePage: React.FC = () => {
     setSubmitSuccess(false);
 
     try {
-      // In a real implementation, this would call the API
-      // const response = await apiService.createTopic(values);
-      
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await apiService.createTopic({
+        title: values.title,
+        description: values.description,
+        category: values.category,
+        private: values.private,
+        tags: values.tags,
+      });
       
       setSubmitSuccess(true);
       

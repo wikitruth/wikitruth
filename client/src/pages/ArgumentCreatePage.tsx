@@ -54,11 +54,14 @@ const ArgumentCreatePage: React.FC = () => {
     setSubmitSuccess(false);
 
     try {
-      // In a real implementation, this would call the API
-      // const response = await apiService.createArgument(values);
-      
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await apiService.createArgument({
+        title: values.title,
+        description: values.description,
+        verdict: values.verdict,
+        topicId: values.topicId || undefined,
+        private: values.private,
+        sources: values.sources,
+      });
       
       setSubmitSuccess(true);
       
@@ -165,6 +168,15 @@ const ArgumentCreatePage: React.FC = () => {
                 { value: 'unknown', label: 'Unknown - Cannot be verified' },
               ]}
               error={touched.verdict ? errors.verdict : undefined}
+            />
+
+            <Input
+              name="topicId"
+              label="Topic ID (optional)"
+              value={values.topicId}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              placeholder="Enter topic id to attach this argument to a topic"
             />
 
             <TextArea

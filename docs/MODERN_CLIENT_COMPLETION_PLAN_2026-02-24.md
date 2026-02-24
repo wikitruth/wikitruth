@@ -43,8 +43,8 @@ Legend: `[x]` done, `[~]` partial, `[ ]` not done
 ### B. Core Content Workflows
 
 - [x] Core read/list pages for topics/arguments/questions/issues/opinions/answers/artifacts exist.
-- [ ] Create topic flow backed by real API mutation (currently simulated in UI).
-- [ ] Create argument flow backed by real API mutation (currently simulated in UI).
+- [x] Create topic flow backed by real API mutation.
+- [x] Create argument flow backed by real API mutation.
 - [ ] Create/edit flows for question/answer/issue/opinion/artifact in React.
 - [ ] Group create/manage flows backed by real API mutations.
 - [ ] Profile pages/create-page flows backed by real APIs.
@@ -60,7 +60,7 @@ Legend: `[x]` done, `[~]` partial, `[ ]` not done
 
 - [x] Versioned compatibility route (`/api/v1/*`) present.
 - [x] Realtime SSE baseline present (`/api/realtime/events`).
-- [ ] Mutation endpoints for modern client workflows (topics/arguments/questions/etc.).
+- [~] Mutation endpoints for modern client workflows (topics/arguments implemented; broader entity coverage pending).
 - [ ] Standardized success envelope and typed DTOs for high-traffic endpoints.
 - [ ] OpenAPI/contract documentation for mobile/web shared clients.
 - [ ] Contract tests for critical auth + content mutation flows.
@@ -101,5 +101,5 @@ Legend: `[x]` done, `[~]` partial, `[ ]` not done
 - [x] Wire `SocialLoginButtons` to OAuth redirect URLs and add integration tests.
 - [x] Replace `SignupPage` scaffold with real form + submit flow.
 - [x] Decide/implement forgot-reset strategy (native API vs legacy handoff) and update UI accordingly.
-- [ ] Create API mutation endpoints for topic and argument create flows.
+- [x] Create API mutation endpoints for topic and argument create flows.
 - [ ] Replace top 10 scaffold pages in admin/account/group areas with live data implementations.

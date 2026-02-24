@@ -62,6 +62,20 @@ class ApiService {
     return this.request(`/topics/entry/${id}`);
   }
 
+  async createTopic(payload: {
+    title: string;
+    description: string;
+    category?: string;
+    private?: boolean;
+    tags?: string;
+    topicId?: string;
+  }) {
+    return this.request('/topics', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
   // Arguments
   async getArguments(topicId?: string) {
     const url = topicId ? `/arguments?topic=${topicId}` : '/arguments';
@@ -70,6 +84,20 @@ class ApiService {
 
   async getArgumentEntry(id: string) {
     return this.request(`/arguments/entry/${id}`);
+  }
+
+  async createArgument(payload: {
+    title: string;
+    description: string;
+    verdict?: string;
+    topicId?: string;
+    private?: boolean;
+    sources?: string;
+  }) {
+    return this.request('/arguments', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
   }
 
   // Questions
