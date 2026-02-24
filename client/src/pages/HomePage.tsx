@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import apiService from '../services/api';
+import type { Answer, Application, Argument, Artifact, Issue, Opinion, Question, Topic } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import TopicEntryRow from '../components/EntryRow/TopicEntryRow';
 import ArgumentEntryRow from '../components/EntryRow/ArgumentEntryRow';
@@ -10,14 +11,14 @@ import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
 
 interface HomeData {
-  topics?: any[];
-  arguments?: any[];
-  questions?: any[];
-  answers?: any[];
-  issues?: any[];
-  opinions?: any[];
-  artifacts?: any[];
-  application?: any;
+  topics?: Topic[];
+  arguments?: Argument[];
+  questions?: Question[];
+  answers?: Answer[];
+  issues?: Issue[];
+  opinions?: Opinion[];
+  artifacts?: Artifact[];
+  application?: Application;
   topicsMore?: boolean;
   argumentsMore?: boolean;
   questionsMore?: boolean;
@@ -37,7 +38,7 @@ const HomePage: React.FC = () => {
 
   const fetchHomeData = async () => {
     try {
-      const result: any = await apiService.getHomeData();
+      const result = (await apiService.getHomeData()) as HomeData;
       setData(result);
       setLoading(false);
     } catch (error) {
@@ -90,7 +91,7 @@ const HomePage: React.FC = () => {
       {/* Feature Sections */}
       {application?.sections ? (
         <div className="row">
-          {application.sections.map((section: any, index: number) => (
+          {application.sections.map((section, index: number) => (
             <div key={index} className="col-lg-4 col-md-6 col-sm-6 wt-section-col text-body">
               <h2 className="wt-feature-header" data-title={section.title}>
                 <i className={section.iconClass}></i> {section.title}
@@ -156,7 +157,7 @@ const HomePage: React.FC = () => {
                   <i className="fa fa-folder-open text-success-x" aria-hidden="true"></i>
                   <div>Topics</div>
                 </li>
-                {data.topics.map((topic: any) => (
+                {data.topics.map((topic) => (
                   <TopicEntryRow key={topic._id} topic={topic} subtitle={true} />
                 ))}
               </ul>
@@ -180,7 +181,7 @@ const HomePage: React.FC = () => {
                   <span className="glyphicon glyphicon-flash" aria-hidden="true"></span>
                   <div>Facts</div>
                 </li>
-                {data.arguments.map((argument: any) => (
+                {data.arguments.map((argument) => (
                   <ArgumentEntryRow key={argument._id} argument={argument} subtitle={true} />
                 ))}
               </ul>
@@ -206,7 +207,7 @@ const HomePage: React.FC = () => {
                   <span className="glyphicon glyphicon-question-sign text-success-x" aria-hidden="true"></span>
                   <div>Questions</div>
                 </li>
-                {data.questions.map((question: any) => (
+                {data.questions.map((question) => (
                   <QuestionEntryRow key={question._id} question={question} subtitle={true} />
                 ))}
               </ul>
@@ -230,7 +231,7 @@ const HomePage: React.FC = () => {
                   <i className="fa fa-check-circle-o text-success-x" aria-hidden="true"></i>
                   <div>Answers</div>
                 </li>
-                {data.answers.map((answer: any) => (
+                {data.answers.map((answer) => (
                   <AnswerEntryRow key={answer._id} answer={answer} subtitle={true} />
                 ))}
               </ul>
@@ -256,7 +257,7 @@ const HomePage: React.FC = () => {
                   <i className="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i>
                   <div>Issues</div>
                 </li>
-                {data.issues.map((issue: any) => (
+                {data.issues.map((issue) => (
                   <IssueEntryRow key={issue._id} issue={issue} subtitle={true} />
                 ))}
               </ul>
@@ -280,7 +281,7 @@ const HomePage: React.FC = () => {
                   <i className="fa fa-comment text-info" aria-hidden="true"></i>
                   <div>Opinions</div>
                 </li>
-                {data.opinions.map((opinion: any) => (
+                {data.opinions.map((opinion) => (
                   <OpinionEntryRow key={opinion._id} opinion={opinion} subtitle={true} />
                 ))}
               </ul>
