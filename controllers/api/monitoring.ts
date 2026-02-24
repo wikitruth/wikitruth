@@ -6,6 +6,14 @@ import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 const logger = require('../../utils/logger') as {
   error: (event: string, fields: Record<string, unknown>) => void;
 };
+const { publishRealtimeEvent } = require('../../services/realtimeEvents') as {
+  publishRealtimeEvent: (event: {
+    type: string;
+    timestamp?: string;
+    requestId?: string | null;
+    data?: unknown;
+  }) => void;
+};
 
 type MonitoringPayload = {
   type?: string;
@@ -34,6 +42,16 @@ module.exports = function (router: Router) {
       path: body.path || req.path,
       userAgent: body.userAgent || req.get('user-agent') || null,
       timestamp: body.timestamp || new Date().toISOString(),
+    });
+
+    publishRealtimeEvent({
+      type: 'monitoring.error',
+      requestId: requestId,
+      data: {
+        eventType: body.type || 'unknown',
+        message: body.message || 'unknown',
+        path: body.path || req.path,
+      },
     });
 
     res.status(202).json({ success: true });

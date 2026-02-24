@@ -22,6 +22,7 @@ module.exports = function (router) {
   const authRouter = wrapAsyncRouter(express.Router());
   const adminRouter = wrapAsyncRouter(express.Router());
   const monitoringRouter = wrapAsyncRouter(express.Router());
+  const realtimeRouter = wrapAsyncRouter(express.Router());
 
   // Load route handlers
   // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
@@ -52,6 +53,8 @@ module.exports = function (router) {
   require('./admin')(adminRouter);
   // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   require('./monitoring')(monitoringRouter);
+  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
+  require('./realtime')(realtimeRouter);
 
   // Mount sub-routers
   router.use('/home', homeRouter);
@@ -68,4 +71,5 @@ module.exports = function (router) {
   router.use('/auth', authRouter);
   router.use('/admin', adminRouter);
   router.use('/monitoring', monitoringRouter);
+  router.use('/realtime', realtimeRouter);
 };

@@ -25,6 +25,7 @@ describe('API endpoint smoke coverage', function () {
       "router.use('/auth', authRouter)",
       "router.use('/admin', adminRouter)",
       "router.use('/monitoring', monitoringRouter)",
+      "router.use('/realtime', realtimeRouter)",
     ].forEach((contract) => expect(apiIndex).toContain(contract));
   });
 
@@ -62,5 +63,12 @@ describe('API endpoint smoke coverage', function () {
 
     expect(monitoringApi).toContain("router.post('/errors'");
     expect(monitoringApi).toContain("logger.error('client.runtime.error'");
+  });
+
+  it('exposes realtime SSE endpoint for React clients', function () {
+    const realtimeApi = read('controllers/api/realtime.ts');
+
+    expect(realtimeApi).toContain("router.get('/events'");
+    expect(realtimeApi).toContain("res.setHeader('Content-Type', 'text/event-stream')");
   });
 });
