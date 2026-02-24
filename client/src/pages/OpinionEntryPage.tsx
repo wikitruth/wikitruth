@@ -67,6 +67,11 @@ const OpinionEntryPage: React.FC = () => {
         subtitle={opinion.subtitle}
         icon="comment"
         iconColor="text-info"
+        actions={
+          <Link to={`/opinions/edit/${opinion._id}`} className="btn btn-default">
+            <i className="fa fa-pencil"></i> Edit
+          </Link>
+        }
       />
       
       <PageTabs tabs={tabs} activeTab="overview" />

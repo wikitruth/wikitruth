@@ -123,6 +123,22 @@ class ApiService {
     });
   }
 
+  async updateQuestion(
+    id: string,
+    payload: {
+      title?: string;
+      description?: string;
+      topicId?: string;
+      private?: boolean;
+      references?: string;
+    }
+  ) {
+    return this.request(`/questions/entry/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  }
+
   // Issues
   async getIssues(topicId?: string) {
     const url = topicId ? `/issues?topic=${topicId}` : '/issues';
@@ -142,6 +158,22 @@ class ApiService {
   }) {
     return this.request('/issues', {
       method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async updateIssue(
+    id: string,
+    payload: {
+      title?: string;
+      description?: string;
+      topicId?: string;
+      private?: boolean;
+      issueType?: number;
+    }
+  ) {
+    return this.request(`/issues/entry/${id}`, {
+      method: 'PUT',
       body: JSON.stringify(payload),
     });
   }
@@ -169,6 +201,21 @@ class ApiService {
     });
   }
 
+  async updateOpinion(
+    id: string,
+    payload: {
+      title?: string;
+      description?: string;
+      topicId?: string;
+      private?: boolean;
+    }
+  ) {
+    return this.request(`/opinions/entry/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  }
+
   // Answers
   async getAnswers(questionId?: string) {
     const url = questionId ? `/answers?question=${questionId}` : '/answers';
@@ -192,6 +239,22 @@ class ApiService {
     });
   }
 
+  async updateAnswer(
+    id: string,
+    payload: {
+      title?: string;
+      description?: string;
+      questionId?: string;
+      private?: boolean;
+      references?: string;
+    }
+  ) {
+    return this.request(`/answers/entry/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  }
+
   // Artifacts
   async getArtifacts(topicId?: string) {
     const url = topicId ? `/artifacts?topic=${topicId}` : '/artifacts';
@@ -211,6 +274,22 @@ class ApiService {
   }) {
     return this.request('/artifacts', {
       method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async updateArtifact(
+    id: string,
+    payload: {
+      title?: string;
+      description?: string;
+      topicId?: string;
+      private?: boolean;
+      source?: string;
+    }
+  ) {
+    return this.request(`/artifacts/entry/${id}`, {
+      method: 'PUT',
       body: JSON.stringify(payload),
     });
   }

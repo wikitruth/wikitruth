@@ -65,6 +65,11 @@ const QuestionEntryPage: React.FC = () => {
         subtitle={question.subtitle}
         icon="question-circle"
         iconColor="text-success-x"
+        actions={
+          <Link to={`/questions/edit/${question._id}`} className="btn btn-default">
+            <i className="fa fa-pencil"></i> Edit
+          </Link>
+        }
       />
       
       <PageTabs tabs={tabs} activeTab="overview" />

@@ -45,7 +45,7 @@ Legend: `[x]` done, `[~]` partial, `[ ]` not done
 - [x] Core read/list pages for topics/arguments/questions/issues/opinions/answers/artifacts exist.
 - [x] Create topic flow backed by real API mutation.
 - [x] Create argument flow backed by real API mutation.
-- [~] Create flows for question/answer/issue/opinion/artifact implemented in React; edit pages still pending.
+- [x] Create/edit flows for question/answer/issue/opinion/artifact in React.
 - [x] Group create/manage flows backed by real API mutations.
 - [x] Profile pages/create-page flows backed by real APIs.
 

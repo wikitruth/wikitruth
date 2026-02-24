@@ -67,6 +67,11 @@ const IssueEntryPage: React.FC = () => {
         subtitle={issue.subtitle}
         icon="exclamation-triangle"
         iconColor="text-warning"
+        actions={
+          <Link to={`/issues/edit/${issue._id}`} className="btn btn-default">
+            <i className="fa fa-pencil"></i> Edit
+          </Link>
+        }
       />
       
       <PageTabs tabs={tabs} activeTab="overview" />
