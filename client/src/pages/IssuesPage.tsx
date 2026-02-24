@@ -9,9 +9,11 @@ import Pagination from '../components/common/Pagination';
 import Input from '../components/Form/Input';
 import Select from '../components/Form/Select';
 import Alert from '../components/common/Alert';
+import type { LegacyEntity, LegacyResponse } from '../types/legacy';
+import type { Issue } from '../types';
 
 const IssuesPage: React.FC = () => {
-  const [issues, setIssues] = useState<any[]>([]);
+  const [issues, setIssues] = useState<LegacyEntity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,7 +28,7 @@ const IssuesPage: React.FC = () => {
   const fetchIssues = async () => {
     try {
       setLoading(true);
-      const data = await apiService.getIssues() as any;
+      const data = (await apiService.getIssues()) as LegacyResponse;
       setIssues(data.issues || []);
     } catch (err) {
       setError('Failed to load issues');
@@ -164,8 +166,8 @@ const IssuesPage: React.FC = () => {
                 )}
               </div>
             </li>
-            {paginatedIssues.map((issue: any) => (
-              <IssueEntryRow key={issue._id} issue={issue} subtitle={true} />
+            {paginatedIssues.map((issue) => (
+              <IssueEntryRow key={issue._id} issue={issue as unknown as Issue} subtitle={true} />
             ))}
           </ul>
 

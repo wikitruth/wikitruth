@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import Breadcrumb from '../../../../components/common/Breadcrumb';
 import PageHeader from '../../../../components/common/PageHeader';
 import Input from '../../../../components/Form/Input';
@@ -9,13 +9,13 @@ import Alert from '../../../../components/common/Alert';
 import LoadingSpinner from '../../../../components/LoadingSpinner';
 import apiService from '../../../../services/api';
 import { useAuth } from '../../../../context/AuthContext';
+import type { LegacyEntity, LegacyResponse } from '../../../../types/legacy';
 
 const PageView: React.FC = () => {
-  const navigate = useNavigate();
   const { username: routeUsername, id } = useParams<{ username?: string; id: string }>();
   const { user } = useAuth();
   const username = routeUsername || user?.username || '';
-  const [page, setPage] = useState<any>(null);
+  const [page, setPage] = useState<LegacyEntity | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
@@ -37,9 +37,9 @@ const PageView: React.FC = () => {
 
       try {
         setLoading(true);
-        const result: any = await apiService.getMemberPage(username, id);
-        const pageModel = result?.page;
-        setPage(pageModel);
+        const result = (await apiService.getMemberPage(username, id)) as LegacyResponse;
+        const pageModel = result?.page as LegacyEntity | undefined;
+        setPage(pageModel || null);
         setTitle(pageModel?.title || '');
         setContent(pageModel?.content || '');
       } catch (err) {
@@ -65,8 +65,8 @@ const PageView: React.FC = () => {
     setBusy(true);
     setError(null);
     try {
-      const result: any = await apiService.updateMemberPage(username, id, { title, content });
-      setPage(result?.page || page);
+      const result = (await apiService.updateMemberPage(username, id, { title, content })) as LegacyResponse;
+      setPage((result?.page as LegacyEntity | undefined) || page);
       setEditing(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update page');

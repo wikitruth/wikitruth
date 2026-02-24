@@ -9,6 +9,7 @@ import Button from '../components/common/Button';
 import Alert from '../components/common/Alert';
 import LoadingSpinner from '../components/LoadingSpinner';
 import apiService from '../services/api';
+import type { LegacyResponse } from '../types/legacy';
 
 const OpinionEditPage: React.FC = () => {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ const OpinionEditPage: React.FC = () => {
       }
 
       try {
-        const result: any = await apiService.getOpinionEntry(id);
+        const result = (await apiService.getOpinionEntry(id)) as LegacyResponse;
         const opinion = result?.opinion;
         setTitle(opinion?.title || '');
         setDescription(opinion?.content || opinion?.description || '');

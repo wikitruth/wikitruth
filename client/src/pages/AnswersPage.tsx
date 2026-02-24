@@ -9,9 +9,11 @@ import Pagination from '../components/common/Pagination';
 import Input from '../components/Form/Input';
 import Select from '../components/Form/Select';
 import Alert from '../components/common/Alert';
+import type { LegacyEntity, LegacyResponse } from '../types/legacy';
+import type { Answer } from '../types';
 
 const AnswersPage: React.FC = () => {
-  const [answers, setAnswers] = useState<any[]>([]);
+  const [answers, setAnswers] = useState<LegacyEntity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -23,10 +25,10 @@ const AnswersPage: React.FC = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const result: any = await apiService.getAnswers();
+        const result = (await apiService.getAnswers()) as LegacyResponse;
         setAnswers(result?.answers || []);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Failed to load answers');
       } finally {
         setLoading(false);
       }
@@ -163,8 +165,8 @@ const AnswersPage: React.FC = () => {
                 )}
               </div>
             </li>
-            {paginatedAnswers.map((answer: any) => (
-              <AnswerEntryRow key={answer._id} answer={answer} />
+            {paginatedAnswers.map((answer) => (
+              <AnswerEntryRow key={answer._id} answer={answer as unknown as Answer} />
             ))}
           </ul>
 

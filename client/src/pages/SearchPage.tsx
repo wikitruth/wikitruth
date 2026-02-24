@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import apiService from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import TopicEntryRow from '../components/EntryRow/TopicEntryRow';
 import ArgumentEntryRow from '../components/EntryRow/ArgumentEntryRow';
 import QuestionEntryRow from '../components/EntryRow/QuestionEntryRow';
+import type { LegacyResponse } from '../types/legacy';
+import type { Argument, Question, Topic } from '../types';
 
 const SearchPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get('q') || '';
   
   const [searchQuery, setSearchQuery] = useState(query);
-  const [results, setResults] = useState<any>({});
+  const [results, setResults] = useState<LegacyResponse>({});
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
 
@@ -27,7 +29,7 @@ const SearchPage: React.FC = () => {
     try {
       setLoading(true);
       setSearched(true);
-      const result = await apiService.search(q);
+      const result = (await apiService.search(q)) as LegacyResponse;
       setResults(result);
       setLoading(false);
     } catch (error) {
@@ -93,8 +95,8 @@ const SearchPage: React.FC = () => {
                     <i className="fa fa-folder-open"></i> Topics ({results.topics.length})
                   </h3>
                   <ul className="list-group wt-list">
-                    {results.topics.map((topic: any) => (
-                      <TopicEntryRow key={topic._id} topic={topic} subtitle={true} />
+                    {results.topics.map((topic) => (
+                      <TopicEntryRow key={topic._id} topic={topic as unknown as Topic} subtitle={true} />
                     ))}
                   </ul>
                 </div>
@@ -107,8 +109,8 @@ const SearchPage: React.FC = () => {
                     <span className="glyphicon glyphicon-flash"></span> Arguments ({results.arguments.length})
                   </h3>
                   <ul className="list-group wt-list">
-                    {results.arguments.map((argument: any) => (
-                      <ArgumentEntryRow key={argument._id} argument={argument} subtitle={true} />
+                    {results.arguments.map((argument) => (
+                      <ArgumentEntryRow key={argument._id} argument={argument as unknown as Argument} subtitle={true} />
                     ))}
                   </ul>
                 </div>
@@ -121,8 +123,8 @@ const SearchPage: React.FC = () => {
                     <span className="glyphicon glyphicon-question-sign"></span> Questions ({results.questions.length})
                   </h3>
                   <ul className="list-group wt-list">
-                    {results.questions.map((question: any) => (
-                      <QuestionEntryRow key={question._id} question={question} subtitle={true} />
+                    {results.questions.map((question) => (
+                      <QuestionEntryRow key={question._id} question={question as unknown as Question} subtitle={true} />
                     ))}
                   </ul>
                 </div>

@@ -10,6 +10,7 @@ import Button from '../components/common/Button';
 import Alert from '../components/common/Alert';
 import LoadingSpinner from '../components/LoadingSpinner';
 import apiService from '../services/api';
+import type { LegacyResponse } from '../types/legacy';
 
 const IssueEditPage: React.FC = () => {
   const navigate = useNavigate();
@@ -32,7 +33,7 @@ const IssueEditPage: React.FC = () => {
       }
 
       try {
-        const result: any = await apiService.getIssueEntry(id);
+        const result = (await apiService.getIssueEntry(id)) as LegacyResponse;
         const issue = result?.issue;
         setTitle(issue?.title || '');
         setDescription(issue?.content || issue?.description || '');

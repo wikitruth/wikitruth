@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom';
 import Alert from '../../components/common/Alert';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import authApi from '../../services/api/auth';
+import type { User } from '../../types';
 
 const AccountPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [verification, setVerification] = useState<{ required: boolean; isVerified: boolean } | null>(null);
   const [error, setError] = useState<string | null>(null);
 

@@ -10,10 +10,12 @@ import Alert from '../components/common/Alert';
 import TopicEntryRow from '../components/EntryRow/TopicEntryRow';
 import ArgumentEntryRow from '../components/EntryRow/ArgumentEntryRow';
 import QuestionEntryRow from '../components/EntryRow/QuestionEntryRow';
+import type { LegacyEntity, LegacyResponse } from '../types/legacy';
+import type { Argument, Question, Topic } from '../types';
 
 const TopicEntryPage: React.FC = () => {
   const { id } = useParams();
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<LegacyResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,7 +28,7 @@ const TopicEntryPage: React.FC = () => {
     
     try {
       setLoading(true);
-      const result: any = await apiService.getTopicEntry(id);
+      const result = (await apiService.getTopicEntry(id)) as LegacyResponse;
       setData(result);
       setLoading(false);
     } catch (err) {
@@ -44,7 +46,10 @@ const TopicEntryPage: React.FC = () => {
     return <Alert type="danger">{error || 'Topic not found'}</Alert>;
   }
 
-  const { topic, topics, arguments: args, questions } = data;
+  const topic = data.topic as LegacyEntity;
+  const topics = (data.topics || []) as LegacyEntity[];
+  const args = (data.arguments || []) as LegacyEntity[];
+  const questions = (data.questions || []) as LegacyEntity[];
   
   // Build breadcrumb items
   const breadcrumbItems = [
@@ -97,11 +102,11 @@ const TopicEntryPage: React.FC = () => {
           title="Topics"
           icon="folder-open"
           iconColor="text-success-x"
-          count={topic.childrenCount?.topics?.accepted}
-          moreUrl={topic.childrenCount?.topics?.accepted > 5 ? `/topics/${topic.friendlyUrl}/${topic._id}` : undefined}
+          count={topic.childrenCount?.topics?.accepted || 0}
+          moreUrl={(topic.childrenCount?.topics?.accepted || 0) > 5 ? `/topics/${topic.friendlyUrl}/${topic._id}` : undefined}
         >
-          {topics.map((t: any) => (
-            <TopicEntryRow key={t._id} topic={t} subtitle={false} />
+          {topics.map((t) => (
+            <TopicEntryRow key={t._id} topic={t as unknown as Topic} subtitle={false} />
           ))}
         </EntryList>
       )}
@@ -112,10 +117,10 @@ const TopicEntryPage: React.FC = () => {
           title="Facts"
           icon="flash"
           iconColor="text-primary"
-          count={topic.childrenCount?.arguments?.accepted}
+          count={topic.childrenCount?.arguments?.accepted || 0}
         >
-          {args.map((arg: any) => (
-            <ArgumentEntryRow key={arg._id} argument={arg} subtitle={false} />
+          {args.map((arg) => (
+            <ArgumentEntryRow key={arg._id} argument={arg as unknown as Argument} subtitle={false} />
           ))}
         </EntryList>
       )}
@@ -126,10 +131,10 @@ const TopicEntryPage: React.FC = () => {
           title="Questions"
           icon="question-circle"
           iconColor="text-success-x"
-          count={topic.childrenCount?.questions?.accepted}
+          count={topic.childrenCount?.questions?.accepted || 0}
         >
-          {questions.map((q: any) => (
-            <QuestionEntryRow key={q._id} question={q} subtitle={false} />
+          {questions.map((q) => (
+            <QuestionEntryRow key={q._id} question={q as unknown as Question} subtitle={false} />
           ))}
         </EntryList>
       )}

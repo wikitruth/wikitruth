@@ -8,13 +8,15 @@ import PageHeader from '../components/common/PageHeader';
 import Pagination from '../components/common/Pagination';
 import Input from '../components/Form/Input';
 import Select from '../components/Form/Select';
+import type { LegacyEntity, LegacyResponse } from '../types/legacy';
+import type { Question } from '../types';
 
 const QuestionsPage: React.FC = () => {
-  const { friendlyUrl, id } = useParams();
+  const { id } = useParams();
   const [searchParams] = useSearchParams();
   const topicId = searchParams.get('topic') || id;
   
-  const [questions, setQuestions] = useState<any[]>([]);
+  const [questions, setQuestions] = useState<LegacyEntity[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('editDate');
@@ -27,7 +29,7 @@ const QuestionsPage: React.FC = () => {
 
   const fetchQuestions = async () => {
     try {
-      const result: any = await apiService.getQuestions(topicId);
+      const result = (await apiService.getQuestions(topicId)) as LegacyResponse;
       setQuestions(result.questions || []);
       setLoading(false);
     } catch (error) {
@@ -159,10 +161,10 @@ const QuestionsPage: React.FC = () => {
                 )}
               </div>
             </li>
-            {paginatedQuestions.map((question: any) => (
+            {paginatedQuestions.map((question) => (
               <QuestionEntryRow
                 key={question._id}
-                question={question}
+                question={question as unknown as Question}
                 subtitle={true}
                 labels={true}
               />

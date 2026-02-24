@@ -5,7 +5,7 @@ interface UseFetchOptions {
   refetchOnMount?: boolean;
 }
 
-export function useFetch<T = any>(
+export function useFetch<T = unknown>(
   url: string,
   options: UseFetchOptions = {}
 ) {

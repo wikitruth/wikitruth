@@ -4,6 +4,7 @@ import Layout from '../components/Layout/Layout';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { apiService } from '../services/api';
 import { User } from '../types';
+import type { LegacyResponse } from '../types/legacy';
 
 const MembersPage: React.FC = () => {
   const [contributors, setContributors] = useState<User[]>([]);
@@ -13,8 +14,8 @@ const MembersPage: React.FC = () => {
   useEffect(() => {
     const fetchMembers = async () => {
       try {
-        const data: any = await apiService.getMembers();
-        setContributors(data.contributors || []);
+        const data = (await apiService.getMembers()) as LegacyResponse;
+        setContributors((data.contributors || []) as User[]);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load members');
       } finally {

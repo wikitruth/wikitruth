@@ -9,6 +9,7 @@ import Button from '../components/common/Button';
 import Alert from '../components/common/Alert';
 import LoadingSpinner from '../components/LoadingSpinner';
 import apiService from '../services/api';
+import type { LegacyResponse } from '../types/legacy';
 
 const QuestionEditPage: React.FC = () => {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ const QuestionEditPage: React.FC = () => {
       }
 
       try {
-        const result: any = await apiService.getQuestionEntry(id);
+        const result = (await apiService.getQuestionEntry(id)) as LegacyResponse;
         const question = result?.question;
         if (!question) {
           setError('Question not found');

@@ -7,6 +7,7 @@ import Button from '../../../components/common/Button';
 import Alert from '../../../components/common/Alert';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import apiService from '../../../services/api';
+import type { LegacyEntity, LegacyResponse } from '../../../types/legacy';
 
 const ProfileSettings: React.FC = () => {
   const navigate = useNavigate();
@@ -21,8 +22,8 @@ const ProfileSettings: React.FC = () => {
     const fetchCurrentProfile = async () => {
       try {
         setLoading(true);
-        const result: any = await apiService.getCurrentMemberProfile();
-        const member = result?.member || result;
+        const result = (await apiService.getCurrentMemberProfile()) as LegacyResponse;
+        const member = (result?.member || result) as LegacyEntity;
         setUsername(member?.username || '');
         setEmail(member?.email || '');
         setPrivateProfile(Boolean(member?.preferences?.privateProfile));

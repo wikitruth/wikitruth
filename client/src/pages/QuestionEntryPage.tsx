@@ -6,10 +6,11 @@ import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import PageTabs from '../components/common/PageTabs';
 import Alert from '../components/common/Alert';
+import type { LegacyEntity, LegacyResponse } from '../types/legacy';
 
 const QuestionEntryPage: React.FC = () => {
   const { id } = useParams();
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<LegacyResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,7 +23,7 @@ const QuestionEntryPage: React.FC = () => {
     
     try {
       setLoading(true);
-      const result: any = await apiService.getQuestionEntry(id);
+      const result = (await apiService.getQuestionEntry(id)) as LegacyResponse;
       setData(result);
       setLoading(false);
     } catch (err) {
@@ -40,7 +41,7 @@ const QuestionEntryPage: React.FC = () => {
     return <Alert type="danger">{error || 'Question not found'}</Alert>;
   }
 
-  const { question } = data;
+  const question = data.question as LegacyEntity;
   
   // Build breadcrumb items
   const breadcrumbItems = [

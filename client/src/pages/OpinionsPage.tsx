@@ -9,9 +9,11 @@ import Pagination from '../components/common/Pagination';
 import Input from '../components/Form/Input';
 import Select from '../components/Form/Select';
 import Alert from '../components/common/Alert';
+import type { LegacyEntity, LegacyResponse } from '../types/legacy';
+import type { Opinion } from '../types';
 
 const OpinionsPage: React.FC = () => {
-  const [opinions, setOpinions] = useState<any[]>([]);
+  const [opinions, setOpinions] = useState<LegacyEntity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,7 +28,7 @@ const OpinionsPage: React.FC = () => {
   const fetchOpinions = async () => {
     try {
       setLoading(true);
-      const data = await apiService.getOpinions() as any;
+      const data = (await apiService.getOpinions()) as LegacyResponse;
       setOpinions(data.opinions || []);
     } catch (err) {
       setError('Failed to load opinions');
@@ -164,8 +166,8 @@ const OpinionsPage: React.FC = () => {
                 )}
               </div>
             </li>
-            {paginatedOpinions.map((opinion: any) => (
-              <OpinionEntryRow key={opinion._id} opinion={opinion} subtitle={true} />
+            {paginatedOpinions.map((opinion) => (
+              <OpinionEntryRow key={opinion._id} opinion={opinion as unknown as Opinion} subtitle={true} />
             ))}
           </ul>
 

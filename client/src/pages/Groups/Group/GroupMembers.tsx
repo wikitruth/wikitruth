@@ -5,10 +5,11 @@ import PageHeader from '../../../components/common/PageHeader';
 import Alert from '../../../components/common/Alert';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import apiService from '../../../services/api';
+import type { LegacyEntity, LegacyResponse } from '../../../types/legacy';
 
 const GroupMembers: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [group, setGroup] = useState<any>(null);
+  const [group, setGroup] = useState<LegacyEntity | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,8 +23,8 @@ const GroupMembers: React.FC = () => {
 
       try {
         setLoading(true);
-        const result: any = await apiService.getGroupEntry(id);
-        setGroup(result?.group || result);
+        const result = (await apiService.getGroupEntry(id)) as LegacyResponse;
+        setGroup((result?.group || result) as LegacyEntity);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load group members');
       } finally {
@@ -62,9 +63,10 @@ const GroupMembers: React.FC = () => {
           {members.length === 0 ? (
             <li className="list-group-item">No members found.</li>
           ) : (
-            members.map((member: any, index: number) => {
-              const memberId = String(member?.userId?._id || member?.userId || '');
-              const username = member?.userId?.username || memberId || 'Unknown user';
+            members.map((member, index: number) => {
+              const memberUser = typeof member.userId === 'string' ? null : member.userId;
+              const memberId = String(memberUser?._id || member?.userId || '');
+              const username = memberUser?.username || memberId || 'Unknown user';
               const roleType = Number(member?.roleType || 10);
               const roleLabel = roleType === 20 ? 'Administrator' : 'Member';
 

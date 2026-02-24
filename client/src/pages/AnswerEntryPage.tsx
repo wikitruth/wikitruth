@@ -5,10 +5,11 @@ import Alert from '../components/common/Alert';
 import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import apiService from '../services/api';
+import type { LegacyEntity, LegacyResponse } from '../types/legacy';
 
 const AnswerEntryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [answer, setAnswer] = useState<any>(null);
+  const [answer, setAnswer] = useState<LegacyEntity | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,7 +21,7 @@ const AnswerEntryPage: React.FC = () => {
         return;
       }
       try {
-        const result: any = await apiService.getAnswerEntry(id);
+        const result = (await apiService.getAnswerEntry(id)) as LegacyResponse;
         setAnswer(result?.answer || null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load answer');

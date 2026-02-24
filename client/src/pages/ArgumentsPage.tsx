@@ -8,13 +8,15 @@ import PageHeader from '../components/common/PageHeader';
 import Pagination from '../components/common/Pagination';
 import Input from '../components/Form/Input';
 import Select from '../components/Form/Select';
+import type { LegacyEntity, LegacyResponse } from '../types/legacy';
+import type { Argument } from '../types';
 
 const ArgumentsPage: React.FC = () => {
-  const { friendlyUrl, id } = useParams();
+  const { id } = useParams();
   const [searchParams] = useSearchParams();
   const topicId = searchParams.get('topic') || id;
   
-  const [argumentsList, setArgumentsList] = useState<any[]>([]);
+  const [argumentsList, setArgumentsList] = useState<LegacyEntity[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('editDate');
@@ -28,7 +30,7 @@ const ArgumentsPage: React.FC = () => {
 
   const fetchArguments = async () => {
     try {
-      const result: any = await apiService.getArguments(topicId);
+      const result = (await apiService.getArguments(topicId)) as LegacyResponse;
       setArgumentsList(result.arguments || []);
       setLoading(false);
     } catch (error) {
@@ -188,10 +190,10 @@ const ArgumentsPage: React.FC = () => {
                 )}
               </div>
             </li>
-            {paginatedArguments.map((argument: any) => (
+            {paginatedArguments.map((argument) => (
               <ArgumentEntryRow
                 key={argument._id}
-                argument={argument}
+                argument={argument as unknown as Argument}
                 subtitle={true}
                 labels={true}
               />

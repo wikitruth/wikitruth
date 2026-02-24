@@ -6,10 +6,11 @@ import PageHeader from '../components/common/PageHeader';
 import PageTabs from '../components/common/PageTabs';
 import Alert from '../components/common/Alert';
 import apiService from '../services/api';
+import type { LegacyEntity, LegacyResponse } from '../types/legacy';
 
 const OpinionEntryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<LegacyResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,10 +24,10 @@ const OpinionEntryPage: React.FC = () => {
 
       try {
         setLoading(true);
-        const result = await apiService.getOpinionEntry(id);
+        const result = (await apiService.getOpinionEntry(id)) as LegacyResponse;
         setData(result);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Failed to load opinion');
       } finally {
         setLoading(false);
       }
@@ -43,7 +44,7 @@ const OpinionEntryPage: React.FC = () => {
     return <Alert type="danger">Error loading opinion: {error || 'Opinion not found'}</Alert>;
   }
 
-  const opinion = data.opinion;
+  const opinion = data.opinion as LegacyEntity;
   
   // Build breadcrumb items
   const breadcrumbItems = [

@@ -3,10 +3,11 @@ import { Link, useParams } from 'react-router-dom';
 import Alert from '../../../components/common/Alert';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import apiService from '../../../services/api';
+import type { LegacyEntity, LegacyResponse } from '../../../types/legacy';
 
 const GroupPosts: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [group, setGroup] = useState<any>(null);
+  const [group, setGroup] = useState<LegacyEntity | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,8 +19,8 @@ const GroupPosts: React.FC = () => {
         return;
       }
       try {
-        const result: any = await apiService.getGroupEntry(id);
-        setGroup(result?.group || result);
+        const result = (await apiService.getGroupEntry(id)) as LegacyResponse;
+        setGroup((result?.group || result) as LegacyEntity);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load group');
       } finally {

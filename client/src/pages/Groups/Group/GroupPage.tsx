@@ -10,12 +10,13 @@ import Alert from '../../../components/common/Alert';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import apiService from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
+import type { LegacyEntity, LegacyResponse } from '../../../types/legacy';
 
 const GroupPage: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
-  const [group, setGroup] = useState<any>(null);
+  const [group, setGroup] = useState<LegacyEntity | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
@@ -32,8 +33,8 @@ const GroupPage: React.FC = () => {
 
       try {
         setLoading(true);
-        const result: any = await apiService.getGroupEntry(id);
-        const groupModel = result?.group || result;
+        const result = (await apiService.getGroupEntry(id)) as LegacyResponse;
+        const groupModel = (result?.group || result) as LegacyEntity;
         setGroup(groupModel);
         setForm({
           title: groupModel?.title || '',
@@ -50,24 +51,25 @@ const GroupPage: React.FC = () => {
     fetchGroup();
   }, [id]);
 
-  const currentUserId = String((user as any)?._id || (user as any)?.id || '');
+  const currentUserId = String(user?._id || '');
 
-  const members = Array.isArray(group?.members) ? group.members : [];
-  const isMember = members.some((member: any) => String(member?.userId?._id || member?.userId || '') === currentUserId);
+  const members: LegacyEntity[] = Array.isArray(group?.members) ? group.members : [];
+  const isMember = members.some((member) => String((member.userId as LegacyEntity)?._id || member.userId || '') === currentUserId);
   const isManager = Boolean(
     group &&
       (String(group.createUserId || '') === currentUserId ||
         members.some(
-          (member: any) =>
-            String(member?.userId?._id || member?.userId || '') === currentUserId && Number(member?.roleType || 10) === 20
+          (member) =>
+            String((member.userId as LegacyEntity)?._id || member.userId || '') === currentUserId &&
+            Number(member.roleType || 10) === 20
         ) ||
-        Boolean((user as any)?.roles?.admin))
+        Boolean(user?.roles?.admin))
   );
 
   const refreshGroup = async () => {
     if (!id) return;
-    const result: any = await apiService.getGroupEntry(id);
-    setGroup(result?.group || result);
+    const result = (await apiService.getGroupEntry(id)) as LegacyResponse;
+    setGroup((result?.group || result) as LegacyEntity);
   };
 
   const handleJoin = async () => {

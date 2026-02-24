@@ -6,13 +6,14 @@ import LoadingSpinner from '../../../components/LoadingSpinner';
 import Alert from '../../../components/common/Alert';
 import apiService from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
+import type { LegacyEntity, LegacyResponse } from '../../../types/legacy';
 
 const ProfilePage: React.FC = () => {
   const { username: routeUsername } = useParams<{ username?: string }>();
   const { user } = useAuth();
   const username = routeUsername || user?.username || '';
-  const [profile, setProfile] = useState<any>(null);
-  const [pages, setPages] = useState<any[]>([]);
+  const [profile, setProfile] = useState<LegacyEntity | null>(null);
+  const [pages, setPages] = useState<LegacyEntity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -30,12 +31,12 @@ const ProfilePage: React.FC = () => {
 
       try {
         setLoading(true);
-        const [profileResult, pagesResult]: any[] = await Promise.all([
+        const [profileResult, pagesResult] = (await Promise.all([
           apiService.getMemberProfile(username),
           apiService.getMemberPages(username),
-        ]);
+        ])) as [LegacyResponse, LegacyResponse];
 
-        setProfile(profileResult?.member || profileResult);
+        setProfile((profileResult?.member || profileResult) as LegacyEntity);
         setPages(Array.isArray(pagesResult?.pages) ? pagesResult.pages : []);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load profile');

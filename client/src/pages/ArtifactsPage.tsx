@@ -3,9 +3,10 @@ import { Link } from 'react-router-dom';
 import Layout from '../components/Layout/Layout';
 import LoadingSpinner from '../components/LoadingSpinner';
 import apiService from '../services/api';
+import type { LegacyEntity, LegacyResponse } from '../types/legacy';
 
 const ArtifactsPage: React.FC = () => {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<LegacyResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -13,10 +14,10 @@ const ArtifactsPage: React.FC = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const result = await apiService.getArtifacts();
+        const result = (await apiService.getArtifacts()) as LegacyResponse;
         setData(result);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'Failed to load artifacts');
       } finally {
         setLoading(false);
       }
@@ -61,7 +62,7 @@ const ArtifactsPage: React.FC = () => {
             </div>
             <ul className="list-group">
               {data?.artifacts && data.artifacts.length > 0 ? (
-                data.artifacts.map((artifact: any) => (
+                data.artifacts.map((artifact: LegacyEntity) => (
                   <li key={artifact._id} className="list-group-item">
                     <h4>
                       <Link to={`/artifacts/entry/${artifact.friendlyUrl}/${artifact._id}`}>

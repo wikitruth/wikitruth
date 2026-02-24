@@ -6,10 +6,11 @@ import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import PageTabs from '../components/common/PageTabs';
 import Alert from '../components/common/Alert';
+import type { LegacyEntity, LegacyResponse } from '../types/legacy';
 
 const ArgumentEntryPage: React.FC = () => {
   const { id } = useParams();
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<LegacyResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -22,7 +23,7 @@ const ArgumentEntryPage: React.FC = () => {
     
     try {
       setLoading(true);
-      const result: any = await apiService.getArgumentEntry(id);
+      const result = (await apiService.getArgumentEntry(id)) as LegacyResponse;
       setData(result);
       setLoading(false);
     } catch (err) {
@@ -40,21 +41,7 @@ const ArgumentEntryPage: React.FC = () => {
     return <Alert type="danger">{error || 'Argument not found'}</Alert>;
   }
 
-  const { argument } = data;
-  
-  const getVerdictClass = () => {
-    if (!argument.verdict?.result) return 'text-muted';
-    switch (argument.verdict.result) {
-      case 'true':
-        return 'text-success';
-      case 'false':
-        return 'text-danger';
-      case 'unknown':
-        return 'text-warning';
-      default:
-        return 'text-muted';
-    }
-  };
+  const argument = data.argument as LegacyEntity;
   
   // Build breadcrumb items
   const breadcrumbItems = [

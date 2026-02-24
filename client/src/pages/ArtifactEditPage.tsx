@@ -9,6 +9,7 @@ import Button from '../components/common/Button';
 import Alert from '../components/common/Alert';
 import LoadingSpinner from '../components/LoadingSpinner';
 import apiService from '../services/api';
+import type { LegacyResponse } from '../types/legacy';
 
 const ArtifactEditPage: React.FC = () => {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ const ArtifactEditPage: React.FC = () => {
       }
 
       try {
-        const result: any = await apiService.getArtifactEntry(id);
+        const result = (await apiService.getArtifactEntry(id)) as LegacyResponse;
         const artifact = result?.artifact;
         setTitle(artifact?.title || '');
         setDescription(artifact?.content || artifact?.description || '');

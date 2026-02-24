@@ -6,11 +6,12 @@ import LoadingSpinner from '../../../../components/LoadingSpinner';
 import Alert from '../../../../components/common/Alert';
 import apiService from '../../../../services/api';
 import { useAuth } from '../../../../context/AuthContext';
+import type { LegacyEntity, LegacyResponse } from '../../../../types/legacy';
 
 const PagesIndex: React.FC = () => {
   const { user } = useAuth();
   const username = user?.username || '';
-  const [pages, setPages] = useState<any[]>([]);
+  const [pages, setPages] = useState<LegacyEntity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,7 +25,7 @@ const PagesIndex: React.FC = () => {
 
       try {
         setLoading(true);
-        const result: any = await apiService.getMemberPages(username);
+        const result = (await apiService.getMemberPages(username)) as LegacyResponse;
         setPages(Array.isArray(result?.pages) ? result.pages : []);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load profile pages');

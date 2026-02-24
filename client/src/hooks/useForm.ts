@@ -6,7 +6,7 @@ interface UseFormOptions<T> {
   validate?: (values: T) => Partial<Record<keyof T, string>>;
 }
 
-export function useForm<T extends Record<string, any>>({
+export function useForm<T extends object>({
   initialValues,
   onSubmit,
   validate,
@@ -79,7 +79,7 @@ export function useForm<T extends Record<string, any>>({
     setIsSubmitting(false);
   }, [initialValues]);
 
-  const setFieldValue = useCallback((name: keyof T, value: any) => {
+  const setFieldValue = useCallback((name: keyof T, value: unknown) => {
     setValues((prev) => ({ ...prev, [name]: value }));
   }, []);
 
