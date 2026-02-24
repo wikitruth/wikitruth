@@ -1,8 +1,11 @@
 'use strict';
 
+import type { Router } from 'express';
+import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
+
 const db = require('../../app').db.models;
 
-function ensureAdmin(req, res) {
+function ensureAdmin(req: WikitruthRequest, res: WikitruthResponse): boolean {
   if (!req.user || !req.user.canPlayRoleOf || !req.user.canPlayRoleOf('admin')) {
     res.status(403).json({ success: false, message: 'Admin privileges required' });
     return false;
@@ -11,8 +14,8 @@ function ensureAdmin(req, res) {
   return true;
 }
 
-module.exports = function (router) {
-  router.get('/', async function (req, res) {
+module.exports = function (router: Router) {
+  router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAdmin(req, res)) {
       return;
     }
@@ -30,7 +33,7 @@ module.exports = function (router) {
     });
   });
 
-  router.get('/users', async function (req, res) {
+  router.get('/users', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAdmin(req, res)) {
       return;
     }
@@ -39,7 +42,7 @@ module.exports = function (router) {
     res.json(users);
   });
 
-  router.get('/accounts', async function (req, res) {
+  router.get('/accounts', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAdmin(req, res)) {
       return;
     }
@@ -48,7 +51,7 @@ module.exports = function (router) {
     res.json(accounts);
   });
 
-  router.get('/administrators', async function (req, res) {
+  router.get('/administrators', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAdmin(req, res)) {
       return;
     }
@@ -57,7 +60,7 @@ module.exports = function (router) {
     res.json(admins);
   });
 
-  router.get('/groups', async function (req, res) {
+  router.get('/groups', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAdmin(req, res)) {
       return;
     }
@@ -66,7 +69,7 @@ module.exports = function (router) {
     res.json(groups);
   });
 
-  router.get('/categories', async function (req, res) {
+  router.get('/categories', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAdmin(req, res)) {
       return;
     }
@@ -75,7 +78,7 @@ module.exports = function (router) {
     res.json(categories);
   });
 
-  router.get('/statuses', async function (req, res) {
+  router.get('/statuses', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAdmin(req, res)) {
       return;
     }
