@@ -11,7 +11,7 @@ This proposal consolidates pending enhancement work after migration closure, bas
 - [x] E2. Fix TS7006 errors in `controllers/api/auth.ts`.
 - [x] E3. Add typed signatures to `controllers/api/monitoring.ts` and `controllers/api/v1.ts`.
 - [x] E4. Re-enable `build:server` in `test:ci` and CI workflow.
-- [ ] E5. Patch XSS hotspot in `public/js/app.js`.
+- [x] E5. Patch XSS hotspot in `public/js/app.js`.
 - [ ] E6. Implement real user/app fetch in `client/src/components/Layout/Header.tsx`.
 - [ ] E7. Remove unused vars and `any` in `client/src/pages/TopicsPage.tsx`.
 - [ ] E8. Remove unused vars and `any` in `client/src/pages/HomePage.tsx`.

@@ -85,8 +85,8 @@ $(document).ready(function () {
             var contentContainer = $(this).parents('.wt-entry-row-content');
             var content = contentContainer.data('content');
             if(content) {
-                // FIXME: this is an XSS vulnerability, fix it.
-                contentContainer.html($("<div/>").html(content).text());
+                // Use text() to render untrusted data without HTML interpretation.
+                contentContainer.text(String(content));
             }
             return false;
         });
