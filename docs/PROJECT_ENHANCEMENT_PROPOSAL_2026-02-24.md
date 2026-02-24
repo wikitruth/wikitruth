@@ -15,7 +15,7 @@ This proposal consolidates pending enhancement work after migration closure, bas
 - [x] E6. Implement real user/app fetch in `client/src/components/Layout/Header.tsx`.
 - [x] E7. Remove unused vars and `any` in `client/src/pages/TopicsPage.tsx`.
 - [x] E8. Remove unused vars and `any` in `client/src/pages/HomePage.tsx`.
-- [ ] E9. Publish dependency upgrade plan by risk tier.
+- [x] E9. Publish dependency upgrade plan by risk tier.
 - [ ] E10. Start PWA Phase 0 (manifest + service worker + ADR).
 - [ ] E11. Add dark mode theme tokens and toggle support.
 - [ ] E12. Add baseline realtime event channel (WebSocket/SSE) for React client.
