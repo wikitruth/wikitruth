@@ -21,7 +21,7 @@ This audit answers three questions:
 - Forgot/reset pages now call auth APIs with token-aware UX in React.
 - Legacy server still owns OAuth routes (`/login/google`, `/login/github`, `/login/facebook`, `/login/twitter`, and signup/account variants) in `middlewares/routes.ts`.
 - Apple and Microsoft OAuth strategies are now configured in `middlewares/passport.ts` and wired through legacy auth/account routes used by the modern client redirect flow.
-- API surface is mostly read-only for content domain controllers; `router.post/put/delete` exists mainly in auth/monitoring (`controllers/api/*`).
+- API surface now includes create/update mutations for topics, arguments, questions, answers, issues, opinions, and artifacts; group/profile and contract standardization are still pending.
 - Migration scaffolds remain in 51 React page modules (scan using `rg "migration scaffold|scaffold" client/src/pages`).
 
 ## Completion Checklist
@@ -45,7 +45,7 @@ Legend: `[x]` done, `[~]` partial, `[ ]` not done
 - [x] Core read/list pages for topics/arguments/questions/issues/opinions/answers/artifacts exist.
 - [x] Create topic flow backed by real API mutation.
 - [x] Create argument flow backed by real API mutation.
-- [ ] Create/edit flows for question/answer/issue/opinion/artifact in React.
+- [~] Create flows for question/answer/issue/opinion/artifact implemented in React; edit pages still pending.
 - [ ] Group create/manage flows backed by real API mutations.
 - [ ] Profile pages/create-page flows backed by real APIs.
 
@@ -60,7 +60,7 @@ Legend: `[x]` done, `[~]` partial, `[ ]` not done
 
 - [x] Versioned compatibility route (`/api/v1/*`) present.
 - [x] Realtime SSE baseline present (`/api/realtime/events`).
-- [~] Mutation endpoints for modern client workflows (topics/arguments implemented; broader entity coverage pending).
+- [~] Mutation endpoints for modern client workflows (topics/arguments/questions/answers/issues/opinions/artifacts implemented; groups/profile parity pending).
 - [ ] Standardized success envelope and typed DTOs for high-traffic endpoints.
 - [ ] OpenAPI/contract documentation for mobile/web shared clients.
 - [ ] Contract tests for critical auth + content mutation flows.

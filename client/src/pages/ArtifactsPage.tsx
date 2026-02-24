@@ -49,6 +49,11 @@ const ArtifactsPage: React.FC = () => {
             <span className="glyphicon glyphicon-picture" aria-hidden="true"></span> Artifacts
           </h2>
           <p className="lead">Browse media, documents, and other artifacts</p>
+          <p>
+            <Link to="/artifacts/create" className="btn btn-primary">
+              <span className="glyphicon glyphicon-plus"></span> Add Artifact
+            </Link>
+          </p>
           
           <div className="panel panel-default">
             <div className="panel-heading">

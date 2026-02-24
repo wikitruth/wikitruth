@@ -6,6 +6,8 @@ describe('routeConfig', () => {
     expect(paths).toContain('/');
     expect(paths).toContain('/login');
     expect(paths).toContain('/topics');
+    expect(paths).toContain('/questions/create');
+    expect(paths).toContain('/answers/create');
     expect(paths).toContain('/admin');
     expect(paths).toContain('*');
   });

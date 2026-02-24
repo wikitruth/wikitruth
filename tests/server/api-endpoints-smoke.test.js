@@ -75,13 +75,28 @@ describe('API endpoint smoke coverage', function () {
     expect(realtimeApi).toContain("res.setHeader('Content-Type', 'text/event-stream')");
   });
 
-  it('exposes topic and argument create mutation handlers for modern forms', function () {
+  it('exposes content mutation handlers required by modern create/edit forms', function () {
     const topicsApi = read('controllers/api/topics.ts');
     const argumentsApi = read('controllers/api/arguments.ts');
+    const questionsApi = read('controllers/api/questions.ts');
+    const answersApi = read('controllers/api/answers.ts');
+    const issuesApi = read('controllers/api/issues.ts');
+    const opinionsApi = read('controllers/api/opinions.ts');
+    const artifactsApi = read('controllers/api/artifacts.ts');
 
     expect(topicsApi).toContain("router.post('/',");
     expect(topicsApi).toContain('POST_topic_create');
     expect(argumentsApi).toContain("router.post('/',");
     expect(argumentsApi).toContain('POST_argument_create');
+    expect(questionsApi).toContain("router.post('/',");
+    expect(questionsApi).toContain("router.put('/entry/:id'");
+    expect(answersApi).toContain("router.post('/',");
+    expect(answersApi).toContain("router.put('/entry/:id'");
+    expect(issuesApi).toContain("router.post('/',");
+    expect(issuesApi).toContain("router.put('/entry/:id'");
+    expect(opinionsApi).toContain("router.post('/',");
+    expect(opinionsApi).toContain("router.put('/entry/:id'");
+    expect(artifactsApi).toContain("router.post('/',");
+    expect(artifactsApi).toContain("router.put('/entry/:id'");
   });
 });

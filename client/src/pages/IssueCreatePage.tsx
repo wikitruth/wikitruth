@@ -1,0 +1,170 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Breadcrumb from '../components/common/Breadcrumb';
+import PageHeader from '../components/common/PageHeader';
+import Input from '../components/Form/Input';
+import TextArea from '../components/Form/TextArea';
+import Select from '../components/Form/Select';
+import Checkbox from '../components/Form/Checkbox';
+import Button from '../components/common/Button';
+import Alert from '../components/common/Alert';
+import useForm from '../hooks/useForm';
+import apiService from '../services/api';
+
+interface IssueFormValues {
+  title: string;
+  description: string;
+  topicId: string;
+  issueType: string;
+  private: boolean;
+}
+
+const IssueCreatePage: React.FC = () => {
+  const navigate = useNavigate();
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+
+  const validate = (values: IssueFormValues) => {
+    const errors: Partial<Record<keyof IssueFormValues, string>> = {};
+
+    if (!values.title || values.title.trim().length < 3) {
+      errors.title = 'Title must be at least 3 characters';
+    }
+
+    if (!values.description || values.description.trim().length < 10) {
+      errors.description = 'Description must be at least 10 characters';
+    }
+
+    return errors;
+  };
+
+  const handleSubmit = async (values: IssueFormValues) => {
+    setSubmitError(null);
+    setSubmitSuccess(false);
+
+    try {
+      await apiService.createIssue({
+        title: values.title,
+        description: values.description,
+        topicId: values.topicId || undefined,
+        issueType: Number(values.issueType || '100'),
+        private: values.private,
+      });
+
+      setSubmitSuccess(true);
+      setTimeout(() => {
+        navigate('/issues');
+      }, 1200);
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : 'Failed to create issue');
+    }
+  };
+
+  const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit: onSubmit } = useForm<IssueFormValues>({
+    initialValues: {
+      title: '',
+      description: '',
+      topicId: '',
+      issueType: '100',
+      private: false,
+    },
+    validate,
+    onSubmit: handleSubmit,
+  });
+
+  return (
+    <div>
+      <Breadcrumb
+        items={[
+          { title: 'Home', url: '/' },
+          { title: 'Issues', url: '/issues' },
+          { title: 'Report Issue', active: true },
+        ]}
+      />
+
+      <PageHeader title="Report Issue" subtitle="Raise a problem or concern" icon="exclamation-triangle" iconColor="text-warning" />
+
+      {submitSuccess && <Alert type="success">Issue created successfully. Redirecting...</Alert>}
+      {submitError && (
+        <Alert type="danger" dismissible onDismiss={() => setSubmitError(null)}>
+          {submitError}
+        </Alert>
+      )}
+
+      <div className="panel panel-default">
+        <div className="panel-body">
+          <form onSubmit={onSubmit}>
+            <Input
+              name="title"
+              label="Issue title"
+              value={values.title}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              placeholder="Describe the issue briefly"
+              required
+              error={touched.title ? errors.title : undefined}
+            />
+
+            <TextArea
+              name="description"
+              label="Issue details"
+              value={values.description}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              placeholder="Provide full details of the issue"
+              required
+              rows={6}
+              error={touched.description ? errors.description : undefined}
+            />
+
+            <Select
+              name="issueType"
+              label="Issue type"
+              value={values.issueType}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              options={[
+                { value: '10', label: 'Logical fallacy (critical)' },
+                { value: '20', label: 'Biased or flawed reasoning (critical)' },
+                { value: '30', label: 'Terminology issue (critical)' },
+                { value: '40', label: 'Unwelcome content (critical)' },
+                { value: '45', label: 'Other issue (critical)' },
+                { value: '50', label: 'Incoherent or unrelated' },
+                { value: '60', label: 'Too broad or multiple topics' },
+                { value: '70', label: 'Unsubstantiated claim' },
+                { value: '100', label: 'Other issue (warning)' },
+              ]}
+            />
+
+            <Input
+              name="topicId"
+              label="Topic ID (optional)"
+              value={values.topicId}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              placeholder="Attach this issue to a topic"
+            />
+
+            <Checkbox
+              name="private"
+              label="Make this issue private"
+              checked={values.private}
+              onChange={handleChange}
+            />
+
+            <div className="form-group" style={{ marginTop: '24px' }}>
+              <Button type="submit" variant="warning" disabled={isSubmitting} icon={isSubmitting ? 'spinner fa-spin' : 'check'}>
+                {isSubmitting ? 'Submitting...' : 'Create Issue'}
+              </Button>{' '}
+              <Button type="button" variant="default" onClick={() => navigate('/issues')} disabled={isSubmitting} icon="times">
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default IssueCreatePage;

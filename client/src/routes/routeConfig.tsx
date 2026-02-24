@@ -30,13 +30,18 @@ const ArgumentsPage = lazy(() => import('../pages/ArgumentsPage'));
 const ArgumentCreatePage = lazy(() => import('../pages/ArgumentCreatePage'));
 const ArgumentEntryPage = lazy(() => import('../pages/ArgumentEntryPage'));
 const QuestionsPage = lazy(() => import('../pages/QuestionsPage'));
+const QuestionCreatePage = lazy(() => import('../pages/QuestionCreatePage'));
 const QuestionEntryPage = lazy(() => import('../pages/QuestionEntryPage'));
 const IssuesPage = lazy(() => import('../pages/IssuesPage'));
+const IssueCreatePage = lazy(() => import('../pages/IssueCreatePage'));
 const IssueEntryPage = lazy(() => import('../pages/IssueEntryPage'));
 const OpinionsPage = lazy(() => import('../pages/OpinionsPage'));
+const OpinionCreatePage = lazy(() => import('../pages/OpinionCreatePage'));
 const OpinionEntryPage = lazy(() => import('../pages/OpinionEntryPage'));
 const AnswersPage = lazy(() => import('../pages/AnswersPage'));
+const AnswerCreatePage = lazy(() => import('../pages/AnswerCreatePage'));
 const ArtifactsPage = lazy(() => import('../pages/ArtifactsPage'));
+const ArtifactCreatePage = lazy(() => import('../pages/ArtifactCreatePage'));
 const GroupsPage = lazy(() => import('../pages/GroupsPage'));
 const GroupsIndex = lazy(() => import('../pages/Groups/GroupsIndex'));
 const GroupCreate = lazy(() => import('../pages/Groups/GroupCreate'));
@@ -104,13 +109,18 @@ export const appRoutes: AppRoute[] = [
   { path: '/arguments/create', element: <ArgumentCreatePage /> },
   { path: '/arguments/entry/:friendlyUrl/:id', element: <ArgumentEntryPage /> },
   { path: '/questions', element: <QuestionsPage /> },
+  { path: '/questions/create', element: <QuestionCreatePage /> },
   { path: '/questions/entry/:friendlyUrl/:id', element: <QuestionEntryPage /> },
   { path: '/issues', element: <IssuesPage /> },
+  { path: '/issues/create', element: <IssueCreatePage /> },
   { path: '/issues/entry/:friendlyUrl/:id', element: <IssueEntryPage /> },
   { path: '/opinions', element: <OpinionsPage /> },
+  { path: '/opinions/create', element: <OpinionCreatePage /> },
   { path: '/opinions/entry/:friendlyUrl/:id', element: <OpinionEntryPage /> },
   { path: '/answers', element: <AnswersPage /> },
+  { path: '/answers/create', element: <AnswerCreatePage /> },
   { path: '/artifacts', element: <ArtifactsPage /> },
+  { path: '/artifacts/create', element: <ArtifactCreatePage /> },
   { path: '/groups', element: <GroupsPage /> },
   { path: '/groups/index', element: <GroupsIndex /> },
   { path: '/groups/create', element: <GroupCreate /> },

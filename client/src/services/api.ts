@@ -110,6 +110,19 @@ class ApiService {
     return this.request(`/questions/entry/${id}`);
   }
 
+  async createQuestion(payload: {
+    title: string;
+    description: string;
+    topicId?: string;
+    private?: boolean;
+    references?: string;
+  }) {
+    return this.request('/questions', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
   // Issues
   async getIssues(topicId?: string) {
     const url = topicId ? `/issues?topic=${topicId}` : '/issues';
@@ -118,6 +131,19 @@ class ApiService {
 
   async getIssueEntry(id: string) {
     return this.request(`/issues/entry/${id}`);
+  }
+
+  async createIssue(payload: {
+    title: string;
+    description: string;
+    topicId?: string;
+    private?: boolean;
+    issueType?: number;
+  }) {
+    return this.request('/issues', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
   }
 
   // Opinions
@@ -130,6 +156,19 @@ class ApiService {
     return this.request(`/opinions/entry/${id}`);
   }
 
+  async createOpinion(payload: {
+    title: string;
+    description: string;
+    topicId?: string;
+    parentId?: string;
+    private?: boolean;
+  }) {
+    return this.request('/opinions', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
   // Answers
   async getAnswers(questionId?: string) {
     const url = questionId ? `/answers?question=${questionId}` : '/answers';
@@ -140,6 +179,19 @@ class ApiService {
     return this.request(`/answers/entry/${id}`);
   }
 
+  async createAnswer(payload: {
+    title: string;
+    description: string;
+    questionId: string;
+    private?: boolean;
+    references?: string;
+  }) {
+    return this.request('/answers', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
   // Artifacts
   async getArtifacts(topicId?: string) {
     const url = topicId ? `/artifacts?topic=${topicId}` : '/artifacts';
@@ -148,6 +200,19 @@ class ApiService {
 
   async getArtifactEntry(id: string) {
     return this.request(`/artifacts/entry/${id}`);
+  }
+
+  async createArtifact(payload: {
+    title: string;
+    description: string;
+    topicId?: string;
+    private?: boolean;
+    source?: string;
+  }) {
+    return this.request('/artifacts', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
   }
 
   // Search
