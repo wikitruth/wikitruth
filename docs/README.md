@@ -17,6 +17,10 @@ This folder contains active engineering documentation and archived migration art
 
 - Frontend docs folder: `docs/frontend/`
 
+## API Contracts
+
+- OpenAPI contract: `docs/api/openapi.json`
+
 ## Reports
 
 - Accessibility: `docs/accessibility/`

@@ -21,7 +21,8 @@ This audit answers three questions:
 - Forgot/reset pages now call auth APIs with token-aware UX in React.
 - Legacy server still owns OAuth routes (`/login/google`, `/login/github`, `/login/facebook`, `/login/twitter`, and signup/account variants) in `middlewares/routes.ts`.
 - Apple and Microsoft OAuth strategies are now configured in `middlewares/passport.ts` and wired through legacy auth/account routes used by the modern client redirect flow.
-- API surface now includes create/update mutations for topics, arguments, questions, answers, issues, opinions, artifacts, groups, and profile custom pages; contract standardization is still pending.
+- API surface now includes create/update mutations for topics, arguments, questions, answers, issues, opinions, artifacts, groups, and profile custom pages with documented contract DTOs.
+- OpenAPI contract now documents auth + core content mutation request/response DTOs in `docs/api/openapi.json`.
 - Migration scaffolds remain in 20 React page modules, primarily legacy comparison pages under `client/src/pages/Wiki/*` (scan using `rg "migration scaffold|scaffold" client/src/pages`).
 
 ## Completion Checklist
@@ -61,9 +62,9 @@ Legend: `[x]` done, `[~]` partial, `[ ]` not done
 - [x] Versioned compatibility route (`/api/v1/*`) present.
 - [x] Realtime SSE baseline present (`/api/realtime/events`).
 - [x] Mutation endpoints for modern client workflows (topics/arguments/questions/answers/issues/opinions/artifacts/groups/profile implemented).
-- [ ] Standardized success envelope and typed DTOs for high-traffic endpoints.
-- [ ] OpenAPI/contract documentation for mobile/web shared clients.
-- [ ] Contract tests for critical auth + content mutation flows.
+- [x] Standardized success envelope and typed DTOs for high-traffic endpoints.
+- [x] OpenAPI/contract documentation for mobile/web shared clients.
+- [x] Contract tests for critical auth + content mutation flows.
 
 ### E. Migration Completion and Quality Gates
 

@@ -1,0 +1,640 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Wikitruth API",
+    "version": "1.0.0",
+    "description": "Modern client and shared contract surface for auth and core content mutations."
+  },
+  "servers": [
+    { "url": "/api" }
+  ],
+  "paths": {
+    "/auth/me": {
+      "get": {
+        "summary": "Get current session user",
+        "responses": {
+          "200": {
+            "description": "Authenticated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthUserResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthUserResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/signup": {
+      "post": {
+        "summary": "Create account",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SignupRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthUserResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/LoginRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logged in",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AuthUserResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "summary": "Logout",
+        "responses": {
+          "200": {
+            "description": "Logged out",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SuccessMessageResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "summary": "Generate password reset token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ForgotPasswordRequest" }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SuccessMessageResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/reset-password": {
+      "post": {
+        "summary": "Reset password",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ResetPasswordRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SuccessMessageResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/topics": {
+      "post": {
+        "summary": "Create topic",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/TopicMutationRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TopicMutationResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/arguments": {
+      "post": {
+        "summary": "Create argument",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ArgumentMutationRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ArgumentMutationResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/questions": {
+      "post": {
+        "summary": "Create question",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/QuestionMutationRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/QuestionMutationResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/questions/entry/{id}": {
+      "put": {
+        "summary": "Update question",
+        "parameters": [{ "$ref": "#/components/parameters/Id" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/QuestionMutationRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/QuestionMutationResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/answers": {
+      "post": {
+        "summary": "Create answer",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AnswerMutationRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnswerMutationResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/answers/entry/{id}": {
+      "put": {
+        "summary": "Update answer",
+        "parameters": [{ "$ref": "#/components/parameters/Id" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AnswerMutationRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AnswerMutationResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/issues": {
+      "post": {
+        "summary": "Create issue",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/IssueMutationRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/IssueMutationResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/issues/entry/{id}": {
+      "put": {
+        "summary": "Update issue",
+        "parameters": [{ "$ref": "#/components/parameters/Id" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/IssueMutationRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/IssueMutationResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/opinions": {
+      "post": {
+        "summary": "Create opinion",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/OpinionMutationRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/OpinionMutationResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/opinions/entry/{id}": {
+      "put": {
+        "summary": "Update opinion",
+        "parameters": [{ "$ref": "#/components/parameters/Id" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/OpinionMutationRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/OpinionMutationResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/artifacts": {
+      "post": {
+        "summary": "Create artifact",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ArtifactMutationRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ArtifactMutationResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/artifacts/entry/{id}": {
+      "put": {
+        "summary": "Update artifact",
+        "parameters": [{ "$ref": "#/components/parameters/Id" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ArtifactMutationRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ArtifactMutationResponse" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "Id": {
+        "name": "id",
+        "in": "path",
+        "required": true,
+        "schema": { "type": "string" }
+      }
+    },
+    "schemas": {
+      "ApiUser": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "username": { "type": "string" },
+          "email": { "type": "string" }
+        },
+        "required": ["_id", "username"]
+      },
+      "AuthUserResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "message": { "type": "string" },
+          "user": {
+            "oneOf": [
+              { "$ref": "#/components/schemas/ApiUser" },
+              { "type": "null" }
+            ]
+          }
+        },
+        "required": ["success", "user"]
+      },
+      "SuccessMessageResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "message": { "type": "string" }
+        },
+        "required": ["success"]
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "username": { "type": "string" },
+          "password": { "type": "string" }
+        },
+        "required": ["username", "password"]
+      },
+      "SignupRequest": {
+        "type": "object",
+        "properties": {
+          "username": { "type": "string" },
+          "email": { "type": "string" },
+          "password": { "type": "string" }
+        },
+        "required": ["username", "email", "password"]
+      },
+      "ForgotPasswordRequest": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string" }
+        },
+        "required": ["email"]
+      },
+      "ResetPasswordRequest": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string" },
+          "token": { "type": "string" },
+          "password": { "type": "string" }
+        },
+        "required": ["email", "token", "password"]
+      },
+      "MutationBase": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "title": { "type": "string" },
+          "friendlyUrl": { "type": "string" },
+          "content": { "type": "string" },
+          "private": { "type": "boolean" },
+          "createDate": { "type": "string", "format": "date-time" },
+          "editDate": { "type": "string", "format": "date-time" }
+        },
+        "required": ["_id", "title", "content"]
+      },
+      "TopicMutationRequest": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "topicId": { "type": "string" },
+          "private": { "type": "boolean" },
+          "tags": { "type": "string" }
+        },
+        "required": ["title", "description"]
+      },
+      "TopicMutationResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "topic": { "$ref": "#/components/schemas/MutationBase" }
+        },
+        "required": ["success", "topic"]
+      },
+      "ArgumentMutationRequest": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "topicId": { "type": "string" },
+          "private": { "type": "boolean" },
+          "sources": { "type": "string" }
+        },
+        "required": ["title", "description"]
+      },
+      "ArgumentMutationResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "argument": { "$ref": "#/components/schemas/MutationBase" }
+        },
+        "required": ["success", "argument"]
+      },
+      "QuestionMutationRequest": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "topicId": { "type": "string" },
+          "private": { "type": "boolean" },
+          "references": { "type": "string" }
+        }
+      },
+      "QuestionMutationResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "question": { "$ref": "#/components/schemas/MutationBase" }
+        },
+        "required": ["success", "question"]
+      },
+      "AnswerMutationRequest": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "questionId": { "type": "string" },
+          "private": { "type": "boolean" },
+          "references": { "type": "string" }
+        }
+      },
+      "AnswerMutationResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "answer": { "$ref": "#/components/schemas/MutationBase" }
+        },
+        "required": ["success", "answer"]
+      },
+      "IssueMutationRequest": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "topicId": { "type": "string" },
+          "private": { "type": "boolean" },
+          "issueType": { "type": "number" }
+        }
+      },
+      "IssueMutationResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "issue": { "$ref": "#/components/schemas/MutationBase" }
+        },
+        "required": ["success", "issue"]
+      },
+      "OpinionMutationRequest": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "topicId": { "type": "string" },
+          "private": { "type": "boolean" }
+        }
+      },
+      "OpinionMutationResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "opinion": { "$ref": "#/components/schemas/MutationBase" }
+        },
+        "required": ["success", "opinion"]
+      },
+      "ArtifactMutationRequest": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "topicId": { "type": "string" },
+          "private": { "type": "boolean" },
+          "source": { "type": "string" }
+        }
+      },
+      "ArtifactMutationResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "artifact": { "$ref": "#/components/schemas/MutationBase" }
+        },
+        "required": ["success", "artifact"]
+      }
+    }
+  }
+}
