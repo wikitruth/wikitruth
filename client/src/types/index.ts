@@ -167,6 +167,7 @@ export interface Opinion {
 export interface Artifact {
   _id: string;
   title: string;
+  friendlyUrl?: string;
   description?: string;
   ownerType: string;
   ownerId?: string;

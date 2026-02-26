@@ -16,7 +16,7 @@ Close remaining parity gaps between legacy and modern flows, harden API contract
 - [x] Social auth redirect wiring exists in modern auth UI.
 - [x] Admin, groups, and profile modern pages exist with baseline API integrations.
 - [x] OpenAPI spec now covers the active modern API route surface.
-- [~] E2E test setup exists but only includes light smoke coverage.
+- [x] E2E critical-flow smoke coverage expanded for modern parity routes.
 - [ ] Discussion tabs in entry pages have no matching modern routes.
 - [x] `/visualize` modern route is now data-driven.
 - [x] Group posts modern route now has native read flow and create hooks.
@@ -73,7 +73,7 @@ Close remaining parity gaps between legacy and modern flows, harden API contract
     - `docs/api/openapi.json` includes the active route surface.
     - Validation step passes in CI.
 
-- [ ] **P1.2 Raise E2E coverage for critical flows**
+- [x] **P1.2 Raise E2E coverage for critical flows**
   - Add Playwright coverage for:
     - Auth social callback smoke
     - Group lifecycle and permissions
