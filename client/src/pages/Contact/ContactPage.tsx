@@ -3,6 +3,7 @@ import Alert from '../../components/common/Alert';
 import Button from '../../components/common/Button';
 import Input from '../../components/Form/Input';
 import TextArea from '../../components/Form/TextArea';
+import apiService from '../../services/api';
 
 const ContactPage: React.FC = () => {
   const [name, setName] = useState('');
@@ -10,6 +11,7 @@ const ContactPage: React.FC = () => {
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -22,12 +24,21 @@ const ContactPage: React.FC = () => {
     }
 
     try {
-      setStatus('Message queued. We will respond through your registered email.');
+      setSubmitting(true);
+      const result = await apiService.sendContactMessage({
+        name: name.trim(),
+        email: email.trim(),
+        message: message.trim(),
+      });
+
+      setStatus(result?.message || 'We have received your message. Thank you.');
       setName('');
       setEmail('');
       setMessage('');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to submit message');
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -45,7 +56,9 @@ const ContactPage: React.FC = () => {
             <Input name="name" label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
             <Input name="email" label="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
             <TextArea name="message" label="Message" value={message} onChange={(e) => setMessage(e.target.value)} rows={6} required />
-            <Button type="submit" variant="primary" icon="send">Send Message</Button>
+            <Button type="submit" variant="primary" icon={submitting ? 'spinner fa-spin' : 'send'} disabled={submitting}>
+              {submitting ? 'Sending...' : 'Send Message'}
+            </Button>
           </form>
         </div>
       </div>

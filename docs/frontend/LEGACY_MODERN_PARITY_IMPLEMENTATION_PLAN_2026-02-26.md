@@ -12,7 +12,7 @@ Close remaining functional gaps between the legacy templates/controllers and the
 - [x] P0.1 Fix broken My Diary navigation route in modern client.
 Acceptance criteria: Header `My Diary` link resolves to an implemented modern route and no longer lands on 404.
 
-- [ ] P0.2 Implement modern Contact form backend submission.
+- [x] P0.2 Implement modern Contact form backend submission.
 Acceptance criteria: Modern contact page submits to backend endpoint, includes validation, and returns success/error from server (not local-only mock success).
 
 - [ ] P0.3 Restore Fast Switch functional parity.

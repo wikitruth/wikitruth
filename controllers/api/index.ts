@@ -27,6 +27,7 @@ module.exports = function (router: Router) {
   const groupsRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const membersRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const authRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
+  const contactRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const adminRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const monitoringRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const realtimeRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
@@ -43,6 +44,7 @@ module.exports = function (router: Router) {
   (require('./groups') as (routerArg: Router) => void)(groupsRouter);
   (require('./members') as (routerArg: Router) => void)(membersRouter);
   (require('./auth') as (routerArg: Router) => void)(authRouter);
+  (require('./contact') as (routerArg: Router) => void)(contactRouter);
   (require('./admin') as (routerArg: Router) => void)(adminRouter);
   (require('./monitoring') as (routerArg: Router) => void)(monitoringRouter);
   (require('./realtime') as (routerArg: Router) => void)(realtimeRouter);
@@ -59,6 +61,7 @@ module.exports = function (router: Router) {
   router.use('/groups', groupsRouter);
   router.use('/members', membersRouter);
   router.use('/auth', authRouter);
+  router.use('/contact', contactRouter);
   router.use('/admin', adminRouter);
   router.use('/monitoring', monitoringRouter);
   router.use('/realtime', realtimeRouter);

@@ -31,6 +31,15 @@ class ApiService {
     this.cacheTtlMs = 60_000;
   }
 
+  private getCsrfToken(): string | null {
+    if (typeof document === 'undefined') {
+      return null;
+    }
+
+    const tokenMatch = document.cookie.match(/(?:^|;\s*)_csrfToken=([^;]+)/);
+    return tokenMatch ? decodeURIComponent(tokenMatch[1]) : null;
+  }
+
   private async request<T>(url: string, options?: RequestInit): Promise<T> {
     const method = options?.method?.toUpperCase() ?? 'GET';
     const cacheKey = `${method}:${url}`;
@@ -43,16 +52,35 @@ class ApiService {
       }
     }
 
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...(options?.headers as Record<string, string> | undefined),
+    };
+
+    if (method !== 'GET' && method !== 'HEAD') {
+      const csrfToken = this.getCsrfToken();
+      if (csrfToken) {
+        headers['x-csrf-token'] = csrfToken;
+      }
+    }
+
     const response = await fetch(`${this.baseUrl}${url}`, {
       ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options?.headers,
-      },
+      credentials: 'same-origin',
+      headers: headers,
     });
 
     if (!response.ok) {
-      throw new Error(`API request failed: ${response.statusText}`);
+      let errorMessage = `API request failed: ${response.statusText}`;
+      try {
+        const errorPayload = (await response.json()) as { error?: string; message?: string };
+        if (errorPayload?.error || errorPayload?.message) {
+          errorMessage = errorPayload.error || errorPayload.message || errorMessage;
+        }
+      } catch (_err) {
+        // Keep default status message when the response has no JSON payload.
+      }
+      throw new Error(errorMessage);
     }
 
     const payload = (await response.json()) as T;
@@ -320,6 +348,13 @@ class ApiService {
   // Search
   async search(query: string): Promise<SearchResponse> {
     return this.request<SearchResponse>(`/search?q=${encodeURIComponent(query)}`);
+  }
+
+  async sendContactMessage(payload: { name: string; email: string; message: string; recaptchaResponse?: string }): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>('/contact', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
   }
 
   // Groups
