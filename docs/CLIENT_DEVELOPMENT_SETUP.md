@@ -4,8 +4,8 @@ This guide covers local setup for the React client migration work.
 
 ## Prerequisites
 
-- Node.js `>=22.4.1 <23`
-- npm `>=10.8.1 <11`
+- Node.js `>=22.4.1 <25` (recommended: `24.13.1`, see `.nvmrc`)
+- npm `>=10.8.1 <12`
 - Backend dependencies installed (`npm install` at repository root)
 
 ## Install Dependencies

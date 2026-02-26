@@ -6,7 +6,6 @@ import LoadingSpinner from '../../../components/LoadingSpinner';
 import Alert from '../../../components/common/Alert';
 import apiService from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
-import type { MemberPagesResponse, MemberProfileResponse } from '../../../types/api';
 import type { LegacyEntity } from '../../../types/legacy';
 
 const ProfilePage: React.FC = () => {
@@ -32,10 +31,10 @@ const ProfilePage: React.FC = () => {
 
       try {
         setLoading(true);
-        const [profileResult, pagesResult] = await Promise.all<[MemberProfileResponse, MemberPagesResponse]>([
+        const [profileResult, pagesResult] = await Promise.all([
           apiService.getMemberProfile(username),
           apiService.getMemberPages(username),
-        ]);
+        ] as const);
 
         setProfile((profileResult?.member || profileResult) as LegacyEntity);
         setPages(Array.isArray(pagesResult?.pages) ? pagesResult.pages : []);

@@ -6,11 +6,12 @@ import PageHeader from '../components/common/PageHeader';
 import PageTabs from '../components/common/PageTabs';
 import Alert from '../components/common/Alert';
 import apiService from '../services/api';
-import type { LegacyEntity, LegacyResponse } from '../types/legacy';
+import type { IssueEntryResponse } from '../types/api';
+import type { LegacyEntity } from '../types/legacy';
 
 const IssueEntryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [data, setData] = useState<LegacyResponse | null>(null);
+  const [data, setData] = useState<IssueEntryResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
