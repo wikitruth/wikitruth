@@ -35,7 +35,7 @@ Acceptance criteria: Related/child lists and discussion/context sections match l
 - [x] P1.5 Implement entry actions parity (more/options menu).
 Acceptance criteria: Modern entry option surface supports key legacy actions (edit/report/follow/share, role-aware admin and screener actions).
 
-- [ ] P1.6 Restore search behavior parity.
+- [x] P1.6 Restore search behavior parity.
 Acceptance criteria: Modern search supports content scope (`all/wiki/diary`), tab routing, and “view more” semantics aligned with legacy.
 
 - [ ] P1.7 Restore contextual sidebar/navigation parity.

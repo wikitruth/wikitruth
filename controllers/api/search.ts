@@ -13,12 +13,21 @@ type SearchModel = {
   };
 };
 
-function parseLimit(req: WikitruthRequest): number {
-  const raw = Number(req.query.limit);
-  if (!Number.isFinite(raw) || raw <= 0) {
-    return 20;
+type SearchTab = 'all' | 'topics' | 'arguments' | 'questions' | 'answers' | 'artifacts' | 'issues' | 'opinions';
+type SearchContent = 'all' | 'wiki' | 'diary';
+
+function parseLimit(req: WikitruthRequest, fallback: number): number {
+  const raw = req.query.limit;
+  if (typeof raw === 'undefined') {
+    return fallback;
   }
-  return Math.min(Math.floor(raw), 100);
+
+  const parsed = Number(raw);
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    return fallback;
+  }
+
+  return Math.min(Math.floor(parsed), 100);
 }
 
 function parseCursor(req: WikitruthRequest): Date | null {
@@ -35,17 +44,42 @@ function parseCursor(req: WikitruthRequest): Date | null {
   return parsed;
 }
 
-function buildRegexSearchQuery(query: string): Record<string, unknown> {
+function getCurrentUserId(req: WikitruthRequest): string | null {
+  const id = req.user?._id || req.user?.id;
+  if (!id) {
+    return null;
+  }
+  const normalized = String(id).trim();
+  return normalized.length > 0 ? normalized : null;
+}
+
+function normalizeTab(value: string): SearchTab {
+  const tab = value.trim().toLowerCase() as SearchTab;
+  const validTabs: SearchTab[] = ['all', 'topics', 'arguments', 'questions', 'answers', 'artifacts', 'issues', 'opinions'];
+  return validTabs.includes(tab) ? tab : 'all';
+}
+
+function normalizeContent(value: string): SearchContent {
+  const content = value.trim().toLowerCase() as SearchContent;
+  return content === 'wiki' || content === 'diary' ? content : 'all';
+}
+
+function buildRegexSearchFields(query: string, includeSource: boolean = false): Array<Record<string, unknown>> {
   const pattern = { $regex: query, $options: 'i' };
-  return {
-    $or: [{ title: pattern }, { content: pattern }, { contentPreview: pattern }, { references: pattern }],
-  };
+  const fields: Array<Record<string, unknown>> = [
+    { title: pattern },
+    { content: pattern },
+    { contentPreview: pattern },
+    { references: pattern },
+  ];
+  if (includeSource) {
+    fields.push({ source: pattern });
+  }
+  return fields;
 }
 
 function buildBaseQuery(screeningStatus: number | undefined, cursor: Date | null): Record<string, unknown> {
-  const base: Record<string, unknown> = {
-    private: false,
-  };
+  const base: Record<string, unknown> = {};
 
   if (typeof screeningStatus !== 'undefined') {
     base['screening.status'] = screeningStatus;
@@ -58,26 +92,33 @@ function buildBaseQuery(screeningStatus: number | undefined, cursor: Date | null
   return base;
 }
 
-function findNextCursorDate(resultSets: Array<Array<{ editDate?: unknown }>>): string | null {
-  const candidate = resultSets
-    .map(function (set) {
-      if (!Array.isArray(set) || set.length === 0) {
-        return null;
-      }
-      const last = set[set.length - 1];
-      const value = last?.editDate;
-      if (!value) {
-        return null;
-      }
-      const parsed = new Date(value as string | number | Date);
-      return Number.isNaN(parsed.getTime()) ? null : parsed;
-    })
-    .filter(Boolean)
-    .sort(function (a, b) {
-      return (a as Date).getTime() - (b as Date).getTime();
-    })[0] as Date | undefined;
+function buildPrivacyFilter(content: SearchContent, req: WikitruthRequest): Array<Record<string, unknown>> {
+  const currentUserId = getCurrentUserId(req);
 
-  return candidate ? candidate.toISOString() : null;
+  switch (content) {
+    case 'wiki':
+      return [{ private: false }];
+    case 'diary':
+      return currentUserId ? [{ private: true, createUserId: currentUserId }] : [{ private: false }];
+    case 'all':
+    default:
+      return currentUserId
+        ? [{ private: false }, { private: true, createUserId: currentUserId }]
+        : [{ private: false }];
+  }
+}
+
+function buildSectionQuery(
+  baseQuery: Record<string, unknown>,
+  searchFields: Array<Record<string, unknown>>,
+  privacyFilter: Array<Record<string, unknown>>,
+  extraQuery: Record<string, unknown> = {}
+): Record<string, unknown> {
+  return {
+    ...baseQuery,
+    ...extraQuery,
+    $and: [{ $or: searchFields }, { $or: privacyFilter }],
+  };
 }
 
 module.exports = function (router: Router) {
@@ -92,12 +133,19 @@ module.exports = function (router: Router) {
 };
 
 async function GET_search(req: WikitruthRequest, res: WikitruthResponse) {
-  const query = String(req.query.q || '').trim();
-  const limit = parseLimit(req);
+  const keyword = String(req.query.q || '').trim();
+  const tab = normalizeTab(String(req.query.tab || 'all'));
+  const content = normalizeContent(String(req.query.content || 'all'));
+  const allTabs = tab === 'all';
+  const maxResult = 15;
+  const limit = parseLimit(req, allTabs ? maxResult : 0);
   const cursor = parseCursor(req);
 
-  if (!query) {
+  if (!keyword) {
     return res.json({
+      tab: tab,
+      content: content,
+      results: false,
       topics: [],
       arguments: [],
       questions: [],
@@ -105,18 +153,16 @@ async function GET_search(req: WikitruthRequest, res: WikitruthResponse) {
       artifacts: [],
       issues: [],
       opinions: [],
-      pagination: {
-        limit: limit,
-        cursor: cursor ? cursor.toISOString() : null,
-        nextCursor: null,
-      },
     });
   }
 
   const model: SearchModel = {};
   flowUtils.setScreeningModel(req, model);
-  const screeningStatus = model.screening?.status;
-  const baseQuery = buildBaseQuery(screeningStatus, cursor);
+  const baseQuery = buildBaseQuery(model.screening?.status, cursor);
+  const privacyFilter = buildPrivacyFilter(content, req);
+  const shouldLoad = function (section: SearchTab) {
+    return allTabs || tab === section;
+  };
 
   const [
     topicResults,
@@ -127,21 +173,27 @@ async function GET_search(req: WikitruthRequest, res: WikitruthResponse) {
     issueResults,
     opinionResults,
   ] = await Promise.all([
-    db.Topic.find({ ...baseQuery, ...buildRegexSearchQuery(query) }).sort({ editDate: -1 }).limit(limit).lean(),
-    db.Argument.find({ ...baseQuery, ...buildRegexSearchQuery(query) }).sort({ editDate: -1 }).limit(limit).lean(),
-    db.Question.find({ ...baseQuery, ...buildRegexSearchQuery(query) }).sort({ editDate: -1 }).limit(limit).lean(),
-    db.Answer.find({ ...baseQuery, ...buildRegexSearchQuery(query) }).sort({ editDate: -1 }).limit(limit).lean(),
-    db.Artifact
-      .find({
-        ...baseQuery,
-        ...buildRegexSearchQuery(query),
-        $or: [...(buildRegexSearchQuery(query).$or as Array<Record<string, unknown>>), { source: { $regex: query, $options: 'i' } }],
-      })
-      .sort({ editDate: -1 })
-      .limit(limit)
-      .lean(),
-    db.Issue.find({ ...baseQuery, ...buildRegexSearchQuery(query) }).sort({ editDate: -1 }).limit(limit).lean(),
-    db.Opinion.find({ ...baseQuery, ...buildRegexSearchQuery(query) }).sort({ editDate: -1 }).limit(limit).lean(),
+    shouldLoad('topics')
+      ? db.Topic.find(buildSectionQuery(baseQuery, buildRegexSearchFields(keyword), privacyFilter)).sort({ editDate: -1 }).limit(limit).lean()
+      : [],
+    shouldLoad('arguments')
+      ? db.Argument.find(buildSectionQuery(baseQuery, buildRegexSearchFields(keyword), privacyFilter)).sort({ editDate: -1 }).limit(limit).lean()
+      : [],
+    shouldLoad('questions')
+      ? db.Question.find(buildSectionQuery(baseQuery, buildRegexSearchFields(keyword), privacyFilter)).sort({ editDate: -1 }).limit(limit).lean()
+      : [],
+    shouldLoad('answers')
+      ? db.Answer.find(buildSectionQuery(baseQuery, buildRegexSearchFields(keyword), privacyFilter)).sort({ editDate: -1 }).limit(limit).lean()
+      : [],
+    shouldLoad('artifacts')
+      ? db.Artifact.find(buildSectionQuery(baseQuery, buildRegexSearchFields(keyword, true), privacyFilter)).sort({ editDate: -1 }).limit(limit).lean()
+      : [],
+    shouldLoad('issues')
+      ? db.Issue.find(buildSectionQuery(baseQuery, buildRegexSearchFields(keyword), privacyFilter)).sort({ editDate: -1 }).limit(limit).lean()
+      : [],
+    shouldLoad('opinions')
+      ? db.Opinion.find(buildSectionQuery(baseQuery, buildRegexSearchFields(keyword), privacyFilter)).sort({ editDate: -1 }).limit(limit).lean()
+      : [],
   ]);
 
   await flowUtils.setEditorsUsername(topicResults);
@@ -187,17 +239,19 @@ async function GET_search(req: WikitruthRequest, res: WikitruthResponse) {
     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.opinion, req);
   });
 
-  const nextCursor = findNextCursorDate([
-    topicResults,
-    argumentResults,
-    questionResults,
-    answerResults,
-    artifactResults,
-    issueResults,
-    opinionResults,
-  ]);
+  const anyResults =
+    topicResults.length > 0 ||
+    argumentResults.length > 0 ||
+    questionResults.length > 0 ||
+    answerResults.length > 0 ||
+    artifactResults.length > 0 ||
+    issueResults.length > 0 ||
+    opinionResults.length > 0;
 
   res.json({
+    tab: tab,
+    content: content,
+    results: allTabs ? anyResults : true,
     topics: topicResults,
     arguments: argumentResults,
     questions: questionResults,
@@ -205,10 +259,12 @@ async function GET_search(req: WikitruthRequest, res: WikitruthResponse) {
     artifacts: artifactResults,
     issues: issueResults,
     opinions: opinionResults,
-    pagination: {
-      limit: limit,
-      cursor: cursor ? cursor.toISOString() : null,
-      nextCursor: nextCursor,
-    },
+    topicsMore: allTabs && topicResults.length >= maxResult,
+    argumentsMore: allTabs && argumentResults.length >= maxResult,
+    questionsMore: allTabs && questionResults.length >= maxResult,
+    answersMore: allTabs && answerResults.length >= maxResult,
+    artifactsMore: allTabs && artifactResults.length >= maxResult,
+    issuesMore: allTabs && issueResults.length >= maxResult,
+    opinionsMore: allTabs && opinionResults.length >= maxResult,
   });
 }

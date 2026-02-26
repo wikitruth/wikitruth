@@ -347,8 +347,26 @@ class ApiService {
   }
 
   // Search
-  async search(query: string): Promise<SearchResponse> {
-    return this.request<SearchResponse>(`/search?q=${encodeURIComponent(query)}`);
+  async search(
+    query: string,
+    options?: {
+      tab?: string;
+      content?: string;
+      limit?: number;
+    }
+  ): Promise<SearchResponse> {
+    const params = new URLSearchParams();
+    params.set('q', query);
+    if (options?.tab && options.tab !== 'all') {
+      params.set('tab', options.tab);
+    }
+    if (options?.content) {
+      params.set('content', options.content);
+    }
+    if (typeof options?.limit === 'number') {
+      params.set('limit', String(options.limit));
+    }
+    return this.request<SearchResponse>(`/search?${params.toString()}`);
   }
 
   async sendContactMessage(payload: { name: string; email: string; message: string; recaptchaResponse?: string }): Promise<LegacyApiResponse> {

@@ -29,7 +29,18 @@ export interface HomeDataResponse extends ApiBaseResponse, EntityBuckets {
   artifactsMore?: boolean;
 }
 
-export interface SearchResponse extends ApiBaseResponse, EntityBuckets {}
+export interface SearchResponse extends ApiBaseResponse, EntityBuckets {
+  tab?: string;
+  content?: string;
+  results?: boolean;
+  topicsMore?: boolean;
+  argumentsMore?: boolean;
+  questionsMore?: boolean;
+  answersMore?: boolean;
+  artifactsMore?: boolean;
+  issuesMore?: boolean;
+  opinionsMore?: boolean;
+}
 
 export interface TopicEntryResponse extends ApiBaseResponse {
   topic?: LegacyEntity;
