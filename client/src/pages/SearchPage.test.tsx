@@ -3,6 +3,7 @@ import SearchPage from './SearchPage';
 import { render, screen, waitFor } from '../test-utils/render';
 
 const mockSearch = jest.fn();
+const mockUseAuth = jest.fn();
 
 jest.mock('../services/api', () => ({
   __esModule: true,
@@ -11,34 +12,70 @@ jest.mock('../services/api', () => ({
   },
 }));
 
+jest.mock('../context/AuthContext', () => ({
+  useAuth: () => mockUseAuth(),
+}));
+
 describe('SearchPage', () => {
   beforeEach(() => {
     mockSearch.mockReset();
+    mockUseAuth.mockReset();
+    mockUseAuth.mockReturnValue({ user: null });
   });
 
-  it('renders parity result buckets returned by search API', async () => {
+  it('requests all-tab search and renders bucket sections with view-more links', async () => {
     mockSearch.mockResolvedValue({
+      tab: 'all',
+      content: 'all',
+      results: true,
       topics: [{ _id: 't1', title: 'Topic One', friendlyUrl: 'topic-one' }],
       arguments: [{ _id: 'a1', title: 'Argument One', friendlyUrl: 'argument-one' }],
-      questions: [{ _id: 'q1', title: 'Question One', friendlyUrl: 'question-one' }],
-      answers: [{ _id: 'an1', title: 'Answer One' }],
-      issues: [{ _id: 'i1', title: 'Issue One', friendlyUrl: 'issue-one' }],
-      opinions: [{ _id: 'o1', title: 'Opinion One', friendlyUrl: 'opinion-one' }],
-      artifacts: [{ _id: 'ar1', title: 'Artifact One', friendlyUrl: 'artifact-one' }],
+      questions: [],
+      answers: [],
+      artifacts: [],
+      issues: [],
+      opinions: [],
+      topicsMore: true,
+      argumentsMore: true,
     });
 
     render(<SearchPage />, { route: '/search?q=truth' });
 
     await waitFor(() => {
-      expect(screen.getByText(/found/i)).toBeInTheDocument();
+      expect(mockSearch).toHaveBeenCalledWith('truth', { tab: 'all', content: 'all' });
     });
 
-    expect(screen.getByText(/topics \(1\)/i)).toBeInTheDocument();
-    expect(screen.getByText(/arguments \(1\)/i)).toBeInTheDocument();
-    expect(screen.getByText(/questions \(1\)/i)).toBeInTheDocument();
-    expect(screen.getByText(/answers \(1\)/i)).toBeInTheDocument();
-    expect(screen.getByText(/issues \(1\)/i)).toBeInTheDocument();
-    expect(screen.getByText(/opinions \(1\)/i)).toBeInTheDocument();
-    expect(screen.getByText(/artifacts \(1\)/i)).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /all/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /topics/i })).toBeInTheDocument();
+    expect(screen.getByText(/topic one/i)).toBeInTheDocument();
+    expect(screen.getByText(/argument one/i)).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /view more/i }).length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('passes tab/content from query params and renders scoped radios for authenticated users', async () => {
+    mockUseAuth.mockReturnValue({ user: { _id: 'u1', username: 'demo' } });
+    mockSearch.mockResolvedValue({
+      tab: 'topics',
+      content: 'diary',
+      results: true,
+      topics: [{ _id: 't2', title: 'Diary Topic', friendlyUrl: 'diary-topic' }],
+      arguments: [],
+      questions: [],
+      answers: [],
+      artifacts: [],
+      issues: [],
+      opinions: [],
+    });
+
+    render(<SearchPage />, { route: '/search?q=journal&tab=topics&content=diary' });
+
+    await waitFor(() => {
+      expect(mockSearch).toHaveBeenCalledWith('journal', { tab: 'topics', content: 'diary' });
+    });
+
+    expect(screen.getByLabelText(/all content/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/public wiki/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/my diary/i)).toBeInTheDocument();
+    expect(screen.getByText(/diary topic/i)).toBeInTheDocument();
   });
 });

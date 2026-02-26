@@ -14,6 +14,18 @@ describe('routeConfig', () => {
     expect(paths).toContain('*');
   });
 
+  it('keeps parity-critical modern routes wired', () => {
+    const paths = appRoutes.map((route) => route.path);
+    expect(paths).toContain('/members/:username/diary');
+    expect(paths).toContain('/members/profile/diary');
+    expect(paths).toContain('/contact');
+    expect(paths).toContain('/fast-switch');
+    expect(paths).toContain('/members/:username/contributions');
+    expect(paths).toContain('/members/profile/contributions');
+    expect(paths).toContain('/account/settings');
+    expect(paths).toContain('/search');
+  });
+
   it('includes tab-driven entry subroutes so navigation does not 404', () => {
     const paths = appRoutes.map((route) => route.path);
     expect(paths).toContain('/topics/entry/:friendlyUrl/:id/discussion');

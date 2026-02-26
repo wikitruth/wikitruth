@@ -52,7 +52,7 @@ Acceptance criteria: If artifacts exist in home payload, modern home renders an 
 - [x] P2.2 Resolve or retire unwired migration scaffolds under `client/src/pages/Wiki/*`.
 Acceptance criteria: Each scaffold page is either fully wired and implemented or documented as deferred/retired with explicit rationale.
 
-- [ ] P2.3 Add regression tests for parity-critical routes.
+- [x] P2.3 Add regression tests for parity-critical routes.
 Acceptance criteria: Tests cover P0/P1 route behavior for diary/contact/fast-switch/contributions/account-settings/search and fail on regressions.
 
 ## Cross-Cutting Implementation Rules
