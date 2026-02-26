@@ -67,7 +67,7 @@ const ArgumentEntryPage: React.FC = () => {
         iconColor="text-primary"
       />
       
-      <PageTabs tabs={tabs} activeTab="overview" />
+      <PageTabs tabs={tabs} />
 
       {/* Verdict Badge */}
       {argument.verdict?.result && (

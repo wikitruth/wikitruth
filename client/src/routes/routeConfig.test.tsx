@@ -11,4 +11,14 @@ describe('routeConfig', () => {
     expect(paths).toContain('/admin');
     expect(paths).toContain('*');
   });
+
+  it('includes tab-driven entry subroutes so navigation does not 404', () => {
+    const paths = appRoutes.map((route) => route.path);
+    expect(paths).toContain('/topics/entry/:friendlyUrl/:id/discussion');
+    expect(paths).toContain('/arguments/entry/:friendlyUrl/:id/discussion');
+    expect(paths).toContain('/questions/entry/:friendlyUrl/:id/answers');
+    expect(paths).toContain('/questions/entry/:friendlyUrl/:id/discussion');
+    expect(paths).toContain('/issues/entry/:friendlyUrl/:id/discussion');
+    expect(paths).toContain('/opinions/entry/:friendlyUrl/:id/discussion');
+  });
 });

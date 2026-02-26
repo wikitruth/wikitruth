@@ -73,7 +73,7 @@ const QuestionEntryPage: React.FC = () => {
         }
       />
       
-      <PageTabs tabs={tabs} activeTab="overview" />
+      <PageTabs tabs={tabs} />
 
       {/* Question content */}
       <div className="text-body collapsible" style={{ marginTop: '20px' }}>

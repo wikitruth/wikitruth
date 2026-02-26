@@ -75,7 +75,7 @@ const TopicEntryPage: React.FC = () => {
         iconColor="text-success-x"
       />
       
-      <PageTabs tabs={tabs} activeTab="overview" />
+      <PageTabs tabs={tabs} />
 
       {/* Topic content */}
       <div className="text-body collapsible" style={{ marginTop: '20px' }}>

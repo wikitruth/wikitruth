@@ -75,7 +75,7 @@ const OpinionEntryPage: React.FC = () => {
         }
       />
       
-      <PageTabs tabs={tabs} activeTab="overview" />
+      <PageTabs tabs={tabs} />
 
       {/* Opinion content */}
       <div className="text-body collapsible" style={{ marginTop: '20px' }}>
