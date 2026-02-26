@@ -33,6 +33,24 @@ interface FastSwitchResponse {
   user: User | null;
 }
 
+interface AccountSettingsResponse {
+  success?: boolean;
+  account?: {
+    first?: string;
+    middle?: string;
+    last?: string;
+    company?: string;
+    phone?: string;
+    zip?: string;
+  };
+  identity?: {
+    username?: string;
+    email?: string;
+  };
+  providers?: Record<string, boolean>;
+  social?: Record<string, boolean>;
+}
+
 const getCsrfToken = (): string | null => {
   if (typeof document === 'undefined') {
     return null;
@@ -118,6 +136,30 @@ export const authApi = {
     request<FastSwitchResponse>(`${API_BASE_URL}/auth/fast-switch`, {
       method: 'POST',
       body: JSON.stringify({ pin }),
+    }),
+  accountSettings: () =>
+    request<AccountSettingsResponse>(`${API_BASE_URL}/auth/account-settings`),
+  updateAccountContact: (payload: {
+    first: string;
+    middle?: string;
+    last: string;
+    company?: string;
+    phone?: string;
+    zip?: string;
+  }) =>
+    request<{ success: boolean; message?: string }>(`${API_BASE_URL}/auth/account-settings/contact`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+  updateAccountIdentity: (payload: { username: string; email: string }) =>
+    request<{ success: boolean; message?: string }>(`${API_BASE_URL}/auth/account-settings/identity`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+  updateAccountPassword: (payload: { newPassword: string; confirm: string }) =>
+    request<{ success: boolean; message?: string }>(`${API_BASE_URL}/auth/account-settings/password`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
     }),
 };
 

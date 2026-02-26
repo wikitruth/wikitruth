@@ -26,6 +26,12 @@ type AuthUserDocument = {
   resetPasswordToken?: string;
   resetPasswordExpires?: number;
   mobileTokens?: MobileRefreshTokenRecord[];
+  twitter?: { id?: string };
+  github?: { id?: string };
+  facebook?: { id?: string };
+  google?: { id?: string };
+  apple?: { id?: string };
+  microsoft?: { id?: string };
   save: () => Promise<AuthUserDocument>;
 };
 
@@ -46,6 +52,19 @@ type AccountDocument = {
   _id: unknown;
   isVerified?: string;
   verificationToken?: string;
+  name?: {
+    first?: string;
+    middle?: string;
+    last?: string;
+    full?: string;
+  };
+  company?: string;
+  phone?: string;
+  zip?: string;
+  user?: {
+    id?: unknown;
+    name?: string;
+  };
   save: () => Promise<AccountDocument>;
 };
 
@@ -60,6 +79,14 @@ type ModelsContract = {
   Account: {
     create: (fields: Record<string, unknown>) => Promise<AccountDocument>;
     findById: (id: unknown) => Promise<AccountDocument | null>;
+    findByIdAndUpdate: (
+      id: unknown,
+      fields: Record<string, unknown>,
+      options?: Record<string, unknown>
+    ) => Promise<AccountDocument | null>;
+  };
+  Admin?: {
+    findByIdAndUpdate: (id: unknown, fields: Record<string, unknown>) => Promise<unknown>;
   };
 };
 
@@ -200,6 +227,29 @@ function parseFastSwitchCookies(rawValue: unknown): FastSwitchCookie[] {
   }
 
   return [];
+}
+
+function getOauthProviders(req: WikitruthRequest): Record<string, boolean> {
+  const oauthConfig = (req.app as { config?: { oauth?: Record<string, { key?: string }> } }).config?.oauth || {};
+  return {
+    twitter: Boolean(oauthConfig.twitter?.key),
+    github: Boolean(oauthConfig.github?.key),
+    facebook: Boolean(oauthConfig.facebook?.key),
+    google: Boolean(oauthConfig.google?.key),
+    apple: Boolean(oauthConfig.apple?.key),
+    microsoft: Boolean(oauthConfig.microsoft?.key),
+  };
+}
+
+function getSocialConnections(user: AuthUserDocument | null): Record<string, boolean> {
+  return {
+    twitter: Boolean(user?.twitter?.id),
+    github: Boolean(user?.github?.id),
+    facebook: Boolean(user?.facebook?.id),
+    google: Boolean(user?.google?.id),
+    apple: Boolean(user?.apple?.id),
+    microsoft: Boolean(user?.microsoft?.id),
+  };
 }
 
 function signToken(req: WikitruthRequest, user: AuthUserDocument, kind: TokenKind, tokenId: string, expiresInSeconds: number): string {
@@ -539,6 +589,231 @@ module.exports = function (router: Router) {
 
         res.json({ success: true, user: sanitizeUser(user) });
       });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.get('/account-settings', async function (req: WikitruthRequest, res: WikitruthResponse, next: WikitruthNext) {
+    try {
+      if (!req.user) {
+        res.status(401).json({ success: false, message: 'Authentication required' });
+        return;
+      }
+
+      const user = await db.User.findById(req.user._id || req.user.id);
+      if (!user) {
+        res.status(404).json({ success: false, message: 'User not found' });
+        return;
+      }
+
+      const accountId = getAccountIdFromUser(user);
+      const account = accountId ? await db.Account.findById(accountId) : null;
+
+      res.json({
+        success: true,
+        account: {
+          first: account?.name?.first || '',
+          middle: account?.name?.middle || '',
+          last: account?.name?.last || '',
+          company: account?.company || '',
+          phone: account?.phone || '',
+          zip: account?.zip || '',
+        },
+        identity: {
+          username: user.username || '',
+          email: user.email || '',
+        },
+        providers: getOauthProviders(req),
+        social: getSocialConnections(user),
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.put('/account-settings/contact', async function (req: WikitruthRequest, res: WikitruthResponse, next: WikitruthNext) {
+    try {
+      if (!req.user) {
+        res.status(401).json({ success: false, message: 'Authentication required' });
+        return;
+      }
+
+      const first = String(req.body?.first || '').trim();
+      const middle = String(req.body?.middle || '').trim();
+      const last = String(req.body?.last || '').trim();
+      const company = String(req.body?.company || '').trim();
+      const phone = String(req.body?.phone || '').trim();
+      const zip = String(req.body?.zip || '').trim();
+
+      if (!first) {
+        res.status(400).json({ success: false, message: 'First name is required' });
+        return;
+      }
+      if (!last) {
+        res.status(400).json({ success: false, message: 'Last name is required' });
+        return;
+      }
+
+      const accountId = getAccountIdFromUser(req.user);
+      if (!accountId) {
+        res.status(404).json({ success: false, message: 'Account role not found' });
+        return;
+      }
+
+      const updated = await db.Account.findByIdAndUpdate(
+        accountId,
+        {
+          name: {
+            first: first,
+            middle: middle,
+            last: last,
+            full: `${first} ${last}`.trim(),
+          },
+          company: company,
+          phone: phone,
+          zip: zip,
+          search: [first, middle, last, company, phone, zip],
+        },
+        { new: true },
+      );
+
+      if (!updated) {
+        res.status(404).json({ success: false, message: 'Account not found' });
+        return;
+      }
+
+      res.json({
+        success: true,
+        account: {
+          first: updated.name?.first || '',
+          middle: updated.name?.middle || '',
+          last: updated.name?.last || '',
+          company: updated.company || '',
+          phone: updated.phone || '',
+          zip: updated.zip || '',
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.put('/account-settings/identity', async function (req: WikitruthRequest, res: WikitruthResponse, next: WikitruthNext) {
+    try {
+      if (!req.user) {
+        res.status(401).json({ success: false, message: 'Authentication required' });
+        return;
+      }
+
+      const username = String(req.body?.username || '').trim();
+      const email = String(req.body?.email || '').trim().toLowerCase();
+
+      if (!username) {
+        res.status(400).json({ success: false, message: 'Username is required' });
+        return;
+      }
+      if (!isValidUsername(username)) {
+        res.status(400).json({ success: false, message: 'Invalid username format' });
+        return;
+      }
+      if (!email || !isValidEmail(email)) {
+        res.status(400).json({ success: false, message: 'Invalid email format' });
+        return;
+      }
+
+      const duplicateUsername = await db.User.findOne({ username: username, _id: { $ne: req.user._id || req.user.id } });
+      if (duplicateUsername) {
+        res.status(409).json({ success: false, message: 'Username already taken' });
+        return;
+      }
+
+      const duplicateEmail = await db.User.findOne({ email: email, _id: { $ne: req.user._id || req.user.id } });
+      if (duplicateEmail) {
+        res.status(409).json({ success: false, message: 'Email already taken' });
+        return;
+      }
+
+      const user = await db.User.findById(req.user._id || req.user.id);
+      if (!user) {
+        res.status(404).json({ success: false, message: 'User not found' });
+        return;
+      }
+
+      user.username = username;
+      user.email = email;
+      user.search = [username, email];
+      await user.save();
+
+      if (user.roles?.admin && db.Admin?.findByIdAndUpdate) {
+        await db.Admin.findByIdAndUpdate(user.roles.admin, {
+          user: {
+            id: user._id,
+            name: user.username,
+          },
+        });
+      }
+
+      if (user.roles?.account) {
+        await db.Account.findByIdAndUpdate(user.roles.account, {
+          user: {
+            id: user._id,
+            name: user.username,
+          },
+        });
+      }
+
+      req.user.username = user.username;
+      req.user.email = user.email;
+
+      res.json({
+        success: true,
+        identity: {
+          username: user.username,
+          email: user.email,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.put('/account-settings/password', async function (req: WikitruthRequest, res: WikitruthResponse, next: WikitruthNext) {
+    try {
+      if (!req.user) {
+        res.status(401).json({ success: false, message: 'Authentication required' });
+        return;
+      }
+
+      const newPassword = String(req.body?.newPassword || '');
+      const confirm = String(req.body?.confirm || '');
+      if (!newPassword) {
+        res.status(400).json({ success: false, message: 'New password is required' });
+        return;
+      }
+      if (!confirm) {
+        res.status(400).json({ success: false, message: 'Password confirmation is required' });
+        return;
+      }
+      if (newPassword !== confirm) {
+        res.status(400).json({ success: false, message: 'Passwords do not match' });
+        return;
+      }
+      if (newPassword.length < 6) {
+        res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
+        return;
+      }
+
+      const user = await db.User.findById(req.user._id || req.user.id);
+      if (!user) {
+        res.status(404).json({ success: false, message: 'User not found' });
+        return;
+      }
+
+      user.password = await encryptPassword(newPassword);
+      await user.save();
+
+      res.json({ success: true, message: 'Password updated successfully' });
     } catch (error) {
       next(error);
     }

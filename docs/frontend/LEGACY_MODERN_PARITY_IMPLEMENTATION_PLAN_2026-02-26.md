@@ -26,7 +26,7 @@ Acceptance criteria: Modern contributions supports all legacy entity buckets (to
 - [x] P1.2 Complete profile settings parity.
 Acceptance criteria: Modern profile settings includes legacy-equivalent Fast Switch enable/disable + PIN management and existing private-profile controls.
 
-- [ ] P1.3 Complete account settings parity.
+- [x] P1.3 Complete account settings parity.
 Acceptance criteria: Modern account settings includes contact info update, identity update, password update, and social account connect/disconnect parity.
 
 - [ ] P1.4 Complete entry detail parity for topic/argument/question/issue/opinion/answer/artifact pages.
