@@ -15,7 +15,7 @@ Close remaining parity gaps between legacy and modern flows, harden API contract
 - [x] Core auth and content CRUD flows exist in modern client.
 - [x] Social auth redirect wiring exists in modern auth UI.
 - [x] Admin, groups, and profile modern pages exist with baseline API integrations.
-- [~] OpenAPI spec exists but only covers a limited subset of active APIs.
+- [x] OpenAPI spec now covers the active modern API route surface.
 - [~] E2E test setup exists but only includes light smoke coverage.
 - [ ] Discussion tabs in entry pages have no matching modern routes.
 - [x] `/visualize` modern route is now data-driven.
@@ -67,7 +67,7 @@ Close remaining parity gaps between legacy and modern flows, harden API contract
 
 ## P1 Contract + Test Hardening
 
-- [ ] **P1.1 Expand OpenAPI to full active modern API surface**
+- [x] **P1.1 Expand OpenAPI to full active modern API surface**
   - Add missing routes and schemas for admin, members, groups, verification, search, realtime, and backup operations.
   - Acceptance:
     - `docs/api/openapi.json` includes the active route surface.

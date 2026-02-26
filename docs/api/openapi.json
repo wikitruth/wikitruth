@@ -3,43 +3,468 @@
   "info": {
     "title": "Wikitruth API",
     "version": "1.0.0",
-    "description": "Modern client and shared contract surface for auth and core content mutations."
+    "description": "Modern client and shared contract surface for auth, content, admin, groups, members, and realtime APIs."
   },
   "servers": [
-    { "url": "/api" }
+    {
+      "url": "/api"
+    }
   ],
   "paths": {
-    "/auth/me": {
+    "/admin": {
       "get": {
-        "summary": "Get current session user",
+        "summary": "Get admin dashboard counts",
         "responses": {
           "200": {
-            "description": "Authenticated",
+            "description": "Success",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/AuthUserResponse" }
-              }
-            }
-          },
-          "401": {
-            "description": "Not authenticated",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/AuthUserResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
               }
             }
           }
         }
       }
     },
-    "/auth/signup": {
+    "/admin/accounts": {
+      "get": {
+        "summary": "List accounts",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/administrators": {
+      "get": {
+        "summary": "List administrators",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/categories": {
+      "get": {
+        "summary": "List categories",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      },
       "post": {
-        "summary": "Create account",
+        "summary": "Create category",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/SignupRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/GenericMutationRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/categories/{id}": {
+      "put": {
+        "summary": "Update category",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericMutationRequest"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete category",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ]
+      }
+    },
+    "/admin/db-backup": {
+      "get": {
+        "summary": "Get backup metadata",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Start backup process",
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericMutationRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/groups": {
+      "get": {
+        "summary": "List admin groups",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create admin group",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericMutationRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/groups/{id}": {
+      "put": {
+        "summary": "Update admin group",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericMutationRequest"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete admin group",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ]
+      }
+    },
+    "/admin/statuses": {
+      "get": {
+        "summary": "List statuses",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create status",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericMutationRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/statuses/{id}": {
+      "put": {
+        "summary": "Update status",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericMutationRequest"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete status",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ]
+      }
+    },
+    "/admin/users": {
+      "get": {
+        "summary": "List admin users",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/users/{id}": {
+      "put": {
+        "summary": "Update user from admin panel",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericMutationRequest"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete user from admin panel",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ]
+      }
+    },
+    "/answers": {
+      "post": {
+        "summary": "Create answer",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnswerMutationRequest"
+              }
             }
           }
         },
@@ -48,7 +473,261 @@
             "description": "Created",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/AuthUserResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/AnswerMutationResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "List answers",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/answers/entry/{id}": {
+      "put": {
+        "summary": "Update answer",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnswerMutationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnswerMutationResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get answer entry",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ]
+      }
+    },
+    "/arguments": {
+      "post": {
+        "summary": "Create argument",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ArgumentMutationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArgumentMutationResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "List arguments",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/arguments/entry/{id}": {
+      "get": {
+        "summary": "Get argument entry",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ]
+      }
+    },
+    "/artifacts": {
+      "post": {
+        "summary": "Create artifact",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ArtifactMutationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArtifactMutationResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "List artifacts",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/artifacts/entry/{id}": {
+      "put": {
+        "summary": "Update artifact",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ArtifactMutationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArtifactMutationResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get artifact entry",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ]
+      }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "summary": "Generate password reset token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessageResponse"
+                }
               }
             }
           }
@@ -62,7 +741,9 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/LoginRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
             }
           }
         },
@@ -71,7 +752,9 @@
             "description": "Logged in",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/AuthUserResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/AuthUserResponse"
+                }
               }
             }
           }
@@ -86,30 +769,36 @@
             "description": "Logged out",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SuccessMessageResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessageResponse"
+                }
               }
             }
           }
         }
       }
     },
-    "/auth/forgot-password": {
-      "post": {
-        "summary": "Generate password reset token",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/ForgotPasswordRequest" }
-            }
-          }
-        },
+    "/auth/me": {
+      "get": {
+        "summary": "Get current session user",
         "responses": {
-          "202": {
-            "description": "Accepted",
+          "200": {
+            "description": "Authenticated",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SuccessMessageResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/AuthUserResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthUserResponse"
+                }
               }
             }
           }
@@ -123,7 +812,9 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/ResetPasswordRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequest"
+              }
             }
           }
         },
@@ -132,21 +823,25 @@
             "description": "Password updated",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/SuccessMessageResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessMessageResponse"
+                }
               }
             }
           }
         }
       }
     },
-    "/topics": {
+    "/auth/signup": {
       "post": {
-        "summary": "Create topic",
+        "summary": "Create account",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/TopicMutationRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/SignupRequest"
+              }
             }
           }
         },
@@ -155,124 +850,260 @@
             "description": "Created",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/TopicMutationResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/AuthUserResponse"
+                }
               }
             }
           }
         }
       }
     },
-    "/arguments": {
+    "/auth/verification-confirm": {
       "post": {
-        "summary": "Create argument",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/ArgumentMutationRequest" }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ArgumentMutationResponse" }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/questions": {
-      "post": {
-        "summary": "Create question",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/QuestionMutationRequest" }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/QuestionMutationResponse" }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/questions/entry/{id}": {
-      "put": {
-        "summary": "Update question",
-        "parameters": [{ "$ref": "#/components/parameters/Id" }],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/QuestionMutationRequest" }
-            }
-          }
-        },
+        "summary": "Confirm account verification",
         "responses": {
           "200": {
-            "description": "Updated",
+            "description": "Success",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/QuestionMutationResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericMutationRequest"
               }
             }
           }
         }
       }
     },
-    "/answers": {
+    "/auth/verification-resend": {
       "post": {
-        "summary": "Create answer",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/AnswerMutationRequest" }
+        "summary": "Resend verification token",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
             }
           }
-        },
+        }
+      }
+    },
+    "/auth/verification-status": {
+      "get": {
+        "summary": "Get account verification status",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/groups": {
+      "get": {
+        "summary": "List groups",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create group",
         "responses": {
           "201": {
             "description": "Created",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/AnswerMutationResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericMutationRequest"
               }
             }
           }
         }
       }
     },
-    "/answers/entry/{id}": {
+    "/groups/entry/{id}": {
+      "get": {
+        "summary": "Get group entry",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ]
+      },
       "put": {
-        "summary": "Update answer",
-        "parameters": [{ "$ref": "#/components/parameters/Id" }],
+        "summary": "Update group entry",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/AnswerMutationRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/GenericMutationRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/groups/entry/{id}/members": {
+      "post": {
+        "summary": "Join or add member to group",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
             }
           }
         },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericMutationRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/groups/entry/{id}/members/{userId}": {
+      "delete": {
+        "summary": "Remove or leave group membership",
         "responses": {
           "200": {
-            "description": "Updated",
+            "description": "Success",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/AnswerMutationResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          },
+          {
+            "$ref": "#/components/parameters/UserId"
+          }
+        ]
+      }
+    },
+    "/groups/entry/{id}/posts": {
+      "get": {
+        "summary": "Get grouped posts for group",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ]
+      }
+    },
+    "/home": {
+      "get": {
+        "summary": "Get home feed summary",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
               }
             }
           }
@@ -286,7 +1117,9 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/IssueMutationRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/IssueMutationRequest"
+              }
             }
           }
         },
@@ -295,7 +1128,24 @@
             "description": "Created",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/IssueMutationResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/IssueMutationResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "List issues",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
               }
             }
           }
@@ -305,12 +1155,18 @@
     "/issues/entry/{id}": {
       "put": {
         "summary": "Update issue",
-        "parameters": [{ "$ref": "#/components/parameters/Id" }],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/IssueMutationRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/IssueMutationRequest"
+              }
             }
           }
         },
@@ -319,7 +1175,344 @@
             "description": "Updated",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/IssueMutationResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/IssueMutationResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get issue entry",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ]
+      }
+    },
+    "/members": {
+      "get": {
+        "summary": "List members",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/members/administrators": {
+      "get": {
+        "summary": "List administrator members",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/members/me": {
+      "get": {
+        "summary": "Get current member profile",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/members/me/preferences": {
+      "put": {
+        "summary": "Update current member preferences",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericMutationRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/members/reviewers": {
+      "get": {
+        "summary": "List reviewer members",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/members/screeners": {
+      "get": {
+        "summary": "List screener members",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/members/{username}": {
+      "get": {
+        "summary": "Get member profile by username",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Username"
+          }
+        ]
+      }
+    },
+    "/members/{username}/following": {
+      "get": {
+        "summary": "Get following relationships for member profile",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Username"
+          }
+        ]
+      }
+    },
+    "/members/{username}/pages": {
+      "get": {
+        "summary": "List member pages",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Username"
+          }
+        ]
+      },
+      "post": {
+        "summary": "Create member page",
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Username"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericMutationRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/members/{username}/pages/{id}": {
+      "get": {
+        "summary": "Get member page",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Username"
+          },
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ]
+      },
+      "put": {
+        "summary": "Update member page",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Username"
+          },
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericMutationRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/members/{username}/topics": {
+      "get": {
+        "summary": "Get topics for member profile",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Username"
+          }
+        ]
+      }
+    },
+    "/monitoring/errors": {
+      "post": {
+        "summary": "Report client runtime error",
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericMutationRequest"
               }
             }
           }
@@ -333,7 +1526,9 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/OpinionMutationRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/OpinionMutationRequest"
+              }
             }
           }
         },
@@ -342,7 +1537,24 @@
             "description": "Created",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/OpinionMutationResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/OpinionMutationResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "List opinions",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
               }
             }
           }
@@ -352,12 +1564,18 @@
     "/opinions/entry/{id}": {
       "put": {
         "summary": "Update opinion",
-        "parameters": [{ "$ref": "#/components/parameters/Id" }],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/OpinionMutationRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/OpinionMutationRequest"
+              }
             }
           }
         },
@@ -366,21 +1584,45 @@
             "description": "Updated",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/OpinionMutationResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/OpinionMutationResponse"
+                }
               }
             }
           }
         }
+      },
+      "get": {
+        "summary": "Get opinion entry",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ]
       }
     },
-    "/artifacts": {
+    "/questions": {
       "post": {
-        "summary": "Create artifact",
+        "summary": "Create question",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/ArtifactMutationRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/QuestionMutationRequest"
+              }
             }
           }
         },
@@ -389,22 +1631,45 @@
             "description": "Created",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ArtifactMutationResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionMutationResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "List questions",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
               }
             }
           }
         }
       }
     },
-    "/artifacts/entry/{id}": {
+    "/questions/entry/{id}": {
       "put": {
-        "summary": "Update artifact",
-        "parameters": [{ "$ref": "#/components/parameters/Id" }],
+        "summary": "Update question",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/ArtifactMutationRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/QuestionMutationRequest"
+              }
             }
           }
         },
@@ -413,11 +1678,141 @@
             "description": "Updated",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/ArtifactMutationResponse" }
+                "schema": {
+                  "$ref": "#/components/schemas/QuestionMutationResponse"
+                }
               }
             }
           }
         }
+      },
+      "get": {
+        "summary": "Get question entry",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ]
+      }
+    },
+    "/realtime/events": {
+      "get": {
+        "summary": "Subscribe to realtime event stream",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/search": {
+      "get": {
+        "summary": "Search across content entities",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ]
+      }
+    },
+    "/topics": {
+      "post": {
+        "summary": "Create topic",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TopicMutationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TopicMutationResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "List topics",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/topics/entry/{id}": {
+      "get": {
+        "summary": "Get topic entry",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ]
       }
     }
   },
@@ -427,213 +1822,447 @@
         "name": "id",
         "in": "path",
         "required": true,
-        "schema": { "type": "string" }
+        "schema": {
+          "type": "string"
+        }
+      },
+      "Username": {
+        "name": "username",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "UserId": {
+        "name": "userId",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
       }
     },
     "schemas": {
       "ApiUser": {
         "type": "object",
         "properties": {
-          "_id": { "type": "string" },
-          "username": { "type": "string" },
-          "email": { "type": "string" }
+          "_id": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
         },
-        "required": ["_id", "username"]
+        "required": [
+          "_id",
+          "username"
+        ]
       },
       "AuthUserResponse": {
         "type": "object",
         "properties": {
-          "success": { "type": "boolean" },
-          "message": { "type": "string" },
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
           "user": {
             "oneOf": [
-              { "$ref": "#/components/schemas/ApiUser" },
-              { "type": "null" }
+              {
+                "$ref": "#/components/schemas/ApiUser"
+              },
+              {
+                "type": "null"
+              }
             ]
           }
         },
-        "required": ["success", "user"]
+        "required": [
+          "success",
+          "user"
+        ]
       },
       "SuccessMessageResponse": {
         "type": "object",
         "properties": {
-          "success": { "type": "boolean" },
-          "message": { "type": "string" }
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          }
         },
-        "required": ["success"]
+        "required": [
+          "success"
+        ]
       },
       "LoginRequest": {
         "type": "object",
         "properties": {
-          "username": { "type": "string" },
-          "password": { "type": "string" }
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
         },
-        "required": ["username", "password"]
+        "required": [
+          "username",
+          "password"
+        ]
       },
       "SignupRequest": {
         "type": "object",
         "properties": {
-          "username": { "type": "string" },
-          "email": { "type": "string" },
-          "password": { "type": "string" }
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
         },
-        "required": ["username", "email", "password"]
+        "required": [
+          "username",
+          "email",
+          "password"
+        ]
       },
       "ForgotPasswordRequest": {
         "type": "object",
         "properties": {
-          "email": { "type": "string" }
+          "email": {
+            "type": "string"
+          }
         },
-        "required": ["email"]
+        "required": [
+          "email"
+        ]
       },
       "ResetPasswordRequest": {
         "type": "object",
         "properties": {
-          "email": { "type": "string" },
-          "token": { "type": "string" },
-          "password": { "type": "string" }
+          "email": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
         },
-        "required": ["email", "token", "password"]
+        "required": [
+          "email",
+          "token",
+          "password"
+        ]
       },
       "MutationBase": {
         "type": "object",
         "properties": {
-          "_id": { "type": "string" },
-          "title": { "type": "string" },
-          "friendlyUrl": { "type": "string" },
-          "content": { "type": "string" },
-          "private": { "type": "boolean" },
-          "createDate": { "type": "string", "format": "date-time" },
-          "editDate": { "type": "string", "format": "date-time" }
+          "_id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "friendlyUrl": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "private": {
+            "type": "boolean"
+          },
+          "createDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "editDate": {
+            "type": "string",
+            "format": "date-time"
+          }
         },
-        "required": ["_id", "title", "content"]
+        "required": [
+          "_id",
+          "title",
+          "content"
+        ]
       },
       "TopicMutationRequest": {
         "type": "object",
         "properties": {
-          "title": { "type": "string" },
-          "description": { "type": "string" },
-          "topicId": { "type": "string" },
-          "private": { "type": "boolean" },
-          "tags": { "type": "string" }
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "topicId": {
+            "type": "string"
+          },
+          "private": {
+            "type": "boolean"
+          },
+          "tags": {
+            "type": "string"
+          }
         },
-        "required": ["title", "description"]
+        "required": [
+          "title",
+          "description"
+        ]
       },
       "TopicMutationResponse": {
         "type": "object",
         "properties": {
-          "success": { "type": "boolean" },
-          "topic": { "$ref": "#/components/schemas/MutationBase" }
+          "success": {
+            "type": "boolean"
+          },
+          "topic": {
+            "$ref": "#/components/schemas/MutationBase"
+          }
         },
-        "required": ["success", "topic"]
+        "required": [
+          "success",
+          "topic"
+        ]
       },
       "ArgumentMutationRequest": {
         "type": "object",
         "properties": {
-          "title": { "type": "string" },
-          "description": { "type": "string" },
-          "topicId": { "type": "string" },
-          "private": { "type": "boolean" },
-          "sources": { "type": "string" }
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "topicId": {
+            "type": "string"
+          },
+          "private": {
+            "type": "boolean"
+          },
+          "sources": {
+            "type": "string"
+          }
         },
-        "required": ["title", "description"]
+        "required": [
+          "title",
+          "description"
+        ]
       },
       "ArgumentMutationResponse": {
         "type": "object",
         "properties": {
-          "success": { "type": "boolean" },
-          "argument": { "$ref": "#/components/schemas/MutationBase" }
+          "success": {
+            "type": "boolean"
+          },
+          "argument": {
+            "$ref": "#/components/schemas/MutationBase"
+          }
         },
-        "required": ["success", "argument"]
+        "required": [
+          "success",
+          "argument"
+        ]
       },
       "QuestionMutationRequest": {
         "type": "object",
         "properties": {
-          "title": { "type": "string" },
-          "description": { "type": "string" },
-          "topicId": { "type": "string" },
-          "private": { "type": "boolean" },
-          "references": { "type": "string" }
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "topicId": {
+            "type": "string"
+          },
+          "private": {
+            "type": "boolean"
+          },
+          "references": {
+            "type": "string"
+          }
         }
       },
       "QuestionMutationResponse": {
         "type": "object",
         "properties": {
-          "success": { "type": "boolean" },
-          "question": { "$ref": "#/components/schemas/MutationBase" }
+          "success": {
+            "type": "boolean"
+          },
+          "question": {
+            "$ref": "#/components/schemas/MutationBase"
+          }
         },
-        "required": ["success", "question"]
+        "required": [
+          "success",
+          "question"
+        ]
       },
       "AnswerMutationRequest": {
         "type": "object",
         "properties": {
-          "title": { "type": "string" },
-          "description": { "type": "string" },
-          "questionId": { "type": "string" },
-          "private": { "type": "boolean" },
-          "references": { "type": "string" }
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "questionId": {
+            "type": "string"
+          },
+          "private": {
+            "type": "boolean"
+          },
+          "references": {
+            "type": "string"
+          }
         }
       },
       "AnswerMutationResponse": {
         "type": "object",
         "properties": {
-          "success": { "type": "boolean" },
-          "answer": { "$ref": "#/components/schemas/MutationBase" }
+          "success": {
+            "type": "boolean"
+          },
+          "answer": {
+            "$ref": "#/components/schemas/MutationBase"
+          }
         },
-        "required": ["success", "answer"]
+        "required": [
+          "success",
+          "answer"
+        ]
       },
       "IssueMutationRequest": {
         "type": "object",
         "properties": {
-          "title": { "type": "string" },
-          "description": { "type": "string" },
-          "topicId": { "type": "string" },
-          "private": { "type": "boolean" },
-          "issueType": { "type": "number" }
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "topicId": {
+            "type": "string"
+          },
+          "private": {
+            "type": "boolean"
+          },
+          "issueType": {
+            "type": "number"
+          }
         }
       },
       "IssueMutationResponse": {
         "type": "object",
         "properties": {
-          "success": { "type": "boolean" },
-          "issue": { "$ref": "#/components/schemas/MutationBase" }
+          "success": {
+            "type": "boolean"
+          },
+          "issue": {
+            "$ref": "#/components/schemas/MutationBase"
+          }
         },
-        "required": ["success", "issue"]
+        "required": [
+          "success",
+          "issue"
+        ]
       },
       "OpinionMutationRequest": {
         "type": "object",
         "properties": {
-          "title": { "type": "string" },
-          "description": { "type": "string" },
-          "topicId": { "type": "string" },
-          "private": { "type": "boolean" }
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "topicId": {
+            "type": "string"
+          },
+          "private": {
+            "type": "boolean"
+          }
         }
       },
       "OpinionMutationResponse": {
         "type": "object",
         "properties": {
-          "success": { "type": "boolean" },
-          "opinion": { "$ref": "#/components/schemas/MutationBase" }
+          "success": {
+            "type": "boolean"
+          },
+          "opinion": {
+            "$ref": "#/components/schemas/MutationBase"
+          }
         },
-        "required": ["success", "opinion"]
+        "required": [
+          "success",
+          "opinion"
+        ]
       },
       "ArtifactMutationRequest": {
         "type": "object",
         "properties": {
-          "title": { "type": "string" },
-          "description": { "type": "string" },
-          "topicId": { "type": "string" },
-          "private": { "type": "boolean" },
-          "source": { "type": "string" }
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "topicId": {
+            "type": "string"
+          },
+          "private": {
+            "type": "boolean"
+          },
+          "source": {
+            "type": "string"
+          }
         }
       },
       "ArtifactMutationResponse": {
         "type": "object",
         "properties": {
-          "success": { "type": "boolean" },
-          "artifact": { "$ref": "#/components/schemas/MutationBase" }
+          "success": {
+            "type": "boolean"
+          },
+          "artifact": {
+            "$ref": "#/components/schemas/MutationBase"
+          }
         },
-        "required": ["success", "artifact"]
+        "required": [
+          "success",
+          "artifact"
+        ]
+      },
+      "StandardApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": true,
+        "required": [
+          "success"
+        ]
+      },
+      "GenericMutationRequest": {
+        "type": "object",
+        "additionalProperties": true
       }
     }
   }

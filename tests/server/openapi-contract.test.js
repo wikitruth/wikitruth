@@ -26,8 +26,12 @@ describe('OpenAPI contract', function () {
     const paths = spec.paths || {};
 
     [
+      '/home',
+      '/search',
       '/topics',
+      '/topics/entry/{id}',
       '/arguments',
+      '/arguments/entry/{id}',
       '/questions',
       '/questions/entry/{id}',
       '/answers',
@@ -38,6 +42,18 @@ describe('OpenAPI contract', function () {
       '/opinions/entry/{id}',
       '/artifacts',
       '/artifacts/entry/{id}',
+      '/groups',
+      '/groups/entry/{id}',
+      '/groups/entry/{id}/posts',
+      '/members',
+      '/members/{username}',
+      '/members/{username}/topics',
+      '/members/{username}/following',
+      '/admin',
+      '/admin/users',
+      '/admin/db-backup',
+      '/monitoring/errors',
+      '/realtime/events',
     ].forEach((contractPath) => expect(paths[contractPath]).toBeDefined());
   });
 
@@ -64,6 +80,8 @@ describe('OpenAPI contract', function () {
       'OpinionMutationResponse',
       'ArtifactMutationRequest',
       'ArtifactMutationResponse',
+      'StandardApiResponse',
+      'GenericMutationRequest',
     ].forEach((schemaName) => expect(schemas[schemaName]).toBeDefined());
   });
 });
