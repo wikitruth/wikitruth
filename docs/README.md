@@ -8,6 +8,7 @@ This folder contains active engineering documentation and archived migration art
 - Modern client completion plan: `docs/MODERN_CLIENT_COMPLETION_PLAN_2026-02-24.md`
 - Dependency upgrade plan: `docs/DEPENDENCY_UPGRADE_PLAN_2026-02-24.md`
 - Mobile app strategy: `docs/MOBILE_APP_STRATEGY_2026-02-24.md`
+- Server structure migration plan: `docs/SERVER_STRUCTURE_MIGRATION_PLAN_2026-02-26.md`
 
 ## Architecture Decisions
 
