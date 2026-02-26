@@ -19,6 +19,7 @@ import type {
   MemberFollowingResponse,
   MemberPagesResponse,
   MemberPageResponse,
+  MemberFastSwitchResponse,
 } from '../types/api';
 
 class ApiService {
@@ -461,12 +462,12 @@ class ApiService {
     });
   }
 
-  async getCurrentMemberFastSwitchStatus(): Promise<LegacyApiResponse> {
-    return this.request<LegacyApiResponse>('/members/me/fast-switch');
+  async getCurrentMemberFastSwitchStatus(): Promise<MemberFastSwitchResponse> {
+    return this.request<MemberFastSwitchResponse>('/members/me/fast-switch');
   }
 
-  async updateCurrentMemberFastSwitch(payload: { enabled: boolean; pin?: string }): Promise<LegacyApiResponse> {
-    return this.request<LegacyApiResponse>('/members/me/fast-switch', {
+  async updateCurrentMemberFastSwitch(payload: { enabled: boolean; pin?: string }): Promise<MemberFastSwitchResponse> {
+    return this.request<MemberFastSwitchResponse>('/members/me/fast-switch', {
       method: 'PUT',
       body: JSON.stringify(payload),
     });

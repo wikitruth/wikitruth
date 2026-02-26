@@ -150,3 +150,12 @@ export interface MemberPagesResponse extends ApiBaseResponse {
 export interface MemberPageResponse extends ApiBaseResponse {
   page?: LegacyEntity;
 }
+
+export interface MemberFastSwitchState {
+  enabled?: boolean;
+  trustedClients?: number;
+}
+
+export interface MemberFastSwitchResponse extends ApiBaseResponse {
+  fastSwitch?: MemberFastSwitchState;
+}
