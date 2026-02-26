@@ -15,7 +15,7 @@ Acceptance criteria: Header `My Diary` link resolves to an implemented modern ro
 - [x] P0.2 Implement modern Contact form backend submission.
 Acceptance criteria: Modern contact page submits to backend endpoint, includes validation, and returns success/error from server (not local-only mock success).
 
-- [ ] P0.3 Restore Fast Switch functional parity.
+- [x] P0.3 Restore Fast Switch functional parity.
 Acceptance criteria: Modern Fast Switch supports PIN-based flow equivalent to legacy behavior (not just shortcut links), with failure and success states.
 
 ## Phase P1: Major Feature Parity Gaps

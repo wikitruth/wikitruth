@@ -12,8 +12,6 @@ const templates = require('../models/templates'),
   db = require('../app').db.models,
   // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'jwt'.
   jwt = require('jsonwebtoken'),
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-  cookieParser = require('cookie-parser'),
   // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'async'.
   async = require('async');
 
@@ -301,34 +299,65 @@ module.exports = function (router) {
   });
 
   // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.post('/fast-switch', function (req, res) {
+  router.post('/fast-switch', async function (req, res, next) {
     let model = {};
-    let cookieString = req.body.cookie;
-    let pin = req.body.pin;
-    let success = false;
-    if (cookieString && pin && pin.length === 6) {
-      let secret = pin + '|' + req.app.config.jwtSecret;
-      let cookies = cookieParser.JSONCookie(cookieString);
-      if (cookies.length > 0) {
-        for (let cookie of cookies) {
-          // @ts-ignore TS(7006): Parameter 'err' implicitly has an 'any' type.
-          jwt.verify(cookie.data, secret, function (err, decoded) {
-            if (!err && decoded && decoded.userId) {
-              // pin matched, auto-login the user
-              // decoded.userId
-              // cookie.id -- client_id
-              success = true;
-              // redirect
-            }
-          });
+    let pin = String(req.body.pin || '').trim();
+    let nextUrl = String(req.body.next || req.query.next || '/app').trim() || '/app';
+    if (!/^\d{6}$/.test(pin)) {
+      // @ts-ignore TS(2339): Property 'error' does not exist on type '{}'.
+      model.error = 'PIN must be exactly 6 digits.';
+      return res.render(templates.fastSwitch, model);
+    }
+
+    let cookies = Array.isArray(req.cookies.fast_switch) ? req.cookies.fast_switch : [];
+    if (cookies.length === 0) {
+      // @ts-ignore TS(2339): Property 'error' does not exist on type '{}'.
+      model.error = 'No fast-switch session found on this browser.';
+      return res.render(templates.fastSwitch, model);
+    }
+
+    let secret = pin + '|' + req.app.config.jwtSecret;
+    let matchedUserId = null;
+
+    for (let cookie of cookies) {
+      if (!cookie?.data) {
+        continue;
+      }
+
+      try {
+        let decoded = jwt.verify(cookie.data, secret);
+        if (decoded?.userId) {
+          matchedUserId = decoded.userId;
+          break;
         }
+      } catch (_err) {
+        // continue checking other trusted-client records
       }
     }
 
-    if (!success) {
+    if (!matchedUserId) {
       // @ts-ignore TS(2339): Property 'error' does not exist on type '{}'.
-      model.error = 'Not cookies or session found.';
-      res.render(templates.fastSwitch, model);
+      model.error = 'Invalid PIN or fast-switch session.';
+      return res.render(templates.fastSwitch, model);
+    }
+
+    try {
+      const user = await db.User.findById(matchedUserId);
+      if (!user) {
+        // @ts-ignore TS(2339): Property 'error' does not exist on type '{}'.
+        model.error = 'Account not found.';
+        return res.render(templates.fastSwitch, model);
+      }
+
+      req.login(user, function (err) {
+        if (err) {
+          return next(err);
+        }
+
+        return res.redirect(nextUrl);
+      });
+    } catch (err) {
+      return next(err);
     }
   });
 

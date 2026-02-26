@@ -27,18 +27,45 @@ interface VerificationStatusResponse {
   };
 }
 
+interface FastSwitchResponse {
+  success?: boolean;
+  message?: string;
+  user: User | null;
+}
+
+const getCsrfToken = (): string | null => {
+  if (typeof document === 'undefined') {
+    return null;
+  }
+
+  const match = document.cookie.match(/(?:^|;\s*)_csrfToken=([^;]+)/);
+  return match ? decodeURIComponent(match[1]) : null;
+};
+
 const request = async <T>(url: string, init?: RequestInit): Promise<T> => {
+  const method = init?.method?.toUpperCase() ?? 'GET';
+  const csrfToken = method === 'GET' || method === 'HEAD' ? null : getCsrfToken();
   const response = await fetch(url, {
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
+      ...(csrfToken ? { 'x-csrf-token': csrfToken } : {}),
       ...init?.headers,
     },
     ...init,
   });
 
   if (!response.ok) {
-    throw new Error(`Auth request failed: ${response.status}`);
+    let errorMessage = `Auth request failed: ${response.status}`;
+    try {
+      const payload = (await response.json()) as { message?: string; error?: string };
+      if (payload?.message || payload?.error) {
+        errorMessage = payload.message || payload.error || errorMessage;
+      }
+    } catch (_err) {
+      // Keep default status-based error message when no JSON payload is returned.
+    }
+    throw new Error(errorMessage);
   }
 
   return response.json();
@@ -86,6 +113,11 @@ export const authApi = {
     request<{ success: boolean; message: string }>(`${API_BASE_URL}/auth/verification-confirm`, {
       method: 'POST',
       body: JSON.stringify({ token }),
+    }),
+  fastSwitch: (pin: string) =>
+    request<FastSwitchResponse>(`${API_BASE_URL}/auth/fast-switch`, {
+      method: 'POST',
+      body: JSON.stringify({ pin }),
     }),
 };
 

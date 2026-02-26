@@ -20,6 +20,9 @@
     </ul>
     <br/>
     <p><strong>Enter your PIN to continue.</strong></p>
+    {?error}
+        <div class="alert alert-danger">{error}</div>
+    {/error}
     <form method="post">
         <div class="row">
             <div class="col-md-12">

@@ -79,6 +79,12 @@ type MobileClientTelemetry = {
   build: string;
 };
 
+type FastSwitchCookie = {
+  id?: string;
+  data?: string;
+  created?: string | Date;
+};
+
 function sanitizeUser(user: AuthUserLike | null | undefined) {
   if (!user) {
     return null;
@@ -175,6 +181,25 @@ function getClientTelemetry(req: WikitruthRequest): MobileClientTelemetry {
     version: String(req.header('x-client-version') || '').trim(),
     build: String(req.header('x-client-build') || '').trim(),
   };
+}
+
+function parseFastSwitchCookies(rawValue: unknown): FastSwitchCookie[] {
+  if (Array.isArray(rawValue)) {
+    return rawValue as FastSwitchCookie[];
+  }
+
+  if (typeof rawValue === 'string') {
+    try {
+      const parsed = JSON.parse(rawValue) as unknown;
+      if (Array.isArray(parsed)) {
+        return parsed as FastSwitchCookie[];
+      }
+    } catch (_err) {
+      return [];
+    }
+  }
+
+  return [];
 }
 
 function signToken(req: WikitruthRequest, user: AuthUserDocument, kind: TokenKind, tokenId: string, expiresInSeconds: number): string {
@@ -448,6 +473,62 @@ module.exports = function (router: Router) {
       const isValid = await db.User.validatePassword(password, user.password || '');
       if (!isValid) {
         res.status(401).json({ success: false, message: 'Invalid credentials' });
+        return;
+      }
+
+      req.login(user as never, function (err?: unknown) {
+        if (err) {
+          return next(err);
+        }
+
+        res.json({ success: true, user: sanitizeUser(user) });
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  router.post('/fast-switch', async function (req: WikitruthRequest, res: WikitruthResponse, next: WikitruthNext) {
+    try {
+      const pin = String(req.body?.pin || '').trim();
+      if (!/^\d{6}$/.test(pin)) {
+        res.status(400).json({ success: false, message: 'PIN must be 6 digits' });
+        return;
+      }
+
+      const fastSwitchCookies = parseFastSwitchCookies(req.cookies?.fast_switch);
+      if (fastSwitchCookies.length === 0) {
+        res.status(401).json({ success: false, message: 'No fast-switch session found' });
+        return;
+      }
+
+      const secret = `${pin}|${String((req.app as { config?: { jwtSecret?: string } }).config?.jwtSecret || '')}`;
+      let matchedUserId = '';
+
+      for (const cookie of fastSwitchCookies) {
+        if (!cookie?.data) {
+          continue;
+        }
+
+        try {
+          const decoded = jwt.verify(cookie.data, secret) as { userId?: string };
+          if (decoded?.userId) {
+            matchedUserId = String(decoded.userId);
+            break;
+          }
+        } catch (_err) {
+          // Keep checking other trusted-client records.
+        }
+      }
+
+      if (!matchedUserId) {
+        res.status(401).json({ success: false, message: 'Invalid PIN' });
+        return;
+      }
+
+      const user = await db.User.findById(matchedUserId);
+      if (!user) {
+        res.status(401).json({ success: false, message: 'Account not found' });
         return;
       }
 
