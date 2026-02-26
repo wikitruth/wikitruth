@@ -36,6 +36,6 @@ This folder contains active engineering documentation and archived migration art
 - Archived plans index: `docs/archive/plans/README.md`
 - Historical migration snapshot: `docs/archive/MIGRATION_PLAN_ARCHIVE_2026-02-22.md`
 
-## Root `MIGRATION_*.md` Files
+## Archived Migration Docs
 
-Root migration files are intentionally retained as compatibility pointers for older links. Canonical archived content lives under `docs/archive/migrations/`.
+Canonical historical migration material lives under `docs/archive/migrations/`.

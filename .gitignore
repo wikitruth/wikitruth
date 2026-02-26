@@ -53,3 +53,7 @@ public/js/react
 
 
 dist/
+
+# Local tutorial/build artifacts kept out of root hygiene
+react-tutorial/
+storybook-static/

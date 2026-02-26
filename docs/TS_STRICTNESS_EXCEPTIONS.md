@@ -12,8 +12,8 @@ Current exception mechanism is line-level `@ts-ignore` on legacy hotspots while 
 
 Type-improvement project plan and backlog:
 
-- `TYPE_IMPROVEMENT_PROJECT.md`
-- `TYPE_IMPROVEMENT_BACKLOG.md`
+- `docs/archive/plans/TYPE_IMPROVEMENT_PROJECT.md`
+- `docs/archive/plans/TYPE_IMPROVEMENT_BACKLOG.md`
 
 ## Exception Count
 
