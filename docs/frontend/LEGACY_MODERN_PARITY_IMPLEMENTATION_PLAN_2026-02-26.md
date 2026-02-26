@@ -49,7 +49,7 @@ Acceptance criteria: Existing parity matrix reflects true current state and no l
 - [x] P2.1 Add missing Home artifacts section in modern homepage.
 Acceptance criteria: If artifacts exist in home payload, modern home renders an artifacts block with links.
 
-- [ ] P2.2 Resolve or retire unwired migration scaffolds under `client/src/pages/Wiki/*`.
+- [x] P2.2 Resolve or retire unwired migration scaffolds under `client/src/pages/Wiki/*`.
 Acceptance criteria: Each scaffold page is either fully wired and implemented or documented as deferred/retired with explicit rationale.
 
 - [ ] P2.3 Add regression tests for parity-critical routes.
