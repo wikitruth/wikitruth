@@ -32,7 +32,7 @@ Acceptance criteria: Modern account settings includes contact info update, ident
 - [x] P1.4 Complete entry detail parity for topic/argument/question/issue/opinion/answer/artifact pages.
 Acceptance criteria: Related/child lists and discussion/context sections match legacy behavior where applicable; counts are not hardcoded placeholders.
 
-- [ ] P1.5 Implement entry actions parity (more/options menu).
+- [x] P1.5 Implement entry actions parity (more/options menu).
 Acceptance criteria: Modern entry option surface supports key legacy actions (edit/report/follow/share, role-aware admin and screener actions).
 
 - [ ] P1.6 Restore search behavior parity.

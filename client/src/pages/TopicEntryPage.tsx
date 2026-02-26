@@ -12,6 +12,7 @@ import ArgumentEntryRow from '../components/EntryRow/ArgumentEntryRow';
 import QuestionEntryRow from '../components/EntryRow/QuestionEntryRow';
 import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
+import EntryActionsMenu from '../components/Entry/EntryActionsMenu';
 import type { TopicEntryResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
 import type { Argument, Artifact, Issue, Opinion, Question, Topic } from '../types';
@@ -84,6 +85,7 @@ const TopicEntryPage: React.FC = () => {
         subtitle={topic.subtitle}
         icon="folder-open"
         iconColor="text-success-x"
+        actions={<EntryActionsMenu entry={topic} editPath={`/topics/create?id=${encodeURIComponent(topic._id)}`} />}
       />
       
       <PageTabs tabs={tabs} />

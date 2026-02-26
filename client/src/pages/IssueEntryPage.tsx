@@ -7,6 +7,7 @@ import PageTabs from '../components/common/PageTabs';
 import Alert from '../components/common/Alert';
 import EntryList from '../components/common/EntryList';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
+import EntryActionsMenu from '../components/Entry/EntryActionsMenu';
 import apiService from '../services/api';
 import type { IssueEntryResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
@@ -78,11 +79,7 @@ const IssueEntryPage: React.FC = () => {
         subtitle={issue.subtitle}
         icon="exclamation-triangle"
         iconColor="text-warning"
-        actions={
-          <Link to={`/issues/edit/${issue._id}`} className="btn btn-default">
-            <i className="fa fa-pencil"></i> Edit
-          </Link>
-        }
+        actions={<EntryActionsMenu entry={issue} editPath={`/issues/edit/${encodeURIComponent(issue._id)}`} />}
       />
       
       <PageTabs tabs={tabs} />

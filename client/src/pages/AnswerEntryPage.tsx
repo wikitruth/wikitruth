@@ -7,6 +7,7 @@ import PageHeader from '../components/common/PageHeader';
 import EntryList from '../components/common/EntryList';
 import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
+import EntryActionsMenu from '../components/Entry/EntryActionsMenu';
 import apiService from '../services/api';
 import type { LegacyEntity } from '../types/legacy';
 import type { AnswerEntryResponse } from '../types/api';
@@ -57,11 +58,7 @@ const AnswerEntryPage: React.FC = () => {
         title={answer.title}
         icon="list-alt"
         iconColor="text-primary"
-        actions={
-          <Link to={`/answers/edit/${answer._id}`} className="btn btn-default">
-            <i className="fa fa-pencil"></i> Edit
-          </Link>
-        }
+        actions={<EntryActionsMenu entry={answer} editPath={`/answers/edit/${encodeURIComponent(answer._id)}`} />}
       />
 
       <div className="text-body" style={{ marginTop: '20px' }}>

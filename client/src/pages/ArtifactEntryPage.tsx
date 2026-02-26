@@ -9,6 +9,7 @@ import ArgumentEntryRow from '../components/EntryRow/ArgumentEntryRow';
 import QuestionEntryRow from '../components/EntryRow/QuestionEntryRow';
 import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
+import EntryActionsMenu from '../components/Entry/EntryActionsMenu';
 import apiService from '../services/api';
 import type { LegacyEntity } from '../types/legacy';
 import type { ArtifactEntryResponse } from '../types/api';
@@ -62,11 +63,7 @@ const ArtifactEntryPage: React.FC = () => {
         title={artifact.title}
         icon="picture-o"
         iconColor="text-primary"
-        actions={
-          <Link to={`/artifacts/edit/${artifact._id}`} className="btn btn-default">
-            <i className="fa fa-pencil"></i> Edit
-          </Link>
-        }
+        actions={<EntryActionsMenu entry={artifact} editPath={`/artifacts/edit/${encodeURIComponent(artifact._id)}`} />}
       />
 
       <div className="text-body" style={{ marginTop: '20px' }}>

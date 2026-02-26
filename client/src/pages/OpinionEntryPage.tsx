@@ -8,6 +8,7 @@ import Alert from '../components/common/Alert';
 import EntryList from '../components/common/EntryList';
 import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
+import EntryActionsMenu from '../components/Entry/EntryActionsMenu';
 import apiService from '../services/api';
 import type { OpinionEntryResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
@@ -80,11 +81,7 @@ const OpinionEntryPage: React.FC = () => {
         subtitle={opinion.subtitle}
         icon="comment"
         iconColor="text-info"
-        actions={
-          <Link to={`/opinions/edit/${opinion._id}`} className="btn btn-default">
-            <i className="fa fa-pencil"></i> Edit
-          </Link>
-        }
+        actions={<EntryActionsMenu entry={opinion} editPath={`/opinions/edit/${encodeURIComponent(opinion._id)}`} />}
       />
       
       <PageTabs tabs={tabs} />

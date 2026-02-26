@@ -12,6 +12,7 @@ import EntryList from '../components/common/EntryList';
 import AnswerEntryRow from '../components/EntryRow/AnswerEntryRow';
 import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
+import EntryActionsMenu from '../components/Entry/EntryActionsMenu';
 import type { Answer, Issue, Opinion } from '../types';
 
 const QuestionEntryPage: React.FC = () => {
@@ -85,11 +86,7 @@ const QuestionEntryPage: React.FC = () => {
         subtitle={question.subtitle}
         icon="question-circle"
         iconColor="text-success-x"
-        actions={
-          <Link to={`/questions/edit/${question._id}`} className="btn btn-default">
-            <i className="fa fa-pencil"></i> Edit
-          </Link>
-        }
+        actions={<EntryActionsMenu entry={question} editPath={`/questions/edit/${encodeURIComponent(question._id)}`} />}
       />
       
       <PageTabs tabs={tabs} />

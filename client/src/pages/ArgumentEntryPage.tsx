@@ -12,6 +12,7 @@ import QuestionEntryRow from '../components/EntryRow/QuestionEntryRow';
 import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
 import EntryList from '../components/common/EntryList';
+import EntryActionsMenu from '../components/Entry/EntryActionsMenu';
 import type { Issue, Opinion, Question } from '../types';
 
 const ArgumentEntryPage: React.FC = () => {
@@ -79,6 +80,7 @@ const ArgumentEntryPage: React.FC = () => {
         subtitle={argument.subtitle}
         icon="flash"
         iconColor="text-primary"
+        actions={<EntryActionsMenu entry={argument} editPath={`/arguments/create?id=${encodeURIComponent(argument._id)}`} />}
       />
       
       <PageTabs tabs={tabs} />
