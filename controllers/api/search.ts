@@ -22,86 +22,139 @@ module.exports = function (router) {
 
 // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 async function GET_search(req, res) {
-  const query = req.query.q;
+  const query = String(req.query.q || '').trim();
   
   if (!query) {
     return res.json({ 
       topics: [], 
       arguments: [], 
-      questions: [] 
+      questions: [],
+      answers: [],
+      artifacts: [],
+      issues: [],
+      opinions: [],
     });
   }
 
   let model = {};
   flowUtils.setScreeningModel(req, model);
+  const pattern = { $regex: query, $options: 'i' };
 
-  // Search topics
-  const topicResults = await db.Topic.find({
-    $or: [
-      { title: { $regex: query, $options: 'i' } },
-      { description: { $regex: query, $options: 'i' } }
-    ],
+  const baseQuery = {
     private: false,
     // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
     'screening.status': model.screening.status,
-  })
-  .sort({ editDate: -1 })
-  .limit(20)
-  .lean();
+  };
+
+  const [topicResults, argumentResults, questionResults, answerResults, artifactResults, issueResults, opinionResults] = await Promise.all([
+    db.Topic
+      .find({
+        ...baseQuery,
+        $or: [{ title: pattern }, { content: pattern }, { contentPreview: pattern }, { references: pattern }],
+      })
+      .sort({ editDate: -1 })
+      .limit(20)
+      .lean(),
+    db.Argument
+      .find({
+        ...baseQuery,
+        $or: [{ title: pattern }, { content: pattern }, { contentPreview: pattern }, { references: pattern }],
+      })
+      .sort({ editDate: -1 })
+      .limit(20)
+      .lean(),
+    db.Question
+      .find({
+        ...baseQuery,
+        $or: [{ title: pattern }, { content: pattern }, { contentPreview: pattern }, { references: pattern }],
+      })
+      .sort({ editDate: -1 })
+      .limit(20)
+      .lean(),
+    db.Answer
+      .find({
+        ...baseQuery,
+        $or: [{ title: pattern }, { content: pattern }, { contentPreview: pattern }, { references: pattern }],
+      })
+      .sort({ editDate: -1 })
+      .limit(20)
+      .lean(),
+    db.Artifact
+      .find({
+        ...baseQuery,
+        $or: [{ title: pattern }, { content: pattern }, { contentPreview: pattern }, { references: pattern }, { source: pattern }],
+      })
+      .sort({ editDate: -1 })
+      .limit(20)
+      .lean(),
+    db.Issue
+      .find({
+        ...baseQuery,
+        $or: [{ title: pattern }, { content: pattern }, { contentPreview: pattern }, { references: pattern }],
+      })
+      .sort({ editDate: -1 })
+      .limit(20)
+      .lean(),
+    db.Opinion
+      .find({
+        ...baseQuery,
+        $or: [{ title: pattern }, { content: pattern }, { contentPreview: pattern }, { references: pattern }],
+      })
+      .sort({ editDate: -1 })
+      .limit(20)
+      .lean(),
+  ]);
 
   await flowUtils.setEditorsUsername(topicResults);
   await flowUtils.setEntryParents(topicResults, constants.OBJECT_TYPES.topic);
-  // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
-  topicResults.forEach(function (result) {
+  topicResults.forEach(function (result: any) {
     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.topic, req);
   });
 
-  // Search arguments
-  const argumentResults = await db.Argument.find({
-    $or: [
-      { title: { $regex: query, $options: 'i' } },
-      { description: { $regex: query, $options: 'i' } }
-    ],
-    private: false,
-    // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
-    'screening.status': model.screening.status,
-  })
-  .sort({ editDate: -1 })
-  .limit(20)
-  .lean();
-
   await flowUtils.setEditorsUsername(argumentResults);
   await flowUtils.setEntryParents(argumentResults, constants.OBJECT_TYPES.argument);
-  // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
-  argumentResults.forEach(function (result) {
+  argumentResults.forEach(function (result: any) {
     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.argument, req);
     flowUtils.setVerdictModel(result);
   });
 
-  // Search questions
-  const questionResults = await db.Question.find({
-    $or: [
-      { title: { $regex: query, $options: 'i' } },
-      { description: { $regex: query, $options: 'i' } }
-    ],
-    private: false,
-    // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
-    'screening.status': model.screening.status,
-  })
-  .sort({ editDate: -1 })
-  .limit(20)
-  .lean();
-
   await flowUtils.setEditorsUsername(questionResults);
   await flowUtils.setEntryParents(questionResults, constants.OBJECT_TYPES.question);
-  // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
-  questionResults.forEach(function (result) {
+  questionResults.forEach(function (result: any) {
     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.question, req);
+  });
+
+  await flowUtils.setEditorsUsername(answerResults);
+  await flowUtils.setEntryParents(answerResults, constants.OBJECT_TYPES.answer);
+  answerResults.forEach(function (result: any) {
+    flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.answer, req);
+  });
+
+  await flowUtils.setEditorsUsername(artifactResults);
+  await flowUtils.setEntryParents(artifactResults, constants.OBJECT_TYPES.artifact);
+  artifactResults.forEach(function (result: any) {
+    flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.artifact, req);
+  });
+
+  await flowUtils.setEditorsUsername(issueResults);
+  await flowUtils.setEntryParents(issueResults, constants.OBJECT_TYPES.issue);
+  issueResults.forEach(function (result: any) {
+    flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.issue, req);
+  });
+
+  await flowUtils.setEditorsUsername(opinionResults);
+  await flowUtils.setEntryParents(opinionResults, constants.OBJECT_TYPES.opinion);
+  opinionResults.forEach(function (result: any) {
+    flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.opinion, req);
   });
 
   res.json({
     topics: topicResults,
     arguments: argumentResults,
     questions: questionResults,
+    answers: answerResults,
+    artifacts: artifactResults,
+    issues: issueResults,
+    opinions: opinionResults,
   });
 }

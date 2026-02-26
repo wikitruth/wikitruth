@@ -5,8 +5,11 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import TopicEntryRow from '../components/EntryRow/TopicEntryRow';
 import ArgumentEntryRow from '../components/EntryRow/ArgumentEntryRow';
 import QuestionEntryRow from '../components/EntryRow/QuestionEntryRow';
+import AnswerEntryRow from '../components/EntryRow/AnswerEntryRow';
+import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
+import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
 import type { LegacyResponse } from '../types/legacy';
-import type { Argument, Question, Topic } from '../types';
+import type { Answer, Argument, Issue, Opinion, Question, Topic, Artifact } from '../types';
 
 const SearchPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -47,7 +50,11 @@ const SearchPage: React.FC = () => {
 
   const totalResults = (results.topics?.length || 0) + 
                        (results.arguments?.length || 0) + 
-                       (results.questions?.length || 0);
+                       (results.questions?.length || 0) +
+                       (results.answers?.length || 0) +
+                       (results.issues?.length || 0) +
+                       (results.opinions?.length || 0) +
+                       (results.artifacts?.length || 0);
 
   return (
     <div>
@@ -60,7 +67,7 @@ const SearchPage: React.FC = () => {
           <input
             type="text"
             className="form-control"
-            placeholder="Search topics, arguments, questions..."
+            placeholder="Search topics, arguments, questions, answers, issues, opinions, artifacts..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -125,6 +132,66 @@ const SearchPage: React.FC = () => {
                   <ul className="list-group wt-list">
                     {results.questions.map((question) => (
                       <QuestionEntryRow key={question._id} question={question as unknown as Question} subtitle={true} />
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Answers Results */}
+              {results.answers && results.answers.length > 0 && (
+                <div style={{ marginBottom: '30px' }}>
+                  <h3 className="page-header">
+                    <span className="glyphicon glyphicon-ok-circle"></span> Answers ({results.answers.length})
+                  </h3>
+                  <ul className="list-group wt-list">
+                    {results.answers.map((answer) => (
+                      <AnswerEntryRow key={answer._id} answer={answer as unknown as Answer} subtitle={true} />
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Issues Results */}
+              {results.issues && results.issues.length > 0 && (
+                <div style={{ marginBottom: '30px' }}>
+                  <h3 className="page-header">
+                    <span className="glyphicon glyphicon-warning-sign"></span> Issues ({results.issues.length})
+                  </h3>
+                  <ul className="list-group wt-list">
+                    {results.issues.map((issue) => (
+                      <IssueEntryRow key={issue._id} issue={issue as unknown as Issue} subtitle={true} />
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Opinions Results */}
+              {results.opinions && results.opinions.length > 0 && (
+                <div style={{ marginBottom: '30px' }}>
+                  <h3 className="page-header">
+                    <span className="glyphicon glyphicon-comment"></span> Opinions ({results.opinions.length})
+                  </h3>
+                  <ul className="list-group wt-list">
+                    {results.opinions.map((opinion) => (
+                      <OpinionEntryRow key={opinion._id} opinion={opinion as unknown as Opinion} subtitle={true} />
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Artifacts Results */}
+              {results.artifacts && results.artifacts.length > 0 && (
+                <div style={{ marginBottom: '30px' }}>
+                  <h3 className="page-header">
+                    <span className="glyphicon glyphicon-paperclip"></span> Artifacts ({results.artifacts.length})
+                  </h3>
+                  <ul className="list-group wt-list">
+                    {results.artifacts.map((artifact) => (
+                      <li key={artifact._id} className="list-group-item">
+                        <a href={`/artifacts/entry/${(artifact as unknown as Artifact).friendlyUrl}/${artifact._id}`}>
+                          {artifact.title || '(Untitled)'}
+                        </a>
+                      </li>
                     ))}
                   </ul>
                 </div>

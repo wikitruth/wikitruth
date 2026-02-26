@@ -21,7 +21,7 @@ Close remaining parity gaps between legacy and modern flows, harden API contract
 - [x] `/visualize` modern route is now data-driven.
 - [x] Group posts modern route now has native read flow and create hooks.
 - [x] Member profile `following` and `topics` pages are data-backed.
-- [ ] Search API parity is incomplete (modern search omits legacy entity types).
+- [x] Search API parity now includes legacy-priority entity buckets.
 - [ ] API success/error envelopes are inconsistent across controllers.
 - [ ] Security/data-integrity TODO/FIXME debt remains in critical legacy-backed controllers.
 
@@ -53,7 +53,7 @@ Close remaining parity gaps between legacy and modern flows, harden API contract
   - Acceptance:
     - Pages show real data and handle private-profile constraints.
 
-- [ ] **P0.5 Restore search parity for modern API**
+- [x] **P0.5 Restore search parity for modern API**
   - Extend `controllers/api/search.ts` to support legacy-search entity coverage (at minimum answers, artifacts, issues, opinions), with typed response shape.
   - Acceptance:
     - Modern search response includes all intended entity buckets.

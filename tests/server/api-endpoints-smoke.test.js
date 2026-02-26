@@ -134,4 +134,13 @@ describe('API endpoint smoke coverage', function () {
     expect(groupsApi).toContain("router.post('/entry/:id/members'");
     expect(groupsApi).toContain("router.delete('/entry/:id/members/:userId'");
   });
+
+  it('keeps modern search parity buckets for core content types', function () {
+    const searchApi = read('controllers/api/search.ts');
+
+    expect(searchApi).toContain('answers:');
+    expect(searchApi).toContain('artifacts:');
+    expect(searchApi).toContain('issues:');
+    expect(searchApi).toContain('opinions:');
+  });
 });
