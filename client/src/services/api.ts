@@ -15,6 +15,7 @@ import type {
   GroupsListResponse,
   MemberProfileResponse,
   MemberTopicsResponse,
+  MemberContributionsResponse,
   MemberFollowingResponse,
   MemberPagesResponse,
   MemberPageResponse,
@@ -424,6 +425,11 @@ class ApiService {
 
   async getMemberFollowing(username: string): Promise<MemberFollowingResponse> {
     return this.request<MemberFollowingResponse>(`/members/${encodeURIComponent(username)}/following`);
+  }
+
+  async getMemberContributions(username: string, tab: string = 'all'): Promise<MemberContributionsResponse> {
+    const query = tab && tab !== 'all' ? `?tab=${encodeURIComponent(tab)}` : '';
+    return this.request<MemberContributionsResponse>(`/members/${encodeURIComponent(username)}/contributions${query}`);
   }
 
   async getCurrentMemberProfile(): Promise<LegacyApiResponse> {

@@ -289,6 +289,104 @@ module.exports = function (router) {
     }
   });
 
+  // Get member contributions across entity types
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
+  router.get('/:username/contributions', async function (req, res) {
+    try {
+      const member = await db.User
+        .findOne({ username: req.params.username })
+        .select('_id username preferences')
+        .lean();
+
+      if (!member) {
+        return res.status(404).json({ error: 'Member not found' });
+      }
+      if (!canViewProfile(member, req.user)) {
+        return res.status(403).json({ error: 'Profile is private' });
+      }
+
+      const tab = String(req.query?.tab || 'all').toLowerCase();
+      const validTabs = ['all', 'topics', 'arguments', 'questions', 'answers', 'artifacts', 'issues', 'opinions'];
+      const normalizedTab = validTabs.includes(tab) ? tab : 'all';
+      const limit = normalizedTab === 'all' ? 15 : 100;
+      const canViewPrivate = canViewPrivateEntries(member, req.user);
+      const baseQuery: any = { createUserId: member._id };
+      if (!canViewPrivate) {
+        baseQuery.private = { $ne: true };
+      }
+
+      const shouldLoad = function (name: string) {
+        return normalizedTab === 'all' || normalizedTab === name;
+      };
+
+      const [
+        topics,
+        argumentsList,
+        questions,
+        answers,
+        artifacts,
+        issues,
+        opinions,
+      ] = await Promise.all([
+        shouldLoad('topics') ? db.Topic.find(baseQuery).sort({ editDate: -1 }).limit(limit).lean() : [],
+        shouldLoad('arguments') ? db.Argument.find(baseQuery).sort({ editDate: -1 }).limit(limit).lean() : [],
+        shouldLoad('questions') ? db.Question.find(baseQuery).sort({ editDate: -1 }).limit(limit).lean() : [],
+        shouldLoad('answers') ? db.Answer.find(baseQuery).sort({ editDate: -1 }).limit(limit).lean() : [],
+        shouldLoad('artifacts') ? db.Artifact.find(baseQuery).sort({ editDate: -1 }).limit(limit).lean() : [],
+        shouldLoad('issues') ? db.Issue.find(baseQuery).sort({ editDate: -1 }).limit(limit).lean() : [],
+        shouldLoad('opinions') ? db.Opinion.find(baseQuery).sort({ editDate: -1 }).limit(limit).lean() : [],
+      ]);
+
+      const withFriendlyUrl = function (entry: any) {
+        if (!entry) {
+          return entry;
+        }
+        return {
+          ...entry,
+          friendlyUrl: entry.friendlyUrl || utils.urlify(entry.title || ''),
+        };
+      };
+
+      const model = {
+        member: {
+          _id: member._id,
+          username: member.username,
+        },
+        tab: normalizedTab,
+        results: false,
+        topics: topics.map(withFriendlyUrl),
+        arguments: argumentsList.map(withFriendlyUrl),
+        questions: questions.map(withFriendlyUrl),
+        answers: answers.map(withFriendlyUrl),
+        artifacts: artifacts.map(withFriendlyUrl),
+        issues: issues.map(withFriendlyUrl),
+        opinions: opinions.map(withFriendlyUrl),
+        topicsMore: normalizedTab === 'all' && topics.length >= limit,
+        argumentsMore: normalizedTab === 'all' && argumentsList.length >= limit,
+        questionsMore: normalizedTab === 'all' && questions.length >= limit,
+        answersMore: normalizedTab === 'all' && answers.length >= limit,
+        artifactsMore: normalizedTab === 'all' && artifacts.length >= limit,
+        issuesMore: normalizedTab === 'all' && issues.length >= limit,
+        opinionsMore: normalizedTab === 'all' && opinions.length >= limit,
+      };
+
+      model.results = Boolean(
+        model.topics.length ||
+          model.arguments.length ||
+          model.questions.length ||
+          model.answers.length ||
+          model.artifacts.length ||
+          model.issues.length ||
+          model.opinions.length,
+      );
+
+      return res.json(model);
+    } catch (err) {
+      console.error('Error fetching member contributions:', err);
+      return res.status(500).json({ error: 'Failed to fetch member contributions' });
+    }
+  });
+
   // Get member custom pages
   // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get('/:username/pages', async function (req, res) {

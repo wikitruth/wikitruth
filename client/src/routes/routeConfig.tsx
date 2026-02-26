@@ -167,6 +167,7 @@ export const appRoutes: AppRoute[] = [
   { path: '/members/profile/topics', element: <ProfileTopics /> },
   { path: '/members/:username/diary', element: <ProfileDiary /> },
   { path: '/members/profile/diary', element: <ProfileDiary /> },
+  { path: '/members/:username/contributions', element: <ProfileContributions /> },
   { path: '/members/profile/contributions', element: <ProfileContributions /> },
   { path: '/members/:username/following', element: <ProfileFollowing /> },
   { path: '/members/profile/following', element: <ProfileFollowing /> },

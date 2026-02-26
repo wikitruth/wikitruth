@@ -7,6 +7,7 @@ export const membersApi = {
   administrators: () => apiService.getAdministrators(),
   profile: (username: string) => apiService.getMemberProfile(username),
   topics: (username: string, limit?: number) => apiService.getMemberTopics(username, limit),
+  contributions: (username: string, tab?: string) => apiService.getMemberContributions(username, tab),
   following: (username: string) => apiService.getMemberFollowing(username),
 };
 

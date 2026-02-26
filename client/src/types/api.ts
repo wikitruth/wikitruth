@@ -88,6 +88,19 @@ export interface MemberTopicsResponse extends ApiBaseResponse {
   topics?: LegacyEntity[];
 }
 
+export interface MemberContributionsResponse extends ApiBaseResponse, EntityBuckets {
+  member?: LegacyEntity;
+  tab?: string;
+  results?: boolean;
+  topicsMore?: boolean;
+  argumentsMore?: boolean;
+  questionsMore?: boolean;
+  answersMore?: boolean;
+  artifactsMore?: boolean;
+  issuesMore?: boolean;
+  opinionsMore?: boolean;
+}
+
 export interface MemberFollowingGraph {
   people?: LegacyEntity[];
   users?: LegacyEntity[];
