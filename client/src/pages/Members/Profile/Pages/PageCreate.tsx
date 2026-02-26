@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Breadcrumb from '../../../../components/common/Breadcrumb';
-import PageHeader from '../../../../components/common/PageHeader';
 import Input from '../../../../components/Form/Input';
 import TextArea from '../../../../components/Form/TextArea';
 import Button from '../../../../components/common/Button';
 import Alert from '../../../../components/common/Alert';
+import ProfileShell from '../../../../components/Members/ProfileShell';
 import useForm from '../../../../hooks/useForm';
 import apiService from '../../../../services/api';
 import { useAuth } from '../../../../context/AuthContext';
@@ -70,18 +69,10 @@ const PageCreate: React.FC = () => {
   });
 
   return (
-    <div>
-      <Breadcrumb
-        items={[
-          { title: 'Home', url: '/' },
-          { title: 'Profile', url: '/members/profile' },
-          { title: 'Pages', url: '/members/profile/pages' },
-          { title: 'Create Page', active: true },
-        ]}
-      />
-
-      <PageHeader title="Create Profile Page" subtitle="Publish a custom page on your profile" icon="file-text-o" iconColor="text-primary" />
-
+    <ProfileShell username={username || user?.username || 'member'} activeTab="pages" isOwnProfile={true}>
+      <h1 className="page-header wt-header">
+        <i className="fa fa-file-text-o"></i> Create Profile Page
+      </h1>
       {submitError && <Alert type="danger">{submitError}</Alert>}
 
       <div className="panel panel-default">
@@ -119,7 +110,7 @@ const PageCreate: React.FC = () => {
           </form>
         </div>
       </div>
-    </div>
+    </ProfileShell>
   );
 };
 

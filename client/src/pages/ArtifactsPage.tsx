@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import Layout from '../components/Layout/Layout';
 import LoadingSpinner from '../components/LoadingSpinner';
 import apiService from '../services/api';
 import type { LegacyEntity, LegacyResponse } from '../types/legacy';
@@ -27,77 +26,57 @@ const ArtifactsPage: React.FC = () => {
   }, []);
 
   if (loading) {
-    return (
-      <Layout>
-        <LoadingSpinner message="Loading artifacts..." />
-      </Layout>
-    );
+    return <LoadingSpinner message="Loading artifacts..." />;
   }
 
   if (error) {
-    return (
-      <Layout>
-        <div className="alert alert-danger">Error loading artifacts: {error}</div>
-      </Layout>
-    );
+    return <div className="alert alert-danger">Error loading artifacts: {error}</div>;
   }
 
   return (
-    <Layout>
-      <div className="row">
-        <div className="col-md-12">
-          <h2>
-            <span className="glyphicon glyphicon-picture" aria-hidden="true"></span> Artifacts
-          </h2>
-          <p className="lead">Browse media, documents, and other artifacts</p>
-          <p>
-            <Link to="/artifacts/create" className="btn btn-primary">
-              <span className="glyphicon glyphicon-plus"></span> Add Artifact
-            </Link>
-          </p>
-          
-          <div className="panel panel-default">
-            <div className="panel-heading">
-              <h3 className="panel-title">Recent Artifacts</h3>
-            </div>
-            <ul className="list-group">
-              {data?.artifacts && data.artifacts.length > 0 ? (
-                data.artifacts.map((artifact: LegacyEntity) => (
-                  <li key={artifact._id} className="list-group-item">
-                    <h4>
-                      <Link to={`/artifacts/entry/${artifact.friendlyUrl}/${artifact._id}`}>
-                        {artifact.title}
-                      </Link>
-                    </h4>
-                    {artifact.contentPreview && (
-                      <p className="text-muted">{artifact.contentPreview}</p>
-                    )}
-                    {artifact.file && (
-                      <div className="text-muted">
-                        <small>
-                          <span className="glyphicon glyphicon-file"></span> {artifact.file.type} - {artifact.file.name}
-                        </small>
-                      </div>
-                    )}
-                    <small className="text-muted">
-                      Edited by {artifact.editorUsername} on {new Date(artifact.editDate).toLocaleDateString()}
-                    </small>
-                  </li>
-                ))
-              ) : (
-                <li className="list-group-item">No artifacts found.</li>
-              )}
-            </ul>
-          </div>
+    <div>
+      <h1 className="page-header wt-header">
+        <i className="fa fa-puzzle-piece"></i> Latest Artifacts
+      </h1>
+      <p>
+        <Link to="/artifacts/create" className="btn btn-primary">
+          <i className="fa fa-plus"></i> Add Artifact
+        </Link>
+      </p>
 
-          <div className="text-center">
-            <Link to="/" className="btn btn-default">
-              <span className="glyphicon glyphicon-home"></span> Back to Home
-            </Link>
-          </div>
-        </div>
-      </div>
-    </Layout>
+      <ul className="list-group wt-list">
+        <li className="list-group-item highlight">
+          <i className="fa fa-puzzle-piece text-muted" aria-hidden="true"></i>
+          <div>Latest Artifacts</div>
+        </li>
+        {data?.artifacts && data.artifacts.length > 0 ? (
+          data.artifacts.map((artifact: LegacyEntity) => (
+            <li key={artifact._id} className="list-group-item">
+              <h4>
+                <Link to={`/artifacts/entry/${artifact.friendlyUrl}/${artifact._id}`}>
+                  {artifact.title}
+                </Link>
+              </h4>
+              {artifact.contentPreview && (
+                <p className="text-muted">{artifact.contentPreview}</p>
+              )}
+              {artifact.file && (
+                <div className="text-muted">
+                  <small>
+                    <span className="glyphicon glyphicon-file"></span> {artifact.file.type} - {artifact.file.name}
+                  </small>
+                </div>
+              )}
+              <small className="text-muted">
+                Edited by {artifact.editorUsername} on {new Date(artifact.editDate).toLocaleDateString()}
+              </small>
+            </li>
+          ))
+        ) : (
+          <li className="list-group-item">No artifacts found.</li>
+        )}
+      </ul>
+    </div>
   );
 };
 

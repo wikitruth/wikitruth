@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 const AboutPage: React.FC = () => {
   return (
     <div>
-      <h1 className="page-header">About Wikitruth</h1>
+      <h1 className="page-header wt-header">About Wikitruth</h1>
 
       <div className="lead" style={{ marginBottom: '30px' }}>
         A systematic discourse and knowledge contribution using dialectics and vetting

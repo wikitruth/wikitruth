@@ -143,20 +143,21 @@ const ContextSidebar: React.FC = () => {
 
   return (
     <aside className="wt-context-sidebar" aria-label="Contextual navigation">
-      {sections.map((navSection) => (
-        <div key={navSection.title} className="wt-context-sidebar-section">
-          <div className="wt-context-sidebar-header">{navSection.title}</div>
-          <ul className="nav">
+      <ul className="wt-nav nav">
+        {sections.map((navSection, sectionIndex) => (
+          <React.Fragment key={navSection.title}>
+            {sectionIndex > 0 && <li role="separator" className="divider"></li>}
+            <li className="dropdown-header">{navSection.title}</li>
             {navSection.items.map((item) => (
-              <li key={`${navSection.title}-${item.to}`}>
+              <li key={`${navSection.title}-${item.to}`} className={location.pathname === item.to ? 'active' : ''}>
                 <Link to={item.to}>
                   <i className={`fa fa-${item.icon}`} aria-hidden="true"></i> {item.label}
                 </Link>
               </li>
             ))}
-          </ul>
-        </div>
-      ))}
+          </React.Fragment>
+        ))}
+      </ul>
     </aside>
   );
 };

@@ -1,12 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import Breadcrumb from '../../../../components/common/Breadcrumb';
-import PageHeader from '../../../../components/common/PageHeader';
 import Input from '../../../../components/Form/Input';
 import TextArea from '../../../../components/Form/TextArea';
 import Button from '../../../../components/common/Button';
 import Alert from '../../../../components/common/Alert';
 import LoadingSpinner from '../../../../components/LoadingSpinner';
+import ProfileShell from '../../../../components/Members/ProfileShell';
 import apiService from '../../../../services/api';
 import { useAuth } from '../../../../context/AuthContext';
 import type { LegacyEntity } from '../../../../types/legacy';
@@ -83,30 +82,16 @@ const PageView: React.FC = () => {
     return <Alert type="danger">{error || 'Profile page not found'}</Alert>;
   }
 
-  return (
+  const pageContent = (
     <div>
-      <Breadcrumb
-        items={[
-          { title: 'Home', url: '/' },
-          { title: 'Profile', url: isOwnProfile ? '/members/profile' : `/members/${username}` },
-          { title: 'Pages', url: isOwnProfile ? '/members/profile/pages' : `/members/${username}` },
-          { title: page.title, active: true },
-        ]}
-      />
-
-      <PageHeader
-        title={page.title}
-        subtitle="Custom profile page"
-        icon="file-text-o"
-        iconColor="text-primary"
-        actions={
-          isOwnProfile ? (
-            <Button type="button" variant="default" onClick={() => setEditing((prev) => !prev)} icon="pencil">
-              {editing ? 'Cancel Edit' : 'Edit'}
-            </Button>
-          ) : undefined
-        }
-      />
+      <h1 className="page-header wt-header">
+        <i className="fa fa-file-text-o"></i> {page.title}{' '}
+        {isOwnProfile && (
+          <Button type="button" variant="default" onClick={() => setEditing((prev) => !prev)} icon="pencil" className="btn-sm">
+            {editing ? 'Cancel Edit' : 'Edit'}
+          </Button>
+        )}
+      </h1>
 
       {error && <Alert type="danger">{error}</Alert>}
 
@@ -135,6 +120,16 @@ const PageView: React.FC = () => {
       </Link>
     </div>
   );
+
+  if (isOwnProfile) {
+    return (
+      <ProfileShell username={username} activeTab="pages" isOwnProfile={true}>
+        {pageContent}
+      </ProfileShell>
+    );
+  }
+
+  return pageContent;
 };
 
 export default PageView;

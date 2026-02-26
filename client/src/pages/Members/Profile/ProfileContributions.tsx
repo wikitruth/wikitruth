@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import Alert from '../../../components/common/Alert';
 import LoadingSpinner from '../../../components/LoadingSpinner';
+import ProfileShell from '../../../components/Members/ProfileShell';
 import apiService from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
 import type { LegacyEntity } from '../../../types/legacy';
@@ -23,6 +24,7 @@ const ProfileContributions: React.FC = () => {
   const [data, setData] = useState<MemberContributionsResponse>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const isOwnProfile = useMemo(() => Boolean(user?.username && username && user.username === username), [user?.username, username]);
 
   useEffect(() => {
     const load = async () => {
@@ -68,101 +70,99 @@ const ProfileContributions: React.FC = () => {
   }
 
   return (
-    <div className="container">
-      <h2>Profile Contributions</h2>
-      <p className="text-muted">Recent contributions by {username}.</p>
-
-      <ul className="nav nav-tabs wt-tabs" role="tablist">
-        <li role="presentation" className={tab === 'all' ? 'active' : ''}>
-          <a
-            href="#all"
-            onClick={(event) => {
-              event.preventDefault();
-              setSearchParams({});
-            }}
-          >
-            <i className="fa fa-globe" aria-hidden="true"></i> All
-          </a>
-        </li>
-        {sections.map((section) => (
-          <li key={section.key} role="presentation" className={tab === section.key ? 'active' : ''}>
+    <ProfileShell username={username} activeTab="contributions" isOwnProfile={isOwnProfile}>
+      <div style={{ marginTop: '15px' }}>
+        <ul className="nav nav-tabs wt-tabs" role="tablist">
+          <li role="presentation" className={tab === 'all' ? 'active' : ''}>
             <a
-              href={`#${section.key}`}
+              href="#all"
               onClick={(event) => {
                 event.preventDefault();
-                setSearchParams({ tab: section.key });
+                setSearchParams({});
               }}
             >
-              {section.label}
+              <i className="fa fa-globe" aria-hidden="true"></i> All
             </a>
           </li>
-        ))}
-      </ul>
+          {sections.map((section) => (
+            <li key={section.key} role="presentation" className={tab === section.key ? 'active' : ''}>
+              <a
+                href={`#${section.key}`}
+                onClick={(event) => {
+                  event.preventDefault();
+                  setSearchParams({ tab: section.key });
+                }}
+              >
+                {section.label}
+              </a>
+            </li>
+          ))}
+        </ul>
 
-      {!data.results && <Alert type="warning">No contributions found.</Alert>}
+        {!data.results && <Alert type="warning">No contributions found.</Alert>}
 
-      {sections
-        .filter((section) => tab === 'all' || tab === section.key)
-        .map((section) => (
-          <div key={section.key} style={{ marginTop: '20px' }}>
-            <h4>{section.label}</h4>
-            {section.entries.length === 0 ? (
-              <p className="text-muted">No {section.label.toLowerCase()} yet.</p>
-            ) : (
-              <>
-                <ul className="list-group wt-list">
-                  {section.key === 'topics' &&
-                    section.entries.map((entry) => (
-                      <TopicEntryRow key={entry._id} topic={entry as unknown as Topic} subtitle={true} labels={true} />
-                    ))}
-                  {section.key === 'arguments' &&
-                    section.entries.map((entry) => (
-                      <ArgumentEntryRow key={entry._id} argument={entry as unknown as Argument} subtitle={true} labels={true} />
-                    ))}
-                  {section.key === 'questions' &&
-                    section.entries.map((entry) => (
-                      <QuestionEntryRow key={entry._id} question={entry as unknown as Question} subtitle={true} labels={true} />
-                    ))}
-                  {section.key === 'answers' &&
-                    section.entries.map((entry) => (
-                      <AnswerEntryRow key={entry._id} answer={entry as unknown as Answer} subtitle={true} />
-                    ))}
-                  {section.key === 'issues' &&
-                    section.entries.map((entry) => (
-                      <IssueEntryRow key={entry._id} issue={entry as unknown as Issue} subtitle={true} />
-                    ))}
-                  {section.key === 'opinions' &&
-                    section.entries.map((entry) => (
-                      <OpinionEntryRow key={entry._id} opinion={entry as unknown as Opinion} subtitle={true} />
-                    ))}
-                  {section.key === 'artifacts' &&
-                    section.entries.map((entry: LegacyEntity) => (
-                      <li key={entry._id} className="list-group-item">
-                        <Link to={`/artifacts/entry/${entry.friendlyUrl || entry._id}/${entry._id}`}>
-                          {entry.title || '(Untitled)'}
-                        </Link>
-                      </li>
-                    ))}
-                </ul>
-                {tab === 'all' && section.more && (
-                  <button
-                    type="button"
-                    className="btn btn-default btn-sm"
-                    onClick={() => setSearchParams({ tab: section.key })}
-                  >
-                    <i className="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more
-                  </button>
-                )}
-              </>
-            )}
-          </div>
-        ))}
+        {sections
+          .filter((section) => tab === 'all' || tab === section.key)
+          .map((section) => (
+            <div key={section.key} style={{ marginTop: '20px' }}>
+              {section.entries.length === 0 ? (
+                <p className="text-muted">No {section.label.toLowerCase()} yet.</p>
+              ) : (
+                <>
+                  <ul className="list-group wt-list">
+                    {section.key === 'topics' &&
+                      section.entries.map((entry) => (
+                        <TopicEntryRow key={entry._id} topic={entry as unknown as Topic} subtitle={true} labels={true} />
+                      ))}
+                    {section.key === 'arguments' &&
+                      section.entries.map((entry) => (
+                        <ArgumentEntryRow key={entry._id} argument={entry as unknown as Argument} subtitle={true} labels={true} />
+                      ))}
+                    {section.key === 'questions' &&
+                      section.entries.map((entry) => (
+                        <QuestionEntryRow key={entry._id} question={entry as unknown as Question} subtitle={true} labels={true} />
+                      ))}
+                    {section.key === 'answers' &&
+                      section.entries.map((entry) => (
+                        <AnswerEntryRow key={entry._id} answer={entry as unknown as Answer} subtitle={true} />
+                      ))}
+                    {section.key === 'issues' &&
+                      section.entries.map((entry) => (
+                        <IssueEntryRow key={entry._id} issue={entry as unknown as Issue} subtitle={true} />
+                      ))}
+                    {section.key === 'opinions' &&
+                      section.entries.map((entry) => (
+                        <OpinionEntryRow key={entry._id} opinion={entry as unknown as Opinion} subtitle={true} />
+                      ))}
+                    {section.key === 'artifacts' &&
+                      section.entries.map((entry: LegacyEntity) => (
+                        <li key={entry._id} className="list-group-item">
+                          <Link to={`/artifacts/entry/${entry.friendlyUrl || entry._id}/${entry._id}`}>
+                            {entry.title || '(Untitled)'}
+                          </Link>
+                        </li>
+                      ))}
+                  </ul>
+                  {tab === 'all' && section.more && (
+                    <button
+                      type="button"
+                      className="btn btn-default btn-sm"
+                      onClick={() => setSearchParams({ tab: section.key })}
+                    >
+                      <i className="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more
+                    </button>
+                  )}
+                </>
+              )}
+            </div>
+          ))}
+      </div>
       <div style={{ marginTop: '20px' }}>
-        <Link to={`/members/${username}`} className="btn btn-default">
+        <Link to={isOwnProfile ? '/members/profile' : `/members/${username}`} className="btn btn-default">
           <i className="fa fa-arrow-left"></i> Back to Profile
         </Link>
       </div>
-    </div>
+    </ProfileShell>
   );
 };
 

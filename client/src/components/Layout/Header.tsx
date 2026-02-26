@@ -4,10 +4,11 @@ import OptimizedImage from '../common/OptimizedImage';
 import type { Application, User } from '../../types';
 import authApi from '../../services/api/auth';
 import apiService from '../../services/api';
-import { useTheme } from '../../context/ThemeContext';
 
-type HeaderUser = Pick<User, '_id' | 'username' | 'email'>;
-type HeaderApplication = Pick<Application, '_id' | 'name'> & {
+type HeaderUser = Pick<User, '_id' | 'username' | 'email' | 'roles'>;
+type HeaderApplication = Pick<Application, '_id'> & {
+  name?: string;
+  title?: string;
   logoIcon?: string;
 };
 
@@ -16,12 +17,10 @@ interface HomePayload {
 }
 
 const Header: React.FC = () => {
-  const { theme, toggleTheme } = useTheme();
   const [user, setUser] = useState<HeaderUser | null>(null);
   const [application, setApplication] = useState<HeaderApplication | null>(null);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-  const isDarkTheme = theme === 'dark';
 
   useEffect(() => {
     let isMounted = true;
@@ -41,6 +40,7 @@ const Header: React.FC = () => {
           _id: userResult.value.user._id,
           username: userResult.value.user.username,
           email: userResult.value.user.email,
+          roles: userResult.value.user.roles,
         });
       } else {
         setUser(null);
@@ -73,7 +73,7 @@ const Header: React.FC = () => {
               className="navbar-logo"
             />
             <span className="navbar-brand-label">
-              <span className="hidden-xxs">Wikitruth</span>
+              <span className="hidden-xxs">{application?.name || application?.title || 'Wikitruth'}</span>
             </span>
           </Link>
         </div>
@@ -95,7 +95,7 @@ const Header: React.FC = () => {
               <li className={`dropdown ${isMoreOpen ? 'open' : ''}`}>
                 <button
                   type="button"
-                  title="More"
+                  title="more"
                   className="dropdown-toggle btn btn-link navbar-btn"
                   aria-haspopup="true"
                   aria-expanded={isMoreOpen}
@@ -121,28 +121,34 @@ const Header: React.FC = () => {
                       <i className="fa fa-user-circle"></i> Members
                     </Link>
                   </li>
+                  <li role="separator" className="divider"></li>
+                  <li>
+                    <Link to="/about" onClick={() => setIsMoreOpen(false)}>
+                      <i className="fa fa-info-circle"></i> About
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/contact" onClick={() => setIsMoreOpen(false)}>
+                      <i className="fa fa-comment"></i> Contact
+                    </Link>
+                  </li>
                 </ul>
               </li>
             </ul>
           </nav>
           <nav aria-label="Account navigation">
             <ul className="nav navbar-nav navbar-right">
-            <li>
-              <button
-                type="button"
-                title={isDarkTheme ? 'Switch to light mode' : 'Switch to dark mode'}
-                className="btn btn-link navbar-btn"
-                aria-label={isDarkTheme ? 'Switch to light mode' : 'Switch to dark mode'}
-                onClick={toggleTheme}
-              >
-                <i className={`fa ${isDarkTheme ? 'fa-sun-o' : 'fa-moon-o'}`}></i>
-                <span className="hidden-xs"> Theme</span>
-              </button>
-            </li>
             {user ? (
               <>
                 <li>
-                  <button type="button" title="Notifications" className="btn btn-link navbar-btn">
+                  <button
+                    type="button"
+                    title="Notifications"
+                    className="btn btn-link navbar-btn"
+                    onClick={(event) => {
+                      event.preventDefault();
+                    }}
+                  >
                     <i className="fa fa-bell-o"></i>
                   </button>
                 </li>
@@ -167,21 +173,28 @@ const Header: React.FC = () => {
                       <span className="caret"></span>
                     </span>
                   </button>
-                  <ul id="header-user-menu" className="dropdown-menu dropdown-menu-right">
-                    <li className="dropdown-header">Account</li>
+                    <ul id="header-user-menu" className="dropdown-menu dropdown-menu-right">
+                      <li className="dropdown-header">Account</li>
                     <li>
                       <Link to={`/members/${user.username}`} onClick={() => setIsUserMenuOpen(false)}>
                         <i className="fa fa-user-circle"></i> My Profile
                       </Link>
                     </li>
-                    <li>
-                      <Link to={`/members/${user.username}/diary`} onClick={() => setIsUserMenuOpen(false)}>
-                        <i className="fa fa-folder-open"></i> My Diary
-                      </Link>
-                    </li>
-                    <li role="separator" className="divider"></li>
-                    <li>
-                      <a href="/logout">
+                      <li>
+                        <Link to={`/members/${user.username}/diary`} onClick={() => setIsUserMenuOpen(false)}>
+                          <i className="fa fa-folder-open"></i> My Diary
+                        </Link>
+                      </li>
+                      {Boolean(user.roles?.admin) && (
+                        <li>
+                          <Link to="/admin" onClick={() => setIsUserMenuOpen(false)}>
+                            <i className="fa fa-gear"></i> Admin Area
+                          </Link>
+                        </li>
+                      )}
+                      <li role="separator" className="divider"></li>
+                      <li>
+                        <a href="/logout">
                         <i className="fa fa-sign-out"></i> Sign Out
                       </a>
                     </li>
@@ -196,6 +209,17 @@ const Header: React.FC = () => {
                 </a>
               </li>
             )}
+            <li className="dropdown visible-sm visible-xs">
+              <a
+                href="#"
+                className="dropdown-toggle"
+                onClick={(event) => {
+                  event.preventDefault();
+                }}
+              >
+                <i className="fa fa-navicon"></i>
+              </a>
+            </li>
             </ul>
           </nav>
         </div>

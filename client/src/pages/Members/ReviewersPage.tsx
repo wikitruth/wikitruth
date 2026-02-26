@@ -13,6 +13,7 @@ const ReviewersPage: React.FC = () => {
     <MemberDirectoryPage
       title="Reviewers"
       subtitle="Members with reviewer privileges"
+      tab="reviewers"
       fetchMembers={fetchMembers}
     />
   );

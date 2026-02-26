@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import Breadcrumb from '../../../../components/common/Breadcrumb';
-import PageHeader from '../../../../components/common/PageHeader';
 import LoadingSpinner from '../../../../components/LoadingSpinner';
 import Alert from '../../../../components/common/Alert';
+import ProfileShell from '../../../../components/Members/ProfileShell';
 import apiService from '../../../../services/api';
 import { useAuth } from '../../../../context/AuthContext';
 import type { LegacyEntity } from '../../../../types/legacy';
@@ -46,28 +45,14 @@ const PagesIndex: React.FC = () => {
   }
 
   return (
-    <div>
-      <Breadcrumb
-        items={[
-          { title: 'Home', url: '/' },
-          { title: 'Profile', url: '/members/profile' },
-          { title: 'Pages', active: true },
-        ]}
-      />
+    <ProfileShell username={username} activeTab="pages" isOwnProfile={true}>
+      <div style={{ marginTop: '20px' }}>
+        <Link to="/members/profile/pages/create" className="btn btn-primary">
+          <i className="fa fa-plus"></i> Create Page
+        </Link>
+      </div>
 
-      <PageHeader
-        title="Profile Pages"
-        subtitle="Manage your custom profile pages"
-        icon="file-text-o"
-        iconColor="text-primary"
-        actions={
-          <Link to="/members/profile/pages/create" className="btn btn-primary">
-            <i className="fa fa-plus"></i> Create Page
-          </Link>
-        }
-      />
-
-      <div className="panel panel-default">
+      <div className="panel panel-default" style={{ marginTop: '20px' }}>
         <ul className="list-group">
           {pages.length === 0 ? (
             <li className="list-group-item">No pages yet.</li>
@@ -80,7 +65,7 @@ const PagesIndex: React.FC = () => {
           )}
         </ul>
       </div>
-    </div>
+    </ProfileShell>
   );
 };
 

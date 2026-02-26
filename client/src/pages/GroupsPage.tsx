@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import Layout from '../components/Layout/Layout';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { apiService } from '../services/api';
 import { Group } from '../types';
@@ -28,89 +27,65 @@ const GroupsPage: React.FC = () => {
   }, []);
 
   if (loading) {
-    return (
-      <Layout>
-        <LoadingSpinner message="Loading groups..." />
-      </Layout>
-    );
+    return <LoadingSpinner message="Loading groups..." />;
   }
 
   if (error) {
-    return (
-      <Layout>
-        <div className="alert alert-danger">{error}</div>
-      </Layout>
-    );
+    return <div className="alert alert-danger">{error}</div>;
   }
 
   return (
-    <Layout>
-      <div className="col-md-12">
-        <h2>Groups</h2>
-        
-        <div className="row">
-          <div className="col-md-12">
-            <Link to="/" className="btn btn-default">
-              <span className="glyphicon glyphicon-arrow-left"></span> Back to Home
-            </Link>
-            {' '}
-            <Link to="/groups/create" className="btn btn-primary">
-              <span className="glyphicon glyphicon-plus"></span> Create Group
-            </Link>
-          </div>
+    <div>
+      <h1 className="page-header wt-header-2">
+        <i className="fa fa-group"></i> Groups
+        <div className="pull-right" style={{ paddingTop: '8px', paddingBottom: '8px', fontSize: '28px' }}>
+          <Link to="/groups/create" className="text-muted-2 no-underline">
+            <i className="fa fa-plus"></i> Create
+          </Link>
         </div>
+      </h1>
 
-        <div className="row" style={{ marginTop: '20px' }}>
-          <div className="col-md-6">
-            <h3>Public Groups</h3>
-            {publicGroups.length === 0 ? (
-              <p className="text-muted">No public groups found.</p>
-            ) : (
-              <ul className="list-group">
-                {publicGroups.map((group) => (
-                  <li key={group._id} className="list-group-item">
-                    <h4>
-                      <Link to={`/groups/${group.friendlyUrl}/${group._id}`}>
-                        {group.title}
-                      </Link>
-                    </h4>
-                    {group.description && (
-                      <p className="text-muted">{group.description}</p>
-                    )}
-                    <small className="text-muted">
-                      {group.members?.length || 0} member(s)
-                    </small>
-                  </li>
-                ))}
-              </ul>
-            )}
+      <div className="row">
+        {publicGroups.length === 0 && privateGroups.length === 0 ? (
+          <div className="col-sm-12">
+            <p className="text-muted">No groups found.</p>
           </div>
-
-          {privateGroups.length > 0 && (
-            <div className="col-md-6">
-              <h3>Private Groups</h3>
-              <ul className="list-group">
-                {privateGroups.map((group) => (
-                  <li key={group._id} className="list-group-item">
-                    <h4>
-                      <Link to={`/groups/${group.friendlyUrl}/${group._id}`}>
-                        {group.title}
-                      </Link>
-                    </h4>
+        ) : (
+          [...publicGroups, ...privateGroups].map((group) => (
+            <div key={group._id} className="col-lg-4 col-md-6 col-sm-6">
+              <div className="media wt-category">
+                <div className="media-left media-top">
+                  <Link to={`/groups/${group.friendlyUrl || group._id}/${group._id}`}>
+                    <div className="photo-placeholder" title={group.title}></div>
+                  </Link>
+                </div>
+                <div className="media-body">
+                  <h4 className="media-heading">
+                    <Link to={`/groups/${group.friendlyUrl || group._id}/${group._id}`}>
+                      {group.title}
+                    </Link>
                     {group.description && (
-                      <p className="text-muted">{group.description}</p>
+                      <div>
+                        <span style={{ fontSize: '16px' }} className="text-muted">
+                          {group.description}
+                        </span>
+                      </div>
                     )}
-                    <small className="text-muted">
-                      {group.members?.length || 0} member(s)
-                    </small>
-                  </li>
-                ))}
-              </ul>
+                  </h4>
+                  <div>
+                    <i className="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;
+                    <Link to={`/groups/${group.friendlyUrl || group._id}/${group._id}`} role="button">
+                      view group
+                    </Link>
+                  </div>
+                </div>
+              </div>
             </div>
-          )}
-        </div>
+          ))
+        )}
       </div>
-    </Layout>
+      <br />
+    </div>
   );
 };
 

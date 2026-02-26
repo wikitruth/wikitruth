@@ -13,6 +13,7 @@ const ContributorsPage: React.FC = () => {
     <MemberDirectoryPage
       title="Contributors"
       subtitle="Community members with public profiles"
+      tab="contributors"
       fetchMembers={fetchMembers}
     />
   );

@@ -16,7 +16,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="col-sm-12 col-md-9 col-lg-9-x">
             {children}
           </div>
-          <div className="hidden-xs hidden-sm col-md-3 col-lg-3-x">
+          <div
+            className="col-xs-7-x col-sm-4 col-md-3 col-lg-3-x visible-md visible-lg sidebar-offcanvas"
+            id="sidebar"
+          >
             <ContextSidebar />
           </div>
         </div>

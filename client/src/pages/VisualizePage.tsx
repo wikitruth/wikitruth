@@ -104,7 +104,7 @@ const VisualizePage: React.FC = () => {
 
   return (
     <div>
-      <h1 className="page-header">
+      <h1 className="page-header wt-header">
         <i className="fa fa-snowflake-o"></i> Visualize
       </h1>
 

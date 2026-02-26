@@ -13,6 +13,7 @@ const AdministratorsPage: React.FC = () => {
     <MemberDirectoryPage
       title="Administrators"
       subtitle="Platform administrators"
+      tab="administrators"
       fetchMembers={fetchMembers}
     />
   );

@@ -1,9 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import Breadcrumb from '../../../components/common/Breadcrumb';
-import PageHeader from '../../../components/common/PageHeader';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import Alert from '../../../components/common/Alert';
+import ProfileShell from '../../../components/Members/ProfileShell';
 import apiService from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
 import type { LegacyEntity } from '../../../types/legacy';
@@ -58,69 +57,65 @@ const ProfilePage: React.FC = () => {
 
   return (
     <div>
-      <Breadcrumb
-        items={[
-          { title: 'Home', url: '/' },
-          { title: 'Members', url: '/members' },
-          { title: profile.username, active: true },
-        ]}
-      />
-
-      <PageHeader
-        title={`@${profile.username}`}
-        subtitle={profile.preferences?.privateProfile ? 'Private profile' : 'Public profile'}
-        icon="user"
-        iconColor="text-primary"
-        actions={
-          isOwnProfile ? (
-            <Link to="/members/profile/settings" className="btn btn-default">
-              <i className="fa fa-cog"></i> Profile Settings
-            </Link>
-          ) : undefined
-        }
-      />
-
-      <div className="panel panel-default">
-        <div className="panel-body">
-          <p>
-            <strong>Username:</strong> {profile.username}
-          </p>
-          {profile.email && !profile.preferences?.privateProfile && (
+      <ProfileShell
+        username={profile.username}
+        activeTab="overview"
+        isOwnProfile={isOwnProfile}
+        roles={{
+          admin: profile.roles?.admin,
+          screener: profile.roles?.screener,
+          reviewer: profile.roles?.reviewer,
+        }}
+      >
+        <div className="panel panel-default" style={{ marginTop: '20px' }}>
+          <div className="panel-body">
             <p>
-              <strong>Email:</strong> {profile.email}
+              <strong>Username:</strong> {profile.username}
             </p>
-          )}
-          <p>
-            <strong>Public profile:</strong> {profile.preferences?.privateProfile ? 'No' : 'Yes'}
-          </p>
-        </div>
-      </div>
-
-      <div className="panel panel-default">
-        <div className="panel-heading">
-          <h3 className="panel-title">Custom Pages</h3>
-        </div>
-        <ul className="list-group">
-          {pages.length === 0 ? (
-            <li className="list-group-item">No custom pages yet.</li>
-          ) : (
-            pages.map((page) => (
-              <li key={page._id} className="list-group-item">
-                <Link to={isOwnProfile ? `/members/profile/pages/${page._id}` : `/members/${profile.username}/pages/${page._id}`}>
-                  {page.title}
+            {profile.email && !profile.preferences?.privateProfile && (
+              <p>
+                <strong>Email:</strong> {profile.email}
+              </p>
+            )}
+            <p>
+              <strong>Public profile:</strong> {profile.preferences?.privateProfile ? 'No' : 'Yes'}
+            </p>
+            {isOwnProfile && (
+              <p style={{ marginBottom: 0 }}>
+                <Link to="/members/profile/settings" className="no-underline">
+                  <i className="fa fa-cog"></i> Settings
                 </Link>
-              </li>
-            ))
-          )}
-        </ul>
-        {isOwnProfile && (
-          <div className="panel-footer">
-            <Link to="/members/profile/pages/create" className="btn btn-primary btn-sm">
-              <i className="fa fa-plus"></i> Create Page
-            </Link>
+              </p>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+
+        <div className="panel panel-default">
+          <div className="panel-heading">
+            <h3 className="panel-title">Custom Pages</h3>
+          </div>
+          <ul className="list-group">
+            {pages.length === 0 ? (
+              <li className="list-group-item">No custom pages yet.</li>
+            ) : (
+              pages.map((page) => (
+                <li key={page._id} className="list-group-item">
+                  <Link to={isOwnProfile ? `/members/profile/pages/${page._id}` : `/members/${profile.username}/pages/${page._id}`}>
+                    {page.title}
+                  </Link>
+                </li>
+              ))
+            )}
+          </ul>
+          {isOwnProfile && (
+            <div className="panel-footer">
+              <Link to="/members/profile/pages/create" className="btn btn-primary btn-sm">
+                <i className="fa fa-plus"></i> Create Page
+              </Link>
+            </div>
+          )}
+        </div>
+      </ProfileShell>
     </div>
   );
 };

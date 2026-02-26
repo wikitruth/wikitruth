@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Alert from '../../../components/common/Alert';
 import LoadingSpinner from '../../../components/LoadingSpinner';
+import ProfileShell from '../../../components/Members/ProfileShell';
 import apiService from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
 import type { LegacyEntity } from '../../../types/legacy';
@@ -45,10 +46,13 @@ const ProfileTopics: React.FC = () => {
   }
 
   return (
-    <div className="container">
-      <h2>Profile Topics</h2>
-      <p className="text-muted">Topics created by {username}.</p>
-      <ul className="list-group">
+    <ProfileShell username={username} activeTab="topics" isOwnProfile={Boolean(user?.username && user.username === username)}>
+      <div style={{ marginTop: '20px' }}>
+        <Link className="btn btn-default" to="/topics/create" role="button">
+          <i className="fa fa-folder-open"></i> New Category
+        </Link>
+      </div>
+      <ul className="list-group wt-list" style={{ marginTop: '20px' }}>
         {topics.length === 0 ? (
           <li className="list-group-item">No topics found.</li>
         ) : (
@@ -66,7 +70,7 @@ const ProfileTopics: React.FC = () => {
           ))
         )}
       </ul>
-    </div>
+    </ProfileShell>
   );
 };
 

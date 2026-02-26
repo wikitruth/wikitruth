@@ -7,11 +7,11 @@ interface IndexHeaderProps {
 
 const IndexHeader: React.FC<IndexHeaderProps> = ({ title, count }) => {
   return (
-    <div className="page-header">
-      <h2>
+    <div className="page-header wt-header">
+      <h1>
         {title}
         {count !== undefined ? <small className="text-muted"> ({count})</small> : null}
-      </h2>
+      </h1>
     </div>
   );
 };

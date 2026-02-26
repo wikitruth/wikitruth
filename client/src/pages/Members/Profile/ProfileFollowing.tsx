@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Alert from '../../../components/common/Alert';
 import LoadingSpinner from '../../../components/LoadingSpinner';
+import ProfileShell from '../../../components/Members/ProfileShell';
 import apiService from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
 import type { LegacyEntity } from '../../../types/legacy';
@@ -50,9 +51,10 @@ const ProfileFollowing: React.FC = () => {
   }
 
   return (
-    <div className="container">
-      <h2>Following</h2>
-      <p className="text-muted">Relationship signals derived from member activity for {username}.</p>
+    <ProfileShell username={username} activeTab="following" isOwnProfile={Boolean(user?.username && user.username === username)}>
+      <p style={{ fontWeight: 'normal', marginTop: '20px' }} className="text-muted">
+        Relationship signals derived from member activity for {username}.
+      </p>
 
       <div className="panel panel-default">
         <div className="panel-heading">
@@ -108,7 +110,7 @@ const ProfileFollowing: React.FC = () => {
           )}
         </ul>
       </div>
-    </div>
+    </ProfileShell>
   );
 };
 

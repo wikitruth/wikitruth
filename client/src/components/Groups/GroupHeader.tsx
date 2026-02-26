@@ -7,8 +7,10 @@ interface GroupHeaderProps {
 
 const GroupHeader: React.FC<GroupHeaderProps> = ({ title, description }) => {
   return (
-    <header className="page-header">
-      <h2>{title}</h2>
+    <header className="page-header wt-header">
+      <h1>
+        <i className="fa fa-group"></i> {title}
+      </h1>
       {description ? <p className="text-muted">{description}</p> : null}
     </header>
   );
