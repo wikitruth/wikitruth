@@ -5,7 +5,8 @@ This folder contains active engineering documentation and archived migration art
 ## Start Here
 
 - Completed enhancement tracker (archived): `docs/archive/plans/PROJECT_ENHANCEMENT_PROPOSAL_2026-02-24.md`
-- Modern client completion plan: `docs/MODERN_CLIENT_COMPLETION_PLAN_2026-02-24.md`
+- Completed modern client completion plan (archived): `docs/archive/plans/MODERN_CLIENT_COMPLETION_PLAN_2026-02-24.md`
+- Completed system implementation plan (archived): `docs/archive/plans/SYSTEM_MODERN_CLIENT_IMPLEMENTATION_PLAN_2026-02-26.md`
 - Dependency upgrade plan: `docs/DEPENDENCY_UPGRADE_PLAN_2026-02-24.md`
 - Mobile app strategy: `docs/MOBILE_APP_STRATEGY_2026-02-24.md`
 - Server structure migration plan: `docs/SERVER_STRUCTURE_MIGRATION_PLAN_2026-02-26.md`
