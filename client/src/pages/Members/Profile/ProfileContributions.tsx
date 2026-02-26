@@ -3,7 +3,7 @@ import Alert from '../../../components/common/Alert';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import apiService from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
-import type { LegacyEntity, LegacyResponse } from '../../../types/legacy';
+import type { LegacyEntity } from '../../../types/legacy';
 
 const ProfileContributions: React.FC = () => {
   const { user } = useAuth();
@@ -20,7 +20,7 @@ const ProfileContributions: React.FC = () => {
         return;
       }
       try {
-        const result = (await apiService.getMemberPages(username)) as LegacyResponse;
+        const result = await apiService.getMemberPages(username);
         setPages(result?.pages || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load contributions');

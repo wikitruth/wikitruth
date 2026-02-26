@@ -9,7 +9,7 @@ import Alert from '../../../../components/common/Alert';
 import LoadingSpinner from '../../../../components/LoadingSpinner';
 import apiService from '../../../../services/api';
 import { useAuth } from '../../../../context/AuthContext';
-import type { LegacyEntity, LegacyResponse } from '../../../../types/legacy';
+import type { LegacyEntity } from '../../../../types/legacy';
 
 const PageView: React.FC = () => {
   const { username: routeUsername, id } = useParams<{ username?: string; id: string }>();
@@ -37,7 +37,7 @@ const PageView: React.FC = () => {
 
       try {
         setLoading(true);
-        const result = (await apiService.getMemberPage(username, id)) as LegacyResponse;
+        const result = await apiService.getMemberPage(username, id);
         const pageModel = result?.page as LegacyEntity | undefined;
         setPage(pageModel || null);
         setTitle(pageModel?.title || '');
@@ -65,7 +65,7 @@ const PageView: React.FC = () => {
     setBusy(true);
     setError(null);
     try {
-      const result = (await apiService.updateMemberPage(username, id, { title, content })) as LegacyResponse;
+      const result = await apiService.updateMemberPage(username, id, { title, content });
       setPage((result?.page as LegacyEntity | undefined) || page);
       setEditing(false);
     } catch (err) {

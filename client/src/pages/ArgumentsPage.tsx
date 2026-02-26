@@ -8,7 +8,7 @@ import PageHeader from '../components/common/PageHeader';
 import Pagination from '../components/common/Pagination';
 import Input from '../components/Form/Input';
 import Select from '../components/Form/Select';
-import type { LegacyEntity, LegacyResponse } from '../types/legacy';
+import type { LegacyEntity } from '../types/legacy';
 import type { Argument } from '../types';
 
 const ArgumentsPage: React.FC = () => {
@@ -30,7 +30,7 @@ const ArgumentsPage: React.FC = () => {
 
   const fetchArguments = async () => {
     try {
-      const result = (await apiService.getArguments(topicId)) as LegacyResponse;
+      const result = await apiService.getArguments(topicId);
       setArgumentsList(result.arguments || []);
       setLoading(false);
     } catch (error) {

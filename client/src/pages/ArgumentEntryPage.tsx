@@ -6,11 +6,12 @@ import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import PageTabs from '../components/common/PageTabs';
 import Alert from '../components/common/Alert';
-import type { LegacyEntity, LegacyResponse } from '../types/legacy';
+import type { ArgumentEntryResponse } from '../types/api';
+import type { LegacyEntity } from '../types/legacy';
 
 const ArgumentEntryPage: React.FC = () => {
   const { id } = useParams();
-  const [data, setData] = useState<LegacyResponse | null>(null);
+  const [data, setData] = useState<ArgumentEntryResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,7 +24,7 @@ const ArgumentEntryPage: React.FC = () => {
     
     try {
       setLoading(true);
-      const result = (await apiService.getArgumentEntry(id)) as LegacyResponse;
+      const result = await apiService.getArgumentEntry(id);
       setData(result);
       setLoading(false);
     } catch (err) {

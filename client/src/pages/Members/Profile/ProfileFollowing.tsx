@@ -4,7 +4,7 @@ import Alert from '../../../components/common/Alert';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import apiService from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
-import type { LegacyEntity, LegacyResponse } from '../../../types/legacy';
+import type { LegacyEntity } from '../../../types/legacy';
 
 const ProfileFollowing: React.FC = () => {
   const { username: routeUsername } = useParams<{ username?: string }>();
@@ -26,11 +26,11 @@ const ProfileFollowing: React.FC = () => {
 
       try {
         setLoading(true);
-        const result = (await apiService.getMemberFollowing(username)) as LegacyResponse;
-        const following = (result?.following || {}) as LegacyResponse;
-        setPeople(Array.isArray(following.people) ? (following.people as LegacyEntity[]) : []);
-        setTopics(Array.isArray(following.topics) ? (following.topics as LegacyEntity[]) : []);
-        setGroups(Array.isArray(following.groups) ? (following.groups as LegacyEntity[]) : []);
+        const result = await apiService.getMemberFollowing(username);
+        const following = result?.following || {};
+        setPeople(Array.isArray(following.people) ? following.people : Array.isArray(following.users) ? following.users : []);
+        setTopics(Array.isArray(following.topics) ? following.topics : []);
+        setGroups(Array.isArray(following.groups) ? following.groups : []);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load following data');
       } finally {

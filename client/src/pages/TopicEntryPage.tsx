@@ -10,12 +10,13 @@ import Alert from '../components/common/Alert';
 import TopicEntryRow from '../components/EntryRow/TopicEntryRow';
 import ArgumentEntryRow from '../components/EntryRow/ArgumentEntryRow';
 import QuestionEntryRow from '../components/EntryRow/QuestionEntryRow';
-import type { LegacyEntity, LegacyResponse } from '../types/legacy';
+import type { TopicEntryResponse } from '../types/api';
+import type { LegacyEntity } from '../types/legacy';
 import type { Argument, Question, Topic } from '../types';
 
 const TopicEntryPage: React.FC = () => {
   const { id } = useParams();
-  const [data, setData] = useState<LegacyResponse | null>(null);
+  const [data, setData] = useState<TopicEntryResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,7 +29,7 @@ const TopicEntryPage: React.FC = () => {
     
     try {
       setLoading(true);
-      const result = (await apiService.getTopicEntry(id)) as LegacyResponse;
+      const result = await apiService.getTopicEntry(id);
       setData(result);
       setLoading(false);
     } catch (err) {

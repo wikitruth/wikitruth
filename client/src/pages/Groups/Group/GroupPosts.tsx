@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import Alert from '../../../components/common/Alert';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import apiService from '../../../services/api';
-import type { LegacyEntity, LegacyResponse } from '../../../types/legacy';
+import type { LegacyEntity } from '../../../types/legacy';
 
 const GroupPosts: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -20,17 +20,18 @@ const GroupPosts: React.FC = () => {
         return;
       }
       try {
-        const result = (await apiService.getGroupPosts(id, 25)) as LegacyResponse;
+        const result = await apiService.getGroupPosts(id, 25);
         const groupModel = (result?.group || null) as LegacyEntity | null;
+        const buckets = result?.posts || {};
         setGroup(groupModel);
         setPosts({
-          topics: ((result?.posts as LegacyResponse)?.topics || []) as LegacyEntity[],
-          arguments: ((result?.posts as LegacyResponse)?.arguments || []) as LegacyEntity[],
-          questions: ((result?.posts as LegacyResponse)?.questions || []) as LegacyEntity[],
-          issues: ((result?.posts as LegacyResponse)?.issues || []) as LegacyEntity[],
-          opinions: ((result?.posts as LegacyResponse)?.opinions || []) as LegacyEntity[],
-          artifacts: ((result?.posts as LegacyResponse)?.artifacts || []) as LegacyEntity[],
-          answers: ((result?.posts as LegacyResponse)?.answers || []) as LegacyEntity[],
+          topics: buckets.topics || [],
+          arguments: buckets.arguments || [],
+          questions: buckets.questions || [],
+          issues: buckets.issues || [],
+          opinions: buckets.opinions || [],
+          artifacts: buckets.artifacts || [],
+          answers: buckets.answers || [],
         });
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load group');

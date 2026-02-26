@@ -9,7 +9,7 @@ import Pagination from '../components/common/Pagination';
 import Input from '../components/Form/Input';
 import Select from '../components/Form/Select';
 import Alert from '../components/common/Alert';
-import type { LegacyEntity, LegacyResponse } from '../types/legacy';
+import type { LegacyEntity } from '../types/legacy';
 import type { Answer } from '../types';
 
 const AnswersPage: React.FC = () => {
@@ -25,7 +25,7 @@ const AnswersPage: React.FC = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const result = (await apiService.getAnswers()) as LegacyResponse;
+        const result = await apiService.getAnswers();
         setAnswers(result?.answers || []);
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : 'Failed to load answers');

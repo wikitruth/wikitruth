@@ -9,7 +9,7 @@ import Pagination from '../components/common/Pagination';
 import Input from '../components/Form/Input';
 import Select from '../components/Form/Select';
 import Alert from '../components/common/Alert';
-import type { LegacyEntity, LegacyResponse } from '../types/legacy';
+import type { LegacyEntity } from '../types/legacy';
 import type { Opinion } from '../types';
 
 const OpinionsPage: React.FC = () => {
@@ -28,7 +28,7 @@ const OpinionsPage: React.FC = () => {
   const fetchOpinions = async () => {
     try {
       setLoading(true);
-      const data = (await apiService.getOpinions()) as LegacyResponse;
+      const data = await apiService.getOpinions();
       setOpinions(data.opinions || []);
     } catch (err) {
       setError('Failed to load opinions');

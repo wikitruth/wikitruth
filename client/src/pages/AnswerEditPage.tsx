@@ -9,7 +9,6 @@ import Button from '../components/common/Button';
 import Alert from '../components/common/Alert';
 import LoadingSpinner from '../components/LoadingSpinner';
 import apiService from '../services/api';
-import type { LegacyResponse } from '../types/legacy';
 
 const AnswerEditPage: React.FC = () => {
   const navigate = useNavigate();
@@ -32,7 +31,7 @@ const AnswerEditPage: React.FC = () => {
       }
 
       try {
-        const result = (await apiService.getAnswerEntry(id)) as LegacyResponse;
+        const result = await apiService.getAnswerEntry(id);
         const answer = result?.answer;
         setTitle(answer?.title || '');
         setDescription(answer?.content || answer?.description || '');

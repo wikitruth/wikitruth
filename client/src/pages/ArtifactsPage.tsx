@@ -14,7 +14,7 @@ const ArtifactsPage: React.FC = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const result = (await apiService.getArtifacts()) as LegacyResponse;
+        const result = await apiService.getArtifacts();
         setData(result);
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : 'Failed to load artifacts');

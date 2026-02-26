@@ -8,7 +8,7 @@ import PageHeader from '../components/common/PageHeader';
 import Pagination from '../components/common/Pagination';
 import Input from '../components/Form/Input';
 import Select from '../components/Form/Select';
-import type { LegacyEntity, LegacyResponse } from '../types/legacy';
+import type { LegacyEntity } from '../types/legacy';
 import type { Question } from '../types';
 
 const QuestionsPage: React.FC = () => {
@@ -29,7 +29,7 @@ const QuestionsPage: React.FC = () => {
 
   const fetchQuestions = async () => {
     try {
-      const result = (await apiService.getQuestions(topicId)) as LegacyResponse;
+      const result = await apiService.getQuestions(topicId);
       setQuestions(result.questions || []);
       setLoading(false);
     } catch (error) {

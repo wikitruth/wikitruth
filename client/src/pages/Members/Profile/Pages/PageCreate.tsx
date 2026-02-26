@@ -9,7 +9,7 @@ import Alert from '../../../../components/common/Alert';
 import useForm from '../../../../hooks/useForm';
 import apiService from '../../../../services/api';
 import { useAuth } from '../../../../context/AuthContext';
-import type { LegacyEntity, LegacyResponse } from '../../../../types/legacy';
+import type { LegacyEntity } from '../../../../types/legacy';
 
 interface PageFormValues {
   title: string;
@@ -44,10 +44,10 @@ const PageCreate: React.FC = () => {
 
     setSubmitError(null);
     try {
-      const result = (await apiService.createMemberPage(username, {
+      const result = await apiService.createMemberPage(username, {
         title: values.title,
         content: values.content,
-      })) as LegacyResponse;
+      });
 
       const page = result?.page as LegacyEntity | undefined;
       if (page?._id) {

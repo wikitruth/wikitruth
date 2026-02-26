@@ -24,7 +24,7 @@ const OpinionEntryPage: React.FC = () => {
 
       try {
         setLoading(true);
-        const result = (await apiService.getOpinionEntry(id)) as LegacyResponse;
+        const result = await apiService.getOpinionEntry(id);
         setData(result);
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : 'Failed to load opinion');

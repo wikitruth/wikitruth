@@ -2,11 +2,10 @@ import React, { useCallback } from 'react';
 import MemberDirectoryPage from './common/MemberDirectoryPage';
 import apiService from '../../services/api';
 import type { User } from '../../types';
-import type { LegacyResponse } from '../../types/legacy';
 
 const ContributorsPage: React.FC = () => {
   const fetchMembers = useCallback(async () => {
-    const result = (await apiService.getMembers()) as LegacyResponse;
+    const result = await apiService.getMembers();
     return (result.contributors || []) as unknown as User[];
   }, []);
 

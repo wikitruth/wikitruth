@@ -4,7 +4,7 @@ import Alert from '../../../components/common/Alert';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import apiService from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
-import type { LegacyEntity, LegacyResponse } from '../../../types/legacy';
+import type { LegacyEntity } from '../../../types/legacy';
 
 const ProfileTopics: React.FC = () => {
   const { username: routeUsername } = useParams<{ username?: string }>();
@@ -24,7 +24,7 @@ const ProfileTopics: React.FC = () => {
 
       try {
         setLoading(true);
-        const result = (await apiService.getMemberTopics(username, 100)) as LegacyResponse;
+        const result = await apiService.getMemberTopics(username, 100);
         setTopics(Array.isArray(result?.topics) ? result.topics : []);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load profile topics');

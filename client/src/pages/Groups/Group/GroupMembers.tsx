@@ -5,7 +5,7 @@ import PageHeader from '../../../components/common/PageHeader';
 import Alert from '../../../components/common/Alert';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import apiService from '../../../services/api';
-import type { LegacyEntity, LegacyResponse } from '../../../types/legacy';
+import type { LegacyEntity } from '../../../types/legacy';
 
 const GroupMembers: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -23,7 +23,7 @@ const GroupMembers: React.FC = () => {
 
       try {
         setLoading(true);
-        const result = (await apiService.getGroupEntry(id)) as LegacyResponse;
+        const result = await apiService.getGroupEntry(id);
         setGroup((result?.group || result) as LegacyEntity);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load group members');

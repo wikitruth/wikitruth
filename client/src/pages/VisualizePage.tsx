@@ -3,10 +3,11 @@ import { Link } from 'react-router-dom';
 import apiService from '../services/api';
 import Alert from '../components/common/Alert';
 import LoadingSpinner from '../components/LoadingSpinner';
-import type { LegacyEntity, LegacyResponse } from '../types/legacy';
+import type { HomeDataResponse } from '../types/api';
+import type { LegacyEntity } from '../types/legacy';
 
 const VisualizePage: React.FC = () => {
-  const [data, setData] = useState<LegacyResponse | null>(null);
+  const [data, setData] = useState<HomeDataResponse | null>(null);
   const [selectedTopicId, setSelectedTopicId] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -15,7 +16,7 @@ const VisualizePage: React.FC = () => {
     const fetchVisualizationData = async () => {
       try {
         setLoading(true);
-        const result = (await apiService.getHomeData()) as LegacyResponse;
+        const result = await apiService.getHomeData();
         setData(result);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load visualization data');

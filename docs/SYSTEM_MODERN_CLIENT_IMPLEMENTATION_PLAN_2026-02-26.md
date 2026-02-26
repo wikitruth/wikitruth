@@ -100,7 +100,7 @@ Close remaining parity gaps between legacy and modern flows, harden API contract
     - Strictness debt reduced measurably by module.
     - Types for request/response payloads are declared and reused.
 
-- [ ] **P2.2 Strengthen API client typing in modern client**
+- [x] **P2.2 Strengthen API client typing in modern client**
   - Replace loose `unknown` response handling in `client/src/services/api.ts` call sites with typed DTO contracts.
   - Acceptance:
     - Core page data loaders compile without fallback casting.

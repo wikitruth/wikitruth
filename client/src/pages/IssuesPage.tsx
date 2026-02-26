@@ -9,7 +9,7 @@ import Pagination from '../components/common/Pagination';
 import Input from '../components/Form/Input';
 import Select from '../components/Form/Select';
 import Alert from '../components/common/Alert';
-import type { LegacyEntity, LegacyResponse } from '../types/legacy';
+import type { LegacyEntity } from '../types/legacy';
 import type { Issue } from '../types';
 
 const IssuesPage: React.FC = () => {
@@ -28,7 +28,7 @@ const IssuesPage: React.FC = () => {
   const fetchIssues = async () => {
     try {
       setLoading(true);
-      const data = (await apiService.getIssues()) as LegacyResponse;
+      const data = await apiService.getIssues();
       setIssues(data.issues || []);
     } catch (err) {
       setError('Failed to load issues');

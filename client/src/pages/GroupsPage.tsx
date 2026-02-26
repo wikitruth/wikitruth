@@ -4,7 +4,6 @@ import Layout from '../components/Layout/Layout';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { apiService } from '../services/api';
 import { Group } from '../types';
-import type { LegacyResponse } from '../types/legacy';
 
 const GroupsPage: React.FC = () => {
   const [publicGroups, setPublicGroups] = useState<Group[]>([]);
@@ -15,7 +14,7 @@ const GroupsPage: React.FC = () => {
   useEffect(() => {
     const fetchGroups = async () => {
       try {
-        const data = (await apiService.getGroups()) as LegacyResponse;
+        const data = await apiService.getGroups();
         setPublicGroups((data.publicGroups || []) as unknown as Group[]);
         setPrivateGroups((data.privateGroups || []) as unknown as Group[]);
       } catch (err) {

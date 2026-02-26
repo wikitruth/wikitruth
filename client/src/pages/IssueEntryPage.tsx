@@ -24,7 +24,7 @@ const IssueEntryPage: React.FC = () => {
 
       try {
         setLoading(true);
-        const result = (await apiService.getIssueEntry(id)) as LegacyResponse;
+        const result = await apiService.getIssueEntry(id);
         setData(result);
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : 'Failed to load issue');

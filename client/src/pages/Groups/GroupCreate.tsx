@@ -9,7 +9,6 @@ import Button from '../../components/common/Button';
 import Alert from '../../components/common/Alert';
 import useForm from '../../hooks/useForm';
 import apiService from '../../services/api';
-import type { LegacyResponse } from '../../types/legacy';
 
 interface GroupFormValues {
   title: string;
@@ -35,11 +34,11 @@ const GroupCreate: React.FC = () => {
   const handleSubmit = async (values: GroupFormValues) => {
     setSubmitError(null);
     try {
-      const response = (await apiService.createGroup({
+      const response = await apiService.createGroup({
         title: values.title,
         description: values.description,
         privacyType: Number(values.privacyType),
-      })) as LegacyResponse;
+      });
       const group = response?.group;
       if (group?._id) {
         navigate(`/groups/${group.friendlyUrl || group._id}/${group._id}`);

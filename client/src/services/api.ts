@@ -1,4 +1,24 @@
 // API service for making HTTP requests
+import type {
+  LegacyApiResponse,
+  HomeDataResponse,
+  SearchResponse,
+  TopicEntryResponse,
+  ArgumentEntryResponse,
+  QuestionEntryResponse,
+  IssueEntryResponse,
+  OpinionEntryResponse,
+  AnswerEntryResponse,
+  ArtifactEntryResponse,
+  GroupEntryResponse,
+  GroupPostsResponse,
+  GroupsListResponse,
+  MemberProfileResponse,
+  MemberTopicsResponse,
+  MemberFollowingResponse,
+  MemberPagesResponse,
+  MemberPageResponse,
+} from '../types/api';
 
 class ApiService {
   private baseUrl: string;
@@ -48,18 +68,18 @@ class ApiService {
   }
 
   // Home
-  async getHomeData() {
-    return this.request('/home');
+  async getHomeData(): Promise<HomeDataResponse> {
+    return this.request<HomeDataResponse>('/home');
   }
 
   // Topics
-  async getTopics(topicId?: string) {
+  async getTopics(topicId?: string): Promise<LegacyApiResponse> {
     const url = topicId ? `/topics?topic=${topicId}` : '/topics';
-    return this.request(url);
+    return this.request<LegacyApiResponse>(url);
   }
 
-  async getTopicEntry(id: string) {
-    return this.request(`/topics/entry/${id}`);
+  async getTopicEntry(id: string): Promise<TopicEntryResponse> {
+    return this.request<TopicEntryResponse>(`/topics/entry/${id}`);
   }
 
   async createTopic(payload: {
@@ -70,21 +90,21 @@ class ApiService {
     tags?: string;
     topicId?: string;
     groupId?: string;
-  }) {
-    return this.request('/topics', {
+  }): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>('/topics', {
       method: 'POST',
       body: JSON.stringify(payload),
     });
   }
 
   // Arguments
-  async getArguments(topicId?: string) {
+  async getArguments(topicId?: string): Promise<LegacyApiResponse> {
     const url = topicId ? `/arguments?topic=${topicId}` : '/arguments';
-    return this.request(url);
+    return this.request<LegacyApiResponse>(url);
   }
 
-  async getArgumentEntry(id: string) {
-    return this.request(`/arguments/entry/${id}`);
+  async getArgumentEntry(id: string): Promise<ArgumentEntryResponse> {
+    return this.request<ArgumentEntryResponse>(`/arguments/entry/${id}`);
   }
 
   async createArgument(payload: {
@@ -95,21 +115,21 @@ class ApiService {
     private?: boolean;
     sources?: string;
     groupId?: string;
-  }) {
-    return this.request('/arguments', {
+  }): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>('/arguments', {
       method: 'POST',
       body: JSON.stringify(payload),
     });
   }
 
   // Questions
-  async getQuestions(topicId?: string) {
+  async getQuestions(topicId?: string): Promise<LegacyApiResponse> {
     const url = topicId ? `/questions?topic=${topicId}` : '/questions';
-    return this.request(url);
+    return this.request<LegacyApiResponse>(url);
   }
 
-  async getQuestionEntry(id: string) {
-    return this.request(`/questions/entry/${id}`);
+  async getQuestionEntry(id: string): Promise<QuestionEntryResponse> {
+    return this.request<QuestionEntryResponse>(`/questions/entry/${id}`);
   }
 
   async createQuestion(payload: {
@@ -119,8 +139,8 @@ class ApiService {
     private?: boolean;
     references?: string;
     groupId?: string;
-  }) {
-    return this.request('/questions', {
+  }): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>('/questions', {
       method: 'POST',
       body: JSON.stringify(payload),
     });
@@ -135,21 +155,21 @@ class ApiService {
       private?: boolean;
       references?: string;
     }
-  ) {
-    return this.request(`/questions/entry/${id}`, {
+  ): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>(`/questions/entry/${id}`, {
       method: 'PUT',
       body: JSON.stringify(payload),
     });
   }
 
   // Issues
-  async getIssues(topicId?: string) {
+  async getIssues(topicId?: string): Promise<LegacyApiResponse> {
     const url = topicId ? `/issues?topic=${topicId}` : '/issues';
-    return this.request(url);
+    return this.request<LegacyApiResponse>(url);
   }
 
-  async getIssueEntry(id: string) {
-    return this.request(`/issues/entry/${id}`);
+  async getIssueEntry(id: string): Promise<IssueEntryResponse> {
+    return this.request<IssueEntryResponse>(`/issues/entry/${id}`);
   }
 
   async createIssue(payload: {
@@ -158,8 +178,8 @@ class ApiService {
     topicId?: string;
     private?: boolean;
     issueType?: number;
-  }) {
-    return this.request('/issues', {
+  }): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>('/issues', {
       method: 'POST',
       body: JSON.stringify(payload),
     });
@@ -174,21 +194,21 @@ class ApiService {
       private?: boolean;
       issueType?: number;
     }
-  ) {
-    return this.request(`/issues/entry/${id}`, {
+  ): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>(`/issues/entry/${id}`, {
       method: 'PUT',
       body: JSON.stringify(payload),
     });
   }
 
   // Opinions
-  async getOpinions(topicId?: string) {
+  async getOpinions(topicId?: string): Promise<LegacyApiResponse> {
     const url = topicId ? `/opinions?topic=${topicId}` : '/opinions';
-    return this.request(url);
+    return this.request<LegacyApiResponse>(url);
   }
 
-  async getOpinionEntry(id: string) {
-    return this.request(`/opinions/entry/${id}`);
+  async getOpinionEntry(id: string): Promise<OpinionEntryResponse> {
+    return this.request<OpinionEntryResponse>(`/opinions/entry/${id}`);
   }
 
   async createOpinion(payload: {
@@ -197,8 +217,8 @@ class ApiService {
     topicId?: string;
     parentId?: string;
     private?: boolean;
-  }) {
-    return this.request('/opinions', {
+  }): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>('/opinions', {
       method: 'POST',
       body: JSON.stringify(payload),
     });
@@ -212,21 +232,21 @@ class ApiService {
       topicId?: string;
       private?: boolean;
     }
-  ) {
-    return this.request(`/opinions/entry/${id}`, {
+  ): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>(`/opinions/entry/${id}`, {
       method: 'PUT',
       body: JSON.stringify(payload),
     });
   }
 
   // Answers
-  async getAnswers(questionId?: string) {
+  async getAnswers(questionId?: string): Promise<LegacyApiResponse> {
     const url = questionId ? `/answers?question=${questionId}` : '/answers';
-    return this.request(url);
+    return this.request<LegacyApiResponse>(url);
   }
 
-  async getAnswerEntry(id: string) {
-    return this.request(`/answers/entry/${id}`);
+  async getAnswerEntry(id: string): Promise<AnswerEntryResponse> {
+    return this.request<AnswerEntryResponse>(`/answers/entry/${id}`);
   }
 
   async createAnswer(payload: {
@@ -235,8 +255,8 @@ class ApiService {
     questionId: string;
     private?: boolean;
     references?: string;
-  }) {
-    return this.request('/answers', {
+  }): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>('/answers', {
       method: 'POST',
       body: JSON.stringify(payload),
     });
@@ -251,21 +271,21 @@ class ApiService {
       private?: boolean;
       references?: string;
     }
-  ) {
-    return this.request(`/answers/entry/${id}`, {
+  ): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>(`/answers/entry/${id}`, {
       method: 'PUT',
       body: JSON.stringify(payload),
     });
   }
 
   // Artifacts
-  async getArtifacts(topicId?: string) {
+  async getArtifacts(topicId?: string): Promise<LegacyApiResponse> {
     const url = topicId ? `/artifacts?topic=${topicId}` : '/artifacts';
-    return this.request(url);
+    return this.request<LegacyApiResponse>(url);
   }
 
-  async getArtifactEntry(id: string) {
-    return this.request(`/artifacts/entry/${id}`);
+  async getArtifactEntry(id: string): Promise<ArtifactEntryResponse> {
+    return this.request<ArtifactEntryResponse>(`/artifacts/entry/${id}`);
   }
 
   async createArtifact(payload: {
@@ -274,8 +294,8 @@ class ApiService {
     topicId?: string;
     private?: boolean;
     source?: string;
-  }) {
-    return this.request('/artifacts', {
+  }): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>('/artifacts', {
       method: 'POST',
       body: JSON.stringify(payload),
     });
@@ -290,115 +310,115 @@ class ApiService {
       private?: boolean;
       source?: string;
     }
-  ) {
-    return this.request(`/artifacts/entry/${id}`, {
+  ): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>(`/artifacts/entry/${id}`, {
       method: 'PUT',
       body: JSON.stringify(payload),
     });
   }
 
   // Search
-  async search(query: string) {
-    return this.request(`/search?q=${encodeURIComponent(query)}`);
+  async search(query: string): Promise<SearchResponse> {
+    return this.request<SearchResponse>(`/search?q=${encodeURIComponent(query)}`);
   }
 
   // Groups
-  async getGroups() {
-    return this.request('/groups');
+  async getGroups(): Promise<GroupsListResponse> {
+    return this.request<GroupsListResponse>('/groups');
   }
 
-  async getGroupEntry(id: string) {
-    return this.request(`/groups/entry/${id}`);
+  async getGroupEntry(id: string): Promise<GroupEntryResponse> {
+    return this.request<GroupEntryResponse>(`/groups/entry/${id}`);
   }
 
-  async getGroupPosts(id: string, limit: number = 25) {
-    return this.request(`/groups/entry/${id}/posts?limit=${encodeURIComponent(String(limit))}`);
+  async getGroupPosts(id: string, limit: number = 25): Promise<GroupPostsResponse> {
+    return this.request<GroupPostsResponse>(`/groups/entry/${id}/posts?limit=${encodeURIComponent(String(limit))}`);
   }
 
-  async createGroup(payload: { title: string; description: string; privacyType: number }) {
-    return this.request('/groups', {
+  async createGroup(payload: { title: string; description: string; privacyType: number }): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>('/groups', {
       method: 'POST',
       body: JSON.stringify(payload),
     });
   }
 
-  async updateGroup(id: string, payload: { title?: string; description?: string; privacyType?: number }) {
-    return this.request(`/groups/entry/${id}`, {
+  async updateGroup(id: string, payload: { title?: string; description?: string; privacyType?: number }): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>(`/groups/entry/${id}`, {
       method: 'PUT',
       body: JSON.stringify(payload),
     });
   }
 
-  async joinGroup(id: string) {
-    return this.request(`/groups/entry/${id}/members`, {
+  async joinGroup(id: string): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>(`/groups/entry/${id}/members`, {
       method: 'POST',
       body: JSON.stringify({}),
     });
   }
 
-  async leaveGroup(id: string, userId: string) {
-    return this.request(`/groups/entry/${id}/members/${encodeURIComponent(userId)}`, {
+  async leaveGroup(id: string, userId: string): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>(`/groups/entry/${id}/members/${encodeURIComponent(userId)}`, {
       method: 'DELETE',
     });
   }
 
   // Members
-  async getMembers() {
-    return this.request('/members');
+  async getMembers(): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>('/members');
   }
 
-  async getScreeners() {
-    return this.request('/members/screeners');
+  async getScreeners(): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>('/members/screeners');
   }
 
-  async getReviewers() {
-    return this.request('/members/reviewers');
+  async getReviewers(): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>('/members/reviewers');
   }
 
-  async getAdministrators() {
-    return this.request('/members/administrators');
+  async getAdministrators(): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>('/members/administrators');
   }
 
-  async getMemberProfile(username: string) {
-    return this.request(`/members/${username}`);
+  async getMemberProfile(username: string): Promise<MemberProfileResponse> {
+    return this.request<MemberProfileResponse>(`/members/${username}`);
   }
 
-  async getMemberTopics(username: string, limit: number = 50) {
-    return this.request(`/members/${encodeURIComponent(username)}/topics?limit=${encodeURIComponent(String(limit))}`);
+  async getMemberTopics(username: string, limit: number = 50): Promise<MemberTopicsResponse> {
+    return this.request<MemberTopicsResponse>(`/members/${encodeURIComponent(username)}/topics?limit=${encodeURIComponent(String(limit))}`);
   }
 
-  async getMemberFollowing(username: string) {
-    return this.request(`/members/${encodeURIComponent(username)}/following`);
+  async getMemberFollowing(username: string): Promise<MemberFollowingResponse> {
+    return this.request<MemberFollowingResponse>(`/members/${encodeURIComponent(username)}/following`);
   }
 
-  async getCurrentMemberProfile() {
-    return this.request('/members/me');
+  async getCurrentMemberProfile(): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>('/members/me');
   }
 
-  async updateCurrentMemberPreferences(payload: { privateProfile: boolean }) {
-    return this.request('/members/me/preferences', {
+  async updateCurrentMemberPreferences(payload: { privateProfile: boolean }): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>('/members/me/preferences', {
       method: 'PUT',
       body: JSON.stringify(payload),
     });
   }
 
-  async getMemberPages(username: string) {
-    return this.request(`/members/${encodeURIComponent(username)}/pages`);
+  async getMemberPages(username: string): Promise<MemberPagesResponse> {
+    return this.request<MemberPagesResponse>(`/members/${encodeURIComponent(username)}/pages`);
   }
 
-  async createMemberPage(username: string, payload: { title: string; content: string }) {
-    return this.request(`/members/${encodeURIComponent(username)}/pages`, {
+  async createMemberPage(username: string, payload: { title: string; content: string }): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>(`/members/${encodeURIComponent(username)}/pages`, {
       method: 'POST',
       body: JSON.stringify(payload),
     });
   }
 
-  async getMemberPage(username: string, pageId: string) {
-    return this.request(`/members/${encodeURIComponent(username)}/pages/${encodeURIComponent(pageId)}`);
+  async getMemberPage(username: string, pageId: string): Promise<MemberPageResponse> {
+    return this.request<MemberPageResponse>(`/members/${encodeURIComponent(username)}/pages/${encodeURIComponent(pageId)}`);
   }
 
-  async updateMemberPage(username: string, pageId: string, payload: { title?: string; content?: string }) {
-    return this.request(`/members/${encodeURIComponent(username)}/pages/${encodeURIComponent(pageId)}`, {
+  async updateMemberPage(username: string, pageId: string, payload: { title?: string; content?: string }): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>(`/members/${encodeURIComponent(username)}/pages/${encodeURIComponent(pageId)}`, {
       method: 'PUT',
       body: JSON.stringify(payload),
     });

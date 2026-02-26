@@ -5,7 +5,7 @@ import Alert from '../components/common/Alert';
 import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import apiService from '../services/api';
-import type { LegacyEntity, LegacyResponse } from '../types/legacy';
+import type { LegacyEntity } from '../types/legacy';
 
 const ArtifactEntryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -21,7 +21,7 @@ const ArtifactEntryPage: React.FC = () => {
         return;
       }
       try {
-        const result = (await apiService.getArtifactEntry(id)) as LegacyResponse;
+        const result = await apiService.getArtifactEntry(id);
         setArtifact(result?.artifact || null);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load artifact');

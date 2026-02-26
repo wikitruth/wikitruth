@@ -10,7 +10,7 @@ import Alert from '../../../components/common/Alert';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import apiService from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
-import type { LegacyEntity, LegacyResponse } from '../../../types/legacy';
+import type { LegacyEntity } from '../../../types/legacy';
 
 const GroupPage: React.FC = () => {
   const navigate = useNavigate();
@@ -33,7 +33,7 @@ const GroupPage: React.FC = () => {
 
       try {
         setLoading(true);
-        const result = (await apiService.getGroupEntry(id)) as LegacyResponse;
+        const result = await apiService.getGroupEntry(id);
         const groupModel = (result?.group || result) as LegacyEntity;
         setGroup(groupModel);
         setForm({
@@ -68,7 +68,7 @@ const GroupPage: React.FC = () => {
 
   const refreshGroup = async () => {
     if (!id) return;
-    const result = (await apiService.getGroupEntry(id)) as LegacyResponse;
+    const result = await apiService.getGroupEntry(id);
     setGroup((result?.group || result) as LegacyEntity);
   };
 

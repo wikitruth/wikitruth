@@ -8,7 +8,7 @@ import QuestionEntryRow from '../components/EntryRow/QuestionEntryRow';
 import AnswerEntryRow from '../components/EntryRow/AnswerEntryRow';
 import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
-import type { LegacyResponse } from '../types/legacy';
+import type { SearchResponse } from '../types/api';
 import type { Answer, Argument, Issue, Opinion, Question, Topic, Artifact } from '../types';
 
 const SearchPage: React.FC = () => {
@@ -16,7 +16,7 @@ const SearchPage: React.FC = () => {
   const query = searchParams.get('q') || '';
   
   const [searchQuery, setSearchQuery] = useState(query);
-  const [results, setResults] = useState<LegacyResponse>({});
+  const [results, setResults] = useState<SearchResponse>({});
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
 
@@ -32,7 +32,7 @@ const SearchPage: React.FC = () => {
     try {
       setLoading(true);
       setSearched(true);
-      const result = (await apiService.search(q)) as LegacyResponse;
+      const result = await apiService.search(q);
       setResults(result);
       setLoading(false);
     } catch (error) {
