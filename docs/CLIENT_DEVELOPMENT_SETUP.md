@@ -41,6 +41,7 @@ npm run dev:client
 - Legacy/backend app: `http://localhost:8000`
 - React dev server: `http://localhost:3001`
 - React SPA route base: `http://localhost:3001/app`
+- Opening `http://localhost:3001/` redirects to `http://localhost:3001/app`
 
 `/api/*` requests from the React dev server are proxied to `http://localhost:8000`.
 
