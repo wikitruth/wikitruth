@@ -46,7 +46,7 @@ Acceptance criteria: Existing parity matrix reflects true current state and no l
 
 ## Phase P2: Secondary and Cleanup Parity
 
-- [ ] P2.1 Add missing Home artifacts section in modern homepage.
+- [x] P2.1 Add missing Home artifacts section in modern homepage.
 Acceptance criteria: If artifacts exist in home payload, modern home renders an artifacts block with links.
 
 - [ ] P2.2 Resolve or retire unwired migration scaffolds under `client/src/pages/Wiki/*`.

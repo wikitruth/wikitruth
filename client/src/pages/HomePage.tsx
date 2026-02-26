@@ -248,6 +248,34 @@ const HomePage: React.FC = () => {
       </div>
 
       <div className="row">
+        {/* Artifacts */}
+        {data.artifacts && data.artifacts.length > 0 && (
+          <div className="col-md-6 col-sm-12">
+            <div className="wt-list-container">
+              <ul className="list-group top-list-items wt-list">
+                <li className="list-group-item highlight">
+                  <i className="fa fa-puzzle-piece text-muted-x" aria-hidden="true"></i>
+                  <div>Artifacts</div>
+                </li>
+                {data.artifacts.map((artifact) => (
+                  <li key={artifact._id} className="list-group-item">
+                    <a href={`/artifacts/entry/${artifact.friendlyUrl || artifact._id}/${artifact._id}`}>
+                      {artifact.title || '(Untitled)'}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+              {data.artifactsMore && (
+                <div className="top-list-items-more">
+                  <Link to="/artifacts" role="button" className="btn btn-default btn-sm">
+                    <i className="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Issues */}
         {data.issues && data.issues.length > 0 && (
           <div className="col-md-6 col-sm-12">
