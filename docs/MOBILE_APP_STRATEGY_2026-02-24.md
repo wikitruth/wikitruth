@@ -44,26 +44,26 @@ Reasons:
 Legend: `[x]` ready, `[~]` partial, `[ ]` missing
 
 - [x] Versioned API route available (`/api/v1/*` compatibility).
-- [~] Auth endpoints exist (`/api/auth/login`, `/api/auth/me`, `/api/auth/logout`) but rely on cookie session flow, not mobile token lifecycle.
-- [ ] Dedicated mobile token model (access + refresh token issuance/revocation).
-- [ ] Formal API schema (OpenAPI/JSON Schema) for mobile-critical endpoints.
-- [~] Consistent error envelope exists for server-thrown errors, but success payload shape is not yet fully standardized across all endpoints.
-- [ ] Cursor-based pagination contract for large collections.
-- [ ] Rate-limit and quota response contract (headers + error codes) documented.
-- [ ] Contract-level deprecation policy and sunset headers.
+- [x] Auth endpoints now support both session and mobile token lifecycle (`/api/auth/token`, `/api/auth/token/refresh`, `/api/auth/token/revoke`).
+- [x] Dedicated mobile token model (access + refresh token issuance/revocation) is implemented with refresh-token rotation and revocation.
+- [x] Formal API schema (OpenAPI/JSON Schema) is published for mobile-critical endpoints.
+- [x] Consistent success/error envelope is enforced by API middleware.
+- [x] Cursor-based pagination contract (`limit`, `cursor`, `nextCursor`) is available for mobile-read critical list endpoints.
+- [x] Rate-limit and quota response contract (headers + `RATE_LIMITED`) is implemented and documented.
+- [x] Contract-level deprecation policy and sunset headers are emitted by API contract middleware.
 - [ ] Binary/media upload contract documented for mobile clients.
 - [x] Baseline realtime channel now available via SSE (`/api/realtime/events` and `/api/v1/realtime/events`).
-- [ ] Mobile-specific observability tags (client version, platform, build number) integrated in API telemetry.
-- [ ] End-to-end contract tests for mobile critical path endpoints.
+- [x] Mobile-specific observability tags (client version, platform, build number) are integrated in API telemetry.
+- [x] End-to-end contract tests for mobile critical path endpoints are now in server CI (`mobile-api-contracts`, `openapi-contract`, `request-context`).
 
 ## Required Backlog Before Mobile Build Starts
 
-1. Add token-based auth endpoints and refresh rotation policy.
-2. Define and publish OpenAPI spec for mobile MVP endpoints.
-3. Normalize success response shape for MVP endpoints.
-4. Add pagination contract (`limit`, `cursor`, `nextCursor`) where list volume requires it.
-5. Add contract tests in CI for auth, home/topics/search, and core entry reads.
-6. Define mobile error code taxonomy and map from current server errors.
+1. [x] Add token-based auth endpoints and refresh rotation policy.
+2. [x] Define and publish OpenAPI spec for mobile MVP endpoints.
+3. [x] Normalize success response shape for MVP endpoints.
+4. [x] Add pagination contract (`limit`, `cursor`, `nextCursor`) where list volume requires it.
+5. [x] Add contract tests in CI for auth, home/topics/search, and core entry reads.
+6. [x] Define mobile error code taxonomy and map from current server errors (`RATE_LIMITED`, envelope-level request IDs).
 
 ## Suggested Repository Layout
 

@@ -12,6 +12,7 @@ describe('API endpoint smoke coverage', function () {
     const apiIndex = read('controllers/api/index.ts');
 
     [
+      'router.use(mobileContracts.mobileApiContractMiddleware)',
       "router.use('/home', homeRouter)",
       "router.use('/topics', topicsRouter)",
       "router.use('/arguments', argumentsRouter)",
@@ -48,6 +49,9 @@ describe('API endpoint smoke coverage', function () {
     expect(authApi).toContain("router.get('/verification-status'");
     expect(authApi).toContain("router.post('/verification-resend'");
     expect(authApi).toContain("router.post('/verification-confirm'");
+    expect(authApi).toContain("router.post('/token'");
+    expect(authApi).toContain("router.post('/token/refresh'");
+    expect(authApi).toContain("router.post('/token/revoke'");
   });
 
   it('exposes admin API handlers required by client admin services', function () {

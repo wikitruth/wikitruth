@@ -3,6 +3,7 @@ export const API_ERROR_CODES = {
   API_ERROR: 'API_ERROR',
   VALIDATION_ERROR: 'VALIDATION_ERROR',
   DB_UNAVAILABLE: 'DB_UNAVAILABLE',
+  RATE_LIMITED: 'RATE_LIMITED',
 } as const;
 
 export type ApiErrorCode = (typeof API_ERROR_CODES)[keyof typeof API_ERROR_CODES];

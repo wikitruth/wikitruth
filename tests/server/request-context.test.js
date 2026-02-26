@@ -43,4 +43,26 @@ describe('Request context middleware', function () {
     expect(response.headers['x-request-id']).toBe('req-fixed-12345');
     expect(response.body.error.requestId).toBe('req-fixed-12345');
   });
+
+  it('captures mobile client observability tags from headers', async function () {
+    const app = express();
+    app.use(requestContext);
+
+    app.get('/api/home', function (req, res) {
+      res.status(200).json({ telemetry: req.clientTelemetry });
+    });
+
+    const response = await request(app)
+      .get('/api/home')
+      .set('X-Client-Platform', 'ios')
+      .set('X-Client-Version', '1.2.3')
+      .set('X-Client-Build', '456')
+      .expect(200);
+
+    expect(response.body.telemetry).toEqual({
+      platform: 'ios',
+      version: '1.2.3',
+      build: '456',
+    });
+  });
 });

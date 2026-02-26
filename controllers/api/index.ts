@@ -7,9 +7,13 @@ const apiError = require('../../middlewares/apiError') as {
   wrapAsyncRouter: (router: Router) => Router;
   apiEnvelopeMiddleware: import('express').RequestHandler;
 };
+const mobileContracts = require('../../middlewares/mobileApiContracts') as {
+  mobileApiContractMiddleware: import('express').RequestHandler;
+};
 
 module.exports = function (router: Router) {
   router.use(apiError.apiEnvelopeMiddleware);
+  router.use(mobileContracts.mobileApiContractMiddleware);
 
   const homeRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const topicsRouter = apiError.wrapAsyncRouter(express.Router()) as Router;

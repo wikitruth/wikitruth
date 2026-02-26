@@ -17,7 +17,7 @@ Close remaining parity gaps between legacy and modern flows, harden API contract
 - [x] Admin, groups, and profile modern pages exist with baseline API integrations.
 - [x] OpenAPI spec now covers the active modern API route surface.
 - [x] E2E critical-flow smoke coverage expanded for modern parity routes.
-- [ ] Discussion tabs in entry pages have no matching modern routes.
+- [x] Discussion tabs in entry pages have matching modern routes.
 - [x] `/visualize` modern route is now data-driven.
 - [x] Group posts modern route now has native read flow and create hooks.
 - [x] Member profile `following` and `topics` pages are data-backed.
@@ -106,7 +106,7 @@ Close remaining parity gaps between legacy and modern flows, harden API contract
     - Core page data loaders compile without fallback casting.
     - Runtime errors caused by payload shape mismatch are reduced.
 
-- [ ] **P2.3 Mobile-readiness contract backlog**
+- [x] **P2.3 Mobile-readiness contract backlog**
   - Execute unresolved items from `docs/MOBILE_APP_STRATEGY_2026-02-24.md`:
     - token lifecycle model
     - pagination/rate-limit/deprecation contracts
@@ -117,14 +117,14 @@ Close remaining parity gaps between legacy and modern flows, harden API contract
 
 ## Execution Order
 
-- [ ] Execute all P0 items first.
-- [ ] Execute P1 after P0 is complete.
-- [ ] Execute P2 after P1, except P2.1/P2.2 can run in parallel with P1 when low-risk.
+- [x] Execute all P0 items first.
+- [x] Execute P1 after P0 is complete.
+- [x] Execute P2 after P1, except P2.1/P2.2 can run in parallel with P1 when low-risk.
 
 ## Definition of Done
 
-- [ ] No placeholder or legacy-handoff UX remains on active modern routes.
-- [ ] No broken tab/link routes in modern client navigation.
-- [ ] API contracts are standardized and documented in OpenAPI.
-- [ ] Critical user journeys are covered by automated E2E tests.
-- [ ] High-risk TODO/FIXME items in core controllers are either fixed or formally tracked with explicit risk acceptance.
+- [x] No placeholder or legacy-handoff UX remains on active modern routes.
+- [x] No broken tab/link routes in modern client navigation.
+- [x] API contracts are standardized and documented in OpenAPI.
+- [x] Critical user journeys are covered by automated E2E tests.
+- [x] High-risk TODO/FIXME items in core controllers are either fixed or formally tracked with explicit risk acceptance.

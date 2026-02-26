@@ -16,6 +16,20 @@ exports = module.exports = function(app, mongoose) {
     timeCreated: { type: Date, default: Date.now },
     resetPasswordToken: String,
     resetPasswordExpires: Date,
+    mobileTokens: [
+      {
+        tokenId: { type: String, default: '' },
+        tokenHash: { type: String, default: '' },
+        issuedAt: { type: Date, default: Date.now },
+        expiresAt: { type: Date, default: Date.now },
+        revokedAt: { type: Date, default: null },
+        client: {
+          platform: { type: String, default: '' },
+          version: { type: String, default: '' },
+          build: { type: String, default: '' },
+        },
+      },
+    ],
     twitter: {},
     github: {},
     facebook: {},

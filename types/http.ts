@@ -16,6 +16,11 @@ export interface WikitruthRequest extends Request {
   user?: AuthUser;
   session: WikitruthSession;
   requestId?: string;
+  clientTelemetry?: {
+    platform: string | null;
+    version: string | null;
+    build: string | null;
+  };
 }
 
 export type WikitruthResponse = Response;

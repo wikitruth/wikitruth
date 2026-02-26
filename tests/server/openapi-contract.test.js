@@ -19,6 +19,9 @@ describe('OpenAPI contract', function () {
     expect(paths['/auth/logout']).toBeDefined();
     expect(paths['/auth/forgot-password']).toBeDefined();
     expect(paths['/auth/reset-password']).toBeDefined();
+    expect(paths['/auth/token']).toBeDefined();
+    expect(paths['/auth/token/refresh']).toBeDefined();
+    expect(paths['/auth/token/revoke']).toBeDefined();
   });
 
   it('defines mutation contracts for core content entities', function () {
@@ -82,6 +85,25 @@ describe('OpenAPI contract', function () {
       'ArtifactMutationResponse',
       'StandardApiResponse',
       'GenericMutationRequest',
+      'PaginationMeta',
+      'PaginatedApiResponse',
+      'MobileTokenRequest',
+      'MobileRefreshTokenRequest',
+      'MobileTokenResponse',
     ].forEach((schemaName) => expect(schemas[schemaName]).toBeDefined());
+  });
+
+  it('defines mobile contract headers and auth security scheme', function () {
+    const spec = readOpenApi();
+    const securitySchemes = spec.components?.securitySchemes || {};
+    const homeGet = spec.paths?.['/home']?.get;
+    const headers = homeGet?.responses?.['200']?.headers || {};
+
+    expect(securitySchemes.BearerAuth).toBeDefined();
+    expect(headers['RateLimit-Limit']).toBeDefined();
+    expect(headers['RateLimit-Remaining']).toBeDefined();
+    expect(headers['RateLimit-Reset']).toBeDefined();
+    expect(headers.Deprecation).toBeDefined();
+    expect(headers.Sunset).toBeDefined();
   });
 });

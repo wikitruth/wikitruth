@@ -19,6 +19,29 @@ type TopicScreeningModel = {
   questions?: any[];
 };
 
+function parseLimit(req: WikitruthRequest): number {
+  const raw = Number(req.query.limit);
+  if (!Number.isFinite(raw) || raw <= 0) {
+    return 50;
+  }
+
+  return Math.min(Math.floor(raw), 100);
+}
+
+function parseCursor(req: WikitruthRequest): Date | null {
+  const raw = String(req.query.cursor || '').trim();
+  if (!raw) {
+    return null;
+  }
+
+  const parsed = new Date(raw);
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
+
+  return parsed;
+}
+
 module.exports = function (router: Router) {
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
@@ -50,6 +73,8 @@ module.exports = function (router: Router) {
 
 async function GET_topics(req: WikitruthRequest, res: WikitruthResponse) {
   const model: TopicScreeningModel = {};
+  const limit = parseLimit(req);
+  const cursor = parseCursor(req);
   flowUtils.setScreeningModel(req, model);
 
   if (!req.query.topic && req.params.id) {
@@ -65,9 +90,12 @@ async function GET_topics(req: WikitruthRequest, res: WikitruthResponse) {
   if (typeof screeningStatus !== 'undefined') {
     topicsQuery['screening.status'] = screeningStatus;
   }
+  if (cursor) {
+    topicsQuery.editDate = { $lt: cursor };
+  }
 
   model.topics = await flowUtils.getTopics(topicsQuery, {
-    limit: 0,
+    limit: limit,
     req: req,
   });
 
@@ -76,7 +104,18 @@ async function GET_topics(req: WikitruthRequest, res: WikitruthResponse) {
   }
 
   delete model.screening;
-  res.json(model);
+  const list = Array.isArray(model.topics) ? model.topics : [];
+  const lastTopic = list.length > 0 ? list[list.length - 1] : null;
+  const nextCursor = lastTopic?.editDate ? new Date(lastTopic.editDate as string | number | Date).toISOString() : null;
+
+  res.json({
+    ...model,
+    pagination: {
+      limit: limit,
+      cursor: cursor ? cursor.toISOString() : null,
+      nextCursor: nextCursor,
+    },
+  });
 }
 
 async function POST_topic_create(req: WikitruthRequest, res: WikitruthResponse) {

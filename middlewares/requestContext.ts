@@ -10,6 +10,11 @@ const KEY_PATH_PATTERNS = [/^\/home\/?$/, /^\/login\/?$/, /^\/api\/home\/?$/, /^
 
 interface RequestWithContext extends Request {
   requestId?: string;
+  clientTelemetry?: {
+    platform: string | null;
+    version: string | null;
+    build: string | null;
+  };
 }
 
 function isKeyPath(pathname: string): boolean {
@@ -38,8 +43,15 @@ const requestContext: RequestHandler = function (req, res, next) {
   const path = req.originalUrl || req.path || '/';
 
   const requestWithContext = req as RequestWithContext;
+  const clientTelemetry = {
+    platform: String(req.header('x-client-platform') || '').trim() || null,
+    version: String(req.header('x-client-version') || '').trim() || null,
+    build: String(req.header('x-client-build') || '').trim() || null,
+  };
   requestWithContext.requestId = requestId;
+  requestWithContext.clientTelemetry = clientTelemetry;
   res.locals.requestId = requestId;
+  res.locals.clientTelemetry = clientTelemetry;
   res.set('X-Request-Id', requestId);
 
   if (isKeyPath(path) || path.startsWith('/api/')) {
@@ -47,6 +59,9 @@ const requestContext: RequestHandler = function (req, res, next) {
       requestId: requestId,
       method: req.method,
       path: path,
+      clientPlatform: clientTelemetry.platform,
+      clientVersion: clientTelemetry.version,
+      clientBuild: clientTelemetry.build,
     });
   }
 
@@ -58,6 +73,9 @@ const requestContext: RequestHandler = function (req, res, next) {
         path: path,
         statusCode: res.statusCode,
         durationMs: Date.now() - startedAt,
+        clientPlatform: clientTelemetry.platform,
+        clientVersion: clientTelemetry.version,
+        clientBuild: clientTelemetry.build,
       });
     }
   });

@@ -13,6 +13,28 @@ type SearchModel = {
   };
 };
 
+function parseLimit(req: WikitruthRequest): number {
+  const raw = Number(req.query.limit);
+  if (!Number.isFinite(raw) || raw <= 0) {
+    return 20;
+  }
+  return Math.min(Math.floor(raw), 100);
+}
+
+function parseCursor(req: WikitruthRequest): Date | null {
+  const raw = String(req.query.cursor || '').trim();
+  if (!raw) {
+    return null;
+  }
+
+  const parsed = new Date(raw);
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
+
+  return parsed;
+}
+
 function buildRegexSearchQuery(query: string): Record<string, unknown> {
   const pattern = { $regex: query, $options: 'i' };
   return {
@@ -20,7 +42,7 @@ function buildRegexSearchQuery(query: string): Record<string, unknown> {
   };
 }
 
-function buildBaseQuery(screeningStatus: number | undefined): Record<string, unknown> {
+function buildBaseQuery(screeningStatus: number | undefined, cursor: Date | null): Record<string, unknown> {
   const base: Record<string, unknown> = {
     private: false,
   };
@@ -29,7 +51,33 @@ function buildBaseQuery(screeningStatus: number | undefined): Record<string, unk
     base['screening.status'] = screeningStatus;
   }
 
+  if (cursor) {
+    base.editDate = { $lt: cursor };
+  }
+
   return base;
+}
+
+function findNextCursorDate(resultSets: Array<Array<{ editDate?: unknown }>>): string | null {
+  const candidate = resultSets
+    .map(function (set) {
+      if (!Array.isArray(set) || set.length === 0) {
+        return null;
+      }
+      const last = set[set.length - 1];
+      const value = last?.editDate;
+      if (!value) {
+        return null;
+      }
+      const parsed = new Date(value as string | number | Date);
+      return Number.isNaN(parsed.getTime()) ? null : parsed;
+    })
+    .filter(Boolean)
+    .sort(function (a, b) {
+      return (a as Date).getTime() - (b as Date).getTime();
+    })[0] as Date | undefined;
+
+  return candidate ? candidate.toISOString() : null;
 }
 
 module.exports = function (router: Router) {
@@ -45,6 +93,8 @@ module.exports = function (router: Router) {
 
 async function GET_search(req: WikitruthRequest, res: WikitruthResponse) {
   const query = String(req.query.q || '').trim();
+  const limit = parseLimit(req);
+  const cursor = parseCursor(req);
 
   if (!query) {
     return res.json({
@@ -55,13 +105,18 @@ async function GET_search(req: WikitruthRequest, res: WikitruthResponse) {
       artifacts: [],
       issues: [],
       opinions: [],
+      pagination: {
+        limit: limit,
+        cursor: cursor ? cursor.toISOString() : null,
+        nextCursor: null,
+      },
     });
   }
 
   const model: SearchModel = {};
   flowUtils.setScreeningModel(req, model);
   const screeningStatus = model.screening?.status;
-  const baseQuery = buildBaseQuery(screeningStatus);
+  const baseQuery = buildBaseQuery(screeningStatus, cursor);
 
   const [
     topicResults,
@@ -72,10 +127,10 @@ async function GET_search(req: WikitruthRequest, res: WikitruthResponse) {
     issueResults,
     opinionResults,
   ] = await Promise.all([
-    db.Topic.find({ ...baseQuery, ...buildRegexSearchQuery(query) }).sort({ editDate: -1 }).limit(20).lean(),
-    db.Argument.find({ ...baseQuery, ...buildRegexSearchQuery(query) }).sort({ editDate: -1 }).limit(20).lean(),
-    db.Question.find({ ...baseQuery, ...buildRegexSearchQuery(query) }).sort({ editDate: -1 }).limit(20).lean(),
-    db.Answer.find({ ...baseQuery, ...buildRegexSearchQuery(query) }).sort({ editDate: -1 }).limit(20).lean(),
+    db.Topic.find({ ...baseQuery, ...buildRegexSearchQuery(query) }).sort({ editDate: -1 }).limit(limit).lean(),
+    db.Argument.find({ ...baseQuery, ...buildRegexSearchQuery(query) }).sort({ editDate: -1 }).limit(limit).lean(),
+    db.Question.find({ ...baseQuery, ...buildRegexSearchQuery(query) }).sort({ editDate: -1 }).limit(limit).lean(),
+    db.Answer.find({ ...baseQuery, ...buildRegexSearchQuery(query) }).sort({ editDate: -1 }).limit(limit).lean(),
     db.Artifact
       .find({
         ...baseQuery,
@@ -83,10 +138,10 @@ async function GET_search(req: WikitruthRequest, res: WikitruthResponse) {
         $or: [...(buildRegexSearchQuery(query).$or as Array<Record<string, unknown>>), { source: { $regex: query, $options: 'i' } }],
       })
       .sort({ editDate: -1 })
-      .limit(20)
+      .limit(limit)
       .lean(),
-    db.Issue.find({ ...baseQuery, ...buildRegexSearchQuery(query) }).sort({ editDate: -1 }).limit(20).lean(),
-    db.Opinion.find({ ...baseQuery, ...buildRegexSearchQuery(query) }).sort({ editDate: -1 }).limit(20).lean(),
+    db.Issue.find({ ...baseQuery, ...buildRegexSearchQuery(query) }).sort({ editDate: -1 }).limit(limit).lean(),
+    db.Opinion.find({ ...baseQuery, ...buildRegexSearchQuery(query) }).sort({ editDate: -1 }).limit(limit).lean(),
   ]);
 
   await flowUtils.setEditorsUsername(topicResults);
@@ -132,6 +187,16 @@ async function GET_search(req: WikitruthRequest, res: WikitruthResponse) {
     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.opinion, req);
   });
 
+  const nextCursor = findNextCursorDate([
+    topicResults,
+    argumentResults,
+    questionResults,
+    answerResults,
+    artifactResults,
+    issueResults,
+    opinionResults,
+  ]);
+
   res.json({
     topics: topicResults,
     arguments: argumentResults,
@@ -140,5 +205,10 @@ async function GET_search(req: WikitruthRequest, res: WikitruthResponse) {
     artifacts: artifactResults,
     issues: issueResults,
     opinions: opinionResults,
+    pagination: {
+      limit: limit,
+      cursor: cursor ? cursor.toISOString() : null,
+      nextCursor: nextCursor,
+    },
   });
 }

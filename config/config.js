@@ -158,6 +158,15 @@ exports.systemEmail = requiredFromEnv(['SYSTEM_EMAIL', 'WIKITRUTH_SYSTEM_EMAIL']
 exports.cryptoKey = secretFromEnv(['WIKITRUTH_CRYPTO_KEY', 'CRYPTO_KEY'], 'WIKITRUTH_CRYPTO_KEY');
 exports.cacheBreaker = envWithDefault(['CACHE_BREAKER'], Date.now().toString());
 exports.jwtSecret = secretFromEnv(['WIKITRUTH_JWT_SECRET', 'JWT_SECRET'], 'WIKITRUTH_JWT_SECRET');
+exports.mobileApi = {
+  accessTokenTtlSeconds: Number(envWithDefault(['MOBILE_ACCESS_TOKEN_TTL_SECONDS'], '900')),
+  refreshTokenTtlSeconds: Number(envWithDefault(['MOBILE_REFRESH_TOKEN_TTL_SECONDS'], '2592000')),
+  maxRefreshSessionsPerUser: Number(envWithDefault(['MOBILE_MAX_REFRESH_SESSIONS'], '10')),
+  rateLimitPerMinute: Number(envWithDefault(['MOBILE_API_RATE_LIMIT_PER_MINUTE'], '240')),
+  rateLimitWindowMs: Number(envWithDefault(['MOBILE_API_RATE_LIMIT_WINDOW_MS'], '60000')),
+  deprecationSunset: envWithDefault(['API_DEPRECATION_SUNSET'], '2028-12-31T23:59:59.000Z'),
+  deprecationPolicyUrl: envWithDefault(['API_DEPRECATION_POLICY_URL'], exports.homeUrl + '/docs/deprecations'),
+};
 exports.trustProxy = envBoolean(['TRUST_PROXY'], false);
 exports.session = {
   name: envWithDefault(['SESSION_COOKIE_NAME'], 'sid'),
