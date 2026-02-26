@@ -9,7 +9,7 @@ Close remaining functional gaps between the legacy templates/controllers and the
 
 ## Phase P0: Broken or Missing Core Flows
 
-- [ ] P0.1 Fix broken My Diary navigation route in modern client.
+- [x] P0.1 Fix broken My Diary navigation route in modern client.
 Acceptance criteria: Header `My Diary` link resolves to an implemented modern route and no longer lands on 404.
 
 - [ ] P0.2 Implement modern Contact form backend submission.

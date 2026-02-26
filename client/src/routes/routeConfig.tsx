@@ -63,6 +63,7 @@ const AdministratorsPage = lazy(() => import('../pages/Members/AdministratorsPag
 const ProfilePage = lazy(() => import('../pages/Members/Profile/ProfilePage'));
 const ProfileSettings = lazy(() => import('../pages/Members/Profile/ProfileSettings'));
 const ProfileTopics = lazy(() => import('../pages/Members/Profile/ProfileTopics'));
+const ProfileDiary = lazy(() => import('../pages/Members/Profile/ProfileTopics'));
 const ProfileContributions = lazy(() => import('../pages/Members/Profile/ProfileContributions'));
 const ProfileFollowing = lazy(() => import('../pages/Members/Profile/ProfileFollowing'));
 const PagesIndex = lazy(() => import('../pages/Members/Profile/Pages/PagesIndex'));
@@ -164,6 +165,8 @@ export const appRoutes: AppRoute[] = [
   { path: '/members/profile/settings', element: <ProfileSettings /> },
   { path: '/members/:username/topics', element: <ProfileTopics /> },
   { path: '/members/profile/topics', element: <ProfileTopics /> },
+  { path: '/members/:username/diary', element: <ProfileDiary /> },
+  { path: '/members/profile/diary', element: <ProfileDiary /> },
   { path: '/members/profile/contributions', element: <ProfileContributions /> },
   { path: '/members/:username/following', element: <ProfileFollowing /> },
   { path: '/members/profile/following', element: <ProfileFollowing /> },
