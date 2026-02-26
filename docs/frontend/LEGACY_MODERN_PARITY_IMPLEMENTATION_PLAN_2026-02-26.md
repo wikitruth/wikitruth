@@ -41,7 +41,7 @@ Acceptance criteria: Modern search supports content scope (`all/wiki/diary`), ta
 - [x] P1.7 Restore contextual sidebar/navigation parity.
 Acceptance criteria: Modern layout provides legacy-equivalent contextual side navigation (section context, diary/groups shortcuts, related links) with responsive behavior.
 
-- [ ] P1.8 Correct parity report accuracy.
+- [x] P1.8 Correct parity report accuracy.
 Acceptance criteria: Existing parity matrix reflects true current state and no longer marks incomplete areas as fully done.
 
 ## Phase P2: Secondary and Cleanup Parity

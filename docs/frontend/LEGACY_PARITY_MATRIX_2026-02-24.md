@@ -1,22 +1,32 @@
-# Legacy-to-Modern Parity Matrix (2026-02-24)
+# Legacy-to-Modern Parity Matrix (Updated 2026-02-26)
 
-Legend: `Done` = modern React flow implemented and verified, `Legacy retained` = old template flow intentionally kept for comparison fallback.
+Legend:
+- `Done` = implemented in modern React client and validated in current execution cycle.
+- `Partial` = implemented in part, but parity-critical scope is still open.
+- `Pending` = planned but not yet implemented.
+- `Legacy retained` = legacy route/template intentionally preserved for side-by-side comparison.
 
-| Area | Legacy route/template baseline | Modern React route | API contract | Status | Evidence |
-|---|---|---|---|---|---|
-| Local auth login/logout | `/login`, `/logout` templates | `/app/login`, `/app/logout` | `/api/auth/login`, `/api/auth/logout`, `/api/auth/me` | Done + Legacy retained | Client auth integration tests + server smoke tests |
-| Signup | `/signup` template | `/app/signup` | `/api/auth/signup` | Done + Legacy retained | `signupFlow.integration.test.tsx` |
-| Social auth (login/signup) | `/login/:provider`, `/signup/:provider` | React buttons redirect to legacy OAuth entry routes | Existing passport/OAuth routes + session auth API | Done + Legacy retained | `SocialLoginButtons.test.tsx`, route contract smoke |
-| Password recovery | Legacy email/token templates | `/app/forgot-password`, `/app/reset-password` | `/api/auth/forgot-password`, `/api/auth/reset-password` | Done + Legacy retained | forgot/reset integration tests |
-| Topic + argument create | Legacy create forms | `/app/topics/create`, `/app/arguments/create` | `/api/topics` POST, `/api/arguments` POST | Done + Legacy retained | server smoke + OpenAPI contract |
-| Question/answer/issue/opinion/artifact create/edit | Legacy create/edit forms | `/app/*/create`, `/app/*/edit/:id` | `/api/*` POST + `/api/*/entry/:id` PUT | Done + Legacy retained | server smoke + route config tests |
-| Group lifecycle | Legacy group pages | `/app/groups/create`, `/app/groups/:id`, `/app/groups/:id/members` | `/api/groups` + member join/leave/update routes | Done + Legacy retained | build + smoke coverage |
-| Profile custom pages | Legacy member pages | `/app/members/profile/pages/*` and public profile page view | `/api/members/:username/pages*` | Done + Legacy retained | server smoke coverage |
-| Admin reads/writes | Legacy admin templates | `/app/admin/*` | `/api/admin/users|groups|categories|statuses` GET/POST/PUT/DELETE | Done + Legacy retained | admin route smoke + admin page tests |
-| Account verification | Legacy verification flow | `/app/account/verification` | `/api/auth/verification-status`, `/verification-resend`, `/verification-confirm` | Done + Legacy retained | server smoke coverage |
-| DB backup admin flow | Legacy `/admin/db-backup` | `/app/admin/db-backup` | `/api/admin/db-backup` GET/POST | Done + Legacy retained | server smoke coverage |
+| Area | Legacy baseline | Modern React / API status | Status | Evidence |
+|---|---|---|---|---|
+| Local auth login/logout | `/login`, `/logout` templates | `/app/login`, `/app/logout` + `/api/auth/login|logout|me` | Done + Legacy retained | `client/src/pages/Auth/loginFlow.integration.test.tsx`, auth API tests |
+| Signup + social auth redirects | `/signup`, OAuth provider routes | `/app/signup` + React social redirect buttons | Done + Legacy retained | `client/src/components/Auth/SocialLoginButtons.test.tsx` |
+| Password recovery | Legacy forgot/reset templates | `/app/forgot-password`, `/app/reset-password` + API endpoints | Done + Legacy retained | forgot/reset API and integration coverage |
+| Diary route parity | header “My Diary” legacy route behavior | `/app/members/:username/diary` and `/app/members/profile/diary` | Done + Legacy retained | route config + manual smoke |
+| Contact submission parity | legacy server-backed contact form | `/app/contact` posts to `/api/contact` | Done + Legacy retained | `client/src/pages/Contact/ContactPage.tsx`, API integration |
+| Fast switch parity | legacy PIN-based fast switch | `/app/fast-switch` + `/api/auth/fast-switch` | Done + Legacy retained | fast-switch API + UI flow implementation |
+| Profile contributions parity | legacy multi-entity contribution tabs | `/app/members/:username/contributions` all entity buckets + more flags | Done + Legacy retained | `ProfileContributions.tsx`, `controllers/api/members.ts` |
+| Profile settings parity | private profile + fast switch controls | modern profile settings wired to API | Done + Legacy retained | `ProfileSettings.tsx`, `/api/members/me/fast-switch` |
+| Account settings parity | contact/identity/password/social account controls | modern account settings fully wired | Done + Legacy retained | `SettingsPage.tsx`, `/api/auth/account-settings*` |
+| Entry detail parity | topic/argument/question/issue/opinion/answer/artifact detail behavior | related-child lists + non-placeholder counts + extended entry payloads | Done + Legacy retained | updated entry pages + `/api/*/entry/:id` payload parity |
+| Entry actions parity | legacy more/options menu | modern actions menu (edit/report/follow/share + screener/admin actions) | Done + Legacy retained | `EntryActionsMenu.tsx` |
+| Search parity | legacy tabbed + scoped search | modern `all/wiki/diary` scope, tab routing, and “view more” behavior | Done + Legacy retained | `SearchPage.tsx`, `controllers/api/search.ts` |
+| Contextual sidebar parity | legacy right-column contextual nav | modern contextual sidebar with section, related, diary/group shortcuts on md+ | Done + Legacy retained | `ContextSidebar.tsx`, layout integration |
+| Home artifacts block parity | legacy home includes artifacts list block | modern home currently lacks artifacts block | Pending | tracked as `P2.1` in parity implementation plan |
+| Wiki migration scaffolds cleanup | legacy-vs-modern scaffold handling | `client/src/pages/Wiki/*` still needs resolve-or-retire pass | Pending | tracked as `P2.2` |
+| Parity-critical regression tests | route-level protections against parity regressions | targeted parity tests still incomplete | Pending | tracked as `P2.3` |
 
-## Notes
+## Accuracy Notes
 
-- Legacy templates are intentionally not deleted to support side-by-side comparison and rollback confidence.
-- Parity closure for this phase is based on route/API implementation parity plus automated regression evidence captured in `/docs/frontend/UAT_CHECKLIST.md`.
+- This matrix is now aligned with the active checklist in `docs/frontend/LEGACY_MODERN_PARITY_IMPLEMENTATION_PLAN_2026-02-26.md`.
+- No pending item is marked as complete.
+- Legacy templates/controllers remain intentionally available for flow comparison and rollback confidence.
