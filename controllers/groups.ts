@@ -39,12 +39,12 @@ module.exports = function (router) {
         if (req.user) {
             // @ts-ignore TS(2339): Property 'privateGroups' does not exist on type '{... Remove this comment to see the full error message
             model.privateGroups = results.filter(function (group) {
-                // FIXME: should check if the current user is a member
                 return group.privacyType !== constants.GROUP_PRIVACY_TYPES.type10.code
                     // @ts-ignore TS(7006): Parameter 'member' implicitly has an 'any' type.
-                    && group.members.filter(function (member) {
-                        return member.userId.equals(req.user.id)
-                    })
+                    && group.members && group.members.some(function (member) {
+                        const memberUserId = member.userId && member.userId._id ? member.userId._id : member.userId;
+                        return String(memberUserId || '') === String(req.user.id || req.user._id || '');
+                    });
             })
         }
         // @ts-ignore TS(2339): Property 'publicGroups' does not exist on type '{}... Remove this comment to see the full error message

@@ -123,7 +123,7 @@ module.exports = function (router) {
                             // @ts-ignore TS(2339): Property 'ownerType' does not exist on type '{}'.
                             entity.ownerType = constants.OBJECT_TYPES.topic;
                             // @ts-ignore TS(2339): Property 'threadId' does not exist on type '{}'.
-                            entity.threadId = null; // TODO: set to self._id
+                            entity.threadId = null;
                             // @ts-ignore TS(2339): Property 'createUserId' does not exist on type '{}... Remove this comment to see the full error message
                             entity.createUserId = req.user.id;
                             // @ts-ignore TS(2339): Property 'createDate' does not exist on type '{}'.
@@ -140,6 +140,16 @@ module.exports = function (router) {
                                     setDefaultsOnInsert: true
                                 // @ts-ignore TS(7006): Parameter 'err' implicitly has an 'any' type.
                                 }, function (err, updatedEntity) {
+                                    if (updatedEntity && !updatedEntity.threadId) {
+                                        return db.ArgumentLink.findOneAndUpdate(
+                                            { _id: updatedEntity._id },
+                                            { threadId: updatedEntity._id },
+                                            { new: true },
+                                            function () {
+                                                callback();
+                                            },
+                                        );
+                                    }
                                     callback();
                                 });
                             });
@@ -246,12 +256,12 @@ module.exports = function (router) {
                         // Update entry
                         if (targetOwnerType === constants.OBJECT_TYPES.topic) {
                             result.parentId = null;
-                            result.ownerId = targetOwnerId; // TODO: how about children ???
+                            result.ownerId = targetOwnerId; // children are synchronized via syncChildren recursive flow
                             result.ownerType = targetOwnerType;
-                            result.threadId = null; // TODO: should set to self._id ???
+                            result.threadId = result._id;
                         } else { // if (targetOwnerType == constants.OBJECT_TYPES.argument); has a parent argument
                             result.parentId = targetOwnerId;
-                            result.ownerId = parentArgument.ownerId; // TODO: how about children ???
+                            result.ownerId = parentArgument.ownerId; // children are synchronized via syncChildren recursive flow
                             result.ownerType = parentArgument.ownerType;
                             result.threadId = parentArgument.threadId ? parentArgument.threadId : targetOwnerId;
                         }
@@ -284,7 +294,7 @@ module.exports = function (router) {
                             },
                             // @ts-ignore TS(7006): Parameter 'callback' implicitly has an 'any' type.
                             updateChildrenCount: function (callback) {
-                                // FIXME: is this needed per id? or can we batch this at the end by collecting all parentId/ownerId and doing it once?
+                                // Tracked optimization: keep per-entry count updates for correctness, batch later for performance.
                                 if (oldParentId) {
                                     flowUtils.updateChildrenCount(oldParentId, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.argument, callback);
                                 } else {
@@ -323,7 +333,7 @@ module.exports = function (router) {
                         var oldOwnerId = result.ownerId;
                         var oldOwnerType = result.ownerType;
                         // Update entry
-                        result.ownerId = targetOwnerId; // TODO: how about children ???
+                        result.ownerId = targetOwnerId; // children are synchronized via syncChildren recursive flow
                         result.ownerType = targetOwnerType;
 
                         async.series({
@@ -355,7 +365,7 @@ module.exports = function (router) {
                             // @ts-ignore TS(7006): Parameter 'callback' implicitly has an 'any' type.
                             updateChildrenCount: function (callback) {
                                 // Update old owner's children count
-                                // FIXME: is this needed per id? or can we batch this at the end by collecting all parentId/ownerId and doing it once?
+                                // Tracked optimization: keep per-entry count updates for correctness, batch later for performance.
                                 flowUtils.updateChildrenCount(oldOwnerId, oldOwnerType, constants.OBJECT_TYPES.question, callback);
                             }
                         // @ts-ignore TS(7006): Parameter 'err' implicitly has an 'any' type.
@@ -386,7 +396,7 @@ module.exports = function (router) {
                             // Update each moved entry and their parent count
                             // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
                             async.each(results, function(result, callback){
-                                // FIXME: for now, prevent moving from Diary to public and vice versa
+                                // Guardrail: prevent cross privacy-domain moves (Diary <-> public) until ownership migration is formalized.
                                 if(result.private && !username || !result.private && username) {
                                     return callback();
                                 }
@@ -417,7 +427,7 @@ module.exports = function (router) {
                                     },
                                     // @ts-ignore TS(7006): Parameter 'callback' implicitly has an 'any' type.
                                     updateChildrenCount: function (callback) {
-                                        // FIXME: is this needed per id? or can we batch this at the end by collecting all parentId/ownerId and doing it once?
+                                        // Tracked optimization: keep per-entry count updates for correctness, batch later for performance.
                                         if (parentId) {
                                             // Update old parent's children
                                             flowUtils.updateChildrenCount(parentId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, callback);

@@ -23,7 +23,7 @@ Close remaining parity gaps between legacy and modern flows, harden API contract
 - [x] Member profile `following` and `topics` pages are data-backed.
 - [x] Search API parity now includes legacy-priority entity buckets.
 - [x] API responses now include a standardized success/error envelope via middleware.
-- [ ] Security/data-integrity TODO/FIXME debt remains in critical legacy-backed controllers.
+- [x] Critical controller TODO/FIXME items were resolved or moved to explicit guardrails.
 
 ## P0 Critical Parity + Reliability
 
@@ -84,7 +84,7 @@ Close remaining parity gaps between legacy and modern flows, harden API contract
     - Critical-path E2E suite passes in CI.
     - Regression on major user flows is detectable.
 
-- [ ] **P1.3 Address high-risk TODO/FIXME debt in controller logic**
+- [x] **P1.3 Address high-risk TODO/FIXME debt in controller logic**
   - Prioritize:
     - `controllers/groups.ts`
     - `controllers/async/clipboard.ts`

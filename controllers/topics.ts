@@ -390,7 +390,8 @@ async function POST_create(req, res) {
     entity.ownerType = constants.OBJECT_TYPES.user;
     entity.ownerId = req.user.id;
   } else if (res.locals.group) {
-    entity.private = true; // FIXME: what should I do with this? Probably good to retain this for data privacy safety.
+    // Group-scoped topics remain private to avoid leaking group-only drafts into public feeds.
+    entity.private = true;
     entity.ownerType = constants.OBJECT_TYPES.group;
     entity.ownerId = res.locals.group._id;
     entity.groupId = res.locals.group._id;
