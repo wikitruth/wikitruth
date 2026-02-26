@@ -57,18 +57,18 @@ Acceptance criteria: Tests cover P0/P1 route behavior for diary/contact/fast-swi
 
 ## Cross-Cutting Implementation Rules
 
-- [ ] C1 Keep legacy templates/controllers intact for side-by-side comparison.
+- [x] C1 Keep legacy templates/controllers intact for side-by-side comparison.
 
-- [ ] C2 Deliver in small commits per checklist item.
+- [x] C2 Deliver in small commits per checklist item.
 
-- [ ] C3 Update this checklist immediately after each completed item.
+- [x] C3 Update this checklist immediately after each completed item.
 
-- [ ] C4 Run targeted verification after each item (`npm test` scope + smoke checks for touched routes/pages).
+- [x] C4 Run targeted verification after each item (`npm test` scope + smoke checks for touched routes/pages).
 
 ## Suggested Execution Order
 
-- [ ] S1 P0.1 -> P0.2 -> P0.3
-- [ ] S2 P1.1 -> P1.2 -> P1.3
-- [ ] S3 P1.4 -> P1.5 -> P1.6 -> P1.7
-- [ ] S4 P2.1 -> P2.2 -> P2.3
-- [ ] S5 Final parity matrix/doc refresh
+- [x] S1 P0.1 -> P0.2 -> P0.3
+- [x] S2 P1.1 -> P1.2 -> P1.3
+- [x] S3 P1.4 -> P1.5 -> P1.6 -> P1.7
+- [x] S4 P2.1 -> P2.2 -> P2.3
+- [x] S5 Final parity matrix/doc refresh

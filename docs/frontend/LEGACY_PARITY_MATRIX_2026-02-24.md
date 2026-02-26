@@ -21,9 +21,9 @@ Legend:
 | Entry actions parity | legacy more/options menu | modern actions menu (edit/report/follow/share + screener/admin actions) | Done + Legacy retained | `EntryActionsMenu.tsx` |
 | Search parity | legacy tabbed + scoped search | modern `all/wiki/diary` scope, tab routing, and “view more” behavior | Done + Legacy retained | `SearchPage.tsx`, `controllers/api/search.ts` |
 | Contextual sidebar parity | legacy right-column contextual nav | modern contextual sidebar with section, related, diary/group shortcuts on md+ | Done + Legacy retained | `ContextSidebar.tsx`, layout integration |
-| Home artifacts block parity | legacy home includes artifacts list block | modern home currently lacks artifacts block | Pending | tracked as `P2.1` in parity implementation plan |
-| Wiki migration scaffolds cleanup | legacy-vs-modern scaffold handling | `client/src/pages/Wiki/*` still needs resolve-or-retire pass | Pending | tracked as `P2.2` |
-| Parity-critical regression tests | route-level protections against parity regressions | targeted parity tests still incomplete | Pending | tracked as `P2.3` |
+| Home artifacts block parity | legacy home includes artifacts list block | modern home now renders artifacts block with “view more” parity behavior | Done + Legacy retained | `client/src/pages/HomePage.tsx` |
+| Wiki migration scaffolds cleanup | legacy-vs-modern scaffold handling | unwired `client/src/pages/Wiki/*` scaffolds explicitly retired and documented | Done + Legacy retained | `docs/frontend/WIKI_SCAFFOLD_RESOLUTION_2026-02-26.md`, `client/src/pages/Wiki/README.md` |
+| Parity-critical regression tests | route-level protections against parity regressions | route + search parity regressions covered in targeted tests | Done + Legacy retained | `client/src/routes/routeConfig.test.tsx`, `client/src/pages/SearchPage.test.tsx` |
 
 ## Accuracy Notes
 
