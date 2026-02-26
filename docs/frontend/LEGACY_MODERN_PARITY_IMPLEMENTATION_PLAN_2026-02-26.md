@@ -38,7 +38,7 @@ Acceptance criteria: Modern entry option surface supports key legacy actions (ed
 - [x] P1.6 Restore search behavior parity.
 Acceptance criteria: Modern search supports content scope (`all/wiki/diary`), tab routing, and “view more” semantics aligned with legacy.
 
-- [ ] P1.7 Restore contextual sidebar/navigation parity.
+- [x] P1.7 Restore contextual sidebar/navigation parity.
 Acceptance criteria: Modern layout provides legacy-equivalent contextual side navigation (section context, diary/groups shortcuts, related links) with responsive behavior.
 
 - [ ] P1.8 Correct parity report accuracy.

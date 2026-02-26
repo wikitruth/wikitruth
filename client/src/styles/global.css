@@ -3,6 +3,43 @@ body {
   color: var(--wt-text);
 }
 
+.wt-context-sidebar {
+  position: sticky;
+  top: 84px;
+  padding: 8px 0 24px;
+}
+
+.wt-context-sidebar-section {
+  margin-bottom: 12px;
+  border: 1px solid var(--wt-border);
+  border-radius: 6px;
+  background: var(--wt-surface);
+}
+
+.wt-context-sidebar-header {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--wt-border);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--wt-text-muted);
+}
+
+.wt-context-sidebar .nav {
+  margin: 0;
+  padding: 4px 0;
+}
+
+.wt-context-sidebar .nav li a {
+  display: block;
+  padding: 8px 12px;
+}
+
+.wt-context-sidebar .nav li a i {
+  margin-right: 8px;
+}
+
 .wt-popover {
   position: relative;
   display: inline-flex;
