@@ -18,7 +18,7 @@ Close remaining parity gaps between legacy and modern flows, harden API contract
 - [~] OpenAPI spec exists but only covers a limited subset of active APIs.
 - [~] E2E test setup exists but only includes light smoke coverage.
 - [ ] Discussion tabs in entry pages have no matching modern routes.
-- [ ] `/visualize` modern route is still "Coming Soon".
+- [x] `/visualize` modern route is now data-driven.
 - [ ] Group posts modern route is still legacy handoff text.
 - [ ] Member profile `following` and `topics` pages are placeholders.
 - [ ] Search API parity is incomplete (modern search omits legacy entity types).
@@ -33,7 +33,7 @@ Close remaining parity gaps between legacy and modern flows, harden API contract
     - No entry-page tab points to an unmatched route.
     - Route tests prove expected behavior for each entity.
 
-- [ ] **P0.2 Implement real modern visualize page**
+- [x] **P0.2 Implement real modern visualize page**
   - Replace `client/src/pages/VisualizePage.tsx` placeholder with working data-driven visualization view.
   - Acceptance:
     - Page loads real data.
