@@ -137,7 +137,72 @@ const apiErrorHandler: ErrorRequestHandler = function (err, req, res, next) {
   res.status(normalized.status).json(payload);
 };
 
+const apiEnvelopeMiddleware: RequestHandler = function (req, res, next) {
+  const originalJson = res.json.bind(res);
+  const requestId = (req as Request & { requestId?: string }).requestId ?? null;
+
+  res.json = function (payload: unknown) {
+    if (payload && typeof payload === 'object' && !Array.isArray(payload)) {
+      const objectPayload = payload as Record<string, unknown>;
+
+      if (typeof objectPayload.success === 'boolean') {
+        return originalJson(payload);
+      }
+
+      if (res.statusCode >= 400) {
+        const legacyMessage =
+          typeof objectPayload.error === 'string'
+            ? objectPayload.error
+            : typeof objectPayload.message === 'string'
+              ? objectPayload.message
+              : 'Request failed';
+
+        const normalizedError =
+          objectPayload.error && typeof objectPayload.error === 'object'
+            ? objectPayload.error
+            : {
+              code: API_ERROR_CODES.API_ERROR,
+              message: legacyMessage,
+              details: null,
+              requestId: requestId,
+            };
+
+        return originalJson({
+          success: false,
+          ...objectPayload,
+          error: normalizedError,
+        });
+      }
+
+      return originalJson({
+        success: true,
+        ...objectPayload,
+      });
+    }
+
+    if (res.statusCode >= 400) {
+      return originalJson({
+        success: false,
+        error: {
+          code: API_ERROR_CODES.API_ERROR,
+          message: 'Request failed',
+          details: payload ?? null,
+          requestId: requestId,
+        },
+      });
+    }
+
+    return originalJson({
+      success: true,
+      data: payload ?? null,
+    });
+  } as typeof res.json;
+
+  next();
+};
+
 module.exports = {
   wrapAsyncRouter: wrapAsyncRouter,
   apiErrorHandler: apiErrorHandler,
+  apiEnvelopeMiddleware: apiEnvelopeMiddleware,
 };

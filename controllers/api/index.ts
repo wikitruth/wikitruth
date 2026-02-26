@@ -3,10 +3,12 @@
 // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 const express = require('express');
 // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-const { wrapAsyncRouter } = require('../../middlewares/apiError');
+const { wrapAsyncRouter, apiEnvelopeMiddleware } = require('../../middlewares/apiError');
 
 // @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports = function (router) {
+  router.use(apiEnvelopeMiddleware);
+
   // Create sub-routers for API endpoints
   const homeRouter = wrapAsyncRouter(express.Router());
   const topicsRouter = wrapAsyncRouter(express.Router());

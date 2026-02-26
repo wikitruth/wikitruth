@@ -22,7 +22,7 @@ Close remaining parity gaps between legacy and modern flows, harden API contract
 - [x] Group posts modern route now has native read flow and create hooks.
 - [x] Member profile `following` and `topics` pages are data-backed.
 - [x] Search API parity now includes legacy-priority entity buckets.
-- [ ] API success/error envelopes are inconsistent across controllers.
+- [x] API responses now include a standardized success/error envelope via middleware.
 - [ ] Security/data-integrity TODO/FIXME debt remains in critical legacy-backed controllers.
 
 ## P0 Critical Parity + Reliability
@@ -59,7 +59,7 @@ Close remaining parity gaps between legacy and modern flows, harden API contract
     - Modern search response includes all intended entity buckets.
     - React search UI can render each bucket or intentionally hide with documented rationale.
 
-- [ ] **P0.6 Standardize API envelope and errors**
+- [x] **P0.6 Standardize API envelope and errors**
   - Align all `controllers/api/*` endpoints to one response contract for success and errors.
   - Acceptance:
     - No mixed envelope patterns in API controllers.
