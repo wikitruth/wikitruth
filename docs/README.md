@@ -4,6 +4,7 @@ This folder contains active engineering documentation and archived migration art
 
 ## Start Here
 
+- Client development setup: `docs/CLIENT_DEVELOPMENT_SETUP.md`
 - Completed enhancement tracker (archived): `docs/archive/plans/PROJECT_ENHANCEMENT_PROPOSAL_2026-02-24.md`
 - Completed modern client completion plan (archived): `docs/archive/plans/MODERN_CLIENT_COMPLETION_PLAN_2026-02-24.md`
 - Completed system implementation plan (archived): `docs/archive/plans/SYSTEM_MODERN_CLIENT_IMPLEMENTATION_PLAN_2026-02-26.md`

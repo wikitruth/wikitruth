@@ -44,6 +44,19 @@ npm run dev:client
 
 `/api/*` requests from the React dev server are proxied to `http://localhost:8000`.
 
+## Server-Only Mode (No Webpack Dev Server)
+
+Use this when you want to run only the backend process and serve the built React bundle from Express:
+
+```bash
+npm run build:client
+npm start
+```
+
+Then open:
+
+- `http://localhost:8000/app`
+
 ## Build and Test
 
 Build production client bundle:
@@ -89,3 +102,4 @@ See `docs/frontend/ENVIRONMENT_VARIABLES.md` for the full variable matrix.
 - If port `3001` is in use, stop conflicting processes or change `devServer.port` in `webpack.config.js`.
 - If API calls fail from the dev server, verify backend is running on `8000`.
 - If TypeScript build fails, run `npm run tsc` to isolate server-side type errors.
+- If `http://localhost:8000/app` is blank in server-only mode, rebuild assets with `npm run build:client`.
