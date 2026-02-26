@@ -349,7 +349,7 @@ module.exports = function (router) {
         return res.render(templates.fastSwitch, model);
       }
 
-      req.login(user, function (err) {
+      req.login(user, function (err: unknown) {
         if (err) {
           return next(err);
         }

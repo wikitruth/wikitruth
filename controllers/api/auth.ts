@@ -23,6 +23,7 @@ type AuthUserDocument = {
   defaultReturnUrl?: () => string;
   isAdmin?: () => boolean;
   password?: string;
+  search?: string[];
   resetPasswordToken?: string;
   resetPasswordExpires?: number;
   mobileTokens?: MobileRefreshTokenRecord[];
