@@ -143,6 +143,152 @@ module.exports = function (router) {
     }
   });
 
+  // Get topics created by a member
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
+  router.get('/:username/topics', async function (req, res) {
+    try {
+      const member = await db.User
+        .findOne({ username: req.params.username })
+        .select('_id username preferences')
+        .lean();
+
+      if (!member) {
+        return res.status(404).json({ error: 'Member not found' });
+      }
+      if (!canViewProfile(member, req.user)) {
+        return res.status(403).json({ error: 'Profile is private' });
+      }
+
+      const limit = Math.min(Math.max(Number(req.query?.limit || 50), 1), 200);
+      const query: any = { createUserId: member._id };
+      if (!canViewPrivateEntries(member, req.user)) {
+        query.private = { $ne: true };
+      }
+
+      const topics = await db.Topic
+        .find(query)
+        .sort({ editDate: -1 })
+        .limit(limit)
+        .lean();
+
+      res.json({
+        member: {
+          _id: member._id,
+          username: member.username,
+        },
+        topics: topics.map(function (topic: any) {
+          return {
+            ...topic,
+            friendlyUrl: topic.friendlyUrl || utils.urlify(topic.title || ''),
+          };
+        }),
+      });
+    } catch (err) {
+      console.error('Error fetching member topics:', err);
+      res.status(500).json({ error: 'Failed to fetch member topics' });
+    }
+  });
+
+  // Get member following overview (groups, people, topic interests)
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
+  router.get('/:username/following', async function (req, res) {
+    try {
+      const member = await db.User
+        .findOne({ username: req.params.username })
+        .select('_id username preferences')
+        .lean();
+
+      if (!member) {
+        return res.status(404).json({ error: 'Member not found' });
+      }
+      if (!canViewProfile(member, req.user)) {
+        return res.status(403).json({ error: 'Profile is private' });
+      }
+
+      const canViewPrivate = canViewPrivateEntries(member, req.user);
+
+      const groupsQuery: any = { 'members.userId': member._id };
+      if (!canViewPrivate) {
+        groupsQuery.privacyType = 10;
+      }
+
+      const groups = await db.Group
+        .find(groupsQuery)
+        .select('_id title description privacyType members')
+        .sort({ editDate: -1 })
+        .limit(50)
+        .lean();
+
+      const topicIdBuckets = await Promise.all([
+        db.Argument.distinct('ownerId', { createUserId: member._id, ownerId: { $ne: null } }),
+        db.Question.distinct('ownerId', { createUserId: member._id, ownerId: { $ne: null } }),
+        db.Issue.distinct('ownerId', { createUserId: member._id, ownerId: { $ne: null } }),
+        db.Opinion.distinct('ownerId', { createUserId: member._id, ownerId: { $ne: null } }),
+        db.Artifact.distinct('ownerId', { createUserId: member._id, ownerId: { $ne: null } }),
+      ]);
+      const topicIds = [...new Set(topicIdBuckets.flat().map((id: any) => String(id || '')).filter(Boolean))];
+
+      const topicQuery: any = { _id: { $in: topicIds } };
+      if (!canViewPrivate) {
+        topicQuery.private = { $ne: true };
+      }
+
+      const topics = topicIds.length === 0
+        ? []
+        : await db.Topic.find(topicQuery).select('_id title friendlyUrl private').sort({ editDate: -1 }).limit(50).lean();
+
+      const relatedUserIds = [
+        ...new Set(
+          groups
+            .flatMap(function (group: any) {
+              return (group.members || []).map(function (memberRow: any) {
+                return String(memberRow?.userId || '');
+              });
+            })
+            .filter(function (id: string) {
+              return id && id !== String(member._id);
+            }),
+        ),
+      ];
+
+      const people = relatedUserIds.length === 0
+        ? []
+        : await db.User
+          .find({ _id: { $in: relatedUserIds }, 'preferences.privateProfile': { $ne: true } })
+          .select('_id username roles')
+          .sort({ username: 1 })
+          .lean();
+
+      res.json({
+        member: {
+          _id: member._id,
+          username: member.username,
+        },
+        following: {
+          people: people,
+          topics: topics.map(function (topic: any) {
+            return {
+              ...topic,
+              friendlyUrl: topic.friendlyUrl || utils.urlify(topic.title || ''),
+            };
+          }),
+          groups: groups.map(function (group: any) {
+            return {
+              _id: group._id,
+              title: group.title,
+              description: group.description || '',
+              privacyType: group.privacyType,
+              friendlyUrl: group.friendlyUrl || utils.urlify(group.title || ''),
+            };
+          }),
+        },
+      });
+    } catch (err) {
+      console.error('Error fetching member following:', err);
+      res.status(500).json({ error: 'Failed to fetch member following' });
+    }
+  });
+
   // Get member custom pages
   // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get('/:username/pages', async function (req, res) {
@@ -336,7 +482,7 @@ module.exports = function (router) {
         return res.status(404).json({ error: 'Member not found' });
       }
 
-      if (member.preferences?.privateProfile && (!req.user || req.user.username !== member.username)) {
+      if (!canViewProfile(member, req.user)) {
         return res.status(403).json({ error: 'Profile is private' });
       }
 
@@ -347,3 +493,29 @@ module.exports = function (router) {
     }
   });
 };
+
+function canViewProfile(member: any, currentUser: any): boolean {
+  if (!member) {
+    return false;
+  }
+  if (!member.preferences?.privateProfile) {
+    return true;
+  }
+  if (!currentUser) {
+    return false;
+  }
+  if (currentUser.username === member.username) {
+    return true;
+  }
+  return Boolean(currentUser.canPlayRoleOf?.('admin'));
+}
+
+function canViewPrivateEntries(member: any, currentUser: any): boolean {
+  if (!currentUser || !member) {
+    return false;
+  }
+  if (currentUser.username === member.username) {
+    return true;
+  }
+  return Boolean(currentUser.canPlayRoleOf?.('admin'));
+}

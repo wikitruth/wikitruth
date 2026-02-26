@@ -20,7 +20,7 @@ Close remaining parity gaps between legacy and modern flows, harden API contract
 - [ ] Discussion tabs in entry pages have no matching modern routes.
 - [x] `/visualize` modern route is now data-driven.
 - [x] Group posts modern route now has native read flow and create hooks.
-- [ ] Member profile `following` and `topics` pages are placeholders.
+- [x] Member profile `following` and `topics` pages are data-backed.
 - [ ] Search API parity is incomplete (modern search omits legacy entity types).
 - [ ] API success/error envelopes are inconsistent across controllers.
 - [ ] Security/data-integrity TODO/FIXME debt remains in critical legacy-backed controllers.
@@ -46,7 +46,7 @@ Close remaining parity gaps between legacy and modern flows, harden API contract
     - Read path available without legacy redirect.
     - Permission handling matches group privacy/member rules.
 
-- [ ] **P0.4 Complete profile sections still placeholder**
+- [x] **P0.4 Complete profile sections still placeholder**
   - Implement functional data-backed versions of:
     - `client/src/pages/Members/Profile/ProfileFollowing.tsx`
     - `client/src/pages/Members/Profile/ProfileTopics.tsx`

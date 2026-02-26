@@ -82,6 +82,8 @@ describe('API endpoint smoke coverage', function () {
 
     expect(membersApi).toContain("router.get('/me'");
     expect(membersApi).toContain("router.put('/me/preferences'");
+    expect(membersApi).toContain("router.get('/:username/topics'");
+    expect(membersApi).toContain("router.get('/:username/following'");
     expect(membersApi).toContain("router.get('/:username/pages'");
     expect(membersApi).toContain("router.post('/:username/pages'");
     expect(membersApi).toContain("router.get('/:username/pages/:id'");

@@ -363,6 +363,14 @@ class ApiService {
     return this.request(`/members/${username}`);
   }
 
+  async getMemberTopics(username: string, limit: number = 50) {
+    return this.request(`/members/${encodeURIComponent(username)}/topics?limit=${encodeURIComponent(String(limit))}`);
+  }
+
+  async getMemberFollowing(username: string) {
+    return this.request(`/members/${encodeURIComponent(username)}/following`);
+  }
+
   async getCurrentMemberProfile() {
     return this.request('/members/me');
   }

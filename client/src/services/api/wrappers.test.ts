@@ -33,6 +33,8 @@ jest.mock('../api', () => ({
     getReviewers: jest.fn().mockResolvedValue([]),
     getAdministrators: jest.fn().mockResolvedValue([]),
     getMemberProfile: jest.fn().mockResolvedValue({}),
+    getMemberTopics: jest.fn().mockResolvedValue([]),
+    getMemberFollowing: jest.fn().mockResolvedValue({}),
   },
 }));
 
@@ -68,5 +70,7 @@ describe('api wrappers', () => {
     await membersApi.reviewers();
     await membersApi.administrators();
     await membersApi.profile('demo');
+    await membersApi.topics('demo');
+    await membersApi.following('demo');
   });
 });
