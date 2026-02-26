@@ -23,7 +23,7 @@ Acceptance criteria: Modern Fast Switch supports PIN-based flow equivalent to le
 - [x] P1.1 Expand profile contributions to full multi-entity feed parity.
 Acceptance criteria: Modern contributions supports all legacy entity buckets (topics, arguments, questions, answers, artifacts, issues, opinions) with tab/slice behavior.
 
-- [ ] P1.2 Complete profile settings parity.
+- [x] P1.2 Complete profile settings parity.
 Acceptance criteria: Modern profile settings includes legacy-equivalent Fast Switch enable/disable + PIN management and existing private-profile controls.
 
 - [ ] P1.3 Complete account settings parity.

@@ -443,6 +443,17 @@ class ApiService {
     });
   }
 
+  async getCurrentMemberFastSwitchStatus(): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>('/members/me/fast-switch');
+  }
+
+  async updateCurrentMemberFastSwitch(payload: { enabled: boolean; pin?: string }): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>('/members/me/fast-switch', {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  }
+
   async getMemberPages(username: string): Promise<MemberPagesResponse> {
     return this.request<MemberPagesResponse>(`/members/${encodeURIComponent(username)}/pages`);
   }

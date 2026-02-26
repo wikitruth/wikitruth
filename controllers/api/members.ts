@@ -4,6 +4,7 @@
 const db = require('../../app').db.models;
 // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'utils'.
 const utils = require('../../utils/utils');
+const jwt = require('jsonwebtoken');
 
 // @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports = function (router) {
@@ -140,6 +141,138 @@ module.exports = function (router) {
     } catch (err) {
       console.error('Error updating member preferences:', err);
       res.status(500).json({ error: 'Failed to update member preferences' });
+    }
+  });
+
+  // Get current member fast-switch status
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
+  router.get('/me/fast-switch', async function (req, res) {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+
+      const userId = req.user._id || req.user.id;
+      const trustedClients = await db.TrustedClient.find({ userId: userId }).select('_id').lean();
+      const trustedIds = new Set(trustedClients.map(function (client: any) {
+        return String(client._id || '');
+      }));
+
+      const cookies = Array.isArray(req.cookies.fast_switch) ? req.cookies.fast_switch : [];
+      const enabled = cookies.some(function (cookie: any) {
+        return trustedIds.has(String(cookie?.id || ''));
+      });
+
+      return res.json({
+        success: true,
+        fastSwitch: {
+          enabled: Boolean(enabled),
+          trustedClients: trustedClients.length,
+        },
+      });
+    } catch (err) {
+      console.error('Error fetching fast-switch status:', err);
+      return res.status(500).json({ error: 'Failed to fetch fast-switch status' });
+    }
+  });
+
+  // Update current member fast-switch settings
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
+  router.put('/me/fast-switch', async function (req, res) {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+
+      const userId = req.user._id || req.user.id;
+      const enabled = Boolean(req.body?.enabled);
+      const pin = String(req.body?.pin || '').trim();
+      const cookieName = 'fast_switch';
+      const trustedClients = await db.TrustedClient.find({ userId: userId }).lean();
+      const trustedIds = new Set(trustedClients.map(function (client: any) {
+        return String(client._id || '');
+      }));
+      let cookies = Array.isArray(req.cookies.fast_switch) ? [...req.cookies.fast_switch] : [];
+      const now = new Date();
+      const expiry = new Date(now.getTime());
+      expiry.setMonth(expiry.getMonth() + 6);
+
+      if (enabled) {
+        if (!/^\d{6}$/.test(pin)) {
+          return res.status(400).json({ error: 'PIN must be exactly 6 digits' });
+        }
+
+        const encryptedUserId = jwt.sign({ userId: userId }, `${pin}|${req.app.config.jwtSecret}`);
+        let updated = false;
+
+        cookies = cookies.map(function (cookie: any) {
+          if (trustedIds.has(String(cookie?.id || ''))) {
+            updated = true;
+            return {
+              ...cookie,
+              data: encryptedUserId,
+              created: now,
+            };
+          }
+          return cookie;
+        });
+
+        if (!updated) {
+          const newClient = new db.TrustedClient({
+            userId: userId,
+            clientIp: req.ip,
+            userAgent: req.headers['user-agent'],
+          });
+          await newClient.save();
+          cookies.push({
+            id: newClient._id,
+            data: encryptedUserId,
+            created: now,
+          });
+        }
+
+        res.cookie(cookieName, cookies, { expires: expiry });
+        return res.json({
+          success: true,
+          fastSwitch: {
+            enabled: true,
+            trustedClients: cookies.length,
+          },
+        });
+      }
+
+      const idsToRemove = new Set<string>();
+      cookies.forEach(function (cookie: any) {
+        const cookieId = String(cookie?.id || '');
+        if (trustedIds.has(cookieId)) {
+          idsToRemove.add(cookieId);
+        }
+      });
+
+      if (idsToRemove.size > 0) {
+        await db.TrustedClient.deleteMany({ _id: { $in: Array.from(idsToRemove) } });
+      }
+
+      cookies = cookies.filter(function (cookie: any) {
+        return !idsToRemove.has(String(cookie?.id || ''));
+      });
+
+      if (cookies.length === 0) {
+        res.clearCookie(cookieName);
+      } else {
+        res.cookie(cookieName, cookies, { expires: expiry });
+      }
+
+      return res.json({
+        success: true,
+        fastSwitch: {
+          enabled: false,
+          trustedClients: 0,
+        },
+      });
+    } catch (err) {
+      console.error('Error updating fast-switch settings:', err);
+      return res.status(500).json({ error: 'Failed to update fast-switch settings' });
     }
   });
 
