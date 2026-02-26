@@ -69,6 +69,7 @@ class ApiService {
     private?: boolean;
     tags?: string;
     topicId?: string;
+    groupId?: string;
   }) {
     return this.request('/topics', {
       method: 'POST',
@@ -93,6 +94,7 @@ class ApiService {
     topicId?: string;
     private?: boolean;
     sources?: string;
+    groupId?: string;
   }) {
     return this.request('/arguments', {
       method: 'POST',
@@ -116,6 +118,7 @@ class ApiService {
     topicId?: string;
     private?: boolean;
     references?: string;
+    groupId?: string;
   }) {
     return this.request('/questions', {
       method: 'POST',
@@ -306,6 +309,10 @@ class ApiService {
 
   async getGroupEntry(id: string) {
     return this.request(`/groups/entry/${id}`);
+  }
+
+  async getGroupPosts(id: string, limit: number = 25) {
+    return this.request(`/groups/entry/${id}/posts?limit=${encodeURIComponent(String(limit))}`);
   }
 
   async createGroup(payload: { title: string; description: string; privacyType: number }) {

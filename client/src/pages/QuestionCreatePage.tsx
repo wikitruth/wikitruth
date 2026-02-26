@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import Input from '../components/Form/Input';
@@ -20,6 +20,8 @@ interface QuestionFormValues {
 
 const QuestionCreatePage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const groupId = searchParams.get('group') || undefined;
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
@@ -48,6 +50,7 @@ const QuestionCreatePage: React.FC = () => {
         topicId: values.topicId || undefined,
         references: values.references,
         private: values.private,
+        groupId: groupId,
       });
 
       setSubmitSuccess(true);
@@ -87,6 +90,12 @@ const QuestionCreatePage: React.FC = () => {
       {submitError && (
         <Alert type="danger" dismissible onDismiss={() => setSubmitError(null)}>
           {submitError}
+        </Alert>
+      )}
+
+      {groupId && (
+        <Alert type="info">
+          This question will be created in group context.
         </Alert>
       )}
 

@@ -98,7 +98,14 @@ async function POST_topic_create(req: any, res: any) {
   const description = String(req.body?.description || req.body?.content || '').trim();
   const tagsValue = String(req.body?.tags || '').trim();
   const parentId = req.body?.parentId || req.body?.topicId || null;
+  const groupId = req.body?.groupId || null;
   const categoryId = req.body?.categoryId || req.body?.topicId || req.body?.category || parentId || null;
+  const ownerId = parentId || groupId || null;
+  const ownerType = parentId
+    ? constants.OBJECT_TYPES.topic
+    : groupId
+      ? constants.OBJECT_TYPES.group
+      : -1;
   const isPrivate = Boolean(req.body?.private);
 
   if (!title || title.length < 3) {
@@ -121,9 +128,10 @@ async function POST_topic_create(req: any, res: any) {
     contentPreview: description.slice(0, 240),
     friendlyUrl: utils.urlify(title),
     parentId: parentId,
+    groupId: groupId,
     categoryId: categoryId,
-    ownerId: parentId,
-    ownerType: parentId ? constants.OBJECT_TYPES.topic : -1,
+    ownerId: ownerId,
+    ownerType: ownerType,
     createDate: now,
     editDate: now,
     createUserId: req.user._id,

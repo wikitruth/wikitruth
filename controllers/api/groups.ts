@@ -60,6 +60,9 @@ module.exports = function (router) {
       if (!group) {
         return res.status(404).json({ error: 'Group not found' });
       }
+      if (!canViewGroup(group, req.user)) {
+        return res.status(403).json({ error: 'Group is private' });
+      }
 
       group.friendlyUrl = utils.urlify(group.title);
 
@@ -67,6 +70,124 @@ module.exports = function (router) {
     } catch (err) {
       console.error('Error fetching group:', err);
       res.status(500).json({ error: 'Failed to fetch group' });
+    }
+  });
+
+  // Get group posts across entity types
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
+  router.get('/entry/:id/posts', async function (req, res) {
+    try {
+      const group = await db.Group.findById(req.params.id).lean();
+      if (!group) {
+        return res.status(404).json({ error: 'Group not found' });
+      }
+      if (!canViewGroup(group, req.user)) {
+        return res.status(403).json({ error: 'Group is private' });
+      }
+
+      const limit = Math.min(Math.max(Number(req.query?.limit || 25), 1), 100);
+      const filter = buildGroupContentFilter(group, req.user);
+
+      const [topics, argumentsList, questions, issues, opinions, artifacts, answers] = await Promise.all([
+        db.Topic
+          .find({
+            ...filter,
+            $or: [
+              { groupId: group._id },
+              { ownerType: constants.OBJECT_TYPES.group, ownerId: group._id },
+            ],
+          })
+          .sort({ editDate: -1 })
+          .limit(limit)
+          .lean(),
+        db.Argument
+          .find({
+            ...filter,
+            $or: [{ groupId: group._id }, { private: true, createUserId: group._id }],
+          })
+          .sort({ editDate: -1 })
+          .limit(limit)
+          .lean(),
+        db.Question
+          .find({
+            ...filter,
+            $or: [{ groupId: group._id }, { private: true, createUserId: group._id }],
+          })
+          .sort({ editDate: -1 })
+          .limit(limit)
+          .lean(),
+        db.Issue
+          .find({
+            ...filter,
+            $or: [{ groupId: group._id }, { private: true, createUserId: group._id }],
+          })
+          .sort({ editDate: -1 })
+          .limit(limit)
+          .lean(),
+        db.Opinion
+          .find({
+            ...filter,
+            $or: [{ groupId: group._id }, { private: true, createUserId: group._id }],
+          })
+          .sort({ editDate: -1 })
+          .limit(limit)
+          .lean(),
+        db.Artifact
+          .find({
+            ...filter,
+            $or: [{ groupId: group._id }, { private: true, createUserId: group._id }],
+          })
+          .sort({ editDate: -1 })
+          .limit(limit)
+          .lean(),
+        db.Answer
+          .find({
+            ...filter,
+            $or: [{ groupId: group._id }, { private: true, createUserId: group._id }],
+          })
+          .sort({ editDate: -1 })
+          .limit(limit)
+          .lean(),
+      ]);
+
+      const mapFriendlyUrl = function (entry: any) {
+        if (!entry) return entry;
+        return {
+          ...entry,
+          friendlyUrl: entry.friendlyUrl || utils.urlify(entry.title || ''),
+        };
+      };
+
+      res.json({
+        success: true,
+        group: {
+          _id: group._id,
+          title: group.title,
+          friendlyUrl: group.friendlyUrl || utils.urlify(group.title || ''),
+          privacyType: group.privacyType,
+        },
+        posts: {
+          topics: topics.map(mapFriendlyUrl),
+          arguments: argumentsList.map(mapFriendlyUrl),
+          questions: questions.map(mapFriendlyUrl),
+          issues: issues.map(mapFriendlyUrl),
+          opinions: opinions.map(mapFriendlyUrl),
+          artifacts: artifacts.map(mapFriendlyUrl),
+          answers: answers.map(mapFriendlyUrl),
+        },
+        totals: {
+          topics: topics.length,
+          arguments: argumentsList.length,
+          questions: questions.length,
+          issues: issues.length,
+          opinions: opinions.length,
+          artifacts: artifacts.length,
+          answers: answers.length,
+        },
+      });
+    } catch (err) {
+      console.error('Error fetching group posts:', err);
+      res.status(500).json({ error: 'Failed to fetch group posts' });
     }
   });
 
@@ -263,7 +384,63 @@ function isGroupManager(group: any, user: any) {
   }
 
   return (group.members || []).some(function (member: any) {
-    return String(member.userId || '') === userId
+    return resolveMemberUserId(member) === userId
       && Number(member.roleType || constants.GROUP_ROLE_TYPES.type10.code) === constants.GROUP_ROLE_TYPES.type20.code;
   });
+}
+
+function resolveUserId(user: any): string {
+  return String(user?._id || user?.id || '');
+}
+
+function resolveMemberUserId(member: any): string {
+  if (!member) {
+    return '';
+  }
+  if (typeof member.userId === 'object' && member.userId !== null) {
+    return String(member.userId._id || member.userId.id || '');
+  }
+  return String(member.userId || '');
+}
+
+function isGroupMember(group: any, user: any): boolean {
+  const userId = resolveUserId(user);
+  if (!userId || !group) {
+    return false;
+  }
+  if (String(group.createUserId || '') === userId) {
+    return true;
+  }
+  return (group.members || []).some(function (member: any) {
+    return resolveMemberUserId(member) === userId;
+  });
+}
+
+function canViewGroup(group: any, user: any): boolean {
+  if (!group) {
+    return false;
+  }
+  if (Number(group.privacyType || constants.GROUP_PRIVACY_TYPES.type10.code) === constants.GROUP_PRIVACY_TYPES.type10.code) {
+    return true;
+  }
+  if (!user) {
+    return false;
+  }
+  if (user.canPlayRoleOf && user.canPlayRoleOf('admin')) {
+    return true;
+  }
+  return isGroupMember(group, user);
+}
+
+function buildGroupContentFilter(group: any, user: any): Record<string, unknown> {
+  if (!user) {
+    return { private: { $ne: true } };
+  }
+  if (user.canPlayRoleOf && user.canPlayRoleOf('admin')) {
+    return {};
+  }
+  if (isGroupMember(group, user)) {
+    return {};
+  }
+  return { private: { $ne: true } };
 }

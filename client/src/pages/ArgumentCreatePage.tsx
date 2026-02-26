@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import Input from '../components/Form/Input';
@@ -22,6 +22,8 @@ interface ArgumentFormValues {
 
 const ArgumentCreatePage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const groupId = searchParams.get('group') || undefined;
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
 
@@ -61,6 +63,7 @@ const ArgumentCreatePage: React.FC = () => {
         topicId: values.topicId || undefined,
         private: values.private,
         sources: values.sources,
+        groupId: groupId,
       });
       
       setSubmitSuccess(true);
@@ -121,6 +124,12 @@ const ArgumentCreatePage: React.FC = () => {
       {submitError && (
         <Alert type="danger" dismissible onDismiss={() => setSubmitError(null)}>
           {submitError}
+        </Alert>
+      )}
+
+      {groupId && (
+        <Alert type="info">
+          This argument will be created in group context.
         </Alert>
       )}
 

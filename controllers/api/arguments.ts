@@ -101,6 +101,7 @@ async function POST_argument_create(req: any, res: any) {
   const description = String(req.body?.description || req.body?.content || '').trim();
   const references = String(req.body?.sources || req.body?.references || '').trim();
   const ownerId = req.body?.topicId || req.body?.ownerId || req.query?.topic || null;
+  const groupId = req.body?.groupId || null;
   const ownerType = constants.OBJECT_TYPES.topic;
   const isPrivate = Boolean(req.body?.private);
   const typeId = constants.ARGUMENT_TYPES.factual;
@@ -123,6 +124,7 @@ async function POST_argument_create(req: any, res: any) {
     friendlyUrl: utils.urlify(title),
     ownerType: ownerType,
     ownerId: ownerId,
+    groupId: groupId,
     typeId: typeId,
     createDate: now,
     editDate: now,

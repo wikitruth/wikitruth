@@ -19,7 +19,7 @@ Close remaining parity gaps between legacy and modern flows, harden API contract
 - [~] E2E test setup exists but only includes light smoke coverage.
 - [ ] Discussion tabs in entry pages have no matching modern routes.
 - [x] `/visualize` modern route is now data-driven.
-- [ ] Group posts modern route is still legacy handoff text.
+- [x] Group posts modern route now has native read flow and create hooks.
 - [ ] Member profile `following` and `topics` pages are placeholders.
 - [ ] Search API parity is incomplete (modern search omits legacy entity types).
 - [ ] API success/error envelopes are inconsistent across controllers.
@@ -40,7 +40,7 @@ Close remaining parity gaps between legacy and modern flows, harden API contract
     - Empty/error/loading states are handled.
     - One E2E test verifies render and basic interaction.
 
-- [ ] **P0.3 Complete group posts in modern flow**
+- [x] **P0.3 Complete group posts in modern flow**
   - Replace legacy handoff in `client/src/pages/Groups/Group/GroupPosts.tsx` with native posts stream and post creation hooks as applicable.
   - Acceptance:
     - Read path available without legacy redirect.

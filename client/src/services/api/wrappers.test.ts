@@ -27,6 +27,7 @@ jest.mock('../api', () => ({
     getArtifactEntry: jest.fn().mockResolvedValue({}),
     getGroups: jest.fn().mockResolvedValue([]),
     getGroupEntry: jest.fn().mockResolvedValue({}),
+    getGroupPosts: jest.fn().mockResolvedValue({}),
     getMembers: jest.fn().mockResolvedValue([]),
     getScreeners: jest.fn().mockResolvedValue([]),
     getReviewers: jest.fn().mockResolvedValue([]),
@@ -60,6 +61,7 @@ describe('api wrappers', () => {
 
     await groupsApi.list();
     await groupsApi.entry('1');
+    await groupsApi.posts('1');
 
     await membersApi.list();
     await membersApi.screeners();

@@ -128,6 +128,7 @@ describe('API endpoint smoke coverage', function () {
     expect(artifactsApi).toContain("router.put('/entry/:id'");
     expect(groupsApi).toContain("router.post('/',");
     expect(groupsApi).toContain("router.put('/entry/:id'");
+    expect(groupsApi).toContain("router.get('/entry/:id/posts'");
     expect(groupsApi).toContain("router.post('/entry/:id/members'");
     expect(groupsApi).toContain("router.delete('/entry/:id/members/:userId'");
   });

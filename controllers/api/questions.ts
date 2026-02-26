@@ -122,6 +122,7 @@ async function POST_question_create(req: any, res: any) {
   const description = String(req.body?.description || req.body?.content || '').trim();
   const references = String(req.body?.references || '').trim();
   const ownerId = req.body?.topicId || req.body?.ownerId || req.query?.topic || null;
+  const groupId = req.body?.groupId || null;
   const isPrivate = Boolean(req.body?.private);
 
   if (!title || title.length < 3) {
@@ -141,6 +142,7 @@ async function POST_question_create(req: any, res: any) {
     friendlyUrl: utils.urlify(title),
     ownerType: constants.OBJECT_TYPES.topic,
     ownerId: ownerId,
+    groupId: groupId,
     categoryId: ownerId,
     createDate: now,
     editDate: now,
