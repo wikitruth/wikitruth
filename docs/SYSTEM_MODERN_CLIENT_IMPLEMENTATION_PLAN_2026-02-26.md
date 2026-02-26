@@ -94,7 +94,7 @@ Close remaining parity gaps between legacy and modern flows, harden API contract
 
 ## P2 TypeScript + Modernization Quality
 
-- [ ] **P2.1 Remove remaining `@ts-ignore` heavy zones in API controllers**
+- [x] **P2.1 Remove remaining `@ts-ignore` heavy zones in API controllers**
   - Start with `controllers/api/search.ts`, then other API modules with high suppression density.
   - Acceptance:
     - Strictness debt reduced measurably by module.

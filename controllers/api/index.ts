@@ -1,64 +1,48 @@
 'use strict';
 
-// @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-const express = require('express');
-// @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-const { wrapAsyncRouter, apiEnvelopeMiddleware } = require('../../middlewares/apiError');
+import type { Router } from 'express';
 
-// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
-module.exports = function (router) {
-  router.use(apiEnvelopeMiddleware);
+const express = require('express') as typeof import('express');
+const apiError = require('../../middlewares/apiError') as {
+  wrapAsyncRouter: (router: Router) => Router;
+  apiEnvelopeMiddleware: import('express').RequestHandler;
+};
 
-  // Create sub-routers for API endpoints
-  const homeRouter = wrapAsyncRouter(express.Router());
-  const topicsRouter = wrapAsyncRouter(express.Router());
-  const argumentsRouter = wrapAsyncRouter(express.Router());
-  const questionsRouter = wrapAsyncRouter(express.Router());
-  const searchRouter = wrapAsyncRouter(express.Router());
-  const issuesRouter = wrapAsyncRouter(express.Router());
-  const opinionsRouter = wrapAsyncRouter(express.Router());
-  const answersRouter = wrapAsyncRouter(express.Router());
-  const artifactsRouter = wrapAsyncRouter(express.Router());
-  const groupsRouter = wrapAsyncRouter(express.Router());
-  const membersRouter = wrapAsyncRouter(express.Router());
-  const authRouter = wrapAsyncRouter(express.Router());
-  const adminRouter = wrapAsyncRouter(express.Router());
-  const monitoringRouter = wrapAsyncRouter(express.Router());
-  const realtimeRouter = wrapAsyncRouter(express.Router());
+module.exports = function (router: Router) {
+  router.use(apiError.apiEnvelopeMiddleware);
 
-  // Load route handlers
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-  require('./home')(homeRouter);
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-  require('./topics')(topicsRouter);
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-  require('./arguments')(argumentsRouter);
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-  require('./questions')(questionsRouter);
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-  require('./search')(searchRouter);
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-  require('./issues')(issuesRouter);
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-  require('./opinions')(opinionsRouter);
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-  require('./answers')(answersRouter);
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-  require('./artifacts')(artifactsRouter);
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-  require('./groups')(groupsRouter);
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-  require('./members')(membersRouter);
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-  require('./auth')(authRouter);
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-  require('./admin')(adminRouter);
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-  require('./monitoring')(monitoringRouter);
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-  require('./realtime')(realtimeRouter);
+  const homeRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
+  const topicsRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
+  const argumentsRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
+  const questionsRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
+  const searchRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
+  const issuesRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
+  const opinionsRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
+  const answersRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
+  const artifactsRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
+  const groupsRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
+  const membersRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
+  const authRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
+  const adminRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
+  const monitoringRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
+  const realtimeRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
 
-  // Mount sub-routers
+  (require('./home') as (routerArg: Router) => void)(homeRouter);
+  (require('./topics') as (routerArg: Router) => void)(topicsRouter);
+  (require('./arguments') as (routerArg: Router) => void)(argumentsRouter);
+  (require('./questions') as (routerArg: Router) => void)(questionsRouter);
+  (require('./search') as (routerArg: Router) => void)(searchRouter);
+  (require('./issues') as (routerArg: Router) => void)(issuesRouter);
+  (require('./opinions') as (routerArg: Router) => void)(opinionsRouter);
+  (require('./answers') as (routerArg: Router) => void)(answersRouter);
+  (require('./artifacts') as (routerArg: Router) => void)(artifactsRouter);
+  (require('./groups') as (routerArg: Router) => void)(groupsRouter);
+  (require('./members') as (routerArg: Router) => void)(membersRouter);
+  (require('./auth') as (routerArg: Router) => void)(authRouter);
+  (require('./admin') as (routerArg: Router) => void)(adminRouter);
+  (require('./monitoring') as (routerArg: Router) => void)(monitoringRouter);
+  (require('./realtime') as (routerArg: Router) => void)(realtimeRouter);
+
   router.use('/home', homeRouter);
   router.use('/topics', topicsRouter);
   router.use('/arguments', argumentsRouter);

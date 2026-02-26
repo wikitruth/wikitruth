@@ -1,16 +1,39 @@
 'use strict';
 
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'flowUtils'... Remove this comment to see the full error message
-const flowUtils = require('../../utils/flowUtils');
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'constants'... Remove this comment to see the full error message
-const constants = require('../../models/constants');
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'db'.
-const db = require('../../app').db.models;
+import type { Router } from 'express';
+import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 
-// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
-module.exports = function (router) {
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/', async function (req, res) {
+const flowUtils = require('../../utils/flowUtils') as any;
+const constants = require('../../models/constants') as any;
+const db = require('../../app').db.models as any;
+
+type SearchModel = {
+  screening?: {
+    status?: number;
+  };
+};
+
+function buildRegexSearchQuery(query: string): Record<string, unknown> {
+  const pattern = { $regex: query, $options: 'i' };
+  return {
+    $or: [{ title: pattern }, { content: pattern }, { contentPreview: pattern }, { references: pattern }],
+  };
+}
+
+function buildBaseQuery(screeningStatus: number | undefined): Record<string, unknown> {
+  const base: Record<string, unknown> = {
+    private: false,
+  };
+
+  if (typeof screeningStatus !== 'undefined') {
+    base['screening.status'] = screeningStatus;
+  }
+
+  return base;
+}
+
+module.exports = function (router: Router) {
+  router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       await GET_search(req, res);
     } catch (error) {
@@ -20,14 +43,13 @@ module.exports = function (router) {
   });
 };
 
-// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-async function GET_search(req, res) {
+async function GET_search(req: WikitruthRequest, res: WikitruthResponse) {
   const query = String(req.query.q || '').trim();
-  
+
   if (!query) {
-    return res.json({ 
-      topics: [], 
-      arguments: [], 
+    return res.json({
+      topics: [],
+      arguments: [],
       questions: [],
       answers: [],
       artifacts: [],
@@ -36,73 +58,35 @@ async function GET_search(req, res) {
     });
   }
 
-  let model = {};
+  const model: SearchModel = {};
   flowUtils.setScreeningModel(req, model);
-  const pattern = { $regex: query, $options: 'i' };
+  const screeningStatus = model.screening?.status;
+  const baseQuery = buildBaseQuery(screeningStatus);
 
-  const baseQuery = {
-    private: false,
-    // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
-    'screening.status': model.screening.status,
-  };
-
-  const [topicResults, argumentResults, questionResults, answerResults, artifactResults, issueResults, opinionResults] = await Promise.all([
-    db.Topic
-      .find({
-        ...baseQuery,
-        $or: [{ title: pattern }, { content: pattern }, { contentPreview: pattern }, { references: pattern }],
-      })
-      .sort({ editDate: -1 })
-      .limit(20)
-      .lean(),
-    db.Argument
-      .find({
-        ...baseQuery,
-        $or: [{ title: pattern }, { content: pattern }, { contentPreview: pattern }, { references: pattern }],
-      })
-      .sort({ editDate: -1 })
-      .limit(20)
-      .lean(),
-    db.Question
-      .find({
-        ...baseQuery,
-        $or: [{ title: pattern }, { content: pattern }, { contentPreview: pattern }, { references: pattern }],
-      })
-      .sort({ editDate: -1 })
-      .limit(20)
-      .lean(),
-    db.Answer
-      .find({
-        ...baseQuery,
-        $or: [{ title: pattern }, { content: pattern }, { contentPreview: pattern }, { references: pattern }],
-      })
-      .sort({ editDate: -1 })
-      .limit(20)
-      .lean(),
+  const [
+    topicResults,
+    argumentResults,
+    questionResults,
+    answerResults,
+    artifactResults,
+    issueResults,
+    opinionResults,
+  ] = await Promise.all([
+    db.Topic.find({ ...baseQuery, ...buildRegexSearchQuery(query) }).sort({ editDate: -1 }).limit(20).lean(),
+    db.Argument.find({ ...baseQuery, ...buildRegexSearchQuery(query) }).sort({ editDate: -1 }).limit(20).lean(),
+    db.Question.find({ ...baseQuery, ...buildRegexSearchQuery(query) }).sort({ editDate: -1 }).limit(20).lean(),
+    db.Answer.find({ ...baseQuery, ...buildRegexSearchQuery(query) }).sort({ editDate: -1 }).limit(20).lean(),
     db.Artifact
       .find({
         ...baseQuery,
-        $or: [{ title: pattern }, { content: pattern }, { contentPreview: pattern }, { references: pattern }, { source: pattern }],
+        ...buildRegexSearchQuery(query),
+        $or: [...(buildRegexSearchQuery(query).$or as Array<Record<string, unknown>>), { source: { $regex: query, $options: 'i' } }],
       })
       .sort({ editDate: -1 })
       .limit(20)
       .lean(),
-    db.Issue
-      .find({
-        ...baseQuery,
-        $or: [{ title: pattern }, { content: pattern }, { contentPreview: pattern }, { references: pattern }],
-      })
-      .sort({ editDate: -1 })
-      .limit(20)
-      .lean(),
-    db.Opinion
-      .find({
-        ...baseQuery,
-        $or: [{ title: pattern }, { content: pattern }, { contentPreview: pattern }, { references: pattern }],
-      })
-      .sort({ editDate: -1 })
-      .limit(20)
-      .lean(),
+    db.Issue.find({ ...baseQuery, ...buildRegexSearchQuery(query) }).sort({ editDate: -1 }).limit(20).lean(),
+    db.Opinion.find({ ...baseQuery, ...buildRegexSearchQuery(query) }).sort({ editDate: -1 }).limit(20).lean(),
   ]);
 
   await flowUtils.setEditorsUsername(topicResults);

@@ -1,23 +1,73 @@
 'use strict';
 
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'async'.
-const async = require('async');
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'flowUtils'... Remove this comment to see the full error message
-const flowUtils = require('../../utils/flowUtils');
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'constants'... Remove this comment to see the full error message
-const constants = require('../../models/constants');
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'utils'.
-const utils = require('../../utils/utils');
-// @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-const questionsService = require('../../services/questionsService');
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'db'.
-const db = require('../../app').db.models;
+import type { Router } from 'express';
+import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
+import type { AuthUser } from '../../types/auth';
+import type { ServiceEntry, ServiceQuery } from '../../services/serviceTypes';
+import type { WikitruthConstants } from '../../types/constants';
 
-// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
-module.exports = function (router) {
-  // Get questions list
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/', async function (req, res) {
+const flowUtils = require('../../utils/flowUtils') as {
+  setScreeningModel: (req: WikitruthRequest, model: QuestionListResponse) => void;
+};
+const constants = require('../../models/constants') as WikitruthConstants;
+const utils = require('../../utils/utils') as {
+  urlify: (value: string) => string;
+};
+const questionsService = require('../../services/questionsService') as {
+  getQuestionsList: (
+    query: ServiceQuery,
+    options: {
+      limit?: number;
+      req?: WikitruthRequest;
+    }
+  ) => Promise<ServiceEntry[]>;
+  getQuestionEntry: (questionId: string, req: WikitruthRequest) => Promise<ServiceEntry | null>;
+};
+
+type QuestionDocument = {
+  _id: unknown;
+  title?: string;
+  friendlyUrl?: string;
+  content?: string;
+  contentPreview?: string;
+  references?: string;
+  ownerId?: unknown;
+  categoryId?: unknown;
+  private?: boolean;
+  createDate?: Date;
+  editDate?: Date;
+  editUserId?: unknown;
+  createUserId?: unknown;
+  save: () => Promise<QuestionDocument>;
+};
+
+const db = require('../../app').db.models as {
+  Question: {
+    create: (fields: Record<string, unknown>) => Promise<QuestionDocument>;
+    findById: (id: string) => Promise<QuestionDocument | null>;
+  };
+};
+
+type QuestionListResponse = {
+  screening?: {
+    status?: number;
+  };
+  questions?: ServiceEntry[];
+};
+
+type QuestionWriteBody = {
+  title?: unknown;
+  description?: unknown;
+  content?: unknown;
+  references?: unknown;
+  topicId?: unknown;
+  ownerId?: unknown;
+  groupId?: unknown;
+  private?: unknown;
+};
+
+module.exports = function (router: Router) {
+  router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       await GET_questions(req, res);
     } catch (error) {
@@ -26,9 +76,7 @@ module.exports = function (router) {
     }
   });
 
-  // Get question entry
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/entry/:id', async function (req, res) {
+  router.get('/entry/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       await GET_question_entry(req, res);
     } catch (error) {
@@ -37,9 +85,7 @@ module.exports = function (router) {
     }
   });
 
-  // Create question entry
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.post('/', async function (req, res) {
+  router.post('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       await POST_question_create(req, res);
     } catch (error) {
@@ -48,9 +94,7 @@ module.exports = function (router) {
     }
   });
 
-  // Update question entry
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.put('/entry/:id', async function (req, res) {
+  router.put('/entry/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       await PUT_question_update(req, res);
     } catch (error) {
@@ -60,70 +104,74 @@ module.exports = function (router) {
   });
 };
 
-// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-async function GET_questions(req, res) {
-  let model = {};
+async function GET_questions(req: WikitruthRequest, res: WikitruthResponse) {
+  const model: QuestionListResponse = {};
   flowUtils.setScreeningModel(req, model);
-  
-  const query = {
+
+  const query: ServiceQuery = {
     ownerType: constants.OBJECT_TYPES.topic,
     private: false,
-    // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
-    'screening.status': model.screening.status,
   };
-  
+
+  if (typeof model.screening?.status !== 'undefined') {
+    query['screening.status'] = model.screening.status;
+  }
+
   if (req.query.topic) {
-    // @ts-ignore TS(2339): Property 'ownerId' does not exist on type '{ owner... Remove this comment to see the full error message
     query.ownerId = req.query.topic;
   }
-  
-  const questionsList = await questionsService.getQuestionsList(query, {
+
+  const questions = await questionsService.getQuestionsList(query, {
     limit: 50,
     req: req,
   });
-  
-  // @ts-ignore TS(2339): Property 'questions' does not exist on type '{}'.
-  model.questions = questionsList;
-  
-  // Remove screening model from response (it's server-side only)
-  // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
+
+  model.questions = questions;
   delete model.screening;
-  
+
   res.json(model);
 }
 
-// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-async function GET_question_entry(req, res) {
-  const question = await questionsService.getQuestionEntry(req.params.id, req);
-  
+async function GET_question_entry(req: WikitruthRequest, res: WikitruthResponse) {
+  const questionId = String(req.params.id || '').trim();
+
+  if (!questionId) {
+    return res.status(400).json({ error: 'Question id is required' });
+  }
+
+  const question = await questionsService.getQuestionEntry(questionId, req);
+
   if (!question) {
     return res.status(404).json({ error: 'Question not found' });
   }
-  
-  res.json({ question });
+
+  res.json({ question: question });
 }
 
-function canEditEntry(entry: any, user: any): boolean {
+function canEditEntry(entry: QuestionDocument | null, user: AuthUser | undefined): boolean {
   if (!entry || !user) {
     return false;
   }
-  if (user.canPlayRoleOf && user.canPlayRoleOf('admin')) {
+
+  if (typeof user.canPlayRoleOf === 'function' && user.canPlayRoleOf('admin')) {
     return true;
   }
+
   return String(entry.createUserId || '') === String(user._id || user.id || '');
 }
 
-async function POST_question_create(req: any, res: any) {
+async function POST_question_create(req: WikitruthRequest, res: WikitruthResponse) {
   if (!req.user) {
     return res.status(401).json({ error: 'Authentication required' });
   }
 
-  const title = String(req.body?.title || '').trim();
-  const description = String(req.body?.description || req.body?.content || '').trim();
-  const references = String(req.body?.references || '').trim();
-  const ownerId = req.body?.topicId || req.body?.ownerId || req.query?.topic || null;
-  const groupId = req.body?.groupId || null;
-  const isPrivate = Boolean(req.body?.private);
+  const body = (req.body || {}) as QuestionWriteBody;
+  const title = String(body.title || '').trim();
+  const description = String(body.description || body.content || '').trim();
+  const references = String(body.references || '').trim();
+  const ownerId = body.topicId || body.ownerId || req.query.topic || null;
+  const groupId = body.groupId || null;
+  const isPrivate = Boolean(body.private);
 
   if (!title || title.length < 3) {
     return res.status(400).json({ error: 'Title must be at least 3 characters' });
@@ -159,7 +207,7 @@ async function POST_question_create(req: any, res: any) {
     question: {
       _id: question._id,
       title: question.title,
-      friendlyUrl: question.friendlyUrl || utils.urlify(question.title),
+      friendlyUrl: question.friendlyUrl || utils.urlify(question.title || ''),
       content: question.content,
       references: question.references,
       ownerId: question.ownerId,
@@ -170,21 +218,29 @@ async function POST_question_create(req: any, res: any) {
   });
 }
 
-async function PUT_question_update(req: any, res: any) {
+async function PUT_question_update(req: WikitruthRequest, res: WikitruthResponse) {
   if (!req.user) {
     return res.status(401).json({ error: 'Authentication required' });
   }
 
-  const question = await db.Question.findById(req.params.id);
+  const questionId = String(req.params.id || '').trim();
+  if (!questionId) {
+    return res.status(400).json({ error: 'Question id is required' });
+  }
+
+  const question = await db.Question.findById(questionId);
   if (!question) {
     return res.status(404).json({ error: 'Question not found' });
   }
+
   if (!canEditEntry(question, req.user)) {
     return res.status(403).json({ error: 'Not allowed to edit this question' });
   }
 
-  if (typeof req.body?.title !== 'undefined') {
-    const title = String(req.body.title || '').trim();
+  const body = (req.body || {}) as QuestionWriteBody;
+
+  if (typeof body.title !== 'undefined') {
+    const title = String(body.title || '').trim();
     if (!title || title.length < 3) {
       return res.status(400).json({ error: 'Title must be at least 3 characters' });
     }
@@ -192,8 +248,8 @@ async function PUT_question_update(req: any, res: any) {
     question.friendlyUrl = utils.urlify(title);
   }
 
-  if (typeof req.body?.description !== 'undefined' || typeof req.body?.content !== 'undefined') {
-    const content = String(req.body?.description || req.body?.content || '').trim();
+  if (typeof body.description !== 'undefined' || typeof body.content !== 'undefined') {
+    const content = String(body.description || body.content || '').trim();
     if (!content || content.length < 10) {
       return res.status(400).json({ error: 'Description must be at least 10 characters' });
     }
@@ -201,16 +257,16 @@ async function PUT_question_update(req: any, res: any) {
     question.contentPreview = content.slice(0, 240);
   }
 
-  if (typeof req.body?.references !== 'undefined') {
-    question.references = String(req.body.references || '').trim();
+  if (typeof body.references !== 'undefined') {
+    question.references = String(body.references || '').trim();
   }
 
-  if (typeof req.body?.private !== 'undefined') {
-    question.private = Boolean(req.body.private);
+  if (typeof body.private !== 'undefined') {
+    question.private = Boolean(body.private);
   }
 
-  if (typeof req.body?.topicId !== 'undefined' || typeof req.body?.ownerId !== 'undefined') {
-    question.ownerId = req.body.topicId || req.body.ownerId || null;
+  if (typeof body.topicId !== 'undefined' || typeof body.ownerId !== 'undefined') {
+    question.ownerId = body.topicId || body.ownerId || null;
     question.categoryId = question.ownerId;
   }
 
@@ -223,7 +279,7 @@ async function PUT_question_update(req: any, res: any) {
     question: {
       _id: question._id,
       title: question.title,
-      friendlyUrl: question.friendlyUrl || utils.urlify(question.title),
+      friendlyUrl: question.friendlyUrl || utils.urlify(question.title || ''),
       content: question.content,
       references: question.references,
       ownerId: question.ownerId,

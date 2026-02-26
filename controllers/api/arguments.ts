@@ -1,23 +1,68 @@
 'use strict';
 
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'async'.
-const async = require('async');
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'flowUtils'... Remove this comment to see the full error message
-const flowUtils = require('../../utils/flowUtils');
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'utils'.
-const utils = require('../../utils/utils');
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'constants'... Remove this comment to see the full error message
-const constants = require('../../models/constants');
-// @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-const argumentsService = require('../../services/argumentsService');
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'db'.
-const db = require('../../app').db.models;
+import type { Router } from 'express';
+import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
+import type { ServiceEntry, ServiceQuery } from '../../services/serviceTypes';
+import type { WikitruthConstants } from '../../types/constants';
 
-// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
-module.exports = function (router) {
-  // Get arguments list
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/', async function (req, res) {
+const flowUtils = require('../../utils/flowUtils') as {
+  setScreeningModel: (req: WikitruthRequest, model: ArgumentListResponse) => void;
+};
+const utils = require('../../utils/utils') as {
+  urlify: (value: string) => string;
+};
+const constants = require('../../models/constants') as WikitruthConstants;
+const argumentsService = require('../../services/argumentsService') as {
+  getArgumentsList: (
+    query: ServiceQuery,
+    options: {
+      limit?: number;
+      req?: WikitruthRequest;
+    }
+  ) => Promise<ServiceEntry[]>;
+  getArgumentEntry: (argumentId: string, req: WikitruthRequest) => Promise<ServiceEntry | null>;
+};
+
+type ArgumentDocument = {
+  _id: unknown;
+  title?: string;
+  friendlyUrl?: string;
+  content?: string;
+  references?: string;
+  ownerId?: unknown;
+  ownerType?: unknown;
+  private?: boolean;
+  createDate?: Date;
+  editDate?: Date;
+};
+
+const db = require('../../app').db.models as {
+  Argument: {
+    create: (fields: Record<string, unknown>) => Promise<ArgumentDocument>;
+  };
+};
+
+type ArgumentListResponse = {
+  screening?: {
+    status?: number;
+  };
+  arguments?: ServiceEntry[];
+};
+
+type ArgumentWriteBody = {
+  title?: unknown;
+  description?: unknown;
+  content?: unknown;
+  sources?: unknown;
+  references?: unknown;
+  topicId?: unknown;
+  ownerId?: unknown;
+  groupId?: unknown;
+  private?: unknown;
+};
+
+module.exports = function (router: Router) {
+  router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       await GET_arguments(req, res);
     } catch (error) {
@@ -26,9 +71,7 @@ module.exports = function (router) {
     }
   });
 
-  // Create argument entry
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.post('/', async function (req, res) {
+  router.post('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       await POST_argument_create(req, res);
     } catch (error) {
@@ -37,9 +80,7 @@ module.exports = function (router) {
     }
   });
 
-  // Get argument entry
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/entry/:id', async function (req, res) {
+  router.get('/entry/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       await GET_argument_entry(req, res);
     } catch (error) {
@@ -49,61 +90,63 @@ module.exports = function (router) {
   });
 };
 
-// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-async function GET_arguments(req, res) {
-  let model = {};
+async function GET_arguments(req: WikitruthRequest, res: WikitruthResponse) {
+  const model: ArgumentListResponse = {};
   flowUtils.setScreeningModel(req, model);
-  
-  const query = {
+
+  const query: ServiceQuery = {
     ownerType: constants.OBJECT_TYPES.topic,
     private: false,
-    // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
-    'screening.status': model.screening.status,
   };
-  
+
+  if (typeof model.screening?.status !== 'undefined') {
+    query['screening.status'] = model.screening.status;
+  }
+
   if (req.query.topic) {
-    // @ts-ignore TS(2339): Property 'ownerId' does not exist on type '{ owner... Remove this comment to see the full error message
     query.ownerId = req.query.topic;
   }
-  
+
   const argumentsList = await argumentsService.getArgumentsList(query, {
     limit: 50,
     req: req,
   });
-  
-  // @ts-ignore TS(2339): Property 'arguments' does not exist on type '{}'.
+
   model.arguments = argumentsList;
-  
-  // Remove screening model from response (it's server-side only)
-  // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
   delete model.screening;
-  
+
   res.json(model);
 }
 
-// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-async function GET_argument_entry(req, res) {
-  const argument = await argumentsService.getArgumentEntry(req.params.id, req);
-  
+async function GET_argument_entry(req: WikitruthRequest, res: WikitruthResponse) {
+  const argumentId = String(req.params.id || '').trim();
+
+  if (!argumentId) {
+    return res.status(400).json({ error: 'Argument id is required' });
+  }
+
+  const argument = await argumentsService.getArgumentEntry(argumentId, req);
+
   if (!argument) {
     return res.status(404).json({ error: 'Argument not found' });
   }
-  
-  res.json({ argument });
+
+  res.json({ argument: argument });
 }
 
-async function POST_argument_create(req: any, res: any) {
+async function POST_argument_create(req: WikitruthRequest, res: WikitruthResponse) {
   if (!req.user) {
     return res.status(401).json({ error: 'Authentication required' });
   }
 
-  const title = String(req.body?.title || '').trim();
-  const description = String(req.body?.description || req.body?.content || '').trim();
-  const references = String(req.body?.sources || req.body?.references || '').trim();
-  const ownerId = req.body?.topicId || req.body?.ownerId || req.query?.topic || null;
-  const groupId = req.body?.groupId || null;
+  const body = (req.body || {}) as ArgumentWriteBody;
+  const title = String(body.title || '').trim();
+  const description = String(body.description || body.content || '').trim();
+  const references = String(body.sources || body.references || '').trim();
+  const ownerId = body.topicId || body.ownerId || req.query.topic || null;
+  const groupId = body.groupId || null;
   const ownerType = constants.OBJECT_TYPES.topic;
-  const isPrivate = Boolean(req.body?.private);
+  const isPrivate = Boolean(body.private);
   const typeId = constants.ARGUMENT_TYPES.factual;
   const verdictStatus = constants.VERDICT_STATUS.pending;
 
@@ -146,7 +189,7 @@ async function POST_argument_create(req: any, res: any) {
     argument: {
       _id: argument._id,
       title: argument.title,
-      friendlyUrl: argument.friendlyUrl || utils.urlify(argument.title),
+      friendlyUrl: argument.friendlyUrl || utils.urlify(argument.title || ''),
       content: argument.content,
       ownerId: argument.ownerId,
       ownerType: argument.ownerType,

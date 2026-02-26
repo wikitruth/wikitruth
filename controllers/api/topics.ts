@@ -1,21 +1,26 @@
 'use strict';
 
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'async'.
-const async = require('async');
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'flowUtils'... Remove this comment to see the full error message
-const flowUtils = require('../../utils/flowUtils');
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'utils'.
-const utils = require('../../utils/utils');
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'constants'... Remove this comment to see the full error message
-const constants = require('../../models/constants');
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'db'.
-const db = require('../../app').db.models;
+import type { Router } from 'express';
+import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 
-// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
-module.exports = function (router) {
-  // Get topics list
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/', async function (req, res) {
+const flowUtils = require('../../utils/flowUtils') as any;
+const utils = require('../../utils/utils') as any;
+const constants = require('../../models/constants') as any;
+const db = require('../../app').db.models as any;
+
+type TopicScreeningModel = {
+  screening?: {
+    status?: number;
+  };
+  topic?: any;
+  topics?: any[];
+  categories?: any[];
+  arguments?: any[];
+  questions?: any[];
+};
+
+module.exports = function (router: Router) {
+  router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       await GET_topics(req, res);
     } catch (error) {
@@ -24,9 +29,7 @@ module.exports = function (router) {
     }
   });
 
-  // Create topic entry
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.post('/', async function (req, res) {
+  router.post('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       await POST_topic_create(req, res);
     } catch (error) {
@@ -35,9 +38,7 @@ module.exports = function (router) {
     }
   });
 
-  // Get topic entry
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/entry/:id', async function (req, res) {
+  router.get('/entry/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       await GET_topic_entry(req, res);
     } catch (error) {
@@ -47,49 +48,38 @@ module.exports = function (router) {
   });
 };
 
-// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-async function GET_topics(req, res) {
-  let model = {};
+async function GET_topics(req: WikitruthRequest, res: WikitruthResponse) {
+  const model: TopicScreeningModel = {};
   flowUtils.setScreeningModel(req, model);
-  
+
   if (!req.query.topic && req.params.id) {
     req.query.topic = req.params.id;
   }
-  
-  await async.parallel({
-    topic: async function () {
-      await flowUtils.setTopicModels(req, model);
-    },
-    topics: async function () {
-      // @ts-ignore TS(2339): Property 'topics' does not exist on type '{}'.
-      model.topics = await flowUtils.getTopics(
-        {
-          parentId: req.query.topic,
-          // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
-          'screening.status': model.screening.status,
-        },
-        {
-          limit: 0,
-          req: req,
-        }
-      );
-    },
+
+  await flowUtils.setTopicModels(req, model);
+
+  const screeningStatus = model.screening?.status;
+  const topicsQuery: Record<string, unknown> = {
+    parentId: req.query.topic,
+  };
+  if (typeof screeningStatus !== 'undefined') {
+    topicsQuery['screening.status'] = screeningStatus;
+  }
+
+  model.topics = await flowUtils.getTopics(topicsQuery, {
+    limit: 0,
+    req: req,
   });
-  
-  // @ts-ignore TS(2339): Property 'topic' does not exist on type '{}'.
-  if (model.topic) {
-    // @ts-ignore TS(2339): Property 'topic' does not exist on type '{}'.
+
+  if (model.topic?.childrenCount?.topics) {
     flowUtils.setScreeningModelCount(model, model.topic.childrenCount.topics);
   }
-  
-  // Remove screening model from response (it's server-side only)
-  // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
+
   delete model.screening;
-  
   res.json(model);
 }
 
-async function POST_topic_create(req: any, res: any) {
+async function POST_topic_create(req: WikitruthRequest, res: WikitruthResponse) {
   if (!req.user) {
     return res.status(401).json({ error: 'Authentication required' });
   }
@@ -159,97 +149,83 @@ async function POST_topic_create(req: any, res: any) {
   });
 }
 
-// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-async function GET_topic_entry(req, res) {
-  const model = {};
+async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
+  const model: TopicScreeningModel = {};
   req.query.topic = req.params.id;
-  
+
   await flowUtils.setTopicModels(req, model);
-  
-  // @ts-ignore TS(2339): Property 'topic' does not exist on type '{}'.
+
   if (!model.topic) {
     return res.status(404).json({ error: 'Topic not found' });
   }
-  
+
   if (!req.query.topic) {
-    // @ts-ignore TS(2339): Property 'topic' does not exist on type '{}'.
     req.query.topic = model.topic._id;
   }
-  
-  await async.parallel({
-    categories: async function () {
-      // @ts-ignore TS(2339): Property 'topic' does not exist on type '{}'.
-      if (model.topic.parentId) {
-        // @ts-ignore TS(2339): Property 'categories' does not exist on type '{}'.
-        model.categories = await flowUtils.getCategories(
-          {
-            // @ts-ignore TS(2339): Property 'topic' does not exist on type '{}'.
-            parentId: model.topic.parentId,
-            // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
-            'screening.status': model.screening.status,
-          },
-          {
-            limit: 0,
-            req: req,
-          }
-        );
+
+  const screeningStatus = model.screening?.status;
+
+  await Promise.all([
+    (async function loadCategories() {
+      if (!model.topic?.parentId) {
+        return;
       }
-    },
-    topics: async function () {
-      // @ts-ignore TS(2339): Property 'topics' does not exist on type '{}'.
-      model.topics = await flowUtils.getTopics(
-        {
-          // @ts-ignore TS(2339): Property 'topic' does not exist on type '{}'.
-          parentId: model.topic._id,
-          // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
-          'screening.status': model.screening.status,
-        },
-        {
-          limit: 5,
-          req: req,
-        }
-      );
-    },
-    arguments: async function () {
-      const query = {
-        ownerType: constants.OBJECT_TYPES.topic,
-        // @ts-ignore TS(2339): Property 'topic' does not exist on type '{}'.
-        ownerId: model.topic._id,
-        // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
-        'screening.status': model.screening.status,
+      const query: Record<string, unknown> = {
+        parentId: model.topic.parentId,
       };
-      let results = await db.Argument.find(query).sort({ editDate: -1 }).limit(5).lean();
+      if (typeof screeningStatus !== 'undefined') {
+        query['screening.status'] = screeningStatus;
+      }
+      model.categories = await flowUtils.getCategories(query, {
+        limit: 0,
+        req: req,
+      });
+    })(),
+    (async function loadTopics() {
+      const query: Record<string, unknown> = {
+        parentId: model.topic._id,
+      };
+      if (typeof screeningStatus !== 'undefined') {
+        query['screening.status'] = screeningStatus;
+      }
+      model.topics = await flowUtils.getTopics(query, {
+        limit: 5,
+        req: req,
+      });
+    })(),
+    (async function loadArguments() {
+      const query: Record<string, unknown> = {
+        ownerType: constants.OBJECT_TYPES.topic,
+        ownerId: model.topic._id,
+      };
+      if (typeof screeningStatus !== 'undefined') {
+        query['screening.status'] = screeningStatus;
+      }
+      const results = await db.Argument.find(query).sort({ editDate: -1 }).limit(5).lean();
       await flowUtils.setEditorsUsername(results);
-      // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
-      results.forEach(function (result) {
+      results.forEach(function (result: any) {
         flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.argument, req);
         flowUtils.setVerdictModel(result);
       });
-      // @ts-ignore TS(2339): Property 'arguments' does not exist on type '{}'.
       model.arguments = results;
-    },
-    questions: async function () {
-      const query = {
+    })(),
+    (async function loadQuestions() {
+      const query: Record<string, unknown> = {
         ownerType: constants.OBJECT_TYPES.topic,
-        // @ts-ignore TS(2339): Property 'topic' does not exist on type '{}'.
         ownerId: model.topic._id,
-        // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
-        'screening.status': model.screening.status,
       };
-      let results = await db.Question.find(query).sort({ editDate: -1 }).limit(5).lean();
+      if (typeof screeningStatus !== 'undefined') {
+        query['screening.status'] = screeningStatus;
+      }
+      const results = await db.Question.find(query).sort({ editDate: -1 }).limit(5).lean();
       await flowUtils.setEditorsUsername(results);
-      // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
-      results.forEach(function (result) {
+      results.forEach(function (result: any) {
         flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.question, req);
       });
-      // @ts-ignore TS(2339): Property 'questions' does not exist on type '{}'.
       model.questions = results;
-    },
-  });
-  
-  // Remove screening model from response (it's server-side only)
-  // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
+    })(),
+  ]);
+
   delete model.screening;
-  
   res.json(model);
 }
