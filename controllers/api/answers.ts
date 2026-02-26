@@ -49,13 +49,48 @@ module.exports = function (router) {
   // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get('/entry/:id', async function (req, res) {
     try {
+      const answerId = String(req.params.id || '').trim();
+      if (!answerId) {
+        return res.status(400).json({ error: 'Answer id is required' });
+      }
+
       const answer = await answersService.getAnswerEntry(req.params.id, req);
       
       if (!answer) {
         return res.status(404).json({ error: 'Answer not found' });
       }
-      
-      res.json({ answer });
+
+      const [issues, opinions] = await Promise.all([
+        db.Issue.find({
+          ownerType: constants.OBJECT_TYPES.answer,
+          ownerId: answerId,
+          private: false,
+          'screening.status': constants.SCREENING_STATUS.status1.code,
+        }).sort({ editDate: -1 }).limit(5).lean(),
+        db.Opinion.find({
+          parentId: null,
+          ownerType: constants.OBJECT_TYPES.answer,
+          ownerId: answerId,
+          private: false,
+          'screening.status': constants.SCREENING_STATUS.status1.code,
+        }).sort({ editDate: -1 }).limit(5).lean(),
+      ]);
+
+      await flowUtils.setEditorsUsername(issues);
+      issues.forEach(function (result: any) {
+        flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.issue, req);
+      });
+
+      await flowUtils.setEditorsUsername(opinions);
+      opinions.forEach(function (result: any) {
+        flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.opinion, req);
+      });
+
+      res.json({
+        answer: answer,
+        issues: issues,
+        opinions: opinions,
+      });
     } catch (error) {
       // @ts-ignore TS(2571): Object is of type 'unknown'.
       res.status(500).json({ error: error.message });

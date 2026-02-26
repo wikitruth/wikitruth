@@ -29,7 +29,7 @@ Acceptance criteria: Modern profile settings includes legacy-equivalent Fast Swi
 - [x] P1.3 Complete account settings parity.
 Acceptance criteria: Modern account settings includes contact info update, identity update, password update, and social account connect/disconnect parity.
 
-- [ ] P1.4 Complete entry detail parity for topic/argument/question/issue/opinion/answer/artifact pages.
+- [x] P1.4 Complete entry detail parity for topic/argument/question/issue/opinion/answer/artifact pages.
 Acceptance criteria: Related/child lists and discussion/context sections match legacy behavior where applicable; counts are not hardcoded placeholders.
 
 - [ ] P1.5 Implement entry actions parity (more/options menu).

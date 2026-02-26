@@ -49,13 +49,84 @@ module.exports = function (router) {
   // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get('/entry/:id', async function (req, res) {
     try {
+      const artifactId = String(req.params.id || '').trim();
+      if (!artifactId) {
+        return res.status(400).json({ error: 'Artifact id is required' });
+      }
+
       const artifact = await artifactsService.getArtifactEntry(req.params.id, req);
       
       if (!artifact) {
         return res.status(404).json({ error: 'Artifact not found' });
       }
-      
-      res.json({ artifact });
+
+      const [artifacts, argumentsList, questions, issues, opinions] = await Promise.all([
+        db.Artifact.find({
+          parentId: artifactId,
+          private: false,
+          'screening.status': constants.SCREENING_STATUS.status1.code,
+        }).sort({ editDate: -1 }).limit(5).lean(),
+        db.Argument.find({
+          ownerType: constants.OBJECT_TYPES.artifact,
+          ownerId: artifactId,
+          private: false,
+          'screening.status': constants.SCREENING_STATUS.status1.code,
+        }).sort({ editDate: -1 }).limit(5).lean(),
+        db.Question.find({
+          ownerType: constants.OBJECT_TYPES.artifact,
+          ownerId: artifactId,
+          private: false,
+          'screening.status': constants.SCREENING_STATUS.status1.code,
+        }).sort({ editDate: -1 }).limit(5).lean(),
+        db.Issue.find({
+          ownerType: constants.OBJECT_TYPES.artifact,
+          ownerId: artifactId,
+          private: false,
+          'screening.status': constants.SCREENING_STATUS.status1.code,
+        }).sort({ editDate: -1 }).limit(5).lean(),
+        db.Opinion.find({
+          parentId: null,
+          ownerType: constants.OBJECT_TYPES.artifact,
+          ownerId: artifactId,
+          private: false,
+          'screening.status': constants.SCREENING_STATUS.status1.code,
+        }).sort({ editDate: -1 }).limit(5).lean(),
+      ]);
+
+      await flowUtils.setEditorsUsername(artifacts);
+      artifacts.forEach(function (result: any) {
+        flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.artifact, req);
+      });
+
+      await flowUtils.setEditorsUsername(argumentsList);
+      argumentsList.forEach(function (result: any) {
+        flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.argument, req);
+        flowUtils.setVerdictModel(result);
+      });
+
+      await flowUtils.setEditorsUsername(questions);
+      questions.forEach(function (result: any) {
+        flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.question, req);
+      });
+
+      await flowUtils.setEditorsUsername(issues);
+      issues.forEach(function (result: any) {
+        flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.issue, req);
+      });
+
+      await flowUtils.setEditorsUsername(opinions);
+      opinions.forEach(function (result: any) {
+        flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.opinion, req);
+      });
+
+      res.json({
+        artifact: artifact,
+        artifacts: artifacts,
+        arguments: argumentsList,
+        questions: questions,
+        issues: issues,
+        opinions: opinions,
+      });
     } catch (error) {
       // @ts-ignore TS(2571): Object is of type 'unknown'.
       res.status(500).json({ error: error.message });

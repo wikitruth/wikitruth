@@ -89,13 +89,34 @@ async function GET_issues(req, res) {
 
 // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 async function GET_issue_entry(req, res) {
-  const issue = await issuesService.getIssueEntry(req.params.id, req);
+  const issueId = String(req.params.id || '').trim();
+  if (!issueId) {
+    return res.status(400).json({ error: 'Issue id is required' });
+  }
+
+  const issue = await issuesService.getIssueEntry(issueId, req);
   
   if (!issue) {
     return res.status(404).json({ error: 'Issue not found' });
   }
+
+  const opinions = await db.Opinion.find({
+    parentId: null,
+    ownerType: constants.OBJECT_TYPES.issue,
+    ownerId: issueId,
+    private: false,
+    'screening.status': constants.SCREENING_STATUS.status1.code,
+  }).sort({ editDate: -1 }).limit(5).lean();
+
+  await flowUtils.setEditorsUsername(opinions);
+  opinions.forEach(function (result: any) {
+    flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.opinion, req);
+  });
   
-  res.json({ issue });
+  res.json({
+    issue: issue,
+    opinions: opinions,
+  });
 }
 
 function canEditEntry(entry: any, user: any): boolean {

@@ -10,9 +10,11 @@ import Alert from '../components/common/Alert';
 import TopicEntryRow from '../components/EntryRow/TopicEntryRow';
 import ArgumentEntryRow from '../components/EntryRow/ArgumentEntryRow';
 import QuestionEntryRow from '../components/EntryRow/QuestionEntryRow';
+import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
+import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
 import type { TopicEntryResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
-import type { Argument, Question, Topic } from '../types';
+import type { Argument, Artifact, Issue, Opinion, Question, Topic } from '../types';
 
 const TopicEntryPage: React.FC = () => {
   const { id } = useParams();
@@ -51,6 +53,9 @@ const TopicEntryPage: React.FC = () => {
   const topics = (data.topics || []) as LegacyEntity[];
   const args = (data.arguments || []) as LegacyEntity[];
   const questions = (data.questions || []) as LegacyEntity[];
+  const artifacts = (data.artifacts || []) as LegacyEntity[];
+  const issues = (data.issues || []) as LegacyEntity[];
+  const opinions = (data.opinions || []) as LegacyEntity[];
   
   // Build breadcrumb items
   const breadcrumbItems = [
@@ -62,7 +67,12 @@ const TopicEntryPage: React.FC = () => {
   // Build tabs for the topic entry
   const tabs = [
     { id: 'overview', title: 'Overview', url: `/topics/entry/${topic.friendlyUrl}/${topic._id}` },
-    { id: 'discussion', title: 'Discussion', url: `/topics/entry/${topic.friendlyUrl}/${topic._id}/discussion`, count: 0 }
+    {
+      id: 'discussion',
+      title: 'Discussion',
+      url: `/topics/entry/${topic.friendlyUrl}/${topic._id}/discussion`,
+      count: topic.childrenCount?.opinions?.accepted ?? opinions.length,
+    }
   ];
 
   return (
@@ -103,8 +113,8 @@ const TopicEntryPage: React.FC = () => {
           title="Topics"
           icon="folder-open"
           iconColor="text-success-x"
-          count={topic.childrenCount?.topics?.accepted || 0}
-          moreUrl={(topic.childrenCount?.topics?.accepted || 0) > 5 ? `/topics/${topic.friendlyUrl}/${topic._id}` : undefined}
+          count={topic.childrenCount?.topics?.accepted ?? topics.length}
+          moreUrl={(topic.childrenCount?.topics?.accepted ?? topics.length) > 5 ? `/topics/${topic.friendlyUrl}/${topic._id}` : undefined}
         >
           {topics.map((t) => (
             <TopicEntryRow key={t._id} topic={t as unknown as Topic} subtitle={false} />
@@ -118,7 +128,7 @@ const TopicEntryPage: React.FC = () => {
           title="Facts"
           icon="flash"
           iconColor="text-primary"
-          count={topic.childrenCount?.arguments?.accepted || 0}
+          count={topic.childrenCount?.arguments?.accepted ?? args.length}
         >
           {args.map((arg) => (
             <ArgumentEntryRow key={arg._id} argument={arg as unknown as Argument} subtitle={false} />
@@ -132,10 +142,56 @@ const TopicEntryPage: React.FC = () => {
           title="Questions"
           icon="question-circle"
           iconColor="text-success-x"
-          count={topic.childrenCount?.questions?.accepted || 0}
+          count={topic.childrenCount?.questions?.accepted ?? questions.length}
         >
           {questions.map((q) => (
             <QuestionEntryRow key={q._id} question={q as unknown as Question} subtitle={false} />
+          ))}
+        </EntryList>
+      )}
+
+      {/* Artifacts List */}
+      {artifacts && artifacts.length > 0 && (
+        <EntryList
+          title="Artifacts"
+          icon="paperclip"
+          iconColor="text-muted"
+          count={topic.childrenCount?.artifacts?.accepted ?? artifacts.length}
+        >
+          {artifacts.map((artifact) => (
+            <li key={artifact._id} className="list-group-item">
+              <Link to={`/artifacts/entry/${(artifact as unknown as Artifact).friendlyUrl || artifact._id}/${artifact._id}`}>
+                {artifact.title || '(Untitled)'}
+              </Link>
+            </li>
+          ))}
+        </EntryList>
+      )}
+
+      {/* Issues List */}
+      {issues && issues.length > 0 && (
+        <EntryList
+          title="Issues"
+          icon="exclamation-triangle"
+          iconColor="text-warning"
+          count={topic.childrenCount?.issues?.accepted ?? issues.length}
+        >
+          {issues.map((issue) => (
+            <IssueEntryRow key={issue._id} issue={issue as unknown as Issue} subtitle={false} />
+          ))}
+        </EntryList>
+      )}
+
+      {/* Opinions List */}
+      {opinions && opinions.length > 0 && (
+        <EntryList
+          title="Comments"
+          icon="comment"
+          iconColor="text-info"
+          count={topic.childrenCount?.opinions?.accepted ?? opinions.length}
+        >
+          {opinions.map((opinion) => (
+            <OpinionEntryRow key={opinion._id} opinion={opinion as unknown as Opinion} subtitle={false} />
           ))}
         </EntryList>
       )}

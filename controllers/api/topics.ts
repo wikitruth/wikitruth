@@ -17,6 +17,9 @@ type TopicScreeningModel = {
   categories?: any[];
   arguments?: any[];
   questions?: any[];
+  artifacts?: any[];
+  issues?: any[];
+  opinions?: any[];
 };
 
 function parseLimit(req: WikitruthRequest): number {
@@ -83,7 +86,7 @@ async function GET_topics(req: WikitruthRequest, res: WikitruthResponse) {
 
   await flowUtils.setTopicModels(req, model);
 
-  const screeningStatus = model.screening?.status;
+  const screeningStatus = constants.SCREENING_STATUS.status1.code;
   const topicsQuery: Record<string, unknown> = {
     parentId: req.query.topic,
   };
@@ -262,6 +265,52 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
         flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.question, req);
       });
       model.questions = results;
+    })(),
+    (async function loadArtifacts() {
+      const query: Record<string, unknown> = {
+        ownerType: constants.OBJECT_TYPES.topic,
+        ownerId: model.topic._id,
+      };
+      if (typeof screeningStatus !== 'undefined') {
+        query['screening.status'] = screeningStatus;
+      }
+      const results = await db.Artifact.find(query).sort({ editDate: -1 }).limit(5).lean();
+      await flowUtils.setEditorsUsername(results);
+      results.forEach(function (result: any) {
+        flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.artifact, req);
+      });
+      model.artifacts = results;
+    })(),
+    (async function loadIssues() {
+      const query: Record<string, unknown> = {
+        ownerType: constants.OBJECT_TYPES.topic,
+        ownerId: model.topic._id,
+      };
+      if (typeof screeningStatus !== 'undefined') {
+        query['screening.status'] = screeningStatus;
+      }
+      const results = await db.Issue.find(query).sort({ editDate: -1 }).limit(5).lean();
+      await flowUtils.setEditorsUsername(results);
+      results.forEach(function (result: any) {
+        flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.issue, req);
+      });
+      model.issues = results;
+    })(),
+    (async function loadOpinions() {
+      const query: Record<string, unknown> = {
+        parentId: null,
+        ownerType: constants.OBJECT_TYPES.topic,
+        ownerId: model.topic._id,
+      };
+      if (typeof screeningStatus !== 'undefined') {
+        query['screening.status'] = screeningStatus;
+      }
+      const results = await db.Opinion.find(query).sort({ editDate: -1 }).limit(5).lean();
+      await flowUtils.setEditorsUsername(results);
+      results.forEach(function (result: any) {
+        flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.opinion, req);
+      });
+      model.opinions = results;
     })(),
   ]);
 

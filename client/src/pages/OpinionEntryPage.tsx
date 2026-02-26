@@ -5,9 +5,13 @@ import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import PageTabs from '../components/common/PageTabs';
 import Alert from '../components/common/Alert';
+import EntryList from '../components/common/EntryList';
+import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
+import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
 import apiService from '../services/api';
 import type { OpinionEntryResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
+import type { Issue, Opinion } from '../types';
 
 const OpinionEntryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -46,6 +50,8 @@ const OpinionEntryPage: React.FC = () => {
   }
 
   const opinion = data.opinion as LegacyEntity;
+  const issues = (data.issues || []) as LegacyEntity[];
+  const opinions = (data.opinions || []) as LegacyEntity[];
   
   // Build breadcrumb items
   const breadcrumbItems = [
@@ -57,7 +63,12 @@ const OpinionEntryPage: React.FC = () => {
   // Build tabs
   const tabs = [
     { id: 'overview', title: 'Overview', url: `/opinions/entry/${opinion.friendlyUrl}/${opinion._id}` },
-    { id: 'discussion', title: 'Discussion', url: `/opinions/entry/${opinion.friendlyUrl}/${opinion._id}/discussion`, count: 0 }
+    {
+      id: 'discussion',
+      title: 'Discussion',
+      url: `/opinions/entry/${opinion.friendlyUrl}/${opinion._id}/discussion`,
+      count: opinion.childrenCount?.opinions?.accepted ?? opinions.length,
+    }
   ];
 
   return (
@@ -88,6 +99,32 @@ const OpinionEntryPage: React.FC = () => {
           <p className="lead">{opinion.description}</p>
         )}
       </div>
+
+      {issues.length > 0 && (
+        <EntryList
+          title="Issues"
+          icon="exclamation-triangle"
+          iconColor="text-warning"
+          count={opinion.childrenCount?.issues?.accepted ?? issues.length}
+        >
+          {issues.map((issue) => (
+            <IssueEntryRow key={issue._id} issue={issue as unknown as Issue} subtitle={false} />
+          ))}
+        </EntryList>
+      )}
+
+      {opinions.length > 0 && (
+        <EntryList
+          title="Comments"
+          icon="comment"
+          iconColor="text-info"
+          count={opinion.childrenCount?.opinions?.accepted ?? opinions.length}
+        >
+          {opinions.map((comment) => (
+            <OpinionEntryRow key={comment._id} opinion={comment as unknown as Opinion} subtitle={false} />
+          ))}
+        </EntryList>
+      )}
 
       {/* Footer meta information */}
       <div className="wt-entry-meta" style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid #eee' }}>

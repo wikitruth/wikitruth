@@ -8,6 +8,11 @@ import PageTabs from '../components/common/PageTabs';
 import Alert from '../components/common/Alert';
 import type { QuestionEntryResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
+import EntryList from '../components/common/EntryList';
+import AnswerEntryRow from '../components/EntryRow/AnswerEntryRow';
+import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
+import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
+import type { Answer, Issue, Opinion } from '../types';
 
 const QuestionEntryPage: React.FC = () => {
   const { id } = useParams();
@@ -43,6 +48,9 @@ const QuestionEntryPage: React.FC = () => {
   }
 
   const question = data.question as LegacyEntity;
+  const answers = (data.answers || []) as LegacyEntity[];
+  const issues = (data.issues || []) as LegacyEntity[];
+  const opinions = (data.opinions || []) as LegacyEntity[];
   
   // Build breadcrumb items
   const breadcrumbItems = [
@@ -54,8 +62,18 @@ const QuestionEntryPage: React.FC = () => {
   // Build tabs
   const tabs = [
     { id: 'overview', title: 'Overview', url: `/questions/entry/${question.friendlyUrl}/${question._id}` },
-    { id: 'answers', title: 'Answers', url: `/questions/entry/${question.friendlyUrl}/${question._id}/answers`, count: 0 },
-    { id: 'discussion', title: 'Discussion', url: `/questions/entry/${question.friendlyUrl}/${question._id}/discussion`, count: 0 }
+    {
+      id: 'answers',
+      title: 'Answers',
+      url: `/questions/entry/${question.friendlyUrl}/${question._id}/answers`,
+      count: question.childrenCount?.answers?.accepted ?? answers.length,
+    },
+    {
+      id: 'discussion',
+      title: 'Discussion',
+      url: `/questions/entry/${question.friendlyUrl}/${question._id}/discussion`,
+      count: question.childrenCount?.opinions?.accepted ?? opinions.length,
+    }
   ];
 
   return (
@@ -84,6 +102,45 @@ const QuestionEntryPage: React.FC = () => {
           <p className="lead">{question.description}</p>
         )}
       </div>
+
+      {answers.length > 0 && (
+        <EntryList
+          title="Answers"
+          icon="check-circle-o"
+          iconColor="text-success-x"
+          count={question.childrenCount?.answers?.accepted ?? answers.length}
+        >
+          {answers.map((answer) => (
+            <AnswerEntryRow key={answer._id} answer={answer as unknown as Answer} subtitle={false} />
+          ))}
+        </EntryList>
+      )}
+
+      {issues.length > 0 && (
+        <EntryList
+          title="Issues"
+          icon="exclamation-triangle"
+          iconColor="text-warning"
+          count={question.childrenCount?.issues?.accepted ?? issues.length}
+        >
+          {issues.map((issue) => (
+            <IssueEntryRow key={issue._id} issue={issue as unknown as Issue} subtitle={false} />
+          ))}
+        </EntryList>
+      )}
+
+      {opinions.length > 0 && (
+        <EntryList
+          title="Comments"
+          icon="comment"
+          iconColor="text-info"
+          count={question.childrenCount?.opinions?.accepted ?? opinions.length}
+        >
+          {opinions.map((opinion) => (
+            <OpinionEntryRow key={opinion._id} opinion={opinion as unknown as Opinion} subtitle={false} />
+          ))}
+        </EntryList>
+      )}
 
       {/* Footer meta information */}
       <div className="wt-entry-meta" style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid #eee' }}>

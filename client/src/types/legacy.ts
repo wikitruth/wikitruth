@@ -29,9 +29,13 @@ export interface LegacyEntity {
   };
   parentTopic?: LegacyEntity;
   childrenCount?: {
-    topics?: { accepted?: number };
-    arguments?: { accepted?: number };
-    questions?: { accepted?: number };
+    topics?: { total?: number; accepted?: number; pending?: number; rejected?: number; archived?: number };
+    arguments?: { total?: number; accepted?: number; pending?: number; rejected?: number; archived?: number };
+    questions?: { total?: number; accepted?: number; pending?: number; rejected?: number; archived?: number };
+    answers?: { total?: number; accepted?: number; pending?: number; rejected?: number; archived?: number };
+    artifacts?: { total?: number; accepted?: number; pending?: number; rejected?: number; archived?: number };
+    issues?: { total?: number; accepted?: number; pending?: number; rejected?: number; archived?: number };
+    opinions?: { total?: number; accepted?: number; pending?: number; rejected?: number; archived?: number };
   };
   verdict?: {
     result?: string;

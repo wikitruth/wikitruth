@@ -5,9 +5,12 @@ import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import PageTabs from '../components/common/PageTabs';
 import Alert from '../components/common/Alert';
+import EntryList from '../components/common/EntryList';
+import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
 import apiService from '../services/api';
 import type { IssueEntryResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
+import type { Opinion } from '../types';
 
 const IssueEntryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -46,6 +49,7 @@ const IssueEntryPage: React.FC = () => {
   }
 
   const issue = data.issue as LegacyEntity;
+  const opinions = (data.opinions || []) as LegacyEntity[];
   
   // Build breadcrumb items
   const breadcrumbItems = [
@@ -57,7 +61,12 @@ const IssueEntryPage: React.FC = () => {
   // Build tabs
   const tabs = [
     { id: 'overview', title: 'Overview', url: `/issues/entry/${issue.friendlyUrl}/${issue._id}` },
-    { id: 'discussion', title: 'Discussion', url: `/issues/entry/${issue.friendlyUrl}/${issue._id}/discussion`, count: 0 }
+    {
+      id: 'discussion',
+      title: 'Discussion',
+      url: `/issues/entry/${issue.friendlyUrl}/${issue._id}/discussion`,
+      count: issue.childrenCount?.opinions?.accepted ?? opinions.length,
+    }
   ];
 
   return (
@@ -88,6 +97,19 @@ const IssueEntryPage: React.FC = () => {
           <p className="lead">{issue.description}</p>
         )}
       </div>
+
+      {opinions.length > 0 && (
+        <EntryList
+          title="Comments"
+          icon="comment"
+          iconColor="text-info"
+          count={issue.childrenCount?.opinions?.accepted ?? opinions.length}
+        >
+          {opinions.map((opinion) => (
+            <OpinionEntryRow key={opinion._id} opinion={opinion as unknown as Opinion} subtitle={false} />
+          ))}
+        </EntryList>
+      )}
 
       {/* Footer meta information */}
       <div className="wt-entry-meta" style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid #eee' }}>

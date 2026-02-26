@@ -8,6 +8,11 @@ import PageTabs from '../components/common/PageTabs';
 import Alert from '../components/common/Alert';
 import type { ArgumentEntryResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
+import QuestionEntryRow from '../components/EntryRow/QuestionEntryRow';
+import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
+import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
+import EntryList from '../components/common/EntryList';
+import type { Issue, Opinion, Question } from '../types';
 
 const ArgumentEntryPage: React.FC = () => {
   const { id } = useParams();
@@ -43,6 +48,9 @@ const ArgumentEntryPage: React.FC = () => {
   }
 
   const argument = data.argument as LegacyEntity;
+  const questions = (data.questions || []) as LegacyEntity[];
+  const issues = (data.issues || []) as LegacyEntity[];
+  const opinions = (data.opinions || []) as LegacyEntity[];
   
   // Build breadcrumb items
   const breadcrumbItems = [
@@ -54,7 +62,12 @@ const ArgumentEntryPage: React.FC = () => {
   // Build tabs
   const tabs = [
     { id: 'overview', title: 'Overview', url: `/arguments/entry/${argument.friendlyUrl}/${argument._id}` },
-    { id: 'discussion', title: 'Discussion', url: `/arguments/entry/${argument.friendlyUrl}/${argument._id}/discussion`, count: 0 }
+    {
+      id: 'discussion',
+      title: 'Discussion',
+      url: `/arguments/entry/${argument.friendlyUrl}/${argument._id}/discussion`,
+      count: argument.childrenCount?.opinions?.accepted ?? opinions.length,
+    }
   ];
 
   return (
@@ -93,6 +106,45 @@ const ArgumentEntryPage: React.FC = () => {
           <p className="lead">{argument.description}</p>
         )}
       </div>
+
+      {questions.length > 0 && (
+        <EntryList
+          title="Questions"
+          icon="question-circle"
+          iconColor="text-success-x"
+          count={argument.childrenCount?.questions?.accepted ?? questions.length}
+        >
+          {questions.map((question) => (
+            <QuestionEntryRow key={question._id} question={question as unknown as Question} subtitle={false} />
+          ))}
+        </EntryList>
+      )}
+
+      {issues.length > 0 && (
+        <EntryList
+          title="Issues"
+          icon="exclamation-triangle"
+          iconColor="text-warning"
+          count={argument.childrenCount?.issues?.accepted ?? issues.length}
+        >
+          {issues.map((issue) => (
+            <IssueEntryRow key={issue._id} issue={issue as unknown as Issue} subtitle={false} />
+          ))}
+        </EntryList>
+      )}
+
+      {opinions.length > 0 && (
+        <EntryList
+          title="Comments"
+          icon="comment"
+          iconColor="text-info"
+          count={argument.childrenCount?.opinions?.accepted ?? opinions.length}
+        >
+          {opinions.map((opinion) => (
+            <OpinionEntryRow key={opinion._id} opinion={opinion as unknown as Opinion} subtitle={false} />
+          ))}
+        </EntryList>
+      )}
 
       {/* Footer meta information */}
       <div className="wt-entry-meta" style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid #eee' }}>

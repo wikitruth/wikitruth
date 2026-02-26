@@ -89,13 +89,46 @@ async function GET_opinions(req, res) {
 
 // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 async function GET_opinion_entry(req, res) {
-  const opinion = await opinionsService.getOpinionEntry(req.params.id, req);
+  const opinionId = String(req.params.id || '').trim();
+  if (!opinionId) {
+    return res.status(400).json({ error: 'Opinion id is required' });
+  }
+
+  const opinion = await opinionsService.getOpinionEntry(opinionId, req);
   
   if (!opinion) {
     return res.status(404).json({ error: 'Opinion not found' });
   }
-  
-  res.json({ opinion });
+
+  const [issues, opinions] = await Promise.all([
+    db.Issue.find({
+      ownerType: opinion.ownerType,
+      ownerId: opinion.ownerId,
+      private: false,
+      'screening.status': constants.SCREENING_STATUS.status1.code,
+    }).sort({ editDate: -1 }).limit(5).lean(),
+    db.Opinion.find({
+      parentId: opinionId,
+      private: false,
+      'screening.status': constants.SCREENING_STATUS.status1.code,
+    }).sort({ editDate: -1 }).limit(5).lean(),
+  ]);
+
+  await flowUtils.setEditorsUsername(issues);
+  issues.forEach(function (result: any) {
+    flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.issue, req);
+  });
+
+  await flowUtils.setEditorsUsername(opinions);
+  opinions.forEach(function (result: any) {
+    flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.opinion, req);
+  });
+
+  res.json({
+    opinion: opinion,
+    issues: issues,
+    opinions: opinions,
+  });
 }
 
 function canEditEntry(entry: any, user: any): boolean {

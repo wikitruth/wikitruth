@@ -37,30 +37,49 @@ export interface TopicEntryResponse extends ApiBaseResponse {
   topics?: LegacyEntity[];
   arguments?: LegacyEntity[];
   questions?: LegacyEntity[];
+  artifacts?: LegacyEntity[];
+  issues?: LegacyEntity[];
+  opinions?: LegacyEntity[];
 }
 
 export interface ArgumentEntryResponse extends ApiBaseResponse {
   argument?: LegacyEntity;
+  questions?: LegacyEntity[];
+  issues?: LegacyEntity[];
+  opinions?: LegacyEntity[];
 }
 
 export interface QuestionEntryResponse extends ApiBaseResponse {
   question?: LegacyEntity;
+  answers?: LegacyEntity[];
+  issues?: LegacyEntity[];
+  opinions?: LegacyEntity[];
 }
 
 export interface IssueEntryResponse extends ApiBaseResponse {
   issue?: LegacyEntity;
+  opinions?: LegacyEntity[];
 }
 
 export interface OpinionEntryResponse extends ApiBaseResponse {
   opinion?: LegacyEntity;
+  issues?: LegacyEntity[];
+  opinions?: LegacyEntity[];
 }
 
 export interface AnswerEntryResponse extends ApiBaseResponse {
   answer?: LegacyEntity;
+  issues?: LegacyEntity[];
+  opinions?: LegacyEntity[];
 }
 
 export interface ArtifactEntryResponse extends ApiBaseResponse {
   artifact?: LegacyEntity;
+  artifacts?: LegacyEntity[];
+  arguments?: LegacyEntity[];
+  questions?: LegacyEntity[];
+  issues?: LegacyEntity[];
+  opinions?: LegacyEntity[];
 }
 
 export interface GroupEntryResponse extends ApiBaseResponse {

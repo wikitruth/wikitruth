@@ -6,9 +6,7 @@ import type { AuthUser } from '../../types/auth';
 import type { ServiceEntry, ServiceQuery } from '../../services/serviceTypes';
 import type { WikitruthConstants } from '../../types/constants';
 
-const flowUtils = require('../../utils/flowUtils') as {
-  setScreeningModel: (req: WikitruthRequest, model: QuestionListResponse) => void;
-};
+const flowUtils = require('../../utils/flowUtils') as any;
 const constants = require('../../models/constants') as WikitruthConstants;
 const utils = require('../../utils/utils') as {
   urlify: (value: string) => string;
@@ -41,12 +39,7 @@ type QuestionDocument = {
   save: () => Promise<QuestionDocument>;
 };
 
-const db = require('../../app').db.models as {
-  Question: {
-    create: (fields: Record<string, unknown>) => Promise<QuestionDocument>;
-    findById: (id: string) => Promise<QuestionDocument | null>;
-  };
-};
+const db = require('../../app').db.models as any;
 
 type QuestionListResponse = {
   screening?: {
@@ -145,7 +138,51 @@ async function GET_question_entry(req: WikitruthRequest, res: WikitruthResponse)
     return res.status(404).json({ error: 'Question not found' });
   }
 
-  res.json({ question: question });
+  const [answers, issues, opinions] = await Promise.all([
+    db.Answer.find({
+      $or: [
+        { questionId: questionId },
+        { ownerType: constants.OBJECT_TYPES.question, ownerId: questionId },
+      ],
+      private: false,
+      'screening.status': constants.SCREENING_STATUS.status1.code,
+    }).sort({ editDate: -1 }).limit(5).lean(),
+    db.Issue.find({
+      ownerType: constants.OBJECT_TYPES.question,
+      ownerId: questionId,
+      private: false,
+      'screening.status': constants.SCREENING_STATUS.status1.code,
+    }).sort({ editDate: -1 }).limit(5).lean(),
+    db.Opinion.find({
+      parentId: null,
+      ownerType: constants.OBJECT_TYPES.question,
+      ownerId: questionId,
+      private: false,
+      'screening.status': constants.SCREENING_STATUS.status1.code,
+    }).sort({ editDate: -1 }).limit(5).lean(),
+  ]);
+
+  await flowUtils.setEditorsUsername(answers);
+  answers.forEach(function (result: any) {
+    flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.answer, req);
+  });
+
+  await flowUtils.setEditorsUsername(issues);
+  issues.forEach(function (result: any) {
+    flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.issue, req);
+  });
+
+  await flowUtils.setEditorsUsername(opinions);
+  opinions.forEach(function (result: any) {
+    flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.opinion, req);
+  });
+
+  res.json({
+    question: question,
+    answers: answers,
+    issues: issues,
+    opinions: opinions,
+  });
 }
 
 function canEditEntry(entry: QuestionDocument | null, user: AuthUser | undefined): boolean {
