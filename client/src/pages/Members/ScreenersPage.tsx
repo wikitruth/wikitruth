@@ -12,7 +12,6 @@ const ScreenersPage: React.FC = () => {
   return (
     <MemberDirectoryPage
       title="Screeners"
-      subtitle="Members who review and screen submissions"
       tab="screeners"
       fetchMembers={fetchMembers}
     />

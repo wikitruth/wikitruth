@@ -21,6 +21,8 @@ const ProfileContributions: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const username = routeUsername || user?.username || '';
   const tab = (searchParams.get('tab') || 'all').toLowerCase();
+  const screening = (searchParams.get('screening') || 'all').toLowerCase();
+  const sort = (searchParams.get('sort') || 'latest').toLowerCase();
   const [data, setData] = useState<MemberContributionsResponse>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,16 +51,45 @@ const ProfileContributions: React.FC = () => {
   }, [username, tab]);
 
   const sections = useMemo(
-    () => [
-      { key: 'topics', label: 'Topics', entries: data.topics || [], more: Boolean(data.topicsMore) },
-      { key: 'arguments', label: 'Facts', entries: data.arguments || [], more: Boolean(data.argumentsMore) },
-      { key: 'questions', label: 'Questions', entries: data.questions || [], more: Boolean(data.questionsMore) },
-      { key: 'answers', label: 'Answers', entries: data.answers || [], more: Boolean(data.answersMore) },
-      { key: 'artifacts', label: 'Artifacts', entries: data.artifacts || [], more: Boolean(data.artifactsMore) },
-      { key: 'issues', label: 'Issues', entries: data.issues || [], more: Boolean(data.issuesMore) },
-      { key: 'opinions', label: 'Comments', entries: data.opinions || [], more: Boolean(data.opinionsMore) },
-    ],
-    [data],
+    () => {
+      const applyScreeningAndSort = (entries: LegacyEntity[]): LegacyEntity[] => {
+        const filtered = entries.filter((entry) => {
+          const status = Number(entry.screening?.status);
+          if (screening === 'accepted') {
+            return status === 1;
+          }
+          if (screening === 'pending') {
+            return status === 0;
+          }
+          if (screening === 'rejected') {
+            return status === 2;
+          }
+          return true;
+        });
+
+        const sorted = [...filtered].sort((left, right) => {
+          if (sort === 'popular') {
+            return Number(right.points || 0) - Number(left.points || 0);
+          }
+          const rightTime = new Date(right.editDate || right.createDate || 0).getTime();
+          const leftTime = new Date(left.editDate || left.createDate || 0).getTime();
+          return rightTime - leftTime;
+        });
+
+        return sorted;
+      };
+
+      return [
+        { key: 'topics', label: 'Topics', icon: 'folder-open', entries: applyScreeningAndSort((data.topics || []) as LegacyEntity[]), more: Boolean(data.topicsMore) },
+        { key: 'arguments', label: 'Facts', icon: 'flash', entries: applyScreeningAndSort((data.arguments || []) as LegacyEntity[]), more: Boolean(data.argumentsMore) },
+        { key: 'questions', label: 'Questions', icon: 'question-circle', entries: applyScreeningAndSort((data.questions || []) as LegacyEntity[]), more: Boolean(data.questionsMore) },
+        { key: 'answers', label: 'Answers', icon: 'check-circle-o', entries: applyScreeningAndSort((data.answers || []) as LegacyEntity[]), more: Boolean(data.answersMore) },
+        { key: 'artifacts', label: 'Artifacts', icon: 'puzzle-piece', entries: applyScreeningAndSort((data.artifacts || []) as LegacyEntity[]), more: Boolean(data.artifactsMore) },
+        { key: 'issues', label: 'Issues', icon: 'exclamation-circle', entries: applyScreeningAndSort((data.issues || []) as LegacyEntity[]), more: Boolean(data.issuesMore) },
+        { key: 'opinions', label: 'Comments', icon: 'comments-o', entries: applyScreeningAndSort((data.opinions || []) as LegacyEntity[]), more: Boolean(data.opinionsMore) },
+      ];
+    },
+    [data, screening, sort],
   );
 
   if (loading) {
@@ -72,13 +103,64 @@ const ProfileContributions: React.FC = () => {
   return (
     <ProfileShell username={username} activeTab="contributions" isOwnProfile={isOwnProfile}>
       <div style={{ marginTop: '15px' }}>
+        <div style={{ marginBottom: '15px' }} className="wt-btn-group">
+          <div className="btn-group" role="group" aria-label="Latest or Popular Filter" style={{ marginBottom: '5px' }}>
+            <button
+              type="button"
+              className={`btn btn-sm ${sort === 'latest' ? 'btn-info' : 'btn-default'}`}
+              onClick={() => {
+                const next = new URLSearchParams(searchParams);
+                next.set('sort', 'latest');
+                setSearchParams(next);
+              }}
+            >
+              Latest
+            </button>
+            <button
+              type="button"
+              className={`btn btn-sm ${sort === 'popular' ? 'btn-info' : 'btn-default'}`}
+              onClick={() => {
+                const next = new URLSearchParams(searchParams);
+                next.set('sort', 'popular');
+                setSearchParams(next);
+              }}
+            >
+              Popular
+            </button>
+          </div>
+          <span>&nbsp;&nbsp;</span>
+          <div className="btn-group" role="group" aria-label="Screening Filter" style={{ marginBottom: '5px' }}>
+            {[
+              { key: 'all', label: 'All', theme: 'success' },
+              { key: 'accepted', label: 'Accepted', theme: 'info' },
+              { key: 'pending', label: 'Pending', theme: 'warning' },
+              { key: 'rejected', label: 'Rejected', theme: 'danger' },
+            ].map((item) => (
+              <button
+                key={item.key}
+                type="button"
+                className={`btn btn-sm btn-${screening === item.key ? item.theme : 'default'}`}
+                onClick={() => {
+                  const next = new URLSearchParams(searchParams);
+                  next.set('screening', item.key);
+                  setSearchParams(next);
+                }}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <ul className="nav nav-tabs wt-tabs" role="tablist">
           <li role="presentation" className={tab === 'all' ? 'active' : ''}>
             <a
               href="#all"
               onClick={(event) => {
                 event.preventDefault();
-                setSearchParams({});
+                const next = new URLSearchParams(searchParams);
+                next.set('tab', 'all');
+                setSearchParams(next);
               }}
             >
               <i className="fa fa-globe" aria-hidden="true"></i> All
@@ -90,7 +172,9 @@ const ProfileContributions: React.FC = () => {
                 href={`#${section.key}`}
                 onClick={(event) => {
                   event.preventDefault();
-                  setSearchParams({ tab: section.key });
+                  const next = new URLSearchParams(searchParams);
+                  next.set('tab', section.key);
+                  setSearchParams(next);
                 }}
               >
                 {section.label}
@@ -99,7 +183,7 @@ const ProfileContributions: React.FC = () => {
           ))}
         </ul>
 
-        {!data.results && <Alert type="warning">No contributions found.</Alert>}
+        {!data.results && <p style={{ fontWeight: 'normal' }} className="text-muted-x">No contributions found</p>}
 
         {sections
           .filter((section) => tab === 'all' || tab === section.key)
@@ -109,6 +193,9 @@ const ProfileContributions: React.FC = () => {
                 <p className="text-muted">No {section.label.toLowerCase()} yet.</p>
               ) : (
                 <>
+                  <h3 className="page-header-x text-muted-0">
+                    <i className={`fa fa-${section.icon}`}></i> {section.label}
+                  </h3>
                   <ul className="list-group wt-list">
                     {section.key === 'topics' &&
                       section.entries.map((entry) => (
@@ -147,7 +234,11 @@ const ProfileContributions: React.FC = () => {
                     <button
                       type="button"
                       className="btn btn-default btn-sm"
-                      onClick={() => setSearchParams({ tab: section.key })}
+                      onClick={() => {
+                        const next = new URLSearchParams(searchParams);
+                        next.set('tab', section.key);
+                        setSearchParams(next);
+                      }}
                     >
                       <i className="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more
                     </button>

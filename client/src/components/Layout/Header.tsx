@@ -81,7 +81,7 @@ const Header: React.FC = () => {
           <nav aria-label="Primary navigation">
             <ul className="nav navbar-nav">
               <li>
-                <Link to="/topics" title="Explore" aria-label="Explore topics">
+                <Link to="/explore" title="Explore" aria-label="Explore topics">
                   <i className="fa fa-globe"></i>
                   <span className="hidden-xs"> Explore</span>
                 </Link>

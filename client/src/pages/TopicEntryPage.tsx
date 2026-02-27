@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import apiService from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -17,55 +17,59 @@ import type { TopicEntryResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
 import type { Argument, Artifact, Issue, Opinion, Question, Topic } from '../types';
 
+const CONTENT_COLLAPSE_THRESHOLD = 1200;
+
+function getCount(value: unknown): number {
+  return typeof value === 'number' && Number.isFinite(value) ? value : 0;
+}
+
 const TopicEntryPage: React.FC = () => {
   const { id } = useParams();
   const [data, setData] = useState<TopicEntryResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showFullContent, setShowFullContent] = useState(false);
 
   useEffect(() => {
-    fetchTopicEntry();
+    const fetchTopicEntry = async () => {
+      if (!id) {
+        setError('Topic id is required');
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const result = await apiService.getTopicEntry(id);
+        setData(result);
+      } catch (err) {
+        console.error('Error fetching topic entry:', err);
+        setError('Failed to load topic');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void fetchTopicEntry();
   }, [id]);
 
-  const fetchTopicEntry = async () => {
-    if (!id) return;
-    
-    try {
-      setLoading(true);
-      const result = await apiService.getTopicEntry(id);
-      setData(result);
-      setLoading(false);
-    } catch (err) {
-      console.error('Error fetching topic entry:', err);
-      setError('Failed to load topic');
-      setLoading(false);
-    }
-  };
+  const topic = (data?.topic || {}) as LegacyEntity;
+  const topics = ((data?.topics || data?.topicChildren || []) as LegacyEntity[]).slice(0, 6);
+  const siblingTopics = ((data?.topicSiblings || []) as LegacyEntity[]).slice(0, 6);
+  const args = (data?.arguments || []) as LegacyEntity[];
+  const questions = (data?.questions || []) as LegacyEntity[];
+  const artifacts = (data?.artifacts || []) as LegacyEntity[];
+  const issues = (data?.issues || []) as LegacyEntity[];
+  const opinions = (data?.opinions || []) as LegacyEntity[];
+  const topicLinks = (data?.topicLinks || []) as LegacyEntity[];
+  const categories = (data?.categories || []) as LegacyEntity[];
 
-  if (loading) {
-    return <LoadingSpinner message="Loading topic..." />;
-  }
-
-  if (error || !data?.topic) {
-    return <Alert type="danger">{error || 'Topic not found'}</Alert>;
-  }
-
-  const topic = data.topic as LegacyEntity;
-  const topics = (data.topics || []) as LegacyEntity[];
-  const args = (data.arguments || []) as LegacyEntity[];
-  const questions = (data.questions || []) as LegacyEntity[];
-  const artifacts = (data.artifacts || []) as LegacyEntity[];
-  const issues = (data.issues || []) as LegacyEntity[];
-  const opinions = (data.opinions || []) as LegacyEntity[];
-  
-  // Build breadcrumb items
   const breadcrumbItems = [
     { title: 'Home', url: '/' },
     { title: 'Topics', url: '/topics' },
     { title: topic.title, active: true }
   ];
 
-  // Build tabs for the topic entry
   const tabs = [
     { id: 'overview', title: 'Overview', url: `/topics/entry/${topic.friendlyUrl}/${topic._id}` },
     {
@@ -76,41 +80,174 @@ const TopicEntryPage: React.FC = () => {
     }
   ];
 
+  const content = String(topic.content || topic.description || '');
+  const showSeeMore = content.length > CONTENT_COLLAPSE_THRESHOLD;
+  const contentStyle = showSeeMore && !showFullContent
+    ? { maxHeight: '450px', overflow: 'hidden', position: 'relative' as const }
+    : undefined;
+
+  const topicStats = useMemo(() => {
+    const children = topic?.childrenCount || {};
+    return [
+      {
+        key: 'topics',
+        label: 'Topics',
+        icon: 'folder-open',
+        count: getCount(children.topics?.accepted) || topics.length,
+        to: `/topics/${topic.friendlyUrl || ''}/${topic._id || ''}`,
+      },
+      {
+        key: 'arguments',
+        label: 'Facts',
+        icon: 'flash',
+        count: getCount(children.arguments?.accepted) || args.length,
+        to: `/arguments?topic=${encodeURIComponent(String(topic._id || ''))}`,
+      },
+      {
+        key: 'questions',
+        label: 'Questions',
+        icon: 'question-circle',
+        count: getCount(children.questions?.accepted) || questions.length,
+        to: `/questions?topic=${encodeURIComponent(String(topic._id || ''))}`,
+      },
+      {
+        key: 'issues',
+        label: 'Issues',
+        icon: 'exclamation-circle',
+        count: getCount(children.issues?.accepted) || issues.length,
+        to: `/issues?topic=${encodeURIComponent(String(topic._id || ''))}`,
+      },
+      {
+        key: 'opinions',
+        label: 'Comments',
+        icon: 'comments-o',
+        count: getCount(children.opinions?.accepted) || opinions.length,
+        to: `/opinions?topic=${encodeURIComponent(String(topic._id || ''))}`,
+      },
+      {
+        key: 'artifacts',
+        label: 'Artifacts',
+        icon: 'paperclip',
+        count: getCount(children.artifacts?.accepted) || artifacts.length,
+        to: `/artifacts?topic=${encodeURIComponent(String(topic._id || ''))}`,
+      },
+    ];
+  }, [args.length, artifacts.length, issues.length, opinions.length, questions.length, topic._id, topic.childrenCount, topic.friendlyUrl, topics.length]);
+
+  if (loading) {
+    return <LoadingSpinner message="Loading topic..." />;
+  }
+
+  if (error || !data?.topic) {
+    return <Alert type="danger">{error || 'Topic not found'}</Alert>;
+  }
+
   return (
     <div>
       <Breadcrumb items={breadcrumbItems} />
-      
-      <PageHeader 
+
+      <PageHeader
         title={topic.title}
         subtitle={topic.subtitle}
         icon="folder-open"
         iconColor="text-success-x"
         actions={<EntryActionsMenu entry={topic} editPath={`/topics/create?id=${encodeURIComponent(topic._id)}`} />}
       />
-      
+
       <PageTabs tabs={tabs} />
 
-      {/* Topic content */}
-      <div className="text-body collapsible" style={{ marginTop: '20px' }}>
+      <div className="row" style={{ marginBottom: '10px' }}>
+        {topicStats.map((stat) => (
+          <div key={stat.key} className="col-sm-4 col-md-2" style={{ marginBottom: '12px' }}>
+            <Link to={stat.to} className="no-underline">
+              <div className="well stat" style={{ marginBottom: 0 }}>
+                <div className="stat-value">{stat.count}</div>
+                <div className="stat-label"><i className={`fa fa-${stat.icon}`}></i> {stat.label}</div>
+              </div>
+            </Link>
+          </div>
+        ))}
+      </div>
+
+      <div className="text-body collapsible" style={{ marginTop: '20px', ...contentStyle }}>
         {topic.content ? (
           <div dangerouslySetInnerHTML={{ __html: topic.content }} />
-        ) : topic.description && (
+        ) : topic.description ? (
           <p className="lead">{topic.description}</p>
+        ) : (
+          <p className="text-muted">No content available for this topic yet.</p>
+        )}
+        {showSeeMore && !showFullContent && (
+          <a
+            href="#"
+            onClick={(event) => {
+              event.preventDefault();
+              setShowFullContent(true);
+            }}
+            className="content-see-more"
+          >
+            <div className="content-see-more-gradient"></div>
+            <div className="content-see-more-text">See more</div>
+          </a>
         )}
       </div>
 
-      {/* Related Topics */}
-      {topic.parentTopic && (
-        <div className="wt-related" style={{ marginTop: '20px' }}>
-          <span title="Related Topics">Topics</span>&nbsp;
+      <div className="wt-related" style={{ marginTop: '20px' }}>
+        <span title="Related Topics">Topics</span>&nbsp;
+        {topic.parentTopic && (
           <Link to={`/topics/entry/${topic.parentTopic.friendlyUrl}/${topic.parentTopic._id}`}>
             <span className="wt-label label label-default">{topic.parentTopic.title}</span>
           </Link>
+        )}
+        {topicLinks.map((link) => (
+          <Link key={link._id} to={`/topics/entry/${link.friendlyUrl}/${link._id}`}>
+            <span className="wt-label label label-default">{link.title}</span>
+          </Link>
+        ))}
+        {!topic.parentTopic && topicLinks.length === 0 && <span className="text-muted">No linked topics</span>}
+      </div>
+
+      {(topics.length > 0 || siblingTopics.length > 0 || categories.length > 0) && (
+        <div className="panel panel-default" style={{ marginTop: '20px' }}>
+          <div className="panel-heading">
+            <h3 className="panel-title">Branch Context</h3>
+          </div>
+          <div className="panel-body">
+            {categories.length > 0 && (
+              <div style={{ marginBottom: '10px' }}>
+                <strong>Peer Categories:</strong>{' '}
+                {categories.map((item) => (
+                  <Link key={item._id} to={`/topics/entry/${item.friendlyUrl}/${item._id}`} className="wt-label label label-default" style={{ marginRight: '4px' }}>
+                    {item.title}
+                  </Link>
+                ))}
+              </div>
+            )}
+            {topics.length > 0 && (
+              <div style={{ marginBottom: '10px' }}>
+                <strong>Subtopics:</strong>{' '}
+                {topics.map((item) => (
+                  <Link key={item._id} to={`/topics/entry/${item.friendlyUrl}/${item._id}`} className="wt-label label label-default" style={{ marginRight: '4px' }}>
+                    {item.title}
+                  </Link>
+                ))}
+              </div>
+            )}
+            {siblingTopics.length > 0 && (
+              <div>
+                <strong>Sibling topics:</strong>{' '}
+                {siblingTopics.map((item) => (
+                  <Link key={item._id} to={`/topics/entry/${item.friendlyUrl}/${item._id}`} className="wt-label label label-default" style={{ marginRight: '4px' }}>
+                    {item.title}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
-      {/* Subtopics List */}
-      {topics && topics.length > 0 && (
+      {topics.length > 0 && (
         <EntryList
           title="Topics"
           icon="folder-open"
@@ -124,8 +261,7 @@ const TopicEntryPage: React.FC = () => {
         </EntryList>
       )}
 
-      {/* Arguments List */}
-      {args && args.length > 0 && (
+      {args.length > 0 && (
         <EntryList
           title="Facts"
           icon="flash"
@@ -138,8 +274,7 @@ const TopicEntryPage: React.FC = () => {
         </EntryList>
       )}
 
-      {/* Questions List */}
-      {questions && questions.length > 0 && (
+      {questions.length > 0 && (
         <EntryList
           title="Questions"
           icon="question-circle"
@@ -152,8 +287,7 @@ const TopicEntryPage: React.FC = () => {
         </EntryList>
       )}
 
-      {/* Artifacts List */}
-      {artifacts && artifacts.length > 0 && (
+      {artifacts.length > 0 && (
         <EntryList
           title="Artifacts"
           icon="paperclip"
@@ -170,8 +304,7 @@ const TopicEntryPage: React.FC = () => {
         </EntryList>
       )}
 
-      {/* Issues List */}
-      {issues && issues.length > 0 && (
+      {issues.length > 0 && (
         <EntryList
           title="Issues"
           icon="exclamation-triangle"
@@ -184,8 +317,7 @@ const TopicEntryPage: React.FC = () => {
         </EntryList>
       )}
 
-      {/* Opinions List */}
-      {opinions && opinions.length > 0 && (
+      {opinions.length > 0 && (
         <EntryList
           title="Comments"
           icon="comment"
@@ -198,7 +330,6 @@ const TopicEntryPage: React.FC = () => {
         </EntryList>
       )}
 
-      {/* Footer meta information */}
       <div className="wt-entry-meta" style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid #eee' }}>
         {topic.editorUsername && (
           <p className="text-muted">

@@ -21,6 +21,11 @@ export interface LegacyEntity {
   editorUsername: string;
   username: string;
   email: string;
+  points?: number;
+  screening?: {
+    status?: number;
+    history?: unknown[];
+  };
   createUserId: string;
   roleType: number;
   file: {

@@ -12,7 +12,6 @@ const ContributorsPage: React.FC = () => {
   return (
     <MemberDirectoryPage
       title="Contributors"
-      subtitle="Community members with public profiles"
       tab="contributors"
       fetchMembers={fetchMembers}
     />

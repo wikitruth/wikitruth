@@ -6,7 +6,7 @@ import { User } from '../../../types';
 
 interface MemberDirectoryPageProps {
   title: string;
-  subtitle: string;
+  subtitle?: string;
   tab: 'contributors' | 'screeners' | 'reviewers' | 'administrators';
   fetchMembers: () => Promise<User[]>;
 }

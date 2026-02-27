@@ -85,6 +85,11 @@
   padding: 0;
 }
 
+.page-header.wt-header.wt-profile-header {
+  background-image: linear-gradient(-110deg, #48227d 0%, #2f569c 100%);
+  color: #fff;
+}
+
 @media (max-width: 991px) {
   .wt-entry-header .pull-left,
   .wt-entry-header .pull-right {

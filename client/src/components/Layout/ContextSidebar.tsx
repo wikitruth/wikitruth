@@ -38,9 +38,22 @@ const ContextSidebar: React.FC = () => {
   const appSection: NavSection = {
     title: 'Apps',
     items: [
-      { label: 'Explore', to: '/topics', icon: 'globe' },
+      { label: 'Explore', to: '/explore', icon: 'globe' },
       { label: 'Search', to: '/search', icon: 'search' },
       { label: 'Visualize', to: '/visualize', icon: 'snowflake-o' },
+    ],
+  };
+
+  const browseSection: NavSection = {
+    title: 'Browse',
+    items: [
+      { label: 'Topics', to: '/topics', icon: 'folder-open' },
+      { label: 'Facts', to: '/arguments', icon: 'flash' },
+      { label: 'Questions', to: '/questions', icon: 'question-circle' },
+      { label: 'Answers', to: '/answers', icon: 'check-circle' },
+      { label: 'Artifacts', to: '/artifacts', icon: 'puzzle-piece' },
+      { label: 'Issues', to: '/issues', icon: 'exclamation-circle' },
+      { label: 'Comments', to: '/opinions', icon: 'comments-o' },
     ],
   };
 
@@ -115,8 +128,21 @@ const ContextSidebar: React.FC = () => {
     relatedItems.push({ label: 'Related Issues', to: `/issues?topic=${encodeURIComponent(entryId)}`, icon: 'exclamation-circle' });
     relatedItems.push({ label: 'Related Comments', to: `/opinions?topic=${encodeURIComponent(entryId)}`, icon: 'comments-o' });
   }
+  if (section === 'arguments' && entryId) {
+    relatedItems.push({ label: 'Linked Questions', to: `/questions?topic=${encodeURIComponent(entryId)}`, icon: 'question-circle' });
+    relatedItems.push({ label: 'Linked Issues', to: `/issues?topic=${encodeURIComponent(entryId)}`, icon: 'exclamation-circle' });
+    relatedItems.push({ label: 'Linked Comments', to: `/opinions?topic=${encodeURIComponent(entryId)}`, icon: 'comments-o' });
+  }
   if (section === 'questions' && entryId) {
     relatedItems.push({ label: 'Answers', to: `/answers?question=${encodeURIComponent(entryId)}`, icon: 'check-circle' });
+    relatedItems.push({ label: 'Issues', to: `/issues?topic=${encodeURIComponent(entryId)}`, icon: 'exclamation-circle' });
+    relatedItems.push({ label: 'Comments', to: `/opinions?topic=${encodeURIComponent(entryId)}`, icon: 'comments-o' });
+  }
+  if (section === 'artifacts' && entryId) {
+    relatedItems.push({ label: 'Related Facts', to: `/arguments?topic=${encodeURIComponent(entryId)}`, icon: 'flash' });
+    relatedItems.push({ label: 'Related Questions', to: `/questions?topic=${encodeURIComponent(entryId)}`, icon: 'question-circle' });
+    relatedItems.push({ label: 'Related Issues', to: `/issues?topic=${encodeURIComponent(entryId)}`, icon: 'exclamation-circle' });
+    relatedItems.push({ label: 'Related Comments', to: `/opinions?topic=${encodeURIComponent(entryId)}`, icon: 'comments-o' });
   }
 
   const personalSection: NavSection | null = user
@@ -130,7 +156,7 @@ const ContextSidebar: React.FC = () => {
       }
     : null;
 
-  const sections: NavSection[] = [appSection];
+  const sections: NavSection[] = [appSection, browseSection];
   if (sectionItemsByRoot[section]) {
     sections.push(sectionItemsByRoot[section]);
   }

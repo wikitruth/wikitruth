@@ -87,6 +87,7 @@ export interface AppRoute {
 
 export const appRoutes: AppRoute[] = [
   { path: '/', element: <HomePage /> },
+  { path: '/explore', element: <TopicsPage /> },
   { path: '/login', element: <LoginPage /> },
   { path: '/signup', element: <SignupPage /> },
   { path: '/forgot-password', element: <ForgotPasswordPage /> },

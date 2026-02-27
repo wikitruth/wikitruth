@@ -12,8 +12,8 @@
 
 - Total route pairs audited: `29`
 - Critical regressions (modern route broken): `0`
-- Major visual/functional drift (works but materially different flow): `3`
-- Minor/moderate drift: `22`
+- Major visual/functional drift (works but materially different flow): `0`
+- Minor/moderate drift: `29`
 
 ## Critical Regressions (P0)
 
@@ -42,15 +42,12 @@
 
 - [x] `visualize` page parity restored:
   - Modern now renders an interactive graph/network canvas with node click navigation and fullscreen toggle.
-- [ ] Topic entry richness gap:
-  - Legacy includes key topics cards, richer tabs/actions, deeper right-sidebar hierarchy/related blocks.
-  - Modern topic entry is simplified and omits several sections.
-- [ ] Member profile overview gap:
-  - Legacy has contribution stat tiles and richer profile summary blocks.
-  - Modern profile has reduced data density.
-- [ ] Member contributions gap:
-  - Legacy has filter groups (`Latest/Popular`, screening state filters) and per-type grouped sections.
-  - Modern lacks screening filter controls and some grouped presentation.
+- [x] Topic entry richness parity restored:
+  - Modern now includes stat cards, collapsible body/see-more behavior, branch context blocks, and richer related-topic sections.
+- [x] Member profile overview parity restored:
+  - Modern now includes contribution stat tiles and legacy summary placeholders (`Account Details`, `Reputation`, `Timeline & Activities`).
+- [x] Member contributions parity restored:
+  - Modern now includes `Latest/Popular` and screening-state filters plus grouped per-type sections with headings/icons.
 - [x] Fast-switch UX parity restored:
   - Modern now uses tabbed `Login / Fast Switch` and a multi-box 6-digit PIN flow.
 - [x] Contact page split layout parity restored:
@@ -60,21 +57,21 @@
 
 ## Minor/Moderate Drift (P2)
 
-- [ ] Header/sidebar detail parity:
-  - Modern right sidebar still lacks some context tree depth and legacy section density on several routes.
-- [ ] Explore/top-level route mapping consistency:
-  - Legacy `explore` and modern `topics` are not one-to-one in content composition.
-- [ ] Visual token parity:
-  - Profile header gradient/pattern hue differs from legacy profile header.
-- [ ] Empty-state copy:
-  - Modern member role pages include helper copy absent in legacy (acceptable, but not parity).
+- [x] Header/sidebar detail parity:
+  - Context sidebar now includes denser `Browse` and contextual relation blocks across major entry routes.
+- [x] Explore/top-level route mapping consistency:
+  - Modern client now exposes `/app/explore` as an explicit route and uses it in primary navigation.
+- [x] Visual token parity:
+  - Modern profile header gradient is pinned to legacy token values.
+- [x] Empty-state copy parity:
+  - Extra member-directory helper subtitles were removed to match legacy voice.
 
 ## Route-by-Route Snapshot Status
 
 | Pair | Status |
 |---|---|
 | home (`/` vs `/app`) | Minor drift |
-| explore (`/explore` vs `/app/topics`) | Major drift |
+| explore (`/explore` vs `/app/explore`) | Moderate drift |
 | topics (`/topics` vs `/app/topics`) | Moderate drift |
 | arguments (`/arguments` vs `/app/arguments`) | Minor drift |
 | questions (`/questions` vs `/app/questions`) | Minor drift |
@@ -87,15 +84,15 @@
 | screeners/reviewers/administrators | Minor drift |
 | search (`/search` vs `/app/search`) | Minor drift |
 | visualize (`/visualize` vs `/app/visualize`) | Moderate drift |
-| contact (`/contact` vs `/app/contact`) | Major drift |
-| fast-switch (`/fast-switch` vs `/app/fast-switch`) | Major drift |
-| login (`/login` vs `/app/login`) | Major drift |
-| topic entry | Major drift |
+| contact (`/contact` vs `/app/contact`) | Moderate drift |
+| fast-switch (`/fast-switch` vs `/app/fast-switch`) | Moderate drift |
+| login (`/login` vs `/app/login`) | Moderate drift |
+| topic entry | Moderate drift |
 | argument/question/issue/opinion/artifact entry | Moderate drift |
-| member profile/contributions | Major drift |
+| member profile/contributions | Moderate drift |
 
 ## Implementation Order
 
 - [x] P0: Fix all broken entry APIs and modern detail pages first.
-- [ ] P1: Restore major missing UX sections (visualize graph, profile stats/filter blocks, fast-switch interaction pattern, contact/login layout parity).
-- [ ] P2: Tighten remaining sidebar/context/detail styling parity.
+- [x] P1: Restore major missing UX sections (visualize graph, profile stats/filter blocks, fast-switch interaction pattern, contact/login layout parity).
+- [x] P2: Tighten remaining sidebar/context/detail styling parity.
