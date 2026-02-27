@@ -12,7 +12,7 @@
 
 - Total route pairs audited: `29`
 - Critical regressions (modern route broken): `0`
-- Major visual/functional drift (works but materially different flow): `4`
+- Major visual/functional drift (works but materially different flow): `3`
 - Minor/moderate drift: `22`
 
 ## Critical Regressions (P0)
@@ -40,9 +40,8 @@
 
 ## Major Drift (P1)
 
-- [ ] `visualize` page:
-  - Legacy shows interactive graph/network canvas.
-  - Modern shows KPI cards/list only; graph interaction missing.
+- [x] `visualize` page parity restored:
+  - Modern now renders an interactive graph/network canvas with node click navigation and fullscreen toggle.
 - [ ] Topic entry richness gap:
   - Legacy includes key topics cards, richer tabs/actions, deeper right-sidebar hierarchy/related blocks.
   - Modern topic entry is simplified and omits several sections.
@@ -87,7 +86,7 @@
 | members (`/members` vs `/app/members`) | Minor drift |
 | screeners/reviewers/administrators | Minor drift |
 | search (`/search` vs `/app/search`) | Minor drift |
-| visualize (`/visualize` vs `/app/visualize`) | Major drift |
+| visualize (`/visualize` vs `/app/visualize`) | Moderate drift |
 | contact (`/contact` vs `/app/contact`) | Major drift |
 | fast-switch (`/fast-switch` vs `/app/fast-switch`) | Major drift |
 | login (`/login` vs `/app/login`) | Major drift |

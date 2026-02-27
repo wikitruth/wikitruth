@@ -55,6 +55,36 @@
   display: block;
 }
 
+.vis-container {
+  position: relative;
+}
+
+.vis-container.fullscreen {
+  z-index: 10000;
+  position: fixed;
+  inset: 0;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.98);
+  overflow: auto;
+}
+
+.wt-viz-btn-cont {
+  position: absolute;
+  z-index: 100;
+}
+
+.wt-viz-btn-cont .wt-viz-btn {
+  background-color: #00b0b9;
+  padding: 3px 5px;
+  border-radius: 3px;
+  margin: 5px;
+  display: inline-block;
+}
+
+.wt-viz-btn-cont .wt-viz-btn .btn.btn-link {
+  padding: 0;
+}
+
 @media (max-width: 991px) {
   .wt-entry-header .pull-left,
   .wt-entry-header .pull-right {
