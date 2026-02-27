@@ -11,8 +11,14 @@ const App: React.FC = () => {
     return null;
   }
 
+  const resolvedBasePath =
+    typeof window !== 'undefined' &&
+    (window.location.pathname === APP_BASE_PATH || window.location.pathname.startsWith(`${APP_BASE_PATH}/`))
+      ? APP_BASE_PATH
+      : '';
+
   return (
-    <Router basename={APP_BASE_PATH}>
+    <Router basename={resolvedBasePath}>
       <MainLayout>
         <Suspense fallback={<LoadingSpinner />}>
           <Routes>
