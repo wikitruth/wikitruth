@@ -65,14 +65,26 @@ const LoginPage: React.FC = () => {
   });
 
   return (
-    <div className="container" style={{ maxWidth: '450px', marginTop: '80px' }}>
-      <div className="panel panel-default">
-        <div className="panel-heading">
-          <h3 className="panel-title text-center">
-            <i className="fa fa-sign-in"></i> Sign In to Wikitruth
-          </h3>
-        </div>
-        <div className="panel-body">
+    <div className="container">
+      <div className="row">
+        <div className="col-sm-6">
+          <div className="page-header1" style={{ marginTop: '40px', marginBottom: '20px' }}>
+            <h1>Sign In</h1>
+          </div>
+          <ul className="nav nav-tabs wt-tabs" role="tablist">
+            <li role="presentation" className="active">
+              <Link to="/login" role="tab">
+                <i className="fa fa-user"></i> Login
+              </Link>
+            </li>
+            <li role="presentation">
+              <Link to="/fast-switch" role="tab">
+                <i className="fa fa-undo"></i> Fast Switch
+              </Link>
+            </li>
+          </ul>
+          <br />
+
           {submitError && (
             <Alert type="danger" dismissible onDismiss={() => setSubmitError(null)}>
               {submitError}
@@ -112,40 +124,34 @@ const LoginPage: React.FC = () => {
               onChange={handleChange}
             />
 
-            <div className="form-group" style={{ marginTop: '20px' }}>
+            <div className="form-actions" style={{ marginTop: '20px' }}>
               <Button
                 type="submit"
                 variant="primary"
-                size="lg"
                 disabled={isSubmitting}
                 icon={isSubmitting ? 'spinner fa-spin' : 'sign-in'}
-                className="btn-block"
               >
                 {isSubmitting ? 'Signing In...' : 'Sign In'}
               </Button>
+              <span>&nbsp;</span>
+              <Link to="/forgot-password" className="btn btn-link">
+                Forgot your password?
+              </Link>
             </div>
           </form>
+        </div>
 
-          <hr />
-          <SocialLoginButtons mode="login" />
-
-          <hr />
-
-          <div className="text-center">
-            <p className="text-muted">
-              <Link to="/forgot-password">Forgot your password?</Link>
-            </p>
-            <p className="text-muted">
-              Don't have an account? <Link to="/signup">Sign up here</Link>
-            </p>
+        <div className="col-sm-6">
+          <div style={{ marginTop: '40px' }}>
+            <h3>Or sign in using...</h3>
+            <SocialLoginButtons mode="login" />
+            <hr />
+            <p>Don&apos;t have an account?</p>
+            <Link to="/signup" className="btn btn-primary btn-block">
+              <i className="fa fa-user"></i> Sign Up
+            </Link>
           </div>
         </div>
-      </div>
-
-      <div className="text-center" style={{ marginTop: '20px' }}>
-        <Link to="/" className="btn btn-link">
-          <i className="fa fa-arrow-left"></i> Back to Home
-        </Link>
       </div>
     </div>
   );

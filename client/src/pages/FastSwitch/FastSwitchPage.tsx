@@ -1,15 +1,47 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Alert from '../../components/common/Alert';
 import Button from '../../components/common/Button';
-import Input from '../../components/Form/Input';
 import authApi from '../../services/api/auth';
 
 const FastSwitchPage: React.FC = () => {
   const navigate = useNavigate();
-  const [pin, setPin] = useState('');
+  const [pinDigits, setPinDigits] = useState<string[]>(Array.from({ length: 6 }, () => ''));
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const pinRefs = useRef<Array<HTMLInputElement | null>>([]);
+
+  const pin = pinDigits.join('');
+
+  const updatePinDigit = (index: number, value: string) => {
+    const digit = value.replace(/\D/g, '').slice(-1);
+    const next = [...pinDigits];
+    next[index] = digit;
+    setPinDigits(next);
+
+    if (digit && index < pinRefs.current.length - 1) {
+      pinRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handlePinKeyDown = (index: number, event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Backspace' && !pinDigits[index] && index > 0) {
+      pinRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handlePinPaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
+    event.preventDefault();
+    const pasted = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+    if (!pasted) {
+      return;
+    }
+
+    const next = Array.from({ length: 6 }, (_, index) => pasted[index] || '');
+    setPinDigits(next);
+    const nextFocusIndex = Math.min(pasted.length, 5);
+    pinRefs.current[nextFocusIndex]?.focus();
+  };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -33,29 +65,56 @@ const FastSwitchPage: React.FC = () => {
 
   return (
     <div className="container">
-      <h2>Fast Switch</h2>
-      <p className="text-muted">Enter your 6-digit PIN to sign in quickly on this trusted device.</p>
+      <div className="page-header1" style={{ marginTop: '40px', marginBottom: '20px' }}>
+        <h1>Sign In</h1>
+      </div>
+      <ul className="nav nav-tabs wt-tabs" role="tablist">
+        <li role="presentation">
+          <Link to="/login" role="tab">
+            <i className="fa fa-user"></i> Login
+          </Link>
+        </li>
+        <li role="presentation" className="active">
+          <Link to="/fast-switch" role="tab">
+            <i className="fa fa-undo"></i> Fast Switch
+          </Link>
+        </li>
+      </ul>
+      <br />
+      <p><strong>Enter your PIN to continue.</strong></p>
 
       {error && <Alert type="danger">{error}</Alert>}
 
-      <div className="panel panel-default">
-        <div className="panel-body">
-          <form onSubmit={handleSubmit}>
-            <Input
-              name="pin"
-              type="password"
-              label="PIN"
-              value={pin}
-              onChange={(event) => setPin(event.target.value.replace(/\D/g, '').slice(0, 6))}
-              placeholder="Enter 6-digit PIN"
-              required
-            />
-            <Button type="submit" variant="primary" icon={submitting ? 'spinner fa-spin' : 'unlock'} disabled={submitting}>
-              {submitting ? 'Verifying...' : 'Continue'}
-            </Button>
-          </form>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group form-group-lg">
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'nowrap' }}>
+            {pinDigits.map((digit, index) => (
+              <input
+                key={index}
+                ref={(element) => {
+                  pinRefs.current[index] = element;
+                }}
+                type="password"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={1}
+                className="form-control pincode-input-text"
+                aria-label={`PIN digit ${index + 1}`}
+                value={digit}
+                onChange={(event) => updatePinDigit(index, event.target.value)}
+                onKeyDown={(event) => handlePinKeyDown(index, event)}
+                onPaste={handlePinPaste}
+                autoComplete="off"
+              />
+            ))}
+          </div>
         </div>
-      </div>
+        <div style={{ marginTop: '15px' }}>
+          <Button type="submit" variant="primary" icon={submitting ? 'spinner fa-spin' : 'unlock'} disabled={submitting}>
+            {submitting ? 'Verifying...' : 'Continue'}
+          </Button>
+        </div>
+      </form>
 
       <Link to="/login" className="btn btn-default">
         <i className="fa fa-arrow-left"></i> Back to Login

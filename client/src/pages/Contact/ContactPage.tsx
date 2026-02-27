@@ -44,22 +44,47 @@ const ContactPage: React.FC = () => {
 
   return (
     <div className="container">
-      <h2>Contact</h2>
-      <p className="text-muted">Send a question, report, or partnership request.</p>
+      <div className="row">
+        <div className="col-sm-6">
+          <div className="page-header">
+            <h1>Send us your thoughts</h1>
+          </div>
 
-      {error && <Alert type="danger">{error}</Alert>}
-      {status && <Alert type="success">{status}</Alert>}
+          {error && <Alert type="danger">{error}</Alert>}
+          {status && <Alert type="success">{status}</Alert>}
 
-      <div className="panel panel-default">
-        <div className="panel-body">
-          <form onSubmit={handleSubmit}>
-            <Input name="name" label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
-            <Input name="email" label="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-            <TextArea name="message" label="Message" value={message} onChange={(e) => setMessage(e.target.value)} rows={6} required />
-            <Button type="submit" variant="primary" icon={submitting ? 'spinner fa-spin' : 'send'} disabled={submitting}>
-              {submitting ? 'Sending...' : 'Send Message'}
-            </Button>
-          </form>
+          <div className="panel panel-default">
+            <div className="panel-body">
+              <form onSubmit={handleSubmit}>
+                <Input name="name" label="Your Name" value={name} onChange={(e) => setName(e.target.value)} required />
+                <Input name="email" label="Your Email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                <TextArea name="message" label="Message" value={message} onChange={(e) => setMessage(e.target.value)} rows={6} required />
+                <Button type="submit" variant="primary" icon={submitting ? 'spinner fa-spin' : 'send'} disabled={submitting}>
+                  {submitting ? 'Sending...' : 'Send Message'}
+                </Button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div className="col-sm-6 special">
+          <div className="page-header">
+            <h1>Contact Us</h1>
+          </div>
+          <p className="lead">Glad to hear ideas and suggestions from you.</p>
+          <i className="fa fa-reply-all super-awesome"></i>
+          <address>
+            <div>
+              <i className="fa fa-envelope"></i>&nbsp;
+              <a href="mailto:wikitruth.project@gmail.com">wikitruth.project@gmail.com</a>
+            </div>
+            <div>
+              <i className="fa fa-facebook"></i>&nbsp;
+              <a href="https://www.facebook.com/wikitruth.project" target="_blank" rel="noreferrer">
+                wikitruth.project
+              </a>
+            </div>
+          </address>
         </div>
       </div>
     </div>

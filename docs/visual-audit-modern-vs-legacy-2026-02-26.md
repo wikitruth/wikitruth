@@ -12,7 +12,7 @@
 
 - Total route pairs audited: `29`
 - Critical regressions (modern route broken): `0`
-- Major visual/functional drift (works but materially different flow): `7`
+- Major visual/functional drift (works but materially different flow): `4`
 - Minor/moderate drift: `22`
 
 ## Critical Regressions (P0)
@@ -52,15 +52,12 @@
 - [ ] Member contributions gap:
   - Legacy has filter groups (`Latest/Popular`, screening state filters) and per-type grouped sections.
   - Modern lacks screening filter controls and some grouped presentation.
-- [ ] Fast-switch UX mismatch:
-  - Legacy uses multi-box 6-digit PIN input flow.
-  - Modern uses single input and different interaction model.
-- [ ] Contact page layout mismatch:
-  - Legacy includes split layout with right-side visual/contact block.
-  - Modern is single-column form only.
-- [ ] Login page flow/layout mismatch:
-  - Legacy tabbed `Login / Fast Switch` in one screen.
-  - Modern separates flows and uses centered card + social block.
+- [x] Fast-switch UX parity restored:
+  - Modern now uses tabbed `Login / Fast Switch` and a multi-box 6-digit PIN flow.
+- [x] Contact page split layout parity restored:
+  - Modern now mirrors legacy two-column form + right-side contact info panel.
+- [x] Login page flow/layout parity restored:
+  - Modern now uses legacy-style `Login / Fast Switch` tabs and side-by-side social/CTA block.
 
 ## Minor/Moderate Drift (P2)
 
