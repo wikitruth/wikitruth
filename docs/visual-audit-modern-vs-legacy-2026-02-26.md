@@ -11,32 +11,32 @@
 ## Summary
 
 - Total route pairs audited: `29`
-- Critical regressions (modern route broken): `5`
+- Critical regressions (modern route broken): `0`
 - Major visual/functional drift (works but materially different flow): `7`
-- Minor/moderate drift: `17`
+- Minor/moderate drift: `22`
 
 ## Critical Regressions (P0)
 
-- [ ] `arguments` entry broken:
+- [x] `arguments` entry restored:
   - Legacy: `/argument/the-fda-has-received-many-anecdotal-reports-of-adverse-reactions-to-foods-containing-msg/5a4df5791271ae80f6009554`
   - Modern: `/app/arguments/entry/the-fda-has-received-many-anecdotal-reports-of-adverse-reactions-to-foods-containing-msg/5a4df5791271ae80f6009554`
-  - API: `GET /api/arguments/entry/5a4df5791271ae80f6009554` returns `500`.
-- [ ] `questions` entry broken:
+  - API: `GET /api/arguments/entry/5a4df5791271ae80f6009554` now returns `200` (verified `2026-02-27`).
+- [x] `questions` entry restored:
   - Legacy: `/question/accepted-question/5896a1f7ad8ebac0293812ca`
   - Modern: `/app/questions/entry/accepted-question/5896a1f7ad8ebac0293812ca`
-  - API: `GET /api/questions/entry/5896a1f7ad8ebac0293812ca` returns `500`.
-- [ ] `issues` entry broken:
+  - API: `GET /api/questions/entry/5896a1f7ad8ebac0293812ca` now returns `200` (verified `2026-02-27`).
+- [x] `issues` entry restored:
   - Legacy: `/issue/abc/595e4fcc37c6cc10212e1689`
   - Modern: `/app/issues/entry/abc/595e4fcc37c6cc10212e1689`
-  - API: `GET /api/issues/entry/595e4fcc37c6cc10212e1689` returns `500`.
-- [ ] `opinions` entry broken:
+  - API: `GET /api/issues/entry/595e4fcc37c6cc10212e1689` now returns `200` (verified `2026-02-27`).
+- [x] `opinions` entry restored:
   - Legacy: `/opinion/abc/595e4fd637c6cc10212e168a`
   - Modern: `/app/opinions/entry/abc/595e4fd637c6cc10212e168a`
-  - API: `GET /api/opinions/entry/595e4fd637c6cc10212e168a` returns `500`.
-- [ ] `artifacts` entry broken:
+  - API: `GET /api/opinions/entry/595e4fd637c6cc10212e168a` now returns `200` (verified `2026-02-27`).
+- [x] `artifacts` entry restored:
   - Legacy: `/artifact/sample-artifact/59e467f7ea72bc2893f3f83e`
   - Modern: `/app/artifacts/entry/sample-artifact/59e467f7ea72bc2893f3f83e`
-  - API: `GET /api/artifacts/entry/59e467f7ea72bc2893f3f83e` returns `500` with `flowUtils.setUsername is not a function`.
+  - API: `GET /api/artifacts/entry/59e467f7ea72bc2893f3f83e` now returns `200` (verified `2026-02-27`).
 
 ## Major Drift (P1)
 
@@ -95,11 +95,11 @@
 | fast-switch (`/fast-switch` vs `/app/fast-switch`) | Major drift |
 | login (`/login` vs `/app/login`) | Major drift |
 | topic entry | Major drift |
-| argument/question/issue/opinion/artifact entry | Critical regression |
+| argument/question/issue/opinion/artifact entry | Moderate drift |
 | member profile/contributions | Major drift |
 
 ## Implementation Order
 
-- [ ] P0: Fix all broken entry APIs and modern detail pages first.
+- [x] P0: Fix all broken entry APIs and modern detail pages first.
 - [ ] P1: Restore major missing UX sections (visualize graph, profile stats/filter blocks, fast-switch interaction pattern, contact/login layout parity).
 - [ ] P2: Tighten remaining sidebar/context/detail styling parity.

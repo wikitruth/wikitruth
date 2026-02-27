@@ -484,6 +484,16 @@ async function setEntryParents(items, typeId) {
   }
 }
 
+// Backward-compatible helper for service layers that enrich a single entry.
+// Reuses the same parent resolution path as batch operations.
+// @ts-ignore TS(7006): Parameter 'item' implicitly has an 'any' type.
+async function setEntryParent(item, typeId) {
+  if (!item) {
+    return;
+  }
+  await setEntryParents([item], typeId);
+}
+
 // @ts-ignore TS(7006): Parameter 'items' implicitly has an 'any' type.
 async function setEditorsUsername(items) {
   if (items && items.length > 0) {
@@ -3216,7 +3226,9 @@ module.exports = {
   setEntryModels,
   setGroupModel,
   setEntryParents,
+  setEntryParent,
   setEditorsUsername,
+  setUsername,
   setClipboardModel,
   setupClipboard,
   getClipboard,
