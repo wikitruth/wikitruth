@@ -24,6 +24,17 @@ type GraphEdge = {
   to: string;
 };
 
+type GraphPosition = {
+  x: number;
+  y: number;
+};
+
+type DragState = {
+  nodeId: string;
+  offsetX: number;
+  offsetY: number;
+};
+
 const ROOT_NODE_ID = 'root';
 
 function clamp(value: number, min: number, max: number): number {
@@ -65,7 +76,13 @@ const VisualizePage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const graphContainerRef = useRef<HTMLDivElement | null>(null);
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  const dragMovedRef = useRef(false);
+  const suppressClickRef = useRef(false);
+  const dragResetTimeoutRef = useRef<number | null>(null);
   const [graphSize, setGraphSize] = useState({ width: 960, height: 620 });
+  const [positionOverrides, setPositionOverrides] = useState<Record<string, GraphPosition>>({});
+  const [dragState, setDragState] = useState<DragState | null>(null);
 
   useEffect(() => {
     const fetchVisualizationData = async () => {
@@ -166,7 +183,7 @@ const VisualizePage: React.FC = () => {
     }
   };
 
-  const graph = useMemo(() => {
+  const baseGraph = useMemo(() => {
     const nodes: GraphNode[] = [];
     const edges: GraphEdge[] = [];
     const topicById = new Map<string, GraphNode>();
@@ -235,11 +252,130 @@ const VisualizePage: React.FC = () => {
     return { nodes, edges };
   }, [graphSize.height, graphSize.width, selectedTopicId, topicRelatedEntries, topics]);
 
+  useEffect(() => {
+    const validNodeIds = new Set(baseGraph.nodes.map((node) => node.id));
+    setPositionOverrides((previous) => {
+      let changed = false;
+      const next: Record<string, GraphPosition> = {};
+
+      Object.entries(previous).forEach(([nodeId, position]) => {
+        if (validNodeIds.has(nodeId)) {
+          next[nodeId] = position;
+        } else {
+          changed = true;
+        }
+      });
+
+      return changed ? next : previous;
+    });
+  }, [baseGraph.nodes]);
+
+  useEffect(() => {
+    return () => {
+      if (dragResetTimeoutRef.current !== null) {
+        window.clearTimeout(dragResetTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const graph = useMemo(() => {
+    return {
+      edges: baseGraph.edges,
+      nodes: baseGraph.nodes.map((node) => {
+        const override = positionOverrides[node.id];
+        if (!override) {
+          return node;
+        }
+        return {
+          ...node,
+          x: override.x,
+          y: override.y,
+        };
+      }),
+    };
+  }, [baseGraph.edges, baseGraph.nodes, positionOverrides]);
+
   const nodeById = useMemo(() => {
     const map = new Map<string, GraphNode>();
     graph.nodes.forEach((node) => map.set(node.id, node));
     return map;
   }, [graph.nodes]);
+
+  const getPointerPosition = (clientX: number, clientY: number): GraphPosition | null => {
+    const svg = svgRef.current;
+    if (!svg) {
+      return null;
+    }
+    const rect = svg.getBoundingClientRect();
+    if (rect.width === 0 || rect.height === 0) {
+      return null;
+    }
+    return {
+      x: clientX - rect.left,
+      y: clientY - rect.top,
+    };
+  };
+
+  const handleNodePointerDown = (event: React.PointerEvent<SVGGElement>, node: GraphNode) => {
+    if (event.button !== 0) {
+      return;
+    }
+    const pointer = getPointerPosition(event.clientX, event.clientY);
+    if (!pointer) {
+      return;
+    }
+
+    setDragState({
+      nodeId: node.id,
+      offsetX: pointer.x - node.x,
+      offsetY: pointer.y - node.y,
+    });
+    dragMovedRef.current = false;
+    event.currentTarget.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  };
+
+  const handleGraphPointerMove = (event: React.PointerEvent<SVGSVGElement>) => {
+    if (!dragState) {
+      return;
+    }
+
+    const pointer = getPointerPosition(event.clientX, event.clientY);
+    if (!pointer) {
+      return;
+    }
+
+    const nextX = clamp(pointer.x - dragState.offsetX, 18, graphSize.width - 18);
+    const nextY = clamp(pointer.y - dragState.offsetY, 18, graphSize.height - 18);
+
+    setPositionOverrides((previous) => ({
+      ...previous,
+      [dragState.nodeId]: {
+        x: nextX,
+        y: nextY,
+      },
+    }));
+
+    dragMovedRef.current = true;
+  };
+
+  const handleGraphPointerUp = () => {
+    if (!dragState) {
+      return;
+    }
+
+    setDragState(null);
+
+    if (dragMovedRef.current) {
+      suppressClickRef.current = true;
+      if (dragResetTimeoutRef.current !== null) {
+        window.clearTimeout(dragResetTimeoutRef.current);
+      }
+      dragResetTimeoutRef.current = window.setTimeout(() => {
+        suppressClickRef.current = false;
+      }, 120);
+    }
+  };
 
   if (loading) {
     return <LoadingSpinner message="Loading visualization..." />;
@@ -329,7 +465,17 @@ const VisualizePage: React.FC = () => {
             overflow: 'hidden',
           }}
         >
-          <svg width={graphSize.width} height={graphSize.height} role="img" aria-label="Knowledge graph">
+          <svg
+            ref={svgRef}
+            width={graphSize.width}
+            height={graphSize.height}
+            role="img"
+            aria-label="Knowledge graph"
+            onPointerMove={handleGraphPointerMove}
+            onPointerUp={handleGraphPointerUp}
+            onPointerLeave={handleGraphPointerUp}
+            style={{ touchAction: 'none' }}
+          >
             {graph.edges.map((edge) => {
               const source = nodeById.get(edge.from);
               const target = nodeById.get(edge.to);
@@ -352,7 +498,11 @@ const VisualizePage: React.FC = () => {
             {graph.nodes.map((node) => (
               <g
                 key={node.id}
+                onPointerDown={(event) => handleNodePointerDown(event, node)}
                 onClick={() => {
+                  if (suppressClickRef.current) {
+                    return;
+                  }
                   if (node.type === 'topic') {
                     setSelectedTopicId(node.id);
                   } else if (node.type === 'entry' && node.url) {
@@ -362,11 +512,21 @@ const VisualizePage: React.FC = () => {
                   }
                 }}
                 onDoubleClick={() => {
+                  if (suppressClickRef.current) {
+                    return;
+                  }
                   if (node.type === 'entry' && node.url) {
                     navigate(node.url);
                   }
                 }}
-                style={{ cursor: node.type === 'entry' || node.type === 'topic' ? 'pointer' : 'default' }}
+                style={{
+                  cursor:
+                    dragState?.nodeId === node.id
+                      ? 'grabbing'
+                      : node.type === 'entry' || node.type === 'topic'
+                        ? 'grab'
+                        : 'default',
+                }}
               >
                 <circle cx={node.x} cy={node.y} r={node.size} fill={node.color} stroke="#fff" strokeWidth={2} />
                 <text
