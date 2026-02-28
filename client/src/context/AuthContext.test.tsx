@@ -2,6 +2,17 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { AuthProvider, useAuth } from './AuthContext';
 import { render, screen, waitFor } from '../test-utils/render';
+import authApi from '../services/api/auth';
+
+jest.mock('../services/api/auth', () => ({
+  __esModule: true,
+  default: {
+    me: jest.fn(),
+    login: jest.fn(),
+    signup: jest.fn(),
+    logout: jest.fn(),
+  },
+}));
 
 const TestComponent: React.FC = () => {
   const { user, isLoading, login, logout } = useAuth();
@@ -20,23 +31,28 @@ const TestComponent: React.FC = () => {
 };
 
 describe('AuthContext', () => {
-  const originalFetch = globalThis.fetch;
+  const authApiMock = authApi as jest.Mocked<typeof authApi>;
+  let consoleErrorSpy: jest.SpyInstance;
+
+  beforeEach(() => {
+    consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+  });
 
   afterEach(() => {
-    globalThis.fetch = originalFetch;
     jest.restoreAllMocks();
+    authApiMock.me.mockReset();
+    authApiMock.login.mockReset();
+    authApiMock.signup.mockReset();
+    authApiMock.logout.mockReset();
+    consoleErrorSpy.mockRestore();
   });
 
   it('loads auth status and supports login/logout', async () => {
     const user = userEvent.setup();
 
-    const fetchMock = jest
-      .fn()
-      .mockResolvedValueOnce({ ok: false, json: async () => ({}) })
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ user: { _id: '1', username: 'demo' } }) })
-      .mockResolvedValueOnce({ ok: true, json: async () => ({}) });
-
-    globalThis.fetch = fetchMock as unknown as typeof fetch;
+    authApiMock.me.mockRejectedValueOnce(new Error('Not authenticated'));
+    authApiMock.login.mockResolvedValueOnce({ user: { _id: '1', username: 'demo' } as any });
+    authApiMock.logout.mockResolvedValueOnce({} as any);
 
     render(
       <AuthProvider>
@@ -51,5 +67,9 @@ describe('AuthContext', () => {
 
     await user.click(screen.getByRole('button', { name: /logout/i }));
     await waitFor(() => expect(screen.getByText('guest')).toBeInTheDocument());
+
+    expect(authApiMock.me).toHaveBeenCalledTimes(1);
+    expect(authApiMock.login).toHaveBeenCalledWith({ username: 'demo', password: 'secret12' });
+    expect(authApiMock.logout).toHaveBeenCalledTimes(1);
   });
 });

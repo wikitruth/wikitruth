@@ -18,7 +18,7 @@ Verification:
 - Route test coverage for both diary paths.
 - API tests for owner/non-owner access, private-profile behavior, and tab filters.
 
-- [ ] P0.2 Unify auth client calls through CSRF-safe API layer
+- [x] P0.2 Unify auth client calls through CSRF-safe API layer
 Acceptance criteria:
 - Replace direct `fetch` calls in `AuthContext` with `authApi` methods (or shared client with CSRF token injection).
 - Ensure login/signup/logout/forgot/reset/verification flows all include CSRF where required.

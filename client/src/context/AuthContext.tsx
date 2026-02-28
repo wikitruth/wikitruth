@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User } from '../types';
+import authApi from '../services/api/auth';
 
 interface AuthContextType {
   user: User | null;
@@ -28,15 +29,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const checkAuthStatus = async () => {
     try {
-      // Check session/token to see if user is logged in
-      const response = await fetch('/api/auth/me', {
-        credentials: 'include',
-      });
-      
-      if (response.ok) {
-        const userData = await response.json();
-        setUser(userData.user);
-      }
+      const response = await authApi.me();
+      setUser(response.user || null);
     } catch (error) {
       console.error('Error checking auth status:', error);
     } finally {
@@ -46,22 +40,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (username: string, password: string) => {
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Login failed');
-      }
-
-      const data = await response.json();
-      setUser(data.user);
+      const data = await authApi.login({ username, password });
+      setUser(data.user || null);
     } catch (error) {
       console.error('Login error:', error);
       throw error;
@@ -70,22 +50,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signup = async (username: string, email: string, password: string) => {
     try {
-      const response = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, email, password }),
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Signup failed');
-      }
-
-      const data = await response.json();
-      setUser(data.user);
+      const data = await authApi.signup({ username, email, password });
+      setUser(data.user || null);
     } catch (error) {
       console.error('Signup error:', error);
       throw error;
@@ -94,10 +60,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = async () => {
     try {
-      await fetch('/api/auth/logout', {
-        method: 'POST',
-        credentials: 'include',
-      });
+      await authApi.logout();
       setUser(null);
     } catch (error) {
       console.error('Logout error:', error);
