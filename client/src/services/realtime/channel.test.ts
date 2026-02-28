@@ -33,6 +33,7 @@ describe('realtime channel service', () => {
   const originalEventSource = window.EventSource;
 
   beforeEach(() => {
+    jest.useFakeTimers();
     MockEventSource.instances = [];
     Object.defineProperty(window, 'EventSource', {
       value: MockEventSource,
@@ -42,6 +43,8 @@ describe('realtime channel service', () => {
   });
 
   afterEach(() => {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
     Object.defineProperty(window, 'EventSource', {
       value: originalEventSource,
       writable: true,
@@ -53,12 +56,17 @@ describe('realtime channel service', () => {
     const onOpen = jest.fn();
     const onEvent = jest.fn();
     const onError = jest.fn();
+    const onReconnectAttempt = jest.fn();
+    const onStateChange = jest.fn();
 
     const channel = createRealtimeChannel({
       url: '/api/realtime/events',
+      reconnectDelayMs: 50,
       onOpen,
       onEvent,
       onError,
+      onReconnectAttempt,
+      onStateChange,
     });
 
     channel.connect();
@@ -79,10 +87,16 @@ describe('realtime channel service', () => {
       expect.objectContaining({ type: 'heartbeat', timestamp: '2026-02-24T00:00:00.000Z' })
     );
     expect(onError).toHaveBeenCalledTimes(1);
+    expect(onReconnectAttempt).toHaveBeenCalledWith(1, 250);
+
+    jest.advanceTimersByTime(250);
+    expect(MockEventSource.instances).toHaveLength(2);
+    expect(onStateChange).toHaveBeenCalledWith('connected');
 
     channel.disconnect();
 
     expect(MockEventSource.instances[0]?.close).toHaveBeenCalledTimes(1);
+    expect(MockEventSource.instances[1]?.close).toHaveBeenCalledTimes(1);
     expect(channel.isConnected()).toBe(false);
   });
 

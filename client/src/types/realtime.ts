@@ -5,8 +5,14 @@ export interface RealtimeEvent<TData = unknown> {
   data?: TData;
 }
 
+export type RealtimeConnectionState = 'connecting' | 'connected' | 'error' | 'disconnected';
+
 export interface RealtimeChannelOptions {
   url?: string;
+  reconnectDelayMs?: number;
+  maxReconnectDelayMs?: number;
+  onStateChange?: (state: RealtimeConnectionState) => void;
+  onReconnectAttempt?: (attempt: number, delayMs: number) => void;
   onOpen?: () => void;
   onError?: (event: Event) => void;
   onEvent?: (event: RealtimeEvent) => void;

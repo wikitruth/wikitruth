@@ -6,6 +6,7 @@ import UsersList from './Users/UsersList';
 import UserDetails from './Users/UserDetails';
 import { render, screen } from '../../test-utils/render';
 import adminApi from '../../services/api/admin';
+import { createRealtimeChannel } from '../../services/realtime';
 
 jest.mock('../../services/api/admin', () => ({
   __esModule: true,
@@ -20,9 +21,19 @@ jest.mock('../../services/api/admin', () => ({
   },
 }));
 
+jest.mock('../../services/realtime', () => ({
+  createRealtimeChannel: jest.fn(() => ({
+    connect: jest.fn(),
+    disconnect: jest.fn(),
+    isConnected: () => true,
+  })),
+}));
+
 const mockedAdminApi = adminApi as jest.Mocked<typeof adminApi>;
+const mockedCreateRealtimeChannel = createRealtimeChannel as jest.MockedFunction<typeof createRealtimeChannel>;
 
 beforeEach(() => {
+  mockedCreateRealtimeChannel.mockClear();
   mockedAdminApi.dashboard.mockResolvedValue({
     counts: { users: 2, accounts: 1, categories: 3, statuses: 1 },
   } as Record<string, unknown>);
@@ -38,6 +49,8 @@ describe('Admin pages', () => {
   it('renders admin dashboard', async () => {
     render(<AdminDashboard />);
     expect(await screen.findByRole('heading', { name: /admin dashboard/i })).toBeInTheDocument();
+    expect(screen.getByText(/realtime status/i)).toBeInTheDocument();
+    expect(mockedCreateRealtimeChannel).toHaveBeenCalledTimes(1);
   });
 
   it('renders users list page', async () => {

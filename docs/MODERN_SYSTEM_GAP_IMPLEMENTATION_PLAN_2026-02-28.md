@@ -78,7 +78,7 @@ Verification:
 
 ## P2: Platform Hardening and Modernization
 
-- [ ] P2.1 Wire realtime channel into an observable UX surface
+- [x] P2.1 Wire realtime channel into an observable UX surface
 Acceptance criteria:
 - Use existing SSE channel in at least one user-facing surface (admin dashboard/system status or lightweight notifications).
 - Add reconnect and error-state handling.
