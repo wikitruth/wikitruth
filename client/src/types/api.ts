@@ -136,6 +136,11 @@ export interface MemberContributionsResponse extends ApiBaseResponse, EntityBuck
   opinionsMore?: boolean;
 }
 
+export interface MemberDiaryResponse extends MemberContributionsResponse {
+  categories?: LegacyEntity[];
+  rootTopics?: LegacyEntity[];
+}
+
 export interface MemberFollowingGraph {
   people?: LegacyEntity[];
   users?: LegacyEntity[];

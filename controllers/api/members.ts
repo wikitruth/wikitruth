@@ -4,6 +4,7 @@
 const db = require('../../app').db.models;
 // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'utils'.
 const utils = require('../../utils/utils');
+const constants = require('../../models/constants');
 const jwt = require('jsonwebtoken');
 
 // @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
@@ -273,6 +274,106 @@ module.exports = function (router) {
     } catch (err) {
       console.error('Error updating fast-switch settings:', err);
       return res.status(500).json({ error: 'Failed to update fast-switch settings' });
+    }
+  });
+
+  // Get member diary (private entries authored by the profile owner)
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
+  router.get('/:username/diary', async function (req, res) {
+    try {
+      const member = await db.User.findOne({ username: req.params.username }).select('_id username preferences').lean();
+      if (!member) {
+        return res.status(404).json({ error: 'Member not found' });
+      }
+      if (!canViewPrivateEntries(member, req.user)) {
+        return res.status(403).json({ error: 'Diary is private' });
+      }
+
+      const tab = String(req.query?.tab || 'all').toLowerCase();
+      const validTabs = ['all', 'topics', 'arguments', 'questions', 'answers', 'artifacts', 'issues', 'opinions'];
+      const normalizedTab = validTabs.includes(tab) ? tab : 'all';
+      const limit = normalizedTab === 'all' ? 15 : 100;
+      const baseQuery: any = { createUserId: member._id, private: true };
+      const shouldLoad = function (name: string) {
+        return normalizedTab === 'all' || normalizedTab === name;
+      };
+
+      const [categories, rootTopics, topics, argumentsList, questions, answers, artifacts, issues, opinions] = await Promise.all([
+        db.Topic.find({
+          ownerType: constants.OBJECT_TYPES.user,
+          ownerId: member._id,
+          parentId: null,
+        })
+          .sort({ title: 1 })
+          .limit(50)
+          .lean(),
+        db.Topic.find({
+          ownerType: constants.OBJECT_TYPES.user,
+          ownerId: member._id,
+          parentId: null,
+          private: true,
+        })
+          .sort({ editDate: -1 })
+          .limit(50)
+          .lean(),
+        shouldLoad('topics') ? db.Topic.find(baseQuery).sort({ editDate: -1 }).limit(limit).lean() : [],
+        shouldLoad('arguments') ? db.Argument.find(baseQuery).sort({ editDate: -1 }).limit(limit).lean() : [],
+        shouldLoad('questions') ? db.Question.find(baseQuery).sort({ editDate: -1 }).limit(limit).lean() : [],
+        shouldLoad('answers') ? db.Answer.find(baseQuery).sort({ editDate: -1 }).limit(limit).lean() : [],
+        shouldLoad('artifacts') ? db.Artifact.find(baseQuery).sort({ editDate: -1 }).limit(limit).lean() : [],
+        shouldLoad('issues') ? db.Issue.find(baseQuery).sort({ editDate: -1 }).limit(limit).lean() : [],
+        shouldLoad('opinions') ? db.Opinion.find(baseQuery).sort({ editDate: -1 }).limit(limit).lean() : [],
+      ]);
+
+      const withFriendlyUrl = function (entry: any) {
+        if (!entry) {
+          return entry;
+        }
+        return {
+          ...entry,
+          friendlyUrl: entry.friendlyUrl || utils.urlify(entry.title || ''),
+        };
+      };
+
+      const model = {
+        member: {
+          _id: member._id,
+          username: member.username,
+        },
+        tab: normalizedTab,
+        results: false,
+        categories: categories.map(withFriendlyUrl),
+        rootTopics: rootTopics.map(withFriendlyUrl),
+        topics: topics.map(withFriendlyUrl),
+        arguments: argumentsList.map(withFriendlyUrl),
+        questions: questions.map(withFriendlyUrl),
+        answers: answers.map(withFriendlyUrl),
+        artifacts: artifacts.map(withFriendlyUrl),
+        issues: issues.map(withFriendlyUrl),
+        opinions: opinions.map(withFriendlyUrl),
+        topicsMore: normalizedTab === 'all' && topics.length >= limit,
+        argumentsMore: normalizedTab === 'all' && argumentsList.length >= limit,
+        questionsMore: normalizedTab === 'all' && questions.length >= limit,
+        answersMore: normalizedTab === 'all' && answers.length >= limit,
+        artifactsMore: normalizedTab === 'all' && artifacts.length >= limit,
+        issuesMore: normalizedTab === 'all' && issues.length >= limit,
+        opinionsMore: normalizedTab === 'all' && opinions.length >= limit,
+      };
+
+      model.results = Boolean(
+        model.topics.length ||
+          model.arguments.length ||
+          model.questions.length ||
+          model.answers.length ||
+          model.artifacts.length ||
+          model.issues.length ||
+          model.opinions.length,
+      );
+
+      return res.json(model);
+    } catch (err) {
+      console.error('Error fetching member diary:', err);
+      return res.status(500).json({ error: 'Failed to fetch member diary' });
     }
   });
 

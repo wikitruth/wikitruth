@@ -63,7 +63,7 @@ const AdministratorsPage = lazy(() => import('../pages/Members/AdministratorsPag
 const ProfilePage = lazy(() => import('../pages/Members/Profile/ProfilePage'));
 const ProfileSettings = lazy(() => import('../pages/Members/Profile/ProfileSettings'));
 const ProfileTopics = lazy(() => import('../pages/Members/Profile/ProfileTopics'));
-const ProfileDiary = lazy(() => import('../pages/Members/Profile/ProfileTopics'));
+const ProfileDiary = lazy(() => import('../pages/Members/Profile/ProfileDiary'));
 const ProfileContributions = lazy(() => import('../pages/Members/Profile/ProfileContributions'));
 const ProfileFollowing = lazy(() => import('../pages/Members/Profile/ProfileFollowing'));
 const PagesIndex = lazy(() => import('../pages/Members/Profile/Pages/PagesIndex'));

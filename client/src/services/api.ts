@@ -16,6 +16,7 @@ import type {
   MemberProfileResponse,
   MemberTopicsResponse,
   MemberContributionsResponse,
+  MemberDiaryResponse,
   MemberFollowingResponse,
   MemberPagesResponse,
   MemberPageResponse,
@@ -449,6 +450,11 @@ class ApiService {
   async getMemberContributions(username: string, tab: string = 'all'): Promise<MemberContributionsResponse> {
     const query = tab && tab !== 'all' ? `?tab=${encodeURIComponent(tab)}` : '';
     return this.request<MemberContributionsResponse>(`/members/${encodeURIComponent(username)}/contributions${query}`);
+  }
+
+  async getMemberDiary(username: string, tab: string = 'all'): Promise<MemberDiaryResponse> {
+    const query = tab && tab !== 'all' ? `?tab=${encodeURIComponent(tab)}` : '';
+    return this.request<MemberDiaryResponse>(`/members/${encodeURIComponent(username)}/diary${query}`);
   }
 
   async getCurrentMemberProfile(): Promise<LegacyApiResponse> {

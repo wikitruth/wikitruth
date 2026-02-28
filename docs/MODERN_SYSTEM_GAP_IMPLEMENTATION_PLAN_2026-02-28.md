@@ -9,7 +9,7 @@ Audit coverage for modern React client (`/app`) and modern API/server surface un
 
 ## P0: Correctness and Security Gaps
 
-- [ ] P0.1 Restore real My Diary parity (route + API + UI)
+- [x] P0.1 Restore real My Diary parity (route + API + UI)
 Acceptance criteria:
 - Add a dedicated modern diary page (not aliasing `ProfileTopics`) with the same private-diary semantics as legacy.
 - Add modern API support for diary feed/categories/tabs (topics, arguments, questions, answers, artifacts, issues, opinions) scoped to owner and privacy rules.

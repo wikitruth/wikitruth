@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-type ProfileTab = 'overview' | 'contributions' | 'topics' | 'following' | 'pages' | 'settings';
+type ProfileTab = 'overview' | 'contributions' | 'topics' | 'diary' | 'following' | 'pages' | 'settings';
 
 interface ProfileShellProps {
   username: string;
@@ -45,7 +45,7 @@ const ProfileShell: React.FC<ProfileShellProps> = ({ username, activeTab, isOwnP
           </Link>
         </li>
         {isOwnProfile && (
-          <li role="presentation" className={activeTab === 'topics' ? 'active' : ''}>
+          <li role="presentation" className={activeTab === 'diary' ? 'active' : ''}>
             <Link to={diaryPath} role="tab">
               <i className="fa fa-folder-open"></i> My Diary
             </Link>

@@ -1,4 +1,6 @@
 import { appRoutes } from './routeConfig';
+import * as fs from 'fs';
+import * as path from 'path';
 
 describe('routeConfig', () => {
   it('contains key routes', () => {
@@ -24,6 +26,12 @@ describe('routeConfig', () => {
     expect(paths).toContain('/members/profile/contributions');
     expect(paths).toContain('/account/settings');
     expect(paths).toContain('/search');
+  });
+
+  it('maps diary routes to the dedicated diary page', () => {
+    const file = fs.readFileSync(path.resolve(__dirname, 'routeConfig.tsx'), 'utf8');
+    expect(file).toContain("const ProfileDiary = lazy(() => import('../pages/Members/Profile/ProfileDiary'));");
+    expect(file).not.toContain("const ProfileDiary = lazy(() => import('../pages/Members/Profile/ProfileTopics'));");
   });
 
   it('includes tab-driven entry subroutes so navigation does not 404', () => {
