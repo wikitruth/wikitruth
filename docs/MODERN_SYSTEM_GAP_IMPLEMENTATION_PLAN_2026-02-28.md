@@ -86,7 +86,7 @@ Verification:
 - Unit test for channel lifecycle and event mapping.
 - Manual live event smoke test.
 
-- [ ] P2.2 Add parity and regression guardrails
+- [x] P2.2 Add parity and regression guardrails
 Acceptance criteria:
 - Add an automated parity checklist test suite for critical flows: auth, diary, entry actions, admin mutations, social provider rendering.
 - Fail CI on regression for those flows.
