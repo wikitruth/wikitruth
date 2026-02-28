@@ -14,6 +14,7 @@ describe('OpenAPI contract', function () {
     const paths = spec.paths || {};
 
     expect(paths['/auth/me']).toBeDefined();
+    expect(paths['/auth/providers']).toBeDefined();
     expect(paths['/auth/login']).toBeDefined();
     expect(paths['/auth/signup']).toBeDefined();
     expect(paths['/auth/logout']).toBeDefined();
@@ -51,10 +52,26 @@ describe('OpenAPI contract', function () {
       '/members',
       '/members/{username}',
       '/members/{username}/topics',
+      '/members/{username}/diary',
       '/members/{username}/following',
       '/admin',
       '/admin/users',
+      '/admin/users/{id}/password',
+      '/admin/users/{id}/role-admin',
+      '/admin/users/{id}/role-account',
+      '/admin/users/{id}/roles',
+      '/admin/accounts/{id}/user',
+      '/admin/accounts/{id}/notes',
+      '/admin/accounts/{id}/status',
+      '/admin/administrators/{id}/permissions',
+      '/admin/administrators/{id}/groups',
+      '/admin/administrators/{id}/user',
       '/admin/db-backup',
+      '/moderation/entry',
+      '/moderation/screening',
+      '/moderation/verdict',
+      '/moderation/take-ownership',
+      '/moderation/delete',
       '/monitoring/errors',
       '/realtime/events',
     ].forEach((contractPath) => expect(paths[contractPath]).toBeDefined());

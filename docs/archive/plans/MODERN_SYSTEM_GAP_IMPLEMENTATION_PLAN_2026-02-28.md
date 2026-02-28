@@ -93,7 +93,7 @@ Acceptance criteria:
 Verification:
 - CI run demonstrates new suite execution and pass/fail behavior.
 
-- [ ] P2.3 Refresh technical docs to match final implementation
+- [x] P2.3 Refresh technical docs to match final implementation
 Acceptance criteria:
 - Update README and relevant docs (`docs/frontend/*`, `docs/security/*`, `docs/api/*`) for any new endpoints/flows/security assumptions.
 - Archive superseded plan docs when fully complete.
@@ -104,7 +104,7 @@ Verification:
 
 - [x] E1 P0.1 -> P0.2 -> P0.3 -> P0.4
 - [x] E2 P1.1 -> P1.2 -> P1.3
-- [ ] E3 P2.1 -> P2.2 -> P2.3
+- [x] E3 P2.1 -> P2.2 -> P2.3
 
 ## Notes
 - Keep legacy templates/routes available for side-by-side comparison until explicit removal is requested.

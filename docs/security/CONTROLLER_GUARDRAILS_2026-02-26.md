@@ -40,6 +40,14 @@ Targeted hardening for legacy-backed controller hotspots referenced by the moder
   - `Content-Type` must be `application/json`
   - per-IP event rate capped in one-minute windows
 
+4. `MOD-001` Moderation API role boundaries
+- Status: Active guardrail
+- Rule: modern moderation endpoints keep role-gated boundaries equivalent to legacy behavior.
+- Enforcement:
+  - `/api/moderation/screening` requires `screener` or `admin`
+  - `/api/moderation/verdict`, `/api/moderation/take-ownership`, and `/api/moderation/delete` require `admin`
+  - convert/verdict updates are restricted to topic/argument targets
+
 ## Follow-up Backlog
 
 - [ ] `CLP-004` Add transactional/batched children-count update strategy with invariant tests.

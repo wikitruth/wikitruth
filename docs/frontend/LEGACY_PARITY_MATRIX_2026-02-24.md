@@ -18,12 +18,12 @@ Legend:
 | Profile settings parity | private profile + fast switch controls | modern profile settings wired to API | Done + Legacy retained | `ProfileSettings.tsx`, `/api/members/me/fast-switch` |
 | Account settings parity | contact/identity/password/social account controls | modern account settings fully wired | Done + Legacy retained | `SettingsPage.tsx`, `/api/auth/account-settings*` |
 | Entry detail parity | topic/argument/question/issue/opinion/answer/artifact detail behavior | related-child lists + non-placeholder counts + extended entry payloads | Done + Legacy retained | updated entry pages + `/api/*/entry/:id` payload parity |
-| Entry actions parity | legacy more/options menu | modern actions menu (edit/report/follow/share + screener/admin actions) | Done + Legacy retained | `EntryActionsMenu.tsx` |
+| Entry actions parity | legacy more/options menu | modern actions menu (edit/report/follow/share + screener/admin actions) with modern moderation handoff to `/app/screening` and `/app/convert` | Done + Legacy retained | `EntryActionsMenu.tsx`, `client/src/pages/Wiki/Screening/ScreeningPage.tsx`, `client/src/pages/Wiki/Convert/ConvertPage.tsx`, `controllers/api/moderation.ts` |
 | Search parity | legacy tabbed + scoped search | modern `all/wiki/diary` scope, tab routing, and “view more” behavior | Done + Legacy retained | `SearchPage.tsx`, `controllers/api/search.ts` |
 | Contextual sidebar parity | legacy right-column contextual nav | modern contextual sidebar with section, related, diary/group shortcuts on md+ | Done + Legacy retained | `ContextSidebar.tsx`, layout integration |
 | Home artifacts block parity | legacy home includes artifacts list block | modern home now renders artifacts block with “view more” parity behavior | Done + Legacy retained | `client/src/pages/HomePage.tsx` |
 | Wiki migration scaffolds cleanup | legacy-vs-modern scaffold handling | unwired `client/src/pages/Wiki/*` scaffolds explicitly retired and documented | Done + Legacy retained | `docs/frontend/WIKI_SCAFFOLD_RESOLUTION_2026-02-26.md`, `client/src/pages/Wiki/README.md` |
-| Parity-critical regression tests | route-level protections against parity regressions | route + search parity regressions covered in targeted tests | Done + Legacy retained | `client/src/routes/routeConfig.test.tsx`, `client/src/pages/SearchPage.test.tsx` |
+| Parity-critical regression tests | route-level protections against parity regressions | dedicated parity checklist suite for auth, diary, entry actions, admin mutations, and social provider rendering (`npm run test:parity`, part of `test:ci`) | Done + Legacy retained | `tests/server/parity-checklist.test.js`, `package.json` |
 
 ## Accuracy Notes
 
