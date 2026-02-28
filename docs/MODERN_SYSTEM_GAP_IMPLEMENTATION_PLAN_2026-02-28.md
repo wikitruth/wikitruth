@@ -27,7 +27,7 @@ Verification:
 - Client auth unit tests + manual smoke for login/signup/logout/reset.
 - Confirm no CSRF 403s on auth mutations.
 
-- [ ] P0.3 Add CSRF handling for modern admin mutations
+- [x] P0.3 Add CSRF handling for modern admin mutations
 Acceptance criteria:
 - Add CSRF token propagation for `POST/PUT/DELETE` in `client/src/services/api/admin.ts`.
 - Keep existing admin CRUD UI behavior unchanged.

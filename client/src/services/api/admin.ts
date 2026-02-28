@@ -19,11 +19,23 @@ type MutationResponse = {
   status?: AdminRecord;
 };
 
+const getCsrfToken = (): string | null => {
+  if (typeof document === 'undefined') {
+    return null;
+  }
+
+  const match = document.cookie.match(/(?:^|;\s*)_csrfToken=([^;]+)/);
+  return match ? decodeURIComponent(match[1]) : null;
+};
+
 const request = async <T>(url: string, init?: RequestInit): Promise<T> => {
+  const method = init?.method?.toUpperCase() ?? 'GET';
+  const csrfToken = method === 'GET' || method === 'HEAD' ? null : getCsrfToken();
   const response = await fetch(url, {
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
+      ...(csrfToken ? { 'x-csrf-token': csrfToken } : {}),
       ...init?.headers,
     },
     ...init,
