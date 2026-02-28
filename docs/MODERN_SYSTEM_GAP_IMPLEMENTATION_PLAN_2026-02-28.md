@@ -57,7 +57,7 @@ Verification:
 - Unit tests for button visibility by provider matrix.
 - Manual callback flow test for at least one enabled provider and one disabled provider.
 
-- [ ] P1.2 Expand modern admin API/UI to core legacy capabilities
+- [x] P1.2 Expand modern admin API/UI to core legacy capabilities
 Acceptance criteria:
 - Close high-value gaps between legacy admin routes and modern admin API/UI, including:
   - user create/reset-password/role-link actions,

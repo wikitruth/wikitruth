@@ -14,6 +14,8 @@ export type AdminMutationPayload = Record<string, unknown>;
 type MutationResponse = {
   success: boolean;
   user?: AdminRecord;
+  account?: AdminRecord;
+  admin?: AdminRecord;
   group?: AdminRecord;
   category?: AdminRecord;
   status?: AdminRecord;
@@ -86,6 +88,53 @@ export const adminApi = {
     });
     return response.user || null;
   },
+  createUser: async (payload: AdminMutationPayload) => {
+    const response = await request<MutationResponse>(`${API_BASE_URL}/admin/users`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+    return response.user || null;
+  },
+  resetUserPassword: async (id: string, password: string) => {
+    const response = await request<MutationResponse>(`${API_BASE_URL}/admin/users/${encodeURIComponent(id)}/password`, {
+      method: 'PUT',
+      body: JSON.stringify({ password }),
+    });
+    return response.user || null;
+  },
+  linkUserAdminRole: async (id: string, adminId: string) => {
+    const response = await request<MutationResponse>(`${API_BASE_URL}/admin/users/${encodeURIComponent(id)}/role-admin`, {
+      method: 'PUT',
+      body: JSON.stringify({ adminId }),
+    });
+    return response.user || null;
+  },
+  unlinkUserAdminRole: async (id: string) => {
+    const response = await request<MutationResponse>(`${API_BASE_URL}/admin/users/${encodeURIComponent(id)}/role-admin`, {
+      method: 'DELETE',
+    });
+    return response.user || null;
+  },
+  linkUserAccountRole: async (id: string, accountId: string) => {
+    const response = await request<MutationResponse>(`${API_BASE_URL}/admin/users/${encodeURIComponent(id)}/role-account`, {
+      method: 'PUT',
+      body: JSON.stringify({ accountId }),
+    });
+    return response.user || null;
+  },
+  unlinkUserAccountRole: async (id: string) => {
+    const response = await request<MutationResponse>(`${API_BASE_URL}/admin/users/${encodeURIComponent(id)}/role-account`, {
+      method: 'DELETE',
+    });
+    return response.user || null;
+  },
+  updateUserRoles: async (id: string, payload: { screener: boolean; reviewer: boolean }) => {
+    const response = await request<MutationResponse>(`${API_BASE_URL}/admin/users/${encodeURIComponent(id)}/roles`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+    return response.user || null;
+  },
   deleteUser: (id: string) =>
     request<{ success: boolean }>(`${API_BASE_URL}/admin/users/${encodeURIComponent(id)}`, {
       method: 'DELETE',
@@ -144,6 +193,60 @@ export const adminApi = {
     request<{ success: boolean }>(`${API_BASE_URL}/admin/statuses/${encodeURIComponent(id)}`, {
       method: 'DELETE',
     }),
+  linkAccountUser: async (id: string, userId: string) => {
+    const response = await request<MutationResponse>(`${API_BASE_URL}/admin/accounts/${encodeURIComponent(id)}/user`, {
+      method: 'PUT',
+      body: JSON.stringify({ userId }),
+    });
+    return response.account || null;
+  },
+  unlinkAccountUser: async (id: string) => {
+    const response = await request<MutationResponse>(`${API_BASE_URL}/admin/accounts/${encodeURIComponent(id)}/user`, {
+      method: 'DELETE',
+    });
+    return response.account || null;
+  },
+  addAccountNote: async (id: string, data: string) => {
+    const response = await request<MutationResponse>(`${API_BASE_URL}/admin/accounts/${encodeURIComponent(id)}/notes`, {
+      method: 'POST',
+      body: JSON.stringify({ data }),
+    });
+    return response.account || null;
+  },
+  addAccountStatus: async (id: string, statusId: string) => {
+    const response = await request<MutationResponse>(`${API_BASE_URL}/admin/accounts/${encodeURIComponent(id)}/status`, {
+      method: 'POST',
+      body: JSON.stringify({ statusId }),
+    });
+    return response.account || null;
+  },
+  updateAdministratorPermissions: async (id: string, permissions: Array<{ name: string; permit: boolean }>) => {
+    const response = await request<MutationResponse>(`${API_BASE_URL}/admin/administrators/${encodeURIComponent(id)}/permissions`, {
+      method: 'PUT',
+      body: JSON.stringify({ permissions }),
+    });
+    return response.admin || null;
+  },
+  updateAdministratorGroups: async (id: string, groups: string[]) => {
+    const response = await request<MutationResponse>(`${API_BASE_URL}/admin/administrators/${encodeURIComponent(id)}/groups`, {
+      method: 'PUT',
+      body: JSON.stringify({ groups }),
+    });
+    return response.admin || null;
+  },
+  linkAdministratorUser: async (id: string, userId: string) => {
+    const response = await request<MutationResponse>(`${API_BASE_URL}/admin/administrators/${encodeURIComponent(id)}/user`, {
+      method: 'PUT',
+      body: JSON.stringify({ userId }),
+    });
+    return response.admin || null;
+  },
+  unlinkAdministratorUser: async (id: string) => {
+    const response = await request<MutationResponse>(`${API_BASE_URL}/admin/administrators/${encodeURIComponent(id)}/user`, {
+      method: 'DELETE',
+    });
+    return response.admin || null;
+  },
   user: (id: string) => findById(() => adminApi.users(), id),
   account: (id: string) => findById(() => adminApi.accounts(), id),
   administrator: (id: string) => findById(() => adminApi.administrators(), id),

@@ -10,6 +10,15 @@ const UsersList: React.FC = () => {
       emptyMessage="No users found."
       detailPath="/admin/users"
       loadItems={adminApi.users}
+      createAction={{
+        buttonLabel: 'Create user',
+        fields: [
+          { key: 'username', label: 'Username', required: true },
+          { key: 'email', label: 'Email', required: true, placeholder: 'user@example.com' },
+          { key: 'password', label: 'Password', required: true },
+        ],
+        onCreate: adminApi.createUser,
+      }}
     />
   );
 };
