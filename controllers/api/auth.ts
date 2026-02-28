@@ -423,6 +423,13 @@ module.exports = function (router: Router) {
     res.json({ success: true, user: sanitizeUser(req.user) });
   });
 
+  router.get('/providers', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    res.json({
+      success: true,
+      providers: getOauthProviders(req),
+    });
+  });
+
   router.post('/signup', async function (req: WikitruthRequest, res: WikitruthResponse, next: WikitruthNext) {
     try {
       const username = String(req.body?.username || '').trim();

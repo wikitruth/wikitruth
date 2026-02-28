@@ -41,6 +41,7 @@ describe('API endpoint smoke coverage', function () {
     const authApi = read('controllers/api/auth.ts');
 
     expect(authApi).toContain("router.get('/me'");
+    expect(authApi).toContain("router.get('/providers'");
     expect(authApi).toContain("router.post('/signup'");
     expect(authApi).toContain("router.post('/login'");
     expect(authApi).toContain("router.post('/logout'");

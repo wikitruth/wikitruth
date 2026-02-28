@@ -48,7 +48,7 @@ Verification:
 
 ## P1: Feature Parity Gaps
 
-- [ ] P1.1 Provider-aware social auth in modern login/signup
+- [x] P1.1 Provider-aware social auth in modern login/signup
 Acceptance criteria:
 - Expose provider availability to unauthenticated modern pages (e.g., `/api/auth/providers`) based on server OAuth config.
 - Render only enabled provider buttons in modern login/signup.

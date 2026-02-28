@@ -30,4 +30,41 @@ describe('SocialLoginButtons', () => {
     expect(screen.getByRole('link', { name: /apple/i })).toHaveAttribute('href', '/signup/apple/');
     expect(screen.getByRole('link', { name: /microsoft/i })).toHaveAttribute('href', '/signup/microsoft/');
   });
+
+  it('renders only enabled providers when availability is provided', () => {
+    render(
+      <SocialLoginButtons
+        enabledProviders={{
+          google: true,
+          github: false,
+          facebook: false,
+          twitter: false,
+          apple: true,
+          microsoft: false,
+        }}
+      />
+    );
+
+    expect(screen.getByRole('link', { name: /google/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /apple/i })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /github/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /facebook/i })).not.toBeInTheDocument();
+  });
+
+  it('renders unavailable message when no providers are enabled', () => {
+    render(
+      <SocialLoginButtons
+        enabledProviders={{
+          google: false,
+          github: false,
+          facebook: false,
+          twitter: false,
+          apple: false,
+          microsoft: false,
+        }}
+      />
+    );
+
+    expect(screen.getByText(/social sign-in is currently unavailable/i)).toBeInTheDocument();
+  });
 });

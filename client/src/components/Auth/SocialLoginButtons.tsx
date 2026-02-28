@@ -5,17 +5,40 @@ type SocialProvider = 'google' | 'github' | 'facebook' | 'twitter' | 'apple' | '
 interface SocialLoginButtonsProps {
   mode?: 'login' | 'signup';
   onProviderClick?: (provider: SocialProvider) => void;
+  enabledProviders?: Record<string, boolean> | null;
 }
 
-const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({ mode = 'login', onProviderClick }) => {
-  const providers: Array<{ key: SocialProvider; label: string; icon: string; href: string }> = [
-    { key: 'google', label: 'Google', icon: 'google', href: `/${mode}/google/` },
-    { key: 'github', label: 'GitHub', icon: 'github', href: `/${mode}/github/` },
-    { key: 'facebook', label: 'Facebook', icon: 'facebook', href: `/${mode}/facebook/` },
-    { key: 'twitter', label: 'Twitter', icon: 'twitter', href: `/${mode}/twitter/` },
-    { key: 'apple', label: 'Apple', icon: 'apple', href: `/${mode}/apple/` },
-    { key: 'microsoft', label: 'Microsoft', icon: 'windows', href: `/${mode}/microsoft/` },
-  ];
+const providerCatalog: Array<{ key: SocialProvider; label: string; icon: string }> = [
+  { key: 'google', label: 'Google', icon: 'google' },
+  { key: 'github', label: 'GitHub', icon: 'github' },
+  { key: 'facebook', label: 'Facebook', icon: 'facebook' },
+  { key: 'twitter', label: 'Twitter', icon: 'twitter' },
+  { key: 'apple', label: 'Apple', icon: 'apple' },
+  { key: 'microsoft', label: 'Microsoft', icon: 'windows' },
+];
+
+const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({ mode = 'login', onProviderClick, enabledProviders }) => {
+  const providers = providerCatalog
+    .filter((provider) => {
+      if (!enabledProviders) {
+        return true;
+      }
+      return Boolean(enabledProviders[provider.key]);
+    })
+    .map((provider) => ({
+      ...provider,
+      href: `/${mode}/${provider.key}/`,
+    }));
+
+  if (providers.length === 0) {
+    return (
+      <div className="wt-social-login" aria-label="Social login providers">
+        <p className="text-muted" style={{ marginBottom: 0 }}>
+          Social sign-in is currently unavailable.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="wt-social-login" aria-label="Social login providers">

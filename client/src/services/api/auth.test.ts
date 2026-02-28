@@ -30,4 +30,16 @@ describe('authApi', () => {
       expect.objectContaining({ credentials: 'include' })
     );
   });
+
+  it('calls providers endpoint', async () => {
+    const fetchMock = jest.fn().mockResolvedValue({ ok: true, json: async () => ({ providers: {} }) });
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+    await authApi.providers();
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/auth/providers',
+      expect.objectContaining({ credentials: 'include' })
+    );
+  });
 });

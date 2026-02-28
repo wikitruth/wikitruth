@@ -51,6 +51,11 @@ interface AccountSettingsResponse {
   social?: Record<string, boolean>;
 }
 
+export interface AuthProvidersResponse {
+  success?: boolean;
+  providers: Record<string, boolean>;
+}
+
 const getCsrfToken = (): string | null => {
   if (typeof document === 'undefined') {
     return null;
@@ -105,6 +110,7 @@ export const authApi = {
       method: 'POST',
     }),
   me: () => request<UserResponse>(`${API_BASE_URL}/auth/me`),
+  providers: () => request<AuthProvidersResponse>(`${API_BASE_URL}/auth/providers`),
   forgotPassword: (email: string) =>
     request<{ success: boolean; message: string; debug?: { email: string; token: string } }>(
       `${API_BASE_URL}/auth/forgot-password`,
