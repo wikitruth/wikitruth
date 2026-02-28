@@ -68,7 +68,7 @@ Verification:
 - API tests for each new mutation path.
 - UI smoke tests for affected admin screens.
 
-- [ ] P1.3 Migrate remaining legacy-handoff workflows used by modern entry actions
+- [x] P1.3 Migrate remaining legacy-handoff workflows used by modern entry actions
 Acceptance criteria:
 - Replace legacy redirects for screening/convert (and related moderation actions) with modern routes + API-backed flows.
 - Maintain role-gated behavior for screener/admin users.
@@ -103,7 +103,7 @@ Verification:
 ## Execution Order
 
 - [x] E1 P0.1 -> P0.2 -> P0.3 -> P0.4
-- [ ] E2 P1.1 -> P1.2 -> P1.3
+- [x] E2 P1.1 -> P1.2 -> P1.3
 - [ ] E3 P2.1 -> P2.2 -> P2.3
 
 ## Notes

@@ -25,6 +25,7 @@ describe('API endpoint smoke coverage', function () {
       "router.use('/members', membersRouter)",
       "router.use('/auth', authRouter)",
       "router.use('/admin', adminRouter)",
+      "router.use('/moderation', moderationRouter)",
       "router.use('/monitoring', monitoringRouter)",
       "router.use('/realtime', realtimeRouter)",
     ].forEach((contract) => expect(apiIndex).toContain(contract));
@@ -116,6 +117,18 @@ describe('API endpoint smoke coverage', function () {
 
     expect(monitoringApi).toContain("router.post('/errors'");
     expect(monitoringApi).toContain("logger.error('client.runtime.error'");
+  });
+
+  it('exposes moderation API handlers used by modern entry actions', function () {
+    const moderationApi = read('controllers/api/moderation.ts');
+
+    [
+      "router.get('/entry'",
+      "router.put('/screening'",
+      "router.put('/verdict'",
+      "router.post('/take-ownership'",
+      "router.post('/delete'",
+    ].forEach((contract) => expect(moderationApi).toContain(contract));
   });
 
   it('exposes realtime SSE endpoint for React clients', function () {

@@ -69,6 +69,8 @@ const ProfileFollowing = lazy(() => import('../pages/Members/Profile/ProfileFoll
 const PagesIndex = lazy(() => import('../pages/Members/Profile/Pages/PagesIndex'));
 const PageCreate = lazy(() => import('../pages/Members/Profile/Pages/PageCreate'));
 const PageView = lazy(() => import('../pages/Members/Profile/Pages/PageView'));
+const ScreeningPage = lazy(() => import('../pages/Wiki/Screening/ScreeningPage'));
+const ConvertPage = lazy(() => import('../pages/Wiki/Convert/ConvertPage'));
 const SearchPage = lazy(() => import('../pages/SearchPage'));
 const VisualizePage = lazy(() => import('../pages/VisualizePage'));
 const AboutPage = lazy(() => import('../pages/AboutPage'));
@@ -176,6 +178,8 @@ export const appRoutes: AppRoute[] = [
   { path: '/members/profile/pages/create', element: <PageCreate /> },
   { path: '/members/:username/pages/:id', element: <PageView /> },
   { path: '/members/profile/pages/:id', element: <PageView /> },
+  { path: '/screening', element: <ScreeningPage /> },
+  { path: '/convert', element: <ConvertPage /> },
   { path: '/search', element: <SearchPage /> },
   { path: '/visualize', element: <VisualizePage /> },
   { path: '/about', element: <AboutPage /> },

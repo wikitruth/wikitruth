@@ -26,6 +26,8 @@ describe('routeConfig', () => {
     expect(paths).toContain('/members/profile/contributions');
     expect(paths).toContain('/account/settings');
     expect(paths).toContain('/search');
+    expect(paths).toContain('/screening');
+    expect(paths).toContain('/convert');
   });
 
   it('maps diary routes to the dedicated diary page', () => {

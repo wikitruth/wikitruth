@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import moderationApi from '../../services/api/moderation';
 import type { LegacyEntity } from '../../types/legacy';
 
 interface EntryActionsMenuProps {
@@ -41,33 +42,7 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
   const canEdit = Boolean(editPath) && (isOwner || isAdmin);
   const objectName = String(entry.objectName || '').trim();
   const objectType = typeof entry.objectType === 'number' ? entry.objectType : null;
-
-  const getCsrfToken = (): string | null => {
-    const tokenMatch = document.cookie.match(/(?:^|;\s*)_csrfToken=([^;]+)/);
-    return tokenMatch ? decodeURIComponent(tokenMatch[1]) : null;
-  };
-
-  const postLegacyAsync = async (url: string, payload: Record<string, unknown>) => {
-    const csrfToken = getCsrfToken();
-    const response = await fetch(url, {
-      method: 'POST',
-      credentials: 'same-origin',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(csrfToken ? { 'x-csrf-token': csrfToken } : {}),
-      },
-      body: JSON.stringify({
-        ...payload,
-        ...(csrfToken ? { _csrf: csrfToken } : {}),
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Action failed');
-    }
-
-    return response.json().catch(() => ({}));
-  };
+  const canConvert = objectName === 'topic' || objectName === 'argument';
 
   const handleEdit = () => {
     if (!editPath) {
@@ -126,15 +101,15 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
       return;
     }
     setIsOpen(false);
-    window.location.assign(`/screening?${encodeURIComponent(objectName)}=${encodeURIComponent(entry._id)}`);
+    void navigate(`/screening?${encodeURIComponent(objectName)}=${encodeURIComponent(entry._id)}`);
   };
 
   const handleConvert = () => {
-    if (!objectName) {
+    if (!objectName || !canConvert) {
       return;
     }
     setIsOpen(false);
-    window.location.assign(`/convert?${encodeURIComponent(objectName)}=${encodeURIComponent(entry._id)}`);
+    void navigate(`/convert?${encodeURIComponent(objectName)}=${encodeURIComponent(entry._id)}`);
   };
 
   const handleTakeOwnership = async () => {
@@ -143,10 +118,7 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
     }
     setIsOpen(false);
     try {
-      await postLegacyAsync('/async/entry/take-ownership', {
-        id: entry._id,
-        type: objectType,
-      });
+      await moderationApi.takeOwnership(entry._id, objectType);
       window.location.reload();
     } catch (_error) {
       setStatusMessage('Unable to take ownership');
@@ -162,16 +134,19 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
     }
     setIsOpen(false);
     try {
-      const result = await postLegacyAsync('/async/entry/delete', {
-        id: entry._id,
-        type: objectType,
-      });
-      const redirectUrl = typeof result?.redirectUrl === 'string' ? result.redirectUrl : null;
-      if (redirectUrl) {
-        window.location.assign(redirectUrl);
-      } else {
-        window.location.reload();
-      }
+      await moderationApi.deleteEntry(entry._id, objectType);
+      const listRouteByObject: Record<string, string> = {
+        topic: '/topics',
+        topicLink: '/topics',
+        argument: '/arguments',
+        argumentLink: '/arguments',
+        question: '/questions',
+        answer: '/answers',
+        issue: '/issues',
+        opinion: '/opinions',
+        artifact: '/artifacts',
+      };
+      void navigate(listRouteByObject[objectName] || '/');
     } catch (_error) {
       setStatusMessage('Unable to delete entry');
     }
@@ -233,7 +208,7 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
                     </button>
                   </li>
                 )}
-                {objectName && (
+                {objectName && canConvert && (
                   <li>
                     <button type="button" className="btn btn-link" onClick={handleConvert}>
                       <i className="fa fa-recycle" aria-hidden="true"></i> Convert
