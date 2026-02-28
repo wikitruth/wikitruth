@@ -35,7 +35,7 @@ Verification:
 - Manual mutation checks (category/status/admin group/user update/delete).
 - Confirm no CSRF 403s for admin mutations.
 
-- [ ] P0.4 Make runtime error ingestion compatible with CSRF policy
+- [x] P0.4 Make runtime error ingestion compatible with CSRF policy
 Acceptance criteria:
 - Ensure `/api/monitoring/errors` accepts production client telemetry without weakening global CSRF posture.
 - Implement one of:
@@ -102,7 +102,7 @@ Verification:
 
 ## Execution Order
 
-- [ ] E1 P0.1 -> P0.2 -> P0.3 -> P0.4
+- [x] E1 P0.1 -> P0.2 -> P0.3 -> P0.4
 - [ ] E2 P1.1 -> P1.2 -> P1.3
 - [ ] E3 P2.1 -> P2.2 -> P2.3
 

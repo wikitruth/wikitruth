@@ -140,14 +140,21 @@ app.use(passport.initialize());
 app.use(passport.session());
 const csrfConfig = config.csrf || {};
 const csrfCookie = csrfConfig.cookie || {};
-app.use(csrf({
+const csrfProtection = csrf({
     ignoreMethods: Array.isArray(csrfConfig.ignoreMethods) ? csrfConfig.ignoreMethods : ['GET', 'HEAD', 'OPTIONS'],
     cookie: {
         signed: csrfCookie.signed !== false,
         secure: !!csrfCookie.secure,
         sameSite: csrfCookie.sameSite || 'lax'
     }
-})); // kraken-js:lusca is already using csrf module
+}); // kraken-js:lusca is already using csrf module
+app.use(function (req, res, next) {
+    // Runtime error beacons may come from sendBeacon and cannot reliably attach CSRF headers.
+    if (/^\/api\/(?:v1\/)?monitoring\/errors\/?$/.test(req.path)) {
+        return next();
+    }
+    return csrfProtection(req, res, next);
+});
 
 // setup response locals
 require('./middlewares/locals')(app, passport);

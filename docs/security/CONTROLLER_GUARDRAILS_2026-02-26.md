@@ -32,6 +32,14 @@ Targeted hardening for legacy-backed controller hotspots referenced by the moder
 - Status: Active guardrail
 - Rule: per-entry children-count updates are intentionally retained for correctness. Batch optimization is deferred and must preserve count consistency invariants.
 
+3. `MON-001` Monitoring endpoint CSRF exception protection
+- Status: Active guardrail
+- Rule: `/api/monitoring/errors` is exempted from CSRF token checks to support `sendBeacon`, but only accepts same-origin JSON payloads and is rate-limited per client IP.
+- Enforcement:
+  - origin/referer host must match request host
+  - `Content-Type` must be `application/json`
+  - per-IP event rate capped in one-minute windows
+
 ## Follow-up Backlog
 
 - [ ] `CLP-004` Add transactional/batched children-count update strategy with invariant tests.

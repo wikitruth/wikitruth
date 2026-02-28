@@ -24,8 +24,93 @@ type MonitoringPayload = {
   timestamp?: string;
 };
 
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX_EVENTS = 120;
+const requestRateWindow = new Map<string, { count: number; resetAt: number }>();
+
+function readOriginHost(req: WikitruthRequest): string | null {
+  const origin = String(req.get('origin') || '').trim();
+  if (!origin) {
+    return null;
+  }
+  try {
+    return new URL(origin).host.toLowerCase();
+  } catch (_err) {
+    return '';
+  }
+}
+
+function readRefererHost(req: WikitruthRequest): string | null {
+  const referer = String(req.get('referer') || '').trim();
+  if (!referer) {
+    return null;
+  }
+  try {
+    return new URL(referer).host.toLowerCase();
+  } catch (_err) {
+    return '';
+  }
+}
+
+function isTrustedOrigin(req: WikitruthRequest): boolean {
+  const expectedHost = String(req.get('host') || '').trim().toLowerCase();
+  if (!expectedHost) {
+    return false;
+  }
+
+  const originHost = readOriginHost(req);
+  if (originHost !== null) {
+    return originHost.length > 0 && originHost === expectedHost;
+  }
+
+  const refererHost = readRefererHost(req);
+  if (refererHost !== null) {
+    return refererHost.length > 0 && refererHost === expectedHost;
+  }
+
+  // Some beacon clients omit both headers; treat as trusted same-origin fallback.
+  return true;
+}
+
+function isJsonContentType(req: WikitruthRequest): boolean {
+  const contentType = String(req.get('content-type') || '').toLowerCase();
+  return contentType.startsWith('application/json');
+}
+
+function isRateLimited(req: WikitruthRequest): boolean {
+  const now = Date.now();
+  const key = String(req.ip || 'unknown');
+  const current = requestRateWindow.get(key);
+
+  if (!current || current.resetAt <= now) {
+    requestRateWindow.set(key, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return false;
+  }
+
+  if (current.count >= RATE_LIMIT_MAX_EVENTS) {
+    return true;
+  }
+
+  current.count += 1;
+  requestRateWindow.set(key, current);
+  return false;
+}
+
 module.exports = function (router: Router) {
   router.post('/errors', function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!isTrustedOrigin(req)) {
+      res.status(403).json({ error: 'Untrusted origin' });
+      return;
+    }
+    if (!isJsonContentType(req)) {
+      res.status(415).json({ error: 'Content-Type must be application/json' });
+      return;
+    }
+    if (isRateLimited(req)) {
+      res.status(429).json({ error: 'Too many monitoring events' });
+      return;
+    }
+
     const bodyCandidate = req.body;
     const body: MonitoringPayload =
       bodyCandidate && typeof bodyCandidate === 'object'
