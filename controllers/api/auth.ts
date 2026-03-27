@@ -89,6 +89,10 @@ type ModelsContract = {
   Admin?: {
     findByIdAndUpdate: (id: unknown, fields: Record<string, unknown>) => Promise<unknown>;
   };
+  LoginAttempt?: {
+    countDocuments: (query: Record<string, unknown>) => Promise<number>;
+    create: (fields: Record<string, unknown>) => Promise<unknown>;
+  };
 };
 
 const db = require('../../app').db.models as ModelsContract;
@@ -111,6 +115,45 @@ type FastSwitchCookie = {
   id?: string;
   data?: string;
   created?: string | Date;
+};
+
+type SendmailPayload = {
+  from: string;
+  to: string;
+  replyTo?: string;
+  subject: string;
+  textPath: string;
+  htmlPath: string;
+  locals: Record<string, string>;
+  success: () => void;
+  error: (err: unknown) => void;
+};
+
+type AuthAppContext = {
+  config?: {
+    loginAttempts?: {
+      forIp?: number;
+      forIpAndUser?: number;
+    };
+    smtp?: {
+      from?: {
+        name?: string;
+        address?: string;
+      };
+    };
+    projectName?: string;
+    oauth?: Record<string, { key?: string }>;
+    requireAccountVerification?: boolean;
+    jwtSecret?: string;
+    mobileApi?: Partial<MobileApiConfig>;
+  };
+  utility?: {
+    sendmail?: (
+      req: WikitruthRequest,
+      res: WikitruthResponse,
+      options: SendmailPayload
+    ) => void;
+  };
 };
 
 function sanitizeUser(user: AuthUserLike | null | undefined) {
@@ -183,7 +226,7 @@ function getAccountIdFromUser(user: { roles?: unknown } | null | undefined): unk
 }
 
 function getMobileApiConfig(req: WikitruthRequest): MobileApiConfig {
-  const appConfig = (req.app as { config?: { mobileApi?: Partial<MobileApiConfig> } }).config?.mobileApi || {};
+  const appConfig = (req.app as unknown as AuthAppContext).config?.mobileApi || {};
   return {
     accessTokenTtlSeconds: Number(appConfig.accessTokenTtlSeconds || 900),
     refreshTokenTtlSeconds: Number(appConfig.refreshTokenTtlSeconds || 2592000),
@@ -192,7 +235,7 @@ function getMobileApiConfig(req: WikitruthRequest): MobileApiConfig {
 }
 
 function getJwtSecret(req: WikitruthRequest): string {
-  const secret = String((req.app as { config?: { jwtSecret?: string } }).config?.jwtSecret || '').trim();
+  const secret = String((req.app as unknown as AuthAppContext).config?.jwtSecret || '').trim();
   if (!secret) {
     throw new Error('JWT secret is not configured');
   }
@@ -231,7 +274,7 @@ function parseFastSwitchCookies(rawValue: unknown): FastSwitchCookie[] {
 }
 
 function getOauthProviders(req: WikitruthRequest): Record<string, boolean> {
-  const oauthConfig = (req.app as { config?: { oauth?: Record<string, { key?: string }> } }).config?.oauth || {};
+  const oauthConfig = (req.app as unknown as AuthAppContext).config?.oauth || {};
   return {
     twitter: Boolean(oauthConfig.twitter?.key),
     github: Boolean(oauthConfig.github?.key),
@@ -251,6 +294,96 @@ function getSocialConnections(user: AuthUserDocument | null): Record<string, boo
     apple: Boolean(user?.apple?.id),
     microsoft: Boolean(user?.microsoft?.id),
   };
+}
+
+function getLoginAttemptLimits(req: WikitruthRequest): { forIp: number; forIpAndUser: number } {
+  const appCtx = req.app as unknown as AuthAppContext;
+  return {
+    forIp: Number(appCtx.config?.loginAttempts?.forIp || 50),
+    forIpAndUser: Number(appCtx.config?.loginAttempts?.forIpAndUser || 7),
+  };
+}
+
+async function isLoginAttemptBlocked(req: WikitruthRequest, userKey: string): Promise<boolean> {
+  if (!db.LoginAttempt?.countDocuments) {
+    return false;
+  }
+
+  try {
+    const limits = getLoginAttemptLimits(req);
+    const [ipAttempts, ipUserAttempts] = await Promise.all([
+      db.LoginAttempt.countDocuments({ ip: req.ip }),
+      db.LoginAttempt.countDocuments({ ip: req.ip, user: userKey }),
+    ]);
+    return ipAttempts >= limits.forIp || ipUserAttempts >= limits.forIpAndUser;
+  } catch (_error) {
+    return false;
+  }
+}
+
+async function recordFailedLoginAttempt(req: WikitruthRequest, userKey: string): Promise<void> {
+  if (!db.LoginAttempt?.create) {
+    return;
+  }
+  try {
+    await db.LoginAttempt.create({ ip: req.ip, user: userKey });
+  } catch (_error) {
+    // Login should still respond even if attempt tracking write fails.
+  }
+}
+
+function getRequestOrigin(req: WikitruthRequest): string {
+  const forwardedProto = (String(req.get('x-forwarded-proto') || '').split(',')[0] || '').trim();
+  const forwardedHost = (String(req.get('x-forwarded-host') || '').split(',')[0] || '').trim();
+  const directHost = (String(req.get('host') || '').split(',')[0] || '').trim();
+  const protocol = forwardedProto || req.protocol || 'http';
+  const host = forwardedHost || directHost;
+  if (!host) {
+    return '';
+  }
+  return `${protocol}://${host}`;
+}
+
+function buildAbsoluteUrl(req: WikitruthRequest, path: string): string {
+  const origin = getRequestOrigin(req);
+  const normalizedPath = `/${String(path || '').replace(/^\/+/, '')}`;
+  if (!origin) {
+    return normalizedPath;
+  }
+  return `${origin}${normalizedPath}`;
+}
+
+async function deliverEmail(req: WikitruthRequest, res: WikitruthResponse, payload: {
+  to: string;
+  subject: string;
+  textPath: string;
+  htmlPath: string;
+  locals: Record<string, string>;
+}): Promise<boolean> {
+  const appCtx = req.app as unknown as AuthAppContext;
+  const sendmail = appCtx.utility?.sendmail;
+  if (!sendmail) {
+    return false;
+  }
+
+  const fromName = String(appCtx.config?.smtp?.from?.name || appCtx.config?.projectName || 'Wikitruth').trim();
+  const fromAddress = String(appCtx.config?.smtp?.from?.address || '').trim();
+  if (!fromAddress) {
+    return false;
+  }
+
+  return new Promise((resolve) => {
+    sendmail(req, res, {
+      from: `${fromName} <${fromAddress}>`,
+      to: payload.to,
+      subject: payload.subject,
+      textPath: payload.textPath,
+      htmlPath: payload.htmlPath,
+      locals: payload.locals,
+      success: () => resolve(true),
+      error: () => resolve(false),
+    });
+  });
 }
 
 function signToken(req: WikitruthRequest, user: AuthUserDocument, kind: TokenKind, tokenId: string, expiresInSeconds: number): string {
@@ -478,7 +611,7 @@ module.exports = function (router: Router) {
       });
 
       const requireAccountVerification = Boolean(
-        (req.app as { config?: { requireAccountVerification?: boolean } }).config?.requireAccountVerification
+        (req.app as unknown as AuthAppContext).config?.requireAccountVerification
       );
 
       const account = await db.Account.create({
@@ -513,9 +646,18 @@ module.exports = function (router: Router) {
     try {
       const username = String(req.body?.username || '').trim();
       const password = String(req.body?.password || '');
+      const normalizedLoginIdentity = username.toLowerCase();
 
       if (!username || !password) {
         res.status(400).json({ success: false, message: 'Username and password are required' });
+        return;
+      }
+
+      if (await isLoginAttemptBlocked(req, normalizedLoginIdentity)) {
+        res.status(429).json({
+          success: false,
+          message: 'Too many login attempts. Please try again later.',
+        });
         return;
       }
 
@@ -524,12 +666,14 @@ module.exports = function (router: Router) {
       });
 
       if (!user) {
+        await recordFailedLoginAttempt(req, normalizedLoginIdentity);
         res.status(401).json({ success: false, message: 'Invalid credentials' });
         return;
       }
 
       const isValid = await db.User.validatePassword(password, user.password || '');
       if (!isValid) {
+        await recordFailedLoginAttempt(req, normalizedLoginIdentity);
         res.status(401).json({ success: false, message: 'Invalid credentials' });
         return;
       }
@@ -560,7 +704,7 @@ module.exports = function (router: Router) {
         return;
       }
 
-      const secret = `${pin}|${String((req.app as { config?: { jwtSecret?: string } }).config?.jwtSecret || '')}`;
+      const secret = `${pin}|${String((req.app as unknown as AuthAppContext).config?.jwtSecret || '')}`;
       let matchedUserId = '';
 
       for (const cookie of fastSwitchCookies) {
@@ -954,15 +1098,35 @@ module.exports = function (router: Router) {
       user.resetPasswordExpires = Date.now() + 10000000;
       await user.save();
 
+      const appCtx = req.app as unknown as AuthAppContext;
+      const projectName = String(appCtx.config?.projectName || 'Wikitruth').trim();
+      const resetLink = buildAbsoluteUrl(
+        req,
+        `/app/reset-password?email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}`
+      );
+      const emailSent = await deliverEmail(req, res, {
+        to: user.email || email,
+        subject: `Reset your ${projectName} password`,
+        textPath: 'jade/login/forgot/email-text.jade',
+        htmlPath: 'jade/login/forgot/email-html.jade',
+        locals: {
+          username: user.username || email,
+          resetLink: resetLink,
+          projectName: projectName,
+        },
+      });
+
       const responsePayload: Record<string, unknown> = {
         success: true,
-        message: 'If an account exists, reset instructions were generated.',
+        message: 'If an account exists, reset instructions were sent.',
       };
 
       if (process.env.NODE_ENV !== 'production') {
         responsePayload.debug = {
           email: email,
           token: token,
+          resetLink: resetLink,
+          emailSent: emailSent,
         };
       }
 
@@ -1035,7 +1199,7 @@ module.exports = function (router: Router) {
       }
 
       const requireAccountVerification = Boolean(
-        (req.app as { config?: { requireAccountVerification?: boolean } }).config?.requireAccountVerification
+        (req.app as unknown as AuthAppContext).config?.requireAccountVerification
       );
 
       res.json({
@@ -1102,16 +1266,40 @@ module.exports = function (router: Router) {
       account.isVerified = 'no';
       await account.save();
 
+      const appCtx = req.app as unknown as AuthAppContext;
+      const projectName = String(appCtx.config?.projectName || 'Wikitruth').trim();
+      const verifyUrl = buildAbsoluteUrl(
+        req,
+        `/app/account/verification?token=${encodeURIComponent(token)}`
+      );
+      const emailSent = await deliverEmail(req, res, {
+        to: req.user.email || nextEmail,
+        subject: `Verify Your ${projectName} Account`,
+        textPath: 'jade/account/verification/email-text.jade',
+        htmlPath: 'jade/account/verification/email-html.jade',
+        locals: {
+          verifyURL: verifyUrl,
+          projectName: projectName,
+        },
+      });
+
       const payload: Record<string, unknown> = {
         success: true,
-        message: 'Verification token generated',
+        message: emailSent ? 'Verification email sent' : 'Verification token generated',
       };
 
       if (process.env.NODE_ENV !== 'production') {
         payload.debug = {
           email: req.user.email || '',
           token: token,
+          verifyUrl: verifyUrl,
+          emailSent: emailSent,
         };
+      }
+
+      if (!emailSent && process.env.NODE_ENV === 'production') {
+        res.status(502).json({ success: false, message: 'Unable to send verification email right now' });
+        return;
       }
 
       res.status(202).json(payload);

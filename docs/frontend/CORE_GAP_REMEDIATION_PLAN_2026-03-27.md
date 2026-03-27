@@ -24,10 +24,10 @@ Close the highest-impact gaps across modern client parity, auth/security behavio
 - [x] A4. Tune visualize graph interaction for fluid drag feel with momentum/bounce behavior.
 
 ### B. API and Security Hardening
-- [ ] B1. Add login-attempt throttling parity in `POST /api/auth/login`.
-- [ ] B2. Enforce strict recaptcha semantics in contact API when captcha secret is configured.
-- [ ] B3. Send forgot-password email from API flow with safe fallback behavior.
-- [ ] B4. Send verification resend email from API flow with safe fallback behavior.
+- [x] B1. Add login-attempt throttling parity in `POST /api/auth/login`.
+- [x] B2. Enforce strict recaptcha semantics in contact API when captcha secret is configured.
+- [x] B3. Send forgot-password email from API flow with safe fallback behavior.
+- [x] B4. Send verification resend email from API flow with safe fallback behavior.
 
 ### C. Tests and CI Stability
 - [ ] C1. Update and fix failing client tests for accessibility and visualize flow.
@@ -63,3 +63,9 @@ Close the highest-impact gaps across modern client parity, auth/security behavio
   - `client/src/pages/VisualizePage.tsx`
   - `webpack.config.js`
   - Targeted validation: `npm run test:client -- client/src/accessibility/accessibility.audit.test.tsx client/src/pages/VisualizePage.test.tsx --runInBand`
+- Completed B on 2026-03-27:
+  - `controllers/api/auth.ts`
+  - `controllers/api/contact.ts`
+  - Validation:
+    - `npm run type:check`
+    - `npm run test:server`

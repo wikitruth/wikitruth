@@ -57,8 +57,11 @@ function isValidEmail(value: string): boolean {
 async function validateRecaptcha(req: WikitruthRequest, token: string): Promise<boolean> {
   const appCtx = req.app as unknown as ContactAppContext;
   const secret = String(appCtx.config?.grecaptcha?.secret || '').trim();
-  if (!secret || !token) {
+  if (!secret) {
     return true;
+  }
+  if (!token) {
+    return false;
   }
 
   try {
