@@ -120,6 +120,7 @@ const VisualizePage: React.FC = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const graphContainerRef = useRef<HTMLDivElement | null>(null);
   const networkRef = useRef<any>(null);
+  const dragMomentumTimerRef = useRef<number | null>(null);
   const [graphHeight, setGraphHeight] = useState(560);
 
   useEffect(() => {
@@ -328,15 +329,24 @@ const VisualizePage: React.FC = () => {
             autoResize: true,
             physics: {
               enabled: true,
+              solver: 'barnesHut',
               barnesHut: {
-                gravitationalConstant: -2200,
-                centralGravity: 0.3,
-                springLength: 96,
-                springConstant: 0.04,
-                damping: 0.07,
+                gravitationalConstant: -2800,
+                centralGravity: 0.22,
+                springLength: 120,
+                springConstant: 0.035,
+                damping: 0.14,
+                avoidOverlap: 0.12,
               },
-              stabilization: false,
-              minVelocity: 0.1,
+              stabilization: {
+                enabled: true,
+                iterations: 220,
+                updateInterval: 25,
+                fit: true,
+              },
+              minVelocity: 0.2,
+              maxVelocity: 30,
+              adaptiveTimestep: true,
             },
             interaction: {
               dragNodes: true,
@@ -345,6 +355,7 @@ const VisualizePage: React.FC = () => {
               hover: true,
               navigationButtons: true,
               keyboard: true,
+              hideEdgesOnDrag: false,
             },
             nodes: {
               borderWidth: 2,
@@ -397,6 +408,13 @@ const VisualizePage: React.FC = () => {
         // Ensure the network keeps simulating briefly after drag for legacy-like momentum.
         network.on('dragEnd', () => {
           network.startSimulation();
+          if (dragMomentumTimerRef.current !== null) {
+            window.clearTimeout(dragMomentumTimerRef.current);
+          }
+          dragMomentumTimerRef.current = window.setTimeout(() => {
+            network.stopSimulation();
+            dragMomentumTimerRef.current = null;
+          }, 950);
         });
       } catch (err) {
         if (!cancelled) {
@@ -413,6 +431,10 @@ const VisualizePage: React.FC = () => {
       if (networkRef.current) {
         networkRef.current.destroy();
         networkRef.current = null;
+      }
+      if (dragMomentumTimerRef.current !== null) {
+        window.clearTimeout(dragMomentumTimerRef.current);
+        dragMomentumTimerRef.current = null;
       }
       if (typeof window !== 'undefined') {
         delete (window as any).__wtNetwork;
@@ -462,6 +484,50 @@ const VisualizePage: React.FC = () => {
             </div>
           </div>
         ))}
+      </div>
+
+      <div className="panel panel-default">
+        <div className="panel-heading">
+          <h3 className="panel-title">Topics in Graph</h3>
+        </div>
+        <div className="panel-body">
+          {topics.length === 0 ? (
+            <p className="text-muted" style={{ marginBottom: 0 }}>No topics are currently available.</p>
+          ) : (
+            <div
+              className="btn-group"
+              role="group"
+              aria-label="Select topic for graph details"
+              style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}
+            >
+              {topics.slice(0, 14).map((topic) => {
+                const topicId = String(topic._id || '');
+                const isSelected = selectedTopicId === topicId;
+                return (
+                  <button
+                    key={topicId}
+                    type="button"
+                    className={`btn ${isSelected ? 'btn-primary' : 'btn-default'}`}
+                    style={{ marginBottom: '8px' }}
+                    onClick={() => setSelectedTopicId(topicId)}
+                  >
+                    {String(topic.title || 'Untitled topic')}
+                  </button>
+                );
+              })}
+              {selectedTopicId && (
+                <button
+                  type="button"
+                  className="btn btn-link"
+                  onClick={() => setSelectedTopicId('')}
+                  style={{ marginBottom: '8px' }}
+                >
+                  Clear selection
+                </button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className={`vis-container${isFullscreen ? ' fullscreen' : ''}`}>

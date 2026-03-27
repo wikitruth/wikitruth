@@ -112,6 +112,11 @@ module.exports = (env, argv) => {
           target: 'http://localhost:8000',
           changeOrigin: true,
         },
+        {
+          context: ['/login', '/signup', '/logout', '/account', '/fast-switch'],
+          target: 'http://localhost:8000',
+          changeOrigin: true,
+        },
       ],
     },
   };

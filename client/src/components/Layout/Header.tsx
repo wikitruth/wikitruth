@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import OptimizedImage from '../common/OptimizedImage';
 import type { Application, User } from '../../types';
 import authApi from '../../services/api/auth';
@@ -17,10 +17,12 @@ interface HomePayload {
 }
 
 const Header: React.FC = () => {
+  const location = useLocation();
   const [user, setUser] = useState<HeaderUser | null>(null);
   const [application, setApplication] = useState<HeaderApplication | null>(null);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -60,6 +62,12 @@ const Header: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    setIsMoreOpen(false);
+    setIsUserMenuOpen(false);
+    setIsMobileNavOpen(false);
+  }, [location.pathname]);
+
   return (
     <div className="navbar navbar-default navbar-fixed-top">
       <div className="container-fluid">
@@ -76,18 +84,39 @@ const Header: React.FC = () => {
               <span className="hidden-xxs">{application?.name || application?.title || 'Wikitruth'}</span>
             </span>
           </Link>
+          <button
+            type="button"
+            className="navbar-toggle collapsed"
+            aria-label="Toggle navigation"
+            aria-expanded={isMobileNavOpen}
+            aria-controls="header-main-collapse"
+            onClick={() => setIsMobileNavOpen((value) => !value)}
+          >
+            <span className="sr-only">Toggle navigation</span>
+            <i className="fa fa-navicon" aria-hidden="true"></i>
+          </button>
         </div>
-        <div className="navbar-collapse my-navbar-collapse collapse">
+        <div id="header-main-collapse" className={`navbar-collapse my-navbar-collapse collapse${isMobileNavOpen ? ' in' : ''}`}>
           <nav aria-label="Primary navigation">
             <ul className="nav navbar-nav">
               <li>
-                <Link to="/explore" title="Explore" aria-label="Explore topics">
+                <Link
+                  to="/explore"
+                  title="Explore"
+                  aria-label="Explore topics"
+                  onClick={() => setIsMobileNavOpen(false)}
+                >
                   <i className="fa fa-globe"></i>
                   <span className="hidden-xs"> Explore</span>
                 </Link>
               </li>
               <li>
-                <Link to="/search" title="Search" aria-label="Search content">
+                <Link
+                  to="/search"
+                  title="Search"
+                  aria-label="Search content"
+                  onClick={() => setIsMobileNavOpen(false)}
+                >
                   <i className="fa fa-search"></i>
                   <span className="hidden-xs"> Search</span>
                 </Link>
@@ -97,6 +126,7 @@ const Header: React.FC = () => {
                   type="button"
                   title="more"
                   className="dropdown-toggle btn btn-link navbar-btn"
+                  aria-label="More navigation options"
                   aria-haspopup="true"
                   aria-expanded={isMoreOpen}
                   aria-controls="header-more-menu"
@@ -112,23 +142,35 @@ const Header: React.FC = () => {
                 <ul id="header-more-menu" className="dropdown-menu dropdown-menu-right">
                   <li className="dropdown-header">more</li>
                   <li>
-                    <Link to="/groups" onClick={() => setIsMoreOpen(false)}>
+                    <Link to="/groups" onClick={() => {
+                      setIsMoreOpen(false);
+                      setIsMobileNavOpen(false);
+                    }}>
                       <i className="fa fa-group"></i> Groups
                     </Link>
                   </li>
                   <li>
-                    <Link to="/members" onClick={() => setIsMoreOpen(false)}>
+                    <Link to="/members" onClick={() => {
+                      setIsMoreOpen(false);
+                      setIsMobileNavOpen(false);
+                    }}>
                       <i className="fa fa-user-circle"></i> Members
                     </Link>
                   </li>
-                  <li role="separator" className="divider"></li>
+                  <li className="divider" aria-hidden="true"></li>
                   <li>
-                    <Link to="/about" onClick={() => setIsMoreOpen(false)}>
+                    <Link to="/about" onClick={() => {
+                      setIsMoreOpen(false);
+                      setIsMobileNavOpen(false);
+                    }}>
                       <i className="fa fa-info-circle"></i> About
                     </Link>
                   </li>
                   <li>
-                    <Link to="/contact" onClick={() => setIsMoreOpen(false)}>
+                    <Link to="/contact" onClick={() => {
+                      setIsMoreOpen(false);
+                      setIsMobileNavOpen(false);
+                    }}>
                       <i className="fa fa-comment"></i> Contact
                     </Link>
                   </li>
@@ -145,6 +187,7 @@ const Header: React.FC = () => {
                     type="button"
                     title="Notifications"
                     className="btn btn-link navbar-btn"
+                    aria-label="Notifications"
                     onClick={(event) => {
                       event.preventDefault();
                     }}
@@ -157,6 +200,7 @@ const Header: React.FC = () => {
                     type="button"
                     className="dropdown-toggle"
                     style={{ background: 'transparent', border: 0 }}
+                    aria-label={`Account menu for ${user.username}`}
                     aria-haspopup="true"
                     aria-expanded={isUserMenuOpen}
                     aria-controls="header-user-menu"
@@ -176,50 +220,51 @@ const Header: React.FC = () => {
                     <ul id="header-user-menu" className="dropdown-menu dropdown-menu-right">
                       <li className="dropdown-header">Account</li>
                     <li>
-                      <Link to={`/members/${user.username}`} onClick={() => setIsUserMenuOpen(false)}>
+                      <Link to={`/members/${user.username}`} onClick={() => {
+                        setIsUserMenuOpen(false);
+                        setIsMobileNavOpen(false);
+                      }}>
                         <i className="fa fa-user-circle"></i> My Profile
                       </Link>
                     </li>
                       <li>
-                        <Link to={`/members/${user.username}/diary`} onClick={() => setIsUserMenuOpen(false)}>
+                        <Link to={`/members/${user.username}/diary`} onClick={() => {
+                          setIsUserMenuOpen(false);
+                          setIsMobileNavOpen(false);
+                        }}>
                           <i className="fa fa-folder-open"></i> My Diary
                         </Link>
                       </li>
                       {Boolean(user.roles?.admin) && (
                         <li>
-                          <Link to="/admin" onClick={() => setIsUserMenuOpen(false)}>
+                          <Link to="/admin" onClick={() => {
+                            setIsUserMenuOpen(false);
+                            setIsMobileNavOpen(false);
+                          }}>
                             <i className="fa fa-gear"></i> Admin Area
                           </Link>
                         </li>
                       )}
-                      <li role="separator" className="divider"></li>
+                      <li className="divider" aria-hidden="true"></li>
                       <li>
-                        <a href="/logout">
-                        <i className="fa fa-sign-out"></i> Sign Out
-                      </a>
-                    </li>
-                  </ul>
+                        <Link to="/logout" onClick={() => {
+                          setIsUserMenuOpen(false);
+                          setIsMobileNavOpen(false);
+                        }}>
+                          <i className="fa fa-sign-out"></i> Sign Out
+                        </Link>
+                      </li>
+                    </ul>
                 </li>
               </>
             ) : (
               <li>
-                <a href="/login" className="nav-narrow" aria-label="Sign in">
+                <Link to="/login" className="nav-narrow" aria-label="Sign in">
                   <i className="fa fa-user"></i>
                   <span className="hidden-xxxxs"> Sign In</span>
-                </a>
+                </Link>
               </li>
             )}
-            <li className="dropdown visible-sm visible-xs">
-              <a
-                href="#"
-                className="dropdown-toggle"
-                onClick={(event) => {
-                  event.preventDefault();
-                }}
-              >
-                <i className="fa fa-navicon"></i>
-              </a>
-            </li>
             </ul>
           </nav>
         </div>

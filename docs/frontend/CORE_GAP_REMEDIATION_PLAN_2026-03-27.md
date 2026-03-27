@@ -18,10 +18,10 @@ Close the highest-impact gaps across modern client parity, auth/security behavio
 ## Checklist
 
 ### A. Modern Client Parity and Accessibility
-- [ ] A1. Fix header accessibility violations (discernible mobile nav control text, list semantics).
-- [ ] A2. Normalize auth and account-action links for modern routing and server-backed flows.
-- [ ] A3. Add direct topic selection controls on visualize page (legacy parity path) while preserving graph interactions.
-- [ ] A4. Tune visualize graph interaction for fluid drag feel with momentum/bounce behavior.
+- [x] A1. Fix header accessibility violations (discernible mobile nav control text, list semantics).
+- [x] A2. Normalize auth and account-action links for modern routing and server-backed flows.
+- [x] A3. Add direct topic selection controls on visualize page (legacy parity path) while preserving graph interactions.
+- [x] A4. Tune visualize graph interaction for fluid drag feel with momentum/bounce behavior.
 
 ### B. API and Security Hardening
 - [ ] B1. Add login-attempt throttling parity in `POST /api/auth/login`.
@@ -58,3 +58,8 @@ Close the highest-impact gaps across modern client parity, auth/security behavio
 - Keep legacy templates intact for comparison.
 - Prefer incremental commits by checklist cluster (A, B, C, D).
 - Update checklist items in this file as tasks complete.
+- Completed A on 2026-03-27:
+  - `client/src/components/Layout/Header.tsx`
+  - `client/src/pages/VisualizePage.tsx`
+  - `webpack.config.js`
+  - Targeted validation: `npm run test:client -- client/src/accessibility/accessibility.audit.test.tsx client/src/pages/VisualizePage.test.tsx --runInBand`
