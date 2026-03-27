@@ -30,13 +30,13 @@ Close the highest-impact gaps across modern client parity, auth/security behavio
 - [x] B4. Send verification resend email from API flow with safe fallback behavior.
 
 ### C. Tests and CI Stability
-- [ ] C1. Update and fix failing client tests for accessibility and visualize flow.
-- [ ] C2. Update e2e mocks/assertions for provider/search/visualize parity behavior.
-- [ ] C3. Re-run `test:client`, `test:e2e`, and `test:server` and record outcome.
+- [x] C1. Update and fix failing client tests for accessibility and visualize flow.
+- [x] C2. Update e2e mocks/assertions for provider/search/visualize parity behavior.
+- [x] C3. Re-run `test:client`, `test:e2e`, and `test:server` and record outcome.
 
 ### D. API Contract and Documentation Accuracy
-- [ ] D1. Add missing implemented operations to `docs/api/openapi.json`.
-- [ ] D2. Reconcile stale claims in impacted docs and link to this plan for current status.
+- [x] D1. Add missing implemented operations to `docs/api/openapi.json`.
+- [x] D2. Reconcile stale claims in impacted docs and link to this plan for current status.
 
 ## Missing Endpoints to Add to OpenAPI
 - `GET /auth/account-settings`
@@ -50,9 +50,9 @@ Close the highest-impact gaps across modern client parity, auth/security behavio
 - `POST /contact`
 
 ## Verification Gates
-- [ ] Client: `npm run test:client`
-- [ ] E2E (Chromium): `npm run test:e2e -- --project=chromium`
-- [ ] Server: `npm run test:server`
+- [x] Client: `npm run test:client`
+- [x] E2E (Chromium): `npm run test:e2e -- --project=chromium`
+- [x] Server: `npm run test:server`
 
 ## Execution Notes
 - Keep legacy templates intact for comparison.
@@ -69,3 +69,19 @@ Close the highest-impact gaps across modern client parity, auth/security behavio
   - Validation:
     - `npm run type:check`
     - `npm run test:server`
+- Completed C on 2026-03-27:
+  - `client/src/pages/SearchPage.tsx`
+  - `jest.config.client.js`
+  - `tests/e2e/smoke.spec.ts`
+  - Validation:
+    - `npm run test:client -- --runInBand`
+    - `npm run test:e2e -- --project=chromium`
+    - `npm run test:ci`
+- Completed D on 2026-03-27:
+  - `docs/api/openapi.json`
+  - `docs/frontend/UAT_CHECKLIST.md`
+  - `docs/accessibility/ACCESSIBILITY_AUDIT_REPORT.md`
+  - `docs/security/SECURITY_AUDIT_REPORT.md`
+  - Validation:
+    - `npm run test:server -- --runInBand tests/server/openapi-contract.test.js tests/server/api-endpoints-smoke.test.js`
+    - `npm audit --json`

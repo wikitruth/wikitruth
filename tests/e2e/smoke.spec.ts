@@ -25,6 +25,24 @@ test.beforeEach(async ({ page }) => {
       body: JSON.stringify({ success: false, user: null }),
     });
   });
+
+  await page.route('**/api/auth/providers**', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        success: true,
+        providers: {
+          google: true,
+          github: true,
+          facebook: true,
+          twitter: true,
+          apple: true,
+          microsoft: true,
+        },
+      }),
+    });
+  });
 });
 
 test('loads about page', async ({ page }) => {
@@ -73,9 +91,10 @@ test('social auth buttons are wired to backend provider routes', async ({ page }
 
   await page.goto('/app/login');
 
-  await expect(page.getByRole('link', { name: /google/i })).toHaveAttribute('href', /\/login\/google/);
-  await expect(page.getByRole('link', { name: /github/i })).toHaveAttribute('href', /\/login\/github/);
-  await expect(page.getByRole('link', { name: /facebook/i })).toHaveAttribute('href', /\/login\/facebook/);
+  const socialButtons = page.locator('.wt-social-login');
+  await expect(socialButtons.getByRole('link', { name: 'Google', exact: true })).toHaveAttribute('href', /\/login\/google/);
+  await expect(socialButtons.getByRole('link', { name: 'GitHub', exact: true })).toHaveAttribute('href', /\/login\/github/);
+  await expect(socialButtons.getByRole('link', { name: 'Facebook', exact: true })).toHaveAttribute('href', /\/login\/facebook/);
 });
 
 test('group membership flow toggles join and leave actions', async ({ page }) => {

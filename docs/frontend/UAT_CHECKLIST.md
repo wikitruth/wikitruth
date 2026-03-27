@@ -2,6 +2,8 @@
 
 Date: 2026-02-24
 
+> Status update (2026-03-27): this checklist is a historical migration baseline. Current execution and verification status is tracked in `docs/frontend/CORE_GAP_REMEDIATION_PLAN_2026-03-27.md`.
+
 ## Access and Session
 
 - [x] Login succeeds and redirects correctly.
