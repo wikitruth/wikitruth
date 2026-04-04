@@ -85,6 +85,7 @@ exports.https = {
   port: Number(envWithDefault(['HTTPS_PORT'], '8443')) || 8443,
   keyPath: envWithDefault(['HTTPS_KEY_PATH'], ''),
   certPath: envWithDefault(['HTTPS_CERT_PATH'], ''),
+  redirectHttp: envBoolean(['HTTP_TO_HTTPS_REDIRECT', 'HTTPS_REDIRECT_HTTP'], false),
 };
 exports.mongodb = {
   uri: envWithDefault(['MONGOLAB_URI', 'MONGOHQ_URL', 'MONGODB_URI'], 'mongodb://127.0.0.1:27017/wikitruth'),
