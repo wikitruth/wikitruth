@@ -1,6 +1,12 @@
 'use strict';
 
 exports.port = process.env.PORT || 8000;
+exports.https = {
+  enabled: process.env.HTTPS_ENABLED === 'true',
+  port: Number(process.env.HTTPS_PORT || 8443),
+  keyPath: process.env.HTTPS_KEY_PATH || '',
+  certPath: process.env.HTTPS_CERT_PATH || ''
+};
 exports.mongodb = {
   uri: process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || process.env.MONGODB_URI || 'mongodb://localhost:27017/wikitruth',
   dbname: process.env.MONGODB_DBNAME || 'wikitruth',

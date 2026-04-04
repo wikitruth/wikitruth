@@ -80,6 +80,12 @@ function secretFromEnv(names, requiredLabel) {
 }
 
 exports.port = Number(envWithDefault(['PORT'], '8000')) || 8000;
+exports.https = {
+  enabled: envBoolean(['HTTPS_ENABLED'], false),
+  port: Number(envWithDefault(['HTTPS_PORT'], '8443')) || 8443,
+  keyPath: envWithDefault(['HTTPS_KEY_PATH'], ''),
+  certPath: envWithDefault(['HTTPS_CERT_PATH'], ''),
+};
 exports.mongodb = {
   uri: envWithDefault(['MONGOLAB_URI', 'MONGOHQ_URL', 'MONGODB_URI'], 'mongodb://127.0.0.1:27017/wikitruth'),
   dbname: envWithDefault(['MONGODB_DBNAME'], 'wikitruth'),
