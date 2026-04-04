@@ -12,10 +12,12 @@ module.exports = (env = {}, argv = {}) => {
     },
     optimization: {
       ...configWithoutDevServer.optimization,
-      runtimeChunk: 'single',
+      runtimeChunk: false,
       moduleIds: 'deterministic',
       splitChunks: {
-        chunks: 'all',
+        // Keep initial app bootstrap in bundle.js so public/react-app.html
+        // can serve modern client without additional hardcoded script tags.
+        chunks: 'async',
         maxInitialRequests: 20,
         minSize: 20_000,
       },
