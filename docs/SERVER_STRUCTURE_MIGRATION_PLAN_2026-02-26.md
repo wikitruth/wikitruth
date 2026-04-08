@@ -22,7 +22,7 @@ Migrate backend code from mixed root folders into a dedicated server workspace:
 
 ## Current-State Inventory
 
-- [ ] Confirm all backend source roots and ownership:
+- [x] Confirm all backend source roots and ownership:
   - `controllers/`
   - `middlewares/`
   - `models/`
@@ -31,15 +31,15 @@ Migrate backend code from mixed root folders into a dedicated server workspace:
   - `utils/`
   - `config/`
   - entrypoints: `app.js`, `server.js`
-- [ ] Capture baseline metrics:
+- [x] Capture baseline metrics:
   - `npm run type:check`
   - `npm run test:server`
   - `npm run test:client` (smoke subset)
-- [ ] Freeze migration branch policy (no unrelated refactors while moving paths).
+- [x] Freeze migration branch policy (no unrelated refactors while moving paths).
 
 ## Target Layout
 
-- [ ] Create target folders:
+- [x] Create target folders:
   - `server/src/controllers/`
   - `server/src/middlewares/`
   - `server/src/models/`
@@ -47,98 +47,103 @@ Migrate backend code from mixed root folders into a dedicated server workspace:
   - `server/src/types/`
   - `server/src/utils/`
   - `server/src/config/`
-- [ ] Keep temporary root compatibility shims until final cutover.
+- [x] Keep temporary root compatibility shims until final cutover.
 
 ## Migration Strategy (Phased)
 
 ### Phase 0: Safety Rails
 
-- [ ] Add migration ADR in `docs/adr/` describing constraints and rollback.
-- [ ] Add import-path lint guard to block new root-level backend imports once phase cutover starts.
-- [ ] Add CI check for mixed-path regressions (old + new imports in same moved module).
+- [x] Add migration ADR in `docs/adr/` describing constraints and rollback.
+- [x] Add import-path lint guard to block new root-level backend imports once phase cutover starts.
+- [x] Add CI check for mixed-path regressions (old + new imports in same moved module).
 
 ### Phase 1: Low-Coupling Modules First
 
-- [ ] Move `types/` to `server/src/types/`.
-- [ ] Move `services/` to `server/src/services/`.
-- [ ] Add root re-export shims:
+- [x] Move `types/` to `server/src/types/`.
+- [x] Move `services/` to `server/src/services/`.
+- [x] Add root re-export shims:
   - `types/* -> server/src/types/*`
   - `services/* -> server/src/services/*`
-- [ ] Update `tsconfig.server.json` include paths for both old+new during transition.
-- [ ] Run validation gate:
+- [x] Update `tsconfig.server.json` include paths for both old+new during transition.
+- [x] Run validation gate:
   - `npm run type:check`
   - `npm run test:server`
 
 ### Phase 2: Utility and Middleware Layer
 
-- [ ] Move `utils/` to `server/src/utils/`.
-- [ ] Move `middlewares/` to `server/src/middlewares/`.
-- [ ] Add root compatibility shims for moved files.
-- [ ] Update all direct imports in moved modules to canonical `server/src/...` paths.
-- [ ] Validation gate:
+- [x] Move `utils/` to `server/src/utils/`.
+- [x] Move `middlewares/` to `server/src/middlewares/`.
+- [x] Add root compatibility shims for moved files.
+- [x] Update all direct imports in moved modules to canonical `server/src/...` paths.
+- [x] Validation gate:
   - `npm run type:check`
   - `npm run test:server`
   - Request-context and API envelope tests pass.
 
 ### Phase 3: Models and Config
 
-- [ ] Move `models/` to `server/src/models/`.
-- [ ] Move `config/` to `server/src/config/`.
-- [ ] Keep `config/config.js` compatibility shim until final cutover.
-- [ ] Verify Mongoose model bootstrap resolves correctly from new location.
-- [ ] Validation gate:
+- [x] Move `models/` to `server/src/models/`.
+- [x] Move `config/` to `server/src/config/`.
+- [x] Keep `config/config.js` compatibility shim until final cutover.
+- [x] Verify Mongoose model bootstrap resolves correctly from new location.
+- [x] Validation gate:
   - server starts locally (`npm start`)
   - `npm run test:server`
 
 ### Phase 4: Controllers and API Surface
 
-- [ ] Move `controllers/` to `server/src/controllers/`.
-- [ ] Update route mounting imports and any dynamic requires.
-- [ ] Keep root `controllers/*` shim modules while legacy references remain.
-- [ ] Run full server and selected e2e smoke tests.
-- [ ] Validate modern client API calls still pass smoke suite.
+- [x] Move `controllers/` to `server/src/controllers/`.
+- [x] Update route mounting imports and any dynamic requires.
+- [x] Keep root `controllers/*` shim modules while legacy references remain.
+- [x] Run full server and selected e2e smoke tests.
+- [x] Validate modern client API calls still pass smoke suite.
 
 ### Phase 5: Entrypoint Cutover
 
-- [ ] Introduce canonical server entrypoint in `server/src/` (for example `server/src/app.ts` bootstrap).
-- [ ] Convert root `app.js` and `server.js` into thin forwarding shims only.
-- [ ] Update npm scripts to point to canonical server workspace.
-- [ ] Validate dev/prod scripts:
+- [x] Introduce canonical server entrypoint in `server/src/` (for example `server/src/app.ts` bootstrap).
+- [x] Convert root `app.js` and `server.js` into thin forwarding shims only.
+- [x] Update npm scripts to point to canonical server workspace.
+- [x] Validate dev/prod scripts:
   - `npm run dev:server`
   - `npm run build:server`
   - `npm run start:dist`
 
 ### Phase 6: Cleanup
 
-- [ ] Remove obsolete root backend folders after all imports are migrated.
-- [ ] Remove compatibility shims.
-- [ ] Tighten `tsconfig.server.json` to only include `server/src/**` (plus required shared files if any).
-- [ ] Update docs references and onboarding instructions.
+- [~] Remove obsolete root backend folders after all imports are migrated.
+- [~] Remove compatibility shims.
+- [x] Tighten `tsconfig.server.json` to only include `server/src/**` (plus required shared files if any).
+- [x] Update docs references and onboarding instructions.
 
 ## Compatibility Rules During Migration
 
-- [ ] Every moved file must keep a temporary shim at old path.
-- [ ] No circular "new imports old imports new" chains.
-- [ ] No behavior changes bundled with path moves.
-- [ ] One phase per PR/commit batch with passing validation gate.
+- [x] Every moved file must keep a temporary shim at old path.
+- [x] No circular "new imports old imports new" chains.
+- [x] No behavior changes bundled with path moves.
+- [~] One phase per PR/commit batch with passing validation gate.
 
 ## Validation Checklist (Per Phase)
 
-- [ ] Type-check passes: `npm run type:check`
-- [ ] Server tests pass: `npm run test:server`
-- [ ] OpenAPI contract test passes.
-- [ ] API smoke tests pass.
-- [ ] No broken runtime startup in local environment.
+- [x] Type-check passes: `npm run type:check`
+- [x] Server tests pass: `npm run test:server`
+- [x] OpenAPI contract test passes.
+- [x] API smoke tests pass.
+- [x] No broken runtime startup in local environment.
 
 ## Rollback Plan
 
-- [ ] Keep each phase in isolated commits for clean revert.
-- [ ] If gate fails, revert only that phase commit set.
-- [ ] Do not delete old paths until two consecutive green CI runs post-cutover.
+- [~] Keep each phase in isolated commits for clean revert.
+- [x] If gate fails, revert only that phase commit set.
+- [x] Do not delete old paths until two consecutive green CI runs post-cutover.
 
 ## Exit Criteria
 
-- [ ] Backend source of truth is `server/src/*`.
-- [ ] Root-level backend folders removed or reduced to explicit supported shims.
-- [ ] Scripts and docs reference canonical server paths.
-- [ ] CI green across type-check, server tests, and contract/smoke tests.
+- [x] Backend source of truth is `server/src/*`.
+- [x] Root-level backend folders removed or reduced to explicit supported shims.
+- [x] Scripts and docs reference canonical server paths.
+- [x] CI green across type-check, server tests, and contract/smoke tests.
+
+## Deferred Cleanup Notes
+
+- Root compatibility shims remain intentionally while legacy template modules still resolve root-level backend paths.
+- Final shim removal should happen in a dedicated follow-up once legacy template dependencies are fully cut over.
