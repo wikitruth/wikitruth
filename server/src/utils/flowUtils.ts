@@ -34,13 +34,11 @@ function getBackupDir(isPrivate) {
   let backupRoot = isPrivate && config.mongodb.privateBackupRoot ? config.mongodb.privateBackupRoot : config.mongodb.backupRoot;
   if (backupRoot) {
     if (backupRoot.startsWith('~')) {
-      // @ts-ignore TS(2304): Cannot find name '__dirname'.
-      return __dirname + '/..' + backupRoot.substring(1);
+      return process.cwd() + backupRoot.substring(1);
     }
     return backupRoot;
   }
-  // @ts-ignore TS(2304): Cannot find name '__dirname'.
-  return __dirname + '/../config/mongodb' + (isPrivate ? '/users' : '');
+  return process.cwd() + '/config/mongodb' + (isPrivate ? '/users' : '');
 }
 
 // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.

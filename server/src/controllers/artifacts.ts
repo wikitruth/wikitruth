@@ -25,6 +25,10 @@ let mongoose = require('mongoose'),
   constants = require('../models/constants'),
   // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   db = require('../app').db.models;
+const publicRoot = path.join(process.cwd(), 'public');
+function resolvePublicPath(relativePath: any) {
+  return path.join(publicRoot, String(relativePath || '').replace(/^\/+/, ''));
+}
 
 // @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports = function(router) {
@@ -210,15 +214,12 @@ async function POST_create(req, res) {
       // @ts-ignore TS(7005): Variable 'inlineFile' implicitly has an 'any' type... Remove this comment to see the full error message
       if (inlineFile) {
         // Create directory if not exists
-        let artifactFolderAbs = path.join(
-          // @ts-ignore TS(2304): Cannot find name '__dirname'.
-          __dirname,
-          '/../public',
+        let artifactFolderAbs = resolvePublicPath(
           // @ts-ignore TS(7005): Variable 'updatedEntity' implicitly has an 'any' t... Remove this comment to see the full error message
           updatedEntity.getFolder(req.params.username)
         );
         if (!fs.existsSync(artifactFolderAbs)) {
-          fs.mkdirSync(artifactFolderAbs);
+          fs.mkdirSync(artifactFolderAbs, { recursive: true });
         }
 
         // @ts-ignore TS(7005): Variable 'updatedEntity' implicitly has an 'any' t... Remove this comment to see the full error message
@@ -230,10 +231,9 @@ async function POST_create(req, res) {
         if (result) {
           // @ts-ignore TS(7005): Variable 'oldFilePath' implicitly has an 'any' typ... Remove this comment to see the full error message
           if (oldFilePath && oldFilePath !== filePath) {
-            // @ts-ignore TS(2304): Cannot find name '__dirname'.
-            let oldFilePathAbs = path.join(__dirname, '/../public', oldFilePath);
-            // @ts-ignore TS(2304): Cannot find name '__dirname'.
-            let oldThumbnailPathAbs = path.join(__dirname, '/../public', oldThumbnailPath);
+            let oldFilePathAbs = resolvePublicPath(oldFilePath);
+            // @ts-ignore TS(7005): Variable 'oldThumbnailPath' implicitly has an 'any' type... Remove this comment to see the full error message
+            let oldThumbnailPathAbs = resolvePublicPath(oldThumbnailPath);
             if (fs.existsSync(oldFilePathAbs)) {
               fs.unlinkSync(oldFilePathAbs);
             }
@@ -244,8 +244,7 @@ async function POST_create(req, res) {
           }
         }
 
-        // @ts-ignore TS(2304): Cannot find name '__dirname'.
-        let newPathAbs = path.join(__dirname, '/../public', filePath);
+        let newPathAbs = resolvePublicPath(filePath);
         // INFO: replaced fs.rename() due to error "EXDEV: cross-device link not permitted"
         // @ts-ignore TS(7005): Variable 'inlineFile' implicitly has an 'any' type... Remove this comment to see the full error message
         await mv(inlineFile.path, newPathAbs);
@@ -265,8 +264,7 @@ async function POST_create(req, res) {
 
           // create a thumbnail that fits within 500x500
           let thumbnailWidth = features.width > 500 ? 500 : features.width;
-          // @ts-ignore TS(2304): Cannot find name '__dirname'.
-          let thumbnailPathAbs = path.join(__dirname, '/../public', thumbnailPath);
+          let thumbnailPathAbs = resolvePublicPath(thumbnailPath);
           await imagemagick.resize({
             srcPath: newPathAbs,
             dstPath: thumbnailPathAbs,

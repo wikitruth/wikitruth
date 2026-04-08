@@ -1,10 +1,9 @@
 'use strict';
 
-const fs = require('fs');
-const path = require('path');
+const { readBackendSource } = require('./helpers/readBackendSource');
 
 function read(relativePath) {
-  return fs.readFileSync(path.join(process.cwd(), relativePath), 'utf8');
+  return readBackendSource(relativePath);
 }
 
 describe('API endpoint smoke coverage', function () {

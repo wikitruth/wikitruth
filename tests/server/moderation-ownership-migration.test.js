@@ -11,7 +11,7 @@ const findUser = jest.fn();
 const syncChildren = jest.fn();
 const updateChildrenCountBatch = jest.fn();
 
-jest.mock('../../app', () => ({
+jest.mock('../../server/src/app', () => ({
   db: {
     models: {
       Topic: {
@@ -26,7 +26,7 @@ jest.mock('../../app', () => ({
   },
 }));
 
-jest.mock('../../utils/flowUtils', () => ({
+jest.mock('../../server/src/utils/flowUtils', () => ({
   getDbModelByObjectType: jest.fn(),
   createOwnerQueryFromQuery: jest.fn(() => ({})),
   getParent: jest.fn(),

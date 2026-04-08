@@ -4,7 +4,7 @@
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "outDir": "./dist",
-    "rootDir": "./",
+    "rootDir": "./server/src",
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -15,20 +15,8 @@
     "sourceMap": true,
     "baseUrl": "."
   },
-  "include": [
-    "controllers/**/*.ts",
-    "middlewares/**/*.ts",
-    "models/**/*.ts",
-    "services/**/*.ts",
-    "utils/**/*.ts",
-    "types/**/*.ts",
-    "types/**/*.d.ts"
-  ],
+  "include": ["server/src/**/*.ts", "server/src/**/*.d.ts"],
   "exclude": [
-    "app.js",
-    "server.js",
-    "config/**/*.js",
-    "public/templates/jade/**/*.js",
     "node_modules",
     "dist",
     "public/dist",

@@ -1,13 +1,15 @@
 'use strict';
 
 import type { NextFunction, Request, Response } from 'express';
+const path = require('path');
 import type { AppContext } from '../types/models';
-const tmplRoot = '../public/templates/jade';
+const tmplRoot = path.join(process.cwd(), 'public', 'templates', 'jade');
 const paths = require('../models/paths');
 const { validateBody, schemas } = require('./requestValidation');
 
 function req(code: string): Record<string, (...args: unknown[]) => unknown> {
-  return require(tmplRoot + code);
+  const normalizedCode = String(code || '').replace(/^\/+/, '');
+  return require(path.join(tmplRoot, normalizedCode));
 }
 
 function ensureAuthenticated(req: Request, res: Response, next: NextFunction): void {
