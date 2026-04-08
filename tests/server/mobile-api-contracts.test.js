@@ -4,9 +4,9 @@ require('ts-node/register/transpile-only');
 
 const express = require('express');
 const request = require('supertest');
-const requestContext = require('../../middlewares/requestContext');
-const { apiEnvelopeMiddleware } = require('../../middlewares/apiError');
-const { createMobileApiContractMiddleware } = require('../../middlewares/mobileApiContracts');
+const requestContext = require('../../server/src/middlewares/requestContext');
+const { apiEnvelopeMiddleware } = require('../../server/src/middlewares/apiError');
+const { createMobileApiContractMiddleware } = require('../../server/src/middlewares/mobileApiContracts');
 
 describe('Mobile API contract middleware', function () {
   function createApp(options = {}) {

@@ -8,7 +8,7 @@ function read(relativePath) {
 
 describe('API endpoint smoke coverage', function () {
   it('mounts all migration API routers', function () {
-    const apiIndex = read('controllers/api/index.ts');
+    const apiIndex = read('server/src/controllers/api/index.ts');
 
     [
       'router.use(mobileContracts.mobileApiContractMiddleware)',
@@ -31,14 +31,14 @@ describe('API endpoint smoke coverage', function () {
   });
 
   it('keeps /api/v1 compatibility routed through the same handlers', function () {
-    const apiV1 = read('controllers/api/v1.ts');
+    const apiV1 = read('server/src/controllers/api/v1.ts');
 
     expect(apiV1).toContain("const mountApi = require('./index')");
     expect(apiV1).toContain('mountApi(router)');
   });
 
   it('exposes auth API handlers for session flows', function () {
-    const authApi = read('controllers/api/auth.ts');
+    const authApi = read('server/src/controllers/api/auth.ts');
 
     expect(authApi).toContain("router.get('/me'");
     expect(authApi).toContain("router.get('/providers'");
@@ -56,7 +56,7 @@ describe('API endpoint smoke coverage', function () {
   });
 
   it('exposes admin API handlers required by client admin services', function () {
-    const adminApi = read('controllers/api/admin.ts');
+    const adminApi = read('server/src/controllers/api/admin.ts');
 
     [
       "router.get('/'",
@@ -98,7 +98,7 @@ describe('API endpoint smoke coverage', function () {
   });
 
   it('exposes profile and custom-page member APIs required by modern client', function () {
-    const membersApi = read('controllers/api/members.ts');
+    const membersApi = read('server/src/controllers/api/members.ts');
 
     expect(membersApi).toContain("router.get('/me'");
     expect(membersApi).toContain("router.put('/me/preferences'");
@@ -112,14 +112,14 @@ describe('API endpoint smoke coverage', function () {
   });
 
   it('exposes monitoring endpoint for client runtime error tracking', function () {
-    const monitoringApi = read('controllers/api/monitoring.ts');
+    const monitoringApi = read('server/src/controllers/api/monitoring.ts');
 
     expect(monitoringApi).toContain("router.post('/errors'");
     expect(monitoringApi).toContain("logger.error('client.runtime.error'");
   });
 
   it('exposes moderation API handlers used by modern entry actions', function () {
-    const moderationApi = read('controllers/api/moderation.ts');
+    const moderationApi = read('server/src/controllers/api/moderation.ts');
 
     [
       "router.get('/entry'",
@@ -132,21 +132,21 @@ describe('API endpoint smoke coverage', function () {
   });
 
   it('exposes realtime SSE endpoint for React clients', function () {
-    const realtimeApi = read('controllers/api/realtime.ts');
+    const realtimeApi = read('server/src/controllers/api/realtime.ts');
 
     expect(realtimeApi).toContain("router.get('/events'");
     expect(realtimeApi).toContain("res.setHeader('Content-Type', 'text/event-stream')");
   });
 
   it('exposes content mutation handlers required by modern create/edit forms', function () {
-    const topicsApi = read('controllers/api/topics.ts');
-    const argumentsApi = read('controllers/api/arguments.ts');
-    const questionsApi = read('controllers/api/questions.ts');
-    const answersApi = read('controllers/api/answers.ts');
-    const issuesApi = read('controllers/api/issues.ts');
-    const opinionsApi = read('controllers/api/opinions.ts');
-    const artifactsApi = read('controllers/api/artifacts.ts');
-    const groupsApi = read('controllers/api/groups.ts');
+    const topicsApi = read('server/src/controllers/api/topics.ts');
+    const argumentsApi = read('server/src/controllers/api/arguments.ts');
+    const questionsApi = read('server/src/controllers/api/questions.ts');
+    const answersApi = read('server/src/controllers/api/answers.ts');
+    const issuesApi = read('server/src/controllers/api/issues.ts');
+    const opinionsApi = read('server/src/controllers/api/opinions.ts');
+    const artifactsApi = read('server/src/controllers/api/artifacts.ts');
+    const groupsApi = read('server/src/controllers/api/groups.ts');
 
     expect(topicsApi).toContain("router.post('/',");
     expect(topicsApi).toContain('POST_topic_create');
@@ -170,7 +170,7 @@ describe('API endpoint smoke coverage', function () {
   });
 
   it('keeps modern search parity buckets for core content types', function () {
-    const searchApi = read('controllers/api/search.ts');
+    const searchApi = read('server/src/controllers/api/search.ts');
 
     expect(searchApi).toContain('answers:');
     expect(searchApi).toContain('artifacts:');

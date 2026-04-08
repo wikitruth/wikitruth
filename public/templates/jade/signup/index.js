@@ -1,6 +1,6 @@
 'use strict';
 
-const httpClient = require('../../../../utils/httpClient');
+const httpClient = require('../../../../server/src/utils/httpClient');
 
 exports.init = function(req, res){
   if (req.isAuthenticated()) {

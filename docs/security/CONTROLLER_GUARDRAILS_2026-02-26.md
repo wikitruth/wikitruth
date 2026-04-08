@@ -4,23 +4,23 @@
 
 Targeted hardening for legacy-backed controller hotspots referenced by the modernization plan:
 
-- `controllers/groups.ts`
-- `controllers/topics.ts`
-- `controllers/async/clipboard.ts`
+- `server/src/controllers/groups.ts`
+- `server/src/controllers/topics.ts`
+- `server/src/controllers/async/clipboard.ts`
 
 ## Resolved Risks
 
 1. `GRP-001` Private group visibility bug
 - Status: Resolved
-- Change: fixed membership predicate in `controllers/groups.ts` so private groups render only when the current user is an actual member.
+- Change: fixed membership predicate in `server/src/controllers/groups.ts` so private groups render only when the current user is an actual member.
 
 2. `TOP-001` Group topic privacy ambiguity
 - Status: Resolved
-- Change: codified group-topic behavior in `controllers/topics.ts` with explicit rationale: group-scoped topics remain private by default.
+- Change: codified group-topic behavior in `server/src/controllers/topics.ts` with explicit rationale: group-scoped topics remain private by default.
 
 3. `CLP-001` Orphan `threadId` on root `ArgumentLink` writes
 - Status: Resolved
-- Change: `controllers/async/clipboard.ts` now seeds `threadId` to self `_id` after upsert when missing.
+- Change: `server/src/controllers/async/clipboard.ts` now seeds `threadId` to self `_id` after upsert when missing.
 
 ## Active Guardrails
 
@@ -52,7 +52,7 @@ Targeted hardening for legacy-backed controller hotspots referenced by the moder
 
 - [x] `CLP-004` Add transactional/batched children-count update strategy with invariant tests.
   - Implemented: `flowUtils.updateChildrenCountBatch(...)` now deduplicates parent-update tasks and supports transactional execution when sessions are available.
-  - Implemented: `services/childrenCountGuardrails.ts` enforces children-count invariants (`total = accepted + pending + rejected`) before writes.
+  - Implemented: `server/src/services/childrenCountGuardrails.ts` enforces children-count invariants (`total = accepted + pending + rejected`) before writes.
   - Test coverage: `tests/server/children-count-guardrails.test.js`.
 - [x] `CLP-005` Add explicit migration flow for diary/public ownership transfer with policy checks.
   - Implemented endpoint: `POST /api/moderation/ownership-migration`.

@@ -2,7 +2,7 @@
 
 const express = require('express');
 const request = require('supertest');
-const attachAppRoutes = require('../../controllers/app');
+const attachAppRoutes = require('../../server/src/controllers/app');
 
 describe('React shell routes', function () {
   function createApp() {

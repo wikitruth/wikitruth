@@ -22,10 +22,10 @@ Type-improvement project plan and backlog:
 
 ## Exception Scope
 
-- `controllers/**` (legacy route and page controller hotspots)
-- `middlewares/**` (route composition/auth edge handling)
-- `models/**` (legacy schema and plugin interoperability)
-- `utils/**` (large legacy helper surface, especially `flowUtils`)
+- `server/src/controllers/**` (legacy route and page controller hotspots)
+- `server/src/middlewares/**` (route composition/auth edge handling)
+- `server/src/models/**` (legacy schema and plugin interoperability)
+- `server/src/utils/**` (large legacy helper surface, especially `flowUtils`)
 
 ## Explicit JS Exclusions (Server Compiler Scope)
 
@@ -39,7 +39,7 @@ Type-improvement project plan and backlog:
 Use this command to inspect current exceptions:
 
 ```bash
-rg -n "@ts-ignore" --glob '*.ts' controllers middlewares models services utils types
+rg -n "@ts-ignore" --glob '*.ts' server/src/controllers server/src/middlewares server/src/models server/src/services server/src/utils server/src/types
 ```
 
 Or use the project metrics script:
@@ -50,7 +50,7 @@ npm run type:metrics
 
 ## Reduction Plan
 
-1. Reduce `@ts-ignore` density in `utils/flowUtils.ts` and high-traffic controllers first.
+1. Reduce `@ts-ignore` density in `server/src/utils/flowUtils.ts` and high-traffic controllers first.
 2. Replace line-level suppressions with typed DTO/model interfaces in API/controller boundaries.
 3. Add targeted tests whenever suppressions are removed from mutation-heavy flows.
 4. Track `@ts-ignore` trend weekly using `npm run type:metrics` until materially reduced.

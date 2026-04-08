@@ -64,8 +64,8 @@ Close the highest-impact gaps across modern client parity, auth/security behavio
   - `webpack.config.js`
   - Targeted validation: `npm run test:client -- client/src/accessibility/accessibility.audit.test.tsx client/src/pages/VisualizePage.test.tsx --runInBand`
 - Completed B on 2026-03-27:
-  - `controllers/api/auth.ts`
-  - `controllers/api/contact.ts`
+  - `server/src/controllers/api/auth.ts`
+  - `server/src/controllers/api/contact.ts`
   - Validation:
     - `npm run type:check`
     - `npm run test:server`

@@ -8,7 +8,7 @@ const csrf = require('csurf');
 const request = require('supertest');
 const config = require('../../config/config');
 
-/** @typedef {import('../../types/http').WikitruthRequest} WikitruthRequest */
+/** @typedef {import('../../server/src/types/http').WikitruthRequest} WikitruthRequest */
 
 function createSecurityTestApp() {
   const app = express();

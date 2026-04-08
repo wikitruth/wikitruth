@@ -8,7 +8,7 @@ function read(relativePath) {
 
 describe('Parity checklist guardrails', function () {
   it('keeps auth API and modern social provider surface wired', function () {
-    const authApi = read('controllers/api/auth.ts');
+    const authApi = read('server/src/controllers/api/auth.ts');
     const socialButtons = read('client/src/components/Auth/SocialLoginButtons.tsx');
     const authApiClient = read('client/src/services/api/auth.ts');
 
@@ -24,7 +24,7 @@ describe('Parity checklist guardrails', function () {
   it('keeps diary parity routes and API handlers in place', function () {
     const routeConfig = read('client/src/routes/routeConfig.tsx');
     const profileShell = read('client/src/components/Members/ProfileShell.tsx');
-    const membersApi = read('controllers/api/members.ts');
+    const membersApi = read('server/src/controllers/api/members.ts');
 
     expect(routeConfig).toContain("path: '/members/:username/diary'");
     expect(routeConfig).toContain("path: '/members/profile/diary'");
@@ -34,7 +34,7 @@ describe('Parity checklist guardrails', function () {
 
   it('keeps modern moderation entry actions on api-backed flows', function () {
     const entryActions = read('client/src/components/Entry/EntryActionsMenu.tsx');
-    const moderationApi = read('controllers/api/moderation.ts');
+    const moderationApi = read('server/src/controllers/api/moderation.ts');
 
     expect(entryActions).toContain("navigate(`/screening?");
     expect(entryActions).toContain("navigate(`/convert?");
@@ -48,7 +48,7 @@ describe('Parity checklist guardrails', function () {
   });
 
   it('keeps modern admin mutation coverage for parity-critical operations', function () {
-    const adminApi = read('controllers/api/admin.ts');
+    const adminApi = read('server/src/controllers/api/admin.ts');
     const adminClient = read('client/src/services/api/admin.ts');
 
     [

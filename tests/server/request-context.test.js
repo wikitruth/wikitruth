@@ -4,8 +4,8 @@ require('ts-node/register/transpile-only');
 
 const express = require('express');
 const request = require('supertest');
-const requestContext = require('../../middlewares/requestContext');
-const { apiErrorHandler, wrapAsyncRouter } = require('../../middlewares/apiError');
+const requestContext = require('../../server/src/middlewares/requestContext');
+const { apiErrorHandler, wrapAsyncRouter } = require('../../server/src/middlewares/apiError');
 
 describe('Request context middleware', function () {
   it('generates and propagates request id when header is missing', async function () {

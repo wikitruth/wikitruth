@@ -4,11 +4,11 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const request = require('supertest');
 
-jest.mock('../../utils/logger', () => ({
+jest.mock('../../server/src/utils/logger', () => ({
   error: jest.fn(),
 }));
 
-jest.mock('../../services/realtimeEvents', () => ({
+jest.mock('../../server/src/services/realtimeEvents', () => ({
   publishRealtimeEvent: jest.fn(),
 }));
 
@@ -16,7 +16,7 @@ function createApp() {
   const app = express();
   app.use(bodyParser.json());
   const router = express.Router();
-  require('../../controllers/api/monitoring')(router);
+  require('../../server/src/controllers/api/monitoring')(router);
   app.use('/api/monitoring', router);
   return app;
 }

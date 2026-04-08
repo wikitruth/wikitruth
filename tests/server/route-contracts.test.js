@@ -8,16 +8,16 @@ function readProjectFile(relativePath) {
 
 describe('Server route contracts', function () {
   it('keeps legacy entry routes mounted', function () {
-    const routesSource = readProjectFile('middlewares/routes.ts');
+    const routesSource = readProjectFile('server/src/middlewares/routes.ts');
 
     expect(routesSource).toContain("app.get('/home/'");
     expect(routesSource).toContain("app.get('/login/'");
   });
 
   it('keeps root and api home handlers wired', function () {
-    const indexSource = readProjectFile('controllers/index.ts');
-    const apiIndexSource = readProjectFile('controllers/api/index.ts');
-    const appControllerSource = readProjectFile('controllers/app.ts');
+    const indexSource = readProjectFile('server/src/controllers/index.ts');
+    const apiIndexSource = readProjectFile('server/src/controllers/api/index.ts');
+    const appControllerSource = readProjectFile('server/src/controllers/app.ts');
 
     expect(indexSource).toContain("router.get('/', async function (req, res)");
     expect(apiIndexSource).toContain("router.use('/home', homeRouter)");

@@ -110,8 +110,8 @@ Migrate backend code from mixed root folders into a dedicated server workspace:
 
 ### Phase 6: Cleanup
 
-- [~] Remove obsolete root backend folders after all imports are migrated.
-- [~] Remove compatibility shims.
+- [x] Remove obsolete root backend folders after all imports are migrated.
+- [x] Remove compatibility shims.
 - [x] Tighten `tsconfig.server.json` to only include `server/src/**` (plus required shared files if any).
 - [x] Update docs references and onboarding instructions.
 
@@ -120,7 +120,7 @@ Migrate backend code from mixed root folders into a dedicated server workspace:
 - [x] Every moved file must keep a temporary shim at old path.
 - [x] No circular "new imports old imports new" chains.
 - [x] No behavior changes bundled with path moves.
-- [~] One phase per PR/commit batch with passing validation gate.
+- [x] One phase per PR/commit batch with passing validation gate.
 
 ## Validation Checklist (Per Phase)
 
@@ -132,7 +132,7 @@ Migrate backend code from mixed root folders into a dedicated server workspace:
 
 ## Rollback Plan
 
-- [~] Keep each phase in isolated commits for clean revert.
+- [x] Keep each phase in isolated commits for clean revert.
 - [x] If gate fails, revert only that phase commit set.
 - [x] Do not delete old paths until two consecutive green CI runs post-cutover.
 
@@ -143,7 +143,6 @@ Migrate backend code from mixed root folders into a dedicated server workspace:
 - [x] Scripts and docs reference canonical server paths.
 - [x] CI green across type-check, server tests, and contract/smoke tests.
 
-## Deferred Cleanup Notes
+## Completion Notes
 
-- Root compatibility shims remain intentionally while legacy template modules still resolve root-level backend paths.
-- Final shim removal should happen in a dedicated follow-up once legacy template dependencies are fully cut over.
+- Root compatibility shim folders (`controllers/`, `middlewares/`, `models/`, `services/`, `types/`, `utils/`) were removed after migrating remaining template and test imports to canonical `server/src/*` paths.

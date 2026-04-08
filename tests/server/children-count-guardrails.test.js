@@ -5,7 +5,7 @@ require('ts-node/register/transpile-only');
 const {
   assertChildrenCountInvariants,
   normalizeChildrenCountUpdateTasks,
-} = require('../../services/childrenCountGuardrails');
+} = require('../../server/src/services/childrenCountGuardrails');
 
 describe('Children count guardrails', function () {
   it('deduplicates and normalizes batched children-count updates', function () {

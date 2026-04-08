@@ -8,14 +8,14 @@ function read(relativePath) {
 
 describe('Realtime event channel smoke coverage', function () {
   it('publishes monitoring errors to realtime subscribers', function () {
-    const monitoringApi = read('controllers/api/monitoring.ts');
+    const monitoringApi = read('server/src/controllers/api/monitoring.ts');
 
     expect(monitoringApi).toContain('publishRealtimeEvent({');
     expect(monitoringApi).toContain("type: 'monitoring.error'");
   });
 
   it('maintains a shared realtime event bus service', function () {
-    const realtimeEventsService = read('services/realtimeEvents.ts');
+    const realtimeEventsService = read('server/src/services/realtimeEvents.ts');
 
     expect(realtimeEventsService).toContain('function subscribeRealtime(');
     expect(realtimeEventsService).toContain('function publishRealtimeEvent(');

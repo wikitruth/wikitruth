@@ -44,7 +44,7 @@ function createApp(user) {
   });
 
   const router = express.Router();
-  require('../../controllers/api/moderation')(router);
+  require('../../server/src/controllers/api/moderation')(router);
   app.use('/api/moderation', router);
   return app;
 }

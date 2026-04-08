@@ -4,7 +4,7 @@ require('ts-node/register/transpile-only');
 
 const express = require('express');
 const request = require('supertest');
-const { validateBody, schemas } = require('../../middlewares/requestValidation');
+const { validateBody, schemas } = require('../../server/src/middlewares/requestValidation');
 
 describe('Request validation middleware', function () {
   function createApp(schema) {

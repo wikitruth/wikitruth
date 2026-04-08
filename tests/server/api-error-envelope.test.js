@@ -2,7 +2,7 @@
 
 const express = require('express');
 const request = require('supertest');
-const { apiEnvelopeMiddleware, apiErrorHandler, wrapAsyncRouter } = require('../../middlewares/apiError');
+const { apiEnvelopeMiddleware, apiErrorHandler, wrapAsyncRouter } = require('../../server/src/middlewares/apiError');
 
 describe('API error envelope', function () {
   it('returns a consistent error payload for /api routes', async function () {

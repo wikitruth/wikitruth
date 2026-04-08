@@ -12,7 +12,7 @@ The enhancement roadmap calls for realtime updates in the modern React surface, 
 Implement a baseline Server-Sent Events (SSE) channel with minimal operational risk:
 
 1. Add `/api/realtime/events` (and `/api/v1/realtime/events` through existing v1 compatibility routing).
-2. Use a lightweight in-memory event bus (`services/realtimeEvents.ts`) for publish/subscribe fan-out.
+2. Use a lightweight in-memory event bus (`server/src/services/realtimeEvents.ts`) for publish/subscribe fan-out.
 3. Stream initial `connected` and periodic `heartbeat` events to keep the channel alive.
 4. Publish `monitoring.error` events from the monitoring controller as the first concrete realtime signal.
 5. Provide a typed React client channel utility (`client/src/services/realtime/channel.ts`) for subscribing with `EventSource`.

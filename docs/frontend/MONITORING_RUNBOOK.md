@@ -6,8 +6,8 @@ This runbook covers monitoring for migrated React routes (`/app/*`) and supporti
 
 ## Signals
 
-- Server request logs from `middlewares/requestContext.ts`.
-- API error envelope logs from `middlewares/apiError.ts`.
+- Server request logs from `server/src/middlewares/requestContext.ts`.
+- API error envelope logs from `server/src/middlewares/apiError.ts`.
 - Client runtime error reports from `POST /api/monitoring/errors`.
 
 ## Client Runtime Error Reporting
