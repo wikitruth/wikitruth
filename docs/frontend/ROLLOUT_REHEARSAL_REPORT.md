@@ -29,5 +29,5 @@ Validate migration readiness with local production-style rehearsal, smoke tests,
 ## Production Readiness Notes
 
 - Monitoring endpoint available at `/api/monitoring/errors`.
-- Rollback process documented in `docs/frontend/ROLLBACK_PLAN.md`.
+- Rollback process documented in `docs/plans/ROLLBACK_PLAN.md`.
 - Legacy templates intentionally preserved for side-by-side comparison.

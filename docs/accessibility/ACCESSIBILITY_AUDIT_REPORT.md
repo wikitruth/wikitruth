@@ -29,4 +29,4 @@ Date: 2026-03-27
 
 - This is a component-level audit baseline for migrated React surfaces.
 - Additional page-level/manual assistive technology testing should continue as features are integrated.
-- Related implementation tracker: `docs/frontend/CORE_GAP_REMEDIATION_PLAN_2026-03-27.md`.
+- Related implementation tracker: `docs/plans/completed/CORE_GAP_REMEDIATION_PLAN_2026-03-27.md`.

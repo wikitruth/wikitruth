@@ -30,6 +30,6 @@ Audit date: 2026-02-21
 
 ## Follow-Up Actions
 
-1. Execute deprecation plan from `docs/DEPRECATION_REPLACEMENT_PLAN.md` (`request`, `jade`, auth adapters).
+1. Execute deprecation plan from `docs/plans/DEPRECATION_REPLACEMENT_PLAN.md` (`request`, `jade`, auth adapters).
 2. Complete legacy build chain reduction (remove unused Grunt/Bower-era dependencies).
 3. Run vulnerability reduction pass #2 with major upgrades and regression tests (`P1-10`).

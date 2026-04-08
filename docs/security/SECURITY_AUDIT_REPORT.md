@@ -13,4 +13,4 @@ Source: npm audit --json
 
 ## Note
 This report is a baseline audit snapshot and should be remediated iteratively using dependency updates and patching.
-This snapshot accompanies auth and captcha hardening work tracked in `docs/frontend/CORE_GAP_REMEDIATION_PLAN_2026-03-27.md`.
+This snapshot accompanies auth and captcha hardening work tracked in `docs/plans/completed/CORE_GAP_REMEDIATION_PLAN_2026-03-27.md`.

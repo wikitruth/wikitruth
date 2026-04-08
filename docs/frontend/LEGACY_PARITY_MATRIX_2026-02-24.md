@@ -27,6 +27,6 @@ Legend:
 
 ## Accuracy Notes
 
-- This matrix is now aligned with the active checklist in `docs/frontend/LEGACY_MODERN_PARITY_IMPLEMENTATION_PLAN_2026-02-26.md`.
+- This matrix is now aligned with the active checklist in `docs/plans/completed/LEGACY_MODERN_PARITY_IMPLEMENTATION_PLAN_2026-02-26.md`.
 - No pending item is marked as complete.
 - Legacy templates/controllers remain intentionally available for flow comparison and rollback confidence.

@@ -1,16 +1,16 @@
 # Documentation Index
 
-This folder contains active engineering documentation and archived migration artifacts.
+This folder contains active engineering documentation, planning docs, and historical archives.
 
 ## Start Here
 
 - Client development setup: `docs/CLIENT_DEVELOPMENT_SETUP.md`
-- Completed enhancement tracker (archived): `docs/archive/plans/PROJECT_ENHANCEMENT_PROPOSAL_2026-02-24.md`
-- Completed modern client completion plan (archived): `docs/archive/plans/MODERN_CLIENT_COMPLETION_PLAN_2026-02-24.md`
-- Completed system implementation plan (archived): `docs/archive/plans/SYSTEM_MODERN_CLIENT_IMPLEMENTATION_PLAN_2026-02-26.md`
-- Dependency upgrade plan: `docs/DEPENDENCY_UPGRADE_PLAN_2026-02-24.md`
-- Mobile app strategy: `docs/MOBILE_APP_STRATEGY_2026-02-24.md`
-- Server structure migration plan: `docs/SERVER_STRUCTURE_MIGRATION_PLAN_2026-02-26.md`
+- Active plans index: `docs/plans/README.md`
+- Completed plans index: `docs/plans/completed/README.md`
+- Dependency upgrade plan (active): `docs/plans/DEPENDENCY_UPGRADE_PLAN_2026-02-24.md`
+- Deprecation replacement plan (active): `docs/plans/DEPRECATION_REPLACEMENT_PLAN.md`
+- Mobile app strategy (active): `docs/plans/MOBILE_APP_STRATEGY_2026-02-24.md`
+- Rollback plan (active): `docs/plans/ROLLBACK_PLAN.md`
 
 ## Architecture Decisions
 
@@ -36,8 +36,8 @@ This folder contains active engineering documentation and archived migration art
 ## Migration Archives
 
 - Archive index: `docs/archive/migrations/README.md`
-- Archived plans index: `docs/archive/plans/README.md`
-- Historical migration snapshot: `docs/archive/MIGRATION_PLAN_ARCHIVE_2026-02-22.md`
+- Plans archive index: `docs/plans/completed/README.md`
+- Historical migration snapshot: `docs/plans/completed/MIGRATION_PLAN_ARCHIVE_2026-02-22.md`
 
 ## Archived Migration Docs
 
