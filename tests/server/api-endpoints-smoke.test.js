@@ -127,6 +127,7 @@ describe('API endpoint smoke coverage', function () {
       "router.put('/screening'",
       "router.put('/verdict'",
       "router.post('/take-ownership'",
+      "router.post('/ownership-migration'",
       "router.post('/delete'",
     ].forEach((contract) => expect(moderationApi).toContain(contract));
   });

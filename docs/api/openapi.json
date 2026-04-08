@@ -2458,6 +2458,33 @@
         }
       }
     },
+    "/moderation/ownership-migration": {
+      "post": {
+        "summary": "Migrate root topic ownership scope between public and diary",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericMutationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/moderation/delete": {
       "post": {
         "summary": "Delete an entry as admin",

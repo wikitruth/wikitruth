@@ -51,7 +51,7 @@ Legend: `[x]` ready, `[~]` partial, `[ ]` missing
 - [x] Cursor-based pagination contract (`limit`, `cursor`, `nextCursor`) is available for mobile-read critical list endpoints.
 - [x] Rate-limit and quota response contract (headers + `RATE_LIMITED`) is implemented and documented.
 - [x] Contract-level deprecation policy and sunset headers are emitted by API contract middleware.
-- [ ] Binary/media upload contract documented for mobile clients.
+- [x] Binary/media upload contract documented for mobile clients.
 - [x] Baseline realtime channel now available via SSE (`/api/realtime/events` and `/api/v1/realtime/events`).
 - [x] Mobile-specific observability tags (client version, platform, build number) are integrated in API telemetry.
 - [x] End-to-end contract tests for mobile critical path endpoints are now in server CI (`mobile-api-contracts`, `openapi-contract`, `request-context`).
@@ -64,6 +64,24 @@ Legend: `[x]` ready, `[~]` partial, `[ ]` missing
 4. [x] Add pagination contract (`limit`, `cursor`, `nextCursor`) where list volume requires it.
 5. [x] Add contract tests in CI for auth, home/topics/search, and core entry reads.
 6. [x] Define mobile error code taxonomy and map from current server errors (`RATE_LIMITED`, envelope-level request IDs).
+
+## Binary/Media Upload Contract (MVP)
+
+Current mobile-compatible media flow is metadata-first through the artifacts API:
+
+1. `POST /api/artifacts`
+- Required fields: `title`, `description` (or `content`), `topicId` (or `ownerId`)
+- Optional fields: `source`, `private`
+- Response: `{ success: true, artifact: { ... } }` with canonical artifact id and ownership metadata.
+
+2. `PUT /api/artifacts/entry/{id}`
+- Supports metadata updates (title/content/source/privacy/topic ownership).
+- Response: `{ success: true, artifact: { ... } }`.
+
+3. Binary payload rule for mobile clients
+- The API currently expects artifact metadata and a resolvable media `source` reference; it does not currently accept raw multipart file bytes in this endpoint family.
+- Mobile clients should upload file bytes via the project’s storage channel and pass the resulting stable URL/reference in `source`.
+- Server-side validation failures for incomplete metadata should be handled as standard API errors (`400` with envelope/error payload).
 
 ## Suggested Repository Layout
 

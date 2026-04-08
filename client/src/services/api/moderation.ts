@@ -61,6 +61,16 @@ interface ModerationMutationResponse {
   entry?: ModerationEntry;
 }
 
+interface OwnershipMigrationResponse {
+  success: boolean;
+  migration?: {
+    topicId: string;
+    targetScope: 'public' | 'diary';
+    username: string | null;
+    migratedTopicCount: number;
+  };
+}
+
 const getCsrfToken = (): string | null => {
   if (typeof document === 'undefined') {
     return null;
@@ -117,6 +127,15 @@ export const moderationApi = {
     request<ModerationMutationResponse>('/moderation/delete', {
       method: 'POST',
       body: JSON.stringify({ id, type: objectType }),
+    }),
+  migrateOwnershipScope: (topicId: string, targetScope: 'public' | 'diary', username?: string) =>
+    request<OwnershipMigrationResponse>('/moderation/ownership-migration', {
+      method: 'POST',
+      body: JSON.stringify({
+        topicId,
+        targetScope,
+        username,
+      }),
     }),
 };
 

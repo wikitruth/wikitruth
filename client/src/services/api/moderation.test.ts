@@ -44,4 +44,28 @@ describe('moderationApi', () => {
       }),
     );
   });
+
+  it('posts ownership migration payload for admin migration flow', async () => {
+    document.cookie = '_csrfToken=test-csrf-token';
+    const fetchMock = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true }),
+    });
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+    await moderationApi.migrateOwnershipScope('topic-1', 'diary', 'alice');
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/moderation/ownership-migration',
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({ 'x-csrf-token': 'test-csrf-token' }),
+        body: JSON.stringify({
+          topicId: 'topic-1',
+          targetScope: 'diary',
+          username: 'alice',
+        }),
+      }),
+    );
+  });
 });

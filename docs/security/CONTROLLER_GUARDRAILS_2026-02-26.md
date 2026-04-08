@@ -50,5 +50,16 @@ Targeted hardening for legacy-backed controller hotspots referenced by the moder
 
 ## Follow-up Backlog
 
-- [ ] `CLP-004` Add transactional/batched children-count update strategy with invariant tests.
-- [ ] `CLP-005` Add explicit migration flow for diary/public ownership transfer with policy checks.
+- [x] `CLP-004` Add transactional/batched children-count update strategy with invariant tests.
+  - Implemented: `flowUtils.updateChildrenCountBatch(...)` now deduplicates parent-update tasks and supports transactional execution when sessions are available.
+  - Implemented: `services/childrenCountGuardrails.ts` enforces children-count invariants (`total = accepted + pending + rejected`) before writes.
+  - Test coverage: `tests/server/children-count-guardrails.test.js`.
+- [x] `CLP-005` Add explicit migration flow for diary/public ownership transfer with policy checks.
+  - Implemented endpoint: `POST /api/moderation/ownership-migration`.
+  - Policy checks:
+    - admin-only
+    - root-topic-only (prevents partial subtree drift)
+    - blocks group-owned topics from this flow
+    - requires explicit diary target username
+    - blocks cross-user diary transfer unless ownership is intentionally reassigned first
+  - Follow-through: subtree privacy/owner fields are migrated and descendants are re-synced with count recalculation.

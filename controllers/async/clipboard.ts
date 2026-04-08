@@ -246,6 +246,7 @@ module.exports = function (router) {
                 .lean()
                 // @ts-ignore TS(7006): Parameter 'err' implicitly has an 'any' type.
                 .exec(function (err, results) {
+                    const childrenCountTasks: Array<{ entryId: any; entryType: any; specificEntryType: any }> = [];
                     // Update each moved entry and their parent count
                     // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
                     async.each(results, function (result, callback) {
@@ -294,12 +295,21 @@ module.exports = function (router) {
                             },
                             // @ts-ignore TS(7006): Parameter 'callback' implicitly has an 'any' type.
                             updateChildrenCount: function (callback) {
-                                // Tracked optimization: keep per-entry count updates for correctness, batch later for performance.
+                                // Queue count updates and flush once to avoid repeated recomputation on large moves.
                                 if (oldParentId) {
-                                    flowUtils.updateChildrenCount(oldParentId, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.argument, callback);
+                                    childrenCountTasks.push({
+                                        entryId: oldParentId,
+                                        entryType: constants.OBJECT_TYPES.argument,
+                                        specificEntryType: constants.OBJECT_TYPES.argument,
+                                    });
                                 } else {
-                                    flowUtils.updateChildrenCount(oldOwnerId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.argument, callback);
+                                    childrenCountTasks.push({
+                                        entryId: oldOwnerId,
+                                        entryType: constants.OBJECT_TYPES.topic,
+                                        specificEntryType: constants.OBJECT_TYPES.argument,
+                                    });
                                 }
+                                callback();
                             }
                         // @ts-ignore TS(7006): Parameter 'err' implicitly has an 'any' type.
                         }, function (err, results) {
@@ -308,7 +318,18 @@ module.exports = function (router) {
 
                     }, function () {
                         // Update the new owner's children count
-                        flowUtils.updateChildrenCount(targetOwnerId, targetOwnerType, constants.OBJECT_TYPES.argument, callback);
+                        childrenCountTasks.push({
+                            entryId: targetOwnerId,
+                            entryType: targetOwnerType,
+                            specificEntryType: constants.OBJECT_TYPES.argument,
+                        });
+                        flowUtils.updateChildrenCountBatch(childrenCountTasks, { transactional: true })
+                            .then(function () {
+                                callback();
+                            })
+                            .catch(function (batchError: any) {
+                                callback(batchError);
+                            });
                     });
                 });
         };
@@ -325,6 +346,7 @@ module.exports = function (router) {
                 .lean()
                 // @ts-ignore TS(7006): Parameter 'err' implicitly has an 'any' type.
                 .exec(function (err, results) {
+                    const childrenCountTasks: Array<{ entryId: any; entryType: any; specificEntryType: any }> = [];
                     // Update each moved entry and their parent count
                     // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
                     async.each(results, function (result, callback) {
@@ -365,8 +387,12 @@ module.exports = function (router) {
                             // @ts-ignore TS(7006): Parameter 'callback' implicitly has an 'any' type.
                             updateChildrenCount: function (callback) {
                                 // Update old owner's children count
-                                // Tracked optimization: keep per-entry count updates for correctness, batch later for performance.
-                                flowUtils.updateChildrenCount(oldOwnerId, oldOwnerType, constants.OBJECT_TYPES.question, callback);
+                                childrenCountTasks.push({
+                                    entryId: oldOwnerId,
+                                    entryType: oldOwnerType,
+                                    specificEntryType: constants.OBJECT_TYPES.question,
+                                });
+                                callback();
                             }
                         // @ts-ignore TS(7006): Parameter 'err' implicitly has an 'any' type.
                         }, function (err, results) {
@@ -374,7 +400,18 @@ module.exports = function (router) {
                         });
                     }, function () {
                         // Update the new owner's children count
-                        flowUtils.updateChildrenCount(targetOwnerId, targetOwnerType, constants.OBJECT_TYPES.question, callback);
+                        childrenCountTasks.push({
+                            entryId: targetOwnerId,
+                            entryType: targetOwnerType,
+                            specificEntryType: constants.OBJECT_TYPES.question,
+                        });
+                        flowUtils.updateChildrenCountBatch(childrenCountTasks, { transactional: true })
+                            .then(function () {
+                                callback();
+                            })
+                            .catch(function (batchError: any) {
+                                callback(batchError);
+                            });
                     });
                 });
         };
@@ -393,6 +430,7 @@ module.exports = function (router) {
                         .lean()
                         // @ts-ignore TS(7006): Parameter 'err' implicitly has an 'any' type.
                         .exec(function (err, results) {
+                            const childrenCountTasks: Array<{ entryId: any; entryType: any; specificEntryType: any }> = [];
                             // Update each moved entry and their parent count
                             // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
                             async.each(results, function(result, callback){
@@ -427,13 +465,14 @@ module.exports = function (router) {
                                     },
                                     // @ts-ignore TS(7006): Parameter 'callback' implicitly has an 'any' type.
                                     updateChildrenCount: function (callback) {
-                                        // Tracked optimization: keep per-entry count updates for correctness, batch later for performance.
                                         if (parentId) {
-                                            // Update old parent's children
-                                            flowUtils.updateChildrenCount(parentId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, callback);
-                                        } else {
-                                            callback();
+                                            childrenCountTasks.push({
+                                                entryId: parentId,
+                                                entryType: constants.OBJECT_TYPES.topic,
+                                                specificEntryType: constants.OBJECT_TYPES.topic,
+                                            });
                                         }
+                                        callback();
                                     }
                                 // @ts-ignore TS(7006): Parameter 'err' implicitly has an 'any' type.
                                 }, function (err, results) {
@@ -442,7 +481,18 @@ module.exports = function (router) {
                             }, function () {
                                 if(targetOwnerId) {
                                     // update new parent's children
-                                    flowUtils.updateChildrenCount(targetOwnerId, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic, callback);
+                                    childrenCountTasks.push({
+                                        entryId: targetOwnerId,
+                                        entryType: constants.OBJECT_TYPES.topic,
+                                        specificEntryType: constants.OBJECT_TYPES.topic,
+                                    });
+                                    flowUtils.updateChildrenCountBatch(childrenCountTasks, { transactional: true })
+                                        .then(function () {
+                                            callback();
+                                        })
+                                        .catch(function (batchError: any) {
+                                            callback(batchError);
+                                        });
                                 } else {
                                     callback();
                                 }

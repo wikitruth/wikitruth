@@ -71,6 +71,7 @@ describe('OpenAPI contract', function () {
       '/moderation/screening',
       '/moderation/verdict',
       '/moderation/take-ownership',
+      '/moderation/ownership-migration',
       '/moderation/delete',
       '/monitoring/errors',
       '/realtime/events',

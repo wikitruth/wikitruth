@@ -23,6 +23,10 @@ let db = require('../app').db.models,
   // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   async = require('async');
 
+const childrenCountGuardrails = require('../services/childrenCountGuardrails'),
+  normalizeChildrenCountUpdateTasks = childrenCountGuardrails.normalizeChildrenCountUpdateTasks,
+  assertChildrenCountInvariants = childrenCountGuardrails.assertChildrenCountInvariants;
+
 let mn = ' 12:00 AM';
 
 // @ts-ignore TS(7006): Parameter 'isPrivate' implicitly has an 'any' type... Remove this comment to see the full error message
@@ -1353,8 +1357,70 @@ async function getTopOpinions(query, model, req) {
  * @param entryType: parent entryType
  * @param specificEntryType: specific child entries to update
  */
+// @ts-ignore TS(7006): Parameter 'query' implicitly has an 'any' type.
+function applySessionToQuery(query, session) {
+  if (session && query && typeof query.session === 'function') {
+    return query.session(session);
+  }
+  return query;
+}
+
+// @ts-ignore TS(7006): Parameter 'dbModel' implicitly has an 'any' type.
+async function countDocumentsWithSession(dbModel, query, session) {
+  return await applySessionToQuery(dbModel.countDocuments(query), session);
+}
+
+// @ts-ignore TS(7006): Parameter 'dbModel' implicitly has an 'any' type.
+async function updateOneWithSession(dbModel, filter, update, session) {
+  return await applySessionToQuery(dbModel.updateOne(filter, update), session);
+}
+
+// @ts-ignore TS(7006): Parameter 'specificEntryType' implicitly has an 'any' type.
+function normalizeUpdateChildrenCountArgs(specificEntryType, callbackOrOptions, maybeOptions) {
+  let normalizedSpecificEntryType = specificEntryType;
+  let callback = null;
+  let options: any = {};
+
+  if (typeof normalizedSpecificEntryType === 'function') {
+    callback = normalizedSpecificEntryType;
+    normalizedSpecificEntryType = null;
+  } else if (normalizedSpecificEntryType && typeof normalizedSpecificEntryType === 'object') {
+    options = normalizedSpecificEntryType;
+    normalizedSpecificEntryType = null;
+  }
+
+  if (typeof callbackOrOptions === 'function') {
+    callback = callbackOrOptions;
+  } else if (callbackOrOptions && typeof callbackOrOptions === 'object') {
+    options = callbackOrOptions;
+  }
+
+  if (typeof maybeOptions === 'function') {
+    callback = maybeOptions;
+  } else if (maybeOptions && typeof maybeOptions === 'object') {
+    options = maybeOptions;
+  }
+
+  return {
+    specificEntryType: normalizedSpecificEntryType,
+    callback,
+    options,
+  };
+}
+
+// @ts-ignore TS(7006): Parameter 'entryType' implicitly has an 'any' type.
+function getDbConnectionForObjectType(entryType) {
+  const dbModel = getDbModelByObjectType(entryType);
+  return dbModel && dbModel.db ? dbModel.db : null;
+}
+
 // @ts-ignore TS(7006): Parameter 'entryId' implicitly has an 'any' type.
-async function updateChildrenCount(entryId, entryType, specificEntryType) {
+async function updateChildrenCount(entryId, entryType, specificEntryType, callbackOrOptions?, maybeOptions?) {
+  const normalizedArgs = normalizeUpdateChildrenCountArgs(specificEntryType, callbackOrOptions, maybeOptions);
+  specificEntryType = normalizedArgs.specificEntryType;
+  const callback = normalizedArgs.callback;
+  const session = normalizedArgs.options && normalizedArgs.options.session ? normalizedArgs.options.session : null;
+
   let countNode = {};
   let model = {}, req = {};
 
@@ -1365,20 +1431,20 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
       await async.parallel({
         accepted: async function() {
           const query = { parentId: entryId, 'screening.status': constants.SCREENING_STATUS.status1.code };
-          let count = await db.Topic.countDocuments(query);
-          let linkCount = await db.TopicLink.countDocuments(query);
+          let count = await countDocumentsWithSession(db.Topic, query, session);
+          let linkCount = await countDocumentsWithSession(db.TopicLink, query, session);
           topics.accepted = count + linkCount;
         },
         pending: async function() {
           const query = { parentId: entryId, 'screening.status': constants.SCREENING_STATUS.status0.code };
-          let count = await db.Topic.countDocuments(query);
-          let linkCount = await db.TopicLink.countDocuments(query);
+          let count = await countDocumentsWithSession(db.Topic, query, session);
+          let linkCount = await countDocumentsWithSession(db.TopicLink, query, session);
           topics.pending = count + linkCount;
         },
         rejected: async function() {
           const query = { parentId: entryId, 'screening.status': constants.SCREENING_STATUS.status2.code };
-          const count = await db.Topic.countDocuments(query);
-          const linkCount = await db.TopicLink.countDocuments(query);
+          const count = await countDocumentsWithSession(db.Topic, query, session);
+          const linkCount = await countDocumentsWithSession(db.TopicLink, query, session);
           topics.rejected = count + linkCount;
         },
       });
@@ -1402,8 +1468,8 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
             parentId: q.parentId,
             'screening.status': constants.SCREENING_STATUS.status1.code,
           };
-          const count = await db.Argument.countDocuments(query);
-          const linkCount = await db.ArgumentLink.countDocuments(query);
+          const count = await countDocumentsWithSession(db.Argument, query, session);
+          const linkCount = await countDocumentsWithSession(db.ArgumentLink, query, session);
           args.accepted = count + linkCount;
         },
         pending: async function() {
@@ -1412,8 +1478,8 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
             parentId: q.parentId,
             'screening.status': constants.SCREENING_STATUS.status0.code,
           };
-          const count = await db.Argument.countDocuments(query);
-          const linkCount = await db.ArgumentLink.countDocuments(query);
+          const count = await countDocumentsWithSession(db.Argument, query, session);
+          const linkCount = await countDocumentsWithSession(db.ArgumentLink, query, session);
           args.pending = count + linkCount;
         },
         rejected: async function() {
@@ -1422,8 +1488,8 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
             parentId: q.parentId,
             'screening.status': constants.SCREENING_STATUS.status2.code,
           };
-          const count = await db.Argument.countDocuments(query);
-          const linkCount = await db.ArgumentLink.countDocuments(query);
+          const count = await countDocumentsWithSession(db.Argument, query, session);
+          const linkCount = await countDocumentsWithSession(db.ArgumentLink, query, session);
           args.rejected = count + linkCount;
         },
       });
@@ -1447,7 +1513,7 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
             parentId: q.parentId,
             'screening.status': constants.SCREENING_STATUS.status1.code,
           };
-          artifacts.accepted = await db.Artifact.countDocuments(query);
+          artifacts.accepted = await countDocumentsWithSession(db.Artifact, query, session);
         },
         pending: async function() {
           const query = {
@@ -1455,7 +1521,7 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
             parentId: q.parentId,
             'screening.status': constants.SCREENING_STATUS.status0.code,
           };
-          artifacts.pending = await db.Artifact.countDocuments(query);
+          artifacts.pending = await countDocumentsWithSession(db.Artifact, query, session);
         },
         rejected: async function() {
           const query = {
@@ -1463,7 +1529,7 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
             parentId: q.parentId,
             'screening.status': constants.SCREENING_STATUS.status2.code,
           };
-          artifacts.rejected = await db.Artifact.countDocuments(query);
+          artifacts.rejected = await countDocumentsWithSession(db.Artifact, query, session);
         },
       });
       artifacts.total = artifacts.accepted + artifacts.pending + artifacts.rejected;
@@ -1475,22 +1541,22 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
       const questions = countNode.childrenCount.questions;
       await async.parallel({
         accepted: async function() {
-          questions.accepted = await db.Question.countDocuments({
+          questions.accepted = await countDocumentsWithSession(db.Question, {
             ownerId: entryId,
             'screening.status': constants.SCREENING_STATUS.status1.code,
-          });
+          }, session);
         },
         pending: async function() {
-          questions.pending = await db.Question.countDocuments({
+          questions.pending = await countDocumentsWithSession(db.Question, {
             ownerId: entryId,
             'screening.status': constants.SCREENING_STATUS.status0.code,
-          });
+          }, session);
         },
         rejected: async function() {
-          questions.rejected = await db.Question.countDocuments({
+          questions.rejected = await countDocumentsWithSession(db.Question, {
             ownerId: entryId,
             'screening.status': constants.SCREENING_STATUS.status2.code,
-          });
+          }, session);
         },
       });
       questions.total = questions.accepted + questions.pending + questions.rejected;
@@ -1502,22 +1568,22 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
       const answers = countNode.childrenCount.answers;
       await async.parallel({
         accepted: async () => {
-          answers.accepted = await db.Answer.countDocuments({
+          answers.accepted = await countDocumentsWithSession(db.Answer, {
             questionId: entryId,
             'screening.status': constants.SCREENING_STATUS.status1.code,
-          });
+          }, session);
         },
         pending: async () => {
-          answers.pending = await db.Answer.countDocuments({
+          answers.pending = await countDocumentsWithSession(db.Answer, {
             questionId: entryId,
             'screening.status': constants.SCREENING_STATUS.status0.code,
-          });
+          }, session);
         },
         rejected: async () => {
-          answers.rejected = await db.Answer.countDocuments({
+          answers.rejected = await countDocumentsWithSession(db.Answer, {
             questionId: entryId,
             'screening.status': constants.SCREENING_STATUS.status2.code,
-          });
+          }, session);
         },
       });
       answers.total = answers.accepted + answers.pending + answers.rejected;
@@ -1529,22 +1595,22 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
       const issues = countNode.childrenCount.issues;
       await async.parallel({
         accepted: async function() {
-          issues.accepted = await db.Issue.countDocuments({
+          issues.accepted = await countDocumentsWithSession(db.Issue, {
             ownerId: entryId,
             'screening.status': constants.SCREENING_STATUS.status1.code,
-          });
+          }, session);
         },
         pending: async function() {
-          issues.pending = await db.Issue.countDocuments({
+          issues.pending = await countDocumentsWithSession(db.Issue, {
             ownerId: entryId,
             'screening.status': constants.SCREENING_STATUS.status0.code,
-          });
+          }, session);
         },
         rejected: async function() {
-          issues.rejected = await db.Issue.countDocuments({
+          issues.rejected = await countDocumentsWithSession(db.Issue, {
             ownerId: entryId,
             'screening.status': constants.SCREENING_STATUS.status2.code,
-          });
+          }, session);
         },
       });
       issues.total = issues.accepted + issues.pending + issues.rejected;
@@ -1556,166 +1622,235 @@ async function updateChildrenCount(entryId, entryType, specificEntryType) {
       const opinions = countNode.childrenCount.opinions;
       await async.parallel({
         accepted: async function() {
-          opinions.accepted = await db.Opinion.countDocuments({
+          opinions.accepted = await countDocumentsWithSession(db.Opinion, {
             ownerId: entryId,
             'screening.status': constants.SCREENING_STATUS.status1.code,
-          });
+          }, session);
         },
         pending: async function() {
-          opinions.pending = await db.Opinion.countDocuments({
+          opinions.pending = await countDocumentsWithSession(db.Opinion, {
             ownerId: entryId,
             'screening.status': constants.SCREENING_STATUS.status0.code,
-          });
+          }, session);
         },
         rejected: async function() {
-          opinions.rejected = await db.Opinion.countDocuments({
+          opinions.rejected = await countDocumentsWithSession(db.Opinion, {
             ownerId: entryId,
             'screening.status': constants.SCREENING_STATUS.status2.code,
-          });
+          }, session);
         },
       });
       opinions.total = opinions.accepted + opinions.pending + opinions.rejected;
     }
   };
 
-  switch (entryType) {
-    case constants.OBJECT_TYPES.topic:
-      req = { query: { topic: entryId } };
-      await setEntryModels(createOwnerQueryFromQuery(req), req, model);
-      // @ts-ignore TS(2339): Property 'topic' does not exist on type '{}'.
-      countNode = { childrenCount: model.topic.childrenCount };
-      await async.parallel({
-        topics: updateTopics,
-        arguments: updateArguments,
-        artifacts: updateArtifacts,
-        questions: updateQuestions,
-        issues: updateIssues,
-        opinions: updateOpinions,
-      });
-      await db.Topic.updateOne({ _id: entryId }, {
-        $set: countNode,
-      });
-      break;
+  try {
+    switch (entryType) {
+      case constants.OBJECT_TYPES.topic:
+        req = { query: { topic: entryId } };
+        await setEntryModels(createOwnerQueryFromQuery(req), req, model);
+        // @ts-ignore TS(2339): Property 'topic' does not exist on type '{}'.
+        countNode = { childrenCount: model.topic.childrenCount };
+        await async.parallel({
+          topics: updateTopics,
+          arguments: updateArguments,
+          artifacts: updateArtifacts,
+          questions: updateQuestions,
+          issues: updateIssues,
+          opinions: updateOpinions,
+        });
+        // @ts-ignore TS(2339): Property 'childrenCount' does not exist on type '{}'.
+        assertChildrenCountInvariants(countNode.childrenCount, { entryId, entryType });
+        await updateOneWithSession(db.Topic, { _id: entryId }, { $set: countNode }, session);
+        break;
 
-    case constants.OBJECT_TYPES.topicLink:
-      req = { query: { topicLink: entryId } };
-      await setEntryModels(createOwnerQueryFromQuery(req), req, model);
-      // @ts-ignore TS(2339): Property 'topicLink' does not exist on type '{}'.
-      countNode = { childrenCount: model.topicLink.childrenCount };
-      await async.parallel({
-        issues: updateIssues,
-        opinions: updateOpinions,
-      });
-      await db.TopicLink.updateOne({ _id: entryId }, {
-        $set: countNode,
-      });
-      break;
+      case constants.OBJECT_TYPES.topicLink:
+        req = { query: { topicLink: entryId } };
+        await setEntryModels(createOwnerQueryFromQuery(req), req, model);
+        // @ts-ignore TS(2339): Property 'topicLink' does not exist on type '{}'.
+        countNode = { childrenCount: model.topicLink.childrenCount };
+        await async.parallel({
+          issues: updateIssues,
+          opinions: updateOpinions,
+        });
+        // @ts-ignore TS(2339): Property 'childrenCount' does not exist on type '{}'.
+        assertChildrenCountInvariants(countNode.childrenCount, { entryId, entryType });
+        await updateOneWithSession(db.TopicLink, { _id: entryId }, { $set: countNode }, session);
+        break;
 
-    case constants.OBJECT_TYPES.argument:
-      req = { query: { argument: entryId } };
-      await setEntryModels(createOwnerQueryFromQuery(req), req, model);
-      // @ts-ignore TS(2339): Property 'argument' does not exist on type '{}'.
-      countNode = { childrenCount: model.argument.childrenCount };
-      await async.parallel({
-        arguments: updateArguments,
-        questions: updateQuestions,
-        issues: updateIssues,
-        opinions: updateOpinions,
-      });
-      await db.Argument.updateOne({ _id: entryId }, {
-        $set: countNode,
-      });
-      break;
+      case constants.OBJECT_TYPES.argument:
+        req = { query: { argument: entryId } };
+        await setEntryModels(createOwnerQueryFromQuery(req), req, model);
+        // @ts-ignore TS(2339): Property 'argument' does not exist on type '{}'.
+        countNode = { childrenCount: model.argument.childrenCount };
+        await async.parallel({
+          arguments: updateArguments,
+          questions: updateQuestions,
+          issues: updateIssues,
+          opinions: updateOpinions,
+        });
+        // @ts-ignore TS(2339): Property 'childrenCount' does not exist on type '{}'.
+        assertChildrenCountInvariants(countNode.childrenCount, { entryId, entryType });
+        await updateOneWithSession(db.Argument, { _id: entryId }, { $set: countNode }, session);
+        break;
 
-    case constants.OBJECT_TYPES.argumentLink:
-      req = { query: { argumentLink: entryId } };
-      await setEntryModels(createOwnerQueryFromQuery(req), req, model);
-      // @ts-ignore TS(2339): Property 'argumentLink' does not exist on type '{}... Remove this comment to see the full error message
-      countNode = { childrenCount: model.argumentLink.childrenCount };
-      await async.parallel({
-        issues: updateIssues,
-        opinions: updateOpinions,
-      });
-      await db.ArgumentLink.updateOne({ _id: entryId }, {
-        $set: countNode,
-      });
-      break;
+      case constants.OBJECT_TYPES.argumentLink:
+        req = { query: { argumentLink: entryId } };
+        await setEntryModels(createOwnerQueryFromQuery(req), req, model);
+        // @ts-ignore TS(2339): Property 'argumentLink' does not exist on type '{}... Remove this comment to see the full error message
+        countNode = { childrenCount: model.argumentLink.childrenCount };
+        await async.parallel({
+          issues: updateIssues,
+          opinions: updateOpinions,
+        });
+        // @ts-ignore TS(2339): Property 'childrenCount' does not exist on type '{}'.
+        assertChildrenCountInvariants(countNode.childrenCount, { entryId, entryType });
+        await updateOneWithSession(db.ArgumentLink, { _id: entryId }, { $set: countNode }, session);
+        break;
 
-    case constants.OBJECT_TYPES.artifact:
-      req = { query: { artifact: entryId } };
-      await setEntryModels(createOwnerQueryFromQuery(req), req, model);
-      // @ts-ignore TS(2339): Property 'artifact' does not exist on type '{}'.
-      countNode = { childrenCount: model.artifact.childrenCount };
-      await async.parallel({
-        artifacts: updateArtifacts,
-        arguments: updateArguments,
-        questions: updateQuestions,
-        issues: updateIssues,
-        opinions: updateOpinions,
-      });
-      await db.Artifact.updateOne({ _id: entryId }, {
-        $set: countNode,
-      });
-      break;
+      case constants.OBJECT_TYPES.artifact:
+        req = { query: { artifact: entryId } };
+        await setEntryModels(createOwnerQueryFromQuery(req), req, model);
+        // @ts-ignore TS(2339): Property 'artifact' does not exist on type '{}'.
+        countNode = { childrenCount: model.artifact.childrenCount };
+        await async.parallel({
+          artifacts: updateArtifacts,
+          arguments: updateArguments,
+          questions: updateQuestions,
+          issues: updateIssues,
+          opinions: updateOpinions,
+        });
+        // @ts-ignore TS(2339): Property 'childrenCount' does not exist on type '{}'.
+        assertChildrenCountInvariants(countNode.childrenCount, { entryId, entryType });
+        await updateOneWithSession(db.Artifact, { _id: entryId }, { $set: countNode }, session);
+        break;
 
-    case constants.OBJECT_TYPES.question:
-      req = { query: { question: entryId } };
-      await setEntryModels(createOwnerQueryFromQuery(req), req, model);
-      // @ts-ignore TS(2339): Property 'question' does not exist on type '{}'.
-      countNode = { childrenCount: model.question.childrenCount };
-      await async.parallel({
-        answers: updateAnswers,
-        issues: updateIssues,
-        opinions: updateOpinions,
-      });
-      await db.Question.updateOne({ _id: entryId }, {
-        $set: countNode,
-      });
-      break;
+      case constants.OBJECT_TYPES.question:
+        req = { query: { question: entryId } };
+        await setEntryModels(createOwnerQueryFromQuery(req), req, model);
+        // @ts-ignore TS(2339): Property 'question' does not exist on type '{}'.
+        countNode = { childrenCount: model.question.childrenCount };
+        await async.parallel({
+          answers: updateAnswers,
+          issues: updateIssues,
+          opinions: updateOpinions,
+        });
+        // @ts-ignore TS(2339): Property 'childrenCount' does not exist on type '{}'.
+        assertChildrenCountInvariants(countNode.childrenCount, { entryId, entryType });
+        await updateOneWithSession(db.Question, { _id: entryId }, { $set: countNode }, session);
+        break;
 
-    case constants.OBJECT_TYPES.answer:
-      req = { query: { answer: entryId } };
-      await setEntryModels(createOwnerQueryFromQuery(req), req, model);
-      // @ts-ignore TS(2339): Property 'answer' does not exist on type '{}'.
-      countNode = { childrenCount: model.answer.childrenCount };
-      await async.parallel({
-        issues: updateIssues,
-        opinions: updateOpinions,
-      });
-      await db.Answer.updateOne({ _id: entryId }, {
-        $set: countNode,
-      });
-      break;
+      case constants.OBJECT_TYPES.answer:
+        req = { query: { answer: entryId } };
+        await setEntryModels(createOwnerQueryFromQuery(req), req, model);
+        // @ts-ignore TS(2339): Property 'answer' does not exist on type '{}'.
+        countNode = { childrenCount: model.answer.childrenCount };
+        await async.parallel({
+          issues: updateIssues,
+          opinions: updateOpinions,
+        });
+        // @ts-ignore TS(2339): Property 'childrenCount' does not exist on type '{}'.
+        assertChildrenCountInvariants(countNode.childrenCount, { entryId, entryType });
+        await updateOneWithSession(db.Answer, { _id: entryId }, { $set: countNode }, session);
+        break;
 
-    case constants.OBJECT_TYPES.issue:
-      req = { query: { issue: entryId } };
-      await setEntryModels(createOwnerQueryFromQuery(req), req, model);
-      // @ts-ignore TS(2339): Property 'issue' does not exist on type '{}'.
-      countNode = { childrenCount: model.issue.childrenCount };
-      await async.parallel({
-        opinions: updateOpinions,
-      });
-      await db.Issue.updateOne({ _id: entryId }, {
-        $set: countNode,
-      });
-      break;
+      case constants.OBJECT_TYPES.issue:
+        req = { query: { issue: entryId } };
+        await setEntryModels(createOwnerQueryFromQuery(req), req, model);
+        // @ts-ignore TS(2339): Property 'issue' does not exist on type '{}'.
+        countNode = { childrenCount: model.issue.childrenCount };
+        await async.parallel({
+          opinions: updateOpinions,
+        });
+        // @ts-ignore TS(2339): Property 'childrenCount' does not exist on type '{}'.
+        assertChildrenCountInvariants(countNode.childrenCount, { entryId, entryType });
+        await updateOneWithSession(db.Issue, { _id: entryId }, { $set: countNode }, session);
+        break;
 
-    case constants.OBJECT_TYPES.opinion:
-      req = { query: { opinion: entryId } };
-      await setEntryModels(createOwnerQueryFromQuery(req), req, model);
-      // @ts-ignore TS(2339): Property 'opinion' does not exist on type '{}'.
-      countNode = { childrenCount: model.opinion.childrenCount };
-      await async.parallel({
-        issues: updateIssues,
-        opinions: updateOpinions,
-      });
-      await db.Opinion.updateOne({ _id: entryId }, {
-        $set: countNode,
-      });
-      break;
+      case constants.OBJECT_TYPES.opinion:
+        req = { query: { opinion: entryId } };
+        await setEntryModels(createOwnerQueryFromQuery(req), req, model);
+        // @ts-ignore TS(2339): Property 'opinion' does not exist on type '{}'.
+        countNode = { childrenCount: model.opinion.childrenCount };
+        await async.parallel({
+          issues: updateIssues,
+          opinions: updateOpinions,
+        });
+        // @ts-ignore TS(2339): Property 'childrenCount' does not exist on type '{}'.
+        assertChildrenCountInvariants(countNode.childrenCount, { entryId, entryType });
+        await updateOneWithSession(db.Opinion, { _id: entryId }, { $set: countNode }, session);
+        break;
 
-    default:
+      default:
+    }
+  } catch (error) {
+    if (callback) {
+      callback(error);
+      return;
+    }
+    throw error;
   }
+
+  if (callback) {
+    callback();
+  }
+}
+
+// @ts-ignore TS(7006): Parameter 'tasks' implicitly has an 'any' type.
+async function updateChildrenCountBatch(tasks, options) {
+  const normalizedTasks = normalizeChildrenCountUpdateTasks(tasks);
+  if (normalizedTasks.length === 0) {
+    return {
+      processed: 0,
+      unique: 0,
+      skipped: Array.isArray(tasks) ? tasks.length : 0,
+      transactional: false,
+    };
+  }
+
+  const runBatch = async function(session: any) {
+    for (const task of normalizedTasks) {
+      await updateChildrenCount(task.entryId, task.entryType, task.specificEntryType, { session });
+    }
+  };
+
+  const transactional = Boolean(options && options.transactional === true);
+  if (!transactional) {
+    await runBatch(null);
+    return {
+      processed: normalizedTasks.length,
+      unique: normalizedTasks.length,
+      skipped: Array.isArray(tasks) ? Math.max(tasks.length - normalizedTasks.length, 0) : 0,
+      transactional: false,
+    };
+  }
+
+  const connection = getDbConnectionForObjectType(normalizedTasks[0].entryType);
+  if (!connection || typeof connection.startSession !== 'function') {
+    await runBatch(null);
+    return {
+      processed: normalizedTasks.length,
+      unique: normalizedTasks.length,
+      skipped: Array.isArray(tasks) ? Math.max(tasks.length - normalizedTasks.length, 0) : 0,
+      transactional: false,
+    };
+  }
+
+  const session = await connection.startSession();
+  try {
+    await session.withTransaction(async function() {
+      await runBatch(session);
+    });
+  } finally {
+    await session.endSession();
+  }
+
+  return {
+    processed: normalizedTasks.length,
+    unique: normalizedTasks.length,
+    skipped: Array.isArray(tasks) ? Math.max(tasks.length - normalizedTasks.length, 0) : 0,
+    transactional: true,
+  };
 }
 
 // SUMMARY: updates the children of parent including the categoryId, does not touch the parent
@@ -3242,6 +3377,7 @@ module.exports = {
 
   sortArguments,
   updateChildrenCount,
+  updateChildrenCountBatch,
   syncCategoryId,
   syncChildren,
   initScreeningStatus,

@@ -32,7 +32,7 @@ const VERDICT_STATUS_ORDER: number[] = [
   constants.VERDICT_STATUS.misleading_invalid,
 ];
 
-const db = require('../../app').db.models as Record<string, unknown>;
+const db = require('../../app').db.models as Record<string, any>;
 
 function canPlayRole(req: WikitruthRequest, role: string): boolean {
   return Boolean(req.user && req.user.canPlayRoleOf && req.user.canPlayRoleOf(role));
@@ -142,6 +142,32 @@ function toModerationEntry(entry: any, target: ModerationTarget): Record<string,
     ownerType: toNumber(entry?.ownerType),
     parentId: entry?.parentId || null,
     questionId: entry?.questionId || null,
+  };
+}
+
+function areIdsEqual(left: unknown, right: unknown): boolean {
+  if (!left && !right) {
+    return true;
+  }
+  if (!left || !right) {
+    return false;
+  }
+  return String(left) === String(right);
+}
+
+function parseOwnershipMigrationRequest(req: WikitruthRequest): {
+  topicId: string;
+  targetScope: 'public' | 'diary' | '';
+  username: string;
+} {
+  const topicId = String(req.body?.topicId || req.body?.id || '').trim();
+  const rawScope = String(req.body?.targetScope || req.body?.target || '').trim().toLowerCase();
+  const username = String(req.body?.username || '').trim();
+  const targetScope = rawScope === 'public' || rawScope === 'diary' ? rawScope : '';
+  return {
+    topicId,
+    targetScope,
+    username,
   };
 }
 
@@ -351,6 +377,129 @@ module.exports = function (router: Router) {
       success: true,
       target,
       deleted: true,
+    });
+  });
+
+  router.post('/ownership-migration', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureAdmin(req, res)) {
+      return;
+    }
+
+    const migration = parseOwnershipMigrationRequest(req);
+    if (!migration.topicId) {
+      res.status(400).json({ success: false, message: 'A topicId is required for ownership migration' });
+      return;
+    }
+
+    if (!migration.targetScope) {
+      res.status(400).json({ success: false, message: 'targetScope must be either "public" or "diary"' });
+      return;
+    }
+
+    if (migration.targetScope === 'public' && migration.username) {
+      res.status(400).json({ success: false, message: 'username is only valid for diary ownership migrations' });
+      return;
+    }
+
+    const topic = await db.Topic.findById(migration.topicId);
+    if (!topic) {
+      res.status(404).json({ success: false, message: 'Topic not found' });
+      return;
+    }
+
+    if (topic.parentId) {
+      res.status(400).json({
+        success: false,
+        message: 'Ownership migration only supports root topics to prevent partial subtree drifts',
+      });
+      return;
+    }
+
+    if (topic.groupId || topic.ownerType === constants.OBJECT_TYPES.group) {
+      res.status(409).json({
+        success: false,
+        message: 'Group-scoped topics must use group membership workflows instead of diary/public migration',
+      });
+      return;
+    }
+
+    let targetOwnerId: string | null = null;
+    let targetOwnerType = -1;
+    let targetPrivate = false;
+    let targetUser: { _id: string; username: string } | null = null;
+
+    if (migration.targetScope === 'diary') {
+      if (!migration.username) {
+        res.status(400).json({ success: false, message: 'username is required when targetScope is diary' });
+        return;
+      }
+
+      targetUser = await db.User.findOne({ username: migration.username }).select('_id username').lean();
+      if (!targetUser) {
+        res.status(404).json({ success: false, message: 'Diary owner account not found' });
+        return;
+      }
+
+      // Policy check: require the diary target user to be the original creator to avoid implicit cross-user transfer.
+      if (!areIdsEqual(topic.createUserId, targetUser._id)) {
+        res.status(409).json({
+          success: false,
+          message:
+            'Diary migration target must match the original topic creator. Use take-ownership first if transfer is intended.',
+        });
+        return;
+      }
+
+      targetOwnerId = String(targetUser._id);
+      targetOwnerType = constants.OBJECT_TYPES.user;
+      targetPrivate = true;
+    }
+
+    const unchanged =
+      Boolean(topic.private) === targetPrivate &&
+      Number(topic.ownerType) === targetOwnerType &&
+      areIdsEqual(topic.ownerId, targetOwnerId);
+    if (unchanged) {
+      res.status(409).json({ success: false, message: 'Topic already matches requested ownership scope' });
+      return;
+    }
+
+    const now = new Date();
+    const actingUserId = req.user?.id || req.user?._id || topic.editUserId;
+    const subtreeFilter = { $or: [{ _id: topic._id }, { categoryId: topic._id }] };
+
+    await db.Topic.updateMany(subtreeFilter, {
+      $set: {
+        private: targetPrivate,
+        ownerType: targetOwnerType,
+        ownerId: targetOwnerId,
+        groupId: null,
+        editDate: now,
+        editUserId: actingUserId,
+      },
+    });
+
+    const updatedRootTopic = await db.Topic.findById(topic._id);
+    if (updatedRootTopic) {
+      await flowUtils.syncChildren(updatedRootTopic, { entryType: constants.OBJECT_TYPES.topic });
+    }
+
+    const impactedTopics = await db.Topic.find(subtreeFilter).select('_id').lean();
+    const countTasks = impactedTopics.map((entry: { _id: string }) => ({
+      entryId: entry._id,
+      entryType: constants.OBJECT_TYPES.topic,
+      specificEntryType: null,
+    }));
+    await flowUtils.updateChildrenCountBatch(countTasks, { transactional: true });
+
+    res.json({
+      success: true,
+      migration: {
+        topicId: String(topic._id),
+        targetScope: migration.targetScope,
+        username: targetUser?.username || null,
+        migratedTopicCount: impactedTopics.length,
+      },
     });
   });
 };
