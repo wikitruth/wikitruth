@@ -2,16 +2,20 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Breadcrumb from '../components/common/Breadcrumb';
+import GeoPatternBackground from '../components/common/GeoPatternBackground';
 import PageHeader from '../components/common/PageHeader';
 import PageTabs from '../components/common/PageTabs';
 import Alert from '../components/common/Alert';
 import EntryList from '../components/common/EntryList';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
 import EntryActionsMenu from '../components/Entry/EntryActionsMenu';
+import PageMeta from '../components/common/PageMeta';
 import apiService from '../services/api';
 import type { IssueEntryResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
 import type { Opinion } from '../types';
+import { formatRelativeTime } from '../utils/dateFormat';
+import { sanitizeHtml } from '../utils/sanitizeHtml';
 
 const IssueEntryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -72,7 +76,9 @@ const IssueEntryPage: React.FC = () => {
 
   return (
     <div>
+      <PageMeta title={issue.title} description={issue.description || issue.contentPreview} />
       <Breadcrumb items={breadcrumbItems} />
+      <GeoPatternBackground seed={issue.title || 'issue'} height={100} />
       
       <PageHeader 
         title={issue.title}
@@ -87,7 +93,7 @@ const IssueEntryPage: React.FC = () => {
       {/* Issue content */}
       <div className="text-body collapsible" style={{ marginTop: '20px' }}>
         {issue.content ? (
-          <div dangerouslySetInnerHTML={{ __html: issue.content }} />
+          <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(issue.content) }} />
         ) : issue.contentPreview ? (
           <p className="lead">{issue.contentPreview}</p>
         ) : issue.description && (
@@ -117,7 +123,7 @@ const IssueEntryPage: React.FC = () => {
         )}
         {issue.editDate && (
           <p className="text-muted">
-            <i className="fa fa-clock-o"></i> Last updated: {new Date(issue.editDate).toLocaleDateString()}
+            <i className="fa fa-clock-o"></i> Last updated: {formatRelativeTime(issue.editDate)}
           </p>
         )}
         {issue.private && (

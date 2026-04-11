@@ -7,6 +7,7 @@ This folder contains active engineering documentation, planning docs, and histor
 - Client development setup: `docs/CLIENT_DEVELOPMENT_SETUP.md`
 - Active plans index: `docs/plans/README.md`
 - Completed plans index: `docs/plans/completed/README.md`
+- Deferred plans index: `docs/plans/deferred/README.md`
 - Dependency upgrade plan (active): `docs/plans/DEPENDENCY_UPGRADE_PLAN_2026-02-24.md`
 - Deprecation replacement plan (active): `docs/plans/DEPRECATION_REPLACEMENT_PLAN.md`
 - Mobile app strategy (active): `docs/plans/MOBILE_APP_STRATEGY_2026-02-24.md`

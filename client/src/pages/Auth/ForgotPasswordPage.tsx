@@ -3,6 +3,7 @@ import Input from '../../components/Form/Input';
 import Button from '../../components/common/Button';
 import Alert from '../../components/common/Alert';
 import authApi from '../../services/api/auth';
+import PageMeta from '../../components/common/PageMeta';
 
 const ForgotPasswordPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -39,6 +40,7 @@ const ForgotPasswordPage: React.FC = () => {
 
   return (
     <div className="container" style={{ maxWidth: '520px', marginTop: '60px' }}>
+      <PageMeta title="Forgot Password" />
       <h2>Forgot password</h2>
 
       {submitError ? <Alert type="danger">{submitError}</Alert> : null}

@@ -12,3 +12,7 @@ Active and historical planning documents are organized under this folder.
 ## Completed Plans
 
 - `docs/plans/completed/README.md`
+
+## Deferred Plans
+
+- `docs/plans/deferred/README.md`

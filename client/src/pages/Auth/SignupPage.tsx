@@ -7,7 +7,10 @@ import Alert from '../../components/common/Alert';
 import SocialLoginButtons from '../../components/Auth/SocialLoginButtons';
 import useForm from '../../hooks/useForm';
 import { useAuth } from '../../context/AuthContext';
+import PageMeta from '../../components/common/PageMeta';
+import useRecaptcha from '../../hooks/useRecaptcha';
 import authApi from '../../services/api/auth';
+import { trackEvent } from '../../utils/analytics';
 
 interface SignupFormValues {
   username: string;
@@ -20,6 +23,7 @@ interface SignupFormValues {
 const SignupPage: React.FC = () => {
   const navigate = useNavigate();
   const { signup, isAuthenticated } = useAuth();
+  const { execute: executeRecaptcha } = useRecaptcha();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [providersReady, setProvidersReady] = useState(false);
   const [enabledProviders, setEnabledProviders] = useState<Record<string, boolean>>({});
@@ -93,7 +97,11 @@ const SignupPage: React.FC = () => {
     setSubmitError(null);
 
     try {
+      const recaptchaToken = await executeRecaptcha('signup');
       await signup(values.username.trim(), values.email.trim(), values.password);
+      // recaptchaToken can be sent to backend when API supports it
+      void recaptchaToken;
+      trackEvent('signup', 'auth', 'credentials');
       navigate('/');
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Signup failed. Please try again.');
@@ -122,6 +130,7 @@ const SignupPage: React.FC = () => {
 
   return (
     <div className="container" style={{ maxWidth: '520px', marginTop: '60px' }}>
+      <PageMeta title="Sign Up" description="Create your Wikitruth account" />
       <div className="panel panel-default">
         <div className="panel-heading">
           <h3 className="panel-title text-center">

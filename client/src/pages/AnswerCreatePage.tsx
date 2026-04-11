@@ -3,12 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import Input from '../components/Form/Input';
+import RichTextEditor from '../components/Form/RichTextEditor';
 import TextArea from '../components/Form/TextArea';
 import Checkbox from '../components/Form/Checkbox';
 import Button from '../components/common/Button';
 import Alert from '../components/common/Alert';
+import PageMeta from '../components/common/PageMeta';
 import useForm from '../hooks/useForm';
 import apiService from '../services/api';
+import { trackEvent } from '../utils/analytics';
+import { useNotification } from '../context/NotificationContext';
 
 interface AnswerFormValues {
   title: string;
@@ -22,6 +26,7 @@ const AnswerCreatePage: React.FC = () => {
   const navigate = useNavigate();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const { addToast } = useNotification();
 
   const validate = (values: AnswerFormValues) => {
     const errors: Partial<Record<keyof AnswerFormValues, string>> = {};
@@ -54,16 +59,20 @@ const AnswerCreatePage: React.FC = () => {
         private: values.private,
       });
 
+      trackEvent('create_answer', 'content', values.title);
+      addToast('success', 'Answer created successfully!');
       setSubmitSuccess(true);
       setTimeout(() => {
         navigate('/answers');
       }, 1200);
     } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : 'Failed to create answer');
+      const msg = error instanceof Error ? error.message : 'Failed to create answer';
+      setSubmitError(msg);
+      addToast('danger', msg);
     }
   };
 
-  const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit: onSubmit } = useForm<AnswerFormValues>({
+  const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit: onSubmit, setFieldValue } = useForm<AnswerFormValues>({
     initialValues: {
       title: '',
       description: '',
@@ -77,6 +86,7 @@ const AnswerCreatePage: React.FC = () => {
 
   return (
     <div>
+      <PageMeta title="Create Answer" description="Post an answer to a specific question" />
       <Breadcrumb
         items={[
           { title: 'Home', url: '/' },
@@ -108,15 +118,14 @@ const AnswerCreatePage: React.FC = () => {
               error={touched.title ? errors.title : undefined}
             />
 
-            <TextArea
+            <RichTextEditor
               name="description"
               label="Answer details"
               value={values.description}
-              onChange={handleChange}
-              onBlur={handleBlur}
+              onChange={(name, html) => setFieldValue(name as keyof AnswerFormValues, html)}
+              onBlur={() => {}}
               placeholder="Provide complete answer details"
               required
-              rows={6}
               error={touched.description ? errors.description : undefined}
             />
 

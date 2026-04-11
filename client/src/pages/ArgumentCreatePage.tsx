@@ -3,13 +3,17 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import Input from '../components/Form/Input';
+import RichTextEditor from '../components/Form/RichTextEditor';
 import TextArea from '../components/Form/TextArea';
 import Select from '../components/Form/Select';
 import Checkbox from '../components/Form/Checkbox';
 import Button from '../components/common/Button';
 import Alert from '../components/common/Alert';
+import PageMeta from '../components/common/PageMeta';
 import useForm from '../hooks/useForm';
 import apiService from '../services/api';
+import { trackEvent } from '../utils/analytics';
+import { useNotification } from '../context/NotificationContext';
 
 interface ArgumentFormValues {
   title: string;
@@ -26,6 +30,7 @@ const ArgumentCreatePage: React.FC = () => {
   const groupId = searchParams.get('group') || undefined;
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const { addToast } = useNotification();
 
   const validate = (values: ArgumentFormValues) => {
     const errors: Partial<Record<keyof ArgumentFormValues, string>> = {};
@@ -66,6 +71,8 @@ const ArgumentCreatePage: React.FC = () => {
         groupId: groupId,
       });
       
+      trackEvent('create_argument', 'content', values.title);
+      addToast('success', 'Argument created successfully!');
       setSubmitSuccess(true);
       
       // Redirect after a short delay
@@ -73,7 +80,9 @@ const ArgumentCreatePage: React.FC = () => {
         navigate('/arguments');
       }, 1500);
     } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : 'Failed to create argument');
+      const msg = error instanceof Error ? error.message : 'Failed to create argument';
+      setSubmitError(msg);
+      addToast('danger', msg);
     }
   };
 
@@ -85,6 +94,7 @@ const ArgumentCreatePage: React.FC = () => {
     handleChange,
     handleBlur,
     handleSubmit: onSubmit,
+    setFieldValue,
   } = useForm<ArgumentFormValues>({
     initialValues: {
       title: '',
@@ -106,6 +116,7 @@ const ArgumentCreatePage: React.FC = () => {
 
   return (
     <div>
+      <PageMeta title="Create Argument" description="Present a fact or claim with supporting evidence" />
       <Breadcrumb items={breadcrumbItems} />
       
       <PageHeader
@@ -148,15 +159,14 @@ const ArgumentCreatePage: React.FC = () => {
               maxLength={250}
             />
 
-            <TextArea
+            <RichTextEditor
               name="description"
               label="Supporting Evidence"
               value={values.description}
-              onChange={handleChange}
-              onBlur={handleBlur}
+              onChange={(name, html) => setFieldValue(name as keyof ArgumentFormValues, html)}
+              onBlur={() => {}}
               placeholder="Provide detailed evidence and reasoning to support your claim"
               required
-              rows={8}
               error={touched.description ? errors.description : undefined}
             />
 

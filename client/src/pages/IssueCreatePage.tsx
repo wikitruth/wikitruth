@@ -3,13 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import Input from '../components/Form/Input';
-import TextArea from '../components/Form/TextArea';
+import RichTextEditor from '../components/Form/RichTextEditor';
 import Select from '../components/Form/Select';
 import Checkbox from '../components/Form/Checkbox';
 import Button from '../components/common/Button';
 import Alert from '../components/common/Alert';
+import PageMeta from '../components/common/PageMeta';
 import useForm from '../hooks/useForm';
 import apiService from '../services/api';
+import { trackEvent } from '../utils/analytics';
+import { useNotification } from '../context/NotificationContext';
 
 interface IssueFormValues {
   title: string;
@@ -23,6 +26,7 @@ const IssueCreatePage: React.FC = () => {
   const navigate = useNavigate();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const { addToast } = useNotification();
 
   const validate = (values: IssueFormValues) => {
     const errors: Partial<Record<keyof IssueFormValues, string>> = {};
@@ -51,16 +55,20 @@ const IssueCreatePage: React.FC = () => {
         private: values.private,
       });
 
+      trackEvent('create_issue', 'content', values.title);
+      addToast('success', 'Issue created successfully!');
       setSubmitSuccess(true);
       setTimeout(() => {
         navigate('/issues');
       }, 1200);
     } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : 'Failed to create issue');
+      const msg = error instanceof Error ? error.message : 'Failed to create issue';
+      setSubmitError(msg);
+      addToast('danger', msg);
     }
   };
 
-  const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit: onSubmit } = useForm<IssueFormValues>({
+  const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit: onSubmit, setFieldValue } = useForm<IssueFormValues>({
     initialValues: {
       title: '',
       description: '',
@@ -74,6 +82,7 @@ const IssueCreatePage: React.FC = () => {
 
   return (
     <div>
+      <PageMeta title="Report Issue" description="Raise a problem or concern" />
       <Breadcrumb
         items={[
           { title: 'Home', url: '/' },
@@ -105,15 +114,14 @@ const IssueCreatePage: React.FC = () => {
               error={touched.title ? errors.title : undefined}
             />
 
-            <TextArea
+            <RichTextEditor
               name="description"
               label="Issue details"
               value={values.description}
-              onChange={handleChange}
-              onBlur={handleBlur}
+              onChange={(name, html) => setFieldValue(name as keyof IssueFormValues, html)}
+              onBlur={() => {}}
               placeholder="Provide full details of the issue"
               required
-              rows={6}
               error={touched.description ? errors.description : undefined}
             />
 

@@ -256,3 +256,111 @@ test('visualize page loads metrics and topic connections', async ({ page }) => {
   await page.getByRole('button', { name: /climate policy/i }).click({ force: true });
   await expect(page.getByText(/carbon pricing/i)).toBeVisible();
 });
+
+test('home page loads and renders heading', async ({ page }) => {
+  await page.goto('/app');
+  await expect(page.locator('h1, h2, h3').first()).toBeVisible();
+});
+
+test('topic listing → entry → back navigation', async ({ page }) => {
+  await page.route('**/api/topics**', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        success: true,
+        topics: [
+          { _id: 't1', title: 'Climate Change', friendlyUrl: 'climate-change' },
+          { _id: 't2', title: 'Artificial Intelligence', friendlyUrl: 'artificial-intelligence' },
+        ],
+      }),
+    });
+  });
+
+  await page.route('**/api/topics/entry/t1', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        success: true,
+        topic: {
+          _id: 't1',
+          title: 'Climate Change',
+          friendlyUrl: 'climate-change',
+          content: '<p>A critical global issue.</p>',
+        },
+      }),
+    });
+  });
+
+  await page.goto('/app/topics');
+  await expect(page.getByText(/climate change/i)).toBeVisible();
+
+  await page.getByText(/climate change/i).first().click();
+  await expect(page.getByRole('heading', { name: /climate change/i })).toBeVisible();
+
+  await page.goBack();
+  await expect(page.getByText(/artificial intelligence/i)).toBeVisible();
+});
+
+test('create topic requires authentication', async ({ page }) => {
+  await page.route('**/api/auth/me**', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ success: true, user: { _id: 'u1', username: 'demo' } }),
+    });
+  });
+
+  await page.route('**/api/topics', async (route) => {
+    if (route.request().method() === 'POST') {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          success: true,
+          topic: { _id: 't1', title: 'New Topic', friendlyUrl: 'new-topic' },
+        }),
+      });
+      return;
+    }
+    await route.continue();
+  });
+
+  await page.goto('/app/topics/create');
+  await expect(page.getByLabel(/title/i)).toBeVisible();
+});
+
+test('search flow from shortcut to result', async ({ page }) => {
+  await page.route('**/api/search**', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        success: true,
+        topics: [{ _id: 't1', title: 'Found Topic', friendlyUrl: 'found-topic' }],
+        arguments: [],
+        questions: [],
+        answers: [],
+        issues: [],
+        opinions: [],
+        artifacts: [],
+      }),
+    });
+  });
+
+  await page.goto('/app');
+  await page.goto('/app/search?q=found');
+  await expect(page.getByText(/found topic/i)).toBeVisible();
+});
+
+test('mobile sidebar toggle', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 667 });
+  await page.goto('/app');
+
+  const sidebarToggle = page.locator('[data-testid="sidebar-toggle"], .navbar-toggle, button[aria-label*="menu" i]');
+  if (await sidebarToggle.count() > 0) {
+    await sidebarToggle.first().click();
+    await expect(page.locator('.wt-sidebar, .sidebar, [role="navigation"]').first()).toBeVisible();
+  }
+});

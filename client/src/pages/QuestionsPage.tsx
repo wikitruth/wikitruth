@@ -7,9 +7,14 @@ import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import Pagination from '../components/common/Pagination';
 import Input from '../components/Form/Input';
+import PageMeta from '../components/common/PageMeta';
 import Select from '../components/Form/Select';
+import ContentViewFilter, { type ViewMode } from '../components/common/ContentViewFilter';
 import type { LegacyEntity } from '../types/legacy';
 import type { Question } from '../types';
+import { useNotification } from '../context/NotificationContext';
+import EmptyState from '../components/common/EmptyState';
+import { useAuth } from '../context/AuthContext';
 
 const QuestionsPage: React.FC = () => {
   const { id } = useParams();
@@ -20,20 +25,31 @@ const QuestionsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('editDate');
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    const saved = localStorage.getItem('wt_view_mode');
+    return (saved === 'wiki' || saved === 'original') ? saved : 'all';
+  });
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
+  const { addToast } = useNotification();
+  const { user } = useAuth();
+
+  const handleViewModeChange = (mode: ViewMode) => {
+    setViewMode(mode);
+    localStorage.setItem('wt_view_mode', mode);
+  };
 
   useEffect(() => {
     fetchQuestions();
-  }, [topicId]);
+  }, [topicId, viewMode]);
 
   const fetchQuestions = async () => {
     try {
-      const result = await apiService.getQuestions(topicId);
+      const result = await apiService.getQuestions(topicId, viewMode);
       setQuestions(result.questions || []);
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching questions:', error);
+      addToast('danger', 'Failed to load questions');
       setLoading(false);
     }
   };
@@ -92,6 +108,7 @@ const QuestionsPage: React.FC = () => {
 
   return (
     <div>
+      <PageMeta title="Questions" description="Browse questions from the community" />
       <Breadcrumb items={breadcrumbItems} />
       
       <PageHeader
@@ -99,9 +116,11 @@ const QuestionsPage: React.FC = () => {
         icon="question-circle"
         iconColor="text-success-x"
         actions={
-          <Link to="/questions/create" className="btn btn-success">
-            <i className="fa fa-plus"></i> Ask Question
-          </Link>
+          user ? (
+            <Link to="/questions/create" className="btn btn-success">
+              <i className="fa fa-plus"></i> Ask Question
+            </Link>
+          ) : undefined
         }
       />
 
@@ -134,6 +153,11 @@ const QuestionsPage: React.FC = () => {
                 ]}
                 label="Sort by"
               />
+            </div>
+          </div>
+          <div className="row" style={{ marginTop: '10px' }}>
+            <div className="col-md-12">
+              <ContentViewFilter value={viewMode} onChange={handleViewModeChange} />
             </div>
           </div>
         </div>
@@ -181,9 +205,11 @@ const QuestionsPage: React.FC = () => {
           )}
         </>
       ) : (
-        <div className="alert alert-info">
-          {searchQuery ? `No questions found matching "${searchQuery}"` : 'No questions found.'}
-        </div>
+        <EmptyState
+          icon="question-circle"
+          title={searchQuery ? `No questions found matching "${searchQuery}"` : 'No questions found'}
+          description="Try adjusting your search criteria."
+        />
       )}
     </div>
   );

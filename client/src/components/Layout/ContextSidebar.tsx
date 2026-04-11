@@ -40,6 +40,7 @@ const ContextSidebar: React.FC = () => {
     items: [
       { label: 'Explore', to: '/explore', icon: 'globe' },
       { label: 'Search', to: '/search', icon: 'search' },
+      { label: 'Clipboard', to: '/clipboard', icon: 'clipboard' },
       { label: 'Visualize', to: '/visualize', icon: 'snowflake-o' },
     ],
   };

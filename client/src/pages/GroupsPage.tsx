@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { apiService } from '../services/api';
 import { Group } from '../types';
+import PageMeta from '../components/common/PageMeta';
 
 const GroupsPage: React.FC = () => {
   const [publicGroups, setPublicGroups] = useState<Group[]>([]);
@@ -36,6 +37,7 @@ const GroupsPage: React.FC = () => {
 
   return (
     <div>
+      <PageMeta title="Groups" />
       <h1 className="page-header wt-header-2">
         <i className="fa fa-group"></i> Groups
         <div className="pull-right" style={{ paddingTop: '8px', paddingBottom: '8px', fontSize: '28px' }}>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import apiService from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -8,7 +8,11 @@ import QuestionEntryRow from '../components/EntryRow/QuestionEntryRow';
 import AnswerEntryRow from '../components/EntryRow/AnswerEntryRow';
 import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
+import PageMeta from '../components/common/PageMeta';
+import { trackEvent } from '../utils/analytics';
 import { useAuth } from '../context/AuthContext';
+import { useNotification } from '../context/NotificationContext';
+import EmptyState from '../components/common/EmptyState';
 import type { SearchResponse } from '../types/api';
 import type { Answer, Argument, Artifact, Issue, Opinion, Question, Topic } from '../types';
 import type { LegacyEntity } from '../types/legacy';
@@ -72,10 +76,33 @@ const SearchPage: React.FC = () => {
   const [results, setResults] = useState<SearchResponse>(emptyResults);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const { addToast } = useNotification();
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
+  const [focusedIndex, setFocusedIndex] = useState(-1);
 
   useEffect(() => {
     setSearchQuery(query);
   }, [query]);
+
+  // Debounced auto-search
+  useEffect(() => {
+    const trimmed = searchQuery.trim();
+    if (!trimmed || trimmed === query) return;
+    const timer = setTimeout(() => {
+      const params = new URLSearchParams();
+      params.set('q', trimmed);
+      if (tab !== 'all') params.set('tab', tab);
+      if (content !== 'all') params.set('content', content);
+      setSearchParams(params);
+    }, 333);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Reset focused index when results change
+  useEffect(() => {
+    setFocusedIndex(-1);
+  }, [results]);
 
   useEffect(() => {
     if (!query.trim()) {
@@ -89,9 +116,10 @@ const SearchPage: React.FC = () => {
         setLoading(true);
         setSearched(true);
         const response = await apiService.search(query, { tab: tab, content: content });
+        trackEvent('search', 'engagement', query);
         setResults(response);
       } catch (error) {
-        console.error('Error searching:', error);
+        addToast('danger', 'Search failed. Please try again.');
         setResults(emptyResults);
       } finally {
         setLoading(false);
@@ -176,6 +204,45 @@ const SearchPage: React.FC = () => {
   const hasResults = Boolean(results.results || totalResults > 0);
   const activeSections = tab === 'all' ? sectionConfigs : sectionConfigs.filter((section) => section.key === tab);
 
+  const getResultLinks = useCallback((): HTMLAnchorElement[] => {
+    if (!resultsRef.current) return [];
+    return Array.from(resultsRef.current.querySelectorAll('.wt-list .list-group-item:not(.highlight) a:first-child'));
+  }, []);
+
+  // Highlight and scroll to focused result
+  useEffect(() => {
+    if (!resultsRef.current) return;
+    const items = resultsRef.current.querySelectorAll('.wt-list .list-group-item:not(.highlight)');
+    items.forEach((item, i) => {
+      if (i === focusedIndex) {
+        item.classList.add('wt-result-focused');
+        item.scrollIntoView({ block: 'nearest' });
+      } else {
+        item.classList.remove('wt-result-focused');
+      }
+    });
+  }, [focusedIndex, results]);
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      setSearchQuery('');
+      setFocusedIndex(-1);
+      return;
+    }
+    const links = getResultLinks();
+    if (!links.length) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setFocusedIndex((prev) => Math.min(prev + 1, links.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setFocusedIndex((prev) => Math.max(prev - 1, 0));
+    } else if (e.key === 'Enter' && focusedIndex >= 0 && links[focusedIndex]) {
+      e.preventDefault();
+      links[focusedIndex].click();
+    }
+  };
+
   const renderSectionRows = (section: SectionConfig, entries: LegacyEntity[]) => {
     switch (section.key) {
       case 'topics':
@@ -211,6 +278,7 @@ const SearchPage: React.FC = () => {
 
   return (
     <div>
+      <PageMeta title="Search" description="Search Wikitruth content" />
       <h1 className="page-header wt-header">
         <i className="fa fa-search"></i> Search
       </h1>
@@ -220,6 +288,7 @@ const SearchPage: React.FC = () => {
           <div className="col-lg-6 col-md-8 col-sm-8">
             <div className="input-group">
               <input
+                ref={searchInputRef}
                 type="text"
                 id="search"
                 name="q"
@@ -227,6 +296,11 @@ const SearchPage: React.FC = () => {
                 placeholder="Search for..."
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
+                onKeyDown={handleSearchKeyDown}
+                role="combobox"
+                aria-expanded={hasResults}
+                aria-controls="search-results"
+                aria-activedescendant={focusedIndex >= 0 ? `search-result-${focusedIndex}` : undefined}
               />
               <span className="input-group-btn">
                 <button type="submit" className="btn btn-default">
@@ -277,20 +351,13 @@ const SearchPage: React.FC = () => {
       {loading && <LoadingSpinner message="Searching..." />}
 
       {!loading && searched && (
-        <div className="wt-search">
+        <div className="wt-search" ref={resultsRef} id="search-results" role="listbox">
           {!hasResults ? (
-            <h4 style={{ fontWeight: 'normal' }} className="text-muted-x">
-              No results found for <strong>{query}</strong>.
-              <br />
-              <br />
-              <p>Suggestions:</p>
-              <ul>
-                <li>Make sure all words are spelled correctly.</li>
-                <li>Try different keywords.</li>
-                <li>Try more general keywords.</li>
-                <li>Try fewer keywords.</li>
-              </ul>
-            </h4>
+            <EmptyState
+              icon="search"
+              title={`No results found for "${query}"`}
+              description="Try different keywords, check spelling, or use more general terms."
+            />
           ) : (
             <>
               <ul className="nav nav-tabs wt-tabs" role="tablist">

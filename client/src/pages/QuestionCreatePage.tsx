@@ -3,12 +3,16 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import Input from '../components/Form/Input';
+import RichTextEditor from '../components/Form/RichTextEditor';
 import TextArea from '../components/Form/TextArea';
 import Checkbox from '../components/Form/Checkbox';
 import Button from '../components/common/Button';
 import Alert from '../components/common/Alert';
+import PageMeta from '../components/common/PageMeta';
 import useForm from '../hooks/useForm';
 import apiService from '../services/api';
+import { trackEvent } from '../utils/analytics';
+import { useNotification } from '../context/NotificationContext';
 
 interface QuestionFormValues {
   title: string;
@@ -24,6 +28,7 @@ const QuestionCreatePage: React.FC = () => {
   const groupId = searchParams.get('group') || undefined;
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const { addToast } = useNotification();
 
   const validate = (values: QuestionFormValues) => {
     const errors: Partial<Record<keyof QuestionFormValues, string>> = {};
@@ -53,16 +58,20 @@ const QuestionCreatePage: React.FC = () => {
         groupId: groupId,
       });
 
+      trackEvent('create_question', 'content', values.title);
+      addToast('success', 'Question created successfully!');
       setSubmitSuccess(true);
       setTimeout(() => {
         navigate('/questions');
       }, 1200);
     } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : 'Failed to create question');
+      const msg = error instanceof Error ? error.message : 'Failed to create question';
+      setSubmitError(msg);
+      addToast('danger', msg);
     }
   };
 
-  const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit: onSubmit } = useForm<QuestionFormValues>({
+  const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit: onSubmit, setFieldValue } = useForm<QuestionFormValues>({
     initialValues: {
       title: '',
       description: '',
@@ -76,6 +85,7 @@ const QuestionCreatePage: React.FC = () => {
 
   return (
     <div>
+      <PageMeta title="Ask a Question" description="Create a new question for the community" />
       <Breadcrumb
         items={[
           { title: 'Home', url: '/' },
@@ -113,15 +123,14 @@ const QuestionCreatePage: React.FC = () => {
               error={touched.title ? errors.title : undefined}
             />
 
-            <TextArea
+            <RichTextEditor
               name="description"
               label="Question details"
               value={values.description}
-              onChange={handleChange}
-              onBlur={handleBlur}
+              onChange={(name, html) => setFieldValue(name as keyof QuestionFormValues, html)}
+              onBlur={() => {}}
               placeholder="Provide context and details"
               required
-              rows={6}
               error={touched.description ? errors.description : undefined}
             />
 

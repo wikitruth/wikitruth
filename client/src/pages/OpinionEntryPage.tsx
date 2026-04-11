@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Breadcrumb from '../components/common/Breadcrumb';
+import GeoPatternBackground from '../components/common/GeoPatternBackground';
 import PageHeader from '../components/common/PageHeader';
 import PageTabs from '../components/common/PageTabs';
 import Alert from '../components/common/Alert';
@@ -9,10 +10,13 @@ import EntryList from '../components/common/EntryList';
 import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
 import EntryActionsMenu from '../components/Entry/EntryActionsMenu';
+import PageMeta from '../components/common/PageMeta';
 import apiService from '../services/api';
 import type { OpinionEntryResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
 import type { Issue, Opinion } from '../types';
+import { formatRelativeTime } from '../utils/dateFormat';
+import { sanitizeHtml } from '../utils/sanitizeHtml';
 
 const OpinionEntryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -74,7 +78,9 @@ const OpinionEntryPage: React.FC = () => {
 
   return (
     <div>
+      <PageMeta title={opinion.title} description={opinion.description || opinion.contentPreview} />
       <Breadcrumb items={breadcrumbItems} />
+      <GeoPatternBackground seed={opinion.title || 'opinion'} height={100} />
       
       <PageHeader 
         title={opinion.title}
@@ -89,7 +95,7 @@ const OpinionEntryPage: React.FC = () => {
       {/* Opinion content */}
       <div className="text-body collapsible" style={{ marginTop: '20px' }}>
         {opinion.content ? (
-          <div dangerouslySetInnerHTML={{ __html: opinion.content }} />
+          <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(opinion.content) }} />
         ) : opinion.contentPreview ? (
           <p className="lead">{opinion.contentPreview}</p>
         ) : opinion.description && (
@@ -132,7 +138,7 @@ const OpinionEntryPage: React.FC = () => {
         )}
         {opinion.editDate && (
           <p className="text-muted">
-            <i className="fa fa-clock-o"></i> Last updated: {new Date(opinion.editDate).toLocaleDateString()}
+            <i className="fa fa-clock-o"></i> Last updated: {formatRelativeTime(opinion.editDate)}
           </p>
         )}
         {opinion.private && (

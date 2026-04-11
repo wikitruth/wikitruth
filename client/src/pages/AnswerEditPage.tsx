@@ -3,11 +3,13 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import Input from '../components/Form/Input';
+import RichTextEditor from '../components/Form/RichTextEditor';
 import TextArea from '../components/Form/TextArea';
 import Checkbox from '../components/Form/Checkbox';
 import Button from '../components/common/Button';
 import Alert from '../components/common/Alert';
 import LoadingSpinner from '../components/LoadingSpinner';
+import PageMeta from '../components/common/PageMeta';
 import apiService from '../services/api';
 
 const AnswerEditPage: React.FC = () => {
@@ -81,6 +83,7 @@ const AnswerEditPage: React.FC = () => {
 
   return (
     <div>
+      <PageMeta title="Edit Answer" description={`Editing: ${title}`} />
       <Breadcrumb items={[{ title: 'Home', url: '/' }, { title: 'Answers', url: '/answers' }, { title: 'Edit Answer', active: true }]} />
       <PageHeader title="Edit Answer" icon="list-alt" iconColor="text-primary" />
       {error && <Alert type="danger">{error}</Alert>}
@@ -89,7 +92,7 @@ const AnswerEditPage: React.FC = () => {
         <div className="panel-body">
           <form onSubmit={handleSave}>
             <Input name="title" label="Answer title" value={title} onChange={(e) => setTitle(e.target.value)} required />
-            <TextArea name="description" label="Answer details" value={description} onChange={(e) => setDescription(e.target.value)} rows={6} required />
+            <RichTextEditor name="description" label="Answer details" value={description} onChange={(_, html) => setDescription(html)} />
             <Input name="questionId" label="Question ID" value={questionId} onChange={(e) => setQuestionId(e.target.value)} required />
             <TextArea name="references" label="References (optional)" value={references} onChange={(e) => setReferences(e.target.value)} rows={3} />
             <Checkbox name="private" label="Private" checked={isPrivate} onChange={(e) => setIsPrivate(e.target.checked)} />

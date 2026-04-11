@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Alert from '../components/common/Alert';
 import Breadcrumb from '../components/common/Breadcrumb';
+import GeoPatternBackground from '../components/common/GeoPatternBackground';
 import PageHeader from '../components/common/PageHeader';
 import EntryList from '../components/common/EntryList';
 import ArgumentEntryRow from '../components/EntryRow/ArgumentEntryRow';
@@ -10,10 +11,13 @@ import QuestionEntryRow from '../components/EntryRow/QuestionEntryRow';
 import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
 import EntryActionsMenu from '../components/Entry/EntryActionsMenu';
+import PageMeta from '../components/common/PageMeta';
 import apiService from '../services/api';
 import type { LegacyEntity } from '../types/legacy';
 import type { ArtifactEntryResponse } from '../types/api';
 import type { Argument, Artifact, Issue, Opinion, Question } from '../types';
+import { formatRelativeTime } from '../utils/dateFormat';
+import { sanitizeHtml } from '../utils/sanitizeHtml';
 
 const ArtifactEntryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -58,7 +62,9 @@ const ArtifactEntryPage: React.FC = () => {
 
   return (
     <div>
+      <PageMeta title={artifact.title} description={artifact.description || artifact.contentPreview} />
       <Breadcrumb items={[{ title: 'Home', url: '/' }, { title: 'Artifacts', url: '/artifacts' }, { title: artifact.title, active: true }]} />
+      <GeoPatternBackground seed={artifact.title || 'artifact'} height={100} />
       <PageHeader
         title={artifact.title}
         icon="picture-o"
@@ -67,7 +73,7 @@ const ArtifactEntryPage: React.FC = () => {
       />
 
       <div className="text-body" style={{ marginTop: '20px' }}>
-        <div dangerouslySetInnerHTML={{ __html: artifact.content || artifact.description || '' }} />
+        <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(artifact.content || artifact.description || '') }} />
       </div>
 
       {artifacts.length > 0 && (
@@ -156,7 +162,7 @@ const ArtifactEntryPage: React.FC = () => {
         )}
         {artifact.editDate && (
           <p className="text-muted">
-            <i className="fa fa-clock-o"></i> Last updated: {new Date(artifact.editDate).toLocaleDateString()}
+            <i className="fa fa-clock-o"></i> Last updated: {formatRelativeTime(artifact.editDate)}
           </p>
         )}
         {artifact.private && (

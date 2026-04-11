@@ -99,8 +99,19 @@ app.use(require('./middlewares/requestContext'));
 const helmetConfig = config.security && config.security.helmet ? config.security.helmet : { enabled: true };
 if (helmetConfig.enabled) {
     app.use(helmet({
-        // Keep CSP opt-in for now to avoid breaking legacy dust/jade inline scripts during migration.
-        contentSecurityPolicy: helmetConfig.contentSecurityPolicy ? undefined : false,
+        contentSecurityPolicy: helmetConfig.contentSecurityPolicy ? {
+            directives: {
+                defaultSrc: ["'self'"],
+                scriptSrc: ["'self'", "https://www.googletagmanager.com", "https://www.google.com", "https://www.gstatic.com"],
+                styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+                imgSrc: ["'self'", "data:", "https:"],
+                fontSrc: ["'self'", "https://fonts.gstatic.com"],
+                connectSrc: ["'self'", "https://www.google-analytics.com"],
+                frameSrc: ["'self'", "https://www.google.com"],
+                objectSrc: ["'none'"],
+                baseUri: ["'self'"],
+            }
+        } : false,
         crossOriginEmbedderPolicy: helmetConfig.crossOriginEmbedderPolicy,
         crossOriginResourcePolicy: { policy: helmetConfig.crossOriginResourcePolicy || 'cross-origin' },
         referrerPolicy: { policy: helmetConfig.referrerPolicy || 'no-referrer' },

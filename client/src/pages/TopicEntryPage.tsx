@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import apiService from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Breadcrumb from '../components/common/Breadcrumb';
+import GeoPatternBackground from '../components/common/GeoPatternBackground';
 import PageHeader from '../components/common/PageHeader';
 import PageTabs from '../components/common/PageTabs';
 import EntryList from '../components/common/EntryList';
@@ -13,9 +14,12 @@ import QuestionEntryRow from '../components/EntryRow/QuestionEntryRow';
 import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
 import EntryActionsMenu from '../components/Entry/EntryActionsMenu';
+import PageMeta from '../components/common/PageMeta';
 import type { TopicEntryResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
 import type { Argument, Artifact, Issue, Opinion, Question, Topic } from '../types';
+import { formatRelativeTime } from '../utils/dateFormat';
+import { sanitizeHtml } from '../utils/sanitizeHtml';
 
 const CONTENT_COLLAPSE_THRESHOLD = 1200;
 
@@ -144,7 +148,9 @@ const TopicEntryPage: React.FC = () => {
 
   return (
     <div>
+      <PageMeta title={topic.title} description={topic.description || topic.contentPreview} />
       <Breadcrumb items={breadcrumbItems} />
+      <GeoPatternBackground seed={topic.title || 'topic'} height={100} />
 
       <PageHeader
         title={topic.title}
@@ -171,7 +177,7 @@ const TopicEntryPage: React.FC = () => {
 
       <div className="text-body collapsible" style={{ marginTop: '20px', ...contentStyle }}>
         {topic.content ? (
-          <div dangerouslySetInnerHTML={{ __html: topic.content }} />
+          <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(topic.content) }} />
         ) : topic.description ? (
           <p className="lead">{topic.description}</p>
         ) : (
@@ -338,7 +344,7 @@ const TopicEntryPage: React.FC = () => {
         )}
         {topic.editDate && (
           <p className="text-muted">
-            <i className="fa fa-clock-o"></i> Last updated: {new Date(topic.editDate).toLocaleDateString()}
+            <i className="fa fa-clock-o"></i> Last updated: {formatRelativeTime(topic.editDate)}
           </p>
         )}
         {topic.private && (

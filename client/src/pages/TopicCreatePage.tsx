@@ -3,13 +3,16 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import Input from '../components/Form/Input';
-import TextArea from '../components/Form/TextArea';
+import RichTextEditor from '../components/Form/RichTextEditor';
 import Select from '../components/Form/Select';
 import Checkbox from '../components/Form/Checkbox';
 import Button from '../components/common/Button';
 import Alert from '../components/common/Alert';
+import PageMeta from '../components/common/PageMeta';
 import useForm from '../hooks/useForm';
 import apiService from '../services/api';
+import { trackEvent } from '../utils/analytics';
+import { useNotification } from '../context/NotificationContext';
 
 interface TopicFormValues {
   title: string;
@@ -25,6 +28,7 @@ const TopicCreatePage: React.FC = () => {
   const groupId = searchParams.get('group') || undefined;
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const { addToast } = useNotification();
 
   const validate = (values: TopicFormValues) => {
     const errors: Partial<Record<keyof TopicFormValues, string>> = {};
@@ -64,6 +68,8 @@ const TopicCreatePage: React.FC = () => {
         groupId: groupId,
       });
       
+      trackEvent('create_topic', 'content', values.title);
+      addToast('success', 'Topic created successfully!');
       setSubmitSuccess(true);
       
       // Redirect after a short delay
@@ -71,7 +77,9 @@ const TopicCreatePage: React.FC = () => {
         navigate('/topics');
       }, 1500);
     } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : 'Failed to create topic');
+      const msg = error instanceof Error ? error.message : 'Failed to create topic';
+      setSubmitError(msg);
+      addToast('danger', msg);
     }
   };
 
@@ -83,6 +91,7 @@ const TopicCreatePage: React.FC = () => {
     handleChange,
     handleBlur,
     handleSubmit: onSubmit,
+    setFieldValue,
   } = useForm<TopicFormValues>({
     initialValues: {
       title: '',
@@ -103,6 +112,7 @@ const TopicCreatePage: React.FC = () => {
 
   return (
     <div>
+      <PageMeta title="Create Topic" description="Share a new topic for discussion and exploration" />
       <Breadcrumb items={breadcrumbItems} />
       
       <PageHeader
@@ -145,15 +155,14 @@ const TopicCreatePage: React.FC = () => {
               maxLength={200}
             />
 
-            <TextArea
+            <RichTextEditor
               name="description"
               label="Description"
               value={values.description}
-              onChange={handleChange}
-              onBlur={handleBlur}
+              onChange={(name, html) => setFieldValue(name as keyof TopicFormValues, html)}
+              onBlur={() => {}}
               placeholder="Provide a detailed description of the topic"
               required
-              rows={6}
               error={touched.description ? errors.description : undefined}
             />
 

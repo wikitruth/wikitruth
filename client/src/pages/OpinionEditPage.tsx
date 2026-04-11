@@ -3,11 +3,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import Input from '../components/Form/Input';
-import TextArea from '../components/Form/TextArea';
+import RichTextEditor from '../components/Form/RichTextEditor';
 import Checkbox from '../components/Form/Checkbox';
 import Button from '../components/common/Button';
 import Alert from '../components/common/Alert';
 import LoadingSpinner from '../components/LoadingSpinner';
+import PageMeta from '../components/common/PageMeta';
 import apiService from '../services/api';
 
 const OpinionEditPage: React.FC = () => {
@@ -78,6 +79,7 @@ const OpinionEditPage: React.FC = () => {
 
   return (
     <div>
+      <PageMeta title="Edit Opinion" description={`Editing: ${title}`} />
       <Breadcrumb items={[{ title: 'Home', url: '/' }, { title: 'Opinions', url: '/opinions' }, { title: 'Edit Opinion', active: true }]} />
       <PageHeader title="Edit Opinion" icon="comment" iconColor="text-info" />
       {error && <Alert type="danger">{error}</Alert>}
@@ -86,7 +88,7 @@ const OpinionEditPage: React.FC = () => {
         <div className="panel-body">
           <form onSubmit={handleSave}>
             <Input name="title" label="Opinion title" value={title} onChange={(e) => setTitle(e.target.value)} required />
-            <TextArea name="description" label="Opinion details" value={description} onChange={(e) => setDescription(e.target.value)} rows={6} required />
+            <RichTextEditor name="description" label="Opinion details" value={description} onChange={(_, html) => setDescription(html)} />
             <Input name="topicId" label="Topic ID (optional)" value={topicId} onChange={(e) => setTopicId(e.target.value)} />
             <Checkbox name="private" label="Private" checked={isPrivate} onChange={(e) => setIsPrivate(e.target.checked)} />
             <div className="form-group" style={{ marginTop: '20px' }}>

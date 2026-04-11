@@ -1,12 +1,23 @@
 const baseConfigFactory = require('./webpack.config');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 module.exports = (env = {}, argv = {}) => {
   const baseConfig = baseConfigFactory(env, { ...argv, mode: 'production' });
   const { devServer, ...configWithoutDevServer } = baseConfig;
 
+  const plugins = [...(configWithoutDevServer.plugins || [])];
+  if (process.env.ANALYZE_BUNDLE) {
+    plugins.push(new BundleAnalyzerPlugin({
+      analyzerMode: 'static',
+      openAnalyzer: false,
+      reportFilename: 'bundle-report.html',
+    }));
+  }
+
   return {
     ...configWithoutDevServer,
     mode: 'production',
+    plugins,
     cache: {
       type: 'filesystem',
     },

@@ -9,6 +9,8 @@ import QuestionEntryRow from '../components/EntryRow/QuestionEntryRow';
 import AnswerEntryRow from '../components/EntryRow/AnswerEntryRow';
 import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
+import PageMeta from '../components/common/PageMeta';
+import { useNotification } from '../context/NotificationContext';
 
 interface HomeData {
   topics?: Topic[];
@@ -31,6 +33,7 @@ interface HomeData {
 const HomePage: React.FC = () => {
   const [data, setData] = useState<HomeData>({});
   const [loading, setLoading] = useState(true);
+  const { addToast } = useNotification();
 
   useEffect(() => {
     fetchHomeData();
@@ -42,7 +45,7 @@ const HomePage: React.FC = () => {
       setData(result);
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching home data:', error);
+      addToast('danger', 'Failed to load homepage data');
       setLoading(false);
     }
   };
@@ -55,6 +58,7 @@ const HomePage: React.FC = () => {
 
   return (
     <div>
+      <PageMeta title="Home" description="A systematic discourse and knowledge contribution using dialectics and vetting" />
       {/* Jumbotron */}
       <div className="jumbotron">
         {application ? (

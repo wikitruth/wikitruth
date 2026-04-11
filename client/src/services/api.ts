@@ -104,8 +104,12 @@ class ApiService {
   }
 
   // Topics
-  async getTopics(topicId?: string): Promise<LegacyApiResponse> {
-    const url = topicId ? `/topics?topic=${topicId}` : '/topics';
+  async getTopics(topicId?: string, view?: string): Promise<LegacyApiResponse> {
+    const params = new URLSearchParams();
+    if (topicId) params.set('topic', topicId);
+    if (view && view !== 'all') params.set('view', view);
+    const qs = params.toString();
+    const url = qs ? `/topics?${qs}` : '/topics';
     return this.request<LegacyApiResponse>(url);
   }
 
@@ -129,8 +133,12 @@ class ApiService {
   }
 
   // Arguments
-  async getArguments(topicId?: string): Promise<LegacyApiResponse> {
-    const url = topicId ? `/arguments?topic=${topicId}` : '/arguments';
+  async getArguments(topicId?: string, view?: string): Promise<LegacyApiResponse> {
+    const params = new URLSearchParams();
+    if (topicId) params.set('topic', topicId);
+    if (view && view !== 'all') params.set('view', view);
+    const qs = params.toString();
+    const url = qs ? `/arguments?${qs}` : '/arguments';
     return this.request<LegacyApiResponse>(url);
   }
 
@@ -153,9 +161,31 @@ class ApiService {
     });
   }
 
+  async updateArgument(
+    id: string,
+    payload: {
+      title?: string;
+      description?: string;
+      verdict?: string;
+      verdictReasoning?: string;
+      topicId?: string;
+      private?: boolean;
+      sources?: string;
+    }
+  ): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>(`/arguments/entry/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  }
+
   // Questions
-  async getQuestions(topicId?: string): Promise<LegacyApiResponse> {
-    const url = topicId ? `/questions?topic=${topicId}` : '/questions';
+  async getQuestions(topicId?: string, view?: string): Promise<LegacyApiResponse> {
+    const params = new URLSearchParams();
+    if (topicId) params.set('topic', topicId);
+    if (view && view !== 'all') params.set('view', view);
+    const qs = params.toString();
+    const url = qs ? `/questions?${qs}` : '/questions';
     return this.request<LegacyApiResponse>(url);
   }
 
@@ -194,8 +224,12 @@ class ApiService {
   }
 
   // Issues
-  async getIssues(topicId?: string): Promise<LegacyApiResponse> {
-    const url = topicId ? `/issues?topic=${topicId}` : '/issues';
+  async getIssues(topicId?: string, view?: string): Promise<LegacyApiResponse> {
+    const params = new URLSearchParams();
+    if (topicId) params.set('topic', topicId);
+    if (view && view !== 'all') params.set('view', view);
+    const qs = params.toString();
+    const url = qs ? `/issues?${qs}` : '/issues';
     return this.request<LegacyApiResponse>(url);
   }
 
@@ -233,8 +267,12 @@ class ApiService {
   }
 
   // Opinions
-  async getOpinions(topicId?: string): Promise<LegacyApiResponse> {
-    const url = topicId ? `/opinions?topic=${topicId}` : '/opinions';
+  async getOpinions(topicId?: string, view?: string): Promise<LegacyApiResponse> {
+    const params = new URLSearchParams();
+    if (topicId) params.set('topic', topicId);
+    if (view && view !== 'all') params.set('view', view);
+    const qs = params.toString();
+    const url = qs ? `/opinions?${qs}` : '/opinions';
     return this.request<LegacyApiResponse>(url);
   }
 
@@ -271,8 +309,12 @@ class ApiService {
   }
 
   // Answers
-  async getAnswers(questionId?: string): Promise<LegacyApiResponse> {
-    const url = questionId ? `/answers?question=${questionId}` : '/answers';
+  async getAnswers(questionId?: string, view?: string): Promise<LegacyApiResponse> {
+    const params = new URLSearchParams();
+    if (questionId) params.set('question', questionId);
+    if (view && view !== 'all') params.set('view', view);
+    const qs = params.toString();
+    const url = qs ? `/answers?${qs}` : '/answers';
     return this.request<LegacyApiResponse>(url);
   }
 
@@ -497,6 +539,13 @@ class ApiService {
   async updateMemberPage(username: string, pageId: string, payload: { title?: string; content?: string }): Promise<LegacyApiResponse> {
     return this.request<LegacyApiResponse>(`/members/${encodeURIComponent(username)}/pages/${encodeURIComponent(pageId)}`, {
       method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async createOutlineLink(payload: { parentId: string; targetId: string }): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>('/outline/link', {
+      method: 'POST',
       body: JSON.stringify(payload),
     });
   }

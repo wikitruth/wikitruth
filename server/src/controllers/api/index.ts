@@ -10,10 +10,12 @@ const apiError = require('../../middlewares/apiError') as {
 const mobileContracts = require('../../middlewares/mobileApiContracts') as {
   mobileApiContractMiddleware: import('express').RequestHandler;
 };
+import { sanitizeContentMiddleware } from '../../middlewares/sanitizeContent';
 
 module.exports = function (router: Router) {
   router.use(apiError.apiEnvelopeMiddleware);
   router.use(mobileContracts.mobileApiContractMiddleware);
+  router.use(sanitizeContentMiddleware);
 
   const homeRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const topicsRouter = apiError.wrapAsyncRouter(express.Router()) as Router;

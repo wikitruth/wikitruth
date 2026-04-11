@@ -7,10 +7,15 @@ import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import Pagination from '../components/common/Pagination';
 import Input from '../components/Form/Input';
+import PageMeta from '../components/common/PageMeta';
 import Select from '../components/Form/Select';
+import ContentViewFilter, { type ViewMode } from '../components/common/ContentViewFilter';
 import Alert from '../components/common/Alert';
+import EmptyState from '../components/common/EmptyState';
+import { useAuth } from '../context/AuthContext';
 import type { LegacyEntity } from '../types/legacy';
 import type { Answer } from '../types';
+import { useNotification } from '../context/NotificationContext';
 
 const AnswersPage: React.FC = () => {
   const [answers, setAnswers] = useState<LegacyEntity[]>([]);
@@ -18,24 +23,37 @@ const AnswersPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('editDate');
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    const saved = localStorage.getItem('wt_view_mode');
+    return (saved === 'wiki' || saved === 'original') ? saved : 'all';
+  });
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
+  const { addToast } = useNotification();
+  const { user } = useAuth();
+
+  const handleViewModeChange = (mode: ViewMode) => {
+    setViewMode(mode);
+    localStorage.setItem('wt_view_mode', mode);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const result = await apiService.getAnswers();
+        const result = await apiService.getAnswers(undefined, viewMode);
         setAnswers(result?.answers || []);
       } catch (err: unknown) {
-        setError(err instanceof Error ? err.message : 'Failed to load answers');
+        const msg = err instanceof Error ? err.message : 'Failed to load answers';
+        setError(msg);
+        addToast('danger', msg);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [viewMode]);
 
   // Filter and sort answers
   const filteredAndSortedAnswers = React.useMemo(() => {
@@ -95,6 +113,7 @@ const AnswersPage: React.FC = () => {
 
   return (
     <div>
+      <PageMeta title="Answers" description="Browse all answers in the knowledge base" />
       <Breadcrumb items={breadcrumbItems} />
       
       <PageHeader
@@ -103,9 +122,11 @@ const AnswersPage: React.FC = () => {
         icon="list-alt"
         iconColor="text-primary"
         actions={
-          <Link to="/answers/create" className="btn btn-primary">
-            <i className="fa fa-plus"></i> Add Answer
-          </Link>
+          user ? (
+            <Link to="/answers/create" className="btn btn-primary">
+              <i className="fa fa-plus"></i> Add Answer
+            </Link>
+          ) : undefined
         }
       />
 
@@ -138,6 +159,11 @@ const AnswersPage: React.FC = () => {
                 ]}
                 label="Sort by"
               />
+            </div>
+          </div>
+          <div className="row" style={{ marginTop: '10px' }}>
+            <div className="col-md-12">
+              <ContentViewFilter value={viewMode} onChange={handleViewModeChange} />
             </div>
           </div>
         </div>
@@ -180,9 +206,11 @@ const AnswersPage: React.FC = () => {
           )}
         </>
       ) : (
-        <div className="alert alert-info">
-          {searchQuery ? `No answers found matching "${searchQuery}"` : 'No answers found.'}
-        </div>
+        <EmptyState
+          icon="check-circle"
+          title={searchQuery ? `No answers found matching "${searchQuery}"` : 'No answers found'}
+          description="Try adjusting your search criteria."
+        />
       )}
     </div>
   );

@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import apiService from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Breadcrumb from '../components/common/Breadcrumb';
+import GeoPatternBackground from '../components/common/GeoPatternBackground';
 import PageHeader from '../components/common/PageHeader';
 import PageTabs from '../components/common/PageTabs';
 import Alert from '../components/common/Alert';
@@ -13,7 +14,10 @@ import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
 import EntryList from '../components/common/EntryList';
 import EntryActionsMenu from '../components/Entry/EntryActionsMenu';
+import PageMeta from '../components/common/PageMeta';
 import type { Issue, Opinion, Question } from '../types';
+import { formatRelativeTime } from '../utils/dateFormat';
+import { sanitizeHtml } from '../utils/sanitizeHtml';
 
 const ArgumentEntryPage: React.FC = () => {
   const { id } = useParams();
@@ -73,7 +77,9 @@ const ArgumentEntryPage: React.FC = () => {
 
   return (
     <div>
+      <PageMeta title={argument.title} description={argument.description || argument.contentPreview} />
       <Breadcrumb items={breadcrumbItems} />
+      <GeoPatternBackground seed={argument.title || 'argument'} height={100} />
       
       <PageHeader 
         title={argument.title}
@@ -103,7 +109,7 @@ const ArgumentEntryPage: React.FC = () => {
       {/* Argument content */}
       <div className="text-body collapsible" style={{ marginTop: '20px' }}>
         {argument.content ? (
-          <div dangerouslySetInnerHTML={{ __html: argument.content }} />
+          <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(argument.content) }} />
         ) : argument.description && (
           <p className="lead">{argument.description}</p>
         )}
@@ -157,7 +163,7 @@ const ArgumentEntryPage: React.FC = () => {
         )}
         {argument.editDate && (
           <p className="text-muted">
-            <i className="fa fa-clock-o"></i> Last updated: {new Date(argument.editDate).toLocaleDateString()}
+            <i className="fa fa-clock-o"></i> Last updated: {formatRelativeTime(argument.editDate)}
           </p>
         )}
         {argument.private && (

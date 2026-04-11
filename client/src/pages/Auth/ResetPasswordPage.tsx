@@ -4,6 +4,7 @@ import Input from '../../components/Form/Input';
 import Button from '../../components/common/Button';
 import Alert from '../../components/common/Alert';
 import authApi from '../../services/api/auth';
+import PageMeta from '../../components/common/PageMeta';
 
 const ResetPasswordPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -58,6 +59,7 @@ const ResetPasswordPage: React.FC = () => {
 
   return (
     <div className="container" style={{ maxWidth: '520px', marginTop: '60px' }}>
+      <PageMeta title="Reset Password" />
       <h2>Reset password</h2>
 
       {submitError ? <Alert type="danger">{submitError}</Alert> : null}

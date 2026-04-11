@@ -6,6 +6,8 @@ import ProfileShell from '../../../components/Members/ProfileShell';
 import apiService from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
 import type { LegacyEntity } from '../../../types/legacy';
+import PageMeta from '../../../components/common/PageMeta';
+import GeoPatternBackground from '../../../components/common/GeoPatternBackground';
 
 const ProfilePage: React.FC = () => {
   const { username: routeUsername } = useParams<{ username?: string }>();
@@ -68,6 +70,8 @@ const ProfilePage: React.FC = () => {
 
   return (
     <div>
+      <PageMeta title={`${profile.username || 'User'} - Profile`} />
+      <GeoPatternBackground seed={profile.username || 'user'} height={120} />
       <ProfileShell
         username={profile.username}
         activeTab="overview"

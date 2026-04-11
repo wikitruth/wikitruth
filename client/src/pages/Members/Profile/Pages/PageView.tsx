@@ -9,6 +9,7 @@ import ProfileShell from '../../../../components/Members/ProfileShell';
 import apiService from '../../../../services/api';
 import { useAuth } from '../../../../context/AuthContext';
 import type { LegacyEntity } from '../../../../types/legacy';
+import { sanitizeHtml } from '../../../../utils/sanitizeHtml';
 
 const PageView: React.FC = () => {
   const { username: routeUsername, id } = useParams<{ username?: string; id: string }>();
@@ -109,7 +110,7 @@ const PageView: React.FC = () => {
             </>
           ) : (
             <div>
-              <div dangerouslySetInnerHTML={{ __html: page.content }} />
+              <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content) }} />
             </div>
           )}
         </div>

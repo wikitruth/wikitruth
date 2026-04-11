@@ -17,6 +17,8 @@ Backend variables are read by `config/config.js`. Required production values are
 | `TRUST_PROXY` | Express trust proxy flag | `false` |
 | `SESSION_COOKIE_SECURE` | Secure session cookie | `true` in production |
 | `SECURITY_HELMET_ENABLED` | Enable Helmet middleware | `true` |
+| `SECURITY_HELMET_CONTENT_SECURITY_POLICY` | Enable CSP headers | `false` |
+| `GRECAPTCHA_SECRET` | Google reCAPTCHA v3 secret key (server-side verification) | empty (disabled) |
 
 ## React Client Build-Time
 
@@ -29,6 +31,7 @@ Client variables are injected through webpack `DefinePlugin` in `webpack.config.
 | `REACT_APP_ENVIRONMENT` | Client environment label | `development` / `production` |
 | `CDN_ASSET_PREFIX` | Webpack `publicPath` for built bundles | `/dist/` |
 | `ANALYZE_BUNDLE` | Enables bundle report generation | `false` |
+| `REACT_APP_RECAPTCHA_SITE_KEY` | Google reCAPTCHA v3 site key (client-side widget) | empty (disabled) |
 
 ## Example `.env`
 
@@ -46,4 +49,8 @@ REACT_APP_ENVIRONMENT=production
 REACT_APP_ERROR_REPORT_ENDPOINT=/api/monitoring/errors
 CDN_ASSET_PREFIX=/dist/
 ANALYZE_BUNDLE=false
+
+# reCAPTCHA (obtain keys from https://www.google.com/recaptcha/admin)
+REACT_APP_RECAPTCHA_SITE_KEY=your-recaptcha-v3-site-key
+GRECAPTCHA_SECRET=your-recaptcha-v3-secret-key
 ```

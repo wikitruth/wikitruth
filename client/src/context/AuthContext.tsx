@@ -1,11 +1,16 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback, ReactNode } from 'react';
 import { User } from '../types';
 import authApi from '../services/api/auth';
+
+type ActiveRole = 'contributor' | 'screener' | 'reviewer' | 'admin';
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
+  activeRole: ActiveRole;
+  setActiveRole: (role: ActiveRole) => void;
+  availableRoles: ActiveRole[];
   signup: (username: string, email: string, password: string) => Promise<void>;
   login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
@@ -21,6 +26,28 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeRole, setActiveRoleState] = useState<ActiveRole>(() => {
+    try {
+      const stored = localStorage.getItem('wt_active_role');
+      if (stored && ['contributor', 'screener', 'reviewer', 'admin'].includes(stored)) {
+        return stored as ActiveRole;
+      }
+    } catch { /* ignore */ }
+    return 'contributor';
+  });
+
+  const setActiveRole = useCallback((role: ActiveRole) => {
+    setActiveRoleState(role);
+    try { localStorage.setItem('wt_active_role', role); } catch { /* ignore */ }
+  }, []);
+
+  const availableRoles: ActiveRole[] = React.useMemo(() => {
+    const roles: ActiveRole[] = ['contributor'];
+    if (user?.roles?.screener) roles.push('screener');
+    if (user?.roles?.reviewer) roles.push('reviewer');
+    if (user?.roles?.admin) roles.push('admin');
+    return roles;
+  }, [user]);
 
   useEffect(() => {
     // Check if user is already logged in on mount
@@ -74,15 +101,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const value: AuthContextType = {
+  const value: AuthContextType = useMemo(() => ({
     user,
     isAuthenticated: !!user,
     isLoading,
+    activeRole,
+    setActiveRole,
+    availableRoles,
     signup,
     login,
     logout,
     updateUser,
-  };
+  }), [user, isLoading, activeRole, setActiveRole, availableRoles]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

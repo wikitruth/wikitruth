@@ -1,0 +1,76 @@
+/* Print-specific styles */
+@media print {
+  /* Hide navigation, sidebar, and interactive elements during print */
+  .navbar,
+  .navbar-fixed-top,
+  .sidebar-offcanvas,
+  .wt-sidebar,
+  .wt-rte-toolbar,
+  .btn,
+  .breadcrumb,
+  .pagination,
+  .footer,
+  #sidebar,
+  .dropdown-menu,
+  .wt-content-view-filter {
+    display: none !important;
+  }
+
+  /* Remove fixed positioning */
+  .navbar-fixed-top {
+    position: static !important;
+  }
+
+  /* Full-width content */
+  .container-fluid,
+  .container,
+  .col-sm-12,
+  .col-md-9,
+  .col-lg-9-x {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .row-offcanvas {
+    display: block !important;
+  }
+
+  /* Clean typography */
+  body {
+    font-size: 12pt !important;
+    line-height: 1.5 !important;
+    color: #000 !important;
+    background: #fff !important;
+  }
+
+  h1 { font-size: 18pt !important; }
+  h2 { font-size: 16pt !important; }
+  h3 { font-size: 14pt !important; }
+
+  /* Show link targets */
+  a[href]:not([href^="#"])::after {
+    content: " (" attr(href) ")";
+    font-size: 10pt;
+    font-weight: normal;
+    color: #666;
+  }
+
+  /* Page breaks */
+  .panel {
+    page-break-inside: avoid;
+  }
+
+  .page-header {
+    page-break-after: avoid;
+  }
+
+  /* Remove box shadows and borders */
+  .panel,
+  .well,
+  .jumbotron {
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+  }
+}

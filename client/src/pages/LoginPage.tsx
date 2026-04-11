@@ -8,6 +8,8 @@ import SocialLoginButtons from '../components/Auth/SocialLoginButtons';
 import useForm from '../hooks/useForm';
 import { useAuth } from '../context/AuthContext';
 import authApi from '../services/api/auth';
+import PageMeta from '../components/common/PageMeta';
+import { trackEvent } from '../utils/analytics';
 
 interface LoginFormValues {
   username: string;
@@ -74,6 +76,7 @@ const LoginPage: React.FC = () => {
 
     try {
       await login(values.username, values.password);
+      trackEvent('login', 'auth', 'credentials');
       navigate('/');
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Login failed. Please check your credentials.');
@@ -100,6 +103,7 @@ const LoginPage: React.FC = () => {
 
   return (
     <div className="container">
+      <PageMeta title="Login" />
       <div className="row">
         <div className="col-sm-6">
           <div className="page-header1" style={{ marginTop: '40px', marginBottom: '20px' }}>

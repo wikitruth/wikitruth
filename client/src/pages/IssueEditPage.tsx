@@ -3,12 +3,13 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import Input from '../components/Form/Input';
-import TextArea from '../components/Form/TextArea';
+import RichTextEditor from '../components/Form/RichTextEditor';
 import Select from '../components/Form/Select';
 import Checkbox from '../components/Form/Checkbox';
 import Button from '../components/common/Button';
 import Alert from '../components/common/Alert';
 import LoadingSpinner from '../components/LoadingSpinner';
+import PageMeta from '../components/common/PageMeta';
 import apiService from '../services/api';
 
 const IssueEditPage: React.FC = () => {
@@ -82,6 +83,7 @@ const IssueEditPage: React.FC = () => {
 
   return (
     <div>
+      <PageMeta title="Edit Issue" description={`Editing: ${title}`} />
       <Breadcrumb items={[{ title: 'Home', url: '/' }, { title: 'Issues', url: '/issues' }, { title: 'Edit Issue', active: true }]} />
       <PageHeader title="Edit Issue" icon="exclamation-triangle" iconColor="text-warning" />
       {error && <Alert type="danger">{error}</Alert>}
@@ -90,7 +92,7 @@ const IssueEditPage: React.FC = () => {
         <div className="panel-body">
           <form onSubmit={handleSave}>
             <Input name="title" label="Issue title" value={title} onChange={(e) => setTitle(e.target.value)} required />
-            <TextArea name="description" label="Issue details" value={description} onChange={(e) => setDescription(e.target.value)} rows={6} required />
+            <RichTextEditor name="description" label="Issue details" value={description} onChange={(_, html) => setDescription(html)} />
             <Select
               name="issueType"
               label="Issue type"

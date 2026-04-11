@@ -3,15 +3,19 @@ import { Link, useParams } from 'react-router-dom';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Alert from '../components/common/Alert';
 import Breadcrumb from '../components/common/Breadcrumb';
+import GeoPatternBackground from '../components/common/GeoPatternBackground';
 import PageHeader from '../components/common/PageHeader';
 import EntryList from '../components/common/EntryList';
 import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
 import EntryActionsMenu from '../components/Entry/EntryActionsMenu';
+import PageMeta from '../components/common/PageMeta';
 import apiService from '../services/api';
 import type { LegacyEntity } from '../types/legacy';
 import type { AnswerEntryResponse } from '../types/api';
 import type { Issue, Opinion } from '../types';
+import { formatRelativeTime } from '../utils/dateFormat';
+import { sanitizeHtml } from '../utils/sanitizeHtml';
 
 const AnswerEntryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -53,7 +57,9 @@ const AnswerEntryPage: React.FC = () => {
 
   return (
     <div>
+      <PageMeta title={answer.title} description={answer.description || answer.contentPreview} />
       <Breadcrumb items={[{ title: 'Home', url: '/' }, { title: 'Answers', url: '/answers' }, { title: answer.title, active: true }]} />
+      <GeoPatternBackground seed={answer.title || 'answer'} height={100} />
       <PageHeader
         title={answer.title}
         icon="list-alt"
@@ -62,7 +68,7 @@ const AnswerEntryPage: React.FC = () => {
       />
 
       <div className="text-body" style={{ marginTop: '20px' }}>
-        <div dangerouslySetInnerHTML={{ __html: answer.content || answer.description || '' }} />
+        <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(answer.content || answer.description || '') }} />
       </div>
 
       {issues.length > 0 && (
@@ -99,7 +105,7 @@ const AnswerEntryPage: React.FC = () => {
         )}
         {answer.editDate && (
           <p className="text-muted">
-            <i className="fa fa-clock-o"></i> Last updated: {new Date(answer.editDate).toLocaleDateString()}
+            <i className="fa fa-clock-o"></i> Last updated: {formatRelativeTime(answer.editDate)}
           </p>
         )}
         {answer.private && (

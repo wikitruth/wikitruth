@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import adminApi from '../../services/api/admin';
 import { createRealtimeChannel } from '../../services/realtime';
 import type { RealtimeConnectionState, RealtimeEvent } from '../../types/realtime';
+import PageMeta from '../../components/common/PageMeta';
 
 interface DashboardCounts {
   users?: number;
@@ -81,6 +82,7 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <div className="container">
+      <PageMeta title="Admin Dashboard" />
       <h2>Admin Dashboard</h2>
       <p className="text-muted">Administrative controls and system overview.</p>
 

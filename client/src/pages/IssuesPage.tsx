@@ -7,10 +7,15 @@ import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import Pagination from '../components/common/Pagination';
 import Input from '../components/Form/Input';
+import PageMeta from '../components/common/PageMeta';
 import Select from '../components/Form/Select';
+import ContentViewFilter, { type ViewMode } from '../components/common/ContentViewFilter';
 import Alert from '../components/common/Alert';
+import EmptyState from '../components/common/EmptyState';
+import { useAuth } from '../context/AuthContext';
 import type { LegacyEntity } from '../types/legacy';
 import type { Issue } from '../types';
+import { useNotification } from '../context/NotificationContext';
 
 const IssuesPage: React.FC = () => {
   const [issues, setIssues] = useState<LegacyEntity[]>([]);
@@ -18,21 +23,32 @@ const IssuesPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('editDate');
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    const saved = localStorage.getItem('wt_view_mode');
+    return (saved === 'wiki' || saved === 'original') ? saved : 'all';
+  });
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
+  const { addToast } = useNotification();
+  const { user } = useAuth();
+
+  const handleViewModeChange = (mode: ViewMode) => {
+    setViewMode(mode);
+    localStorage.setItem('wt_view_mode', mode);
+  };
 
   useEffect(() => {
     fetchIssues();
-  }, []);
+  }, [viewMode]);
 
   const fetchIssues = async () => {
     try {
       setLoading(true);
-      const data = await apiService.getIssues();
+      const data = await apiService.getIssues(undefined, viewMode);
       setIssues(data.issues || []);
     } catch (err) {
       setError('Failed to load issues');
-      console.error(err);
+      addToast('danger', 'Failed to load issues');
     } finally {
       setLoading(false);
     }
@@ -96,6 +112,7 @@ const IssuesPage: React.FC = () => {
 
   return (
     <div>
+      <PageMeta title="Issues" description="Browse issues and concerns raised by the community" />
       <Breadcrumb items={breadcrumbItems} />
       
       <PageHeader
@@ -104,9 +121,11 @@ const IssuesPage: React.FC = () => {
         icon="exclamation-triangle"
         iconColor="text-warning"
         actions={
-          <Link to="/issues/create" className="btn btn-warning">
-            <i className="fa fa-plus"></i> Report Issue
-          </Link>
+          user ? (
+            <Link to="/issues/create" className="btn btn-warning">
+              <i className="fa fa-plus"></i> Report Issue
+            </Link>
+          ) : undefined
         }
       />
 
@@ -139,6 +158,11 @@ const IssuesPage: React.FC = () => {
                 ]}
                 label="Sort by"
               />
+            </div>
+          </div>
+          <div className="row" style={{ marginTop: '10px' }}>
+            <div className="col-md-12">
+              <ContentViewFilter value={viewMode} onChange={handleViewModeChange} />
             </div>
           </div>
         </div>
@@ -181,9 +205,11 @@ const IssuesPage: React.FC = () => {
           )}
         </>
       ) : (
-        <div className="alert alert-info">
-          {searchQuery ? `No issues found matching "${searchQuery}"` : 'No issues found.'}
-        </div>
+        <EmptyState
+          icon="exclamation-circle"
+          title={searchQuery ? `No issues found matching "${searchQuery}"` : 'No issues found'}
+          description="Try adjusting your search criteria."
+        />
       )}
     </div>
   );

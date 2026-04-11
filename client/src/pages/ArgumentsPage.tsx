@@ -7,9 +7,14 @@ import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import Pagination from '../components/common/Pagination';
 import Input from '../components/Form/Input';
+import PageMeta from '../components/common/PageMeta';
 import Select from '../components/Form/Select';
+import ContentViewFilter, { type ViewMode } from '../components/common/ContentViewFilter';
 import type { LegacyEntity } from '../types/legacy';
 import type { Argument } from '../types';
+import { useNotification } from '../context/NotificationContext';
+import EmptyState from '../components/common/EmptyState';
+import { useAuth } from '../context/AuthContext';
 
 const ArgumentsPage: React.FC = () => {
   const { id } = useParams();
@@ -20,21 +25,32 @@ const ArgumentsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('editDate');
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    const saved = localStorage.getItem('wt_view_mode');
+    return (saved === 'wiki' || saved === 'original') ? saved : 'all';
+  });
   const [filterVerdict, setFilterVerdict] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
+  const { addToast } = useNotification();
+  const { user } = useAuth();
+
+  const handleViewModeChange = (mode: ViewMode) => {
+    setViewMode(mode);
+    localStorage.setItem('wt_view_mode', mode);
+  };
 
   useEffect(() => {
     fetchArguments();
-  }, [topicId]);
+  }, [topicId, viewMode]);
 
   const fetchArguments = async () => {
     try {
-      const result = await apiService.getArguments(topicId);
+      const result = await apiService.getArguments(topicId, viewMode);
       setArgumentsList(result.arguments || []);
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching arguments:', error);
+      addToast('danger', 'Failed to load arguments');
       setLoading(false);
     }
   };
@@ -102,6 +118,7 @@ const ArgumentsPage: React.FC = () => {
 
   return (
     <div>
+      <PageMeta title="Arguments" description="Browse arguments and claims" />
       <Breadcrumb items={breadcrumbItems} />
       
       <PageHeader
@@ -109,9 +126,11 @@ const ArgumentsPage: React.FC = () => {
         icon="flash"
         iconColor="text-primary"
         actions={
-          <Link to="/arguments/create" className="btn btn-primary">
-            <i className="fa fa-plus"></i> New Argument
-          </Link>
+          user ? (
+            <Link to="/arguments/create" className="btn btn-primary">
+              <i className="fa fa-plus"></i> New Argument
+            </Link>
+          ) : undefined
         }
       />
 
@@ -165,6 +184,11 @@ const ArgumentsPage: React.FC = () => {
               />
             </div>
           </div>
+          <div className="row" style={{ marginTop: '10px' }}>
+            <div className="col-md-12">
+              <ContentViewFilter value={viewMode} onChange={handleViewModeChange} />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -210,11 +234,13 @@ const ArgumentsPage: React.FC = () => {
           )}
         </>
       ) : (
-        <div className="alert alert-info">
-          {searchQuery || filterVerdict !== 'all'
-            ? `No arguments found with current filters`
-            : 'No arguments found.'}
-        </div>
+        <EmptyState
+          icon="balance-scale"
+          title={searchQuery || filterVerdict !== 'all'
+            ? 'No arguments found with current filters'
+            : 'No arguments found'}
+          description="Try adjusting your search or filters."
+        />
       )}
     </div>
   );

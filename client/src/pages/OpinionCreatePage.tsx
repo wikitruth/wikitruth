@@ -3,12 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import Input from '../components/Form/Input';
-import TextArea from '../components/Form/TextArea';
+import RichTextEditor from '../components/Form/RichTextEditor';
 import Checkbox from '../components/Form/Checkbox';
 import Button from '../components/common/Button';
 import Alert from '../components/common/Alert';
+import PageMeta from '../components/common/PageMeta';
 import useForm from '../hooks/useForm';
 import apiService from '../services/api';
+import { trackEvent } from '../utils/analytics';
+import { useNotification } from '../context/NotificationContext';
 
 interface OpinionFormValues {
   title: string;
@@ -21,6 +24,7 @@ const OpinionCreatePage: React.FC = () => {
   const navigate = useNavigate();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const { addToast } = useNotification();
 
   const validate = (values: OpinionFormValues) => {
     const errors: Partial<Record<keyof OpinionFormValues, string>> = {};
@@ -48,16 +52,20 @@ const OpinionCreatePage: React.FC = () => {
         private: values.private,
       });
 
+      trackEvent('create_opinion', 'content', values.title);
+      addToast('success', 'Opinion created successfully!');
       setSubmitSuccess(true);
       setTimeout(() => {
         navigate('/opinions');
       }, 1200);
     } catch (error) {
-      setSubmitError(error instanceof Error ? error.message : 'Failed to create opinion');
+      const msg = error instanceof Error ? error.message : 'Failed to create opinion';
+      setSubmitError(msg);
+      addToast('danger', msg);
     }
   };
 
-  const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit: onSubmit } = useForm<OpinionFormValues>({
+  const { values, errors, touched, isSubmitting, handleChange, handleBlur, handleSubmit: onSubmit, setFieldValue } = useForm<OpinionFormValues>({
     initialValues: {
       title: '',
       description: '',
@@ -70,6 +78,7 @@ const OpinionCreatePage: React.FC = () => {
 
   return (
     <div>
+      <PageMeta title="Share Opinion" description="Add your perspective to the discussion" />
       <Breadcrumb
         items={[
           { title: 'Home', url: '/' },
@@ -101,15 +110,14 @@ const OpinionCreatePage: React.FC = () => {
               error={touched.title ? errors.title : undefined}
             />
 
-            <TextArea
+            <RichTextEditor
               name="description"
               label="Opinion details"
               value={values.description}
-              onChange={handleChange}
-              onBlur={handleBlur}
+              onChange={(name, html) => setFieldValue(name as keyof OpinionFormValues, html)}
+              onBlur={() => {}}
               placeholder="Write your opinion"
               required
-              rows={6}
               error={touched.description ? errors.description : undefined}
             />
 

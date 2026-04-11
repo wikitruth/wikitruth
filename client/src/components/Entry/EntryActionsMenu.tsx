@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import moderationApi from '../../services/api/moderation';
+import { addToClipboard } from '../../pages/ClipboardPage';
 import type { LegacyEntity } from '../../types/legacy';
 
 interface EntryActionsMenuProps {
@@ -87,6 +88,30 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
     }
   };
 
+  const handleCopyToClipboard = () => {
+    addToClipboard({
+      _id: entry._id,
+      title: entry.title || 'Untitled',
+      type: objectName || 'entry',
+      entryId: entry._id,
+      friendlyUrl: entry.friendlyUrl,
+    });
+    setStatusMessage('Added to clipboard');
+    setIsOpen(false);
+  };
+
+  const handleLinkTo = () => {
+    setIsOpen(false);
+    void navigate(`/outline/link?parentId=${encodeURIComponent(entry._id)}&parentTitle=${encodeURIComponent(entry.title || '')}`);
+  };
+
+  const handleViewHistory = () => {
+    setIsOpen(false);
+    // Navigate to entry with history tab/query
+    const currentPath = window.location.pathname;
+    void navigate(`${currentPath}?tab=history`);
+  };
+
   const handleReport = () => {
     setIsOpen(false);
     if (objectName === 'topic') {
@@ -94,6 +119,13 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
       return;
     }
     void navigate('/issues/create');
+  };
+
+  const canReply = ['topic', 'argument', 'question', 'answer', 'issue', 'opinion'].includes(objectName);
+
+  const handleReply = () => {
+    setIsOpen(false);
+    void navigate(`/opinions/create?parentId=${encodeURIComponent(entry._id)}&parentType=${encodeURIComponent(objectName)}`);
   };
 
   const handleScreening = () => {
@@ -184,6 +216,28 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
             <li>
               <button type="button" className="btn btn-link" onClick={handleShare}>
                 <i className="fa fa-share" aria-hidden="true"></i> Share
+              </button>
+            </li>
+            {canReply && (
+              <li>
+                <button type="button" className="btn btn-link" onClick={handleReply}>
+                  <i className="fa fa-reply" aria-hidden="true"></i> Reply
+                </button>
+              </li>
+            )}
+            <li>
+              <button type="button" className="btn btn-link" onClick={handleCopyToClipboard}>
+                <i className="fa fa-clipboard" aria-hidden="true"></i> Copy to Clipboard
+              </button>
+            </li>
+            <li>
+              <button type="button" className="btn btn-link" onClick={handleLinkTo}>
+                <i className="fa fa-link" aria-hidden="true"></i> Link to...
+              </button>
+            </li>
+            <li>
+              <button type="button" className="btn btn-link" onClick={handleViewHistory}>
+                <i className="fa fa-history" aria-hidden="true"></i> View History
               </button>
             </li>
             <li>

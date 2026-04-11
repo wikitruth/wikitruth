@@ -3,11 +3,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import Input from '../components/Form/Input';
-import TextArea from '../components/Form/TextArea';
+import RichTextEditor from '../components/Form/RichTextEditor';
 import Checkbox from '../components/Form/Checkbox';
 import Button from '../components/common/Button';
 import Alert from '../components/common/Alert';
 import LoadingSpinner from '../components/LoadingSpinner';
+import PageMeta from '../components/common/PageMeta';
 import apiService from '../services/api';
 
 const ArtifactEditPage: React.FC = () => {
@@ -81,6 +82,7 @@ const ArtifactEditPage: React.FC = () => {
 
   return (
     <div>
+      <PageMeta title="Edit Artifact" description={`Editing: ${title}`} />
       <Breadcrumb items={[{ title: 'Home', url: '/' }, { title: 'Artifacts', url: '/artifacts' }, { title: 'Edit Artifact', active: true }]} />
       <PageHeader title="Edit Artifact" icon="picture-o" iconColor="text-primary" />
       {error && <Alert type="danger">{error}</Alert>}
@@ -89,7 +91,7 @@ const ArtifactEditPage: React.FC = () => {
         <div className="panel-body">
           <form onSubmit={handleSave}>
             <Input name="title" label="Artifact title" value={title} onChange={(e) => setTitle(e.target.value)} required />
-            <TextArea name="description" label="Description" value={description} onChange={(e) => setDescription(e.target.value)} rows={6} required />
+            <RichTextEditor name="description" label="Description" value={description} onChange={(_, html) => setDescription(html)} />
             <Input name="source" label="Source URL (optional)" value={source} onChange={(e) => setSource(e.target.value)} />
             <Input name="topicId" label="Topic ID (optional)" value={topicId} onChange={(e) => setTopicId(e.target.value)} />
             <Checkbox name="private" label="Private" checked={isPrivate} onChange={(e) => setIsPrivate(e.target.checked)} />

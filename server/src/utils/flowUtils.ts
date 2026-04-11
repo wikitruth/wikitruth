@@ -2686,7 +2686,8 @@ function setModelContext(req, res, model, mixedMode) {
 // @ts-ignore TS(7006): Parameter 'content' implicitly has an 'any' type.
 function getEditorContent(content) {
   if (!content) return '';
-  let c = content.trim();
+  const { sanitizeContent } = require('./sanitizeHtml');
+  let c = sanitizeContent(content.trim());
   if (c === '<p><br></p>') {
     c = '';
   }

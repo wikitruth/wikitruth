@@ -3,6 +3,8 @@ import Alert from '../../components/common/Alert';
 import Button from '../../components/common/Button';
 import Input from '../../components/Form/Input';
 import TextArea from '../../components/Form/TextArea';
+import PageMeta from '../../components/common/PageMeta';
+import useRecaptcha from '../../hooks/useRecaptcha';
 import apiService from '../../services/api';
 
 const ContactPage: React.FC = () => {
@@ -12,6 +14,7 @@ const ContactPage: React.FC = () => {
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const { execute: executeRecaptcha } = useRecaptcha();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -25,10 +28,12 @@ const ContactPage: React.FC = () => {
 
     try {
       setSubmitting(true);
+      const recaptchaToken = await executeRecaptcha('contact');
       const result = await apiService.sendContactMessage({
         name: name.trim(),
         email: email.trim(),
         message: message.trim(),
+        ...(recaptchaToken ? { recaptchaResponse: recaptchaToken } : {}),
       });
 
       setStatus(result?.message || 'We have received your message. Thank you.');
@@ -44,6 +49,7 @@ const ContactPage: React.FC = () => {
 
   return (
     <div className="container">
+      <PageMeta title="Contact Us" description="Send us your thoughts and ideas" />
       <div className="row">
         <div className="col-sm-6">
           <div className="page-header">

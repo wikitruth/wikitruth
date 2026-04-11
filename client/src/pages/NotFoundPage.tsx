@@ -1,9 +1,16 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import PageMeta from '../components/common/PageMeta';
+import { trackEvent } from '../utils/analytics';
 
 const NotFoundPage: React.FC = () => {
+  const location = useLocation();
+  useEffect(() => {
+    trackEvent('404', 'error', location.pathname);
+  }, [location.pathname]);
   return (
     <div className="text-center" style={{ padding: '80px 20px' }}>
+      <PageMeta title="Page Not Found" />
       <h1 style={{ fontSize: '120px', marginBottom: '20px' }}>
         <i className="fa fa-question-circle text-muted"></i>
       </h1>

@@ -11,6 +11,7 @@ import LoadingSpinner from '../../../components/LoadingSpinner';
 import apiService from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
 import type { LegacyEntity } from '../../../types/legacy';
+import GeoPatternBackground from '../../../components/common/GeoPatternBackground';
 
 const GroupPage: React.FC = () => {
   const navigate = useNavigate();
@@ -138,6 +139,8 @@ const GroupPage: React.FC = () => {
           { title: group.title, active: true },
         ]}
       />
+
+      <GeoPatternBackground seed={group.title || 'group'} height={120} />
 
       <PageHeader
         title={group.title}

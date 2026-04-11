@@ -7,10 +7,15 @@ import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import Pagination from '../components/common/Pagination';
 import Input from '../components/Form/Input';
+import PageMeta from '../components/common/PageMeta';
 import Select from '../components/Form/Select';
+import ContentViewFilter, { type ViewMode } from '../components/common/ContentViewFilter';
 import Alert from '../components/common/Alert';
+import EmptyState from '../components/common/EmptyState';
+import { useAuth } from '../context/AuthContext';
 import type { LegacyEntity } from '../types/legacy';
 import type { Opinion } from '../types';
+import { useNotification } from '../context/NotificationContext';
 
 const OpinionsPage: React.FC = () => {
   const [opinions, setOpinions] = useState<LegacyEntity[]>([]);
@@ -18,21 +23,32 @@ const OpinionsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('editDate');
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    const saved = localStorage.getItem('wt_view_mode');
+    return (saved === 'wiki' || saved === 'original') ? saved : 'all';
+  });
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
+  const { addToast } = useNotification();
+  const { user } = useAuth();
+
+  const handleViewModeChange = (mode: ViewMode) => {
+    setViewMode(mode);
+    localStorage.setItem('wt_view_mode', mode);
+  };
 
   useEffect(() => {
     fetchOpinions();
-  }, []);
+  }, [viewMode]);
 
   const fetchOpinions = async () => {
     try {
       setLoading(true);
-      const data = await apiService.getOpinions();
+      const data = await apiService.getOpinions(undefined, viewMode);
       setOpinions(data.opinions || []);
     } catch (err) {
       setError('Failed to load opinions');
-      console.error(err);
+      addToast('danger', 'Failed to load opinions');
     } finally {
       setLoading(false);
     }
@@ -96,6 +112,7 @@ const OpinionsPage: React.FC = () => {
 
   return (
     <div>
+      <PageMeta title="Opinions" description="Browse opinions and perspectives from the community" />
       <Breadcrumb items={breadcrumbItems} />
       
       <PageHeader
@@ -104,9 +121,11 @@ const OpinionsPage: React.FC = () => {
         icon="comment"
         iconColor="text-info"
         actions={
-          <Link to="/opinions/create" className="btn btn-info">
-            <i className="fa fa-plus"></i> Share Opinion
-          </Link>
+          user ? (
+            <Link to="/opinions/create" className="btn btn-info">
+              <i className="fa fa-plus"></i> Share Opinion
+            </Link>
+          ) : undefined
         }
       />
 
@@ -139,6 +158,11 @@ const OpinionsPage: React.FC = () => {
                 ]}
                 label="Sort by"
               />
+            </div>
+          </div>
+          <div className="row" style={{ marginTop: '10px' }}>
+            <div className="col-md-12">
+              <ContentViewFilter value={viewMode} onChange={handleViewModeChange} />
             </div>
           </div>
         </div>
@@ -181,9 +205,11 @@ const OpinionsPage: React.FC = () => {
           )}
         </>
       ) : (
-        <div className="alert alert-info">
-          {searchQuery ? `No opinions found matching "${searchQuery}"` : 'No opinions found.'}
-        </div>
+        <EmptyState
+          icon="comment"
+          title={searchQuery ? `No opinions found matching "${searchQuery}"` : 'No opinions found'}
+          description="Try adjusting your search criteria."
+        />
       )}
     </div>
   );

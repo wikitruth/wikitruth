@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import OptimizedImage from '../common/OptimizedImage';
 import type { Application, User } from '../../types';
+import { useAuth } from '../../context/AuthContext';
 import authApi from '../../services/api/auth';
 import apiService from '../../services/api';
 
@@ -16,8 +17,16 @@ interface HomePayload {
   application?: HeaderApplication;
 }
 
+const ROLE_LABELS: Record<string, string> = {
+  contributor: 'Contributor',
+  screener: 'Screener',
+  reviewer: 'Reviewer',
+  admin: 'Admin',
+};
+
 const Header: React.FC = () => {
   const location = useLocation();
+  const { activeRole, setActiveRole, availableRoles } = useAuth();
   const [user, setUser] = useState<HeaderUser | null>(null);
   const [application, setApplication] = useState<HeaderApplication | null>(null);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
@@ -244,6 +253,29 @@ const Header: React.FC = () => {
                             <i className="fa fa-gear"></i> Admin Area
                           </Link>
                         </li>
+                      )}
+                      {availableRoles.length > 1 && (
+                        <>
+                          <li className="divider" aria-hidden="true"></li>
+                          <li className="dropdown-header">Switch Role</li>
+                          {availableRoles.map((role) => (
+                            <li key={role}>
+                              <button
+                                type="button"
+                                className="btn btn-link"
+                                style={{ width: '100%', textAlign: 'left', padding: '3px 20px' }}
+                                onClick={() => {
+                                  setActiveRole(role);
+                                  setIsUserMenuOpen(false);
+                                  setIsMobileNavOpen(false);
+                                }}
+                              >
+                                <i className={`fa ${activeRole === role ? 'fa-check-circle' : 'fa-circle-o'}`}></i>{' '}
+                                {ROLE_LABELS[role] || role}
+                              </button>
+                            </li>
+                          ))}
+                        </>
                       )}
                       <li className="divider" aria-hidden="true"></li>
                       <li>

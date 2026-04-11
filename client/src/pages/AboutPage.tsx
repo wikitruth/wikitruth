@@ -1,9 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import PageMeta from '../components/common/PageMeta';
 
 const AboutPage: React.FC = () => {
   return (
     <div>
+      <PageMeta title="About" description="Learn about the Wikitruth project" />
       <h1 className="page-header wt-header">About Wikitruth</h1>
 
       <div className="lead" style={{ marginBottom: '30px' }}>

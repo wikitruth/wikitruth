@@ -78,6 +78,9 @@ const ContactPage = lazy(() => import('../pages/Contact/ContactPage'));
 const HelpUsPage = lazy(() => import('../pages/HelpUs/HelpUsPage'));
 const InstallPage = lazy(() => import('../pages/Install/InstallPage'));
 const FastSwitchPage = lazy(() => import('../pages/FastSwitch/FastSwitchPage'));
+const ClipboardPage = lazy(() => import('../pages/ClipboardPage'));
+const OutlineLinkPage = lazy(() => import('../pages/OutlineLinkPage'));
+const VerdictUpdatePage = lazy(() => import('../pages/Admin/Verdicts/VerdictUpdatePage'));
 const ServerError500 = lazy(() => import('../pages/Errors/ServerError500'));
 const ServiceUnavailable503 = lazy(() => import('../pages/Errors/ServiceUnavailable503'));
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
@@ -187,6 +190,9 @@ export const appRoutes: AppRoute[] = [
   { path: '/help-us', element: <HelpUsPage /> },
   { path: '/install', element: <InstallPage /> },
   { path: '/fast-switch', element: <FastSwitchPage /> },
+  { path: '/clipboard', element: <ClipboardPage /> },
+  { path: '/outline/link', element: <OutlineLinkPage /> },
+  { path: '/admin/verdicts/:id', element: <VerdictUpdatePage /> },
   { path: '/500', element: <ServerError500 /> },
   { path: '/503', element: <ServiceUnavailable503 /> },
   { path: '*', element: <NotFoundPage /> },

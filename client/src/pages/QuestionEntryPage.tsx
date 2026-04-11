@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import apiService from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Breadcrumb from '../components/common/Breadcrumb';
+import GeoPatternBackground from '../components/common/GeoPatternBackground';
 import PageHeader from '../components/common/PageHeader';
 import PageTabs from '../components/common/PageTabs';
 import Alert from '../components/common/Alert';
@@ -13,7 +14,10 @@ import AnswerEntryRow from '../components/EntryRow/AnswerEntryRow';
 import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
 import EntryActionsMenu from '../components/Entry/EntryActionsMenu';
+import PageMeta from '../components/common/PageMeta';
 import type { Answer, Issue, Opinion } from '../types';
+import { formatRelativeTime } from '../utils/dateFormat';
+import { sanitizeHtml } from '../utils/sanitizeHtml';
 
 const QuestionEntryPage: React.FC = () => {
   const { id } = useParams();
@@ -79,7 +83,9 @@ const QuestionEntryPage: React.FC = () => {
 
   return (
     <div>
+      <PageMeta title={question.title} description={question.description || question.contentPreview} />
       <Breadcrumb items={breadcrumbItems} />
+      <GeoPatternBackground seed={question.title || 'question'} height={100} />
       
       <PageHeader 
         title={question.title}
@@ -94,7 +100,7 @@ const QuestionEntryPage: React.FC = () => {
       {/* Question content */}
       <div className="text-body collapsible" style={{ marginTop: '20px' }}>
         {question.content ? (
-          <div dangerouslySetInnerHTML={{ __html: question.content }} />
+          <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(question.content) }} />
         ) : question.description && (
           <p className="lead">{question.description}</p>
         )}
@@ -148,7 +154,7 @@ const QuestionEntryPage: React.FC = () => {
         )}
         {question.editDate && (
           <p className="text-muted">
-            <i className="fa fa-clock-o"></i> Last updated: {new Date(question.editDate).toLocaleDateString()}
+            <i className="fa fa-clock-o"></i> Last updated: {formatRelativeTime(question.editDate)}
           </p>
         )}
         {question.private && (

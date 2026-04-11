@@ -8,7 +8,12 @@ import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import Pagination from '../components/common/Pagination';
 import Input from '../components/Form/Input';
+import PageMeta from '../components/common/PageMeta';
+import ContentViewFilter, { type ViewMode } from '../components/common/ContentViewFilter';
+import EmptyState from '../components/common/EmptyState';
 import Select from '../components/Form/Select';
+import { useNotification } from '../context/NotificationContext';
+import { useAuth } from '../context/AuthContext';
 
 interface TopicsApiResponse {
   topics?: Topic[];
@@ -25,23 +30,34 @@ const TopicsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('editDate');
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    const saved = localStorage.getItem('wt_view_mode');
+    return (saved === 'wiki' || saved === 'original') ? saved : 'all';
+  });
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
+  const { addToast } = useNotification();
+  const { user } = useAuth();
+
+  const handleViewModeChange = (mode: ViewMode) => {
+    setViewMode(mode);
+    localStorage.setItem('wt_view_mode', mode);
+  };
 
   const toTimestamp = (value?: Date) => (value ? new Date(value).getTime() : 0);
 
   useEffect(() => {
     fetchTopics();
-  }, [topicId]);
+  }, [topicId, viewMode]);
 
   const fetchTopics = async () => {
     try {
-      const result = (await apiService.getTopics(topicId)) as TopicsApiResponse;
+      const result = (await apiService.getTopics(topicId, viewMode)) as TopicsApiResponse;
       setTopics(result.topics || []);
       setTopic(result.topic || null);
       setLoading(false);
     } catch (error) {
-      console.error('Error fetching topics:', error);
+      addToast('danger', 'Failed to load topics');
       setLoading(false);
     }
   };
@@ -107,6 +123,7 @@ const TopicsPage: React.FC = () => {
 
   return (
     <div>
+      <PageMeta title="Topics" description="Browse and explore topics" />
       <Breadcrumb items={breadcrumbItems} />
       
       <PageHeader
@@ -115,9 +132,11 @@ const TopicsPage: React.FC = () => {
         icon="folder-open"
         iconColor="text-success-x"
         actions={
-          <Link to="/topics/create" className="btn btn-success">
-            <i className="fa fa-plus"></i> New Topic
-          </Link>
+          user ? (
+            <Link to="/topics/create" className="btn btn-success">
+              <i className="fa fa-plus"></i> New Topic
+            </Link>
+          ) : undefined
         }
       />
 
@@ -150,6 +169,11 @@ const TopicsPage: React.FC = () => {
                 ]}
                 label="Sort by"
               />
+            </div>
+          </div>
+          <div className="row" style={{ marginTop: '10px' }}>
+            <div className="col-md-12">
+              <ContentViewFilter value={viewMode} onChange={handleViewModeChange} />
             </div>
           </div>
         </div>
@@ -197,9 +221,12 @@ const TopicsPage: React.FC = () => {
           )}
         </>
       ) : (
-        <div className="alert alert-info">
-          {searchQuery ? `No topics found matching "${searchQuery}"` : 'No topics found.'}
-        </div>
+        <EmptyState
+          icon="folder-open"
+          title={searchQuery ? `No topics found matching "${searchQuery}"` : 'No topics yet'}
+          description={searchQuery ? 'Try adjusting your search terms.' : 'Be the first to create a topic.'}
+          action={!searchQuery && user ? <Link to="/topics/create" className="btn btn-primary"><i className="fa fa-plus"></i> Create Topic</Link> : undefined}
+        />
       )}
     </div>
   );
