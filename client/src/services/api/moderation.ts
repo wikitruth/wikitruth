@@ -27,12 +27,16 @@ export interface ModerationEntry {
   friendlyUrl?: string;
   objectType?: number;
   objectName?: string;
+  editDate?: string;
+  createDate?: string;
   screening?: {
     status?: number | null;
   };
   verdict?: {
     status?: number | null;
+    reasoning?: string | null;
   };
+  verdictReasoning?: string | null;
   ownerId?: string | null;
   ownerType?: number | null;
   parentId?: string | null;
@@ -59,6 +63,24 @@ interface ModerationMutationResponse {
     id: string;
   };
   entry?: ModerationEntry;
+}
+
+interface ModerationVerdictsResponse {
+  success: boolean;
+  entries: ModerationEntry[];
+  page: number;
+  limit: number;
+  total: number;
+  verdictStatuses: ModerationStatusOption[];
+}
+
+interface ModerationBulkVerdictResponse {
+  success: boolean;
+  results: Array<{
+    id: string;
+    success: boolean;
+    message?: string;
+  }>;
 }
 
 interface OwnershipMigrationResponse {
@@ -117,6 +139,44 @@ export const moderationApi = {
     request<ModerationMutationResponse>(`/moderation/verdict?${toQuery(target)}`, {
       method: 'PUT',
       body: JSON.stringify({ status }),
+    }),
+  listVerdicts: (params?: {
+    objectType?: number;
+    status?: number;
+    q?: string;
+    page?: number;
+    limit?: number;
+  }) => {
+    const query = new URLSearchParams();
+    if (typeof params?.objectType === 'number') {
+      query.set('objectType', String(params.objectType));
+    }
+    if (typeof params?.status === 'number') {
+      query.set('status', String(params.status));
+    }
+    if (typeof params?.page === 'number') {
+      query.set('page', String(params.page));
+    }
+    if (typeof params?.limit === 'number') {
+      query.set('limit', String(params.limit));
+    }
+    if (params?.q) {
+      query.set('q', params.q);
+    }
+    const suffix = query.toString();
+    return request<ModerationVerdictsResponse>(`/moderation/verdicts${suffix ? `?${suffix}` : ''}`);
+  },
+  bulkUpdateVerdicts: (
+    updates: Array<{
+      id: string;
+      type: number;
+      status: number;
+      reasoning?: string;
+    }>,
+  ) =>
+    request<ModerationBulkVerdictResponse>('/moderation/verdicts/bulk', {
+      method: 'POST',
+      body: JSON.stringify({ updates }),
     }),
   takeOwnership: (id: string, objectType: number) =>
     request<ModerationMutationResponse>('/moderation/take-ownership', {

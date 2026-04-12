@@ -15,9 +15,17 @@ const GeoPatternBackground: React.FC<GeoPatternBackgroundProps> = ({
   children,
 }) => {
   const style = useMemo(() => {
-    const pattern = GeoPattern.generate(seed);
+    let dataUrl = '';
+    try {
+      const pattern = GeoPattern.generate(seed);
+      dataUrl = pattern.toDataUrl();
+    } catch (_error) {
+      dataUrl = '';
+    }
+
+    const fallbackUrl = "url('/img/green-bg-pattern.svg')";
     return {
-      backgroundImage: pattern.toDataUrl(),
+      backgroundImage: dataUrl ? `${dataUrl}, ${fallbackUrl}` : fallbackUrl,
       backgroundSize: 'cover',
       height: `${height}px`,
     };

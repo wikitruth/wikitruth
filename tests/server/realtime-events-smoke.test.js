@@ -12,6 +12,7 @@ describe('Realtime event channel smoke coverage', function () {
 
     expect(monitoringApi).toContain('publishRealtimeEvent({');
     expect(monitoringApi).toContain("type: 'monitoring.error'");
+    expect(monitoringApi).toContain("type: 'monitoring.csp'");
   });
 
   it('maintains a shared realtime event bus service', function () {

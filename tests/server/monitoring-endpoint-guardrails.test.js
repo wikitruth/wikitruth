@@ -57,4 +57,22 @@ describe('Monitoring endpoint guardrails', function () {
       .send('oops')
       .expect(415);
   });
+
+  it('accepts same-origin CSP reports', async function () {
+    const app = createApp();
+
+    await request(app)
+      .post('/api/monitoring/csp')
+      .set('Host', 'example.test')
+      .set('Origin', 'https://example.test')
+      .set('Content-Type', 'application/json')
+      .send({
+        'csp-report': {
+          'document-uri': 'https://example.test/app',
+          'violated-directive': 'script-src',
+          'blocked-uri': 'inline',
+        },
+      })
+      .expect(202);
+  });
 });

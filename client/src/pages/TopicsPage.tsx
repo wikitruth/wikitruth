@@ -37,7 +37,7 @@ const TopicsPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
   const { addToast } = useNotification();
-  const { user } = useAuth();
+  const { user, activeRole } = useAuth();
 
   const handleViewModeChange = (mode: ViewMode) => {
     setViewMode(mode);
@@ -132,7 +132,7 @@ const TopicsPage: React.FC = () => {
         icon="folder-open"
         iconColor="text-success-x"
         actions={
-          user ? (
+          user && activeRole !== 'reader' ? (
             <Link to="/topics/create" className="btn btn-success">
               <i className="fa fa-plus"></i> New Topic
             </Link>
@@ -225,7 +225,7 @@ const TopicsPage: React.FC = () => {
           icon="folder-open"
           title={searchQuery ? `No topics found matching "${searchQuery}"` : 'No topics yet'}
           description={searchQuery ? 'Try adjusting your search terms.' : 'Be the first to create a topic.'}
-          action={!searchQuery && user ? <Link to="/topics/create" className="btn btn-primary"><i className="fa fa-plus"></i> Create Topic</Link> : undefined}
+          action={!searchQuery && user && activeRole !== 'reader' ? <Link to="/topics/create" className="btn btn-primary"><i className="fa fa-plus"></i> Create Topic</Link> : undefined}
         />
       )}
     </div>

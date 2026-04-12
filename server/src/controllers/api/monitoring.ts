@@ -24,6 +24,20 @@ type MonitoringPayload = {
   timestamp?: string;
 };
 
+type CspPayload = {
+  ['csp-report']?: {
+    'document-uri'?: string;
+    'violated-directive'?: string;
+    'effective-directive'?: string;
+    'blocked-uri'?: string;
+    'original-policy'?: string;
+    disposition?: string;
+    sourceFile?: string;
+    lineNumber?: number;
+    columnNumber?: number;
+  };
+};
+
 const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_EVENTS = 120;
 const requestRateWindow = new Map<string, { count: number; resetAt: number }>();
@@ -75,6 +89,15 @@ function isTrustedOrigin(req: WikitruthRequest): boolean {
 function isJsonContentType(req: WikitruthRequest): boolean {
   const contentType = String(req.get('content-type') || '').toLowerCase();
   return contentType.startsWith('application/json');
+}
+
+function isCspContentType(req: WikitruthRequest): boolean {
+  const contentType = String(req.get('content-type') || '').toLowerCase();
+  return (
+    contentType.startsWith('application/json') ||
+    contentType.startsWith('application/csp-report') ||
+    contentType.startsWith('application/reports+json')
+  );
 }
 
 function isRateLimited(req: WikitruthRequest): boolean {
@@ -136,6 +159,57 @@ module.exports = function (router: Router) {
         eventType: body.type || 'unknown',
         message: body.message || 'unknown',
         path: body.path || req.path,
+      },
+    });
+
+    res.status(202).json({ success: true });
+  });
+
+  router.post('/csp', function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!isTrustedOrigin(req)) {
+      res.status(403).json({ error: 'Untrusted origin' });
+      return;
+    }
+    if (!isCspContentType(req)) {
+      res.status(415).json({ error: 'Unsupported Content-Type for CSP report' });
+      return;
+    }
+    if (isRateLimited(req)) {
+      res.status(429).json({ error: 'Too many monitoring events' });
+      return;
+    }
+
+    const bodyCandidate = req.body as CspPayload | Array<Record<string, unknown>> | null;
+    const cspReport =
+      bodyCandidate && typeof bodyCandidate === 'object' && !Array.isArray(bodyCandidate)
+        ? bodyCandidate['csp-report'] || (bodyCandidate as Record<string, unknown>)
+        : Array.isArray(bodyCandidate)
+          ? bodyCandidate[0] || {}
+          : {};
+
+    const report = (cspReport || {}) as Record<string, unknown>;
+    const requestId = req.requestId || null;
+
+    logger.error('client.csp.violation', {
+      requestId: requestId,
+      source: 'react-client',
+      documentUri: String(report['document-uri'] || report.document_uri || req.get('referer') || ''),
+      violatedDirective: String(
+        report['violated-directive'] || report['effective-directive'] || report.effective_directive || '',
+      ),
+      blockedUri: String(report['blocked-uri'] || report.blocked_uri || ''),
+      originalPolicy: String(report['original-policy'] || report.original_policy || ''),
+      disposition: String(report.disposition || ''),
+      userAgent: req.get('user-agent') || null,
+      timestamp: new Date().toISOString(),
+    });
+
+    publishRealtimeEvent({
+      type: 'monitoring.csp',
+      requestId: requestId,
+      data: {
+        violatedDirective: report['violated-directive'] || report['effective-directive'] || null,
+        blockedUri: report['blocked-uri'] || null,
       },
     });
 

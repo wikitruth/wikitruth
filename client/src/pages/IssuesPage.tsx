@@ -30,7 +30,7 @@ const IssuesPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
   const { addToast } = useNotification();
-  const { user } = useAuth();
+  const { user, activeRole } = useAuth();
 
   const handleViewModeChange = (mode: ViewMode) => {
     setViewMode(mode);
@@ -121,7 +121,7 @@ const IssuesPage: React.FC = () => {
         icon="exclamation-triangle"
         iconColor="text-warning"
         actions={
-          user ? (
+          user && activeRole !== 'reader' ? (
             <Link to="/issues/create" className="btn btn-warning">
               <i className="fa fa-plus"></i> Report Issue
             </Link>

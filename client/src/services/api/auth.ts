@@ -10,11 +10,13 @@ interface SignupRequest {
   username: string;
   email: string;
   password: string;
+  recaptchaResponse?: string;
 }
 
 interface UserResponse {
   success?: boolean;
   user: User | null;
+  activeRole?: string;
 }
 
 interface VerificationStatusResponse {
@@ -31,6 +33,11 @@ interface FastSwitchResponse {
   success?: boolean;
   message?: string;
   user: User | null;
+}
+
+interface RoleSwitchResponse {
+  success?: boolean;
+  activeRole?: string;
 }
 
 interface AccountSettingsResponse {
@@ -110,6 +117,11 @@ export const authApi = {
       method: 'POST',
     }),
   me: () => request<UserResponse>(`${API_BASE_URL}/auth/me`),
+  roleSwitch: (role: string) =>
+    request<RoleSwitchResponse>(`${API_BASE_URL}/auth/role-switch`, {
+      method: 'POST',
+      body: JSON.stringify({ role }),
+    }),
   providers: () => request<AuthProvidersResponse>(`${API_BASE_URL}/auth/providers`),
   forgotPassword: (email: string) =>
     request<{ success: boolean; message: string; debug?: { email: string; token: string } }>(

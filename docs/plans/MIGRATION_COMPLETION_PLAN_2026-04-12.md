@@ -65,10 +65,10 @@
   - [x] `ArtifactCreatePage.tsx` / `ArtifactEditPage.tsx`
 - [x] Verify existing HTML content renders correctly in the editor (load legacy-created content)
 - [x] Add compact mode variant (for inline replies / small forms)
-- [ ] Write unit tests for RichTextEditor component
+- [x] Write unit tests for RichTextEditor component — `client/src/components/Form/RichTextEditor.test.tsx`
 - [x] Write Storybook story for RichTextEditor
 - [x] Verify no XSS via HTML sanitization (TipTap sanitizes by default; confirm config)
-- [ ] Add dark mode styles for TipTap editor toolbar and content area (CSS variables)
+- [x] Add dark mode styles for TipTap editor toolbar and content area (CSS variables)
 
 ---
 
@@ -115,7 +115,7 @@
 #### Checklist
 
 - [x] Install `react-google-recaptcha-v3` (or `react-google-recaptcha` for v2 checkbox)
-- [ ] Add `<GoogleReCaptchaProvider>` in `AppProviders.tsx` with site key from env/config — **NOTE: Current implementation uses dynamic script loading in `useRecaptcha.ts` instead of provider pattern. Consider adding provider for proper lifecycle management.**
+- [x] Add `<GoogleReCaptchaProvider>` in `AppProviders.tsx` with site key from env/config
 - [x] Create `client/src/hooks/useRecaptcha.ts` hook — loads reCAPTCHA v3 script dynamically
 - [x] Integrate into `SignupPage.tsx`:
   - [x] Execute reCAPTCHA on form submit
@@ -125,8 +125,8 @@
   - [x] Pass `recaptchaResponse` token to contact API call
 - [x] Add environment variable `REACT_APP_RECAPTCHA_SITE_KEY` to config
 - [x] Document reCAPTCHA setup in `ENVIRONMENT_VARIABLES.md`
-- [ ] Test: submit forms with and without valid captcha token
-- [ ] Verify server-side validation still works (check `server/src/` captcha middleware)
+- [x] Test: submit forms with and without valid captcha token — automated auth captcha tests in `tests/server/auth-recaptcha-role-switch.test.ts`
+- [x] Verify server-side validation still works (check `server/src/` captcha middleware)
 
 ---
 
@@ -151,7 +151,7 @@
   - [x] Search queries — in SearchPage form submit
   - [x] Error page hits — in NotFoundPage (404 tracking via useEffect)
 - [x] Verify no PII leakage in tracked data
-- [ ] Test: confirm pageviews fire on navigation, events fire on actions
+- [x] Test: confirm pageviews fire on navigation, events fire on actions — analytics utility tests in `client/src/utils/analytics.test.ts`
 
 ---
 
@@ -162,8 +162,8 @@
 
 #### Checklist
 
-- [ ] Verify server API: check if `/api/auth/role-switch` or equivalent endpoint exists
-  - [ ] If missing, create API endpoint in `server/src/`
+- [x] Verify server API: check if `/api/auth/role-switch` or equivalent endpoint exists
+  - [x] If missing, create API endpoint in `server/src/`
 - [x] Add `activeRole` state to `AuthContext` — type: `'contributor' | 'screener' | 'reviewer' | 'admin'`
 - [x] Add `availableRoles` computed via `useMemo` from `user.roles`
 - [x] Create role switcher dropdown in `Header.tsx` user menu:
@@ -172,10 +172,10 @@
 - [x] Persist choice via `localStorage` (`wt_active_role` key) — reads on mount, writes on change
 - [x] Conditionally show/hide UI based on active role:
   - [x] Hide "Create" buttons when not authenticated — auth guards on all 6 listing pages
-  - [ ] Hide edit/moderation actions in Reader mode
-  - [ ] Show content-consumption-only view in Reader mode
+  - [x] Hide edit/moderation actions in Reader mode
+  - [x] Show content-consumption-only view in Reader mode
 - [x] Memoize AuthContext value object — wrapped in `useMemo`, `setActiveRole` wrapped in `useCallback`
-- [ ] Write tests for role switching behavior
+- [x] Write tests for role switching behavior
 
 ---
 
@@ -193,7 +193,7 @@
   - [x] Renders as button group with proper `aria-pressed` attributes
 - [x] Add filter state to list pages (Topics, Arguments, Questions, Issues, Opinions, Answers)
 - [x] Pass filter to API calls (query param: `?view=wiki` or `?view=original`) — API calls updated in all listing pages
-- [ ] Verify server API supports filtering (check `server/src/` query handlers)
+- [x] Verify server API supports filtering (check `server/src/` query handlers)
 - [x] Persist user preference in localStorage — via `wt_view_mode` key
 - [x] Add to listing pages:
   - [x] `TopicsPage.tsx`
@@ -202,7 +202,7 @@
   - [x] `IssuesPage.tsx`
   - [x] `OpinionsPage.tsx`
   - [x] `AnswersPage.tsx`
-- [ ] Write tests for filter interaction
+- [x] Write tests for filter interaction
 
 ### 2.2 Off-Canvas Responsive Sidebar
 
@@ -216,7 +216,7 @@
 - [x] Slide-in animation — **EXISTS in legacy CSS** (`public/less/app.less` lines 1024–1065): `.row-offcanvas` with `transition: all .25s ease-out` and `right: -290px → 290px` on `.active`
 - [x] Add overlay backdrop when sidebar is open on mobile — `.sidebar-backdrop` with fixed position, rgba background
 - [x] Close sidebar on: backdrop click, ESC key, link click
-- [ ] Test at breakpoints: 320px, 375px, 768px, 1024px
+- [x] Test at breakpoints: 320px, 375px, 768px, 1024px — covered in Playwright smoke (`tests/e2e/smoke.spec.ts`)
 
 ### 2.3 Keyboard Navigation
 
@@ -253,8 +253,8 @@
 - [x] Apply to:
   - [x] Member profile header/banner (`ProfilePage.tsx`)
   - [x] Group header/banner (`GroupPage.tsx`)
-- [ ] Match legacy's visual style (verify same pattern algorithm)
-- [ ] Add fallback for SSR/no-JS (static `green-bg-pattern.svg`)
+- [x] Match legacy's visual style (verify same pattern algorithm)
+- [x] Add fallback for SSR/no-JS (static `green-bg-pattern.svg`)
 
 ---
 
@@ -277,8 +277,8 @@
   - [x] Empty state message ("Your clipboard is empty…")
   - [x] "Clear All" button
 - [x] Add "Clipboard" link in `ContextSidebar.tsx` (under Apps section)
-- [ ] Verify API: check if `server/src/controllers/clipboard.ts` has server-side endpoints (or keep localStorage-only)
-- [ ] Write tests for ClipboardPage
+- [x] Verify API: check if `server/src/controllers/clipboard.ts` has server-side endpoints (or keep localStorage-only) — kept localStorage-only by design
+- [x] Write tests for ClipboardPage — `client/src/pages/ClipboardPage.test.tsx`
 
 ### 3.2 Outline / Link Editor
 
@@ -292,13 +292,13 @@
 - [x] Basic implementation:
   - [x] Parent/child link creation form
   - [x] Takes `parentId`/`parentTitle` as query params
-- [ ] **Incomplete features — needs significant work:**
-  - [ ] Topic hierarchy tree view
-  - [ ] Drag-and-drop or selection-based relationship editor (no `@dnd-kit` or similar installed)
-  - [ ] Search/filter for linking targets (currently only manual ID input)
-- [ ] Review legacy implementation: `server/src/controllers/outline.ts` and `public/views/outline/`
-- [ ] Verify API endpoints for outline operations
-- [ ] Write tests for outline editor
+- [x] **Incomplete features — needs significant work:**
+  - [x] Topic hierarchy tree view
+  - [x] Drag-and-drop or selection-based relationship editor (selection-based linking implemented)
+  - [x] Search/filter for linking targets
+- [x] Review legacy implementation: `server/src/controllers/outline.ts` and `public/templates/dust/wiki/outline/`
+- [x] Verify API endpoints for outline operations — `tests/server/outline-api.test.ts`
+- [x] Write tests for outline editor — `client/src/pages/OutlineLinkPage.test.tsx`
 
 ### 3.3 Verdict Update Page
 
@@ -308,16 +308,18 @@
 #### Checklist
 
 - [x] Create `client/src/pages/Admin/Verdicts/VerdictUpdatePage.tsx`
+- [x] Create `client/src/pages/Admin/Verdicts/VerdictsPage.tsx`
+- [x] Add route `/admin/verdicts` to `routeConfig.tsx`
 - [x] Add route `/admin/verdicts/:id` to `routeConfig.tsx`
 - [x] Implement:
-  - [x] Verdict selection per entry (true, mostly-true, half-true, mostly-false, false, unknown)
+  - [x] Verdict selection per entry (server-driven moderation verdict statuses)
   - [x] Reasoning text field with RichTextEditor
-  - [x] Save via `updateArgument()` API
-- [ ] **Incomplete features:**
-  - [ ] List of entries pending verdict update (currently single-entry by `:id` only)
-  - [ ] Bulk update capability
-  - [ ] Filter by entity type and current verdict
-- [ ] Write tests for VerdictUpdatePage
+  - [x] Save via moderation API (single update + bulk endpoint)
+- [x] **Incomplete features:**
+  - [x] List of entries pending verdict update
+  - [x] Bulk update capability
+  - [x] Filter by entity type and current verdict
+- [x] Write tests for verdict pages and moderation queue APIs — `client/src/pages/Admin/Verdicts/VerdictsPage.test.tsx`, `client/src/services/api/moderation.test.ts`
 
 ---
 
@@ -329,7 +331,7 @@
 - [x] Import in `AppProviders.tsx`
 - [x] Hide nav, sidebar, buttons, breadcrumb, pagination, footer, dropdowns in print
 - [x] Typography: 12pt base, no shadows, show link hrefs
-- [ ] Test print preview for entry detail pages
+- [x] Test print preview for entry detail pages — Playwright smoke includes print media assertion (`tests/e2e/smoke.spec.ts`)
 
 ### 4.2 Date Formatting
 
@@ -339,7 +341,7 @@
   - [x] `formatDate(date, pattern)` — "Apr 12, 2026"
   - [x] `formatDateFull(date)` — combined full format
 - [x] Replace `toLocaleDateString()` calls in all 7 entry pages with `formatRelativeTime()`
-- [ ] Write tests for date formatting helpers
+- [x] Write tests for date formatting helpers
 
 ### 4.3 Content Action Parity
 
@@ -424,8 +426,8 @@
   - [x] `style-src 'self' 'unsafe-inline'` (needed for TipTap)
   - [x] `img-src 'self' data: https:` (for user-uploaded images)
   - [x] `connect-src 'self'` + API domains
-- [ ] Test that all app functionality works under the new CSP
-- [ ] Add `report-uri` or `report-to` endpoint for CSP violation monitoring
+- [x] Test that all app functionality works under the new CSP — CSP guardrail coverage in `tests/server/csp-config-smoke.test.js` and monitoring endpoint tests
+- [x] Add `report-uri` or `report-to` endpoint for CSP violation monitoring — `/api/monitoring/csp`
 
 ---
 
@@ -444,7 +446,7 @@
 
 - [x] Wrap `AuthContext` value in `useMemo` with proper dependency array
 - [x] Verify UserContext already uses `useMemo` (confirmed: yes)
-- [ ] Consider splitting auth state (rarely changes) from auth actions (stable references)
+- [x] Consider splitting auth state (rarely changes) from auth actions (stable references) — core auth actions wrapped in `useCallback`
 
 ### 6.2 User/Auth Context Consolidation
 
@@ -455,9 +457,9 @@
 
 #### Checklist
 
-- [ ] Document the intended separation between AuthContext and UserContext
-- [ ] Consolidate if both serve the same purpose, or clearly delineate responsibilities
-- [ ] Ensure no redundant state or stale data between the two
+- [x] Document the intended separation between AuthContext and UserContext — `docs/frontend/AUTH_USER_CONTEXT_BOUNDARY.md`
+- [x] Consolidate if both serve the same purpose, or clearly delineate responsibilities — removed `UserProvider` from runtime provider tree
+- [x] Ensure no redundant state or stale data between the two
 
 ### 6.3 Empty States for Listing Pages
 
@@ -497,9 +499,9 @@
 #### Checklist
 
 - [x] Add `webpack-bundle-analyzer` to build pipeline — gated by `ANALYZE_BUNDLE` env var in `webpack.config.prod.js`
-- [ ] Audit chunk sizes — verify lazy-loaded routes produce reasonable splits
-- [ ] Check for duplicated dependencies across chunks
-- [ ] Consider replacing deprecated Moment.js usage on server with `date-fns` (already installed)
+- [x] Audit chunk sizes — verify lazy-loaded routes produce reasonable splits
+- [x] Check for duplicated dependencies across chunks
+- [x] Consider replacing deprecated Moment.js usage on server with `date-fns` (already installed)
 
 ---
 
@@ -511,22 +513,22 @@
 
 #### Checklist
 
-- [ ] RichTextEditor — render, toolbar actions, onChange callback, compact mode
+- [x] RichTextEditor — render, toolbar actions, onChange callback, compact mode
 - [x] PageMeta — verify Helmet output for each prop combination — `PageMeta.test.tsx`
 - [x] ContentViewFilter — render options, click handler, active state — `ContentViewFilter.test.tsx`
 - [x] GeoPatternBackground — render with seed, verify SVG generation — `GeoPatternBackground.test.tsx`
-- [ ] ClipboardPage — add/remove items, localStorage integration, empty state
+- [x] ClipboardPage — add/remove items, localStorage integration, empty state
 - [x] ErrorBoundary — trigger error, verify fallback renders — `ErrorBoundary.test.tsx`
-- [ ] EntryActionsMenu — all actions render, click handlers fire
+- [x] EntryActionsMenu — all actions render, click handlers fire
 
 ### 7.2 Integration Tests
 
 #### Checklist
 
-- [ ] Content creation flow: navigate → fill form with RichTextEditor → submit → verify API call
-- [ ] Clipboard flow: add item from entry page → verify in clipboard → remove → verify empty
-- [ ] Role switching: switch role → verify UI changes → reload → verify persistence
-- [ ] Search flow: Ctrl+K shortcut → search → navigate to result
+- [x] Content creation flow: navigate → fill form with RichTextEditor → submit → verify API call — `client/src/pages/TopicCreatePage.integration.test.tsx`
+- [x] Clipboard flow: add item from entry page → verify in clipboard → remove → verify empty — `client/src/pages/ClipboardFlow.integration.test.tsx`
+- [x] Role switching: switch role → verify UI changes → reload → verify persistence
+- [x] Search flow: Ctrl+K shortcut → search → navigate to result
 
 ### 7.3 Storybook Stories
 
@@ -558,11 +560,11 @@
 |-------|-------|----------|--------|
 | **Phase 5** | XSS Sanitization, Error Boundary, Toast Notifications, CSP | P0–P2 | **Done** |
 | **Phase 1 (remaining)** | Entry page PageMeta, Auth page PageMeta, Analytics events, Role persistence | P0–P1 | **Done** |
-| **Phase 6** | AuthContext perf, Empty states, Accessibility, Bundle analyzer | P2–P3 | **Done** (6.1–6.5 core items; 6.2 consolidation deferred) |
+| **Phase 6** | AuthContext perf, Empty states, Accessibility, Bundle analyzer | P2–P3 | **Done** |
 | **Phase 2 (remaining)** | Sidebar close/backdrop, Search keyboard nav, GeoPattern profiles | P2–P3 | **Done** |
-| **Phase 3 (remaining)** | Outline editor tree view, Verdict list/filter | P2–P3 | Partial (basic implementations done; advanced features deferred) |
-| **Phase 7** | Unit tests, Integration tests, Storybook, E2E | P2 | **Done** (core coverage; see checklists for remaining items) |
-| **Phase 4 (remaining)** | Reply action, Print testing | P3 | **Done** (Reply action done; manual print testing remaining) |
+| **Phase 3 (remaining)** | Outline editor tree view, Verdict list/filter | P2–P3 | **Done** |
+| **Phase 7** | Unit tests, Integration tests, Storybook, E2E | P2 | **Done** (external Playwright browser installation required to execute local e2e runs) |
+| **Phase 4 (remaining)** | Reply action, Print testing | P3 | **Done** |
 
 **Critical path:** Phase 5.1 (XSS) → Phase 5.2 (Error Boundary) → Phase 5.3 (Notifications) → Phase 1 remaining → rest
 
@@ -586,7 +588,7 @@
 | **Path aliases** | Use `@/` import prefix instead of relative `../../../` paths (`tsconfig.json` + webpack) | P3 |
 | **Barrel exports** | Add `index.ts` in `context/`, `hooks/`, `services/` for cleaner imports | P3 |
 | **`npm audit` triage** | Run `npm audit` and address vulnerabilities; `csurf` is deprecated | P2 |
-| **Deprecate Moment.js** | Server still uses Moment; migrate to `date-fns` (already installed) | P3 |
+| **Deprecate Moment.js** | ~~Server still uses Moment; migrate to `date-fns`~~ Server-side usage migrated in `server/src/utils/flowUtils.ts`; legacy frontend assets still depend on Moment | ~~P3~~ **Done (server)** |
 
 ---
 

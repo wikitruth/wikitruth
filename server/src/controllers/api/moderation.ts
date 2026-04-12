@@ -125,6 +125,18 @@ function toNumber(value: unknown): number | null {
   return null;
 }
 
+function toPositiveInt(value: unknown, fallback: number): number {
+  const parsed = toNumber(value);
+  if (parsed === null || parsed <= 0) {
+    return fallback;
+  }
+  return Math.floor(parsed);
+}
+
+function escapeRegex(raw: string): string {
+  return raw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function toModerationEntry(entry: any, target: ModerationTarget): Record<string, unknown> {
   return {
     _id: entry?._id,
@@ -132,12 +144,16 @@ function toModerationEntry(entry: any, target: ModerationTarget): Record<string,
     friendlyUrl: entry?.friendlyUrl || '',
     objectType: target.objectType,
     objectName: target.objectName,
+    createDate: entry?.createDate || null,
+    editDate: entry?.editDate || null,
     screening: {
       status: toNumber(entry?.screening?.status),
     },
     verdict: {
       status: toNumber(entry?.verdict?.status),
+      reasoning: entry?.verdict?.reasoning || entry?.verdictReasoning || null,
     },
+    verdictReasoning: entry?.verdict?.reasoning || entry?.verdictReasoning || null,
     ownerId: entry?.ownerId || null,
     ownerType: toNumber(entry?.ownerType),
     parentId: entry?.parentId || null,
@@ -276,6 +292,7 @@ module.exports = function (router: Router) {
     }
 
     const status = toNumber(req.body?.status ?? req.body?.verdictStatus);
+    const reasoning = String(req.body?.reasoning || req.body?.verdictReasoning || '').trim();
     if (status === null || !isSupportedVerdictStatus(status)) {
       res.status(400).json({ success: false, message: 'A valid verdict status is required' });
       return;
@@ -298,7 +315,11 @@ module.exports = function (router: Router) {
       status,
       editDate: Date.now(),
       editUserId: req.user?.id || req.user?._id || entry.editUserId,
+      ...(reasoning ? { reasoning } : {}),
     };
+    if (reasoning && typeof entry.verdictReasoning !== 'undefined') {
+      entry.verdictReasoning = reasoning;
+    }
     entry.editDate = new Date();
     entry.editUserId = req.user?.id || req.user?._id || entry.editUserId;
     await entry.save();
@@ -307,6 +328,143 @@ module.exports = function (router: Router) {
       success: true,
       target,
       entry: toModerationEntry(entry.toObject(), target),
+    });
+  });
+
+  router.get('/verdicts', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureAdmin(req, res)) {
+      return;
+    }
+
+    const objectType = toNumber(req.query.objectType);
+    const verdictStatus = toNumber(req.query.status ?? req.query.verdictStatus);
+    const page = toPositiveInt(req.query.page, 1);
+    const limit = Math.min(toPositiveInt(req.query.limit, 20), 100);
+    const search = String(req.query.q || '').trim();
+    const regex = search ? new RegExp(escapeRegex(search), 'i') : null;
+
+    const supportedTypes = [constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.argument];
+    const targetTypes = objectType && supportedTypes.includes(objectType) ? [objectType] : supportedTypes;
+
+    const allEntries: Record<string, unknown>[] = [];
+    let total = 0;
+
+    for (const targetType of targetTypes) {
+      const dbModel = getDbModelByObjectType(targetType);
+      if (!dbModel) {
+        continue;
+      }
+
+      const query: Record<string, unknown> = {
+        private: false,
+      };
+      if (verdictStatus !== null && isSupportedVerdictStatus(verdictStatus)) {
+        query['verdict.status'] = verdictStatus;
+      }
+      if (regex) {
+        query.title = regex;
+      }
+
+      const [count, entries] = await Promise.all([
+        dbModel.countDocuments(query),
+        dbModel
+          .find(query)
+          .sort({ editDate: -1 })
+          .limit(limit * page)
+          .lean(),
+      ]);
+
+      total += Number(count || 0);
+      const objectName = String(constants.OBJECT_ID_NAME_MAP?.[targetType] || '').trim();
+      entries.forEach((entry: any) => {
+        allEntries.push(toModerationEntry(entry, { objectType: targetType, objectName, id: String(entry._id || '') }));
+      });
+    }
+
+    allEntries.sort((a, b) => {
+      const left = new Date(String((a as Record<string, unknown>).editDate || 0)).getTime();
+      const right = new Date(String((b as Record<string, unknown>).editDate || 0)).getTime();
+      return right - left;
+    });
+
+    const start = (page - 1) * limit;
+    const pagedEntries = allEntries.slice(start, start + limit);
+
+    res.json({
+      success: true,
+      entries: pagedEntries,
+      page,
+      limit,
+      total,
+      verdictStatuses: getVerdictStatuses(),
+    });
+  });
+
+  router.post('/verdicts/bulk', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureAdmin(req, res)) {
+      return;
+    }
+
+    const updates = Array.isArray(req.body?.updates) ? (req.body.updates as Array<Record<string, unknown>>) : [];
+    if (!updates.length) {
+      res.status(400).json({ success: false, message: 'updates array is required' });
+      return;
+    }
+    if (updates.length > 100) {
+      res.status(400).json({ success: false, message: 'Bulk update is limited to 100 records' });
+      return;
+    }
+
+    const userId = req.user?.id || req.user?._id;
+    const results: Array<{ id: string; success: boolean; message?: string }> = [];
+
+    for (const update of updates) {
+      const id = String(update.id || '').trim();
+      const objectType = toNumber(update.type ?? update.objectType);
+      const status = toNumber(update.status ?? update.verdictStatus);
+      const reasoning = String(update.reasoning || '').trim();
+
+      if (!id || !objectType || status === null || !isSupportedVerdictStatus(status)) {
+        results.push({
+          id: id || 'unknown',
+          success: false,
+          message: 'Invalid id/type/status',
+        });
+        continue;
+      }
+
+      const dbModel = getDbModelByObjectType(objectType);
+      if (!dbModel) {
+        results.push({ id, success: false, message: 'Unsupported object type' });
+        continue;
+      }
+
+      const entry = await dbModel.findById(id);
+      if (!entry) {
+        results.push({ id, success: false, message: 'Entry not found' });
+        continue;
+      }
+
+      entry.verdict = {
+        ...(entry.verdict || {}),
+        status,
+        editDate: Date.now(),
+        editUserId: userId || entry.editUserId,
+        ...(reasoning ? { reasoning } : {}),
+      };
+      if (reasoning && typeof entry.verdictReasoning !== 'undefined') {
+        entry.verdictReasoning = reasoning;
+      }
+      entry.editDate = new Date();
+      entry.editUserId = userId || entry.editUserId;
+      await entry.save();
+
+      results.push({ id, success: true });
+    }
+
+    res.json({
+      success: true,
+      results,
     });
   });
 

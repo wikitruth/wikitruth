@@ -5,6 +5,12 @@ import type { WikitruthNext, WikitruthRequest, WikitruthResponse } from '../../t
 
 const crypto = require('crypto') as typeof import('crypto');
 const jwt = require('jsonwebtoken') as typeof import('jsonwebtoken');
+const httpClient = require('../../utils/httpClient') as {
+  postForm: (
+    url: string,
+    formData: Record<string, string>,
+  ) => Promise<{ statusCode: number; body?: { success?: boolean } }>;
+};
 
 type AuthUserLike = {
   _id: string;
@@ -143,6 +149,9 @@ type AuthAppContext = {
     };
     projectName?: string;
     oauth?: Record<string, { key?: string }>;
+    grecaptcha?: {
+      secret?: string;
+    };
     requireAccountVerification?: boolean;
     jwtSecret?: string;
     mobileApi?: Partial<MobileApiConfig>;
@@ -156,6 +165,15 @@ type AuthAppContext = {
   };
 };
 
+type ActiveRole = 'reader' | 'contributor' | 'screener' | 'reviewer' | 'admin';
+
+type SignupBody = {
+  username?: unknown;
+  email?: unknown;
+  password?: unknown;
+  recaptchaResponse?: unknown;
+};
+
 function sanitizeUser(user: AuthUserLike | null | undefined) {
   if (!user) {
     return null;
@@ -167,6 +185,69 @@ function sanitizeUser(user: AuthUserLike | null | undefined) {
     email: user.email,
     roles: user.roles,
   };
+}
+
+function getAvailableRoles(user: AuthUserDocument | AuthUserLike | null | undefined): ActiveRole[] {
+  const roles: ActiveRole[] = ['reader', 'contributor'];
+  const roleSet = user?.roles as Record<string, unknown> | undefined;
+  if (roleSet?.screener) {
+    roles.push('screener');
+  }
+  if (roleSet?.reviewer) {
+    roles.push('reviewer');
+  }
+  if (roleSet?.admin) {
+    roles.push('admin');
+  }
+  return roles;
+}
+
+function normalizeActiveRole(
+  role: unknown,
+  user: AuthUserDocument | AuthUserLike | null | undefined,
+): ActiveRole | null {
+  const normalizedRole = String(role || '').trim().toLowerCase();
+  if (!normalizedRole) {
+    return null;
+  }
+  if (!['reader', 'contributor', 'screener', 'reviewer', 'admin'].includes(normalizedRole)) {
+    return null;
+  }
+  const allowedRoles = getAvailableRoles(user);
+  return allowedRoles.includes(normalizedRole as ActiveRole) ? (normalizedRole as ActiveRole) : null;
+}
+
+function getSessionActiveRole(req: WikitruthRequest): ActiveRole | null {
+  const stored = req.session?.preferences?.activeRole;
+  return normalizeActiveRole(stored, req.user as unknown as AuthUserDocument | null);
+}
+
+function setSessionActiveRole(req: WikitruthRequest, role: ActiveRole): void {
+  if (!req.session.preferences || typeof req.session.preferences !== 'object') {
+    req.session.preferences = {};
+  }
+  req.session.preferences.activeRole = role;
+}
+
+async function validateRecaptcha(req: WikitruthRequest, token: string): Promise<boolean> {
+  const appCtx = req.app as unknown as AuthAppContext;
+  const secret = String(appCtx.config?.grecaptcha?.secret || '').trim();
+  if (!secret) {
+    return true;
+  }
+  if (!token) {
+    return false;
+  }
+
+  try {
+    const captchaResult = await httpClient.postForm('https://www.google.com/recaptcha/api/siteverify', {
+      secret: secret,
+      response: token,
+    });
+    return Boolean(captchaResult.statusCode === 200 && captchaResult.body?.success);
+  } catch (_error) {
+    return false;
+  }
 }
 
 function isValidUsername(username: string): boolean {
@@ -549,11 +630,13 @@ async function revokeRefreshToken(req: WikitruthRequest, refreshToken: string): 
 module.exports = function (router: Router) {
   router.get('/me', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!req.user) {
-      res.status(401).json({ success: false, user: null });
+      res.status(401).json({ success: false, user: null, activeRole: 'reader' });
       return;
     }
 
-    res.json({ success: true, user: sanitizeUser(req.user) });
+    const activeRole = getSessionActiveRole(req) || 'contributor';
+    setSessionActiveRole(req, activeRole);
+    res.json({ success: true, user: sanitizeUser(req.user), activeRole: activeRole });
   });
 
   router.get('/providers', async function (req: WikitruthRequest, res: WikitruthResponse) {
@@ -565,9 +648,11 @@ module.exports = function (router: Router) {
 
   router.post('/signup', async function (req: WikitruthRequest, res: WikitruthResponse, next: WikitruthNext) {
     try {
-      const username = String(req.body?.username || '').trim();
-      const email = String(req.body?.email || '').trim().toLowerCase();
-      const password = String(req.body?.password || '');
+      const body = (req.body || {}) as SignupBody;
+      const username = String(body.username || '').trim();
+      const email = String(body.email || '').trim().toLowerCase();
+      const password = String(body.password || '');
+      const recaptchaResponse = String(body.recaptchaResponse || '').trim();
 
       if (!username || !email || !password) {
         res.status(400).json({ success: false, message: 'Username, email, and password are required' });
@@ -586,6 +671,12 @@ module.exports = function (router: Router) {
 
       if (password.length < 6) {
         res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
+        return;
+      }
+
+      const captchaValid = await validateRecaptcha(req, recaptchaResponse);
+      if (!captchaValid) {
+        res.status(400).json({ success: false, message: 'Invalid captcha' });
         return;
       }
 
@@ -634,8 +725,8 @@ module.exports = function (router: Router) {
         if (err) {
           return next(err);
         }
-
-        res.status(201).json({ success: true, user: sanitizeUser(user) });
+        setSessionActiveRole(req, 'contributor');
+        res.status(201).json({ success: true, user: sanitizeUser(user), activeRole: 'contributor' });
       });
     } catch (error) {
       next(error);
@@ -682,12 +773,30 @@ module.exports = function (router: Router) {
         if (err) {
           return next(err);
         }
-
-        res.json({ success: true, user: sanitizeUser(user) });
+        const activeRole = getSessionActiveRole(req) || 'contributor';
+        setSessionActiveRole(req, activeRole);
+        res.json({ success: true, user: sanitizeUser(user), activeRole: activeRole });
       });
     } catch (error) {
       next(error);
     }
+  });
+
+  router.post('/role-switch', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!req.user) {
+      res.status(401).json({ success: false, message: 'Authentication required' });
+      return;
+    }
+
+    const requestedRole = String(req.body?.role || '').trim().toLowerCase();
+    const role = normalizeActiveRole(requestedRole, req.user as unknown as AuthUserDocument);
+    if (!role) {
+      res.status(400).json({ success: false, message: 'Invalid role switch request' });
+      return;
+    }
+
+    setSessionActiveRole(req, role);
+    res.json({ success: true, activeRole: role });
   });
 
   router.post('/fast-switch', async function (req: WikitruthRequest, res: WikitruthResponse, next: WikitruthNext) {
@@ -738,8 +847,9 @@ module.exports = function (router: Router) {
         if (err) {
           return next(err);
         }
-
-        res.json({ success: true, user: sanitizeUser(user) });
+        const activeRole = getSessionActiveRole(req) || 'contributor';
+        setSessionActiveRole(req, activeRole);
+        res.json({ success: true, user: sanitizeUser(user), activeRole: activeRole });
       });
     } catch (error) {
       next(error);

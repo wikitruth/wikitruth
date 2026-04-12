@@ -2,6 +2,7 @@
 
 import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
+import { applyViewModeFilter } from './viewFilter';
 
 const flowUtils = require('../../utils/flowUtils') as any;
 const utils = require('../../utils/utils') as any;
@@ -90,9 +91,7 @@ async function GET_topics(req: WikitruthRequest, res: WikitruthResponse) {
   const topicsQuery: Record<string, unknown> = {
     parentId: req.query.topic,
   };
-  if (typeof screeningStatus !== 'undefined') {
-    topicsQuery['screening.status'] = screeningStatus;
-  }
+  applyViewModeFilter(req, topicsQuery, screeningStatus);
   if (cursor) {
     topicsQuery.editDate = { $lt: cursor };
   }

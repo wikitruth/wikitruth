@@ -98,9 +98,7 @@ const SignupPage: React.FC = () => {
 
     try {
       const recaptchaToken = await executeRecaptcha('signup');
-      await signup(values.username.trim(), values.email.trim(), values.password);
-      // recaptchaToken can be sent to backend when API supports it
-      void recaptchaToken;
+      await signup(values.username.trim(), values.email.trim(), values.password, recaptchaToken || undefined);
       trackEvent('signup', 'auth', 'credentials');
       navigate('/');
     } catch (error) {

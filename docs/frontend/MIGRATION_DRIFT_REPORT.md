@@ -1,6 +1,6 @@
 # Migration Doc-to-Repo Drift Report
 
-Date (UTC): 2026-02-22
+Date (UTC): 2026-04-11
 
 ## Script Contract Check
 

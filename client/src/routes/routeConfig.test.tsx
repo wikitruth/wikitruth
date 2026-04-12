@@ -28,6 +28,8 @@ describe('routeConfig', () => {
     expect(paths).toContain('/search');
     expect(paths).toContain('/screening');
     expect(paths).toContain('/convert');
+    expect(paths).toContain('/admin/verdicts');
+    expect(paths).toContain('/admin/verdicts/:id');
   });
 
   it('maps diary routes to the dedicated diary page', () => {

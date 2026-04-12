@@ -4,6 +4,7 @@ import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 import type { ServiceEntry, ServiceQuery } from '../../services/serviceTypes';
 import type { WikitruthConstants } from '../../types/constants';
+import { applyViewModeFilter } from './viewFilter';
 
 const flowUtils = require('../../utils/flowUtils') as any;
 const utils = require('../../utils/utils') as {
@@ -93,9 +94,7 @@ async function GET_arguments(req: WikitruthRequest, res: WikitruthResponse) {
     private: false,
   };
 
-  if (typeof model.screening?.status !== 'undefined') {
-    query['screening.status'] = model.screening.status;
-  }
+  applyViewModeFilter(req, query as Record<string, unknown>, model.screening?.status);
 
   if (req.query.topic) {
     query.ownerId = req.query.topic;

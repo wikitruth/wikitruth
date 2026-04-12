@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import Breadcrumb from '../../../components/common/Breadcrumb';
 import PageHeader from '../../../components/common/PageHeader';
 import Select from '../../../components/Form/Select';
@@ -8,81 +8,124 @@ import Button from '../../../components/common/Button';
 import Alert from '../../../components/common/Alert';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import PageMeta from '../../../components/common/PageMeta';
-import apiService from '../../../services/api';
+import moderationApi, { type ModerationStatusOption } from '../../../services/api/moderation';
 
-const verdictOptions = [
-  { value: 'true', label: 'True' },
-  { value: 'mostly-true', label: 'Mostly True' },
-  { value: 'half-true', label: 'Half True' },
-  { value: 'mostly-false', label: 'Mostly False' },
-  { value: 'false', label: 'False' },
-  { value: 'unknown', label: 'Unknown' },
-];
+const TOPIC_OBJECT_TYPE = 1;
+const ARGUMENT_OBJECT_TYPE = 2;
+
+function normalizeType(value: string | null): 'topic' | 'argument' {
+  return value === 'topic' ? 'topic' : 'argument';
+}
 
 const VerdictUpdatePage: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
+  const entryType = normalizeType(searchParams.get('type'));
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [title, setTitle] = useState('');
-  const [verdict, setVerdict] = useState('');
+  const [verdict, setVerdict] = useState<number>(0);
   const [reasoning, setReasoning] = useState('');
+  const [statuses, setStatuses] = useState<ModerationStatusOption[]>([]);
+  const [resolvedObjectType, setResolvedObjectType] = useState<number>(
+    entryType === 'topic' ? TOPIC_OBJECT_TYPE : ARGUMENT_OBJECT_TYPE,
+  );
 
   useEffect(() => {
     const load = async () => {
       if (!id) {
-        setError('Argument ID is required');
+        setError('Entry ID is required');
         setLoading(false);
         return;
       }
       try {
-        const result = await apiService.getArgumentEntry(id);
-        const arg = result?.argument;
-        setTitle(arg?.title || '');
-        setVerdict(arg?.verdict?.result || '');
-        setReasoning((arg as Record<string, unknown>)?.verdictReasoning as string || '');
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load argument');
+        const result = await moderationApi.entry({ key: entryType, id });
+        const entry = result.entry;
+        const nextStatuses = result.verdictStatuses || [];
+        setTitle(entry?.title || '');
+        setStatuses(nextStatuses);
+        setVerdict(
+          typeof entry?.verdict?.status === 'number' ? entry.verdict.status : nextStatuses[0]?.code || 0,
+        );
+        setReasoning(String(entry?.verdict?.reasoning || entry?.verdictReasoning || ''));
+        setResolvedObjectType(
+          typeof entry?.objectType === 'number'
+            ? entry.objectType
+            : entryType === 'topic'
+              ? TOPIC_OBJECT_TYPE
+              : ARGUMENT_OBJECT_TYPE,
+        );
+      } catch (loadError) {
+        setError(loadError instanceof Error ? loadError.message : 'Failed to load entry');
       } finally {
         setLoading(false);
       }
     };
-    load();
-  }, [id]);
+    void load();
+  }, [entryType, id]);
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!id || !verdict) {
-      setError('A verdict is required');
+  const verdictOptions = useMemo(() => {
+    return statuses.map((status) => ({
+      value: String(status.code),
+      label: status.text,
+    }));
+  }, [statuses]);
+
+  const handleSave = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!id) {
+      setError('Entry ID is required');
       return;
     }
 
     try {
       setSaving(true);
       setError(null);
-      await apiService.updateArgument(id, { verdict, verdictReasoning: reasoning });
-      navigate(-1);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update verdict');
+      const result = await moderationApi.bulkUpdateVerdicts([
+        {
+          id,
+          type: resolvedObjectType,
+          status: verdict,
+          reasoning: reasoning.trim() || undefined,
+        },
+      ]);
+      const row = result.results[0];
+      if (!row?.success) {
+        setError(row?.message || 'Failed to update verdict');
+        return;
+      }
+      navigate('/admin/verdicts');
+    } catch (saveError) {
+      setError(saveError instanceof Error ? saveError.message : 'Failed to update verdict');
     } finally {
       setSaving(false);
     }
   };
 
-  if (loading) return <LoadingSpinner message="Loading argument..." />;
+  if (loading) {
+    return <LoadingSpinner message="Loading entry..." />;
+  }
 
   return (
     <div>
-      <PageMeta title="Update Verdict" description={`Update verdict for: ${title}`} />
-      <Breadcrumb items={[{ title: 'Home', url: '/' }, { title: 'Arguments', url: '/arguments' }, { title: 'Update Verdict', active: true }]} />
-      <PageHeader title="Update Verdict" subtitle={title} icon="gavel" iconColor="text-warning" />
+      <PageMeta title="Update Verdict" description={`Update verdict for: ${title || 'entry'}`} />
+      <Breadcrumb
+        items={[
+          { title: 'Home', url: '/' },
+          { title: 'Admin', url: '/admin' },
+          { title: 'Verdict Queue', url: '/admin/verdicts' },
+          { title: 'Update Verdict', active: true },
+        ]}
+      />
+      <PageHeader title="Update Verdict" subtitle={title || id || ''} icon="gavel" iconColor="text-warning" />
 
-      {error && (
+      {error ? (
         <Alert type="danger" dismissible onDismiss={() => setError(null)}>
           {error}
         </Alert>
-      )}
+      ) : null}
 
       <div className="panel panel-default">
         <div className="panel-body">
@@ -90,8 +133,8 @@ const VerdictUpdatePage: React.FC = () => {
             <Select
               name="verdict"
               label="Verdict"
-              value={verdict}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setVerdict(e.target.value)}
+              value={String(verdict)}
+              onChange={(event: React.ChangeEvent<HTMLSelectElement>) => setVerdict(Number(event.target.value))}
               options={verdictOptions}
               required
             />
@@ -100,7 +143,7 @@ const VerdictUpdatePage: React.FC = () => {
               name="reasoning"
               label="Reasoning (optional)"
               value={reasoning}
-              onChange={(_: string, html: string) => setReasoning(html)}
+              onChange={(_name: string, html: string) => setReasoning(html)}
               placeholder="Explain the reasoning behind this verdict"
               compact
             />
@@ -109,9 +152,12 @@ const VerdictUpdatePage: React.FC = () => {
               <Button type="submit" variant="warning" disabled={saving} icon={saving ? 'spinner fa-spin' : 'check'}>
                 {saving ? 'Saving...' : 'Update Verdict'}
               </Button>{' '}
-              <Button type="button" variant="default" onClick={() => navigate(-1)} icon="times">
+              <Button type="button" variant="default" onClick={() => navigate('/admin/verdicts')} icon="times">
                 Cancel
-              </Button>
+              </Button>{' '}
+              <Link to="/admin/verdicts" className="btn btn-link">
+                Back to queue
+              </Link>
             </div>
           </form>
         </div>

@@ -8,6 +8,7 @@ const constants = require('../../models/constants');
 const utils = require('../../utils/utils');
 // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 const opinionsService = require('../../services/opinionsService');
+const { applyViewModeFilter } = require('./viewFilter');
 // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'db'.
 const db = require('../../app').db.models;
 
@@ -66,9 +67,9 @@ async function GET_opinions(req, res) {
   const query = {
     ownerType: constants.OBJECT_TYPES.topic,
     private: false,
-    // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
-    'screening.status': model.screening.status,
   };
+  // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
+  applyViewModeFilter(req, query, model.screening.status);
   
   if (req.query.topic) {
     // @ts-ignore TS(2339): Property 'ownerId' does not exist on type '{ owner... Remove this comment to see the full error message

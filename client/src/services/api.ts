@@ -549,6 +549,59 @@ class ApiService {
       body: JSON.stringify(payload),
     });
   }
+
+  async getOutlineTree(rootId?: string, depth: number = 2): Promise<{
+    success?: boolean;
+    tree?: {
+      _id: string;
+      title: string;
+      objectName: 'topic';
+      friendlyUrl?: string;
+      children: Array<{
+        _id: string;
+        title: string;
+        objectName: 'topic';
+        friendlyUrl?: string;
+        children: unknown[];
+      }>;
+    };
+    trees?: Array<{
+      _id: string;
+      title: string;
+      objectName: 'topic';
+      friendlyUrl?: string;
+      children: unknown[];
+    }>;
+  }> {
+    const params = new URLSearchParams();
+    if (rootId) {
+      params.set('rootId', rootId);
+    }
+    params.set('depth', String(depth));
+    return this.request(`/outline/tree?${params.toString()}`);
+  }
+
+  async searchOutlineTargets(
+    query: string,
+    options?: {
+      types?: 'topic' | 'argument' | 'topic,argument';
+      limit?: number;
+    },
+  ): Promise<{
+    success?: boolean;
+    results?: Array<{
+      _id: string;
+      title: string;
+      friendlyUrl?: string;
+      objectName: 'topic' | 'argument';
+    }>;
+  }> {
+    const params = new URLSearchParams();
+    params.set('q', query);
+    params.set('types', options?.types || 'topic,argument');
+    params.set('limit', String(options?.limit || 20));
+    return this.request(`/outline/search?${params.toString()}`);
+  }
 }
 
 export const apiService = new ApiService();

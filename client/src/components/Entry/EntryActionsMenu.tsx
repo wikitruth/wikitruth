@@ -11,7 +11,7 @@ interface EntryActionsMenuProps {
 }
 
 const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) => {
-  const { user } = useAuth();
+  const { user, activeRole } = useAuth();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [followed, setFollowed] = useState(false);
@@ -39,11 +39,14 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
 
   const isAdmin = Boolean(user?.roles?.admin);
   const isScreener = Boolean(user?.roles?.screener);
+  const isReaderMode = activeRole === 'reader';
   const isOwner = Boolean(user?._id && entry.createUserId && String(user._id) === String(entry.createUserId));
-  const canEdit = Boolean(editPath) && (isOwner || isAdmin);
+  const canEdit = !isReaderMode && Boolean(editPath) && (isOwner || isAdmin);
   const objectName = String(entry.objectName || '').trim();
   const objectType = typeof entry.objectType === 'number' ? entry.objectType : null;
   const canConvert = objectName === 'topic' || objectName === 'argument';
+  const canReply = !isReaderMode && ['topic', 'argument', 'question', 'answer', 'issue', 'opinion'].includes(objectName);
+  const canManageEntry = !isReaderMode && (isScreener || isAdmin);
 
   const handleEdit = () => {
     if (!editPath) {
@@ -120,8 +123,6 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
     }
     void navigate('/issues/create');
   };
-
-  const canReply = ['topic', 'argument', 'question', 'answer', 'issue', 'opinion'].includes(objectName);
 
   const handleReply = () => {
     setIsOpen(false);
@@ -208,11 +209,13 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
                 </button>
               </li>
             )}
-            <li>
-              <button type="button" className="btn btn-link" onClick={handleFollow}>
-                <i className="fa fa-rss" aria-hidden="true"></i> {followed ? 'Unfollow' : 'Follow'}
-              </button>
-            </li>
+            {!isReaderMode && (
+              <li>
+                <button type="button" className="btn btn-link" onClick={handleFollow}>
+                  <i className="fa fa-rss" aria-hidden="true"></i> {followed ? 'Unfollow' : 'Follow'}
+                </button>
+              </li>
+            )}
             <li>
               <button type="button" className="btn btn-link" onClick={handleShare}>
                 <i className="fa fa-share" aria-hidden="true"></i> Share
@@ -225,35 +228,41 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
                 </button>
               </li>
             )}
-            <li>
-              <button type="button" className="btn btn-link" onClick={handleCopyToClipboard}>
-                <i className="fa fa-clipboard" aria-hidden="true"></i> Copy to Clipboard
-              </button>
-            </li>
-            <li>
-              <button type="button" className="btn btn-link" onClick={handleLinkTo}>
-                <i className="fa fa-link" aria-hidden="true"></i> Link to...
-              </button>
-            </li>
+            {!isReaderMode && (
+              <li>
+                <button type="button" className="btn btn-link" onClick={handleCopyToClipboard}>
+                  <i className="fa fa-clipboard" aria-hidden="true"></i> Copy to Clipboard
+                </button>
+              </li>
+            )}
+            {!isReaderMode && (
+              <li>
+                <button type="button" className="btn btn-link" onClick={handleLinkTo}>
+                  <i className="fa fa-link" aria-hidden="true"></i> Link to...
+                </button>
+              </li>
+            )}
             <li>
               <button type="button" className="btn btn-link" onClick={handleViewHistory}>
                 <i className="fa fa-history" aria-hidden="true"></i> View History
               </button>
             </li>
-            <li>
-              <button type="button" className="btn btn-link" onClick={handleReport}>
-                <i className="fa fa-flag" aria-hidden="true"></i> Report
-              </button>
-            </li>
-            {(isScreener || isAdmin) && <li role="separator" className="divider"></li>}
-            {isScreener && objectName && (
+            {!isReaderMode && (
+              <li>
+                <button type="button" className="btn btn-link" onClick={handleReport}>
+                  <i className="fa fa-flag" aria-hidden="true"></i> Report
+                </button>
+              </li>
+            )}
+            {canManageEntry && <li role="separator" className="divider"></li>}
+            {!isReaderMode && isScreener && objectName && (
               <li>
                 <button type="button" className="btn btn-link" onClick={handleScreening}>
                   <i className="fa fa-pencil-square-o" aria-hidden="true"></i> Screening Status
                 </button>
               </li>
             )}
-            {isAdmin && (
+            {!isReaderMode && isAdmin && (
               <>
                 {objectType !== null && !isOwner && (
                   <li>

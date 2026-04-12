@@ -19,15 +19,13 @@ let db = require('../app').db.models,
   // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   htmlToText = require('html-to-text'),
   // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-  moment = require('moment'),
+  dateFns = require('date-fns'),
   // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   async = require('async');
 
 const childrenCountGuardrails = require('../services/childrenCountGuardrails'),
   normalizeChildrenCountUpdateTasks = childrenCountGuardrails.normalizeChildrenCountUpdateTasks,
   assertChildrenCountInvariants = childrenCountGuardrails.assertChildrenCountInvariants;
-
-let mn = ' 12:00 AM';
 
 // @ts-ignore TS(7006): Parameter 'isPrivate' implicitly has an 'any' type... Remove this comment to see the full error message
 function getBackupDir(isPrivate) {
@@ -96,13 +94,17 @@ function appendEntryExtras(item, objectType, req, shortTitleLength) {
   item.sameEditDate = item.createDate.valueOf() === item.editDate.valueOf();
 
   if (item.referenceDate) {
-    let refDate = moment(item.referenceDate);
+    let refDate = new Date(item.referenceDate);
     item.referenceDateString = item.referenceDate.toLocaleString(); // FIXME: using this on front-end might produce an issue when the locale of the server does not match the locale of the client.
     item.referenceDateUTC = item.referenceDate.toUTCString();
-    //item.referenceDateSimple = item.referenceDate.toLocaleString(); // toDateString(): Tue Dec 27 2016, toLocaleString(): 12/27/2016, 8:50:00 PM, toISOString(): 2016-12-27T12:50:00.000Z
-    item.referenceDateSimple = refDate.format('lll'); // see https://momentjs.com/docs/#/displaying/format/
-    if (item.referenceDateSimple.endsWith(mn)) {
-      item.referenceDateSimple = item.referenceDateSimple.substring(0, item.referenceDateSimple.length - mn.length);
+    // Aligns with prior `moment(...).format('lll')` style using date-fns server-side formatting.
+    if (!Number.isNaN(refDate.getTime())) {
+      item.referenceDateSimple = dateFns.format(refDate, 'PP p');
+    } else {
+      item.referenceDateSimple = item.referenceDate.toLocaleString();
+    }
+    if (/,?\s*12:00 AM$/.test(item.referenceDateSimple)) {
+      item.referenceDateSimple = item.referenceDateSimple.replace(/,?\s*12:00 AM$/, '');
     }
   }
   if (item.childrenCount) {

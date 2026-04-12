@@ -350,17 +350,47 @@ test('search flow from shortcut to result', async ({ page }) => {
   });
 
   await page.goto('/app');
-  await page.goto('/app/search?q=found');
+  await page.keyboard.press('Control+K');
+  await expect(page).toHaveURL(/\/app\/search/);
+  await page.getByPlaceholder('Search for...').fill('found');
+  await page.getByRole('button', { name: /^search$/i }).click();
   await expect(page.getByText(/found topic/i)).toBeVisible();
 });
 
 test('mobile sidebar toggle', async ({ page }) => {
-  await page.setViewportSize({ width: 375, height: 667 });
-  await page.goto('/app');
+  const breakpoints = [320, 375, 768, 1024];
+  for (const width of breakpoints) {
+    await page.setViewportSize({ width, height: 667 });
+    await page.goto('/app');
 
-  const sidebarToggle = page.locator('[data-testid="sidebar-toggle"], .navbar-toggle, button[aria-label*="menu" i]');
-  if (await sidebarToggle.count() > 0) {
-    await sidebarToggle.first().click();
-    await expect(page.locator('.wt-sidebar, .sidebar, [role="navigation"]').first()).toBeVisible();
+    const sidebarToggle = page.locator('[data-testid="sidebar-toggle"], button[aria-label="Toggle sidebar"], .navbar-toggle');
+    if (await sidebarToggle.count() > 0) {
+      await sidebarToggle.first().click();
+      await expect(page.locator('.wt-sidebar, .sidebar, [role="navigation"], #sidebar').first()).toBeVisible();
+    }
   }
+});
+
+test('print preview hides navigation chrome on entry pages', async ({ page }) => {
+  await page.route('**/api/topics/entry/t1', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        success: true,
+        topic: {
+          _id: 't1',
+          title: 'Climate Change',
+          friendlyUrl: 'climate-change',
+          content: '<p>A critical global issue.</p>',
+        },
+      }),
+    });
+  });
+
+  await page.goto('/app/topics/entry/climate-change/t1');
+  await page.emulateMedia({ media: 'print' });
+
+  const navbarDisplay = await page.locator('.navbar').first().evaluate((node) => window.getComputedStyle(node).display);
+  expect(navbarDisplay).toBe('none');
 });

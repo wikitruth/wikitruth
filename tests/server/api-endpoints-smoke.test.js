@@ -115,6 +115,7 @@ describe('API endpoint smoke coverage', function () {
     const monitoringApi = read('server/src/controllers/api/monitoring.ts');
 
     expect(monitoringApi).toContain("router.post('/errors'");
+    expect(monitoringApi).toContain("router.post('/csp'");
     expect(monitoringApi).toContain("logger.error('client.runtime.error'");
   });
 

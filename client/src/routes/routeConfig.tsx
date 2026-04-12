@@ -80,6 +80,7 @@ const InstallPage = lazy(() => import('../pages/Install/InstallPage'));
 const FastSwitchPage = lazy(() => import('../pages/FastSwitch/FastSwitchPage'));
 const ClipboardPage = lazy(() => import('../pages/ClipboardPage'));
 const OutlineLinkPage = lazy(() => import('../pages/OutlineLinkPage'));
+const VerdictsPage = lazy(() => import('../pages/Admin/Verdicts/VerdictsPage'));
 const VerdictUpdatePage = lazy(() => import('../pages/Admin/Verdicts/VerdictUpdatePage'));
 const ServerError500 = lazy(() => import('../pages/Errors/ServerError500'));
 const ServiceUnavailable503 = lazy(() => import('../pages/Errors/ServiceUnavailable503'));
@@ -192,6 +193,7 @@ export const appRoutes: AppRoute[] = [
   { path: '/fast-switch', element: <FastSwitchPage /> },
   { path: '/clipboard', element: <ClipboardPage /> },
   { path: '/outline/link', element: <OutlineLinkPage /> },
+  { path: '/admin/verdicts', element: <VerdictsPage /> },
   { path: '/admin/verdicts/:id', element: <VerdictUpdatePage /> },
   { path: '/500', element: <ServerError500 /> },
   { path: '/503', element: <ServiceUnavailable503 /> },

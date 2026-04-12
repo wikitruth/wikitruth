@@ -1,4 +1,5 @@
 import { useCallback, useRef, useEffect } from 'react';
+import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 
 const RECAPTCHA_SITE_KEY =
   typeof process !== 'undefined' ? process.env.REACT_APP_RECAPTCHA_SITE_KEY : undefined;
@@ -23,16 +24,27 @@ function loadScript(): void {
 }
 
 export function useRecaptcha() {
+  const { executeRecaptcha } = useGoogleReCaptcha();
   const siteKey = useRef(RECAPTCHA_SITE_KEY);
 
   useEffect(() => {
-    loadScript();
-  }, []);
+    // Fallback for environments where provider is not mounted (tests/legacy pages).
+    if (!executeRecaptcha) {
+      loadScript();
+    }
+  }, [executeRecaptcha]);
 
   const execute = useCallback(
     async (action: string): Promise<string | null> => {
       const key = siteKey.current;
       if (!key) return null;
+      if (executeRecaptcha) {
+        try {
+          return await executeRecaptcha(action);
+        } catch {
+          return null;
+        }
+      }
       const win = window as unknown as RecaptchaWindow;
       if (!win.grecaptcha) return null;
       return new Promise((resolve) => {
@@ -46,7 +58,7 @@ export function useRecaptcha() {
         });
       });
     },
-    [],
+    [executeRecaptcha],
   );
 
   const isEnabled = Boolean(siteKey.current);

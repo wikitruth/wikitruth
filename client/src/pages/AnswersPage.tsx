@@ -30,7 +30,7 @@ const AnswersPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
   const { addToast } = useNotification();
-  const { user } = useAuth();
+  const { user, activeRole } = useAuth();
 
   const handleViewModeChange = (mode: ViewMode) => {
     setViewMode(mode);
@@ -122,7 +122,7 @@ const AnswersPage: React.FC = () => {
         icon="list-alt"
         iconColor="text-primary"
         actions={
-          user ? (
+          user && activeRole !== 'reader' ? (
             <Link to="/answers/create" className="btn btn-primary">
               <i className="fa fa-plus"></i> Add Answer
             </Link>

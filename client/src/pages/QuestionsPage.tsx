@@ -32,7 +32,7 @@ const QuestionsPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
   const { addToast } = useNotification();
-  const { user } = useAuth();
+  const { user, activeRole } = useAuth();
 
   const handleViewModeChange = (mode: ViewMode) => {
     setViewMode(mode);
@@ -116,7 +116,7 @@ const QuestionsPage: React.FC = () => {
         icon="question-circle"
         iconColor="text-success-x"
         actions={
-          user ? (
+          user && activeRole !== 'reader' ? (
             <Link to="/questions/create" className="btn btn-success">
               <i className="fa fa-plus"></i> Ask Question
             </Link>

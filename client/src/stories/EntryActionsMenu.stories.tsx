@@ -1,7 +1,7 @@
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import EntryActionsMenu from '../components/Entry/EntryActionsMenu';
-import { AuthProvider } from '../contexts/AuthContext';
+import { AuthProvider } from '../context/AuthContext';
 
 const mockEntry = {
   _id: 'abc123',

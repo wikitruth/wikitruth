@@ -18,6 +18,7 @@ interface HomePayload {
 }
 
 const ROLE_LABELS: Record<string, string> = {
+  reader: 'Reader',
   contributor: 'Contributor',
   screener: 'Screener',
   reviewer: 'Reviewer',

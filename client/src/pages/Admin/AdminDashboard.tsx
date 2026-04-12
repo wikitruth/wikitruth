@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import adminApi from '../../services/api/admin';
 import { createRealtimeChannel } from '../../services/realtime';
 import type { RealtimeConnectionState, RealtimeEvent } from '../../types/realtime';
@@ -155,6 +156,19 @@ const AdminDashboard: React.FC = () => {
               <div className="panel-heading">Statuses</div>
               <div className="panel-body">
                 <strong>{counts.statuses || 0}</strong>
+              </div>
+            </div>
+          </div>
+          <div className="col-sm-3">
+            <div className="panel panel-warning">
+              <div className="panel-heading">Verdict Queue</div>
+              <div className="panel-body">
+                <p className="text-muted" style={{ marginBottom: 10 }}>
+                  Review pending verdict updates.
+                </p>
+                <Link to="/admin/verdicts" className="btn btn-warning btn-xs">
+                  Open Queue
+                </Link>
               </div>
             </div>
           </div>

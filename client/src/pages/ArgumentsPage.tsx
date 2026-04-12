@@ -33,7 +33,7 @@ const ArgumentsPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
   const { addToast } = useNotification();
-  const { user } = useAuth();
+  const { user, activeRole } = useAuth();
 
   const handleViewModeChange = (mode: ViewMode) => {
     setViewMode(mode);
@@ -126,7 +126,7 @@ const ArgumentsPage: React.FC = () => {
         icon="flash"
         iconColor="text-primary"
         actions={
-          user ? (
+          user && activeRole !== 'reader' ? (
             <Link to="/arguments/create" className="btn btn-primary">
               <i className="fa fa-plus"></i> New Argument
             </Link>

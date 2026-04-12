@@ -68,4 +68,55 @@ describe('moderationApi', () => {
       }),
     );
   });
+
+  it('loads verdict queue with filter query params', async () => {
+    const fetchMock = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true, entries: [] }),
+    });
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+    await moderationApi.listVerdicts({
+      objectType: 1,
+      status: 0,
+      q: 'climate',
+      page: 2,
+      limit: 25,
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/moderation/verdicts?objectType=1&status=0&page=2&limit=25&q=climate',
+      expect.objectContaining({
+        credentials: 'include',
+      }),
+    );
+  });
+
+  it('posts bulk verdict updates with csrf token', async () => {
+    document.cookie = '_csrfToken=test-csrf-token';
+    const fetchMock = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true, results: [] }),
+    });
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+    await moderationApi.bulkUpdateVerdicts([
+      { id: 'topic-1', type: 1, status: 1, reasoning: '<p>Verified</p>' },
+      { id: 'arg-1', type: 2, status: 2 },
+    ]);
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/moderation/verdicts/bulk',
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({ 'x-csrf-token': 'test-csrf-token' }),
+        body: JSON.stringify({
+          updates: [
+            { id: 'topic-1', type: 1, status: 1, reasoning: '<p>Verified</p>' },
+            { id: 'arg-1', type: 2, status: 2 },
+          ],
+        }),
+      }),
+    );
+  });
 });

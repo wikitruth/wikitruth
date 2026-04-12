@@ -30,7 +30,7 @@ const OpinionsPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
   const { addToast } = useNotification();
-  const { user } = useAuth();
+  const { user, activeRole } = useAuth();
 
   const handleViewModeChange = (mode: ViewMode) => {
     setViewMode(mode);
@@ -121,7 +121,7 @@ const OpinionsPage: React.FC = () => {
         icon="comment"
         iconColor="text-info"
         actions={
-          user ? (
+          user && activeRole !== 'reader' ? (
             <Link to="/opinions/create" className="btn btn-info">
               <i className="fa fa-plus"></i> Share Opinion
             </Link>

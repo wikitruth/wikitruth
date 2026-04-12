@@ -106,10 +106,11 @@ if (helmetConfig.enabled) {
                 styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
                 imgSrc: ["'self'", "data:", "https:"],
                 fontSrc: ["'self'", "https://fonts.gstatic.com"],
-                connectSrc: ["'self'", "https://www.google-analytics.com"],
+                connectSrc: ["'self'", "https://www.google-analytics.com", "https://www.google.com", "https://www.gstatic.com"],
                 frameSrc: ["'self'", "https://www.google.com"],
                 objectSrc: ["'none'"],
                 baseUri: ["'self'"],
+                reportUri: ["/api/monitoring/csp"],
             }
         } : false,
         crossOriginEmbedderPolicy: helmetConfig.crossOriginEmbedderPolicy,
@@ -160,7 +161,7 @@ const csrfProtection = csrf({
 }); // kraken-js:lusca is already using csrf module
 app.use(function (req: any, res: any, next: any) {
     // Runtime error beacons may come from sendBeacon and cannot reliably attach CSRF headers.
-    if (/^\/api\/(?:v1\/)?monitoring\/errors\/?$/.test(req.path)) {
+    if (/^\/api\/(?:v1\/)?monitoring\/(?:errors|csp)\/?$/.test(req.path)) {
         return next();
     }
     return csrfProtection(req, res, next);
