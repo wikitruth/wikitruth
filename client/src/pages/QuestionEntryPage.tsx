@@ -14,6 +14,7 @@ import AnswerEntryRow from '../components/EntryRow/AnswerEntryRow';
 import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
 import EntryActionsMenu from '../components/Entry/EntryActionsMenu';
+import EntryQuickActions from '../components/Entry/EntryQuickActions';
 import PageMeta from '../components/common/PageMeta';
 import type { Answer, Issue, Opinion } from '../types';
 import { formatRelativeTime } from '../utils/dateFormat';
@@ -92,7 +93,12 @@ const QuestionEntryPage: React.FC = () => {
         subtitle={question.subtitle}
         icon="question-circle"
         iconColor="text-success-x"
-        actions={<EntryActionsMenu entry={question} editPath={`/questions/edit/${encodeURIComponent(question._id)}`} />}
+      />
+
+      <EntryQuickActions
+        entry={question}
+        objectName="question"
+        moreActions={<EntryActionsMenu entry={question} editPath={`/questions/edit/${encodeURIComponent(question._id)}`} />}
       />
       
       <PageTabs tabs={tabs} />

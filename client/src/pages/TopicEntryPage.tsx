@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import apiService from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -14,6 +14,7 @@ import QuestionEntryRow from '../components/EntryRow/QuestionEntryRow';
 import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
 import EntryActionsMenu from '../components/Entry/EntryActionsMenu';
+import EntryQuickActions from '../components/Entry/EntryQuickActions';
 import PageMeta from '../components/common/PageMeta';
 import type { TopicEntryResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
@@ -25,6 +26,12 @@ const CONTENT_COLLAPSE_THRESHOLD = 1200;
 
 function getCount(value: unknown): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : 0;
+}
+
+function getTopicPath(topic: Partial<LegacyEntity>): string {
+  const id = encodeURIComponent(String(topic._id || ''));
+  const friendly = encodeURIComponent(String(topic.friendlyUrl || topic._id || ''));
+  return `/topics/entry/${friendly}/${id}`;
 }
 
 const TopicEntryPage: React.FC = () => {
@@ -58,7 +65,9 @@ const TopicEntryPage: React.FC = () => {
   }, [id]);
 
   const topic = (data?.topic || {}) as LegacyEntity;
-  const topics = ((data?.topics || data?.topicChildren || []) as LegacyEntity[]).slice(0, 6);
+  const topics = ((data?.topics || data?.topicChildren || []) as LegacyEntity[]).slice(0, 15);
+  const keyTopics = ((data?.keyTopics || []) as LegacyEntity[]).slice(0, 6);
+  const keyArguments = ((data?.keyArguments || []) as LegacyEntity[]).slice(0, 6);
   const siblingTopics = ((data?.topicSiblings || []) as LegacyEntity[]).slice(0, 6);
   const args = (data?.arguments || []) as LegacyEntity[];
   const questions = (data?.questions || []) as LegacyEntity[];
@@ -67,21 +76,57 @@ const TopicEntryPage: React.FC = () => {
   const opinions = (data?.opinions || []) as LegacyEntity[];
   const topicLinks = (data?.topicLinks || []) as LegacyEntity[];
   const categories = (data?.categories || []) as LegacyEntity[];
+  const isMainTopic = Boolean(data?.mainTopic);
+  const tagLabels = Array.isArray(data?.tagLabels) ? (data?.tagLabels as LegacyEntity[]) : [];
 
   const breadcrumbItems = [
     { title: 'Home', url: '/' },
     { title: 'Topics', url: '/topics' },
-    { title: topic.title, active: true }
+    { title: topic.title, active: true },
   ];
 
   const tabs = [
-    { id: 'overview', title: 'Overview', url: `/topics/entry/${topic.friendlyUrl}/${topic._id}` },
     {
-      id: 'discussion',
-      title: 'Discussion',
-      url: `/topics/entry/${topic.friendlyUrl}/${topic._id}/discussion`,
-      count: topic.childrenCount?.opinions?.accepted ?? opinions.length,
-    }
+      id: 'details',
+      title: 'Details',
+      icon: 'info-circle',
+      url: getTopicPath(topic),
+    },
+    {
+      id: 'topics',
+      title: 'Topics',
+      icon: 'folder-open',
+      url: `/topics/${encodeURIComponent(String(topic.friendlyUrl || ''))}/${encodeURIComponent(String(topic._id || ''))}`,
+      count: getCount(topic.childrenCount?.topics?.accepted),
+    },
+    {
+      id: 'arguments',
+      title: 'Facts',
+      icon: 'flash',
+      url: `/arguments?topic=${encodeURIComponent(String(topic._id || ''))}`,
+      count: getCount(topic.childrenCount?.arguments?.accepted),
+    },
+    {
+      id: 'questions',
+      title: 'Questions',
+      icon: 'question-circle',
+      url: `/questions?topic=${encodeURIComponent(String(topic._id || ''))}`,
+      count: getCount(topic.childrenCount?.questions?.accepted),
+    },
+    {
+      id: 'issues',
+      title: 'Issues',
+      icon: 'exclamation-circle',
+      url: `/issues?topic=${encodeURIComponent(String(topic._id || ''))}`,
+      count: getCount(topic.childrenCount?.issues?.accepted),
+    },
+    {
+      id: 'comments',
+      title: 'Comments',
+      icon: 'comments-o',
+      url: `/opinions?topic=${encodeURIComponent(String(topic._id || ''))}`,
+      count: getCount(topic.childrenCount?.opinions?.accepted),
+    },
   ];
 
   const content = String(topic.content || topic.description || '');
@@ -89,54 +134,6 @@ const TopicEntryPage: React.FC = () => {
   const contentStyle = showSeeMore && !showFullContent
     ? { maxHeight: '450px', overflow: 'hidden', position: 'relative' as const }
     : undefined;
-
-  const topicStats = useMemo(() => {
-    const children = topic?.childrenCount || {};
-    return [
-      {
-        key: 'topics',
-        label: 'Topics',
-        icon: 'folder-open',
-        count: getCount(children.topics?.accepted) || topics.length,
-        to: `/topics/${topic.friendlyUrl || ''}/${topic._id || ''}`,
-      },
-      {
-        key: 'arguments',
-        label: 'Facts',
-        icon: 'flash',
-        count: getCount(children.arguments?.accepted) || args.length,
-        to: `/arguments?topic=${encodeURIComponent(String(topic._id || ''))}`,
-      },
-      {
-        key: 'questions',
-        label: 'Questions',
-        icon: 'question-circle',
-        count: getCount(children.questions?.accepted) || questions.length,
-        to: `/questions?topic=${encodeURIComponent(String(topic._id || ''))}`,
-      },
-      {
-        key: 'issues',
-        label: 'Issues',
-        icon: 'exclamation-circle',
-        count: getCount(children.issues?.accepted) || issues.length,
-        to: `/issues?topic=${encodeURIComponent(String(topic._id || ''))}`,
-      },
-      {
-        key: 'opinions',
-        label: 'Comments',
-        icon: 'comments-o',
-        count: getCount(children.opinions?.accepted) || opinions.length,
-        to: `/opinions?topic=${encodeURIComponent(String(topic._id || ''))}`,
-      },
-      {
-        key: 'artifacts',
-        label: 'Artifacts',
-        icon: 'paperclip',
-        count: getCount(children.artifacts?.accepted) || artifacts.length,
-        to: `/artifacts?topic=${encodeURIComponent(String(topic._id || ''))}`,
-      },
-    ];
-  }, [args.length, artifacts.length, issues.length, opinions.length, questions.length, topic._id, topic.childrenCount, topic.friendlyUrl, topics.length]);
 
   if (loading) {
     return <LoadingSpinner message="Loading topic..." />;
@@ -157,23 +154,57 @@ const TopicEntryPage: React.FC = () => {
         subtitle={topic.subtitle}
         icon="folder-open"
         iconColor="text-success-x"
-        actions={<EntryActionsMenu entry={topic} editPath={`/topics/create?id=${encodeURIComponent(topic._id)}`} />}
       />
 
-      <PageTabs tabs={tabs} />
-
-      <div className="row" style={{ marginBottom: '10px' }}>
-        {topicStats.map((stat) => (
-          <div key={stat.key} className="col-sm-4 col-md-2" style={{ marginBottom: '12px' }}>
-            <Link to={stat.to} className="no-underline">
-              <div className="well stat" style={{ marginBottom: 0 }}>
-                <div className="stat-value">{stat.count}</div>
-                <div className="stat-label"><i className={`fa fa-${stat.icon}`}></i> {stat.label}</div>
-              </div>
-            </Link>
-          </div>
-        ))}
+      <div className="text-muted" style={{ marginTop: '-6px', marginBottom: '8px' }}>
+        <small>
+          <i className="fa fa-folder-open-o" aria-hidden="true"></i> A topic category{' '}
+          {topic.editDate ? (
+            <>
+              <i className="fa fa-clock-o" aria-hidden="true"></i> {new Date(topic.editDate).toLocaleString()}
+            </>
+          ) : null}
+        </small>
       </div>
+
+      <div style={{ marginBottom: '8px' }}>
+        {topic.screening?.status === 0 ? (
+          <span className="label label-warning" style={{ marginRight: '6px' }}>
+            unverified
+          </span>
+        ) : null}
+        {typeof data?.linkCount === 'number' && data.linkCount > 1 ? (
+          <span className="label label-warning" style={{ marginRight: '6px' }}>
+            {data.linkCount}
+          </span>
+        ) : null}
+        {isMainTopic ? (
+          <span className="label label-info" style={{ marginRight: '6px' }}>
+            Main
+          </span>
+        ) : null}
+        {tagLabels.map((tag, index) => {
+          const theme = String(tag.theme || 'default');
+          const label = String(tag.label || tag.title || '');
+          if (!label) {
+            return null;
+          }
+          const className = `label label-${theme}`;
+          return (
+            <span key={`tag-label-${index}`} className={className} style={{ marginRight: '6px' }}>
+              {label}
+            </span>
+          );
+        })}
+      </div>
+
+      <EntryQuickActions
+        entry={topic}
+        objectName="topic"
+        moreActions={<EntryActionsMenu entry={topic} editPath={`/topics/create?id=${encodeURIComponent(String(topic._id || ''))}`} />}
+      />
+
+      <PageTabs tabs={tabs} activeTab="details" />
 
       <div className="text-body collapsible" style={{ marginTop: '20px', ...contentStyle }}>
         {topic.content ? (
@@ -198,22 +229,96 @@ const TopicEntryPage: React.FC = () => {
         )}
       </div>
 
+      {(keyTopics.length > 0 || keyArguments.length > 0) && (
+        <div style={{ marginTop: '18px' }}>
+          {keyTopics.length > 0 && (
+            <div style={{ marginBottom: '10px' }}>
+              <h3 style={{ marginTop: 0 }}>Key topics</h3>
+              <ul>
+                {keyTopics.map((item) => (
+                  <li key={`key-topic-${item._id}`}>
+                    <Link to={getTopicPath(item)}>{item.title}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {keyArguments.length > 0 && (
+            <div>
+              <h3 style={{ marginTop: 0 }}>Key facts</h3>
+              <ul>
+                {keyArguments.map((item) => (
+                  <li key={`key-argument-${item._id}`}>
+                    <Link to={`/arguments/entry/${encodeURIComponent(String(item.friendlyUrl || item._id))}/${encodeURIComponent(String(item._id))}`}>
+                      {item.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="wt-related" style={{ marginTop: '20px' }}>
         <span title="Related Topics">Topics</span>&nbsp;
         {topic.parentTopic && (
-          <Link to={`/topics/entry/${topic.parentTopic.friendlyUrl}/${topic.parentTopic._id}`}>
+          <Link to={getTopicPath(topic.parentTopic)}>
             <span className="wt-label label label-default">{topic.parentTopic.title}</span>
           </Link>
         )}
         {topicLinks.map((link) => (
-          <Link key={link._id} to={`/topics/entry/${link.friendlyUrl}/${link._id}`}>
+          <Link key={link._id} to={getTopicPath(link)}>
             <span className="wt-label label label-default">{link.title}</span>
           </Link>
         ))}
         {!topic.parentTopic && topicLinks.length === 0 && <span className="text-muted">No linked topics</span>}
       </div>
 
-      {(topics.length > 0 || siblingTopics.length > 0 || categories.length > 0) && (
+      {isMainTopic && categories.length > 0 && (
+        <div className="row" style={{ marginTop: '25px' }}>
+          {categories.map((category) => {
+            const subtopics = Array.isArray(category.subtopics) ? (category.subtopics as LegacyEntity[]).slice(0, 3) : [];
+            const subarguments = Array.isArray(category.subarguments) ? (category.subarguments as LegacyEntity[]).slice(0, 3) : [];
+            return (
+              <div key={`category-tile-${category._id}`} className="col-lg-4 col-md-6 col-sm-6">
+                <div className="media wt-category">
+                  <div className="media-left media-top">
+                    <Link to={getTopicPath(category)}>
+                      <GeoPatternBackground
+                        seed={String(category.title || category._id)}
+                        className="wt-category-icon wt-geopattern-title"
+                        height={90}
+                      />
+                    </Link>
+                  </div>
+                  <div className="media-body">
+                    <h4 className="media-heading">
+                      <Link to={getTopicPath(category)}>{category.title}</Link>
+                    </h4>
+                    {subtopics.map((subtopic) => (
+                      <div key={`cat-subtopic-${subtopic._id}`}>
+                        <i className="fa fa-folder-open text-muted" aria-hidden="true"></i>{' '}
+                        <Link to={getTopicPath(subtopic)}>{String(subtopic.shortTitle || subtopic.title || '(Untitled)')}</Link>
+                      </div>
+                    ))}
+                    {subarguments.map((subargument) => (
+                      <div key={`cat-subarg-${subargument._id}`}>
+                        <i className="fa fa-flash text-muted" aria-hidden="true"></i>{' '}
+                        <Link to={`/arguments/entry/${encodeURIComponent(String(subargument.friendlyUrl || subargument._id))}/${encodeURIComponent(String(subargument._id))}`}>
+                          {String(subargument.shortTitle || subargument.title || '(Untitled)')}
+                        </Link>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {!isMainTopic && (topics.length > 0 || siblingTopics.length > 0 || categories.length > 0) && (
         <div className="panel panel-default" style={{ marginTop: '20px' }}>
           <div className="panel-heading">
             <h3 className="panel-title">Branch Context</h3>
@@ -223,7 +328,7 @@ const TopicEntryPage: React.FC = () => {
               <div style={{ marginBottom: '10px' }}>
                 <strong>Peer Categories:</strong>{' '}
                 {categories.map((item) => (
-                  <Link key={item._id} to={`/topics/entry/${item.friendlyUrl}/${item._id}`} className="wt-label label label-default" style={{ marginRight: '4px' }}>
+                  <Link key={item._id} to={getTopicPath(item)} className="wt-label label label-default" style={{ marginRight: '4px' }}>
                     {item.title}
                   </Link>
                 ))}
@@ -233,7 +338,7 @@ const TopicEntryPage: React.FC = () => {
               <div style={{ marginBottom: '10px' }}>
                 <strong>Subtopics:</strong>{' '}
                 {topics.map((item) => (
-                  <Link key={item._id} to={`/topics/entry/${item.friendlyUrl}/${item._id}`} className="wt-label label label-default" style={{ marginRight: '4px' }}>
+                  <Link key={item._id} to={getTopicPath(item)} className="wt-label label label-default" style={{ marginRight: '4px' }}>
                     {item.title}
                   </Link>
                 ))}
@@ -243,7 +348,7 @@ const TopicEntryPage: React.FC = () => {
               <div>
                 <strong>Sibling topics:</strong>{' '}
                 {siblingTopics.map((item) => (
-                  <Link key={item._id} to={`/topics/entry/${item.friendlyUrl}/${item._id}`} className="wt-label label label-default" style={{ marginRight: '4px' }}>
+                  <Link key={item._id} to={getTopicPath(item)} className="wt-label label label-default" style={{ marginRight: '4px' }}>
                     {item.title}
                   </Link>
                 ))}
@@ -259,7 +364,7 @@ const TopicEntryPage: React.FC = () => {
           icon="folder-open"
           iconColor="text-success-x"
           count={topic.childrenCount?.topics?.accepted ?? topics.length}
-          moreUrl={(topic.childrenCount?.topics?.accepted ?? topics.length) > 5 ? `/topics/${topic.friendlyUrl}/${topic._id}` : undefined}
+          moreUrl={(topic.childrenCount?.topics?.accepted ?? topics.length) > 15 ? `/topics/${topic.friendlyUrl}/${topic._id}` : undefined}
         >
           {topics.map((t) => (
             <TopicEntryRow key={t._id} topic={t as unknown as Topic} subtitle={false} />

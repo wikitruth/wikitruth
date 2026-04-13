@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import apiService from '../services/api';
 import type { Answer, Application, Argument, Artifact, Issue, Opinion, Question, Topic } from '../types';
+import type { LegacyEntity } from '../types/legacy';
 import LoadingSpinner from '../components/LoadingSpinner';
 import TopicEntryRow from '../components/EntryRow/TopicEntryRow';
 import ArgumentEntryRow from '../components/EntryRow/ArgumentEntryRow';
@@ -12,6 +13,10 @@ import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
 import PageMeta from '../components/common/PageMeta';
 import { useNotification } from '../context/NotificationContext';
 
+type HomeEntrySetColumn = {
+  entries?: LegacyEntity[];
+};
+
 interface HomeData {
   topics?: Topic[];
   arguments?: Argument[];
@@ -21,6 +26,7 @@ interface HomeData {
   opinions?: Opinion[];
   artifacts?: Artifact[];
   application?: Application;
+  entrySet?: HomeEntrySetColumn[];
   topicsMore?: boolean;
   argumentsMore?: boolean;
   questionsMore?: boolean;
@@ -28,6 +34,30 @@ interface HomeData {
   issuesMore?: boolean;
   opinionsMore?: boolean;
   artifactsMore?: boolean;
+}
+
+function getLegacyEntryPath(entry: LegacyEntity): string | null {
+  const id = encodeURIComponent(String(entry._id || ''));
+  const friendly = encodeURIComponent(String(entry.friendlyUrl || ''));
+
+  switch (String(entry.objectName || '')) {
+    case 'topic':
+      return `/topics/entry/${friendly || id}/${id}`;
+    case 'argument':
+      return `/arguments/entry/${friendly || id}/${id}`;
+    case 'question':
+      return `/questions/entry/${friendly || id}/${id}`;
+    case 'answer':
+      return `/answers/entry/${id}`;
+    case 'issue':
+      return friendly ? `/issues/entry/${friendly}/${id}` : `/issues/entry/${id}`;
+    case 'opinion':
+      return friendly ? `/opinions/entry/${friendly}/${id}` : `/opinions/entry/${id}`;
+    case 'artifact':
+      return `/artifacts/entry/${friendly || id}/${id}`;
+    default:
+      return null;
+  }
 }
 
 const HomePage: React.FC = () => {
@@ -55,6 +85,99 @@ const HomePage: React.FC = () => {
   }
 
   const { application } = data;
+  const entrySetColumns = (data.entrySet || []) as HomeEntrySetColumn[];
+
+  const renderMixedEntry = (entry: LegacyEntity) => {
+    const entryType = String(entry.objectName || '');
+    switch (entryType) {
+      case 'topic':
+        return (
+          <TopicEntryRow
+            key={`entry-topic-${entry._id}`}
+            topic={entry as unknown as Topic}
+            subtitle={true}
+            standalone={true}
+            contentPreview={String(entry.contentPreview || '')}
+            showMore={Boolean(entry.showMore)}
+          />
+        );
+      case 'argument':
+        return (
+          <ArgumentEntryRow
+            key={`entry-argument-${entry._id}`}
+            argument={entry as unknown as Argument}
+            subtitle={true}
+          />
+        );
+      case 'question':
+        return (
+          <QuestionEntryRow
+            key={`entry-question-${entry._id}`}
+            question={entry as unknown as Question}
+            subtitle={true}
+          />
+        );
+      case 'answer':
+        return (
+          <AnswerEntryRow
+            key={`entry-answer-${entry._id}`}
+            answer={entry as unknown as Answer}
+            subtitle={true}
+          />
+        );
+      case 'issue':
+        return (
+          <IssueEntryRow
+            key={`entry-issue-${entry._id}`}
+            issue={entry as unknown as Issue}
+            subtitle={true}
+          />
+        );
+      case 'opinion':
+        return (
+          <OpinionEntryRow
+            key={`entry-opinion-${entry._id}`}
+            opinion={entry as unknown as Opinion}
+            subtitle={true}
+          />
+        );
+      case 'artifact': {
+        const entryPath = getLegacyEntryPath(entry);
+        return (
+          <li key={`entry-artifact-${entry._id}`} className="list-group-item">
+            <i className="fa fa-puzzle-piece text-muted-x" aria-hidden="true"></i>
+            <div>
+              {entryPath ? (
+                <Link to={entryPath}>{entry.title || '(Untitled)'}</Link>
+              ) : (
+                <span>{entry.title || '(Untitled)'}</span>
+              )}
+              {entry.editorUsername || entry.editDate ? (
+                <div className="text-muted">
+                  <small>
+                    {entry.editorUsername ? (
+                      <>
+                        <i className="fa fa-user"></i> {entry.editorUsername}
+                      </>
+                    ) : null}
+                    {entry.editDate ? (
+                      <>
+                        {' '}
+                        <i className="fa fa-clock-o"></i>{' '}
+                        {new Date(entry.editDate).toLocaleDateString()}
+                      </>
+                    ) : null}
+                  </small>
+                </div>
+              ) : null}
+            </div>
+          </li>
+        );
+      }
+      default:
+        return null;
+    }
+  };
 
   return (
     <div>
@@ -151,6 +274,25 @@ const HomePage: React.FC = () => {
       </h1>
 
       {/* Entry Lists */}
+      {entrySetColumns.length > 0 ? (
+        <div className="row">
+          {entrySetColumns.map((column, index) => (
+            <div key={`entry-set-col-${index}`} className="col-md-6 col-sm-12">
+              <div className="wt-list-container">
+                <ul className="list-group top-list-items wt-list">
+                  {(column.entries || []).map((entry) => renderMixedEntry(entry))}
+                </ul>
+                <div className="top-list-items-more">
+                  <Link to="/explore#browse" role="button" className="btn btn-default btn-sm">
+                    <i className="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+      <>
       <div className="row">
         {/* Topics */}
         {data.topics && data.topics.length > 0 && (
@@ -328,6 +470,8 @@ const HomePage: React.FC = () => {
           </div>
         )}
       </div>
+      </>
+      )}
     </div>
   );
 };

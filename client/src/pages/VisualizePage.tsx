@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import apiService from '../services/api';
 import Alert from '../components/common/Alert';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -112,6 +112,7 @@ function ensureVisAssetsLoaded(): Promise<void> {
 
 const VisualizePage: React.FC = () => {
   const navigate = useNavigate();
+  const params = useParams<{ id?: string }>();
   const [data, setData] = useState<HomeDataResponse | null>(null);
   const [selectedTopicId, setSelectedTopicId] = useState<string>('');
   const [loading, setLoading] = useState(true);
@@ -138,6 +139,15 @@ const VisualizePage: React.FC = () => {
 
     void fetchVisualizationData();
   }, []);
+
+  useEffect(() => {
+    const searchTopic =
+      typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('topic') : null;
+    const requestedTopicId = decodeURIComponent(String(params.id || searchTopic || '')).trim();
+    if (requestedTopicId) {
+      setSelectedTopicId(requestedTopicId);
+    }
+  }, [params.id]);
 
   useEffect(() => {
     const element = graphContainerRef.current;

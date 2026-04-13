@@ -10,17 +10,26 @@ const constants = require('../../models/constants') as any;
 const db = require('../../app').db.models as any;
 
 type TopicScreeningModel = {
+  [key: string]: any;
   screening?: {
     status?: number;
   };
   topic?: any;
   topics?: any[];
   categories?: any[];
+  keyTopics?: any[];
+  topicLinks?: any[];
+  linkCount?: number;
   arguments?: any[];
+  keyArguments?: any[];
+  verdict?: any;
   questions?: any[];
   artifacts?: any[];
   issues?: any[];
   opinions?: any[];
+  mainTopic?: boolean;
+  hasKeyEntries?: boolean;
+  entry?: any;
 };
 
 function parseLimit(req: WikitruthRequest): number {
@@ -204,61 +213,179 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
     req.query.topic = model.topic._id;
   }
 
-  const screeningStatus = model.screening?.status;
+  // Keep parity with legacy topic-entry model flags and labels.
+  flowUtils.setModelOwnerEntry(req, res, model);
+  const screeningStatus = constants.SCREENING_STATUS.status1.code;
 
   await Promise.all([
     (async function loadCategories() {
-      if (!model.topic?.parentId) {
-        return;
+      if (model.mainTopic) {
+        const results = await flowUtils.getTopics(
+          {
+            parentId: model.topic._id,
+            'screening.status': screeningStatus,
+          },
+          {
+            limit: 0,
+            shortTitleLength: constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN,
+            req: req,
+          }
+        );
+
+        await Promise.all(
+          results.map(async function enrichCategory(result: any) {
+            const subTopics = await flowUtils.getTopics(
+              {
+                parentId: result._id,
+                'screening.status': screeningStatus,
+              },
+              {
+                limit: constants.SETTINGS.SUBCATEGORY_LIST_SIZE,
+                shortTitleLength: constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN,
+                req: req,
+              }
+            );
+
+            result.subtopics = subTopics;
+
+            if (subTopics.length < constants.SETTINGS.SUBCATEGORY_LIST_SIZE) {
+              const subArguments = await flowUtils.getArguments(
+                {
+                  parentId: null,
+                  ownerId: result._id,
+                  ownerType: constants.OBJECT_TYPES.topic,
+                  'screening.status': screeningStatus,
+                },
+                {
+                  limit: constants.SETTINGS.SUBCATEGORY_LIST_SIZE - subTopics.length,
+                  req: req,
+                  shortTitleLength: constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN,
+                }
+              );
+
+              subArguments.forEach(function (subArgument: any) {
+                flowUtils.setVerdictModel(subArgument);
+              });
+              flowUtils.sortArguments(subArguments);
+              result.subarguments = subArguments;
+            }
+          })
+        );
+
+        model.categories = results;
+      } else if (model.topic?.parentId) {
+        model.categories = await flowUtils.getCategories(
+          {
+            parentId: model.topic.parentId,
+            'screening.status': screeningStatus,
+          },
+          {
+            limit: 0,
+            req: req,
+          }
+        );
       }
-      const query: Record<string, unknown> = {
-        parentId: model.topic.parentId,
-      };
-      if (typeof screeningStatus !== 'undefined') {
-        query['screening.status'] = screeningStatus;
-      }
-      model.categories = await flowUtils.getCategories(query, {
-        limit: 0,
-        req: req,
-      });
     })(),
     (async function loadTopics() {
-      const query: Record<string, unknown> = {
-        parentId: model.topic._id,
-      };
-      if (typeof screeningStatus !== 'undefined') {
-        query['screening.status'] = screeningStatus;
-      }
-      model.topics = await flowUtils.getTopics(query, {
-        limit: 5,
-        req: req,
+      model.topics = await flowUtils.getTopics(
+        {
+          parentId: req.query.topic,
+          'screening.status': screeningStatus,
+        },
+        {
+          limit: 15,
+          req: req,
+        }
+      );
+
+      model.keyTopics = (model.topics || []).filter(function (result: any) {
+        return Array.isArray(result.tags) && result.tags.indexOf(constants.TOPIC_TAGS.tag20.code) >= 0;
       });
-    })(),
-    (async function loadArguments() {
-      const query: Record<string, unknown> = {
-        ownerType: constants.OBJECT_TYPES.topic,
-        ownerId: model.topic._id,
-      };
-      if (typeof screeningStatus !== 'undefined') {
-        query['screening.status'] = screeningStatus;
+
+      if ((model.keyTopics || []).length > 0) {
+        model.hasKeyEntries = true;
       }
-      const results = await db.Argument.find(query).sort({ editDate: -1 }).limit(5).lean();
+    })(),
+    (async function loadTopicLinks() {
+      const links = await db.TopicLink.find({
+        $or: [{ topicId: req.query.topic }, { parentId: req.query.topic }],
+        'screening.status': screeningStatus,
+      }).lean();
+
+      if (!links || links.length === 0) {
+        return;
+      }
+
+      const relatedTopicIdSet = new Set<string>();
+      links.forEach(function (link: any) {
+        const topicId = String(link.topicId || '');
+        const parentId = String(link.parentId || '');
+        const currentTopicId = String(req.query.topic || '');
+        if (topicId && topicId !== currentTopicId) {
+          relatedTopicIdSet.add(topicId);
+        }
+        if (parentId && parentId !== currentTopicId) {
+          relatedTopicIdSet.add(parentId);
+        }
+      });
+
+      if (relatedTopicIdSet.size === 0) {
+        return;
+      }
+
+      const results = await db.Topic.find({ _id: { $in: Array.from(relatedTopicIdSet) } })
+        .sort({ title: 1 })
+        .lean();
+
       await flowUtils.setEditorsUsername(results);
       results.forEach(function (result: any) {
-        flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.argument, req);
+        flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.topic, req);
+      });
+
+      model.topicLinks = results;
+      model.linkCount = (results || []).length + 1;
+    })(),
+    (async function loadArguments() {
+      const results = await flowUtils.getArguments(
+        {
+          parentId: null,
+          ownerId: req.query.topic,
+          ownerType: constants.OBJECT_TYPES.topic,
+          'screening.status': screeningStatus,
+        },
+        {
+          limit: 0,
+          req: req,
+        }
+      );
+
+      results.forEach(function (result: any) {
         flowUtils.setVerdictModel(result);
       });
-      model.arguments = results;
+      flowUtils.sortArguments(results);
+      model.arguments = results.slice(0, 15);
+
+      model.keyArguments = results.filter(function (result: any) {
+        return Array.isArray(result.tags) && result.tags.indexOf(constants.ARGUMENT_TAGS.tag20.code) >= 0;
+      });
+
+      if ((model.keyArguments || []).length > 0) {
+        model.hasKeyEntries = true;
+      }
+
+      model.verdict = {
+        counts: flowUtils.getVerdictCount(results),
+      };
     })(),
     (async function loadQuestions() {
-      const query: Record<string, unknown> = {
+      const results = await db.Question.find({
         ownerType: constants.OBJECT_TYPES.topic,
         ownerId: model.topic._id,
-      };
-      if (typeof screeningStatus !== 'undefined') {
-        query['screening.status'] = screeningStatus;
-      }
-      const results = await db.Question.find(query).sort({ editDate: -1 }).limit(5).lean();
+        'screening.status': screeningStatus,
+      })
+        .sort({ editDate: -1 })
+        .limit(15)
+        .lean();
       await flowUtils.setEditorsUsername(results);
       results.forEach(function (result: any) {
         flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.question, req);
@@ -266,14 +393,14 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
       model.questions = results;
     })(),
     (async function loadArtifacts() {
-      const query: Record<string, unknown> = {
+      const results = await db.Artifact.find({
         ownerType: constants.OBJECT_TYPES.topic,
         ownerId: model.topic._id,
-      };
-      if (typeof screeningStatus !== 'undefined') {
-        query['screening.status'] = screeningStatus;
-      }
-      const results = await db.Artifact.find(query).sort({ editDate: -1 }).limit(5).lean();
+        'screening.status': screeningStatus,
+      })
+        .sort({ editDate: -1 })
+        .limit(15)
+        .lean();
       await flowUtils.setEditorsUsername(results);
       results.forEach(function (result: any) {
         flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.artifact, req);
@@ -281,14 +408,14 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
       model.artifacts = results;
     })(),
     (async function loadIssues() {
-      const query: Record<string, unknown> = {
+      const results = await db.Issue.find({
         ownerType: constants.OBJECT_TYPES.topic,
         ownerId: model.topic._id,
-      };
-      if (typeof screeningStatus !== 'undefined') {
-        query['screening.status'] = screeningStatus;
-      }
-      const results = await db.Issue.find(query).sort({ editDate: -1 }).limit(5).lean();
+        'screening.status': screeningStatus,
+      })
+        .sort({ editDate: -1 })
+        .limit(15)
+        .lean();
       await flowUtils.setEditorsUsername(results);
       results.forEach(function (result: any) {
         flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.issue, req);
@@ -296,15 +423,15 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
       model.issues = results;
     })(),
     (async function loadOpinions() {
-      const query: Record<string, unknown> = {
+      const results = await db.Opinion.find({
         parentId: null,
         ownerType: constants.OBJECT_TYPES.topic,
         ownerId: model.topic._id,
-      };
-      if (typeof screeningStatus !== 'undefined') {
-        query['screening.status'] = screeningStatus;
-      }
-      const results = await db.Opinion.find(query).sort({ editDate: -1 }).limit(5).lean();
+        'screening.status': screeningStatus,
+      })
+        .sort({ editDate: -1 })
+        .limit(15)
+        .lean();
       await flowUtils.setEditorsUsername(results);
       results.forEach(function (result: any) {
         flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.opinion, req);

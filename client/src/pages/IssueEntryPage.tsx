@@ -9,6 +9,7 @@ import Alert from '../components/common/Alert';
 import EntryList from '../components/common/EntryList';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
 import EntryActionsMenu from '../components/Entry/EntryActionsMenu';
+import EntryQuickActions from '../components/Entry/EntryQuickActions';
 import PageMeta from '../components/common/PageMeta';
 import apiService from '../services/api';
 import type { IssueEntryResponse } from '../types/api';
@@ -85,7 +86,12 @@ const IssueEntryPage: React.FC = () => {
         subtitle={issue.subtitle}
         icon="exclamation-triangle"
         iconColor="text-warning"
-        actions={<EntryActionsMenu entry={issue} editPath={`/issues/edit/${encodeURIComponent(issue._id)}`} />}
+      />
+
+      <EntryQuickActions
+        entry={issue}
+        objectName="issue"
+        moreActions={<EntryActionsMenu entry={issue} editPath={`/issues/edit/${encodeURIComponent(issue._id)}`} />}
       />
       
       <PageTabs tabs={tabs} />

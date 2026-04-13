@@ -22,6 +22,9 @@ export interface HomeDataResponse extends ApiBaseResponse, EntityBuckets {
   application?: LegacyEntity;
   applications?: LegacyEntity[];
   appCategories?: LegacyEntity[];
+  entrySet?: Array<{
+    entries?: LegacyEntity[];
+  }>;
   topicsMore?: boolean;
   argumentsMore?: boolean;
   questionsMore?: boolean;
@@ -46,14 +49,22 @@ export interface SearchResponse extends ApiBaseResponse, EntityBuckets {
 
 export interface TopicEntryResponse extends ApiBaseResponse {
   topic?: LegacyEntity;
+  entry?: LegacyEntity;
+  tagLabels?: LegacyEntity[];
+  hasValue?: boolean;
+  linkCount?: number;
+  verdict?: LegacyEntity;
   categories?: LegacyEntity[];
   topics?: LegacyEntity[];
+  keyTopics?: LegacyEntity[];
   topicChildren?: LegacyEntity[];
   topicSiblings?: LegacyEntity[];
+  topicSiblingsMore?: boolean;
   topicLinks?: LegacyEntity[];
   parentTopic?: LegacyEntity;
   mainTopic?: boolean;
   arguments?: LegacyEntity[];
+  keyArguments?: LegacyEntity[];
   questions?: LegacyEntity[];
   artifacts?: LegacyEntity[];
   issues?: LegacyEntity[];

@@ -187,6 +187,8 @@ export const appRoutes: AppRoute[] = [
   { path: '/convert', element: <ConvertPage /> },
   { path: '/search', element: <SearchPage /> },
   { path: '/visualize', element: <VisualizePage /> },
+  { path: '/visualize/topic/:id', element: <VisualizePage /> },
+  { path: '/visualize/topic/:friendlyUrl/:id', element: <VisualizePage /> },
   { path: '/about', element: <AboutPage /> },
   { path: '/contact', element: <ContactPage /> },
   { path: '/help-us', element: <HelpUsPage /> },

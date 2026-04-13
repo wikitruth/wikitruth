@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import apiService from '../../services/api';
-import type { HomeDataResponse } from '../../types/api';
+import type { HomeDataResponse, TopicEntryResponse } from '../../types/api';
 import type { LegacyEntity } from '../../types/legacy';
 
 type SidebarApplication = LegacyEntity & {
@@ -32,6 +32,8 @@ interface SidebarNavItem {
   href?: string;
   badge?: number;
   logoIcon?: string;
+  level?: number;
+  emphasize?: boolean;
 }
 
 interface SidebarSection {
@@ -72,6 +74,7 @@ const ContextSidebar: React.FC = () => {
   const section = getSectionFromPath(location.pathname);
   const entryId = getEntryIdFromPath(location.pathname);
   const [homeContext, setHomeContext] = useState<HomeDataResponse | null>(null);
+  const [topicContext, setTopicContext] = useState<TopicEntryResponse | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -92,6 +95,32 @@ const ContextSidebar: React.FC = () => {
       mounted = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (section !== 'topics' || !entryId) {
+      setTopicContext(null);
+      return;
+    }
+
+    let mounted = true;
+    const loadTopicContext = async () => {
+      try {
+        const data = await apiService.getTopicEntry(entryId);
+        if (mounted) {
+          setTopicContext(data);
+        }
+      } catch (_error) {
+        if (mounted) {
+          setTopicContext(null);
+        }
+      }
+    };
+
+    void loadTopicContext();
+    return () => {
+      mounted = false;
+    };
+  }, [section, entryId]);
 
   const appsSection = useMemo<SidebarSection>(() => {
     const appItems: SidebarNavItem[] = [
@@ -198,6 +227,81 @@ const ContextSidebar: React.FC = () => {
     },
   };
 
+  const topicInSection = useMemo<SidebarSection | null>(() => {
+    if (section !== 'topics') {
+      return null;
+    }
+
+    const fallback: SidebarSection = {
+      title: 'In This Section',
+      items: [
+        { key: 'topics-list', label: 'Topics', to: '/topics', icon: 'folder-open' },
+        { key: 'topics-create', label: 'Create Topic', to: '/topics/create', icon: 'plus-circle' },
+      ],
+    };
+
+    if (!topicContext?.topic) {
+      return fallback;
+    }
+
+    const topic = topicContext.topic as SidebarCategory;
+    const children = ((topicContext.topicChildren || topicContext.topics || []) as SidebarCategory[]).slice(0, 8);
+    const siblings = ((topicContext.topicSiblings || []) as SidebarCategory[]).slice(0, 8);
+    const items: SidebarNavItem[] = [
+      { key: 'topic-explore', label: 'Explore', to: '/explore', icon: 'globe' },
+      {
+        key: `topic-current-${String(topic._id)}`,
+        label: String(topic.title || topic.contextTitle || '(Untitled)'),
+        to: buildTopicLink(topic),
+        icon: String(topic.icon || '').trim() || 'folder-open',
+        badge: Number(topic.childrenCount?.topics?.accepted || 0) || undefined,
+        emphasize: true,
+      },
+    ];
+
+    children.forEach((child, index) => {
+      items.push({
+        key: `topic-child-${index}-${String(child._id)}`,
+        label: String(child.title || child.contextTitle || '(Untitled)'),
+        to: buildTopicLink(child),
+        icon: String(child.icon || '').trim() || 'folder-open',
+        badge: Number(child.childrenCount?.topics?.accepted || 0) || undefined,
+        level: 1,
+      });
+    });
+
+    siblings.forEach((sibling, index) => {
+      items.push({
+        key: `topic-sibling-${index}-${String(sibling._id)}`,
+        label: String(sibling.title || sibling.contextTitle || '(Untitled)'),
+        to: buildTopicLink(sibling),
+        icon: String(sibling.icon || '').trim() || 'folder-open',
+        badge: Number(sibling.childrenCount?.topics?.accepted || 0) || undefined,
+      });
+    });
+
+    if (topicContext.topicSiblingsMore) {
+      items.push({
+        key: 'topic-siblings-more',
+        label: 'more...',
+        to: `/topics/${encodeURIComponent(String(topic.friendlyUrl || ''))}/${encodeURIComponent(String(topic._id || ''))}`,
+        icon: 'ellipsis-h',
+      });
+    }
+
+    items.push({
+      key: 'topic-create',
+      label: 'Create Topic',
+      to: `/topics/create?topic=${encodeURIComponent(String(topic._id || ''))}`,
+      icon: 'plus-circle',
+    });
+
+    return {
+      title: 'In This Section',
+      items,
+    };
+  }, [section, topicContext]);
+
   const relatedItems: SidebarNavItem[] = [];
   if (section === 'topics' && entryId) {
     relatedItems.push({ key: 'related-facts', label: 'Related Facts', to: `/arguments?topic=${encodeURIComponent(entryId)}`, icon: 'flash' });
@@ -220,7 +324,9 @@ const ContextSidebar: React.FC = () => {
   if (exploreSection.items.length > 0) {
     sections.push(exploreSection);
   }
-  if (sectionItemsByRoot[section]) {
+  if (section === 'topics' && topicInSection) {
+    sections.push(topicInSection);
+  } else if (sectionItemsByRoot[section]) {
     sections.push(sectionItemsByRoot[section]);
   }
   if (relatedItems.length > 0) {
@@ -246,15 +352,19 @@ const ContextSidebar: React.FC = () => {
             {navSection.items.map((item) => {
               const isActive = item.to ? location.pathname === item.to : false;
               const iconName = item.icon || 'folder-open';
+              const linkStyle: React.CSSProperties = {
+                marginLeft: item.level ? `${item.level * 18}px` : undefined,
+                fontWeight: item.emphasize ? 700 : undefined,
+              };
               return (
                 <li key={item.key} className={isActive ? 'active' : ''}>
                   {item.to ? (
-                    <Link to={item.to}>
+                    <Link to={item.to} style={linkStyle}>
                       <i className={`fa fa-${iconName}`} aria-hidden="true"></i> {item.label}
                       {typeof item.badge === 'number' ? <span className="wt-label label label-default">{item.badge}</span> : null}
                     </Link>
                   ) : (
-                    <a href={item.href || '#'}>
+                    <a href={item.href || '#'} style={linkStyle}>
                       {item.logoIcon ? (
                         <img
                           src={item.logoIcon}

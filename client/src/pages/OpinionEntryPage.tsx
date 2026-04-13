@@ -10,6 +10,7 @@ import EntryList from '../components/common/EntryList';
 import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
 import EntryActionsMenu from '../components/Entry/EntryActionsMenu';
+import EntryQuickActions from '../components/Entry/EntryQuickActions';
 import PageMeta from '../components/common/PageMeta';
 import apiService from '../services/api';
 import type { OpinionEntryResponse } from '../types/api';
@@ -87,7 +88,12 @@ const OpinionEntryPage: React.FC = () => {
         subtitle={opinion.subtitle}
         icon="comment"
         iconColor="text-info"
-        actions={<EntryActionsMenu entry={opinion} editPath={`/opinions/edit/${encodeURIComponent(opinion._id)}`} />}
+      />
+
+      <EntryQuickActions
+        entry={opinion}
+        objectName="opinion"
+        moreActions={<EntryActionsMenu entry={opinion} editPath={`/opinions/edit/${encodeURIComponent(opinion._id)}`} />}
       />
       
       <PageTabs tabs={tabs} />

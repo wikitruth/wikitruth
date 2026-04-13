@@ -206,6 +206,9 @@ async function GET_home(req, res) {
     },
   });
 
+  // Keep parity with legacy homepage mixed "Latest Posts" columns.
+  flowUtils.createEntrySet(model);
+
   // Add application data
   if (res.locals.application) {
     // @ts-ignore TS(2339): Property 'application' does not exist on type '{}'... Remove this comment to see the full error message
