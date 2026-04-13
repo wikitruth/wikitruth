@@ -1,6 +1,7 @@
 import React, { lazy } from 'react';
 
 const HomePage = lazy(() => import('../pages/HomePage'));
+const ExplorePage = lazy(() => import('../pages/ExplorePage'));
 const LoginPage = lazy(() => import('../pages/Auth/LoginPage'));
 const SignupPage = lazy(() => import('../pages/Auth/SignupPage'));
 const ForgotPasswordPage = lazy(() => import('../pages/Auth/ForgotPasswordPage'));
@@ -93,7 +94,7 @@ export interface AppRoute {
 
 export const appRoutes: AppRoute[] = [
   { path: '/', element: <HomePage /> },
-  { path: '/explore', element: <TopicsPage /> },
+  { path: '/explore', element: <ExplorePage /> },
   { path: '/login', element: <LoginPage /> },
   { path: '/signup', element: <SignupPage /> },
   { path: '/forgot-password', element: <ForgotPasswordPage /> },

@@ -630,7 +630,8 @@ async function revokeRefreshToken(req: WikitruthRequest, refreshToken: string): 
 module.exports = function (router: Router) {
   router.get('/me', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!req.user) {
-      res.status(401).json({ success: false, user: null, activeRole: 'reader' });
+      // Keep this endpoint non-failing for anonymous page loads in modern UI.
+      res.json({ success: false, user: null, activeRole: 'reader' });
       return;
     }
 

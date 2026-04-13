@@ -1,16 +1,43 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import apiService from '../../services/api';
+import type { HomeDataResponse } from '../../types/api';
+import type { LegacyEntity } from '../../types/legacy';
 
-interface NavItem {
+type SidebarApplication = LegacyEntity & {
+  id?: string;
+  title?: string;
+  homeUrl?: string;
+  logoIcon?: string;
+};
+
+type SidebarCategory = LegacyEntity & {
+  title?: string;
+  contextTitle?: string;
+  friendlyUrl?: string;
+  icon?: string;
+  childrenCount?: {
+    topics?: {
+      accepted?: number;
+    };
+  };
+};
+
+interface SidebarNavItem {
+  key: string;
   label: string;
-  to: string;
-  icon: string;
+  icon?: string;
+  to?: string;
+  href?: string;
+  badge?: number;
+  logoIcon?: string;
 }
 
-interface NavSection {
+interface SidebarSection {
   title: string;
-  items: NavItem[];
+  titleTo?: string;
+  items: SidebarNavItem[];
 }
 
 function getEntryIdFromPath(pathname: string): string | null {
@@ -29,135 +56,170 @@ function getSectionFromPath(pathname: string): string {
   return parts[0] || 'home';
 }
 
+function buildTopicLink(topic: Pick<SidebarCategory, '_id' | 'friendlyUrl'>): string {
+  const friendly = encodeURIComponent(String(topic.friendlyUrl || topic._id || ''));
+  const id = encodeURIComponent(String(topic._id || ''));
+  return `/topics/entry/${friendly}/${id}`;
+}
+
+function buildSectionLink(section: SidebarSection): string | undefined {
+  return section.titleTo;
+}
+
 const ContextSidebar: React.FC = () => {
   const location = useLocation();
   const { user } = useAuth();
   const section = getSectionFromPath(location.pathname);
   const entryId = getEntryIdFromPath(location.pathname);
+  const [homeContext, setHomeContext] = useState<HomeDataResponse | null>(null);
 
-  const appSection: NavSection = {
-    title: 'Apps',
-    items: [
-      { label: 'Explore', to: '/explore', icon: 'globe' },
-      { label: 'Search', to: '/search', icon: 'search' },
-      { label: 'Clipboard', to: '/clipboard', icon: 'clipboard' },
-      { label: 'Visualize', to: '/visualize', icon: 'snowflake-o' },
-    ],
-  };
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      try {
+        const data = await apiService.getHomeData();
+        if (mounted) {
+          setHomeContext(data);
+        }
+      } catch (_error) {
+        if (mounted) {
+          setHomeContext(null);
+        }
+      }
+    };
+    void load();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
-  const browseSection: NavSection = {
-    title: 'Browse',
-    items: [
-      { label: 'Topics', to: '/topics', icon: 'folder-open' },
-      { label: 'Facts', to: '/arguments', icon: 'flash' },
-      { label: 'Questions', to: '/questions', icon: 'question-circle' },
-      { label: 'Answers', to: '/answers', icon: 'check-circle' },
-      { label: 'Artifacts', to: '/artifacts', icon: 'puzzle-piece' },
-      { label: 'Issues', to: '/issues', icon: 'exclamation-circle' },
-      { label: 'Comments', to: '/opinions', icon: 'comments-o' },
-    ],
-  };
+  const appsSection = useMemo<SidebarSection>(() => {
+    const appItems: SidebarNavItem[] = [
+      {
+        key: 'app-core',
+        label: 'Wikitruth',
+        href: '/',
+        logoIcon: '/img/logo-64x64.png',
+      },
+    ];
 
-  const sectionItemsByRoot: Record<string, NavSection> = {
+    const applications = (homeContext?.applications || []) as SidebarApplication[];
+    applications.forEach((app, index) => {
+      const title = String(app.title || app.id || '').trim();
+      const homeUrl = String(app.homeUrl || '').trim();
+      if (!title || !homeUrl) {
+        return;
+      }
+
+      appItems.push({
+        key: `app-${index}-${title}`,
+        label: title,
+        href: homeUrl,
+        logoIcon: app.logoIcon ? String(app.logoIcon) : undefined,
+      });
+    });
+
+    return {
+      title: 'Apps',
+      items: appItems,
+    };
+  }, [homeContext?.applications]);
+
+  const exploreSection = useMemo<SidebarSection>(() => {
+    const categories = (homeContext?.appCategories || []) as SidebarCategory[];
+    const items: SidebarNavItem[] = categories.map((category, index) => {
+      const acceptedTopics = Number(category.childrenCount?.topics?.accepted || 0);
+      const icon = String(category.icon || '').trim() || 'folder-open';
+      return {
+        key: `category-${index}-${String(category._id || '')}`,
+        label: String(category.contextTitle || category.title || '(Untitled)'),
+        to: buildTopicLink(category),
+        icon,
+        badge: acceptedTopics > 0 ? acceptedTopics : undefined,
+      };
+    });
+
+    return {
+      title: 'Explore',
+      titleTo: '/explore',
+      items,
+    };
+  }, [homeContext?.appCategories]);
+
+  const sectionItemsByRoot: Record<string, SidebarSection> = {
     topics: {
       title: 'In This Section',
       items: [
-        { label: 'Topics', to: '/topics', icon: 'folder-open' },
-        { label: 'Create Topic', to: '/topics/create', icon: 'plus-circle' },
+        { key: 'topics-list', label: 'Topics', to: '/topics', icon: 'folder-open' },
+        { key: 'topics-create', label: 'Create Topic', to: '/topics/create', icon: 'plus-circle' },
       ],
     },
     arguments: {
       title: 'In This Section',
       items: [
-        { label: 'Facts', to: '/arguments', icon: 'flash' },
-        { label: 'Create Fact', to: '/arguments/create', icon: 'plus-circle' },
+        { key: 'arguments-list', label: 'Facts', to: '/arguments', icon: 'flash' },
+        { key: 'arguments-create', label: 'Create Fact', to: '/arguments/create', icon: 'plus-circle' },
       ],
     },
     questions: {
       title: 'In This Section',
       items: [
-        { label: 'Questions', to: '/questions', icon: 'question-circle' },
-        { label: 'Ask Question', to: '/questions/create', icon: 'plus-circle' },
+        { key: 'questions-list', label: 'Questions', to: '/questions', icon: 'question-circle' },
+        { key: 'questions-create', label: 'Ask Question', to: '/questions/create', icon: 'plus-circle' },
       ],
     },
     answers: {
       title: 'In This Section',
       items: [
-        { label: 'Answers', to: '/answers', icon: 'check-circle' },
-        { label: 'Create Answer', to: '/answers/create', icon: 'plus-circle' },
+        { key: 'answers-list', label: 'Answers', to: '/answers', icon: 'check-circle' },
+        { key: 'answers-create', label: 'Create Answer', to: '/answers/create', icon: 'plus-circle' },
       ],
     },
     artifacts: {
       title: 'In This Section',
       items: [
-        { label: 'Artifacts', to: '/artifacts', icon: 'puzzle-piece' },
-        { label: 'Add Artifact', to: '/artifacts/create', icon: 'plus-circle' },
+        { key: 'artifacts-list', label: 'Artifacts', to: '/artifacts', icon: 'puzzle-piece' },
+        { key: 'artifacts-create', label: 'Add Artifact', to: '/artifacts/create', icon: 'plus-circle' },
       ],
     },
     issues: {
       title: 'In This Section',
       items: [
-        { label: 'Issues', to: '/issues', icon: 'exclamation-circle' },
-        { label: 'Report Issue', to: '/issues/create', icon: 'plus-circle' },
+        { key: 'issues-list', label: 'Issues', to: '/issues', icon: 'exclamation-circle' },
+        { key: 'issues-create', label: 'Report Issue', to: '/issues/create', icon: 'plus-circle' },
       ],
     },
     opinions: {
       title: 'In This Section',
       items: [
-        { label: 'Comments', to: '/opinions', icon: 'comments-o' },
-        { label: 'Share Opinion', to: '/opinions/create', icon: 'plus-circle' },
+        { key: 'opinions-list', label: 'Comments', to: '/opinions', icon: 'comments-o' },
+        { key: 'opinions-create', label: 'Share Opinion', to: '/opinions/create', icon: 'plus-circle' },
       ],
-    },
-    groups: {
-      title: 'In This Section',
-      items: [
-        { label: 'Groups', to: '/groups', icon: 'group' },
-        { label: 'Create Group', to: '/groups/create', icon: 'plus-circle' },
-      ],
-    },
-    members: {
-      title: 'In This Section',
-      items: [{ label: 'Members', to: '/members', icon: 'user-circle' }],
     },
   };
 
-  const relatedItems: NavItem[] = [];
+  const relatedItems: SidebarNavItem[] = [];
   if (section === 'topics' && entryId) {
-    relatedItems.push({ label: 'Related Facts', to: `/arguments?topic=${encodeURIComponent(entryId)}`, icon: 'flash' });
-    relatedItems.push({ label: 'Related Questions', to: `/questions?topic=${encodeURIComponent(entryId)}`, icon: 'question-circle' });
-    relatedItems.push({ label: 'Related Artifacts', to: `/artifacts?topic=${encodeURIComponent(entryId)}`, icon: 'puzzle-piece' });
-    relatedItems.push({ label: 'Related Issues', to: `/issues?topic=${encodeURIComponent(entryId)}`, icon: 'exclamation-circle' });
-    relatedItems.push({ label: 'Related Comments', to: `/opinions?topic=${encodeURIComponent(entryId)}`, icon: 'comments-o' });
-  }
-  if (section === 'arguments' && entryId) {
-    relatedItems.push({ label: 'Linked Questions', to: `/questions?topic=${encodeURIComponent(entryId)}`, icon: 'question-circle' });
-    relatedItems.push({ label: 'Linked Issues', to: `/issues?topic=${encodeURIComponent(entryId)}`, icon: 'exclamation-circle' });
-    relatedItems.push({ label: 'Linked Comments', to: `/opinions?topic=${encodeURIComponent(entryId)}`, icon: 'comments-o' });
-  }
-  if (section === 'questions' && entryId) {
-    relatedItems.push({ label: 'Answers', to: `/answers?question=${encodeURIComponent(entryId)}`, icon: 'check-circle' });
-    relatedItems.push({ label: 'Issues', to: `/issues?topic=${encodeURIComponent(entryId)}`, icon: 'exclamation-circle' });
-    relatedItems.push({ label: 'Comments', to: `/opinions?topic=${encodeURIComponent(entryId)}`, icon: 'comments-o' });
-  }
-  if (section === 'artifacts' && entryId) {
-    relatedItems.push({ label: 'Related Facts', to: `/arguments?topic=${encodeURIComponent(entryId)}`, icon: 'flash' });
-    relatedItems.push({ label: 'Related Questions', to: `/questions?topic=${encodeURIComponent(entryId)}`, icon: 'question-circle' });
-    relatedItems.push({ label: 'Related Issues', to: `/issues?topic=${encodeURIComponent(entryId)}`, icon: 'exclamation-circle' });
-    relatedItems.push({ label: 'Related Comments', to: `/opinions?topic=${encodeURIComponent(entryId)}`, icon: 'comments-o' });
+    relatedItems.push({ key: 'related-facts', label: 'Related Facts', to: `/arguments?topic=${encodeURIComponent(entryId)}`, icon: 'flash' });
+    relatedItems.push({ key: 'related-questions', label: 'Related Questions', to: `/questions?topic=${encodeURIComponent(entryId)}`, icon: 'question-circle' });
+    relatedItems.push({ key: 'related-artifacts', label: 'Related Artifacts', to: `/artifacts?topic=${encodeURIComponent(entryId)}`, icon: 'puzzle-piece' });
   }
 
-  const personalSection: NavSection | null = user
+  const personalSection: SidebarSection | null = user
     ? {
         title: 'My Shortcuts',
         items: [
-          { label: 'My Profile', to: `/members/${encodeURIComponent(user.username)}`, icon: 'user-circle' },
-          { label: 'My Diary', to: `/members/${encodeURIComponent(user.username)}/diary`, icon: 'book' },
-          { label: 'My Groups', to: '/groups', icon: 'group' },
+          { key: 'my-profile', label: 'My Profile', to: `/members/${encodeURIComponent(user.username)}`, icon: 'user-circle' },
+          { key: 'my-diary', label: 'My Diary', to: `/members/${encodeURIComponent(user.username)}/diary`, icon: 'book' },
+          { key: 'my-groups', label: 'My Groups', to: '/groups', icon: 'group' },
         ],
       }
     : null;
 
-  const sections: NavSection[] = [appSection, browseSection];
+  const sections: SidebarSection[] = [appsSection];
+  if (exploreSection.items.length > 0) {
+    sections.push(exploreSection);
+  }
   if (sectionItemsByRoot[section]) {
     sections.push(sectionItemsByRoot[section]);
   }
@@ -172,16 +234,43 @@ const ContextSidebar: React.FC = () => {
     <aside className="wt-context-sidebar" aria-label="Contextual navigation">
       <ul className="wt-nav nav">
         {sections.map((navSection, sectionIndex) => (
-          <React.Fragment key={navSection.title}>
+          <React.Fragment key={`${navSection.title}-${sectionIndex}`}>
             {sectionIndex > 0 && <li role="separator" className="divider"></li>}
-            <li className="dropdown-header">{navSection.title}</li>
-            {navSection.items.map((item) => (
-              <li key={`${navSection.title}-${item.to}`} className={location.pathname === item.to ? 'active' : ''}>
-                <Link to={item.to}>
-                  <i className={`fa fa-${item.icon}`} aria-hidden="true"></i> {item.label}
-                </Link>
-              </li>
-            ))}
+            <li className="dropdown-header">
+              {buildSectionLink(navSection) ? (
+                <Link to={String(buildSectionLink(navSection))}>{navSection.title}</Link>
+              ) : (
+                navSection.title
+              )}
+            </li>
+            {navSection.items.map((item) => {
+              const isActive = item.to ? location.pathname === item.to : false;
+              const iconName = item.icon || 'folder-open';
+              return (
+                <li key={item.key} className={isActive ? 'active' : ''}>
+                  {item.to ? (
+                    <Link to={item.to}>
+                      <i className={`fa fa-${iconName}`} aria-hidden="true"></i> {item.label}
+                      {typeof item.badge === 'number' ? <span className="wt-label label label-default">{item.badge}</span> : null}
+                    </Link>
+                  ) : (
+                    <a href={item.href || '#'}>
+                      {item.logoIcon ? (
+                        <img
+                          src={item.logoIcon}
+                          alt=""
+                          style={{ width: 16, height: 16, marginRight: 8, objectFit: 'contain' }}
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        <i className={`fa fa-${iconName}`} aria-hidden="true"></i>
+                      )}{' '}
+                      {item.label}
+                    </a>
+                  )}
+                </li>
+              );
+            })}
           </React.Fragment>
         ))}
       </ul>

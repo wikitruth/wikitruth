@@ -17,6 +17,11 @@ interface HomePayload {
   application?: HeaderApplication;
 }
 
+interface HeaderProps {
+  onToggleSidebar?: () => void;
+  sidebarOpen?: boolean;
+}
+
 const ROLE_LABELS: Record<string, string> = {
   reader: 'Reader',
   contributor: 'Contributor',
@@ -25,7 +30,7 @@ const ROLE_LABELS: Record<string, string> = {
   admin: 'Admin',
 };
 
-const Header: React.FC = () => {
+const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false }) => {
   const location = useLocation();
   const { activeRole, setActiveRole, availableRoles } = useAuth();
   const [user, setUser] = useState<HeaderUser | null>(null);
@@ -298,6 +303,23 @@ const Header: React.FC = () => {
                 </Link>
               </li>
             )}
+              <li className="dropdown visible-sm visible-xs">
+                <button
+                  type="button"
+                  className="dropdown-toggle btn btn-link navbar-btn"
+                  aria-label={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+                  aria-expanded={sidebarOpen}
+                  aria-controls="sidebar"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    setIsMobileNavOpen(false);
+                    onToggleSidebar?.();
+                  }}
+                  style={{ color: '#777' }}
+                >
+                  <i className="fa fa-navicon" aria-hidden="true"></i>
+                </button>
+              </li>
             </ul>
           </nav>
         </div>

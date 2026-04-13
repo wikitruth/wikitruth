@@ -20,6 +20,8 @@ export type EntityBuckets = {
 
 export interface HomeDataResponse extends ApiBaseResponse, EntityBuckets {
   application?: LegacyEntity;
+  applications?: LegacyEntity[];
+  appCategories?: LegacyEntity[];
   topicsMore?: boolean;
   argumentsMore?: boolean;
   questionsMore?: boolean;

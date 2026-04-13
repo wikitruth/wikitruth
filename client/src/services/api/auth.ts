@@ -116,7 +116,24 @@ export const authApi = {
     request(`${API_BASE_URL}/auth/logout`, {
       method: 'POST',
     }),
-  me: () => request<UserResponse>(`${API_BASE_URL}/auth/me`),
+  me: async () => {
+    const response = await fetch(`${API_BASE_URL}/auth/me`, {
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.status === 401) {
+      return { success: false, user: null, activeRole: 'reader' } as UserResponse;
+    }
+
+    if (!response.ok) {
+      throw new Error(`Auth request failed: ${response.status}`);
+    }
+
+    return response.json() as Promise<UserResponse>;
+  },
   roleSwitch: (role: string) =>
     request<RoleSwitchResponse>(`${API_BASE_URL}/auth/role-switch`, {
       method: 'POST',

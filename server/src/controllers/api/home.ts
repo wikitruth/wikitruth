@@ -6,6 +6,7 @@ const async = require('async');
 const flowUtils = require('../../utils/flowUtils');
 // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'constants'... Remove this comment to see the full error message
 const constants = require('../../models/constants');
+const applications = require('../../models/applications');
 // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'db'.
 const db = require('../../app').db.models;
 
@@ -210,6 +211,12 @@ async function GET_home(req, res) {
     // @ts-ignore TS(2339): Property 'application' does not exist on type '{}'... Remove this comment to see the full error message
     model.application = res.locals.application;
   }
+
+  // Expose sidebar context so modern client can mirror legacy navigation.
+  // @ts-ignore TS(2339): Property 'applications' does not exist on type '{}'.
+  model.applications = applications.getApplications();
+  // @ts-ignore TS(2339): Property 'appCategories' does not exist on type '{}'.
+  model.appCategories = res.locals.appCategories || req.app.locals?.appCategories || [];
 
   res.json(model);
 }
