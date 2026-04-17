@@ -74,6 +74,7 @@ describe('OpenAPI contract', function () {
       '/moderation/ownership-migration',
       '/moderation/delete',
       '/monitoring/errors',
+      '/reactions',
       '/realtime/events',
     ].forEach((contractPath) => expect(paths[contractPath]).toBeDefined());
   });

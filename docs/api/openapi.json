@@ -1798,6 +1798,128 @@
         }
       }
     },
+    "/reactions": {
+      "get": {
+        "summary": "Get reaction summary for an entry",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "objectName",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["topic", "argument", "question", "answer", "issue", "opinion", "artifact"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Set or toggle a reaction for an authenticated user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["id", "objectName", "channel", "value"],
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "objectName": {
+                    "type": "string",
+                    "enum": ["topic", "argument", "question", "answer", "issue", "opinion", "artifact"]
+                  },
+                  "channel": {
+                    "type": "string",
+                    "enum": ["exposure", "vote", "value"]
+                  },
+                  "value": {
+                    "type": "string",
+                    "enum": ["expose", "bury", "upvote", "downvote", "good", "bad"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Clear current user's reaction channel for an entry",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "objectName",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["topic", "argument", "question", "answer", "issue", "opinion", "artifact"]
+            }
+          },
+          {
+            "name": "channel",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["exposure", "vote", "value"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cleared",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/search": {
       "get": {
         "summary": "Search across content entities",

@@ -35,6 +35,7 @@ module.exports = function (router: Router) {
   const outlineRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const monitoringRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const realtimeRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
+  const reactionsRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
 
   (require('./home') as (routerArg: Router) => void)(homeRouter);
   (require('./topics') as (routerArg: Router) => void)(topicsRouter);
@@ -54,6 +55,7 @@ module.exports = function (router: Router) {
   (require('./outline') as (routerArg: Router) => void)(outlineRouter);
   (require('./monitoring') as (routerArg: Router) => void)(monitoringRouter);
   (require('./realtime') as (routerArg: Router) => void)(realtimeRouter);
+  (require('./reactions') as (routerArg: Router) => void)(reactionsRouter);
 
   router.use('/home', homeRouter);
   router.use('/topics', topicsRouter);
@@ -73,4 +75,5 @@ module.exports = function (router: Router) {
   router.use('/outline', outlineRouter);
   router.use('/monitoring', monitoringRouter);
   router.use('/realtime', realtimeRouter);
+  router.use('/reactions', reactionsRouter);
 };

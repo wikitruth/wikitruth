@@ -70,6 +70,7 @@ const AnswerEntryPage: React.FC = () => {
       <EntryQuickActions
         entry={answer}
         objectName="answer"
+        hasValue={Boolean(data?.hasValue)}
         moreActions={<EntryActionsMenu entry={answer} editPath={`/answers/edit/${encodeURIComponent(answer._id)}`} />}
       />
 

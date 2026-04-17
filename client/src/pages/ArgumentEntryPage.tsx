@@ -92,6 +92,7 @@ const ArgumentEntryPage: React.FC = () => {
       <EntryQuickActions
         entry={argument}
         objectName="argument"
+        hasValue={Boolean(data?.hasValue)}
         moreActions={<EntryActionsMenu entry={argument} editPath={`/arguments/create?id=${encodeURIComponent(argument._id)}`} />}
       />
       

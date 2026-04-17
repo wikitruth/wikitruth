@@ -28,6 +28,7 @@ module.exports = function (app: any, mongoose: any) {
   require('./core/Page')(app, mongoose);
   require('./core/Artifact')(app, mongoose);
   require('./core/Group')(app, mongoose);
+  require('./core/Reaction')(app, mongoose);
 
   require('./core/TrustedClient')(app, mongoose);
   //require('./schema/core/Word')(app, mongoose);

@@ -93,6 +93,7 @@ const OpinionEntryPage: React.FC = () => {
       <EntryQuickActions
         entry={opinion}
         objectName="opinion"
+        hasValue={Boolean(data?.hasValue)}
         moreActions={<EntryActionsMenu entry={opinion} editPath={`/opinions/edit/${encodeURIComponent(opinion._id)}`} />}
       />
       

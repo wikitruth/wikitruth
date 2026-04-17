@@ -8,6 +8,49 @@ export interface ApiBaseResponse {
 
 export type LegacyApiResponse = LegacyResponse & ApiBaseResponse;
 
+export type ReactionChannel = 'exposure' | 'vote' | 'value';
+export type ExposureReaction = 'expose' | 'bury';
+export type VoteReaction = 'upvote' | 'downvote';
+export type ValueReaction = 'good' | 'bad';
+export type ReactionValue = ExposureReaction | VoteReaction | ValueReaction;
+
+export interface EntryReactionCounts {
+  exposure: {
+    expose: number;
+    bury: number;
+  };
+  vote: {
+    upvote: number;
+    downvote: number;
+  };
+  value: {
+    good: number;
+    bad: number;
+  };
+}
+
+export interface EntryReactionState {
+  exposure: ExposureReaction | null;
+  vote: VoteReaction | null;
+  value: ValueReaction | null;
+}
+
+export interface EntryReactionsResponse extends ApiBaseResponse {
+  action?: 'set' | 'updated' | 'cleared' | 'noop';
+  target?: {
+    id: string;
+    objectName: string;
+    objectType: number;
+  };
+  counts?: EntryReactionCounts;
+  totals?: {
+    exposure: number;
+    vote: number;
+    value: number;
+  };
+  myReactions?: EntryReactionState;
+}
+
 export type EntityBuckets = {
   topics?: LegacyEntity[];
   arguments?: LegacyEntity[];
@@ -73,6 +116,7 @@ export interface TopicEntryResponse extends ApiBaseResponse {
 
 export interface ArgumentEntryResponse extends ApiBaseResponse {
   argument?: LegacyEntity;
+  hasValue?: boolean;
   questions?: LegacyEntity[];
   issues?: LegacyEntity[];
   opinions?: LegacyEntity[];
@@ -80,6 +124,7 @@ export interface ArgumentEntryResponse extends ApiBaseResponse {
 
 export interface QuestionEntryResponse extends ApiBaseResponse {
   question?: LegacyEntity;
+  hasValue?: boolean;
   answers?: LegacyEntity[];
   issues?: LegacyEntity[];
   opinions?: LegacyEntity[];
@@ -87,23 +132,27 @@ export interface QuestionEntryResponse extends ApiBaseResponse {
 
 export interface IssueEntryResponse extends ApiBaseResponse {
   issue?: LegacyEntity;
+  hasValue?: boolean;
   opinions?: LegacyEntity[];
 }
 
 export interface OpinionEntryResponse extends ApiBaseResponse {
   opinion?: LegacyEntity;
+  hasValue?: boolean;
   issues?: LegacyEntity[];
   opinions?: LegacyEntity[];
 }
 
 export interface AnswerEntryResponse extends ApiBaseResponse {
   answer?: LegacyEntity;
+  hasValue?: boolean;
   issues?: LegacyEntity[];
   opinions?: LegacyEntity[];
 }
 
 export interface ArtifactEntryResponse extends ApiBaseResponse {
   artifact?: LegacyEntity;
+  hasValue?: boolean;
   artifacts?: LegacyEntity[];
   arguments?: LegacyEntity[];
   questions?: LegacyEntity[];

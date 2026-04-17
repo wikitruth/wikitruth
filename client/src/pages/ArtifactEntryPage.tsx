@@ -75,6 +75,7 @@ const ArtifactEntryPage: React.FC = () => {
       <EntryQuickActions
         entry={artifact}
         objectName="artifact"
+        hasValue={Boolean(data?.hasValue)}
         moreActions={<EntryActionsMenu entry={artifact} editPath={`/artifacts/edit/${encodeURIComponent(artifact._id)}`} />}
       />
 

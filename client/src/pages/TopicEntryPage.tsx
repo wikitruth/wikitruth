@@ -201,6 +201,7 @@ const TopicEntryPage: React.FC = () => {
       <EntryQuickActions
         entry={topic}
         objectName="topic"
+        hasValue={Boolean(data?.hasValue)}
         moreActions={<EntryActionsMenu entry={topic} editPath={`/topics/create?id=${encodeURIComponent(String(topic._id || ''))}`} />}
       />
 

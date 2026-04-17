@@ -91,6 +91,7 @@ const IssueEntryPage: React.FC = () => {
       <EntryQuickActions
         entry={issue}
         objectName="issue"
+        hasValue={Boolean(data?.hasValue)}
         moreActions={<EntryActionsMenu entry={issue} editPath={`/issues/edit/${encodeURIComponent(issue._id)}`} />}
       />
       

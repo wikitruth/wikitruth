@@ -21,6 +21,9 @@ import type {
   MemberPagesResponse,
   MemberPageResponse,
   MemberFastSwitchResponse,
+  EntryReactionsResponse,
+  ReactionChannel,
+  ReactionValue,
 } from '../types/api';
 
 class ApiService {
@@ -47,8 +50,9 @@ class ApiService {
     const method = options?.method?.toUpperCase() ?? 'GET';
     const cacheKey = `${method}:${url}`;
     const now = Date.now();
+    const shouldCacheGet = method === 'GET' && !url.startsWith('/reactions');
 
-    if (method === 'GET') {
+    if (shouldCacheGet) {
       const cached = this.cache.get(cacheKey);
       if (cached && cached.expiresAt > now) {
         return cached.value as T;
@@ -88,7 +92,7 @@ class ApiService {
 
     const payload = (await response.json()) as T;
 
-    if (method === 'GET') {
+    if (shouldCacheGet) {
       this.cache.set(cacheKey, {
         expiresAt: now + this.cacheTtlMs,
         value: payload,
@@ -387,6 +391,53 @@ class ApiService {
     return this.request<LegacyApiResponse>(`/artifacts/entry/${id}`, {
       method: 'PUT',
       body: JSON.stringify(payload),
+    });
+  }
+
+  // Reactions
+  async getEntryReactions(payload: {
+    id: string;
+    objectName: 'topic' | 'argument' | 'question' | 'answer' | 'issue' | 'opinion' | 'artifact';
+    objectType?: number;
+  }): Promise<EntryReactionsResponse> {
+    const params = new URLSearchParams();
+    params.set('id', payload.id);
+    params.set('objectName', payload.objectName);
+    if (typeof payload.objectType === 'number') {
+      params.set('objectType', String(payload.objectType));
+    }
+    return this.request<EntryReactionsResponse>(`/reactions?${params.toString()}`);
+  }
+
+  async setEntryReaction(payload: {
+    id: string;
+    objectName: 'topic' | 'argument' | 'question' | 'answer' | 'issue' | 'opinion' | 'artifact';
+    objectType?: number;
+    channel: ReactionChannel;
+    value: ReactionValue;
+  }): Promise<EntryReactionsResponse> {
+    return this.request<EntryReactionsResponse>('/reactions', {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async clearEntryReaction(payload: {
+    id: string;
+    objectName: 'topic' | 'argument' | 'question' | 'answer' | 'issue' | 'opinion' | 'artifact';
+    objectType?: number;
+    channel: ReactionChannel;
+  }): Promise<EntryReactionsResponse> {
+    const params = new URLSearchParams();
+    params.set('id', payload.id);
+    params.set('objectName', payload.objectName);
+    params.set('channel', payload.channel);
+    if (typeof payload.objectType === 'number') {
+      params.set('objectType', String(payload.objectType));
+    }
+
+    return this.request<EntryReactionsResponse>(`/reactions?${params.toString()}`, {
+      method: 'DELETE',
     });
   }
 

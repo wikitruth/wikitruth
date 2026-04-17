@@ -27,6 +27,7 @@ describe('API endpoint smoke coverage', function () {
       "router.use('/moderation', moderationRouter)",
       "router.use('/monitoring', monitoringRouter)",
       "router.use('/realtime', realtimeRouter)",
+      "router.use('/reactions', reactionsRouter)",
     ].forEach((contract) => expect(apiIndex).toContain(contract));
   });
 
@@ -137,6 +138,14 @@ describe('API endpoint smoke coverage', function () {
 
     expect(realtimeApi).toContain("router.get('/events'");
     expect(realtimeApi).toContain("res.setHeader('Content-Type', 'text/event-stream')");
+  });
+
+  it('exposes reactions API handlers used by modern entry quick actions', function () {
+    const reactionsApi = read('server/src/controllers/api/reactions.ts');
+
+    expect(reactionsApi).toContain("router.get('/',");
+    expect(reactionsApi).toContain("router.put('/',");
+    expect(reactionsApi).toContain("router.delete('/',");
   });
 
   it('exposes content mutation handlers required by modern create/edit forms', function () {
