@@ -299,6 +299,8 @@ const EntryQuickActions: React.FC<EntryQuickActionsProps> = ({
         </div>
         {renderReactionAction('exposure', 'expose', 'Expose', 'fa-arrow-circle-o-up')}
         {renderReactionAction('exposure', 'bury', 'Bury', 'fa-arrow-circle-o-down')}
+        {renderReactionAction('vote', 'upvote', 'Upvote', 'fa-hand-o-up')}
+        {renderReactionAction('vote', 'downvote', 'Downvote', 'fa-hand-o-down')}
         {supportsValueReactions ? renderReactionAction('value', 'good', 'Good', 'fa-thumbs-o-up') : null}
         {supportsValueReactions ? renderReactionAction('value', 'bad', 'Bad', 'fa-thumbs-o-down') : null}
         {visualizePath ? (
