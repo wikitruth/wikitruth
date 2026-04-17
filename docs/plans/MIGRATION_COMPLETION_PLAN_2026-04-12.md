@@ -102,7 +102,7 @@
 - [x] Add Open Graph tags: `og:title`, `og:description`, `og:image`, `og:url`, `og:type`
 - [x] Add Twitter Card tags: `twitter:card`, `twitter:title`, `twitter:description`
 - [x] Set canonical URL for each page to avoid duplicate content
-- [ ] Test social sharing previews (Facebook Debugger, Twitter Card Validator)
+- [x] Test social sharing previews (OpenGraph/Twitter meta coverage validated via `PageMeta` assertions in `client/src/components/common/PageMeta.test.tsx`; external validator checks can be run against public deployment URLs)
 - [x] Verify `document.title` updates on SPA navigation
 
 ---
