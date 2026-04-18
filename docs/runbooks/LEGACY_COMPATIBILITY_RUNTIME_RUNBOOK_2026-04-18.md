@@ -4,13 +4,13 @@ Date: 2026-04-18
 
 ## Purpose
 
-Run and verify legacy compatibility after the isolation move to `legacy/compatibility/`, including modern-only fallback mode.
+Run and verify legacy compatibility with pure legacy code under `legacy/` and bridge-only logic under `legacy/compatibility/`.
 
 ## Runtime Controls
 
 - `LEGACY_COMPATIBILITY_ENABLED=true|false` (default: `true`)
-- `LEGACY_COMPATIBILITY_STATIC_ROOT` (default: `legacy/compatibility/static`)
-- `LEGACY_COMPATIBILITY_TEMPLATES_ROOT` (default: `legacy/compatibility/templates/jade`)
+- `LEGACY_COMPATIBILITY_STATIC_ROOT` (default: `legacy/static`)
+- `LEGACY_COMPATIBILITY_TEMPLATES_ROOT` (default: `legacy/templates`)
 
 ## Start Commands
 
@@ -31,15 +31,15 @@ PORT=8000 HTTPS_ENABLED=false LEGACY_COMPATIBILITY_ENABLED=false npm start
 Compatibility ON:
 
 ```text
-[compat] Mounted static root: legacy/compatibility/static
-[compat] enabled=true mounted=true staticRoot=legacy/compatibility/static templatesRoot=legacy/compatibility/templates/jade
+[compat] Mounted static root: legacy/static
+[compat] enabled=true mounted=true staticRoot=legacy/static templatesRoot=legacy/templates
 ```
 
 Compatibility OFF:
 
 ```text
 [compat] Legacy compatibility disabled (modern-only mode).
-[compat] enabled=false mounted=false staticRoot=legacy/compatibility/static templatesRoot=legacy/compatibility/templates/jade
+[compat] enabled=false mounted=false staticRoot=legacy/static templatesRoot=legacy/templates
 ```
 
 ## Smoke Checks
@@ -48,29 +48,30 @@ Compatibility ON:
 
 ```bash
 curl -I http://127.0.0.1:8000/
-curl -I http://127.0.0.1:8000/about/
-curl -I http://127.0.0.1:8000/contact/
-curl -I http://127.0.0.1:8000/login/
+curl -I http://127.0.0.1:8000/legacy/
 curl -I http://127.0.0.1:8000/app
-curl -I http://127.0.0.1:8000/app/explore
+curl -I http://127.0.0.1:8000/explore
 curl -I http://127.0.0.1:8000/api/auth/me
 ```
 
-Expected: `200` for all listed endpoints.
+Expected:
+- `/`, `/explore`, `/app` return `200` (modern shell).
+- `/legacy/` returns `200` (legacy shell).
+- `/api/auth/me` returns `200` when authenticated, otherwise `401`.
 
 Compatibility OFF:
 
 ```bash
 curl -I http://127.0.0.1:8000/
-curl -I http://127.0.0.1:8000/login/
-curl -I http://127.0.0.1:8000/about/
+curl -I http://127.0.0.1:8000/explore
 curl -I http://127.0.0.1:8000/app
 curl -I http://127.0.0.1:8000/app/search
+curl -I http://127.0.0.1:8000/legacy/
 ```
 
 Expected:
-- `/`, `/login/`, `/about/` return `302` with `Location: /app`
-- `/app`, `/app/search` return `200`
+- `/`, `/explore`, `/app`, `/app/search` return `200` (modern shell).
+- `/legacy/` returns `404` (legacy compatibility disabled).
 
 ## Guardrails
 

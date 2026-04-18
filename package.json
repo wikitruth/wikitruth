@@ -48,7 +48,7 @@
     "runtime:pm2:check": "bash scripts/runtime/pm2-restart-check.sh",
     "analyze:bundle": "npm run build:client:stats",
     "test:server": "jest --config jest.config.server.js",
-    "start:legacy-grunt": "grunt --gruntfile legacy/compatibility/build/Gruntfile.js --base ."
+    "start:legacy-grunt": "grunt --gruntfile legacy/build/Gruntfile.js --base ."
   },
   "repository": {
     "type": "git",

@@ -1,4 +1,5 @@
 function EntryOptionsPopover(props) {
+    var legacyPrefix = '/legacy';
 
     var idparam = props.type == WT_CONSTANTS.OBJECT_TYPES.topic
                 || props.type == WT_CONSTANTS.OBJECT_TYPES.topicLink
@@ -23,6 +24,8 @@ function EntryOptionsPopover(props) {
 
     if(props.private) {
         editUrl = WT_PATHS.members.index + '/' + WT_USER.username + WT_PATHS.members.profile.diary + editUrl;
+    } else {
+        editUrl = legacyPrefix + editUrl;
     }
 
     return (
@@ -60,7 +63,7 @@ function entryTakeOwnership2() {
 
         $.ajax({
             type: "POST",
-            url: "/async/entry/take-ownership",
+            url: "/legacy/async/entry/take-ownership",
             data: JSON.stringify({id: id, type: type, _csrf: csrf}),
             contentType: 'application/json',
             success: function (data) {
@@ -81,7 +84,7 @@ function entryDelete2() {
 
         $.ajax({
             type: "POST",
-            url: "/async/entry/delete",
+            url: "/legacy/async/entry/delete",
             data: JSON.stringify({id: id, type: type, _csrf: csrf}),
             contentType: 'application/json',
             success: function (data) {

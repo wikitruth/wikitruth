@@ -2,14 +2,14 @@
 
 const path = require('path');
 
-const COMPATIBILITY_ROOT = path.join(process.cwd(), 'legacy', 'compatibility');
+const LEGACY_ROOT = path.join(process.cwd(), 'legacy');
 
 function resolveCompatibilityPath(relativePath) {
   const normalized = String(relativePath || '').replace(/^\/+/, '');
-  return path.join(COMPATIBILITY_ROOT, normalized);
+  return path.join(LEGACY_ROOT, normalized);
 }
 
 module.exports = {
-  COMPATIBILITY_ROOT,
+  LEGACY_ROOT,
   resolveCompatibilityPath,
 };

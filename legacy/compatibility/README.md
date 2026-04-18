@@ -1,19 +1,16 @@
 # Legacy Compatibility Workspace
 
-This directory is the isolated home for legacy runtime assets and code.
+This directory is the bridge layer between modern runtime and the legacy stack.
 
 ## Boundaries
 
-- Legacy implementation lives here.
+- Legacy implementation lives in `legacy/` (`legacy/server`, `legacy/templates`, `legacy/static`, `legacy/build`).
 - Modern implementation stays in `client/`, `server/src/`, and modern `public/`.
-- Modern server integration is limited to thin mount/proxy seams.
+- Mixed modern+legacy integration is limited to thin mount/proxy seams here.
 
 ## Structure
 
-- `server/` legacy controllers and compatibility mount
-- `server/pathResolver.js` compatibility path resolver utility
-- `templates/` dust/jade templates
-- `static/` legacy static assets (`css`, `js`, `layouts`, `views`, `components`, etc.)
-- `build/` Grunt/task + bower/jshint-era build files
-- `config/` compatibility configuration artifacts
+- `server/bootstrap.js` compatibility bootstrap entrypoint
+- `server/mount.js` static/template mount adapter
+- `server/pathResolver.js` legacy-root path resolver utility
 - `contracts/` path map and compatibility manifests

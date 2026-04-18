@@ -9,7 +9,7 @@ module.exports = function (grunt) {
         files: [
           {
             expand: true, cwd: 'node_modules/font-awesome/',
-            src: ['fonts/**', 'less/**'], dest: 'legacy/compatibility/static/components/font-awesome/'
+            src: ['fonts/**', 'less/**'], dest: 'legacy/static/components/font-awesome/'
           }
         ]
       }
@@ -28,7 +28,7 @@ module.exports = function (grunt) {
       dev: {
         script: 'server.js',
         options: {
-          ignore: ['node_modules/**', 'legacy/compatibility/static/**'],
+          ignore: ['node_modules/**', 'legacy/static/**'],
           ext: 'js',
         },
       },
@@ -40,9 +40,9 @@ module.exports = function (grunt) {
       },
       dist: {
         files: {
-          'legacy/compatibility/static/js/react/hello-world.js': 'legacy/compatibility/templates/react/hello-world.js',
-          'legacy/compatibility/static/js/react/entry-options-popover.js':
-            'legacy/compatibility/templates/react/entry-options-popover.js',
+          'legacy/static/js/react/hello-world.js': 'legacy/templates/react/hello-world.js',
+          'legacy/static/js/react/entry-options-popover.js':
+            'legacy/templates/react/entry-options-popover.js',
         },
       },
     },

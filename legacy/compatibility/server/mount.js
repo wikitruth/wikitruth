@@ -1,14 +1,15 @@
 'use strict';
 
 const fs = require('fs');
+const path = require('path');
 const serveStatic = require('serve-static');
 const { resolveCompatibilityPath } = require('./pathResolver');
 
 function resolveCompatibilityConfig(options) {
   const config = options || {};
   const enabled = config.enabled !== false;
-  const staticRoot = config.staticRoot || resolveCompatibilityPath('static');
-  const templatesRoot = config.templatesRoot || resolveCompatibilityPath('templates/jade');
+  const staticRoot = path.resolve(config.staticRoot || resolveCompatibilityPath('static'));
+  const templatesRoot = path.resolve(config.templatesRoot || resolveCompatibilityPath('templates'));
   return {
     enabled,
     staticRoot,

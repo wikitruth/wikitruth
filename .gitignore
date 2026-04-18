@@ -50,6 +50,17 @@ legacy/compatibility/static/views/**/*.min.js
 legacy/compatibility/static/views/**/*.min.js.map
 legacy/compatibility/static/components
 legacy/compatibility/static/js/react
+legacy/static/css
+legacy/static/js/*.min.js
+legacy/static/js/*.min.js.map
+legacy/static/layouts/*.min.css
+legacy/static/layouts/*.min.js
+legacy/static/layouts/*.min.js.map
+legacy/static/views/**/*.min.css
+legacy/static/views/**/*.min.js
+legacy/static/views/**/*.min.js.map
+legacy/static/components
+legacy/static/js/react
 
 
 dist/

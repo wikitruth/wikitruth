@@ -31,7 +31,7 @@ for p in "${prohibited_paths[@]}"; do
 done
 
 if (( ${#violations[@]} > 0 )); then
-  echo "Legacy-isolation violations found (outside legacy/compatibility):"
+  echo "Legacy-isolation violations found (outside legacy/):"
   printf ' - %s\n' "${violations[@]}"
   exit 1
 fi

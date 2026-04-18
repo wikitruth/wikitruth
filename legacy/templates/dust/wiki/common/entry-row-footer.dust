@@ -3,7 +3,7 @@
     <span title="{editDate}"><i class="fa fa-clock-o"></i> {editDateString}</span>
     {^private}
         {?editUsername}
-            <a class="text-muted-2" href="/members/{editUsername}">{!<i class="fa fa-user"></i>!}<i class="fa fa-user-circle-o text-muted-3"></i> {editUsername}</a>
+            <a class="text-muted-2" href="/legacy/members/{editUsername}">{!<i class="fa fa-user"></i>!}<i class="fa fa-user-circle-o text-muted-3"></i> {editUsername}</a>
         {/editUsername}
     {/private}
     <a class="text-muted-2 wt-entry-reply" data-toggle="popover" data-trigger="focus" tabindex="0"><i class="fa fa-reply"></i> reply</a>

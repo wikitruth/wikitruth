@@ -12,7 +12,7 @@ module.exports = function dustjs(grunt) {
 	        files: [
 	            {
 	                expand: true,
-                    cwd: 'legacy/compatibility/templates/',
+                    cwd: 'legacy/templates/',
 	                src: '**/*.dust',
 	                dest: '.build/templates',
 	                ext: '.js'
@@ -20,7 +20,7 @@ module.exports = function dustjs(grunt) {
 	        ],
 	        options: {
                 fullname: function (filepath) {
-                    return path.relative('legacy/compatibility/templates/', filepath).replace(/[.]dust$/, '');
+                    return path.relative('legacy/templates/', filepath).replace(/[.]dust$/, '');
                 }
 	        }
 	    }

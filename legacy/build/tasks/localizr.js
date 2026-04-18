@@ -7,7 +7,7 @@ module.exports = function localizr(grunt) {
 
 	// Options
 	return {
-	    files: ['legacy/compatibility/templates/**/*.dust'],
+	    files: ['legacy/templates/**/*.dust'],
         options: {
             contentPath: ['locales/**/*.properties']
         }

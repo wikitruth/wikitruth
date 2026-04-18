@@ -9,8 +9,8 @@ module.exports = function requirejs(grunt) {
 	return {
         build: {
             options: {
-                baseUrl: 'legacy/compatibility/static/js/requirejs',
-                mainConfigFile: 'legacy/compatibility/static/js/requirejs/config.js',
+                baseUrl: 'legacy/static/js/requirejs',
+                mainConfigFile: 'legacy/static/js/requirejs/config.js',
                 dir: '.build/js/requirejs',
                 optimize: 'uglify',
                 modules: [

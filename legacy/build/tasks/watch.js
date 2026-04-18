@@ -9,8 +9,8 @@ module.exports = function watch(grunt) {
     return {
         clientJS: {
             files: [
-                'legacy/compatibility/static/layouts/**/*.js', '!legacy/compatibility/static/layouts/**/*.min.js',
-                'legacy/compatibility/static/views/**/*.js', '!legacy/compatibility/static/views/**/*.min.js'
+                'legacy/static/layouts/**/*.js', '!legacy/static/layouts/**/*.min.js',
+                'legacy/static/views/**/*.js', '!legacy/static/views/**/*.min.js'
             ],
             tasks: ['newer:uglify', 'newer:jshint:client']
         },
@@ -20,16 +20,16 @@ module.exports = function watch(grunt) {
         },
         clientLess: {
             files: [
-                'legacy/compatibility/static/layouts/**/*.less',
-                'legacy/compatibility/static/views/**/*.less',
-                'legacy/compatibility/static/less/**/*.less'
+                'legacy/static/layouts/**/*.less',
+                'legacy/static/views/**/*.less',
+                'legacy/static/less/**/*.less'
             ],
             tasks: ['newer:less']
         },
         layoutLess: {
             files: [
-                'legacy/compatibility/static/layouts/**/*.less',
-                'legacy/compatibility/static/less/**/*.less'
+                'legacy/static/layouts/**/*.less',
+                'legacy/static/less/**/*.less'
             ],
             tasks: ['less:layouts']
         }

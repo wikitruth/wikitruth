@@ -5,15 +5,15 @@
 
     "express": {
         "view cache": false,
-        "view engine": "js",
-        "views": "path:./.build/templates"
+        "view engine": "dust",
+        "views": "path:./legacy/templates"
     },
 
     "view engines": {
-        "js": {
+        "dust": {
             "module": "engine-munger",
             "renderer": {
-                "method": "js",
+                "method": "dust",
                 "arguments": [
                     { "cache": true },
                     {

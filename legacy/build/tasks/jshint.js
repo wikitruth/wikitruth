@@ -21,13 +21,13 @@ module.exports = function jshint(grunt) {
             options: {
                 jshintrc: '.jshintrc-client',
                 ignores: [
-                    'legacy/compatibility/static/layouts/**/*.min.js',
-                    'legacy/compatibility/static/views/**/*.min.js'
+                    'legacy/static/layouts/**/*.min.js',
+                    'legacy/static/views/**/*.min.js'
                 ]
             },
             src: [
-                'legacy/compatibility/static/layouts/**/*.js',
-                'legacy/compatibility/static/views/**/*.js'
+                'legacy/static/layouts/**/*.js',
+                'legacy/static/views/**/*.js'
             ]
         },
         server: {
@@ -40,7 +40,7 @@ module.exports = function jshint(grunt) {
                 'utils/**/*.js',
                 'middlewares/**/*.js',
                 'models/**/*.js',
-                'legacy/compatibility/templates/jade/**/*.js'
+                'legacy/templates/jade/**/*.js'
             ]
         }
     };

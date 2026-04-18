@@ -9,16 +9,16 @@ module.exports = function copyto(grunt) {
     return {
         build: {
             files: [{
-                cwd: 'legacy/compatibility/static',
+                cwd: 'legacy/static',
                 src: ['**/*'],
                 dest: '.build/',
                 expand: true
             }],
             options: {
                 ignore: [
-                    'legacy/compatibility/static/less{,/**/*}',
-                    //'legacy/compatibility/static/js/**/*',
-                    'legacy/compatibility/templates/**/*'
+                    'legacy/static/less{,/**/*}',
+                    //'legacy/static/js/**/*',
+                    'legacy/templates/**/*'
                 ]
             }
         }

@@ -11,7 +11,7 @@
     "**/.*",
     "node_modules",
     "bower_components",
-    "legacy/compatibility/static/components",
+    "legacy/static/components",
     "test",
     "tests"
   ],

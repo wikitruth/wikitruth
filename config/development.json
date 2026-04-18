@@ -2,7 +2,7 @@
     "express": {
         "view cache": false,
         "view engine": "dust",
-        "views": "path:./.build/templates"
+        "views": "path:./legacy/templates"
     },
 
     "view engines": {

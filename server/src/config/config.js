@@ -87,6 +87,12 @@ exports.https = {
   certPath: envWithDefault(['HTTPS_CERT_PATH'], ''),
   redirectHttp: envBoolean(['HTTP_TO_HTTPS_REDIRECT', 'HTTPS_REDIRECT_HTTP'], false),
 };
+exports.legacyCompatibility = {
+  enabled: envBoolean(['LEGACY_COMPATIBILITY_ENABLED'], true),
+  mountPath: envWithDefault(['LEGACY_COMPATIBILITY_MOUNT_PATH'], '/legacy'),
+  staticRoot: envWithDefault(['LEGACY_COMPATIBILITY_STATIC_ROOT'], 'legacy/static'),
+  templatesRoot: envWithDefault(['LEGACY_COMPATIBILITY_TEMPLATES_ROOT'], 'legacy/templates'),
+};
 exports.mongodb = {
   uri: envWithDefault(['MONGOLAB_URI', 'MONGOHQ_URL', 'MONGODB_URI'], 'mongodb://127.0.0.1:27017/wikitruth'),
   dbname: envWithDefault(['MONGODB_DBNAME'], 'wikitruth'),
