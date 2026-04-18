@@ -5,6 +5,8 @@ import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 
 const constants = require('../../models/constants');
 const flowUtils = require('../../utils/flowUtils');
+const { logEntryEvent } = require('../../services/entryEventsService');
+const { notifySubscribers, createNotification } = require('../../services/notificationsService');
 
 type ModerationTarget = {
   objectType: number;
@@ -51,6 +53,14 @@ function ensureAdmin(req: WikitruthRequest, res: WikitruthResponse): boolean {
     return true;
   }
   res.status(403).json({ success: false, message: 'Admin privileges required' });
+  return false;
+}
+
+function ensureReviewerOrAdmin(req: WikitruthRequest, res: WikitruthResponse): boolean {
+  if (canPlayRole(req, 'reviewer') || canPlayRole(req, 'admin')) {
+    return true;
+  }
+  res.status(403).json({ success: false, message: 'Reviewer or admin privileges required' });
   return false;
 }
 
@@ -195,6 +205,92 @@ function isSupportedVerdictStatus(status: number): boolean {
   return VERDICT_STATUS_ORDER.includes(status);
 }
 
+function computeConsensus(votes: Array<{ verdictStatus: number; voterUserId?: unknown }>): {
+  threshold: number;
+  totalVotes: number;
+  leadingStatus: number | null;
+  leadingCount: number;
+  reached: boolean;
+} {
+  const totalVotes = votes.length;
+  const threshold = Math.max(2, Math.ceil(3 * (2 / 3)));
+  if (!totalVotes) {
+    return {
+      threshold,
+      totalVotes,
+      leadingStatus: null,
+      leadingCount: 0,
+      reached: false,
+    };
+  }
+
+  const byStatus = new Map<number, number>();
+  votes.forEach((vote) => {
+    const status = Number(vote.verdictStatus);
+    if (!Number.isFinite(status)) {
+      return;
+    }
+    byStatus.set(status, Number(byStatus.get(status) || 0) + 1);
+  });
+
+  let leadingStatus: number | null = null;
+  let leadingCount = 0;
+  byStatus.forEach((count, status) => {
+    if (count > leadingCount) {
+      leadingStatus = status;
+      leadingCount = count;
+    }
+  });
+
+  return {
+    threshold,
+    totalVotes,
+    leadingStatus,
+    leadingCount,
+    reached: leadingCount >= threshold,
+  };
+}
+
+async function buildVoteSummary(entry: any): Promise<{
+  totalVotes: number;
+  threshold: number;
+  consensusReached: boolean;
+  consensusStatus: number | null;
+  counts: Array<{ status: number; count: number }>;
+}> {
+  const objectType = Number(entry.objectType || 0);
+  const objectId = String(entry._id || '');
+  if (!objectType || !objectId) {
+    return {
+      totalVotes: 0,
+      threshold: 2,
+      consensusReached: false,
+      consensusStatus: null,
+      counts: [],
+    };
+  }
+
+  const votes = await db.VerdictVote.find({
+    objectType,
+    objectId,
+  }).lean();
+
+  const consensus = computeConsensus(votes);
+  const statusCountMap = new Map<number, number>();
+  votes.forEach((vote: { verdictStatus: number }) => {
+    const status = Number(vote.verdictStatus);
+    statusCountMap.set(status, Number(statusCountMap.get(status) || 0) + 1);
+  });
+
+  return {
+    totalVotes: consensus.totalVotes,
+    threshold: consensus.threshold,
+    consensusReached: consensus.reached,
+    consensusStatus: consensus.leadingStatus,
+    counts: Array.from(statusCountMap.entries()).map(([status, count]) => ({ status, count })),
+  };
+}
+
 module.exports = function (router: Router) {
   router.get('/entry', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureScreenerOrAdmin(req, res)) {
@@ -268,6 +364,32 @@ module.exports = function (router: Router) {
       await flowUtils.updateChildrenCount(parent.entryId, parent.entryType, target.objectType);
     }
 
+    await logEntryEvent({
+      eventType: 'moderation.screening.updated',
+      objectType: target.objectType,
+      objectName: target.objectName,
+      objectId: target.id,
+      actorUserId: String(req.user?.id || req.user?._id || ''),
+      actorUsername: String(req.user?.username || ''),
+      message: `Screening status updated to ${status}`,
+      payload: { status },
+    });
+
+    await notifySubscribers({
+      target: {
+        objectType: target.objectType,
+        objectName: target.objectName,
+        objectId: target.id,
+      },
+      type: 'screening',
+      trigger: 'screening',
+      title: 'Screening status updated',
+      body: `${target.objectName} was moved to screening status ${status}.`,
+      link: `/${target.objectName}s/entry/${encodeURIComponent(String(entry.friendlyUrl || target.id))}/${encodeURIComponent(target.id)}`,
+      excludeUserIds: [String(req.user?.id || req.user?._id || '')],
+      payload: { status },
+    });
+
     res.json({
       success: true,
       target,
@@ -323,6 +445,33 @@ module.exports = function (router: Router) {
     entry.editDate = new Date();
     entry.editUserId = req.user?.id || req.user?._id || entry.editUserId;
     await entry.save();
+
+    await logEntryEvent({
+      scope: 'privileged',
+      eventType: 'moderation.verdict.updated',
+      objectType: target.objectType,
+      objectName: target.objectName,
+      objectId: target.id,
+      actorUserId: String(req.user?.id || req.user?._id || ''),
+      actorUsername: String(req.user?.username || ''),
+      message: `Verdict updated to ${status}`,
+      payload: { status, reasoning },
+    });
+
+    await notifySubscribers({
+      target: {
+        objectType: target.objectType,
+        objectName: target.objectName,
+        objectId: target.id,
+      },
+      type: 'verdict',
+      trigger: 'verdict',
+      title: 'Verdict updated',
+      body: `${target.objectName} verdict changed to ${constants.VERDICT_STATUS.getLabel(status) || status}.`,
+      link: `/${target.objectName}s/entry/${encodeURIComponent(String(entry.friendlyUrl || target.id))}/${encodeURIComponent(target.id)}`,
+      excludeUserIds: [String(req.user?.id || req.user?._id || '')],
+      payload: { status, reasoning },
+    });
 
     res.json({
       success: true,
@@ -389,10 +538,16 @@ module.exports = function (router: Router) {
 
     const start = (page - 1) * limit;
     const pagedEntries = allEntries.slice(start, start + limit);
+    const entriesWithVoteSummary = await Promise.all(
+      pagedEntries.map(async (entry) => ({
+        ...entry,
+        voteSummary: await buildVoteSummary(entry),
+      }))
+    );
 
     res.json({
       success: true,
-      entries: pagedEntries,
+      entries: entriesWithVoteSummary,
       page,
       limit,
       total,
@@ -459,6 +614,17 @@ module.exports = function (router: Router) {
       entry.editUserId = userId || entry.editUserId;
       await entry.save();
 
+      await logEntryEvent({
+        scope: 'privileged',
+        eventType: 'moderation.verdict.bulk-updated',
+        objectType,
+        objectId: id,
+        actorUserId: String(req.user?.id || req.user?._id || ''),
+        actorUsername: String(req.user?.username || ''),
+        message: `Bulk verdict update to ${status}`,
+        payload: { status, reasoning },
+      });
+
       results.push({ id, success: true });
     }
 
@@ -496,6 +662,17 @@ module.exports = function (router: Router) {
     entry.editDate = new Date();
     await entry.save();
 
+    await logEntryEvent({
+      scope: 'privileged',
+      eventType: 'moderation.take-ownership',
+      objectType: target.objectType,
+      objectName: target.objectName,
+      objectId: target.id,
+      actorUserId: String(req.user?.id || req.user?._id || ''),
+      actorUsername: String(req.user?.username || ''),
+      message: 'Entry ownership claimed by moderator',
+    });
+
     res.json({
       success: true,
       target,
@@ -530,6 +707,20 @@ module.exports = function (router: Router) {
     if (parent?.entryId && parent?.entryType) {
       await flowUtils.updateChildrenCount(parent.entryId, parent.entryType, target.objectType);
     }
+
+    await logEntryEvent({
+      scope: 'privileged',
+      eventType: 'moderation.delete',
+      objectType: target.objectType,
+      objectName: target.objectName,
+      objectId: target.id,
+      actorUserId: String(req.user?.id || req.user?._id || ''),
+      actorUsername: String(req.user?.username || ''),
+      message: 'Entry deleted by moderator',
+      payload: {
+        title: entry?.title || '',
+      },
+    });
 
     res.json({
       success: true,
@@ -650,6 +841,22 @@ module.exports = function (router: Router) {
     }));
     await flowUtils.updateChildrenCountBatch(countTasks, { transactional: true });
 
+    await logEntryEvent({
+      scope: 'privileged',
+      eventType: 'moderation.ownership-migration',
+      objectType: constants.OBJECT_TYPES.topic,
+      objectName: 'topic',
+      objectId: String(topic._id),
+      actorUserId: String(req.user?.id || req.user?._id || ''),
+      actorUsername: String(req.user?.username || ''),
+      message: `Ownership migration to ${migration.targetScope}`,
+      payload: {
+        topicId: String(topic._id),
+        targetScope: migration.targetScope,
+        username: targetUser?.username || null,
+      },
+    });
+
     res.json({
       success: true,
       migration: {
@@ -658,6 +865,340 @@ module.exports = function (router: Router) {
         username: targetUser?.username || null,
         migratedTopicCount: impactedTopics.length,
       },
+    });
+  });
+
+  router.post('/verdict-votes', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureReviewerOrAdmin(req, res)) {
+      return;
+    }
+
+    const target = parseModerationTarget(req);
+    if (!target) {
+      res.status(400).json({ success: false, message: 'A moderation target is required' });
+      return;
+    }
+
+    const verdictStatus = toNumber(req.body?.status ?? req.body?.verdictStatus);
+    if (verdictStatus === null || !isSupportedVerdictStatus(verdictStatus)) {
+      res.status(400).json({ success: false, message: 'A valid verdict status is required' });
+      return;
+    }
+
+    const rationale = String(req.body?.rationale || '').trim();
+    const voterUserId = String(req.user?._id || req.user?.id || '');
+    const voterUsername = String(req.user?.username || '');
+
+    const vote = await db.VerdictVote.findOneAndUpdate(
+      {
+        objectType: target.objectType,
+        objectId: target.id,
+        voterUserId: voterUserId,
+      },
+      {
+        $set: {
+          objectType: target.objectType,
+          objectName: target.objectName,
+          objectId: target.id,
+          verdictStatus: verdictStatus,
+          rationale: rationale,
+          voterUserId: voterUserId,
+          voterUsername: voterUsername,
+          editDate: new Date(),
+        },
+        $setOnInsert: {
+          createDate: new Date(),
+        },
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    ).lean();
+
+    await logEntryEvent({
+      eventType: 'moderation.verdict.vote',
+      objectType: target.objectType,
+      objectName: target.objectName,
+      objectId: target.id,
+      actorUserId: voterUserId,
+      actorUsername: voterUsername,
+      message: `Verdict vote submitted for status ${verdictStatus}`,
+      payload: { verdictStatus, rationale },
+    });
+
+    const votes = await db.VerdictVote.find({
+      objectType: target.objectType,
+      objectId: target.id,
+    }).lean();
+    const consensus = computeConsensus(votes);
+
+    res.json({
+      success: true,
+      vote,
+      summary: {
+        threshold: consensus.threshold,
+        totalVotes: consensus.totalVotes,
+        consensusReached: consensus.reached,
+        consensusStatus: consensus.leadingStatus,
+      },
+    });
+  });
+
+  router.get('/verdict-votes', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureReviewerOrAdmin(req, res)) {
+      return;
+    }
+
+    const target = parseModerationTarget(req);
+    if (!target) {
+      res.status(400).json({ success: false, message: 'A moderation target is required' });
+      return;
+    }
+
+    const votes = await db.VerdictVote.find({
+      objectType: target.objectType,
+      objectId: target.id,
+    })
+      .sort({ createDate: 1 })
+      .lean();
+
+    const consensus = computeConsensus(votes);
+
+    res.json({
+      success: true,
+      votes,
+      summary: {
+        threshold: consensus.threshold,
+        totalVotes: consensus.totalVotes,
+        consensusReached: consensus.reached,
+        consensusStatus: consensus.leadingStatus,
+      },
+    });
+  });
+
+  router.post('/signals', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!req.user?._id && !req.user?.id) {
+      res.status(401).json({ success: false, message: 'Authentication required' });
+      return;
+    }
+
+    const target = parseModerationTarget(req);
+    if (!target) {
+      res.status(400).json({ success: false, message: 'A moderation target is required' });
+      return;
+    }
+
+    const signalType = String(req.body?.signalType || '').trim();
+    const supportedSignalTypes = ['controversial', 'incorrect_verdict', 'needs_reevaluation', 'wrong_category'];
+    if (!supportedSignalTypes.includes(signalType)) {
+      res.status(400).json({ success: false, message: 'Unsupported signalType' });
+      return;
+    }
+
+    const note = String(req.body?.note || '').trim();
+    const signal = await db.ReaderSignal.create({
+      objectType: target.objectType,
+      objectName: target.objectName,
+      objectId: target.id,
+      signalType,
+      note,
+      status: 'open',
+      createUserId: String(req.user?._id || req.user?.id || ''),
+      createUsername: String(req.user?.username || ''),
+      createDate: new Date(),
+      editDate: new Date(),
+    });
+
+    await logEntryEvent({
+      eventType: 'moderation.reader-signal.created',
+      objectType: target.objectType,
+      objectName: target.objectName,
+      objectId: target.id,
+      actorUserId: String(req.user?._id || req.user?.id || ''),
+      actorUsername: String(req.user?.username || ''),
+      message: `Reader signal submitted: ${signalType}`,
+      payload: { signalType, note },
+    });
+
+    const reviewerUsers = await db.User.find({
+      $or: [{ 'roles.reviewer': true }, { 'roles.admin': { $ne: null } }],
+    })
+      .select('_id')
+      .lean();
+
+    await Promise.all(
+      reviewerUsers
+        .map((reviewer: { _id?: unknown }) => String(reviewer._id || '').trim())
+        .filter(Boolean)
+        .map((reviewerId: string) =>
+          createNotification({
+            userId: reviewerId,
+            type: 'reader_signal',
+            title: 'New reader signal',
+            body: `${target.objectName} was flagged as ${signalType.replace('_', ' ')}.`,
+            link: `/admin/moderation/signals?type=signals`,
+            target: {
+              objectType: target.objectType,
+              objectName: target.objectName,
+              objectId: target.id,
+            },
+            payload: { signalId: String(signal._id || '') },
+          })
+        )
+    );
+
+    res.status(201).json({
+      success: true,
+      signal,
+    });
+  });
+
+  router.get('/signals', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureReviewerOrAdmin(req, res)) {
+      return;
+    }
+
+    const status = String(req.query.status || '').trim();
+    const signalType = String(req.query.signalType || '').trim();
+    const query: Record<string, unknown> = {};
+    if (status) {
+      query.status = status;
+    }
+    if (signalType) {
+      query.signalType = signalType;
+    }
+
+    const signals = await db.ReaderSignal.find(query).sort({ createDate: -1 }).limit(200).lean();
+    res.json({
+      success: true,
+      signals,
+    });
+  });
+
+  router.put('/signals/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureReviewerOrAdmin(req, res)) {
+      return;
+    }
+
+    const signal = await db.ReaderSignal.findById(req.params.id);
+    if (!signal) {
+      res.status(404).json({ success: false, message: 'Signal not found' });
+      return;
+    }
+
+    const status = String(req.body?.status || '').trim();
+    const resolutionNote = String(req.body?.resolutionNote || '').trim();
+    if (status) {
+      signal.status = status;
+    }
+    if (resolutionNote) {
+      signal.resolutionNote = resolutionNote;
+    }
+    signal.assignedUserId = String(req.user?._id || req.user?.id || '');
+    signal.editDate = new Date();
+    await signal.save();
+
+    res.json({
+      success: true,
+      signal: signal.toObject(),
+    });
+  });
+
+  router.post('/appeals', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!req.user?._id && !req.user?.id) {
+      res.status(401).json({ success: false, message: 'Authentication required' });
+      return;
+    }
+
+    const target = parseModerationTarget(req);
+    if (!target) {
+      res.status(400).json({ success: false, message: 'A moderation target is required' });
+      return;
+    }
+
+    const reasonType = String(req.body?.reasonType || 'general').trim();
+    const note = String(req.body?.note || '').trim();
+    if (!note || note.length < 6) {
+      res.status(400).json({ success: false, message: 'Appeal note must be at least 6 characters' });
+      return;
+    }
+
+    const appeal = await db.Appeal.create({
+      objectType: target.objectType,
+      objectName: target.objectName,
+      objectId: target.id,
+      reasonType,
+      note,
+      status: 'open',
+      createUserId: String(req.user?._id || req.user?.id || ''),
+      createUsername: String(req.user?.username || ''),
+      createDate: new Date(),
+      editDate: new Date(),
+    });
+
+    await logEntryEvent({
+      eventType: 'moderation.appeal.created',
+      objectType: target.objectType,
+      objectName: target.objectName,
+      objectId: target.id,
+      actorUserId: String(req.user?._id || req.user?.id || ''),
+      actorUsername: String(req.user?.username || ''),
+      message: `Appeal created (${reasonType})`,
+      payload: { reasonType, note },
+    });
+
+    res.status(201).json({
+      success: true,
+      appeal,
+    });
+  });
+
+  router.get('/appeals', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureReviewerOrAdmin(req, res)) {
+      return;
+    }
+
+    const status = String(req.query.status || '').trim();
+    const reasonType = String(req.query.reasonType || '').trim();
+    const query: Record<string, unknown> = {};
+    if (status) {
+      query.status = status;
+    }
+    if (reasonType) {
+      query.reasonType = reasonType;
+    }
+
+    const appeals = await db.Appeal.find(query).sort({ createDate: -1 }).limit(200).lean();
+    res.json({
+      success: true,
+      appeals,
+    });
+  });
+
+  router.put('/appeals/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureReviewerOrAdmin(req, res)) {
+      return;
+    }
+
+    const appeal = await db.Appeal.findById(req.params.id);
+    if (!appeal) {
+      res.status(404).json({ success: false, message: 'Appeal not found' });
+      return;
+    }
+
+    const status = String(req.body?.status || '').trim();
+    const resolutionNote = String(req.body?.resolutionNote || '').trim();
+    if (status) {
+      appeal.status = status;
+    }
+    if (resolutionNote) {
+      appeal.resolutionNote = resolutionNote;
+    }
+    appeal.assignedReviewerId = String(req.user?._id || req.user?.id || '');
+    appeal.editDate = new Date();
+    await appeal.save();
+
+    res.json({
+      success: true,
+      appeal: appeal.toObject(),
     });
   });
 };

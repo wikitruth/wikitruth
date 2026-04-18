@@ -29,6 +29,12 @@ module.exports = function (app: any, mongoose: any) {
   require('./core/Artifact')(app, mongoose);
   require('./core/Group')(app, mongoose);
   require('./core/Reaction')(app, mongoose);
+  require('./core/EntryEvent')(app, mongoose);
+  require('./core/VerdictVote')(app, mongoose);
+  require('./core/ReaderSignal')(app, mongoose);
+  require('./core/Appeal')(app, mongoose);
+  require('./core/Subscription')(app, mongoose);
+  require('./core/Notification')(app, mongoose);
 
   require('./core/TrustedClient')(app, mongoose);
   //require('./schema/core/Word')(app, mongoose);

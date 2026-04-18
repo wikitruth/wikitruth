@@ -11,6 +11,8 @@ const issuesService = require('../../services/issuesService');
 const { applyViewModeFilter } = require('./viewFilter');
 // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'db'.
 const db = require('../../app').db.models;
+const { logEntryEvent } = require('../../services/entryEventsService');
+const { notifySubscribers } = require('../../services/notificationsService');
 
 // @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports = function (router) {
@@ -168,6 +170,41 @@ async function POST_issue_create(req: any, res: any) {
     },
     private: isPrivate,
   });
+
+  await logEntryEvent({
+    eventType: 'issue.created',
+    objectType: constants.OBJECT_TYPES.topic,
+    objectName: 'topic',
+    objectId: String(ownerId || issue._id),
+    actorUserId: String(req.user._id),
+    actorUsername: String(req.user.username || ''),
+    message: `Issue reported (type ${issueType})`,
+    payload: {
+      issueId: String(issue._id),
+      issueType,
+      title,
+    },
+  });
+
+  if (ownerId) {
+    await notifySubscribers({
+      target: {
+        objectType: constants.OBJECT_TYPES.topic,
+        objectName: 'topic',
+        objectId: String(ownerId),
+      },
+      type: 'issue',
+      trigger: 'issue',
+      title: 'New issue reported',
+      body: title,
+      link: `/issues/entry/${encodeURIComponent(String(issue.friendlyUrl || issue._id))}/${encodeURIComponent(String(issue._id))}`,
+      excludeUserIds: [String(req.user._id)],
+      payload: {
+        issueId: String(issue._id),
+        issueType,
+      },
+    });
+  }
 
   res.status(201).json({
     success: true,

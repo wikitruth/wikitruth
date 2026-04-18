@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import moderationApi from '../../services/api/moderation';
+import notificationsApi from '../../services/api/notifications';
 import { addToClipboard } from '../../pages/ClipboardPage';
 import type { LegacyEntity } from '../../types/legacy';
 
@@ -15,19 +16,34 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [followed, setFollowed] = useState(false);
+  const [loadingFollowState, setLoadingFollowState] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
-
-  const followStorageKey = useMemo(() => {
-    return `wt-follow:${entry.objectName || 'entry'}:${entry._id}`;
-  }, [entry._id, entry.objectName]);
+  const objectName = useMemo(() => String(entry.objectName || '').trim(), [entry.objectName]);
 
   useEffect(() => {
-    try {
-      setFollowed(localStorage.getItem(followStorageKey) === '1');
-    } catch (_error) {
-      setFollowed(false);
-    }
-  }, [followStorageKey]);
+    const loadFollowState = async () => {
+      if (!user?._id || !objectName || !entry._id) {
+        setFollowed(false);
+        return;
+      }
+
+      try {
+        setLoadingFollowState(true);
+        const result = await notificationsApi.getSubscription(
+          objectName,
+          entry._id,
+          typeof entry.objectType === 'number' ? entry.objectType : undefined,
+        );
+        setFollowed(Boolean(result.subscription?.followed));
+      } catch (_error) {
+        setFollowed(false);
+      } finally {
+        setLoadingFollowState(false);
+      }
+    };
+
+    void loadFollowState();
+  }, [entry._id, entry.objectType, objectName, user?._id]);
 
   useEffect(() => {
     if (!statusMessage) {
@@ -42,7 +58,6 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
   const isReaderMode = activeRole === 'reader';
   const isOwner = Boolean(user?._id && entry.createUserId && String(user._id) === String(entry.createUserId));
   const canEdit = !isReaderMode && Boolean(editPath) && (isOwner || isAdmin);
-  const objectName = String(entry.objectName || '').trim();
   const objectType = typeof entry.objectType === 'number' ? entry.objectType : null;
   const canConvert = objectName === 'topic' || objectName === 'argument';
   const canReply = !isReaderMode && ['topic', 'argument', 'question', 'answer', 'issue', 'opinion'].includes(objectName);
@@ -79,16 +94,28 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
   };
 
   const handleFollow = () => {
-    try {
-      const next = !followed;
-      localStorage.setItem(followStorageKey, next ? '1' : '0');
-      setFollowed(next);
-      setStatusMessage(next ? 'Following entry' : 'Unfollowed entry');
-    } catch (_error) {
+    if (!objectName || !entry._id) {
       setStatusMessage('Unable to update follow state');
-    } finally {
-      setIsOpen(false);
+      return;
     }
+    void (async () => {
+      try {
+        const next = !followed;
+        const result = await notificationsApi.setSubscription({
+          objectName,
+          objectType: objectType || undefined,
+          id: entry._id,
+          enabled: next,
+          triggers: ['reply', 'screening', 'verdict', 'issue'],
+        });
+        setFollowed(Boolean(result.subscription?.followed));
+        setStatusMessage(result.subscription?.followed ? 'Following entry' : 'Unfollowed entry');
+      } catch (_error) {
+        setStatusMessage('Unable to update follow state');
+      } finally {
+        setIsOpen(false);
+      }
+    })();
   };
 
   const handleCopyToClipboard = () => {
@@ -110,9 +137,16 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
 
   const handleViewHistory = () => {
     setIsOpen(false);
-    // Navigate to entry with history tab/query
-    const currentPath = window.location.pathname;
-    void navigate(`${currentPath}?tab=history`);
+    if (!objectName || !entry._id) {
+      return;
+    }
+    const params = new URLSearchParams();
+    params.set('objectName', objectName);
+    params.set('id', entry._id);
+    if (objectType !== null) {
+      params.set('objectType', String(objectType));
+    }
+    void navigate(`/timeline?${params.toString()}`);
   };
 
   const handleReport = () => {
@@ -122,6 +156,66 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
       return;
     }
     void navigate('/issues/create');
+  };
+
+  const handleSignal = () => {
+    if (!objectName || objectType === null) {
+      return;
+    }
+    const signalType = window.prompt(
+      'Signal type: controversial | incorrect_verdict | needs_reevaluation | wrong_category',
+      'needs_reevaluation',
+    );
+    if (!signalType) {
+      return;
+    }
+    const note = window.prompt('Optional note for reviewers', '') || '';
+    setIsOpen(false);
+    void (async () => {
+      try {
+        await moderationApi.submitReaderSignal(
+          {
+            key: objectName as any,
+            id: entry._id,
+          },
+          {
+            signalType: signalType as any,
+            note,
+          },
+        );
+        setStatusMessage('Signal submitted for moderation review');
+      } catch (_error) {
+        setStatusMessage('Unable to submit signal');
+      }
+    })();
+  };
+
+  const handleAppeal = () => {
+    if (!objectName || objectType === null) {
+      return;
+    }
+    const note = window.prompt('Appeal note (required)', '');
+    if (!note) {
+      return;
+    }
+    setIsOpen(false);
+    void (async () => {
+      try {
+        await moderationApi.submitAppeal(
+          {
+            key: objectName as any,
+            id: entry._id,
+          },
+          {
+            reasonType: 'general',
+            note,
+          },
+        );
+        setStatusMessage('Appeal submitted');
+      } catch (_error) {
+        setStatusMessage('Unable to submit appeal');
+      }
+    })();
   };
 
   const handleReply = () => {
@@ -212,7 +306,8 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
             {!isReaderMode && (
               <li>
                 <button type="button" className="btn btn-link" onClick={handleFollow}>
-                  <i className="fa fa-rss" aria-hidden="true"></i> {followed ? 'Unfollow' : 'Follow'}
+                  <i className="fa fa-rss" aria-hidden="true"></i>{' '}
+                  {loadingFollowState ? 'Checking follow…' : followed ? 'Unfollow' : 'Follow'}
                 </button>
               </li>
             )}
@@ -251,6 +346,20 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
               <li>
                 <button type="button" className="btn btn-link" onClick={handleReport}>
                   <i className="fa fa-flag" aria-hidden="true"></i> Report
+                </button>
+              </li>
+            )}
+            {!isReaderMode && (
+              <li>
+                <button type="button" className="btn btn-link" onClick={handleSignal}>
+                  <i className="fa fa-bullhorn" aria-hidden="true"></i> Signal for Review
+                </button>
+              </li>
+            )}
+            {!isReaderMode && (
+              <li>
+                <button type="button" className="btn btn-link" onClick={handleAppeal}>
+                  <i className="fa fa-gavel" aria-hidden="true"></i> Submit Appeal
                 </button>
               </li>
             )}

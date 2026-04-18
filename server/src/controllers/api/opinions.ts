@@ -11,6 +11,8 @@ const opinionsService = require('../../services/opinionsService');
 const { applyViewModeFilter } = require('./viewFilter');
 // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'db'.
 const db = require('../../app').db.models;
+const { logEntryEvent } = require('../../services/entryEventsService');
+const { notifySubscribers } = require('../../services/notificationsService');
 
 // @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports = function (router) {
@@ -142,6 +144,26 @@ function canEditEntry(entry: any, user: any): boolean {
   return String(entry.createUserId || '') === String(user._id || user.id || '');
 }
 
+function normalizeOpinionClassification(value: unknown): 'supplement' | 'objection' | 'question' | 'general' {
+  const normalized = String(value || '').trim().toLowerCase();
+  switch (normalized) {
+    case 'supplement':
+    case 'objection':
+    case 'question':
+      return normalized;
+    default:
+      return 'general';
+  }
+}
+
+function normalizeTextForSimilarity(value: string): string {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/[\s\W_]+/g, ' ')
+    .trim();
+}
+
 async function POST_opinion_create(req: any, res: any) {
   if (!req.user) {
     return res.status(401).json({ error: 'Authentication required' });
@@ -152,6 +174,7 @@ async function POST_opinion_create(req: any, res: any) {
   const ownerId = req.body?.topicId || req.body?.ownerId || req.query?.topic || null;
   const parentId = req.body?.parentId || null;
   const isPrivate = Boolean(req.body?.private);
+  const classification = normalizeOpinionClassification(req.body?.classification);
 
   if (!title || title.length < 3) {
     return res.status(400).json({ error: 'Title must be at least 3 characters' });
@@ -159,6 +182,50 @@ async function POST_opinion_create(req: any, res: any) {
 
   if (!description || description.length < 10) {
     return res.status(400).json({ error: 'Description must be at least 10 characters' });
+  }
+
+  if (description.length > 5000) {
+    return res.status(400).json({ error: 'Description is too long. Limit is 5000 characters.' });
+  }
+
+  // Thread quality guardrails: prevent repetitive duplicate posts and posting spikes in the same thread.
+  const recentWindowStart = new Date(Date.now() - 10 * 60 * 1000);
+  const lastDayWindowStart = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const [recentCount, recentEntries] = await Promise.all([
+    db.Opinion.countDocuments({
+      createUserId: req.user._id,
+      ownerId: ownerId,
+      parentId: parentId,
+      createDate: { $gte: recentWindowStart },
+    }),
+    db.Opinion.find({
+      createUserId: req.user._id,
+      ownerId: ownerId,
+      parentId: parentId,
+      createDate: { $gte: lastDayWindowStart },
+    })
+      .sort({ createDate: -1 })
+      .limit(50)
+      .select('title content')
+      .lean(),
+  ]);
+
+  if (recentCount >= 8) {
+    return res.status(429).json({
+      error: 'Too many comments in this thread. Please wait a few minutes before posting again.',
+    });
+  }
+
+  const incomingNormalized = normalizeTextForSimilarity(`${title} ${description}`);
+  const duplicateFound = recentEntries.some((entry: any) => {
+    const existingNormalized = normalizeTextForSimilarity(`${entry?.title || ''} ${entry?.content || ''}`);
+    return existingNormalized && existingNormalized === incomingNormalized;
+  });
+
+  if (duplicateFound) {
+    return res.status(409).json({
+      error: 'Duplicate comment detected in this thread. Please edit your existing comment instead.',
+    });
   }
 
   const now = new Date();
@@ -179,7 +246,50 @@ async function POST_opinion_create(req: any, res: any) {
       status: constants.SCREENING_STATUS.status0.code,
     },
     private: isPrivate,
+    extras: {
+      classification,
+    },
   });
+
+  const timelineObjectType = ownerId ? constants.OBJECT_TYPES.topic : constants.OBJECT_TYPES.opinion;
+  const timelineObjectName = ownerId ? 'topic' : 'opinion';
+  const timelineObjectId = String(ownerId || opinion._id);
+
+  await logEntryEvent({
+    eventType: 'discussion.reply.created',
+    objectType: timelineObjectType,
+    objectName: timelineObjectName,
+    objectId: timelineObjectId,
+    actorUserId: String(req.user._id),
+    actorUsername: String(req.user.username || ''),
+    message: `Comment created (${classification})`,
+    payload: {
+      opinionId: String(opinion._id),
+      ownerId: String(ownerId || ''),
+      parentId: String(parentId || ''),
+      classification,
+    },
+  });
+
+  if (ownerId) {
+    await notifySubscribers({
+      target: {
+        objectType: constants.OBJECT_TYPES.topic,
+        objectName: 'topic',
+        objectId: String(ownerId),
+      },
+      type: 'reply',
+      trigger: 'reply',
+      title: 'New discussion comment',
+      body: title,
+      link: `/opinions/entry/${encodeURIComponent(String(opinion.friendlyUrl || opinion._id))}/${encodeURIComponent(String(opinion._id))}`,
+      excludeUserIds: [String(req.user._id)],
+      payload: {
+        classification,
+        ownerId: String(ownerId),
+      },
+    });
+  }
 
   res.status(201).json({
     success: true,
@@ -190,6 +300,7 @@ async function POST_opinion_create(req: any, res: any) {
       content: opinion.content,
       ownerId: opinion.ownerId,
       private: opinion.private,
+      classification,
       createDate: opinion.createDate,
       editDate: opinion.editDate,
     },
@@ -227,6 +338,12 @@ async function PUT_opinion_update(req: any, res: any) {
     opinion.contentPreview = content.slice(0, 240);
   }
 
+  if (typeof req.body?.classification !== 'undefined') {
+    const classification = normalizeOpinionClassification(req.body?.classification);
+    opinion.extras = opinion.extras || {};
+    opinion.extras.classification = classification;
+  }
+
   if (typeof req.body?.private !== 'undefined') {
     opinion.private = Boolean(req.body.private);
   }
@@ -249,6 +366,7 @@ async function PUT_opinion_update(req: any, res: any) {
       content: opinion.content,
       ownerId: opinion.ownerId,
       private: opinion.private,
+      classification: normalizeOpinionClassification(opinion?.extras?.classification),
       createDate: opinion.createDate,
       editDate: opinion.editDate,
     },

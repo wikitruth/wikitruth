@@ -36,6 +36,8 @@ module.exports = function (router: Router) {
   const monitoringRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const realtimeRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const reactionsRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
+  const notificationsRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
+  const timelineRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
 
   (require('./home') as (routerArg: Router) => void)(homeRouter);
   (require('./topics') as (routerArg: Router) => void)(topicsRouter);
@@ -56,6 +58,8 @@ module.exports = function (router: Router) {
   (require('./monitoring') as (routerArg: Router) => void)(monitoringRouter);
   (require('./realtime') as (routerArg: Router) => void)(realtimeRouter);
   (require('./reactions') as (routerArg: Router) => void)(reactionsRouter);
+  (require('./notifications') as (routerArg: Router) => void)(notificationsRouter);
+  (require('./timeline') as (routerArg: Router) => void)(timelineRouter);
 
   router.use('/home', homeRouter);
   router.use('/topics', topicsRouter);
@@ -76,4 +80,6 @@ module.exports = function (router: Router) {
   router.use('/monitoring', monitoringRouter);
   router.use('/realtime', realtimeRouter);
   router.use('/reactions', reactionsRouter);
+  router.use('/notifications', notificationsRouter);
+  router.use('/timeline', timelineRouter);
 };

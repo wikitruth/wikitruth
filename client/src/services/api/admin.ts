@@ -81,6 +81,57 @@ export const adminApi = {
       method: 'POST',
       body: JSON.stringify({ action: 'backup' }),
     }),
+  runDbRestore: (options: {
+    restorePublicData: boolean;
+    restorePrivateData: boolean;
+    confirmText: string;
+  }) =>
+    request<{
+      success: boolean;
+      message: string;
+      restore: {
+        restorePublicData: boolean;
+        restorePrivateData: boolean;
+        completedAt: string;
+        summary: Record<string, unknown>;
+      };
+    }>(`${API_BASE_URL}/admin/db-backup`, {
+      method: 'POST',
+      body: JSON.stringify({
+        action: 'restore',
+        restorePublicData: options.restorePublicData,
+        restorePrivateData: options.restorePrivateData,
+        confirmText: options.confirmText,
+      }),
+    }),
+  listAuditEvents: (params?: {
+    page?: number;
+    limit?: number;
+    objectType?: number;
+    eventTypes?: string;
+  }) => {
+    const query = new URLSearchParams();
+    if (typeof params?.page === 'number') {
+      query.set('page', String(params.page));
+    }
+    if (typeof params?.limit === 'number') {
+      query.set('limit', String(params.limit));
+    }
+    if (typeof params?.objectType === 'number') {
+      query.set('objectType', String(params.objectType));
+    }
+    if (params?.eventTypes) {
+      query.set('eventTypes', params.eventTypes);
+    }
+    const suffix = query.toString();
+    return request<{
+      success: boolean;
+      events: Array<Record<string, unknown>>;
+      total: number;
+      page: number;
+      limit: number;
+    }>(`${API_BASE_URL}/admin/audit-events${suffix ? `?${suffix}` : ''}`);
+  },
   updateUser: async (id: string, payload: AdminMutationPayload) => {
     const response = await request<MutationResponse>(`${API_BASE_URL}/admin/users/${encodeURIComponent(id)}`, {
       method: 'PUT',

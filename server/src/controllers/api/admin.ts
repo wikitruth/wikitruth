@@ -9,6 +9,7 @@ const path = require('path');
 const backup = require('mongodb-backup-fixed');
 const config = require('../../config/config');
 const flowUtils = require('../../utils/flowUtils');
+const { listPrivilegedEvents, logEntryEvent } = require('../../services/entryEventsService');
 
 function ensureDir(dirPath: string): void {
   if (fs.existsSync(dirPath)) {
@@ -118,6 +119,72 @@ function encryptPassword(password: string): Promise<string> {
       resolve(hash);
     });
   });
+}
+
+function toPositiveInt(value: unknown, fallback: number): number {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return fallback;
+  }
+  return Math.floor(parsed);
+}
+
+function toRestoreBoolean(value: unknown, fallback: boolean): boolean {
+  if (typeof value === 'boolean') {
+    return value;
+  }
+  if (typeof value === 'string') {
+    const normalized = value.trim().toLowerCase();
+    if (!normalized) {
+      return fallback;
+    }
+    if (['1', 'true', 'yes', 'on'].includes(normalized)) {
+      return true;
+    }
+    if (['0', 'false', 'no', 'off'].includes(normalized)) {
+      return false;
+    }
+  }
+  return fallback;
+}
+
+async function restoreCollectionFromDirectory(options: {
+  collectionName: string;
+  collectionDir: string;
+  overwriteQuery?: Record<string, unknown>;
+  modelMapping: Record<string, string>;
+}): Promise<{ restored: number; skipped: boolean }> {
+  const { collectionName, collectionDir, overwriteQuery, modelMapping } = options;
+  if (!fs.existsSync(collectionDir)) {
+    return { restored: 0, skipped: true };
+  }
+
+  const modelName = modelMapping[collectionName];
+  if (!modelName || !db[modelName]) {
+    return { restored: 0, skipped: true };
+  }
+
+  const files = fs
+    .readdirSync(collectionDir)
+    .filter((name: string) => name.endsWith('.json'))
+    .sort((a: string, b: string) => a.localeCompare(b));
+
+  if (overwriteQuery) {
+    await db[modelName].deleteMany(overwriteQuery);
+  } else {
+    await db[modelName].deleteMany({});
+  }
+
+  let restored = 0;
+  for (const jsonFile of files) {
+    const file = path.join(collectionDir, jsonFile);
+    const raw = fs.readFileSync(file, 'utf8');
+    const doc = JSON.parse(raw);
+    await db[modelName].create(doc);
+    restored += 1;
+  }
+
+  return { restored, skipped: false };
 }
 
 module.exports = function (router: Router) {
@@ -805,49 +872,194 @@ module.exports = function (router: Router) {
     }
 
     const action = String(req.body?.action || req.body?.buttonAction || 'backup');
-    if (action !== 'backup') {
-      res.status(400).json({ success: false, message: 'Only backup action is supported in modern API' });
-      return;
-    }
-
     const backupDir = flowUtils.getBackupDir();
     const privateBackupDir = path.join(flowUtils.getBackupDir(true), 'users');
     ensureDir(backupDir);
     ensureDir(privateBackupDir);
 
     const collections = config.mongodb?.collections || {};
+    const userId = String(req.user?._id || req.user?.id || '');
+    const username = String(req.user?.username || '');
 
-    backup({
-      uri: config.mongodb.uri,
-      root: backupDir,
-      collections: collections.backupList || [],
-      parser: 'json',
+    if (action === 'backup') {
+      backup({
+        uri: config.mongodb.uri,
+        root: backupDir,
+        collections: collections.backupList || [],
+        parser: 'json',
+      });
+
+      backup({
+        uri: config.mongodb.uri,
+        root: backupDir,
+        collections: collections.privateBackupList || [],
+        parser: 'json',
+        query: { private: false },
+      });
+
+      backup({
+        uri: config.mongodb.uri,
+        root: privateBackupDir,
+        collections: collections.privateBackupList || [],
+        parser: 'json',
+        query: { private: true },
+      });
+
+      await logEntryEvent({
+        scope: 'privileged',
+        eventType: 'admin.backup.started',
+        objectType: 1,
+        objectName: 'topic',
+        objectId: String(req.user?._id || req.user?.id || req.user?.username || 'admin'),
+        actorUserId: userId,
+        actorUsername: username,
+        message: 'Started database backup',
+        payload: {
+          backupDir,
+          privateBackupDir,
+        },
+      });
+
+      res.status(202).json({
+        success: true,
+        message: 'Backup tasks started',
+        backup: {
+          backupDir: backupDir,
+          privateBackupDir: privateBackupDir,
+          startedAt: new Date().toISOString(),
+        },
+      });
+      return;
+    }
+
+    if (action === 'restore') {
+      const confirmText = String(req.body?.confirmText || req.body?.confirm || '').trim().toUpperCase();
+      if (confirmText !== 'RESTORE') {
+        res.status(400).json({
+          success: false,
+          message: 'Restore confirmation failed. Type RESTORE to continue.',
+        });
+        return;
+      }
+
+      const restorePublicData = toRestoreBoolean(req.body?.restorePublicData, true);
+      const restorePrivateData = toRestoreBoolean(req.body?.restorePrivateData, true);
+      if (!restorePublicData && !restorePrivateData) {
+        res.status(400).json({
+          success: false,
+          message: 'At least one restore scope must be selected.',
+        });
+        return;
+      }
+
+      const dbName = String(config.mongodb?.dbname || '').trim();
+      const modelMapping = (collections.modelMapping || {}) as Record<string, string>;
+      const summary = {
+        public: {} as Record<string, { restored: number; skipped: boolean }>,
+        private: {} as Record<string, { restored: number; skipped: boolean }>,
+      };
+
+      if (restorePublicData) {
+        const publicRoot = path.join(backupDir, dbName);
+        const publicCollections = Array.from(
+          new Set([...(collections.backupList || []), ...(collections.privateBackupList || [])])
+        ) as string[];
+
+        for (const collectionName of publicCollections) {
+          const collectionDir = path.join(publicRoot, collectionName);
+          summary.public[collectionName] = await restoreCollectionFromDirectory({
+            collectionName,
+            collectionDir,
+            modelMapping,
+          });
+        }
+      }
+
+      if (restorePrivateData) {
+        const users = await db.User.find({}).sort({ username: 1 }).select('_id username').lean();
+        for (const user of users) {
+          const usernameKey = String(user.username || '').trim();
+          if (!usernameKey) {
+            continue;
+          }
+          const userRoot = path.join(privateBackupDir, usernameKey, dbName);
+          for (const collectionName of (collections.privateBackupList || []) as string[]) {
+            const collectionDir = path.join(userRoot, collectionName);
+            const key = `${usernameKey}:${collectionName}`;
+            summary.private[key] = await restoreCollectionFromDirectory({
+              collectionName,
+              collectionDir,
+              modelMapping,
+              overwriteQuery: {
+                private: true,
+                createUserId: user._id,
+              },
+            });
+          }
+        }
+      }
+
+      await logEntryEvent({
+        scope: 'privileged',
+        eventType: 'admin.backup.restore',
+        objectType: 1,
+        objectName: 'topic',
+        objectId: String(req.user?._id || req.user?.id || req.user?.username || 'admin'),
+        actorUserId: userId,
+        actorUsername: username,
+        message: 'Executed backup restore',
+        payload: {
+          restorePublicData,
+          restorePrivateData,
+          summary,
+        },
+      });
+
+      res.json({
+        success: true,
+        message: 'Restore completed',
+        restore: {
+          restorePublicData,
+          restorePrivateData,
+          completedAt: new Date().toISOString(),
+          summary,
+        },
+      });
+      return;
+    }
+
+    res.status(400).json({
+      success: false,
+      message: `Unsupported backup action: ${action}`,
+    });
+  });
+
+  router.get('/audit-events', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureAdmin(req, res)) {
+      return;
+    }
+
+    const page = toPositiveInt(req.query.page, 1);
+    const limit = Math.min(toPositiveInt(req.query.limit, 25), 100);
+    const objectType = Number(req.query.objectType || 0);
+    const eventTypes = String(req.query.eventTypes || '')
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean);
+
+    const result = await listPrivilegedEvents({
+      page,
+      limit,
+      eventTypes,
+      objectType: objectType > 0 ? objectType : null,
     });
 
-    backup({
-      uri: config.mongodb.uri,
-      root: backupDir,
-      collections: collections.privateBackupList || [],
-      parser: 'json',
-      query: { private: false },
-    });
-
-    backup({
-      uri: config.mongodb.uri,
-      root: privateBackupDir,
-      collections: collections.privateBackupList || [],
-      parser: 'json',
-      query: { private: true },
-    });
-
-    res.status(202).json({
+    res.json({
       success: true,
-      message: 'Backup tasks started',
-      backup: {
-        backupDir: backupDir,
-        privateBackupDir: privateBackupDir,
-        startedAt: new Date().toISOString(),
-      },
+      events: result.items,
+      total: result.total,
+      page: result.page,
+      limit: result.limit,
     });
   });
 };

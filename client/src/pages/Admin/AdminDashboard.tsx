@@ -172,6 +172,32 @@ const AdminDashboard: React.FC = () => {
               </div>
             </div>
           </div>
+          <div className="col-sm-3">
+            <div className="panel panel-info">
+              <div className="panel-heading">Signals & Appeals</div>
+              <div className="panel-body">
+                <p className="text-muted" style={{ marginBottom: 10 }}>
+                  Triage reader signals and appeal requests.
+                </p>
+                <Link to="/admin/moderation/signals" className="btn btn-info btn-xs">
+                  Open Triage
+                </Link>
+              </div>
+            </div>
+          </div>
+          <div className="col-sm-3">
+            <div className="panel panel-default">
+              <div className="panel-heading">Privileged Audit</div>
+              <div className="panel-body">
+                <p className="text-muted" style={{ marginBottom: 10 }}>
+                  Review immutable privileged action timeline.
+                </p>
+                <Link to="/admin/audit" className="btn btn-default btn-xs">
+                  View Timeline
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
       ) : null}
     </div>

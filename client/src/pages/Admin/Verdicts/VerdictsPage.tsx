@@ -46,6 +46,7 @@ const VerdictsPage: React.FC = () => {
   const [message, setMessage] = useState<string | null>(null);
 
   const canManageVerdicts = Boolean(user?.roles?.admin);
+  const canVoteVerdicts = Boolean(user?.roles?.reviewer || user?.roles?.admin);
   const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
 
   const selectedEntries = useMemo(() => {
@@ -217,6 +218,74 @@ const VerdictsPage: React.FC = () => {
     setSelectedRows({});
   };
 
+  const handleVoteRow = async (entry: ModerationEntry) => {
+    if (!canVoteVerdicts || !entry._id) {
+      return;
+    }
+    const key = rowKey(entry);
+    const draft = drafts[key];
+    try {
+      setError(null);
+      setMessage(null);
+      const response = await moderationApi.submitVerdictVote(
+        {
+          key: (entry.objectName || 'argument') as any,
+          id: String(entry._id),
+        },
+        {
+          status: typeof draft?.status === 'number' ? draft.status : 0,
+          rationale: String(draft?.reasoning || '').trim() || undefined,
+        },
+      );
+      setEntries((prev) =>
+        prev.map((row) =>
+          rowKey(row) === key
+            ? {
+                ...row,
+                voteSummary: {
+                  ...(row.voteSummary || {
+                    totalVotes: 0,
+                    threshold: 2,
+                    consensusReached: false,
+                    consensusStatus: null,
+                    counts: [],
+                  }),
+                  totalVotes: response.summary.totalVotes,
+                  threshold: response.summary.threshold,
+                  consensusReached: response.summary.consensusReached,
+                  consensusStatus: response.summary.consensusStatus,
+                },
+              }
+            : row,
+        ),
+      );
+      setMessage('Vote saved.');
+    } catch (voteError) {
+      setError(voteError instanceof Error ? voteError.message : 'Unable to save vote');
+    }
+  };
+
+  const handleViewVotes = async (entry: ModerationEntry) => {
+    if (!canVoteVerdicts || !entry._id) {
+      return;
+    }
+    try {
+      const response = await moderationApi.listVerdictVotes({
+        key: (entry.objectName || 'argument') as any,
+        id: String(entry._id),
+      });
+      const lines = response.votes.map((vote) => {
+        const username = String(vote.voterUsername || 'reviewer');
+        const status = String(vote.verdictStatus || '-');
+        const rationale = String(vote.rationale || '').trim();
+        return `${username}: ${status}${rationale ? ` — ${rationale}` : ''}`;
+      });
+      window.alert(lines.length > 0 ? lines.join('\n') : 'No votes yet.');
+    } catch (_error) {
+      setError('Unable to load vote provenance.');
+    }
+  };
+
   return (
     <div className="container">
       <PageMeta title="Verdict Queue" description="Review and update verdict status for topics and arguments." />
@@ -370,7 +439,8 @@ const VerdictsPage: React.FC = () => {
                   <th style={{ width: 110 }}>Type</th>
                   <th style={{ width: 220 }}>Verdict</th>
                   <th>Reasoning</th>
-                  <th style={{ width: 180 }}>Actions</th>
+                  <th style={{ width: 200 }}>Votes</th>
+                  <th style={{ width: 220 }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -423,6 +493,28 @@ const VerdictsPage: React.FC = () => {
                         />
                       </td>
                       <td>
+                        <div>
+                          <span className={`label ${entry.voteSummary?.consensusReached ? 'label-success' : 'label-default'}`}>
+                            {entry.voteSummary?.totalVotes || 0}/{entry.voteSummary?.threshold || 2}
+                          </span>{' '}
+                          {typeof entry.voteSummary?.consensusStatus === 'number' ? (
+                            <span className="text-muted">status {entry.voteSummary.consensusStatus}</span>
+                          ) : (
+                            <span className="text-muted">no consensus</span>
+                          )}
+                        </div>
+                        <div style={{ marginTop: 6 }}>
+                          <button
+                            type="button"
+                            className="btn btn-xs btn-default"
+                            onClick={() => void handleViewVotes(entry)}
+                            disabled={!canVoteVerdicts}
+                          >
+                            Provenance
+                          </button>
+                        </div>
+                      </td>
+                      <td>
                         <button
                           type="button"
                           className="btn btn-xs btn-warning"
@@ -434,6 +526,19 @@ const VerdictsPage: React.FC = () => {
                         <Link className="btn btn-xs btn-default" to={entryDetailsPath(entry)}>
                           Open
                         </Link>
+                        {canVoteVerdicts ? (
+                          <>
+                            {' '}
+                            <button
+                              type="button"
+                              className="btn btn-xs btn-info"
+                              disabled={isApplying}
+                              onClick={() => void handleVoteRow(entry)}
+                            >
+                              Vote
+                            </button>
+                          </>
+                        ) : null}
                       </td>
                     </tr>
                   );

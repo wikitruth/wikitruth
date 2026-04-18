@@ -24,6 +24,8 @@ const CategoryDetails = lazy(() => import('../pages/Admin/Categories/CategoryDet
 const StatusesList = lazy(() => import('../pages/Admin/Statuses/StatusesList'));
 const StatusDetails = lazy(() => import('../pages/Admin/Statuses/StatusDetails'));
 const DBBackupPage = lazy(() => import('../pages/Admin/DBBackup/DBBackupPage'));
+const AuditTimelinePage = lazy(() => import('../pages/Admin/Audit/AuditTimelinePage'));
+const SignalsAppealsPage = lazy(() => import('../pages/Admin/ModerationSignals/SignalsAppealsPage'));
 const TopicsPage = lazy(() => import('../pages/TopicsPage'));
 const TopicCreatePage = lazy(() => import('../pages/TopicCreatePage'));
 const TopicEntryPage = lazy(() => import('../pages/TopicEntryPage'));
@@ -80,6 +82,9 @@ const HelpUsPage = lazy(() => import('../pages/HelpUs/HelpUsPage'));
 const InstallPage = lazy(() => import('../pages/Install/InstallPage'));
 const FastSwitchPage = lazy(() => import('../pages/FastSwitch/FastSwitchPage'));
 const ClipboardPage = lazy(() => import('../pages/ClipboardPage'));
+const CreateWizardPage = lazy(() => import('../pages/CreateWizardPage'));
+const NotificationsPage = lazy(() => import('../pages/NotificationsPage'));
+const EntryTimelinePage = lazy(() => import('../pages/EntryTimelinePage'));
 const OutlineLinkPage = lazy(() => import('../pages/OutlineLinkPage'));
 const VerdictsPage = lazy(() => import('../pages/Admin/Verdicts/VerdictsPage'));
 const VerdictUpdatePage = lazy(() => import('../pages/Admin/Verdicts/VerdictUpdatePage'));
@@ -117,6 +122,8 @@ export const appRoutes: AppRoute[] = [
   { path: '/admin/statuses', element: <StatusesList /> },
   { path: '/admin/statuses/:id', element: <StatusDetails /> },
   { path: '/admin/db-backup', element: <DBBackupPage /> },
+  { path: '/admin/audit', element: <AuditTimelinePage /> },
+  { path: '/admin/moderation/signals', element: <SignalsAppealsPage /> },
   { path: '/topics', element: <TopicsPage /> },
   { path: '/topics/create', element: <TopicCreatePage /> },
   { path: '/topics/entry/:friendlyUrl/:id', element: <TopicEntryPage /> },
@@ -194,7 +201,10 @@ export const appRoutes: AppRoute[] = [
   { path: '/help-us', element: <HelpUsPage /> },
   { path: '/install', element: <InstallPage /> },
   { path: '/fast-switch', element: <FastSwitchPage /> },
+  { path: '/create', element: <CreateWizardPage /> },
   { path: '/clipboard', element: <ClipboardPage /> },
+  { path: '/notifications', element: <NotificationsPage /> },
+  { path: '/timeline', element: <EntryTimelinePage /> },
   { path: '/outline/link', element: <OutlineLinkPage /> },
   { path: '/admin/verdicts', element: <VerdictsPage /> },
   { path: '/admin/verdicts/:id', element: <VerdictUpdatePage /> },

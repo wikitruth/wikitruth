@@ -1,6 +1,7 @@
 import React, { ReactElement, ReactNode } from 'react';
 import { render as rtlRender, RenderOptions } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { HelmetProvider } from 'react-helmet-async';
 
 interface TestProvidersProps {
   children: ReactNode;
@@ -9,12 +10,14 @@ interface TestProvidersProps {
 
 const TestProviders: React.FC<TestProvidersProps> = ({ children, route }) => {
   return (
-    <MemoryRouter
-      initialEntries={[route]}
-      future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-    >
-      {children}
-    </MemoryRouter>
+    <HelmetProvider>
+      <MemoryRouter
+        initialEntries={[route]}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        {children}
+      </MemoryRouter>
+    </HelmetProvider>
   );
 };
 

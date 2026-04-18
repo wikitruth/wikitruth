@@ -5,6 +5,7 @@ import type { Application, User } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import authApi from '../../services/api/auth';
 import apiService from '../../services/api';
+import notificationsApi from '../../services/api/notifications';
 
 type HeaderUser = Pick<User, '_id' | 'username' | 'email' | 'roles'>;
 type HeaderApplication = Pick<Application, '_id'> & {
@@ -38,6 +39,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
 
   useEffect(() => {
     let isMounted = true;
@@ -67,6 +69,21 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
         setApplication(homeResult.value.application);
       } else {
         setApplication(null);
+      }
+
+      if (userResult.status === 'fulfilled' && userResult.value.user) {
+        try {
+          const summary = await notificationsApi.summary();
+          if (isMounted) {
+            setUnreadNotifications(Number(summary.unreadCount || 0));
+          }
+        } catch (_error) {
+          if (isMounted) {
+            setUnreadNotifications(0);
+          }
+        }
+      } else if (isMounted) {
+        setUnreadNotifications(0);
       }
     };
 
@@ -157,6 +174,14 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
                 <ul id="header-more-menu" className="dropdown-menu dropdown-menu-right">
                   <li className="dropdown-header">more</li>
                   <li>
+                    <Link to="/create" onClick={() => {
+                      setIsMoreOpen(false);
+                      setIsMobileNavOpen(false);
+                    }}>
+                      <i className="fa fa-plus-circle"></i> Create
+                    </Link>
+                  </li>
+                  <li>
                     <Link to="/groups" onClick={() => {
                       setIsMoreOpen(false);
                       setIsMobileNavOpen(false);
@@ -198,17 +223,14 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
             {user ? (
               <>
                 <li>
-                  <button
-                    type="button"
-                    title="Notifications"
-                    className="btn btn-link navbar-btn"
-                    aria-label="Notifications"
-                    onClick={(event) => {
-                      event.preventDefault();
-                    }}
-                  >
+                  <Link to="/notifications" title="Notifications" className="btn btn-link navbar-btn" aria-label="Notifications">
                     <i className="fa fa-bell-o"></i>
-                  </button>
+                    {unreadNotifications > 0 ? (
+                      <span className="badge" style={{ marginLeft: 6, background: '#d9534f' }}>
+                        {unreadNotifications > 99 ? '99+' : unreadNotifications}
+                      </span>
+                    ) : null}
+                  </Link>
                 </li>
                 <li className={`dropdown ${isUserMenuOpen ? 'open' : ''}`}>
                   <button

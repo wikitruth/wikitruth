@@ -4,6 +4,9 @@
 **Reference:** [LEGACY_REACT_GAP_ANALYSIS_2026-04-12.md](../frontend/LEGACY_REACT_GAP_ANALYSIS_2026-04-12.md)
 **Goal:** Close all remaining gaps between legacy frontend and modern React client
 
+> Status update (2026-04-18): phases below document completed remediation work for this plan scope.  
+> Remaining migration-closure gaps (admin parity, final UX parity, runtime hardening) are tracked in `docs/plans/MIGRATION_CLOSURE_PENDING_CHECKLIST_PLAN_2026-04-18.md`.
+
 ---
 
 ## Phase 1 — Critical Gaps (High Impact)
@@ -554,6 +557,28 @@
 
 ---
 
+## Phase 8 — Final Migration Closure (Pending)
+
+> **Priority:** P0–P2
+> **Scope:** Remaining admin parity + UX completion + runtime hardening before full migration sign-off
+
+#### Checklist
+
+- [x] Complete admin parity and operations UX closure:
+  - [x] Restore workflow parity in modern admin (`CORE-030`)
+  - [x] Privileged-action audit timeline + viewer (`CORE-034`)
+  - [x] Reviewer vote governance/provenance UX (`CORE-021`)
+- [ ] Complete remaining core UX parity:
+  - [ ] Inline authoring/reply + unified create wizard (`FLOW-001`, `FLOW-002`)
+  - [x] Notifications/follow subscriptions and timeline UX (`FLOW-023`, `FLOW-024`, `FLOW-025`)
+  - [ ] Final ranking/filter/discussion quality parity (`FLOW-013`, `FLOW-014`, `FLOW-009`, `FLOW-012`)
+- [ ] Complete runtime/security hardening closure:
+  - [ ] PM2/runtime compatibility stability (`CORE-031`)
+  - [ ] Expanded sanitizer/OAuth end-to-end checks (`CORE-032`, `CORE-033`)
+- [ ] Run verification/sign-off checklist from `docs/plans/MIGRATION_CLOSURE_PENDING_CHECKLIST_PLAN_2026-04-18.md`.
+
+---
+
 ## Execution Order Summary (Updated)
 
 | Phase | Items | Priority | Status |
@@ -565,6 +590,7 @@
 | **Phase 3 (remaining)** | Outline editor tree view, Verdict list/filter | P2–P3 | **Done** |
 | **Phase 7** | Unit tests, Integration tests, Storybook, E2E | P2 | **Done** (external Playwright browser installation required to execute local e2e runs) |
 | **Phase 4 (remaining)** | Reply action, Print testing | P3 | **Done** |
+| **Phase 8** | Final migration closure (admin parity + remaining UX + runtime hardening) | P0–P2 | **Pending** |
 
 **Critical path:** Phase 5.1 (XSS) → Phase 5.2 (Error Boundary) → Phase 5.3 (Notifications) → Phase 1 remaining → rest
 

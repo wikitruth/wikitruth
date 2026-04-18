@@ -41,6 +41,13 @@ export interface ModerationEntry {
   ownerType?: number | null;
   parentId?: string | null;
   questionId?: string | null;
+  voteSummary?: {
+    totalVotes: number;
+    threshold: number;
+    consensusReached: boolean;
+    consensusStatus: number | null;
+    counts: Array<{ status: number; count: number }>;
+  };
 }
 
 interface ModerationEntryResponse {
@@ -90,6 +97,28 @@ interface OwnershipMigrationResponse {
     targetScope: 'public' | 'diary';
     username: string | null;
     migratedTopicCount: number;
+  };
+}
+
+interface VerdictVoteResponse {
+  success: boolean;
+  vote: Record<string, unknown>;
+  summary: {
+    threshold: number;
+    totalVotes: number;
+    consensusReached: boolean;
+    consensusStatus: number | null;
+  };
+}
+
+interface VerdictVotesListResponse {
+  success: boolean;
+  votes: Array<Record<string, unknown>>;
+  summary: {
+    threshold: number;
+    totalVotes: number;
+    consensusReached: boolean;
+    consensusStatus: number | null;
   };
 }
 
@@ -196,6 +225,77 @@ export const moderationApi = {
         targetScope,
         username,
       }),
+      }),
+  submitVerdictVote: (
+    target: ModerationTarget,
+    payload: {
+      status: number;
+      rationale?: string;
+    },
+  ) =>
+    request<VerdictVoteResponse>(`/moderation/verdict-votes?${toQuery(target)}`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+  listVerdictVotes: (target: ModerationTarget) =>
+    request<VerdictVotesListResponse>(`/moderation/verdict-votes?${toQuery(target)}`),
+  submitReaderSignal: (
+    target: ModerationTarget,
+    payload: {
+      signalType: 'controversial' | 'incorrect_verdict' | 'needs_reevaluation' | 'wrong_category';
+      note?: string;
+    },
+  ) =>
+    request<{ success: boolean; signal: Record<string, unknown> }>(`/moderation/signals?${toQuery(target)}`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+  listReaderSignals: (params?: { status?: string; signalType?: string }) => {
+    const query = new URLSearchParams();
+    if (params?.status) {
+      query.set('status', params.status);
+    }
+    if (params?.signalType) {
+      query.set('signalType', params.signalType);
+    }
+    const suffix = query.toString();
+    return request<{ success: boolean; signals: Array<Record<string, unknown>> }>(
+      `/moderation/signals${suffix ? `?${suffix}` : ''}`,
+    );
+  },
+  updateReaderSignal: (id: string, payload: { status?: string; resolutionNote?: string }) =>
+    request<{ success: boolean; signal: Record<string, unknown> }>(`/moderation/signals/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+  submitAppeal: (
+    target: ModerationTarget,
+    payload: {
+      reasonType?: 'verdict' | 'issue' | 'general';
+      note: string;
+    },
+  ) =>
+    request<{ success: boolean; appeal: Record<string, unknown> }>(`/moderation/appeals?${toQuery(target)}`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+  listAppeals: (params?: { status?: string; reasonType?: string }) => {
+    const query = new URLSearchParams();
+    if (params?.status) {
+      query.set('status', params.status);
+    }
+    if (params?.reasonType) {
+      query.set('reasonType', params.reasonType);
+    }
+    const suffix = query.toString();
+    return request<{ success: boolean; appeals: Array<Record<string, unknown>> }>(
+      `/moderation/appeals${suffix ? `?${suffix}` : ''}`,
+    );
+  },
+  updateAppeal: (id: string, payload: { status?: string; resolutionNote?: string }) =>
+    request<{ success: boolean; appeal: Record<string, unknown> }>(`/moderation/appeals/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
     }),
 };
 

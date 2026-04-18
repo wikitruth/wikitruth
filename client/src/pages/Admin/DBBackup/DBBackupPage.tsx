@@ -10,6 +10,9 @@ const DBBackupPage: React.FC = () => {
   const [status, setStatus] = useState<{ backupDir: string; privateBackupDir: string; hasGitBackup: boolean } | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [restorePublicData, setRestorePublicData] = useState(true);
+  const [restorePrivateData, setRestorePrivateData] = useState(true);
+  const [confirmText, setConfirmText] = useState('');
 
   const loadStatus = async () => {
     try {
@@ -37,6 +40,33 @@ const DBBackupPage: React.FC = () => {
       setMessage(`${result.message}. Started at ${new Date(result.backup.startedAt).toLocaleString()}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to start backup');
+    } finally {
+      setRunning(false);
+    }
+  };
+
+  const handleRestore = async () => {
+    if (confirmText.trim().toUpperCase() !== 'RESTORE') {
+      setError('Type RESTORE in the confirmation box before restoring.');
+      return;
+    }
+
+    if (!window.confirm('Run restore now? This overwrites persisted data in selected scopes.')) {
+      return;
+    }
+
+    try {
+      setRunning(true);
+      setError(null);
+      setMessage(null);
+      const result = await adminApi.runDbRestore({
+        restorePublicData,
+        restorePrivateData,
+        confirmText,
+      });
+      setMessage(`${result.message}. Completed at ${new Date(result.restore.completedAt).toLocaleString()}`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to run restore');
     } finally {
       setRunning(false);
     }
@@ -75,6 +105,54 @@ const DBBackupPage: React.FC = () => {
                 Refresh Status
               </Button>
             </div>
+
+            <hr />
+            <h4 style={{ marginTop: 10 }}>Restore</h4>
+            <p className="text-warning">
+              Restore overwrites existing records in selected scopes based on backup files.
+            </p>
+            <div className="checkbox">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={restorePublicData}
+                  onChange={(event) => setRestorePublicData(event.target.checked)}
+                  disabled={running}
+                />{' '}
+                Restore public data
+              </label>
+            </div>
+            <div className="checkbox">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={restorePrivateData}
+                  onChange={(event) => setRestorePrivateData(event.target.checked)}
+                  disabled={running}
+                />{' '}
+                Restore private user data
+              </label>
+            </div>
+            <div className="form-group">
+              <label htmlFor="restore-confirm">Type RESTORE to confirm</label>
+              <input
+                id="restore-confirm"
+                className="form-control"
+                value={confirmText}
+                onChange={(event) => setConfirmText(event.target.value)}
+                placeholder="RESTORE"
+                disabled={running}
+              />
+            </div>
+            <Button
+              type="button"
+              variant="danger"
+              onClick={handleRestore}
+              disabled={running || !restorePublicData && !restorePrivateData}
+              icon={running ? 'spinner fa-spin' : 'history'}
+            >
+              {running ? 'Running Restore...' : 'Run Restore'}
+            </Button>
           </div>
         </div>
       )}

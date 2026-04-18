@@ -3,6 +3,7 @@ import EntryActionsMenu from './EntryActionsMenu';
 import { fireEvent, render, screen, waitFor } from '../../test-utils/render';
 import { useAuth } from '../../context/AuthContext';
 import moderationApi from '../../services/api/moderation';
+import notificationsApi from '../../services/api/notifications';
 import * as clipboardPage from '../../pages/ClipboardPage';
 import type { LegacyEntity } from '../../types/legacy';
 
@@ -25,6 +26,22 @@ jest.mock('../../services/api/moderation', () => ({
   default: {
     takeOwnership: jest.fn().mockResolvedValue({ success: true }),
     deleteEntry: jest.fn().mockResolvedValue({ success: true }),
+    submitReaderSignal: jest.fn().mockResolvedValue({ success: true }),
+    submitAppeal: jest.fn().mockResolvedValue({ success: true }),
+  },
+}));
+
+jest.mock('../../services/api/notifications', () => ({
+  __esModule: true,
+  default: {
+    getSubscription: jest.fn().mockResolvedValue({
+      success: true,
+      subscription: { followed: false, triggers: [] },
+    }),
+    setSubscription: jest.fn().mockResolvedValue({
+      success: true,
+      subscription: { followed: true, triggers: ['reply'] },
+    }),
   },
 }));
 
@@ -34,6 +51,7 @@ jest.mock('../../pages/ClipboardPage', () => ({
 
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 const mockedModerationApi = moderationApi as jest.Mocked<typeof moderationApi>;
+const mockedNotificationsApi = notificationsApi as jest.Mocked<typeof notificationsApi>;
 const mockedClipboard = clipboardPage as jest.Mocked<typeof clipboardPage>;
 
 function renderMenu(entry: Partial<LegacyEntity>) {
@@ -84,6 +102,10 @@ describe('EntryActionsMenu moderation actions', () => {
     });
     mockedModerationApi.takeOwnership.mockResolvedValue({ success: true } as never);
     mockedModerationApi.deleteEntry.mockResolvedValue({ success: true } as never);
+    mockedNotificationsApi.getSubscription.mockResolvedValue({
+      success: true,
+      subscription: { followed: false, triggers: [] },
+    } as never);
     mockedClipboard.addToClipboard.mockReset();
   });
 
@@ -147,7 +169,7 @@ describe('EntryActionsMenu moderation actions', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /actions/i }));
     fireEvent.click(screen.getByRole('button', { name: /view history/i }));
-    expect(mockNavigate).toHaveBeenCalledWith('/?tab=history');
+    expect(mockNavigate).toHaveBeenCalledWith('/timeline?objectName=topic&id=topic-1&objectType=1');
 
     fireEvent.click(screen.getByRole('button', { name: /actions/i }));
     fireEvent.click(screen.getByRole('button', { name: /copy to clipboard/i }));
