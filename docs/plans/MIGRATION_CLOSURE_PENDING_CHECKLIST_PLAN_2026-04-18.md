@@ -18,12 +18,12 @@ References:
 ## Track A — Admin Feature Parity and Operations UX
 
 - [x] Implement modern restore workflow end-to-end (API + UI + permission checks + operator confirmations) (`CORE-030`).
-- [ ] Add restore runbook validation and rollback drill evidence for staging (`CORE-030`).
+- [x] Add restore runbook validation and rollback drill evidence for staging (`CORE-030`).
 - [x] Implement immutable privileged-action audit timeline and admin viewer (moderation, verdict, role, ownership) (`CORE-034`).
 - [x] Add reviewer-vote governance UI in admin/moderation (votes, threshold state, provenance details) (`CORE-021`).
 - [x] Add reader-signal triage and appeal queue views in admin/moderation dashboards (`CORE-023`, `CORE-024`, `FLOW-026`).
-- [ ] Add parity QA checklist for all modern admin routes and high-risk mutations (users/accounts/admins/groups/categories/statuses/verdicts/backup) (`FLOW-034`).
-- [ ] Add admin UX refinements for bulk operations, filters, confirms, and failure recovery paths (`FLOW-032`, `FLOW-035`).
+- [x] Add parity QA checklist for all modern admin routes and high-risk mutations (users/accounts/admins/groups/categories/statuses/verdicts/backup) (`FLOW-034`).
+- [x] Add admin UX refinements for bulk operations, filters, confirms, and failure recovery paths (`FLOW-032`, `FLOW-035`).
 
 ## Track B — Core UI/UX Migration Closure
 

@@ -72,4 +72,24 @@ describe('adminApi', () => {
       }),
     );
   });
+
+  it('deletes accounts and administrators via dedicated endpoints', async () => {
+    document.cookie = '_csrfToken=test-admin-csrf';
+    const fetchMock = jest.fn().mockResolvedValue({ ok: true, json: async () => ({ success: true }) });
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+    await adminApi.deleteAccount('acc-1');
+    await adminApi.deleteAdministrator('adm-1');
+
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      1,
+      '/api/admin/accounts/acc-1',
+      expect.objectContaining({ method: 'DELETE' }),
+    );
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      '/api/admin/administrators/adm-1',
+      expect.objectContaining({ method: 'DELETE' }),
+    );
+  });
 });

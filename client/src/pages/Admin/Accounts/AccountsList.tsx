@@ -10,6 +10,11 @@ const AccountsList: React.FC = () => {
       emptyMessage="No accounts found."
       detailPath="/admin/accounts"
       loadItems={adminApi.accounts}
+      bulkDeleteAction={{
+        buttonLabel: 'Delete selected accounts',
+        confirmMessage: 'Delete selected accounts? This action cannot be undone.',
+        onDelete: adminApi.deleteAccount,
+      }}
     />
   );
 };

@@ -19,6 +19,11 @@ const CategoriesList: React.FC = () => {
         ],
         onCreate: adminApi.createCategory,
       }}
+      bulkDeleteAction={{
+        buttonLabel: 'Delete selected categories',
+        confirmMessage: 'Delete selected categories? This action cannot be undone.',
+        onDelete: adminApi.deleteCategory,
+      }}
     />
   );
 };

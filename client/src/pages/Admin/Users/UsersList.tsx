@@ -19,6 +19,11 @@ const UsersList: React.FC = () => {
         ],
         onCreate: adminApi.createUser,
       }}
+      bulkDeleteAction={{
+        buttonLabel: 'Delete selected users',
+        confirmMessage: 'Delete selected user records? This action cannot be undone.',
+        onDelete: adminApi.deleteUser,
+      }}
     />
   );
 };

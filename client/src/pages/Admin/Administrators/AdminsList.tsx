@@ -10,6 +10,11 @@ const AdminsList: React.FC = () => {
       emptyMessage="No administrators found."
       detailPath="/admin/administrators"
       loadItems={adminApi.administrators}
+      bulkDeleteAction={{
+        buttonLabel: 'Delete selected administrators',
+        confirmMessage: 'Delete selected administrators? This action cannot be undone.',
+        onDelete: adminApi.deleteAdministrator,
+      }}
     />
   );
 };

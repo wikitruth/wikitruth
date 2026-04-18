@@ -19,6 +19,11 @@ const StatusesList: React.FC = () => {
         ],
         onCreate: adminApi.createStatus,
       }}
+      bulkDeleteAction={{
+        buttonLabel: 'Delete selected statuses',
+        confirmMessage: 'Delete selected statuses? This action cannot be undone.',
+        onDelete: adminApi.deleteStatus,
+      }}
     />
   );
 };

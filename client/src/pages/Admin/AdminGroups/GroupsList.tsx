@@ -18,6 +18,11 @@ const GroupsList: React.FC = () => {
         ],
         onCreate: adminApi.createAdminGroup,
       }}
+      bulkDeleteAction={{
+        buttonLabel: 'Delete selected groups',
+        confirmMessage: 'Delete selected admin groups? This action cannot be undone.',
+        onDelete: adminApi.deleteAdminGroup,
+      }}
     />
   );
 };

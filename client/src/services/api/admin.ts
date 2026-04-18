@@ -257,6 +257,10 @@ export const adminApi = {
     });
     return response.account || null;
   },
+  deleteAccount: (id: string) =>
+    request<{ success: boolean }>(`${API_BASE_URL}/admin/accounts/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    }),
   addAccountNote: async (id: string, data: string) => {
     const response = await request<MutationResponse>(`${API_BASE_URL}/admin/accounts/${encodeURIComponent(id)}/notes`, {
       method: 'POST',
@@ -298,6 +302,10 @@ export const adminApi = {
     });
     return response.admin || null;
   },
+  deleteAdministrator: (id: string) =>
+    request<{ success: boolean }>(`${API_BASE_URL}/admin/administrators/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    }),
   user: (id: string) => findById(() => adminApi.users(), id),
   account: (id: string) => findById(() => adminApi.accounts(), id),
   administrator: (id: string) => findById(() => adminApi.administrators(), id),
