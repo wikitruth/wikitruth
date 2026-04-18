@@ -4,6 +4,7 @@ import { render, screen, waitFor } from '../test-utils/render';
 import EntryActionsMenu from '../components/Entry/EntryActionsMenu';
 import ClipboardPage from './ClipboardPage';
 import { useAuth } from '../context/AuthContext';
+import { useNotification } from '../context/NotificationContext';
 
 const mockNavigate = jest.fn();
 
@@ -19,12 +20,17 @@ jest.mock('../context/AuthContext', () => ({
   useAuth: jest.fn(),
 }));
 
+jest.mock('../context/NotificationContext', () => ({
+  useNotification: jest.fn(),
+}));
+
 jest.mock('../components/common/PageMeta', () => ({
   __esModule: true,
   default: () => null,
 }));
 
 const mockedUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
+const mockedUseNotification = useNotification as jest.MockedFunction<typeof useNotification>;
 
 describe('Clipboard integration flow', () => {
   beforeEach(() => {
@@ -45,6 +51,11 @@ describe('Clipboard integration flow', () => {
       signup: jest.fn(),
       logout: jest.fn(),
       updateUser: jest.fn(),
+    });
+    mockedUseNotification.mockReturnValue({
+      addToast: jest.fn(),
+      toasts: [],
+      removeToast: jest.fn(),
     });
   });
 

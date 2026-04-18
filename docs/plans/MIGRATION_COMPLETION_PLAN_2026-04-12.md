@@ -569,9 +569,9 @@
   - [x] Privileged-action audit timeline + viewer (`CORE-034`)
   - [x] Reviewer vote governance/provenance UX (`CORE-021`)
 - [ ] Complete remaining core UX parity:
-  - [ ] Inline authoring/reply + unified create wizard (`FLOW-001`, `FLOW-002`)
+  - [x] Inline authoring/reply + unified create wizard (`FLOW-001`, `FLOW-002`)
   - [x] Notifications/follow subscriptions and timeline UX (`FLOW-023`, `FLOW-024`, `FLOW-025`)
-  - [ ] Final ranking/filter/discussion quality parity (`FLOW-013`, `FLOW-014`, `FLOW-009`, `FLOW-012`)
+  - [x] Final ranking/filter/discussion quality parity (`FLOW-013`, `FLOW-014`, `FLOW-009`, `FLOW-012`)
 - [ ] Complete runtime/security hardening closure:
   - [ ] PM2/runtime compatibility stability (`CORE-031`)
   - [ ] Expanded sanitizer/OAuth end-to-end checks (`CORE-032`, `CORE-033`)

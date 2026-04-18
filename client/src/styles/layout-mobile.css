@@ -1,0 +1,16 @@
+@media (max-width: 991px) {
+  .sidebar-backdrop {
+    position: fixed;
+    top: 50px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 1030;
+  }
+
+  .row-offcanvas .sidebar-offcanvas {
+    z-index: 1040;
+  }
+}

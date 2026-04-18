@@ -36,6 +36,49 @@ interface HomeData {
   artifactsMore?: boolean;
 }
 
+function toTimestamp(value: unknown): number {
+  const parsed = new Date(String(value || '')).getTime();
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function countChildren(entry: LegacyEntity): number {
+  const childrenCount = entry.childrenCount || {};
+  return (
+    Number(childrenCount.topics?.accepted || childrenCount.topics?.total || 0) +
+    Number(childrenCount.arguments?.accepted || childrenCount.arguments?.total || 0) +
+    Number(childrenCount.questions?.accepted || childrenCount.questions?.total || 0) +
+    Number(childrenCount.answers?.accepted || childrenCount.answers?.total || 0) +
+    Number(childrenCount.artifacts?.accepted || childrenCount.artifacts?.total || 0) +
+    Number(childrenCount.issues?.accepted || childrenCount.issues?.total || 0) +
+    Number(childrenCount.opinions?.accepted || childrenCount.opinions?.total || 0)
+  );
+}
+
+function verdictWeight(entry: LegacyEntity): number {
+  const status = Number((entry.verdict as { status?: number } | undefined)?.status);
+  if (!Number.isFinite(status)) {
+    return 0;
+  }
+  if (status === 1) {
+    return 4;
+  }
+  if (status === 2) {
+    return 2;
+  }
+  return 1;
+}
+
+function trendingScore(entry: LegacyEntity): number {
+  const editedAt = toTimestamp(entry.editDate || entry.createDate);
+  const ageHours = Math.max(0, (Date.now() - editedAt) / (60 * 60 * 1000));
+  const recency = Math.max(0, 1 - ageHours / 168); // 7-day recency window
+  return countChildren(entry) * 2 + verdictWeight(entry) + recency * 6;
+}
+
+function topScore(entry: LegacyEntity): number {
+  return countChildren(entry) * 3 + verdictWeight(entry) * 2 + Number(entry.points || 0);
+}
+
 function getLegacyEntryPath(entry: LegacyEntity): string | null {
   const id = encodeURIComponent(String(entry._id || ''));
   const friendly = encodeURIComponent(String(entry.friendlyUrl || ''));
@@ -86,6 +129,39 @@ const HomePage: React.FC = () => {
 
   const { application } = data;
   const entrySetColumns = (data.entrySet || []) as HomeEntrySetColumn[];
+  const rankedEntries = React.useMemo(() => {
+    const unique = new Map<string, LegacyEntity>();
+    const pushEntry = (entry: LegacyEntity, fallbackObjectName?: string) => {
+      const id = String(entry._id || '');
+      if (!id) {
+        return;
+      }
+      const objectName = String(entry.objectName || fallbackObjectName || '').trim().toLowerCase();
+      const key = `${objectName}:${id}`;
+      if (!unique.has(key)) {
+        unique.set(key, objectName ? { ...entry, objectName } : entry);
+      }
+    };
+
+    if (entrySetColumns.length > 0) {
+      entrySetColumns.forEach((column) => (column.entries || []).forEach((entry) => pushEntry(entry)));
+    } else {
+      (data.topics || []).forEach((entry) => pushEntry(entry as unknown as LegacyEntity, 'topic'));
+      (data.arguments || []).forEach((entry) => pushEntry(entry as unknown as LegacyEntity, 'argument'));
+      (data.questions || []).forEach((entry) => pushEntry(entry as unknown as LegacyEntity, 'question'));
+      (data.answers || []).forEach((entry) => pushEntry(entry as unknown as LegacyEntity, 'answer'));
+      (data.issues || []).forEach((entry) => pushEntry(entry as unknown as LegacyEntity, 'issue'));
+      (data.opinions || []).forEach((entry) => pushEntry(entry as unknown as LegacyEntity, 'opinion'));
+      (data.artifacts || []).forEach((entry) => pushEntry(entry as unknown as LegacyEntity, 'artifact'));
+    }
+
+    const all = Array.from(unique.values());
+    const latest = [...all].sort((a, b) => toTimestamp(b.editDate || b.createDate) - toTimestamp(a.editDate || a.createDate)).slice(0, 8);
+    const trending = [...all].sort((a, b) => trendingScore(b) - trendingScore(a)).slice(0, 8);
+    const top = [...all].sort((a, b) => topScore(b) - topScore(a)).slice(0, 8);
+
+    return { latest, trending, top };
+  }, [data, entrySetColumns]);
 
   const renderMixedEntry = (entry: LegacyEntity) => {
     const entryType = String(entry.objectName || '');
@@ -272,15 +348,25 @@ const HomePage: React.FC = () => {
       <h1 className="page-header wt-header">
         <i className="fa fa-globe"></i> Latest Posts
       </h1>
+      <p className="text-muted">
+        Ranking formulas: <strong>Latest</strong> by most recent edit date, <strong>Trending</strong> by recency + child activity + verdict signal, <strong>Top</strong> by activity + verdict + score.
+      </p>
 
-      {/* Entry Lists */}
-      {entrySetColumns.length > 0 ? (
+      {rankedEntries.latest.length > 0 || rankedEntries.trending.length > 0 || rankedEntries.top.length > 0 ? (
         <div className="row">
-          {entrySetColumns.map((column, index) => (
-            <div key={`entry-set-col-${index}`} className="col-md-6 col-sm-12">
+          {([
+            { key: 'latest', label: 'Latest', icon: 'clock-o', entries: rankedEntries.latest },
+            { key: 'trending', label: 'Trending', icon: 'line-chart', entries: rankedEntries.trending },
+            { key: 'top', label: 'Top', icon: 'star', entries: rankedEntries.top },
+          ] as Array<{ key: string; label: string; icon: string; entries: LegacyEntity[] }>).map((bucket) => (
+            <div key={bucket.key} className="col-md-4 col-sm-12">
               <div className="wt-list-container">
                 <ul className="list-group top-list-items wt-list">
-                  {(column.entries || []).map((entry) => renderMixedEntry(entry))}
+                  <li className="list-group-item highlight">
+                    <i className={`fa fa-${bucket.icon} text-muted-x`} aria-hidden="true"></i>
+                    <div>{bucket.label}</div>
+                  </li>
+                  {bucket.entries.map((entry) => renderMixedEntry(entry))}
                 </ul>
                 <div className="top-list-items-more">
                   <Link to="/explore#browse" role="button" className="btn btn-default btn-sm">
@@ -292,7 +378,7 @@ const HomePage: React.FC = () => {
           ))}
         </div>
       ) : (
-      <>
+        <>
       <div className="row">
         {/* Topics */}
         {data.topics && data.topics.length > 0 && (

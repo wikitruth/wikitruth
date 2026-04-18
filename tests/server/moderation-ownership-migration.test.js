@@ -10,6 +10,7 @@ const findTopics = jest.fn();
 const findUser = jest.fn();
 const syncChildren = jest.fn();
 const updateChildrenCountBatch = jest.fn();
+const createEntryEvent = jest.fn();
 
 jest.mock('../../server/src/app', () => ({
   db: {
@@ -21,6 +22,9 @@ jest.mock('../../server/src/app', () => ({
       },
       User: {
         findOne: (...args) => findUser(...args),
+      },
+      EntryEvent: {
+        create: (...args) => createEntryEvent(...args),
       },
     },
   },
@@ -55,6 +59,7 @@ describe('Moderation ownership migration', function () {
     updateTopics.mockResolvedValue({ acknowledged: true });
     syncChildren.mockResolvedValue(undefined);
     updateChildrenCountBatch.mockResolvedValue({ processed: 1 });
+    createEntryEvent.mockResolvedValue(undefined);
   });
 
   it('requires admin role', async function () {

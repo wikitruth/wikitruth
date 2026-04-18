@@ -205,6 +205,54 @@ function isSupportedVerdictStatus(status: number): boolean {
   return VERDICT_STATUS_ORDER.includes(status);
 }
 
+function resolveTargetByObjectType(objectType: number): { objectType: number; objectName: string } | null {
+  if (!objectType) {
+    return null;
+  }
+  const objectName = String(constants.OBJECT_ID_NAME_MAP?.[objectType] || '').trim();
+  if (!objectName) {
+    return null;
+  }
+  return {
+    objectType,
+    objectName,
+  };
+}
+
+function resolveConversionTargetType(raw: unknown): { objectType: number; objectName: string } | null {
+  const normalized = String(raw || '').trim().toLowerCase();
+  if (normalized === 'topic') {
+    return resolveTargetByObjectType(constants.OBJECT_TYPES.topic);
+  }
+  if (normalized === 'argument' || normalized === 'fact') {
+    return resolveTargetByObjectType(constants.OBJECT_TYPES.argument);
+  }
+  return null;
+}
+
+function buildEntryPath(target: { objectName: string; id: string; friendlyUrl?: string | null }): string {
+  const encodedId = encodeURIComponent(String(target.id || ''));
+  const encodedFriendly = encodeURIComponent(String(target.friendlyUrl || target.id || ''));
+  switch (target.objectName) {
+    case 'topic':
+      return `/topics/entry/${encodedFriendly}/${encodedId}`;
+    case 'argument':
+      return `/arguments/entry/${encodedFriendly}/${encodedId}`;
+    case 'question':
+      return `/questions/entry/${encodedFriendly}/${encodedId}`;
+    case 'answer':
+      return `/answers/entry/${encodedId}`;
+    case 'issue':
+      return `/issues/entry/${encodedFriendly}/${encodedId}`;
+    case 'opinion':
+      return `/opinions/entry/${encodedFriendly}/${encodedId}`;
+    case 'artifact':
+      return `/artifacts/entry/${encodedFriendly}/${encodedId}`;
+    default:
+      return `/${target.objectName}s/entry/${encodedFriendly}/${encodedId}`;
+  }
+}
+
 function computeConsensus(votes: Array<{ verdictStatus: number; voterUserId?: unknown }>): {
   threshold: number;
   totalVotes: number;
@@ -477,6 +525,226 @@ module.exports = function (router: Router) {
       success: true,
       target,
       entry: toModerationEntry(entry.toObject(), target),
+    });
+  });
+
+  router.post('/convert-type', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureAdmin(req, res)) {
+      return;
+    }
+
+    const sourceTarget = parseModerationTarget(req);
+    if (!sourceTarget) {
+      res.status(400).json({ success: false, message: 'A moderation target is required' });
+      return;
+    }
+
+    if (![constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.argument].includes(sourceTarget.objectType)) {
+      res.status(400).json({ success: false, message: 'Only topics and arguments can be converted' });
+      return;
+    }
+
+    const destinationTarget = resolveConversionTargetType(req.body?.targetType);
+    if (!destinationTarget) {
+      res.status(400).json({ success: false, message: 'A valid targetType is required (topic or argument)' });
+      return;
+    }
+    if (destinationTarget.objectType === sourceTarget.objectType) {
+      res.status(400).json({ success: false, message: 'Source and destination types are the same' });
+      return;
+    }
+
+    const archiveSource = req.body?.archiveSource !== false;
+    const reason = String(req.body?.reason || '').trim();
+
+    const sourceModel = getDbModelByObjectType(sourceTarget.objectType);
+    const destinationModel = getDbModelByObjectType(destinationTarget.objectType);
+    if (!sourceModel || !destinationModel) {
+      res.status(400).json({ success: false, message: 'Unsupported conversion target type' });
+      return;
+    }
+
+    const sourceEntry = await sourceModel.findById(sourceTarget.id);
+    if (!sourceEntry) {
+      res.status(404).json({ success: false, message: 'Source entry not found' });
+      return;
+    }
+
+    const now = new Date();
+    const actorUserId = String(req.user?.id || req.user?._id || '');
+    const actorUsername = String(req.user?.username || '');
+    const source = sourceEntry.toObject ? sourceEntry.toObject() : sourceEntry;
+    const sourceExtras = source?.extras && typeof source.extras === 'object' ? source.extras : {};
+
+    const destinationPayload: Record<string, unknown> = {
+      title: source?.title || '',
+      content: source?.content || '',
+      contentPreview: source?.contentPreview || String(source?.content || '').slice(0, 240),
+      friendlyUrl: source?.friendlyUrl || '',
+      referenceDate: source?.referenceDate || null,
+      references: source?.references || '',
+      topicTags: Array.isArray(source?.topicTags) ? source.topicTags : [],
+      groupId: source?.groupId || null,
+      categoryId: source?.categoryId || source?.ownerId || null,
+      ownerId: source?.ownerId || null,
+      ownerType: toNumber(source?.ownerType),
+      createDate: source?.createDate || now,
+      createUserId: source?.createUserId || actorUserId,
+      editDate: now,
+      editUserId: actorUserId || source?.editUserId || null,
+      screening: source?.screening || { status: constants.SCREENING_STATUS.status0.code },
+      private: Boolean(source?.private),
+      ethicalStatus: source?.ethicalStatus || { hasValue: false },
+      verdict: source?.verdict || {},
+      tags: Array.isArray(source?.tags) ? source.tags : [],
+      extras: {
+        ...sourceExtras,
+        convertedFrom: {
+          objectType: sourceTarget.objectType,
+          objectName: sourceTarget.objectName,
+          objectId: String(sourceEntry._id),
+          title: String(source?.title || ''),
+          convertedAt: now.toISOString(),
+          convertedBy: actorUserId,
+          convertedByUsername: actorUsername,
+          reason,
+        },
+      },
+    };
+
+    if (destinationTarget.objectType === constants.OBJECT_TYPES.topic) {
+      destinationPayload.parentId = sourceTarget.objectType === constants.OBJECT_TYPES.topic
+        ? source?.parentId || null
+        : null;
+      destinationPayload.contextTitle = source?.contextTitle || source?.title || '';
+    } else {
+      destinationPayload.parentId = sourceTarget.objectType === constants.OBJECT_TYPES.argument
+        ? source?.parentId || null
+        : null;
+      destinationPayload.threadId = source?.threadId || null;
+      destinationPayload.typeId = toNumber(source?.typeId) ?? constants.ARGUMENT_TYPES.factual;
+      destinationPayload.against = Boolean(source?.against);
+      destinationPayload.parentRelationship = toNumber(source?.parentRelationship);
+    }
+
+    const destinationEntry = await destinationModel.create(destinationPayload);
+    const destinationId = String(destinationEntry?._id || '');
+    const destinationFriendlyUrl = String(destinationEntry?.friendlyUrl || destinationId);
+    const destinationPath = buildEntryPath({
+      objectName: destinationTarget.objectName,
+      id: destinationId,
+      friendlyUrl: destinationFriendlyUrl,
+    });
+
+    const sourceHistory = Array.isArray(sourceExtras?.conversionHistory)
+      ? sourceExtras.conversionHistory
+      : [];
+    sourceEntry.extras = {
+      ...sourceExtras,
+      convertedTo: {
+        objectType: destinationTarget.objectType,
+        objectName: destinationTarget.objectName,
+        objectId: destinationId,
+        friendlyUrl: destinationFriendlyUrl,
+        convertedAt: now.toISOString(),
+        convertedBy: actorUserId,
+        convertedByUsername: actorUsername,
+        reason,
+      },
+      conversionHistory: [
+        ...sourceHistory,
+        {
+          from: {
+            objectType: sourceTarget.objectType,
+            objectName: sourceTarget.objectName,
+            objectId: String(sourceEntry._id),
+          },
+          to: {
+            objectType: destinationTarget.objectType,
+            objectName: destinationTarget.objectName,
+            objectId: destinationId,
+            friendlyUrl: destinationFriendlyUrl,
+          },
+          convertedAt: now.toISOString(),
+          convertedBy: actorUserId,
+          convertedByUsername: actorUsername,
+          reason,
+        },
+      ],
+    };
+    sourceEntry.editDate = now;
+    sourceEntry.editUserId = actorUserId || sourceEntry.editUserId;
+    if (archiveSource) {
+      sourceEntry.screening = sourceEntry.screening || {};
+      sourceEntry.screening.status = constants.SCREENING_STATUS.status3.code;
+    }
+    await sourceEntry.save();
+
+    await logEntryEvent({
+      scope: 'privileged',
+      eventType: 'moderation.entry.converted',
+      objectType: sourceTarget.objectType,
+      objectName: sourceTarget.objectName,
+      objectId: sourceTarget.id,
+      actorUserId,
+      actorUsername,
+      message: `Converted ${sourceTarget.objectName} to ${destinationTarget.objectName}`,
+      payload: {
+        archiveSource,
+        reason,
+        destination: {
+          objectType: destinationTarget.objectType,
+          objectName: destinationTarget.objectName,
+          objectId: destinationId,
+        },
+      },
+    });
+
+    await notifySubscribers({
+      target: {
+        objectType: sourceTarget.objectType,
+        objectName: sourceTarget.objectName,
+        objectId: sourceTarget.id,
+      },
+      type: 'verdict',
+      trigger: 'verdict',
+      title: 'Entry converted',
+      body: `${sourceTarget.objectName} converted to ${destinationTarget.objectName}.`,
+      link: destinationPath,
+      excludeUserIds: [actorUserId],
+      payload: {
+        sourceObjectType: sourceTarget.objectType,
+        sourceObjectName: sourceTarget.objectName,
+        sourceObjectId: sourceTarget.id,
+        destinationObjectType: destinationTarget.objectType,
+        destinationObjectName: destinationTarget.objectName,
+        destinationObjectId: destinationId,
+      },
+    });
+
+    res.json({
+      success: true,
+      source: {
+        target: sourceTarget,
+        entry: toModerationEntry(sourceEntry.toObject ? sourceEntry.toObject() : sourceEntry, sourceTarget),
+        archived: archiveSource,
+      },
+      destination: {
+        target: {
+          objectType: destinationTarget.objectType,
+          objectName: destinationTarget.objectName,
+          id: destinationId,
+        },
+        entry: toModerationEntry(
+          destinationEntry.toObject ? destinationEntry.toObject() : destinationEntry,
+          {
+            objectType: destinationTarget.objectType,
+            objectName: destinationTarget.objectName,
+            id: destinationId,
+          }
+        ),
+        path: destinationPath,
+      },
     });
   });
 

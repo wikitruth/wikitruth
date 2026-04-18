@@ -32,6 +32,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div>
       <Header onToggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
       <div className="container-fluid">
+        {sidebarOpen ? (
+          <button
+            type="button"
+            className="sidebar-backdrop visible-xs visible-sm"
+            aria-label="Close sidebar"
+            onClick={closeSidebar}
+          />
+        ) : null}
         <div className={`row row-offcanvas row-offcanvas-right${sidebarOpen ? ' active' : ''}`}>
           <div className="col-sm-12 col-md-9 col-lg-9-x">
             {children}

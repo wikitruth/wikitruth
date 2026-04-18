@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import apiService from '../services/api';
 import type { HomeDataResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
@@ -45,13 +45,29 @@ function getArgumentEntryPath(argument: Pick<LegacyEntity, 'friendlyUrl' | '_id'
 }
 
 const ExplorePage: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [data, setData] = useState<HomeDataResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<ExploreTab>('all');
-  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+  const storedViewMode = (() => {
     const saved = localStorage.getItem('wt_view_mode');
     return saved === 'wiki' || saved === 'original' ? saved : 'all';
-  });
+  })();
+  const activeTab = ((): ExploreTab => {
+    const raw = String(searchParams.get('tab') || 'all').toLowerCase();
+    if (raw === 'topics' || raw === 'arguments' || raw === 'questions' || raw === 'answers' || raw === 'artifacts' || raw === 'issues' || raw === 'opinions') {
+      return raw;
+    }
+    return 'all';
+  })();
+  const viewMode: ViewMode = (() => {
+    const raw = String(searchParams.get('view') || storedViewMode).toLowerCase();
+    return raw === 'wiki' || raw === 'original' ? raw : 'all';
+  })();
+  const keyword = String(searchParams.get('q') || '').trim();
+  const screeningFilter = String(searchParams.get('screening') || 'all').trim();
+  const verdictFilter = String(searchParams.get('status') || 'all').trim();
+  const relationshipFilter = String(searchParams.get('relationship') || 'all').trim();
+  const tagFilter = String(searchParams.get('tag') || '').trim();
   const { addToast } = useNotification();
 
   useEffect(() => {
@@ -79,8 +95,24 @@ const ExplorePage: React.FC = () => {
   }, [addToast]);
 
   const handleViewModeChange = (mode: ViewMode) => {
-    setViewMode(mode);
     localStorage.setItem('wt_view_mode', mode);
+    const next = new URLSearchParams(searchParams);
+    if (mode === 'all') {
+      next.delete('view');
+    } else {
+      next.set('view', mode);
+    }
+    setSearchParams(next);
+  };
+
+  const updateFilter = (name: string, value: string) => {
+    const next = new URLSearchParams(searchParams);
+    if (!value || value === 'all') {
+      next.delete(name);
+    } else {
+      next.set(name, value);
+    }
+    setSearchParams(next);
   };
 
   const sections = useMemo(() => {
@@ -144,6 +176,71 @@ const ExplorePage: React.FC = () => {
       },
     ];
   }, [data]);
+
+  const filterEntry = (entry: LegacyEntity): boolean => {
+    if (keyword) {
+      const text = `${String(entry.title || '')} ${String(entry.content || '')} ${String(entry.contentPreview || '')}`.toLowerCase();
+      if (!text.includes(keyword.toLowerCase())) {
+        return false;
+      }
+    }
+
+    if (screeningFilter !== 'all') {
+      const status = Number(entry.screening?.status);
+      if (!Number.isFinite(status) || String(status) !== screeningFilter) {
+        return false;
+      }
+    }
+
+    if (verdictFilter !== 'all') {
+      const verdictStatus = Number((entry.verdict as { status?: number } | undefined)?.status);
+      if (verdictFilter === 'verified' && verdictStatus !== 1) {
+        return false;
+      }
+      if (verdictFilter === 'false' && verdictStatus !== 2) {
+        return false;
+      }
+      if (verdictFilter === 'pending' && verdictStatus !== 0) {
+        return false;
+      }
+    }
+
+    if (relationshipFilter === 'root-only' && entry.parentId) {
+      return false;
+    }
+    if (relationshipFilter === 'with-issues') {
+      const issuesCount = Number(entry.childrenCount?.issues?.accepted || entry.childrenCount?.issues?.total || 0);
+      if (issuesCount <= 0) {
+        return false;
+      }
+    }
+    if (relationshipFilter === 'with-discussion') {
+      const discussionCount = Number(entry.childrenCount?.opinions?.accepted || entry.childrenCount?.opinions?.total || 0);
+      if (discussionCount <= 0) {
+        return false;
+      }
+    }
+
+    if (tagFilter) {
+      const rawTags = Array.isArray(entry.tags) ? entry.tags.map((tag) => String(tag)) : [];
+      const extrasTags = Array.isArray((entry.extras as { tags?: unknown[] } | undefined)?.tags)
+        ? ((entry.extras as { tags?: unknown[] }).tags || []).map((tag) => String(tag))
+        : [];
+      const merged = `${rawTags.join(' ')} ${extrasTags.join(' ')}`.toLowerCase();
+      if (!merged.includes(tagFilter.toLowerCase())) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  const filteredSections = useMemo(() => {
+    return sections.map((section) => ({
+      ...section,
+      items: (section.items || []).filter((entry) => filterEntry(entry as LegacyEntity)),
+    }));
+  }, [sections, keyword, screeningFilter, verdictFilter, relationshipFilter, tagFilter]);
 
   const categories: ExploreCategory[] = (data?.appCategories || []) as ExploreCategory[];
 
@@ -218,6 +315,78 @@ const ExplorePage: React.FC = () => {
       <div style={{ marginBottom: 15 }} className="wt-btn-group">
         <ContentViewFilter value={viewMode} onChange={handleViewModeChange} />
       </div>
+      <div className="panel panel-default">
+        <div className="panel-body">
+          <div className="row">
+            <div className="col-sm-3">
+              <label htmlFor="explore-filter-q">Keyword</label>
+              <input
+                id="explore-filter-q"
+                className="form-control"
+                value={keyword}
+                onChange={(event) => updateFilter('q', event.target.value)}
+                placeholder="Search title/content"
+              />
+            </div>
+            <div className="col-sm-2">
+              <label htmlFor="explore-filter-screening">Screening</label>
+              <select
+                id="explore-filter-screening"
+                className="form-control"
+                value={screeningFilter}
+                onChange={(event) => updateFilter('screening', event.target.value)}
+              >
+                <option value="all">All</option>
+                <option value="1">Accepted</option>
+                <option value="0">Pending</option>
+                <option value="2">Rejected</option>
+                <option value="3">Archived</option>
+              </select>
+            </div>
+            <div className="col-sm-2">
+              <label htmlFor="explore-filter-status">Status</label>
+              <select
+                id="explore-filter-status"
+                className="form-control"
+                value={verdictFilter}
+                onChange={(event) => updateFilter('status', event.target.value)}
+              >
+                <option value="all">All</option>
+                <option value="verified">Verified</option>
+                <option value="pending">Pending</option>
+                <option value="false">False</option>
+              </select>
+            </div>
+            <div className="col-sm-3">
+              <label htmlFor="explore-filter-relationship">Relationship</label>
+              <select
+                id="explore-filter-relationship"
+                className="form-control"
+                value={relationshipFilter}
+                onChange={(event) => updateFilter('relationship', event.target.value)}
+              >
+                <option value="all">All</option>
+                <option value="root-only">Root only</option>
+                <option value="with-issues">With issues</option>
+                <option value="with-discussion">With discussion</option>
+              </select>
+            </div>
+            <div className="col-sm-2">
+              <label htmlFor="explore-filter-tag">Tag</label>
+              <input
+                id="explore-filter-tag"
+                className="form-control"
+                value={tagFilter}
+                onChange={(event) => updateFilter('tag', event.target.value)}
+                placeholder="Tag id/name"
+              />
+            </div>
+          </div>
+          <p className="text-muted" style={{ marginTop: 8, marginBottom: 0 }}>
+            Filters are URL-shareable.
+          </p>
+        </div>
+      </div>
 
       <ul className="nav nav-tabs wt-tabs" role="tablist">
         {([
@@ -236,7 +405,7 @@ const ExplorePage: React.FC = () => {
               role="tab"
               onClick={(event) => {
                 event.preventDefault();
-                setActiveTab(tab.key);
+                updateFilter('tab', tab.key === 'all' ? '' : tab.key);
               }}
             >
               <i className={`fa fa-${tab.icon}`} aria-hidden="true"></i> {tab.label}
@@ -246,7 +415,7 @@ const ExplorePage: React.FC = () => {
       </ul>
 
       <div>
-        {sections
+        {filteredSections
           .filter((section) => activeTab === 'all' || section.key === activeTab)
           .map((section) => {
             if (!Array.isArray(section.items) || section.items.length === 0) {

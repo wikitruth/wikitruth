@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import moderationApi, { type ModerationEntry, type ModerationStatusOption, type ModerationTarget } from '../../../services/api/moderation';
+import moderationApi, { type ModerationEntry, type ModerationTarget } from '../../../services/api/moderation';
 import { useAuth } from '../../../context/AuthContext';
 
 const TARGET_KEYS = ['topic', 'argument'] as const;
@@ -21,11 +21,13 @@ const ConvertPage: React.FC = () => {
   const navigate = useNavigate();
   const { user, isLoading: isAuthLoading } = useAuth();
   const [entry, setEntry] = React.useState<ModerationEntry | null>(null);
-  const [statuses, setStatuses] = React.useState<ModerationStatusOption[]>([]);
-  const [selectedStatus, setSelectedStatus] = React.useState<number>(0);
+  const [targetType, setTargetType] = React.useState<'topic' | 'argument'>('argument');
+  const [archiveSource, setArchiveSource] = React.useState(true);
+  const [reason, setReason] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSaving, setIsSaving] = React.useState(false);
   const [message, setMessage] = React.useState<string | null>(null);
+  const [destinationPath, setDestinationPath] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
 
   const target = React.useMemo(() => getTargetFromSearch(location.search), [location.search]);
@@ -43,13 +45,11 @@ const ConvertPage: React.FC = () => {
         setIsLoading(true);
         const result = await moderationApi.entry(target);
         setEntry(result.entry || null);
-        const nextStatuses = result.verdictStatuses || [];
-        setStatuses(nextStatuses);
-        const currentStatus =
-          typeof result.entry?.verdict?.status === 'number'
-            ? result.entry.verdict.status
-            : nextStatuses[0]?.code || 0;
-        setSelectedStatus(currentStatus);
+        if (target.key === 'topic') {
+          setTargetType('argument');
+        } else {
+          setTargetType('topic');
+        }
       } catch (loadError) {
         setError(loadError instanceof Error ? loadError.message : 'Unable to load entry for convert');
       } finally {
@@ -80,11 +80,20 @@ const ConvertPage: React.FC = () => {
       setIsSaving(true);
       setError(null);
       setMessage(null);
-      const result = await moderationApi.updateVerdict(target, selectedStatus);
-      if (result.entry) {
-        setEntry(result.entry);
+      setDestinationPath(null);
+      const result = await moderationApi.convertEntryType(target, {
+        targetType,
+        archiveSource,
+        reason: reason.trim() || undefined,
+      });
+      if (result.destination?.entry) {
+        setEntry(result.destination.entry);
       }
-      setMessage('Verdict updated.');
+      if (result.destination?.path) {
+        setDestinationPath(result.destination.path);
+      }
+      const destinationLabel = targetType === 'argument' ? 'Fact' : 'Topic';
+      setMessage(`Entry converted to ${destinationLabel}.`);
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : 'Unable to convert entry');
     } finally {
@@ -92,10 +101,13 @@ const ConvertPage: React.FC = () => {
     }
   };
 
+  const currentType = target?.key === 'argument' ? 'argument' : 'topic';
+  const currentTypeLabel = currentType === 'topic' ? 'Topic' : 'Fact';
+
   return (
     <div className="container">
       <h2>Convert</h2>
-      <p className="text-muted">Update verdict status in the modern moderation workflow.</p>
+      <p className="text-muted">Convert between Topic and Fact while preserving conversion history metadata.</p>
 
       {isLoading ? <p className="text-muted">Loading...</p> : null}
       {error ? <div className="alert alert-danger">{error}</div> : null}
@@ -109,24 +121,54 @@ const ConvertPage: React.FC = () => {
             <p className="text-muted">
               Target: <code>{target.key}</code> / <code>{target.id}</code>
             </p>
+            <p className="text-muted">
+              Current type: <strong>{currentTypeLabel}</strong>
+            </p>
             <div className="form-group">
-              <label htmlFor="verdict-status">Verdict status</label>
+              <label htmlFor="target-type">Convert to</label>
               <select
-                id="verdict-status"
+                id="target-type"
                 className="form-control"
-                value={String(selectedStatus)}
-                onChange={(event) => setSelectedStatus(Number(event.target.value))}
+                value={targetType}
+                onChange={(event) => setTargetType(event.target.value === 'topic' ? 'topic' : 'argument')}
               >
-                {statuses.map((status) => (
-                  <option key={status.code} value={String(status.code)}>
-                    {status.text}
-                  </option>
-                ))}
+                <option value="topic" disabled={currentType === 'topic'}>
+                  Topic
+                </option>
+                <option value="argument" disabled={currentType === 'argument'}>
+                  Fact
+                </option>
               </select>
             </div>
+            <div className="checkbox">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={archiveSource}
+                  onChange={(event) => setArchiveSource(event.target.checked)}
+                />{' '}
+                Archive source entry after conversion
+              </label>
+            </div>
+            <div className="form-group">
+              <label htmlFor="conversion-reason">Reason (optional)</label>
+              <textarea
+                id="conversion-reason"
+                className="form-control"
+                rows={3}
+                value={reason}
+                onChange={(event) => setReason(event.target.value)}
+                placeholder="Why this conversion is needed"
+              />
+            </div>
             {message ? <div className="alert alert-success">{message}</div> : null}
+            {destinationPath ? (
+              <div className="alert alert-info">
+                Converted entry path: <a href={destinationPath}>{destinationPath}</a>
+              </div>
+            ) : null}
             <button className="btn btn-primary" type="submit" disabled={isSaving}>
-              {isSaving ? 'Saving...' : 'Save Verdict'}
+              {isSaving ? 'Converting...' : 'Convert Entry'}
             </button>{' '}
             <button className="btn btn-default" type="button" onClick={() => navigate(-1)}>
               Cancel

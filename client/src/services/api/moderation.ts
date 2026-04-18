@@ -100,6 +100,28 @@ interface OwnershipMigrationResponse {
   };
 }
 
+interface ConvertTypeResponse {
+  success: boolean;
+  source: {
+    target: {
+      objectType: number;
+      objectName: string;
+      id: string;
+    };
+    entry: ModerationEntry;
+    archived: boolean;
+  };
+  destination: {
+    target: {
+      objectType: number;
+      objectName: string;
+      id: string;
+    };
+    entry: ModerationEntry;
+    path: string;
+  };
+}
+
 interface VerdictVoteResponse {
   success: boolean;
   vote: Record<string, unknown>;
@@ -168,6 +190,18 @@ export const moderationApi = {
     request<ModerationMutationResponse>(`/moderation/verdict?${toQuery(target)}`, {
       method: 'PUT',
       body: JSON.stringify({ status }),
+    }),
+  convertEntryType: (
+    target: ModerationTarget,
+    payload: {
+      targetType: 'topic' | 'argument';
+      archiveSource?: boolean;
+      reason?: string;
+    },
+  ) =>
+    request<ConvertTypeResponse>(`/moderation/convert-type?${toQuery(target)}`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
     }),
   listVerdicts: (params?: {
     objectType?: number;

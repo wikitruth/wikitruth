@@ -13,9 +13,11 @@ const mockDb = {
     find: jest.fn(),
   },
   TopicLink: {
+    findOne: jest.fn(),
     findOneAndUpdate: jest.fn(),
   },
   ArgumentLink: {
+    findOne: jest.fn(),
     findOneAndUpdate: jest.fn(),
   },
 };
@@ -66,6 +68,8 @@ describe('outline api endpoints', () => {
     jest.clearAllMocks();
     mockDb.Topic.find.mockImplementation(() => chain([]));
     mockDb.Argument.find.mockImplementation(() => chain([]));
+    mockDb.TopicLink.findOne.mockReturnValue(leanDoc(null));
+    mockDb.ArgumentLink.findOne.mockReturnValue(leanDoc(null));
   });
 
   it('returns topic tree for a root id', async () => {

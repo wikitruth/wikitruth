@@ -2,17 +2,50 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { render, screen, waitFor } from '../test-utils/render';
 import ClipboardPage, { addToClipboard, removeFromClipboard } from './ClipboardPage';
+import { useAuth } from '../context/AuthContext';
+import { useNotification } from '../context/NotificationContext';
 
 jest.mock('../components/common/PageMeta', () => ({
   __esModule: true,
   default: () => null,
 }));
 
+jest.mock('../context/AuthContext', () => ({
+  useAuth: jest.fn(),
+}));
+
+jest.mock('../context/NotificationContext', () => ({
+  useNotification: jest.fn(),
+}));
+
 const STORAGE_KEY = 'wt_clipboard';
+const mockedUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
+const mockedUseNotification = useNotification as jest.MockedFunction<typeof useNotification>;
 
 describe('ClipboardPage', () => {
   beforeEach(() => {
     localStorage.clear();
+    mockedUseAuth.mockReturnValue({
+      user: {
+        _id: 'user-1',
+        username: 'demo',
+        roles: {},
+      },
+      isAuthenticated: true,
+      isLoading: false,
+      activeRole: 'contributor',
+      setActiveRole: jest.fn(),
+      availableRoles: ['contributor'],
+      login: jest.fn(),
+      signup: jest.fn(),
+      logout: jest.fn(),
+      updateUser: jest.fn(),
+    });
+    mockedUseNotification.mockReturnValue({
+      addToast: jest.fn(),
+      toasts: [],
+      removeToast: jest.fn(),
+    });
   });
 
   afterEach(() => {

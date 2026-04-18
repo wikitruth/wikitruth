@@ -235,6 +235,22 @@ module.exports = function (router: Router) {
         topicId: target.entry._id,
         parentId: parent.entry._id,
       };
+      const existingLink = await db.TopicLink.findOne(query).lean();
+      if (existingLink) {
+        res.status(200).json({
+          success: true,
+          created: false,
+          conflict: 'already_linked',
+          message: 'Link already exists',
+          link: {
+            _id: String(existingLink?._id || ''),
+            objectName: 'topicLink',
+            parentId,
+            targetId,
+          },
+        });
+        return;
+      }
       const payload = {
         topicId: target.entry._id,
         parentId: parent.entry._id,
@@ -256,6 +272,7 @@ module.exports = function (router: Router) {
 
       res.status(201).json({
         success: true,
+        created: true,
         link: {
           _id: String(link?._id || ''),
           objectName: 'topicLink',
@@ -277,6 +294,22 @@ module.exports = function (router: Router) {
           argumentId: target.entry._id,
           parentId: parent.entry._id,
         };
+    const existingArgumentLink = await db.ArgumentLink.findOne(argumentQuery).lean();
+    if (existingArgumentLink) {
+      res.status(200).json({
+        success: true,
+        created: false,
+        conflict: 'already_linked',
+        message: 'Link already exists',
+        link: {
+          _id: String(existingArgumentLink?._id || ''),
+          objectName: 'argumentLink',
+          parentId,
+          targetId,
+        },
+      });
+      return;
+    }
     const argumentPayload = {
       argumentId: target.entry._id,
       parentId: isTopicParent ? null : parent.entry._id,
@@ -303,6 +336,7 @@ module.exports = function (router: Router) {
 
     res.status(201).json({
       success: true,
+      created: true,
       link: {
         _id: String(argumentLink?._id || ''),
         objectName: 'argumentLink',

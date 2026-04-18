@@ -136,6 +136,21 @@ class ApiService {
     });
   }
 
+  async updateTopic(
+    id: string,
+    payload: {
+      title?: string;
+      description?: string;
+      topicId?: string;
+      private?: boolean;
+    }
+  ): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>(`/topics/entry/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  }
+
   // Arguments
   async getArguments(topicId?: string, view?: string): Promise<LegacyApiResponse> {
     const params = new URLSearchParams();

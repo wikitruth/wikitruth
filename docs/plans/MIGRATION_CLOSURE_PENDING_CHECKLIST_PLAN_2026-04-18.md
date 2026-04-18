@@ -27,15 +27,15 @@ References:
 
 ## Track B — Core UI/UX Migration Closure
 
-- [ ] Implement inline create/edit/reply flows for core entry pages (`FLOW-001`).
+- [x] Implement inline create/edit/reply flows for core entry pages (`FLOW-001`).
 - [x] Implement unified create wizard from navbar with context-aware targeting (`FLOW-002`).
-- [ ] Complete clipboard move/copy/link parity with conflict handling and permission messaging (`FLOW-003`).
-- [ ] Implement true entry-type conversion workflow preserving semantics/history (`FLOW-004`, `CORE-016`).
+- [x] Complete clipboard move/copy/link parity with conflict handling and permission messaging (`FLOW-003`).
+- [x] Implement true entry-type conversion workflow preserving semantics/history (`FLOW-004`, `CORE-016`).
 - [x] Implement notification center + unread counts + deep links with backend subscriptions (`FLOW-024`, `FLOW-025`).
 - [x] Implement unified timeline/history UX and timeline visualization mode (`FLOW-023`, `FLOW-028`).
-- [ ] Implement Home ranking buckets (`Latest`, `Trending`, `Top`) and advanced Explore filters with URL-shareable state (`FLOW-013`, `FLOW-014`).
+- [x] Implement Home ranking buckets (`Latest`, `Trending`, `Top`) and advanced Explore filters with URL-shareable state (`FLOW-013`, `FLOW-014`).
 - [x] Implement comment classification and discussion quality controls (`FLOW-009`, `FLOW-012`).
-- [ ] Complete mobile-first navigation parity and responsive UX consistency across key pages (`FLOW-031`).
+- [x] Complete mobile-first navigation parity and responsive UX consistency across key pages (`FLOW-031`).
 
 ## Track C — Runtime Stability, Security, and Auth Hardening
 

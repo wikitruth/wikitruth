@@ -6,6 +6,7 @@ import { ThemeProvider } from '../context/ThemeContext';
 import { NotificationProvider } from '../context/NotificationContext';
 import ToastContainer from '../components/common/ToastContainer';
 import '../styles/print.css';
+import '../styles/layout-mobile.css';
 
 interface AppProvidersProps {
   children: React.ReactNode;

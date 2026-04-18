@@ -82,6 +82,15 @@ module.exports = function (router: Router) {
       res.status(500).json({ error: 'Internal server error' });
     }
   });
+
+  router.put('/entry/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    try {
+      await PUT_topic_update(req, res);
+    } catch (error) {
+      console.error('Error in PUT /api/topics/entry/:id:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
 };
 
 async function GET_topics(req: WikitruthRequest, res: WikitruthResponse) {
@@ -195,6 +204,79 @@ async function POST_topic_create(req: WikitruthRequest, res: WikitruthResponse) 
       private: topic.private,
       createDate: topic.createDate,
       editDate: topic.editDate,
+    },
+  });
+}
+
+async function PUT_topic_update(req: WikitruthRequest, res: WikitruthResponse) {
+  if (!req.user) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  const topic = await db.Topic.findById(req.params.id);
+  if (!topic) {
+    return res.status(404).json({ error: 'Topic not found' });
+  }
+
+  const actorUserId = String(req.user._id || req.user.id || '');
+  const canEdit = Boolean(
+    (req.user.canPlayRoleOf && req.user.canPlayRoleOf('admin')) ||
+      String(topic.createUserId || '') === actorUserId
+  );
+  if (!canEdit) {
+    return res.status(403).json({ error: 'Not allowed to edit this topic' });
+  }
+
+  if (typeof req.body?.title !== 'undefined') {
+    const title = String(req.body.title || '').trim();
+    if (!title || title.length < 3) {
+      return res.status(400).json({ error: 'Title must be at least 3 characters' });
+    }
+    topic.title = title;
+    topic.friendlyUrl = utils.urlify(title);
+  }
+
+  if (typeof req.body?.description !== 'undefined' || typeof req.body?.content !== 'undefined') {
+    const description = String(req.body?.description || req.body?.content || '').trim();
+    if (!description || description.length < 10) {
+      return res.status(400).json({ error: 'Description must be at least 10 characters' });
+    }
+    topic.content = description;
+    topic.contentPreview = description.slice(0, 240);
+  }
+
+  if (typeof req.body?.private !== 'undefined') {
+    topic.private = Boolean(req.body.private);
+  }
+
+  if (typeof req.body?.topicId !== 'undefined' || typeof req.body?.parentId !== 'undefined') {
+    const nextParentId = req.body?.topicId || req.body?.parentId || null;
+    topic.parentId = nextParentId;
+    topic.ownerId = nextParentId || topic.groupId || null;
+    topic.ownerType = nextParentId
+      ? constants.OBJECT_TYPES.topic
+      : topic.groupId
+        ? constants.OBJECT_TYPES.group
+        : -1;
+    topic.categoryId = nextParentId || topic.categoryId || null;
+  }
+
+  topic.editDate = new Date();
+  topic.editUserId = actorUserId;
+  await topic.save();
+
+  return res.json({
+    success: true,
+    topic: {
+      _id: topic._id,
+      title: topic.title,
+      friendlyUrl: topic.friendlyUrl || utils.urlify(topic.title),
+      content: topic.content,
+      private: topic.private,
+      createDate: topic.createDate,
+      editDate: topic.editDate,
+      ownerId: topic.ownerId || null,
+      parentId: topic.parentId || null,
     },
   });
 }
