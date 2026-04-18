@@ -107,28 +107,9 @@ const HomePage: React.FC = () => {
   const [data, setData] = useState<HomeData>({});
   const [loading, setLoading] = useState(true);
   const { addToast } = useNotification();
-
-  useEffect(() => {
-    fetchHomeData();
-  }, []);
-
-  const fetchHomeData = async () => {
-    try {
-      const result = (await apiService.getHomeData()) as HomeData;
-      setData(result);
-      setLoading(false);
-    } catch (error) {
-      addToast('danger', 'Failed to load homepage data');
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
-    return <LoadingSpinner message="Loading homepage..." />;
-  }
-
   const { application } = data;
   const entrySetColumns = (data.entrySet || []) as HomeEntrySetColumn[];
+
   const rankedEntries = React.useMemo(() => {
     const unique = new Map<string, LegacyEntity>();
     const pushEntry = (entry: LegacyEntity, fallbackObjectName?: string) => {
@@ -162,6 +143,25 @@ const HomePage: React.FC = () => {
 
     return { latest, trending, top };
   }, [data, entrySetColumns]);
+
+  useEffect(() => {
+    fetchHomeData();
+  }, []);
+
+  const fetchHomeData = async () => {
+    try {
+      const result = (await apiService.getHomeData()) as HomeData;
+      setData(result);
+      setLoading(false);
+    } catch (error) {
+      addToast('danger', 'Failed to load homepage data');
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <LoadingSpinner message="Loading homepage..." />;
+  }
 
   const renderMixedEntry = (entry: LegacyEntity) => {
     const entryType = String(entry.objectName || '');

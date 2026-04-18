@@ -17,8 +17,11 @@ const RouteTracker: React.FC = () => {
   }, [location]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    const normalizedKey = String(e.key || '').toLowerCase();
+    const isSearchShortcut = normalizedKey === 'k' || e.code === 'KeyK';
+
     // Ctrl+K or Cmd+K to focus search
-    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    if ((e.ctrlKey || e.metaKey) && isSearchShortcut) {
       e.preventDefault();
       navigate('/search');
       return;
