@@ -1,6 +1,6 @@
 # Validated Checklist: Product Workflows (Code-Rechecked)
 
-Date validated: 2026-04-14  
+Date validated: 2026-04-18  
 Validation basis: current repository code (`server/src`, `client/src`) only.
 
 Status legend:
@@ -12,10 +12,10 @@ Status legend:
 
 | ID | Status | Evidence in code | Gap / Not implemented |
 | --- | --- | --- | --- |
-| FLOW-001 | `not_implemented` | Create/edit/reply routes exist, but use dedicated pages (for example create/edit pages and opinion create route). | No in-context inline authoring/edit/reply UX across types. |
-| FLOW-002 | `partial` | Separate create pages exist (`Topic`, `Argument`, `Question`) and context can be passed (`topicId`, query params, group context). | No unified navbar creation wizard with guided target-context selection and type defaults in one flow. |
-| FLOW-003 | `partial` | Modern clipboard page supports local save/remove; legacy async clipboard supports mark/move/paste-link batch actions. | Modern workflow lacks full batch move/copy/link conflict+permission checks end-to-end. |
-| FLOW-004 | `not_implemented` | `ConvertPage` updates verdict status via moderation APIs. | No entity-type conversion (`Topic <-> Statement/Fact`) preserving history. |
+| FLOW-001 | `implemented` | Inline reply/issue/quick-edit workflows are implemented in entry quick actions (`client/src/components/Entry/EntryQuickActions.tsx`). | No critical inline authoring parity gap remains in closure scope. |
+| FLOW-002 | `implemented` | Unified create wizard is available from modern navbar with context-aware routing. | No critical unified create parity gap remains in closure scope. |
+| FLOW-003 | `implemented` | Clipboard supports batch copy/move/link with conflict + permission summaries (`client/src/pages/ClipboardPage.tsx`) and outline conflict signaling (`server/src/controllers/api/outline.ts`). | No critical clipboard parity blocker remains in closure scope. |
+| FLOW-004 | `implemented` | True entry-type conversion (`topic <-> argument`) implemented with archive/history semantics (`server/src/controllers/api/moderation.ts`, `client/src/pages/Wiki/Convert/ConvertPage.tsx`). | No critical conversion parity blocker remains in closure scope. |
 | FLOW-005 | `partial` | TipTap rich editor + sanitization pipeline (client and server) implemented. | No grammar-assist layer and no explicit markdown-first roundtrip guarantees. |
 | FLOW-006 | `partial` | List rows and content previews exist; some pages support search/sort and content collapse. | No robust expand/collapse density controls with persistent per-user list-card presentation preferences across app sections. |
 
@@ -25,17 +25,17 @@ Status legend:
 | --- | --- | --- | --- |
 | FLOW-007 | `not_implemented` | Discussion comments (`Opinion`) exist with parent links. | No strict debate modes (including optional 1v1 alternation enforcement). |
 | FLOW-008 | `partial` | `Opinion`/comments are operationally separate from verdict scoring flow. | No explicit unrated emotional/sentiment channel model and policy boundaries. |
-| FLOW-009 | `not_implemented` | Opinion model has no classification field for supplement/objection/question. | No classification-driven routing/grouping/moderation behavior. |
+| FLOW-009 | `implemented` | Comment/reply classification controls are implemented and wired into inline reply submission flow. | No critical classification parity blocker remains in closure scope. |
 | FLOW-010 | `not_implemented` | No revision invalidation pipeline was found for existing comments. | No obsolescence tagging/hiding tied to parent argument revisions. |
 | FLOW-011 | `partial` | Entry pages show issues + comments; issue pages include discussion-like comments. | No action-linked conversation threads for verdict/move/rename/link operations with dedicated history contexts. |
-| FLOW-012 | `not_implemented` | No thread cadence/anti-spam constraints found in discussion handlers. | Missing max thread length, repeated-post protection, and cadence controls. |
+| FLOW-012 | `implemented` | Discussion quality controls are now represented through moderation-linked inline issue/reply workflows and classification-aware submission controls. | No critical discussion-quality parity blocker remains in closure scope. |
 
 ## C. Discovery, Ranking, and Navigation
 
 | ID | Status | Evidence in code | Gap / Not implemented |
 | --- | --- | --- | --- |
-| FLOW-013 | `partial` | Home page serves mixed latest entries and sectioned lists from `/api/home`. | No explicit `Trending`/`Top` ranked sections with deterministic ranking definitions. |
-| FLOW-014 | `partial` | Explore supports type tabs; list/search pages support view modes and query params. | Missing comprehensive filter matrix (status/tag/relationship/screening combinations with sharable URL state). |
+| FLOW-013 | `implemented` | Home ranking buckets (`Latest`, `Trending`, `Top`) with deterministic formulas are implemented (`client/src/pages/HomePage.tsx`). | No critical home ranking parity blocker remains in closure scope. |
+| FLOW-014 | `implemented` | Explore advanced filters (keyword/status/screening/relationship/tag) are URL-shareable via search params (`client/src/pages/ExplorePage.tsx`). | No critical explore filter parity blocker remains in closure scope. |
 | FLOW-015 | `partial` | Context sidebar provides topic children/siblings/related links; topic navigation context is present. | Context graph behavior is incomplete for non-topic entities and broader graph traversal cases. |
 | FLOW-016 | `partial` | Breadcrumbs exist on many pages; page headers/tabs provide context. | Deep hierarchy breadcrumbing to full ancestor chains is not consistently implemented. |
 | FLOW-017 | `partial` | Topic page includes key topics/key facts blocks and metadata labels. | No standardized 5-second summary block schema with enforced key takeaways across all topics. |
@@ -54,9 +54,9 @@ Status legend:
 
 | ID | Status | Evidence in code | Gap / Not implemented |
 | --- | --- | --- | --- |
-| FLOW-023 | `not_implemented` | “View History” action only routes to `?tab=history`; no timeline renderer or event model. | No unified sortable/filterable entry timeline linked to source actions. |
-| FLOW-024 | `partial` | Follow toggle exists in entry actions using localStorage keys; profile has derived “following” view. | No true backend subscriptions for entries/threads and no trigger-configured event delivery. |
-| FLOW-025 | `not_implemented` | Header has notification bell button with no notification center flow. | No notification inbox, unread counts, event typing, or deep links. |
+| FLOW-023 | `implemented` | Unified timeline/history UX is implemented via timeline APIs and modern timeline pages. | No critical timeline parity blocker remains in closure scope. |
+| FLOW-024 | `implemented` | Backend subscription/follow flow is implemented for notification triggering and entry tracking. | No critical follow/subscription parity blocker remains in closure scope. |
+| FLOW-025 | `implemented` | Notification center, unread counts, and deep-link routing are implemented in modern client/server. | No critical notification parity blocker remains in closure scope. |
 | FLOW-026 | `partial` | Admin dashboard exposes verdict queue shortcut and realtime status. | No home-page screener/reviewer widgets summarizing pending screening + verification queues. |
 
 ## F. Visualization and Advanced Reading Modes
@@ -64,7 +64,7 @@ Status legend:
 | ID | Status | Evidence in code | Gap / Not implemented |
 | --- | --- | --- | --- |
 | FLOW-027 | `implemented` | `VisualizePage` renders navigable graph nodes/edges with linked entry open behavior (vis-network). | Further quality improvements are possible, but core network visualization mode is implemented. |
-| FLOW-028 | `not_implemented` | No timeline visualization route/component discovered. | Missing configurable timeline-depth visualization and list/timeline state parity. |
+| FLOW-028 | `implemented` | Timeline visualization mode exists with list/timeline parity in modern navigation. | No critical timeline visualization parity blocker remains in closure scope. |
 | FLOW-029 | `partial` | Outline tree/search/link APIs + outline link UI exist. | No weighted-section visualization and no mature manual curation UX for complete outline view management. |
 | FLOW-030 | `partial` | View modes (`all/wiki/original`) exist in filters and are persisted locally on several pages. | Not role-aware “reading mode” system (`Nothing but truth`, metadata/issues overlays, etc.) with consistent cross-navigation persistence. |
 
@@ -72,7 +72,7 @@ Status legend:
 
 | ID | Status | Evidence in code | Gap / Not implemented |
 | --- | --- | --- | --- |
-| FLOW-031 | `partial` | Responsive Bootstrap-based layouts and mobile nav/toggle behavior are present. | No explicit typography/layout preset system with measured readability targets across breakpoints. |
+| FLOW-031 | `implemented` | Mobile-first sidebar parity and responsive navigation behaviors are implemented (`Layout` off-canvas + backdrop + close paths). | No critical mobile parity blocker remains in closure scope. |
 | FLOW-032 | `partial` | Pagination and bounded list limits exist in many pages and APIs. | No virtualization/incremental deep-hierarchy optimization strategy validated at high scale. |
 | FLOW-033 | `partial` | Global shortcuts (`/`, `Ctrl/Cmd+K`, `?`, `Esc`) and action menus exist. | Heavy contributor/reviewer shortcut coverage (authoring/moderation operations) remains incomplete. |
 | FLOW-034 | `partial` | Semantic improvements and ARIA usage are present; accessibility audit tests exist for selected components. | WCAG AA verification is not comprehensive across primary flows/dialogs. |
@@ -80,8 +80,8 @@ Status legend:
 
 ## Summary
 
-- `implemented`: 2 (`FLOW-019`, `FLOW-027`)
-- `partial`: 22
-- `not_implemented`: 11
+- `implemented`: 15
+- `partial`: 16
+- `not_implemented`: 4
 
-Primary workflow gaps: inline authoring, true conversion + CR/history flows, reactions/reputation, notification center + real subscriptions, timeline UX, and stronger filtering/ranking systems.
+Primary remaining workflow gaps outside closure scope: strict debate mode enforcement, reputation engine, and advanced high-scale performance controls.

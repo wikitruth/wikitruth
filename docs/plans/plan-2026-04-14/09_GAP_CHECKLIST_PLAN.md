@@ -77,6 +77,13 @@ This plan turns the validated status docs into an execution checklist focused on
 - [ ] Add incident stage model and severity progression (`FIXPH-007`).
 - [ ] Add long-term historical memory linking incidents to follow-up actions (`FIXPH-008`).
 
+## Track 7: Migration Closure Gate (Admin + UX)
+
+- [x] Execute Track A (admin parity) from `docs/plans/completed/MIGRATION_CLOSURE_PENDING_CHECKLIST_PLAN_2026-04-18.md`.
+- [x] Execute Track B (core UX closure) from `docs/plans/completed/MIGRATION_CLOSURE_PENDING_CHECKLIST_PLAN_2026-04-18.md`.
+- [x] Execute Track C (runtime/security/auth hardening) from `docs/plans/completed/MIGRATION_CLOSURE_PENDING_CHECKLIST_PLAN_2026-04-18.md`.
+- [x] Complete Track D verification/sign-off in `docs/plans/completed/MIGRATION_CLOSURE_PENDING_CHECKLIST_PLAN_2026-04-18.md` before marking migration as fully complete.
+
 ## Pilot and Validation Exit Criteria
 
 - [ ] Run controlled 2-person custom debate pilot and publish findings (`CONTENT-018`).

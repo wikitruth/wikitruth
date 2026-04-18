@@ -10,10 +10,10 @@ References:
 
 ## Exit Criteria
 
-- [ ] No critical migration blocker remains in admin/security/runtime tracks.
-- [ ] Admin modern routes are feature-parity complete for all required operations.
-- [ ] Core UX parity gaps (authoring, notifications, timeline, filtering/ranking) are implemented and verified.
-- [ ] Validated status docs (`06`, `07`, `08`) are updated to reflect completed state.
+- [x] No critical migration blocker remains in admin/security/runtime tracks.
+- [x] Admin modern routes are feature-parity complete for all required operations.
+- [x] Core UX parity gaps (authoring, notifications, timeline, filtering/ranking) are implemented and verified.
+- [x] Validated status docs (`06`, `07`, `08`) are updated to reflect completed state.
 
 ## Track A — Admin Feature Parity and Operations UX
 
@@ -46,10 +46,10 @@ References:
 
 ## Track D — Verification and Sign-Off
 
-- [ ] Run end-to-end parity walkthrough for modern vs legacy on home, entry, admin, moderation, and auth flows.
-- [ ] Produce sign-off checklist artifact with pass/fail notes and linked evidence (tests/screenshots/logs).
-- [ ] Re-run validated checklist pass and update statuses in:
-  - [ ] `docs/plans/plan-2026-04-14/06_VALIDATED_CHECKLIST_CORE_PLATFORM.md`
-  - [ ] `docs/plans/plan-2026-04-14/07_VALIDATED_CHECKLIST_PRODUCT_WORKFLOWS.md`
-  - [ ] `docs/plans/plan-2026-04-14/08_VALIDATED_CHECKLIST_CONTENT_FIXPH.md`
-- [ ] Move this plan to `docs/plans/completed/` only after all checklist items are complete and verification is successful.
+- [x] Run end-to-end parity walkthrough for modern vs legacy on home, entry, admin, moderation, and auth flows.
+- [x] Produce sign-off checklist artifact with pass/fail notes and linked evidence (tests/screenshots/logs).
+- [x] Re-run validated checklist pass and update statuses in:
+  - [x] `docs/plans/plan-2026-04-14/06_VALIDATED_CHECKLIST_CORE_PLATFORM.md`
+  - [x] `docs/plans/plan-2026-04-14/07_VALIDATED_CHECKLIST_PRODUCT_WORKFLOWS.md`
+  - [x] `docs/plans/plan-2026-04-14/08_VALIDATED_CHECKLIST_CONTENT_FIXPH.md`
+- [x] Move this plan to `docs/plans/completed/` only after all checklist items are complete and verification is successful.

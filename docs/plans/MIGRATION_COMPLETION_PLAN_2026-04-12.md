@@ -557,7 +557,7 @@
 
 ---
 
-## Phase 8 — Final Migration Closure (Pending)
+## Phase 8 — Final Migration Closure (Completed)
 
 > **Priority:** P0–P2
 > **Scope:** Remaining admin parity + UX completion + runtime hardening before full migration sign-off
@@ -572,10 +572,10 @@
   - [x] Inline authoring/reply + unified create wizard (`FLOW-001`, `FLOW-002`)
   - [x] Notifications/follow subscriptions and timeline UX (`FLOW-023`, `FLOW-024`, `FLOW-025`)
   - [x] Final ranking/filter/discussion quality parity (`FLOW-013`, `FLOW-014`, `FLOW-009`, `FLOW-012`)
-- [ ] Complete runtime/security hardening closure:
+- [x] Complete runtime/security hardening closure:
   - [x] PM2/runtime compatibility stability (`CORE-031`)
   - [x] Expanded sanitizer/OAuth end-to-end checks (`CORE-032`, `CORE-033`)
-- [ ] Run verification/sign-off checklist from `docs/plans/MIGRATION_CLOSURE_PENDING_CHECKLIST_PLAN_2026-04-18.md`.
+- [x] Run verification/sign-off checklist from `docs/plans/completed/MIGRATION_CLOSURE_PENDING_CHECKLIST_PLAN_2026-04-18.md`.
 
 ---
 
@@ -590,7 +590,7 @@
 | **Phase 3 (remaining)** | Outline editor tree view, Verdict list/filter | P2–P3 | **Done** |
 | **Phase 7** | Unit tests, Integration tests, Storybook, E2E | P2 | **Done** (external Playwright browser installation required to execute local e2e runs) |
 | **Phase 4 (remaining)** | Reply action, Print testing | P3 | **Done** |
-| **Phase 8** | Final migration closure (admin parity + remaining UX + runtime hardening) | P0–P2 | **Pending** |
+| **Phase 8** | Final migration closure (admin parity + remaining UX + runtime hardening) | P0–P2 | **Done** |
 
 **Critical path:** Phase 5.1 (XSS) → Phase 5.2 (Error Boundary) → Phase 5.3 (Notifications) → Phase 1 remaining → rest
 
