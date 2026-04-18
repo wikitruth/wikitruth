@@ -1,5 +1,7 @@
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
 const { readBackendSource } = require('./helpers/readBackendSource');
 
 function readProjectFile(relativePath) {
@@ -7,23 +9,34 @@ function readProjectFile(relativePath) {
 }
 
 describe('Server route contracts', function () {
-  it('keeps legacy entry routes mounted', function () {
+  it('keeps legacy URL redirects mounted toward modern routes', function () {
     const routesSource = readProjectFile('server/src/middlewares/routes.ts');
 
-    expect(routesSource).toContain("app.get('/home/'");
-    expect(routesSource).toContain("app.get('/login/'");
+    expect(routesSource).toContain('legacyRoutePatterns');
+    expect(routesSource).toContain("'/home'");
+    expect(routesSource).toContain("'/login'");
+    expect(routesSource).toContain('/app');
   });
 
-  it('keeps root and api home handlers wired', function () {
-    const indexSource = readProjectFile('legacy/compatibility/server/controllers/index.ts');
-    const indexShimSource = readProjectFile('server/src/controllers/index.ts');
+  it('keeps modern app and api home handlers wired', function () {
     const apiIndexSource = readProjectFile('server/src/controllers/api/index.ts');
     const appControllerSource = readProjectFile('server/src/controllers/app.ts');
 
-    expect(indexSource).toContain("router.get('/', async function (req, res)");
-    expect(indexShimSource).toContain('legacy/compatibility/server/controllers/index.ts');
     expect(apiIndexSource).toContain("router.use('/home', homeRouter)");
     expect(appControllerSource).toContain("router.get('/*'");
+  });
+
+  it('removes legacy shim controllers from modern server tree', function () {
+    const deletedShimFiles = [
+      'server/src/controllers/index.ts',
+      'server/src/controllers/topics.ts',
+      'server/src/controllers/arguments.ts',
+      'server/src/controllers/async/entry.ts',
+    ];
+
+    deletedShimFiles.forEach((relativePath) => {
+      expect(fs.existsSync(path.join(process.cwd(), relativePath))).toBe(false);
+    });
   });
 
   it('enables helmet with an explicit policy configuration', function () {

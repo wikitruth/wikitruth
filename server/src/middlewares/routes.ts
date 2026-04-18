@@ -1,279 +1,220 @@
 'use strict';
 
-import type { NextFunction, Request, Response } from 'express';
-const path = require('path');
+import type { Request, Response } from 'express';
 import type { AppContext } from '../types/models';
-const defaultLegacyTemplateRoot = path.join(
-  process.cwd(),
-  'legacy',
-  'compatibility',
-  'templates',
-  'jade'
-);
-let tmplRoot = defaultLegacyTemplateRoot;
-const paths = require('../models/paths');
-const { validateBody, schemas } = require('./requestValidation');
 
-function req(code: string): Record<string, (...args: unknown[]) => unknown> {
-  const normalizedCode = String(code || '').replace(/^\/+/, '');
-  return require(path.join(tmplRoot, normalizedCode));
+type AppRouteRegistrar = AppContext & {
+  get: (...args: unknown[]) => unknown;
+};
+
+function normalizePath(pathname: string): string {
+  if (!pathname || pathname === '/') {
+    return '/';
+  }
+
+  const withoutTrailingSlash = pathname.replace(/\/+$/, '');
+  return withoutTrailingSlash || '/';
 }
 
-function ensureAuthenticated(req: Request, res: Response, next: NextFunction): void {
-  if (req.isAuthenticated()) {
-    next();
-    return;
+function withQuery(pathname: string, originalUrl: string): string {
+  const queryStart = originalUrl.indexOf('?');
+  if (queryStart === -1) {
+    return pathname;
   }
-  res.set('X-Auth-Required', 'true');
-  req.session.returnUrl = req.originalUrl;
-  res.redirect('/login/');
+  return `${pathname}${originalUrl.slice(queryStart)}`;
 }
 
-function ensureAdmin(req: Request, res: Response, next: NextFunction): void {
-  if (req.user?.canPlayRoleOf('admin')) {
-    next();
-    return;
-  }
-  res.redirect('/');
-}
+function mapLegacyPathToModern(req: Request): string {
+  const normalizedPath = normalizePath(req.path);
 
-function ensureScreener(req: Request, res: Response, next: NextFunction): void {
-  if (req.user?.canPlayRoleOf('screener')) {
-    next();
-    return;
+  if (normalizedPath === '/') {
+    return '/app';
   }
-  res.redirect('/');
-}
 
-function ensureAccount(req: Request & { app: AppContext }, res: Response, next: NextFunction): void {
-  if (req.user?.canPlayRoleOf('account')) {
-    if (req.app.config?.requireAccountVerification) {
-      if (req.user.roles?.account?.isVerified !== 'yes' && !/^\/account\/verification\//.test(req.url)) {
-        return res.redirect('/account/verification/');
-      }
-    }
-    next();
-    return;
-  }
-  res.redirect('/');
-}
-
-function ensureAccountOwner(req: Request, res: Response, next: NextFunction): void {
-  if (req.user?.username === req.params.username) {
-    next();
-    return;
-  }
-  res.redirect('/');
-}
-
-function registerModernOnlyFallbackRoutes(
-  app: AppContext & {
-    get: (...args: unknown[]) => unknown;
-    all: (...args: unknown[]) => unknown;
-  }
-): void {
-  const redirectToApp = (_req: Request, res: Response): void => {
-    res.redirect('/app');
+  const exactMap: Record<string, string> = {
+    '/home': '/app',
+    '/about': '/app/about',
+    '/contact': '/app/contact',
+    '/explore': '/app/explore',
+    '/search': '/app/search',
+    '/login': '/app/login',
+    '/login/forgot': '/app/forgot-password',
+    '/login/reset': '/app/reset-password',
+    '/signup': '/app/signup',
+    '/logout': '/app/logout',
+    '/screening': '/app/screening',
+    '/convert': '/app/convert',
+    '/visualize': '/app/visualize',
+    '/install': '/app/install',
+    '/fast-switch': '/app/fast-switch',
+    '/clipboard': '/app/clipboard',
+    '/notifications': '/app/notifications',
+    '/timeline': '/app/timeline',
+    '/help-us': '/app/help-us',
+    '/create': '/app/create',
   };
 
-  app.get('/', redirectToApp);
-  app.get('/home/', redirectToApp);
-  app.get('/about/', redirectToApp);
-  app.get('/contact/', redirectToApp);
-  app.get('/login/', redirectToApp);
-  app.get('/signup/', redirectToApp);
-}
-
-module.exports = function (app: AppContext & { get: (...args: unknown[]) => unknown; post: (...args: unknown[]) => unknown; put: (...args: unknown[]) => unknown; delete: (...args: unknown[]) => unknown; all: (...args: unknown[]) => unknown }, passport: { authenticate: (...args: unknown[]) => unknown }) {
-  const compatibilityConfig = (((app as unknown as { config?: Record<string, unknown> }).config || {}) as { compatibility?: Record<string, unknown> }).compatibility || {};
-  const configuredTemplatesRoot = compatibilityConfig.templatesRoot || defaultLegacyTemplateRoot;
-  tmplRoot = path.isAbsolute(configuredTemplatesRoot)
-    ? configuredTemplatesRoot
-    : path.join(process.cwd(), configuredTemplatesRoot);
-  const compatibilityEnabled = compatibilityConfig.enabled !== false;
-
-  if (!compatibilityEnabled) {
-    registerModernOnlyFallbackRoutes(app);
-    return;
+  if (exactMap[normalizedPath]) {
+    return withQuery(exactMap[normalizedPath], req.originalUrl);
   }
 
-  app.get(paths.wiki.topics.create, ensureAuthenticated);
-  app.get(paths.wiki.topics.link.edit, ensureAuthenticated);
-  app.get(paths.wiki.arguments.create, ensureAuthenticated);
-  app.get(paths.wiki.arguments.link.edit, ensureAuthenticated);
-  app.get(paths.wiki.questions.create, ensureAuthenticated);
-  app.get(paths.wiki.answers.create, ensureAuthenticated);
-  app.get(paths.wiki.issues.create, ensureAuthenticated);
-  app.get(paths.wiki.opinions.create, ensureAuthenticated);
-  app.get(paths.wiki.artifacts.create, ensureAuthenticated);
+  const resetTokenMatch = normalizedPath.match(/^\/login\/reset\/([^/]+)\/([^/]+)$/);
+  if (resetTokenMatch) {
+    const emailValue = resetTokenMatch[1] || '';
+    const tokenValue = resetTokenMatch[2] || '';
+    const email = encodeURIComponent(decodeURIComponent(emailValue));
+    const token = encodeURIComponent(decodeURIComponent(tokenValue));
+    return `/app/reset-password?email=${email}&token=${token}`;
+  }
 
-  // member diary
-  app.all('/members/:username/diary*', ensureAuthenticated);
-  app.all('/members/:username/diary*', ensureAccountOwner);
+  const socialCallbackMatch = normalizedPath.match(
+    /^\/(signup|login|account\/settings)\/(twitter|github|facebook|google|apple|microsoft)\/callback$/,
+  );
+  if (socialCallbackMatch) {
+    const routeGroup = socialCallbackMatch[1] || '';
+    if (routeGroup === 'account/settings') {
+      return '/app/account/settings';
+    }
+    return '/app/login';
+  }
 
-  app.post(paths.wiki.screening, ensureAuthenticated);
-  app.post(paths.wiki.screening, ensureScreener);
+  const singularEntryMatches: Array<{ pattern: RegExp; targetPrefix: string }> = [
+    { pattern: /^\/topic\/(.+)$/, targetPrefix: '/app/topics/entry/' },
+    { pattern: /^\/argument\/(.+)$/, targetPrefix: '/app/arguments/entry/' },
+    { pattern: /^\/question\/(.+)$/, targetPrefix: '/app/questions/entry/' },
+    { pattern: /^\/answer\/(.+)$/, targetPrefix: '/app/answers/entry/' },
+    { pattern: /^\/issue\/(.+)$/, targetPrefix: '/app/issues/entry/' },
+    { pattern: /^\/opinion\/(.+)$/, targetPrefix: '/app/opinions/entry/' },
+    { pattern: /^\/artifact\/(.+)$/, targetPrefix: '/app/artifacts/entry/' },
+  ];
 
-  //front end
-  app.get('/home/', req('/index').init);
-  app.get('/about/', req('/about/index').init);
-  app.get('/contact/', req('/contact/index').init);
-  app.post('/contact/', validateBody(schemas.contact), req('/contact/index').sendMessage);
+  for (const entryMatch of singularEntryMatches) {
+    const matched = normalizedPath.match(entryMatch.pattern);
+    if (matched) {
+      return withQuery(`${entryMatch.targetPrefix}${matched[1]}`, req.originalUrl);
+    }
+  }
 
-  //sign up
-  app.get('/signup/', req('/signup/index').init);
-  app.post('/signup/', validateBody(schemas.signup), req('/signup/index').signup);
+  const modernPathPrefixes = [
+    '/account',
+    '/admin',
+    '/topics',
+    '/arguments',
+    '/questions',
+    '/answers',
+    '/issues',
+    '/opinions',
+    '/artifacts',
+    '/groups',
+    '/members',
+    '/outline',
+    '/visualize',
+  ];
 
-  //social sign up
-  app.post('/signup/social/', validateBody(schemas.signupSocial), req('/signup/index').signupSocial);
-  app.get('/signup/twitter/', passport.authenticate('twitter', { callbackURL: '/signup/twitter/callback/' }));
-  app.get('/signup/twitter/callback/', req('/signup/index').signupTwitter);
-  app.get('/signup/github/', passport.authenticate('github', { callbackURL: '/signup/github/callback/', scope: ['user:email'] }));
-  app.get('/signup/github/callback/', req('/signup/index').signupGitHub);
-  app.get('/signup/facebook/', passport.authenticate('facebook', { callbackURL: '/signup/facebook/callback/', scope: ['email'] }));
-  app.get('/signup/facebook/callback/', req('/signup/index').signupFacebook);
-  app.get('/signup/google/', passport.authenticate('google', { callbackURL: '/signup/google/callback/', scope: ['profile email'] }));
-  app.get('/signup/google/callback/', req('/signup/index').signupGoogle);
-  app.get('/signup/apple/', passport.authenticate('apple', { callbackURL: '/signup/apple/callback/', scope: ['name', 'email'] }));
-  app.get('/signup/apple/callback/', req('/signup/index').signupApple);
-  app.post('/signup/apple/callback/', req('/signup/index').signupApple);
-  app.get('/signup/microsoft/', passport.authenticate('microsoft', { callbackURL: '/signup/microsoft/callback/', scope: ['user.read'], prompt: 'select_account' }));
-  app.get('/signup/microsoft/callback/', req('/signup/index').signupMicrosoft);
-  // app.get('/signup/tumblr/', passport.authenticate('tumblr', { callbackURL: '/signup/tumblr/callback/' }));
-  // app.get('/signup/tumblr/callback/', req('/signup/index').signupTumblr);
+  for (const prefix of modernPathPrefixes) {
+    if (normalizedPath === prefix || normalizedPath.startsWith(`${prefix}/`)) {
+      return withQuery(`/app${normalizedPath}`, req.originalUrl);
+    }
+  }
 
-  //login/out
-  app.get('/login/', req('/login/index').init);
-  app.post('/login/', validateBody(schemas.login), req('/login/index').login);
-  app.get('/login/forgot/', req('/login/forgot/index').init);
-  app.post('/login/forgot/', validateBody(schemas.forgotPassword), req('/login/forgot/index').send);
-  app.get('/login/reset/', req('/login/reset/index').init);
-  app.get('/login/reset/:email/:token/', req('/login/reset/index').init);
-  app.put('/login/reset/:email/:token/', validateBody(schemas.resetPassword), req('/login/reset/index').set);
-  app.get('/logout/', req('/logout/index').init);
+  return '/app';
+}
 
-  //social login
-  app.get('/login/twitter/', passport.authenticate('twitter', { callbackURL: '/login/twitter/callback/' }));
-  app.get('/login/twitter/callback/', req('/login/index').loginTwitter);
-  app.get('/login/github/', passport.authenticate('github', { callbackURL: '/login/github/callback/' }));
-  app.get('/login/github/callback/', req('/login/index').loginGitHub);
-  app.get('/login/facebook/', passport.authenticate('facebook', { callbackURL: '/login/facebook/callback/' }));
-  app.get('/login/facebook/callback/', req('/login/index').loginFacebook);
-  app.get('/login/google/', passport.authenticate('google', { callbackURL: '/login/google/callback/', scope: ['profile email'] }));
-  app.get('/login/google/callback/', req('/login/index').loginGoogle);
-  app.get('/login/apple/', passport.authenticate('apple', { callbackURL: '/login/apple/callback/', scope: ['name', 'email'] }));
-  app.get('/login/apple/callback/', req('/login/index').loginApple);
-  app.post('/login/apple/callback/', req('/login/index').loginApple);
-  app.get('/login/microsoft/', passport.authenticate('microsoft', { callbackURL: '/login/microsoft/callback/', scope: ['user.read'], prompt: 'select_account' }));
-  app.get('/login/microsoft/callback/', req('/login/index').loginMicrosoft);
-  // app.get('/login/tumblr/', passport.authenticate('tumblr', { callbackURL: '/login/tumblr/callback/', scope: ['profile email'] }));
-  // app.get('/login/tumblr/callback/', req('/login/index').loginTumblr);
+function redirectToModernApp(req: Request, res: Response): void {
+  res.redirect(mapLegacyPathToModern(req));
+}
 
-  //admin
-  app.all('/admin*', ensureAuthenticated);
-  app.all('/admin*', ensureAdmin);
-  app.get('/admin/', req('/admin/index').init);
+module.exports = function registerLegacyPathRedirects(app: AppRouteRegistrar, _passport: unknown): void {
+  const legacyRoutePatterns = [
+    '/',
+    '/home',
+    '/home/*',
+    '/about',
+    '/about/*',
+    '/contact',
+    '/contact/*',
+    '/explore',
+    '/explore/*',
+    '/search',
+    '/search/*',
+    '/login',
+    '/login/*',
+    '/login/twitter/callback/',
+    '/login/github/callback/',
+    '/login/facebook/callback/',
+    '/login/google/callback/',
+    '/login/apple/callback/',
+    '/login/microsoft/callback/',
+    '/signup',
+    '/signup/*',
+    '/signup/twitter/callback/',
+    '/signup/github/callback/',
+    '/signup/facebook/callback/',
+    '/signup/google/callback/',
+    '/signup/apple/callback/',
+    '/signup/microsoft/callback/',
+    '/logout',
+    '/logout/*',
+    '/account',
+    '/account/*',
+    '/account/settings/twitter/callback/',
+    '/account/settings/github/callback/',
+    '/account/settings/facebook/callback/',
+    '/account/settings/google/callback/',
+    '/account/settings/apple/callback/',
+    '/account/settings/microsoft/callback/',
+    '/admin',
+    '/admin/*',
+    '/topics',
+    '/topics/*',
+    '/topic/*',
+    '/arguments',
+    '/arguments/*',
+    '/argument/*',
+    '/questions',
+    '/questions/*',
+    '/question/*',
+    '/answers',
+    '/answers/*',
+    '/answer/*',
+    '/issues',
+    '/issues/*',
+    '/issue/*',
+    '/opinions',
+    '/opinions/*',
+    '/opinion/*',
+    '/artifacts',
+    '/artifacts/*',
+    '/artifact/*',
+    '/groups',
+    '/groups/*',
+    '/members',
+    '/members/*',
+    '/screening',
+    '/screening/*',
+    '/convert',
+    '/convert/*',
+    '/visualize',
+    '/visualize/*',
+    '/outline',
+    '/outline/*',
+    '/install',
+    '/install/*',
+    '/fast-switch',
+    '/fast-switch/*',
+    '/clipboard',
+    '/clipboard/*',
+    '/notifications',
+    '/notifications/*',
+    '/timeline',
+    '/timeline/*',
+    '/help-us',
+    '/help-us/*',
+    '/create',
+    '/create/*',
+  ];
 
-  //admin > users
-  app.get('/admin/users/', req('/admin/users/index').find);
-  app.post('/admin/users/', validateBody(schemas.adminUserCreate), req('/admin/users/index').create);
-  app.get('/admin/users/:id/', req('/admin/users/index').read);
-  app.put('/admin/users/:id/', validateBody(schemas.adminUserUpdate), req('/admin/users/index').update);
-  app.put('/admin/users/:id/password/', req('/admin/users/index').password);
-  app.put('/admin/users/:id/role-admin/', req('/admin/users/index').linkAdmin);
-  app.delete('/admin/users/:id/role-admin/', req('/admin/users/index').unlinkAdmin);
-  app.put('/admin/users/:id/role-account/', req('/admin/users/index').linkAccount);
-  app.put('/admin/users/:id/roles/', req('/admin/users/index').updateRoles);
-  app.delete('/admin/users/:id/role-account/', req('/admin/users/index').unlinkAccount);
-  app.delete('/admin/users/:id/', req('/admin/users/index').delete);
-
-  //admin > administrators
-  app.get('/admin/administrators/', req('/admin/administrators/index').find);
-  app.post('/admin/administrators/', req('/admin/administrators/index').create);
-  app.get('/admin/administrators/:id/', req('/admin/administrators/index').read);
-  app.put('/admin/administrators/:id/', req('/admin/administrators/index').update);
-  app.put('/admin/administrators/:id/permissions/', req('/admin/administrators/index').permissions);
-  app.put('/admin/administrators/:id/groups/', req('/admin/administrators/index').groups);
-  app.put('/admin/administrators/:id/user/', req('/admin/administrators/index').linkUser);
-  app.delete('/admin/administrators/:id/user/', req('/admin/administrators/index').unlinkUser);
-  app.delete('/admin/administrators/:id/', req('/admin/administrators/index').delete);
-
-  //admin > admin groups
-  app.get('/admin/admin-groups/', req('/admin/admin-groups/index').find);
-  app.post('/admin/admin-groups/', req('/admin/admin-groups/index').create);
-  app.get('/admin/admin-groups/:id/', req('/admin/admin-groups/index').read);
-  app.put('/admin/admin-groups/:id/', req('/admin/admin-groups/index').update);
-  app.put('/admin/admin-groups/:id/permissions/', req('/admin/admin-groups/index').permissions);
-  app.delete('/admin/admin-groups/:id/', req('/admin/admin-groups/index').delete);
-
-  //admin > accounts
-  app.get('/admin/accounts/', req('/admin/accounts/index').find);
-  app.post('/admin/accounts/', req('/admin/accounts/index').create);
-  app.get('/admin/accounts/:id/', req('/admin/accounts/index').read);
-  app.put('/admin/accounts/:id/', req('/admin/accounts/index').update);
-  app.put('/admin/accounts/:id/user/', req('/admin/accounts/index').linkUser);
-  app.delete('/admin/accounts/:id/user/', req('/admin/accounts/index').unlinkUser);
-  app.post('/admin/accounts/:id/notes/', req('/admin/accounts/index').newNote);
-  app.post('/admin/accounts/:id/status/', req('/admin/accounts/index').newStatus);
-  app.delete('/admin/accounts/:id/', req('/admin/accounts/index').delete);
-
-  //admin > statuses
-  app.get('/admin/statuses/', req('/admin/statuses/index').find);
-  app.post('/admin/statuses/', req('/admin/statuses/index').create);
-  app.get('/admin/statuses/:id/', req('/admin/statuses/index').read);
-  app.put('/admin/statuses/:id/', req('/admin/statuses/index').update);
-  app.delete('/admin/statuses/:id/', req('/admin/statuses/index').delete);
-
-  //admin > categories
-  app.get('/admin/categories/', req('/admin/categories/index').find);
-  app.post('/admin/categories/', req('/admin/categories/index').create);
-  app.get('/admin/categories/:id/', req('/admin/categories/index').read);
-  app.put('/admin/categories/:id/', req('/admin/categories/index').update);
-  app.delete('/admin/categories/:id/', req('/admin/categories/index').delete);
-
-  //admin > search
-  app.get('/admin/search/', req('/admin/search/index').find);
-
-  //account
-  app.all('/account*', ensureAuthenticated);
-  app.all('/account*', ensureAccount);
-  app.get('/account/', req('/account/index').init);
-
-  //account > verification
-  app.get('/account/verification/', req('/account/verification/index').init);
-  app.post('/account/verification/', req('/account/verification/index').resendVerification);
-  app.get('/account/verification/:token/', req('/account/verification/index').verify);
-
-  //account > settings
-  app.get('/account/settings/', req('/account/settings/index').init);
-  app.put('/account/settings/', req('/account/settings/index').update);
-  app.put('/account/settings/identity/', req('/account/settings/index').identity);
-  app.put('/account/settings/password/', validateBody(schemas.accountPassword), req('/account/settings/index').password);
-
-  //account > settings > social
-  app.get('/account/settings/twitter/', passport.authenticate('twitter', { callbackURL: '/account/settings/twitter/callback/' }));
-  app.get('/account/settings/twitter/callback/', req('/account/settings/index').connectTwitter);
-  app.get('/account/settings/twitter/disconnect/', req('/account/settings/index').disconnectTwitter);
-  app.get('/account/settings/github/', passport.authenticate('github', { callbackURL: '/account/settings/github/callback/' }));
-  app.get('/account/settings/github/callback/', req('/account/settings/index').connectGitHub);
-  app.get('/account/settings/github/disconnect/', req('/account/settings/index').disconnectGitHub);
-  app.get('/account/settings/facebook/', passport.authenticate('facebook', { callbackURL: '/account/settings/facebook/callback/' }));
-  app.get('/account/settings/facebook/callback/', req('/account/settings/index').connectFacebook);
-  app.get('/account/settings/facebook/disconnect/', req('/account/settings/index').disconnectFacebook);
-  app.get('/account/settings/google/', passport.authenticate('google', { callbackURL: '/account/settings/google/callback/', scope: ['profile email'] }));
-  app.get('/account/settings/google/callback/', req('/account/settings/index').connectGoogle);
-  app.get('/account/settings/google/disconnect/', req('/account/settings/index').disconnectGoogle);
-  app.get('/account/settings/apple/', passport.authenticate('apple', { callbackURL: '/account/settings/apple/callback/', scope: ['name', 'email'] }));
-  app.get('/account/settings/apple/callback/', req('/account/settings/index').connectApple);
-  app.post('/account/settings/apple/callback/', req('/account/settings/index').connectApple);
-  app.get('/account/settings/apple/disconnect/', req('/account/settings/index').disconnectApple);
-  app.get('/account/settings/microsoft/', passport.authenticate('microsoft', { callbackURL: '/account/settings/microsoft/callback/', scope: ['user.read'], prompt: 'select_account' }));
-  app.get('/account/settings/microsoft/callback/', req('/account/settings/index').connectMicrosoft);
-  app.get('/account/settings/microsoft/disconnect/', req('/account/settings/index').disconnectMicrosoft);
-  // app.get('/account/settings/tumblr/', passport.authenticate('tumblr', { callbackURL: '/account/settings/tumblr/callback/' }));
-  // app.get('/account/settings/tumblr/callback/', req('/account/settings/index').connectTumblr);
-  // app.get('/account/settings/tumblr/disconnect/', req('/account/settings/index').disconnectTumblr);
-
-  //route not found
-  //app.all('*', require(tmpl + '/http/index').http404);
+  legacyRoutePatterns.forEach((pattern) => {
+    app.get(pattern, redirectToModernApp);
+  });
 };

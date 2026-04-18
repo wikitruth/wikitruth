@@ -20,8 +20,7 @@ const config = require(path.join(process.cwd(), 'config/config')),
     helmet = require('helmet'),
     cons = require('consolidate'),
     csrf = require('csurf'),
-    kraken = require('kraken-js'),
-    mountLegacyCompatibility = require(path.join(process.cwd(), 'legacy/compatibility/server/mount')).mountLegacyCompatibility;
+    kraken = require('kraken-js');
 
 let options, app;
 
@@ -90,11 +89,6 @@ app.engine('hbs', cons.handlebars);
 //middleware
 app.use(require('morgan')('dev'));
 app.use(require('compression')());
-const compatibilityConfig = config.compatibility || {};
-const compatibilityStatus =
-    typeof mountLegacyCompatibility === 'function'
-        ? mountLegacyCompatibility(app, compatibilityConfig)
-        : null;
 //app.use(require('serve-static')(path.join(__dirname, 'public')));
 app.use(require('method-override')());
 app.use(bodyParser.json());
@@ -194,7 +188,6 @@ app.locals.applications = applications.getApplications();
 app.locals.templates = templates;
 app.locals.constants = constants;
 app.locals.contents = contents;
-app.locals.compatibility = compatibilityStatus;
 
 //setup passport
 require('./middlewares/passport')(app, passport);
@@ -226,13 +219,4 @@ app.server.listen(app.config.port, function(){
 app.on('start', function () {
     console.log('Application ready to serve requests.');
     console.log('Environment: %s', app.kraken.get('env:env'));
-    if (compatibilityStatus) {
-        console.log(
-            '[compat] enabled=%s mounted=%s staticRoot=%s templatesRoot=%s',
-            compatibilityStatus.enabled,
-            compatibilityStatus.mounted,
-            compatibilityStatus.staticRoot || 'n/a',
-            compatibilityStatus.templatesRoot || 'n/a'
-        );
-    }
 });

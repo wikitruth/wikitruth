@@ -2,7 +2,7 @@
     "express": {
         "view cache": false,
         "view engine": "dust",
-        "views": "path:./legacy/compatibility/templates"
+        "views": "path:./.build/templates"
     },
 
     "view engines": {
@@ -26,12 +26,12 @@
     "middleware": {
 
         "devtools": {
-            "enabled": true,
+            "enabled": false,
             "priority": 35,
             "module": {
                 "name": "kraken-devtools",
                 "arguments": [
-                    "path:./legacy/compatibility",
+                    "path:./server/src",
                     "path:./.build",
                     {   
                         "template": {
