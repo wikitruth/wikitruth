@@ -2,6 +2,8 @@
 
 This plan turns the validated status docs into an execution checklist focused on `not_implemented` and high-risk `partial` items.
 
+Status update (2026-04-18): migration-closure scope items are completed. Remaining unchecked items are post-migration roadmap work.
+
 ## Track 1: Core Reliability and Moderation Correctness
 
 - [ ] Implement duplicate detection service for topic/argument/question create+edit paths (`CORE-002`).
@@ -12,46 +14,46 @@ This plan turns the validated status docs into an execution checklist focused on
 - [ ] Add revision history model (entry-level + block-level snapshots) (`CORE-016`).
 - [ ] Add reviewer-approved rollback endpoint + UI (`CORE-016`).
 - [ ] Add suggestion-only mode for restricted entries (`CORE-017`).
-- [ ] Add immutable privileged action audit event store (`CORE-034`).
+- [x] Add immutable privileged action audit event store (`CORE-034`).
 - [ ] Emit signed audit events for moderation/verdict/role changes (`CORE-034`).
 
 ## Track 2: Verdict and Issue Governance
 
-- [ ] Implement reviewer vote records for verdicts (`CORE-021`).
-- [ ] Implement threshold consensus policy (default 2/3) with configurable settings (`CORE-021`).
-- [ ] Add verdict provenance UI (who voted, when, rationale) (`CORE-021`).
+- [x] Implement reviewer vote records for verdicts (`CORE-021`).
+- [x] Implement threshold consensus policy (default 2/3) with configurable settings (`CORE-021`).
+- [x] Add verdict provenance UI (who voted, when, rationale) (`CORE-021`).
 - [ ] Add explicit truth-channel vs ethics-channel verdict structures (`CORE-022`, `CONTENT-005`).
-- [ ] Add reader signal model (`controversial`, `incorrect verdict`, `needs reevaluation`, `wrong category`) (`CORE-023`).
-- [ ] Route reader signals into moderation triage queue without auto-mutation (`CORE-023`).
-- [ ] Build verdict/issue appeal workflow with responsible reviewer assignment (`CORE-024`).
+- [x] Add reader signal model (`controversial`, `incorrect verdict`, `needs reevaluation`, `wrong category`) (`CORE-023`).
+- [x] Route reader signals into moderation triage queue without auto-mutation (`CORE-023`).
+- [x] Build verdict/issue appeal workflow with responsible reviewer assignment (`CORE-024`).
 - [ ] Enforce issue-first discussion gate for unresolved critical issues (`CORE-026`).
 - [ ] Add unresolved-content expiry job + override mechanics (`CORE-025`).
 
 ## Track 3: Security, Ops, and Deploy Stability
 
-- [ ] Fix production runtime blocker for PM2/node dynamic library path compatibility (`CORE-031`).
-- [ ] Add deployment matrix validation for supported Node runtime versions (`CORE-031`).
-- [ ] Implement restore action in modern admin backup API (`CORE-030`).
-- [ ] Create and test restore runbook in staging (`CORE-030`).
-- [ ] Expand XSS/security test coverage for sanitizer policy (`CORE-032`).
-- [ ] Add end-to-end OAuth/session callback tests for enabled providers (`CORE-033`).
+- [x] Fix production runtime blocker for PM2/node dynamic library path compatibility (`CORE-031`).
+- [x] Add deployment matrix validation for supported Node runtime versions (`CORE-031`).
+- [x] Implement restore action in modern admin backup API (`CORE-030`).
+- [x] Create and test restore runbook in staging (`CORE-030`).
+- [x] Expand XSS/security test coverage for sanitizer policy (`CORE-032`).
+- [x] Add end-to-end OAuth/session callback tests for enabled providers (`CORE-033`).
 
 ## Track 4: Workflow UX and Engagement
 
-- [ ] Build inline create/edit/reply experience for core entry pages (`FLOW-001`).
-- [ ] Build unified create wizard from navbar with context targeting (`FLOW-002`).
-- [ ] Finish modern clipboard parity: batch copy/move/link + conflict handling (`FLOW-003`).
-- [ ] Implement actual entry-type conversion workflow (not verdict relabeling) (`FLOW-004`).
-- [ ] Add comment classification model and UI routing (`FLOW-009`).
-- [ ] Add thread quality controls (spam cadence, duplicate/repeat protection, max depth/length) (`FLOW-012`).
-- [ ] Add Home ranking buckets (`Latest`, `Trending`, `Top`) with documented formulas (`FLOW-013`).
-- [ ] Expand Explore filters (status/tag/relationship/screening) + sharable URL state (`FLOW-014`).
+- [x] Build inline create/edit/reply experience for core entry pages (`FLOW-001`).
+- [x] Build unified create wizard from navbar with context targeting (`FLOW-002`).
+- [x] Finish modern clipboard parity: batch copy/move/link + conflict handling (`FLOW-003`).
+- [x] Implement actual entry-type conversion workflow (not verdict relabeling) (`FLOW-004`).
+- [x] Add comment classification model and UI routing (`FLOW-009`).
+- [x] Add thread quality controls (spam cadence, duplicate/repeat protection, max depth/length) (`FLOW-012`).
+- [x] Add Home ranking buckets (`Latest`, `Trending`, `Top`) with documented formulas (`FLOW-013`).
+- [x] Expand Explore filters (status/tag/relationship/screening) + sharable URL state (`FLOW-014`).
 - [x] Wire real reactions (`Upvote/Downvote`, `Expose/Bury`, etc.) decoupled from verdict (`FLOW-019`).
 - [ ] Add reputation model and ranking inputs (`FLOW-021`).
 - [ ] Add deterministic badge/scorecard system (`FLOW-022`).
-- [ ] Build unified entry timeline and timeline visualization mode (`FLOW-023`, `FLOW-028`).
-- [ ] Implement backend follow/subscribe with delivery triggers (`FLOW-024`).
-- [ ] Implement notification center + unread counts + deep links (`FLOW-025`).
+- [x] Build unified entry timeline and timeline visualization mode (`FLOW-023`, `FLOW-028`).
+- [x] Implement backend follow/subscribe with delivery triggers (`FLOW-024`).
+- [x] Implement notification center + unread counts + deep links (`FLOW-025`).
 
 ## Track 5: Content Ops and Policy Assets
 
@@ -89,4 +91,4 @@ This plan turns the validated status docs into an execution checklist focused on
 - [ ] Run controlled 2-person custom debate pilot and publish findings (`CONTENT-018`).
 - [ ] Run controversial-topic reviewer calibration stress test (`CONTENT-019`).
 - [ ] Ship one flagship Wikitruth topic + one flagship FixPH issue cluster under full end-to-end flow (`CONTENT-020`).
-- [ ] Update validated checklist docs with new statuses after each completed track.
+- [x] Update validated checklist docs with new statuses after each completed track.

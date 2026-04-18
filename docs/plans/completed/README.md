@@ -8,6 +8,7 @@ Historical planning and execution trackers that are fully completed.
 - `docs/plans/completed/LEGACY_MODERN_PARITY_IMPLEMENTATION_PLAN_2026-02-26.md`
 - `docs/plans/completed/MIGRATION_PLAN.md`
 - `docs/plans/completed/MIGRATION_CHECKLIST.md`
+- `docs/plans/completed/MIGRATION_CLOSURE_PENDING_CHECKLIST_PLAN_2026-04-18.md`
 - `docs/plans/completed/MIGRATION_PLAN_ARCHIVE_2026-02-22.md`
 - `docs/plans/completed/MODERNIZATION_AND_TYPESCRIPT_PROPOSAL.md`
 - `docs/plans/completed/MODERNIZATION_BACKLOG.md`
