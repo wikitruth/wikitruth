@@ -38,3 +38,34 @@ jobs:
         with:
           name: migration-drift-report
           path: docs/frontend/MIGRATION_DRIFT_REPORT.md
+
+  runtime-compatibility-matrix:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version:
+          - 22.x
+          - 24.x
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Runtime Build Compatibility
+        run: |
+          npm run build:server
+          npm run build:client:dev
+
+      - name: Runtime/Security Compatibility Tests
+        run: |
+          npm run test:server -- tests/server/session-csrf-policy.test.js tests/server/auth-social-session-callbacks.test.ts tests/server/sanitize-content-middleware.test.ts --runInBand

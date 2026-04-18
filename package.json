@@ -43,6 +43,7 @@
     "lint:server-paths": "bash scripts/check-server-import-paths.sh",
     "ci:server-paths": "bash scripts/check-server-mixed-paths.sh",
     "docs:drift": "bash scripts/migration-doc-drift-check.sh",
+    "runtime:pm2:check": "bash scripts/runtime/pm2-restart-check.sh",
     "analyze:bundle": "npm run build:client:stats",
     "test:server": "jest --config jest.config.server.js",
     "start:legacy-grunt": "grunt"

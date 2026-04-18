@@ -573,8 +573,8 @@
   - [x] Notifications/follow subscriptions and timeline UX (`FLOW-023`, `FLOW-024`, `FLOW-025`)
   - [x] Final ranking/filter/discussion quality parity (`FLOW-013`, `FLOW-014`, `FLOW-009`, `FLOW-012`)
 - [ ] Complete runtime/security hardening closure:
-  - [ ] PM2/runtime compatibility stability (`CORE-031`)
-  - [ ] Expanded sanitizer/OAuth end-to-end checks (`CORE-032`, `CORE-033`)
+  - [x] PM2/runtime compatibility stability (`CORE-031`)
+  - [x] Expanded sanitizer/OAuth end-to-end checks (`CORE-032`, `CORE-033`)
 - [ ] Run verification/sign-off checklist from `docs/plans/MIGRATION_CLOSURE_PENDING_CHECKLIST_PLAN_2026-04-18.md`.
 
 ---

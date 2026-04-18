@@ -39,10 +39,10 @@ References:
 
 ## Track C — Runtime Stability, Security, and Auth Hardening
 
-- [ ] Resolve production runtime compatibility blockers and validate PM2 restart reliability (`CORE-031`).
-- [ ] Add deployment/runtime compatibility matrix checks to CI (`CORE-031`).
-- [ ] Expand sanitizer/XSS regression coverage for rich content flows (`CORE-032`).
-- [ ] Add end-to-end OAuth/session callback tests for enabled social providers (`CORE-033`).
+- [x] Resolve production runtime compatibility blockers and validate PM2 restart reliability (`CORE-031`).
+- [x] Add deployment/runtime compatibility matrix checks to CI (`CORE-031`).
+- [x] Expand sanitizer/XSS regression coverage for rich content flows (`CORE-032`).
+- [x] Add end-to-end OAuth/session callback tests for enabled social providers (`CORE-033`).
 
 ## Track D — Verification and Sign-Off
 
