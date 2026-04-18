@@ -4,6 +4,7 @@ import { render, screen, waitFor } from '../test-utils/render';
 
 const mockSearch = jest.fn();
 const mockUseAuth = jest.fn();
+const mockUseNotification = jest.fn();
 
 jest.mock('../services/api', () => ({
   __esModule: true,
@@ -16,11 +17,21 @@ jest.mock('../context/AuthContext', () => ({
   useAuth: () => mockUseAuth(),
 }));
 
+jest.mock('../context/NotificationContext', () => ({
+  useNotification: () => mockUseNotification(),
+}));
+
 describe('SearchPage', () => {
   beforeEach(() => {
     mockSearch.mockReset();
     mockUseAuth.mockReset();
+    mockUseNotification.mockReset();
     mockUseAuth.mockReturnValue({ user: null });
+    mockUseNotification.mockReturnValue({
+      toasts: [],
+      addToast: jest.fn(),
+      removeToast: jest.fn(),
+    });
   });
 
   it('requests all-tab search and renders bucket sections with view-more links', async () => {

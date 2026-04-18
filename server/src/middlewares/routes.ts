@@ -3,7 +3,14 @@
 import type { NextFunction, Request, Response } from 'express';
 const path = require('path');
 import type { AppContext } from '../types/models';
-const tmplRoot = path.join(process.cwd(), 'public', 'templates', 'jade');
+const defaultLegacyTemplateRoot = path.join(
+  process.cwd(),
+  'legacy',
+  'compatibility',
+  'templates',
+  'jade'
+);
+let tmplRoot = defaultLegacyTemplateRoot;
 const paths = require('../models/paths');
 const { validateBody, schemas } = require('./requestValidation');
 
@@ -59,7 +66,36 @@ function ensureAccountOwner(req: Request, res: Response, next: NextFunction): vo
   res.redirect('/');
 }
 
+function registerModernOnlyFallbackRoutes(
+  app: AppContext & {
+    get: (...args: unknown[]) => unknown;
+    all: (...args: unknown[]) => unknown;
+  }
+): void {
+  const redirectToApp = (_req: Request, res: Response): void => {
+    res.redirect('/app');
+  };
+
+  app.get('/', redirectToApp);
+  app.get('/home/', redirectToApp);
+  app.get('/about/', redirectToApp);
+  app.get('/contact/', redirectToApp);
+  app.get('/login/', redirectToApp);
+  app.get('/signup/', redirectToApp);
+}
+
 module.exports = function (app: AppContext & { get: (...args: unknown[]) => unknown; post: (...args: unknown[]) => unknown; put: (...args: unknown[]) => unknown; delete: (...args: unknown[]) => unknown; all: (...args: unknown[]) => unknown }, passport: { authenticate: (...args: unknown[]) => unknown }) {
+  const compatibilityConfig = (((app as unknown as { config?: Record<string, unknown> }).config || {}) as { compatibility?: Record<string, unknown> }).compatibility || {};
+  const configuredTemplatesRoot = compatibilityConfig.templatesRoot || defaultLegacyTemplateRoot;
+  tmplRoot = path.isAbsolute(configuredTemplatesRoot)
+    ? configuredTemplatesRoot
+    : path.join(process.cwd(), configuredTemplatesRoot);
+  const compatibilityEnabled = compatibilityConfig.enabled !== false;
+
+  if (!compatibilityEnabled) {
+    registerModernOnlyFallbackRoutes(app);
+    return;
+  }
 
   app.get(paths.wiki.topics.create, ensureAuthenticated);
   app.get(paths.wiki.topics.link.edit, ensureAuthenticated);

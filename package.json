@@ -28,7 +28,7 @@
     "test:parity:server": "jest --config jest.config.server.js tests/server/parity-checklist.test.js",
     "test:parity:client": "jest --config jest.config.client.js client/src/context/AuthContext.test.tsx client/src/components/Auth/SocialLoginButtons.test.tsx client/src/routes/routeConfig.test.tsx client/src/components/Entry/EntryActionsMenu.test.tsx client/src/services/api/admin.test.ts client/src/services/api/moderation.test.ts",
     "test:parity": "npm-run-all test:parity:server test:parity:client",
-    "test:ci": "npm-run-all lint type:guardrails lint:server-paths ci:server-paths test:server test:parity test:coverage build:client build:server",
+    "test:ci": "npm-run-all lint type:guardrails lint:server-paths ci:server-paths lint:compat:isolation lint:compat:imports test:server test:parity test:coverage build:client build:server",
     "storybook": "storybook dev -p 6006 -c .storybook",
     "storybook:build": "storybook build -c .storybook",
     "lint": "eslint client tests/server --ext .ts,.tsx,.js",
@@ -41,12 +41,14 @@
     "type:metrics": "bash scripts/type-metrics.sh",
     "type:guardrails": "bash scripts/check-no-new-ts-nocheck.sh",
     "lint:server-paths": "bash scripts/check-server-import-paths.sh",
+    "lint:compat:isolation": "bash scripts/check-legacy-files-isolated.sh",
+    "lint:compat:imports": "bash scripts/check-modern-no-compat-imports.sh",
     "ci:server-paths": "bash scripts/check-server-mixed-paths.sh",
     "docs:drift": "bash scripts/migration-doc-drift-check.sh",
     "runtime:pm2:check": "bash scripts/runtime/pm2-restart-check.sh",
     "analyze:bundle": "npm run build:client:stats",
     "test:server": "jest --config jest.config.server.js",
-    "start:legacy-grunt": "grunt"
+    "start:legacy-grunt": "grunt --gruntfile legacy/compatibility/build/Gruntfile.js --base ."
   },
   "repository": {
     "type": "git",

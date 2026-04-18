@@ -82,7 +82,7 @@ function ensureVisAssetsLoaded(): Promise<void> {
       const css = document.createElement('link');
       css.id = cssId;
       css.rel = 'stylesheet';
-      css.href = '/components/vis/dist/vis-network.min.css';
+      css.href = '/vendor/vis/dist/vis-network.min.css';
       document.head.appendChild(css);
     }
 
@@ -100,7 +100,7 @@ function ensureVisAssetsLoaded(): Promise<void> {
 
     const script = document.createElement('script');
     script.id = scriptId;
-    script.src = '/components/vis/dist/vis.min.js';
+    script.src = '/vendor/vis/dist/vis.min.js';
     script.async = true;
     script.onload = () => resolve();
     script.onerror = () => reject(new Error('Failed to load vis-network script'));

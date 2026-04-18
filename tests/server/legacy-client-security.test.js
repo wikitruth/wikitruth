@@ -9,7 +9,7 @@ function read(relativePath) {
 
 describe('legacy client security contracts', function () {
   it('renders show-more content as text-only to avoid XSS interpretation', function () {
-    const legacyAppJs = read('public/js/app.js');
+    const legacyAppJs = read('legacy/compatibility/static/js/app.js');
 
     expect(legacyAppJs).toContain('contentContainer.text(String(content));');
     expect(legacyAppJs).not.toContain('contentContainer.html($("<div/>").html(content).text());');

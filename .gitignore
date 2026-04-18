@@ -39,20 +39,24 @@ temp/
 .build
 .vs
 .nodemonignore
-public/css
-public/js/*.min.js
-public/js/*.min.js.map
-public/layouts/*.min.css
-public/layouts/*.min.js
-public/layouts/*.min.js.map
-public/views/**/*.min.css
-public/views/**/*.min.js
-public/views/**/*.min.js.map
-public/components
-public/js/react
+legacy/compatibility/static/css
+legacy/compatibility/static/js/*.min.js
+legacy/compatibility/static/js/*.min.js.map
+legacy/compatibility/static/layouts/*.min.css
+legacy/compatibility/static/layouts/*.min.js
+legacy/compatibility/static/layouts/*.min.js.map
+legacy/compatibility/static/views/**/*.min.css
+legacy/compatibility/static/views/**/*.min.js
+legacy/compatibility/static/views/**/*.min.js.map
+legacy/compatibility/static/components
+legacy/compatibility/static/js/react
 
 
 dist/
+!public/vendor/
+!public/vendor/vis/
+!public/vendor/vis/dist/
+!public/vendor/vis/dist/**
 
 # Local tutorial/build artifacts kept out of root hygiene
 react-tutorial/

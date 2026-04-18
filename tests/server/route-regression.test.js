@@ -9,9 +9,11 @@ function source(relativePath) {
 describe('Route regression coverage for legacy + React shell', function () {
   it('keeps required legacy page endpoints wired', function () {
     const legacyRoutes = source('server/src/middlewares/routes.ts');
-    const legacyRootController = source('server/src/controllers/index.ts');
+    const legacyRootController = source('legacy/compatibility/server/controllers/index.ts');
+    const legacyRootShim = source('server/src/controllers/index.ts');
 
     expect(legacyRootController).toContain("router.get('/', async function (req, res)"); // /
+    expect(legacyRootShim).toContain('legacy/compatibility/server/controllers/index.ts');
     expect(legacyRoutes).toContain("app.get('/home/'"); // /home/
     expect(legacyRoutes).toContain("app.get('/login/'"); // /login/
   });

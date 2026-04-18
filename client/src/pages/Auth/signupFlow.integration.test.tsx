@@ -43,7 +43,7 @@ describe('Signup flow integration', () => {
     await user.click(screen.getByLabelText(/i agree to the terms/i));
     await user.click(screen.getByRole('button', { name: /create account/i }));
 
-    expect(mockSignup).toHaveBeenCalledWith('newuser', 'newuser@example.com', 'secret12');
+    expect(mockSignup).toHaveBeenCalledWith('newuser', 'newuser@example.com', 'secret12', undefined);
     expect(mockNavigate).toHaveBeenCalledWith('/');
   });
 });

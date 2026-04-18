@@ -15,11 +15,13 @@ describe('Server route contracts', function () {
   });
 
   it('keeps root and api home handlers wired', function () {
-    const indexSource = readProjectFile('server/src/controllers/index.ts');
+    const indexSource = readProjectFile('legacy/compatibility/server/controllers/index.ts');
+    const indexShimSource = readProjectFile('server/src/controllers/index.ts');
     const apiIndexSource = readProjectFile('server/src/controllers/api/index.ts');
     const appControllerSource = readProjectFile('server/src/controllers/app.ts');
 
     expect(indexSource).toContain("router.get('/', async function (req, res)");
+    expect(indexShimSource).toContain('legacy/compatibility/server/controllers/index.ts');
     expect(apiIndexSource).toContain("router.use('/home', homeRouter)");
     expect(appControllerSource).toContain("router.get('/*'");
   });

@@ -14,6 +14,7 @@ Active and historical planning documents are organized under this folder.
 ## Completed Plans
 
 - `docs/plans/completed/README.md`
+- `docs/plans/completed/LEGACY_COMPATIBILITY_ISOLATION_CHECKLIST_PLAN_2026-04-18.md`
 
 ## Deferred Plans
 

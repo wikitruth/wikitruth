@@ -2,7 +2,7 @@
     "express": {
         "view cache": false,
         "view engine": "dust",
-        "views": "path:./public/templates"
+        "views": "path:./legacy/compatibility/templates"
     },
 
     "view engines": {
@@ -31,7 +31,7 @@
             "module": {
                 "name": "kraken-devtools",
                 "arguments": [
-                    "path:./public",
+                    "path:./legacy/compatibility",
                     "path:./.build",
                     {   
                         "template": {
@@ -42,11 +42,11 @@
                         },
                         "css": {
                             "module": "kraken-devtools/plugins/less",
-                            "files": "/css/**/*.css"
+                            "files": "/static/css/**/*.css"
                         },
                         "copier": {
                             "module": "kraken-devtools/plugins/copier",
-                            "files": "**/*"
+                            "files": "static/**/*"
                         }
                     }
                 ]

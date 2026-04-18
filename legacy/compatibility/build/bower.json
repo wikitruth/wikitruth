@@ -1,0 +1,36 @@
+{
+  "name": "wikitruth",
+  "version": "0.5.2",
+  "homepage": "https://github.com/wikitruth/wikitruth",
+  "authors": [
+    "Wikitruth Foundation"
+  ],
+  "main": "app.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "legacy/compatibility/static/components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.6",
+    "dustjs-linkedin": "~2.3.0",
+    "requirejs": "^2.2.0",
+    "html5shiv": "^3.7.3",
+    "moment": "^2.21.0",
+    "underscore": "^1.8.3",
+    "backbone": "^1.3.3",
+    "jquery.cookie": "^1.4.1",
+    "respond": "^1.4.2",
+    "summernote": "^0.8.10",
+    "textarea-autosize": "^0.4.2",
+    "geopattern": "^1.2.3",
+    "font-awesome": "^4.7.0",
+    "eonasdan-bootstrap-datetimepicker": "^4.17.43",
+    "vis": "^4.20.0",
+    "bootstrap-pincode-input": "^1.6.1"
+  }
+}
