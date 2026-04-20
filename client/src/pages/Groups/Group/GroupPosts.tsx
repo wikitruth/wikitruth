@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import Alert from '../../../components/common/Alert';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import apiService from '../../../services/api';
@@ -7,10 +7,12 @@ import type { LegacyEntity } from '../../../types/legacy';
 
 const GroupPosts: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
   const [group, setGroup] = useState<LegacyEntity | null>(null);
   const [posts, setPosts] = useState<Record<string, LegacyEntity[]>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const activeTab = String(searchParams.get('tab') || 'all').trim().toLowerCase();
 
   useEffect(() => {
     const fetchGroupPosts = async () => {
@@ -61,7 +63,9 @@ const GroupPosts: React.FC = () => {
     { key: 'answers', title: 'Answers', icon: 'list-alt', entries: posts.answers || [], to: (entry: LegacyEntity) => `/answers/entry/${entry._id}` },
   ];
 
-  const totalEntries = sections.reduce((count, section) => count + section.entries.length, 0);
+  const visibleSections = activeTab === 'all' ? sections : sections.filter((section) => section.key === activeTab);
+
+  const totalEntries = visibleSections.reduce((count, section) => count + section.entries.length, 0);
 
   return (
     <div className="container">
@@ -83,11 +87,19 @@ const GroupPosts: React.FC = () => {
         </a>
       </div>
 
+      {activeTab !== 'all' && (
+        <div className="form-group">
+          <Link to={`/groups/${group.friendlyUrl || group._id}/${group._id}/posts`} className="btn btn-link no-underline" style={{ paddingLeft: 0 }}>
+            <i className="fa fa-list"></i> Show all activity
+          </Link>
+        </div>
+      )}
+
       {totalEntries === 0 && (
         <Alert type="warning">No entries found for this group yet.</Alert>
       )}
 
-      {sections.map((section) => (
+      {visibleSections.map((section) => (
         <div key={section.key} className="panel panel-default">
           <div className="panel-heading">
             <h3 className="panel-title">

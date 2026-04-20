@@ -75,6 +75,37 @@ module.exports = function (router) {
 
   // Get group posts across entity types
   // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
+  router.get('/entry/:id/stats', async function (req, res) {
+    try {
+      const group = await db.Group.findById(req.params.id).lean();
+      if (!group) {
+        return res.status(404).json({ error: 'Group not found' });
+      }
+      if (!canViewGroup(group, req.user)) {
+        return res.status(403).json({ error: 'Group is private' });
+      }
+
+      const filter = buildGroupContentFilter(group, req.user);
+      const totals = await countGroupContributions(group._id, filter);
+
+      res.json({
+        success: true,
+        group: {
+          _id: group._id,
+          title: group.title,
+          friendlyUrl: group.friendlyUrl || utils.urlify(group.title || ''),
+          privacyType: group.privacyType,
+        },
+        totals: totals,
+      });
+    } catch (err) {
+      console.error('Error fetching group contribution stats:', err);
+      res.status(500).json({ error: 'Failed to fetch group contribution stats' });
+    }
+  });
+
+  // Get group posts across entity types
+  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get('/entry/:id/posts', async function (req, res) {
     try {
       const group = await db.Group.findById(req.params.id).lean();
@@ -443,4 +474,51 @@ function buildGroupContentFilter(group: any, user: any): Record<string, unknown>
     return {};
   }
   return { private: { $ne: true } };
+}
+
+async function countGroupContributions(groupId: any, filter: Record<string, unknown>) {
+  const groupOrPrivateOwnerQuery = {
+    $or: [{ groupId: groupId }, { private: true, createUserId: groupId }],
+  };
+  const [topics, argumentsCount, questions, answers, artifacts, issues, opinions] = await Promise.all([
+    db.Topic.countDocuments({
+      ...filter,
+      $or: [{ groupId: groupId }, { ownerType: constants.OBJECT_TYPES.group, ownerId: groupId }],
+    }),
+    db.Argument.countDocuments({
+      ...filter,
+      ...groupOrPrivateOwnerQuery,
+    }),
+    db.Question.countDocuments({
+      ...filter,
+      ...groupOrPrivateOwnerQuery,
+    }),
+    db.Answer.countDocuments({
+      ...filter,
+      ...groupOrPrivateOwnerQuery,
+    }),
+    db.Artifact.countDocuments({
+      ...filter,
+      ...groupOrPrivateOwnerQuery,
+    }),
+    db.Issue.countDocuments({
+      ...filter,
+      ...groupOrPrivateOwnerQuery,
+    }),
+    db.Opinion.countDocuments({
+      ...filter,
+      ...groupOrPrivateOwnerQuery,
+    }),
+  ]);
+
+  return {
+    topics,
+    arguments: argumentsCount,
+    questions,
+    answers,
+    artifacts,
+    issues,
+    opinions,
+    contributions: topics + argumentsCount + questions + answers + artifacts + issues + opinions,
+  };
 }

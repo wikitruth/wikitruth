@@ -13,11 +13,23 @@ import { useAuth } from '../../../context/AuthContext';
 import type { LegacyEntity } from '../../../types/legacy';
 import GeoPatternBackground from '../../../components/common/GeoPatternBackground';
 
+const EMPTY_TOTALS = {
+  topics: 0,
+  arguments: 0,
+  questions: 0,
+  answers: 0,
+  artifacts: 0,
+  issues: 0,
+  opinions: 0,
+  contributions: 0,
+};
+
 const GroupPage: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const [group, setGroup] = useState<LegacyEntity | null>(null);
+  const [totals, setTotals] = useState(EMPTY_TOTALS);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
@@ -34,9 +46,23 @@ const GroupPage: React.FC = () => {
 
       try {
         setLoading(true);
-        const result = await apiService.getGroupEntry(id);
-        const groupModel = (result?.group || result) as LegacyEntity;
+        const [entryResult, statsResult] = await Promise.all([
+          apiService.getGroupEntry(id),
+          apiService.getGroupStats(id).catch(() => null),
+        ]);
+        const groupModel = (entryResult?.group || entryResult) as LegacyEntity;
         setGroup(groupModel);
+        const nextTotals = statsResult?.totals || EMPTY_TOTALS;
+        setTotals({
+          topics: Number(nextTotals.topics || 0),
+          arguments: Number(nextTotals.arguments || 0),
+          questions: Number(nextTotals.questions || 0),
+          answers: Number(nextTotals.answers || 0),
+          artifacts: Number(nextTotals.artifacts || 0),
+          issues: Number(nextTotals.issues || 0),
+          opinions: Number(nextTotals.opinions || 0),
+          contributions: Number(nextTotals.contributions || 0),
+        });
         setForm({
           title: groupModel?.title || '',
           description: groupModel?.description || '',
@@ -160,6 +186,79 @@ const GroupPage: React.FC = () => {
         <div className="panel-body">
           {!editing ? (
             <>
+              <div className="row" style={{ marginBottom: 12 }}>
+                <div className="col-sm-12">
+                  <Link to={`/groups/${group.friendlyUrl || group._id}/${group._id}/posts`} className="no-underline">
+                    <div className="well stat" style={{ marginBottom: 10 }}>
+                      <div className="stat-value">{totals.contributions}</div>
+                      <div className="stat-label">Contributions</div>
+                    </div>
+                  </Link>
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-sm-4">
+                  <Link to={`/groups/${group.friendlyUrl || group._id}/${group._id}/posts?tab=topics`} className="no-underline">
+                    <div className="well stat">
+                      <div className="stat-value">{totals.topics}</div>
+                      <div className="stat-label">Topics</div>
+                    </div>
+                  </Link>
+                </div>
+                <div className="col-sm-4">
+                  <Link to={`/groups/${group.friendlyUrl || group._id}/${group._id}/posts?tab=arguments`} className="no-underline">
+                    <div className="well stat">
+                      <div className="stat-value">{totals.arguments}</div>
+                      <div className="stat-label">Facts</div>
+                    </div>
+                  </Link>
+                </div>
+                <div className="col-sm-4">
+                  <Link to={`/groups/${group.friendlyUrl || group._id}/${group._id}/posts?tab=questions`} className="no-underline">
+                    <div className="well stat">
+                      <div className="stat-value">{totals.questions}</div>
+                      <div className="stat-label">Questions</div>
+                    </div>
+                  </Link>
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-sm-4">
+                  <Link to={`/groups/${group.friendlyUrl || group._id}/${group._id}/posts?tab=answers`} className="no-underline">
+                    <div className="well stat">
+                      <div className="stat-value">{totals.answers}</div>
+                      <div className="stat-label">Answers</div>
+                    </div>
+                  </Link>
+                </div>
+                <div className="col-sm-4">
+                  <Link to={`/groups/${group.friendlyUrl || group._id}/${group._id}/posts?tab=artifacts`} className="no-underline">
+                    <div className="well stat">
+                      <div className="stat-value">{totals.artifacts}</div>
+                      <div className="stat-label">Artifacts</div>
+                    </div>
+                  </Link>
+                </div>
+                <div className="col-sm-4">
+                  <Link to={`/groups/${group.friendlyUrl || group._id}/${group._id}/posts?tab=issues`} className="no-underline">
+                    <div className="well stat">
+                      <div className="stat-value">{totals.issues}</div>
+                      <div className="stat-label">Issues</div>
+                    </div>
+                  </Link>
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-sm-4">
+                  <Link to={`/groups/${group.friendlyUrl || group._id}/${group._id}/posts?tab=opinions`} className="no-underline">
+                    <div className="well stat">
+                      <div className="stat-value">{totals.opinions}</div>
+                      <div className="stat-label">Comments</div>
+                    </div>
+                  </Link>
+                </div>
+              </div>
+
               <p>{group.description || 'No description provided.'}</p>
               <p className="text-muted">{members.length} member(s)</p>
 

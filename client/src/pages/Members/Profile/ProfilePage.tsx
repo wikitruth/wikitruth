@@ -8,6 +8,9 @@ import { useAuth } from '../../../context/AuthContext';
 import type { LegacyEntity } from '../../../types/legacy';
 import PageMeta from '../../../components/common/PageMeta';
 import GeoPatternBackground from '../../../components/common/GeoPatternBackground';
+import notificationsApi from '../../../services/api/notifications';
+
+const USER_OBJECT_TYPE = 21;
 
 const ProfilePage: React.FC = () => {
   const { username: routeUsername } = useParams<{ username?: string }>();
@@ -18,6 +21,10 @@ const ProfilePage: React.FC = () => {
   const [contributionStats, setContributionStats] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [followed, setFollowed] = useState(false);
+  const [followStateLoading, setFollowStateLoading] = useState(false);
+  const [followActionLoading, setFollowActionLoading] = useState(false);
+  const [followMessage, setFollowMessage] = useState<string | null>(null);
 
   const isOwnProfile = useMemo(() => {
     return Boolean(user?.username && username && user.username === username);
@@ -59,6 +66,61 @@ const ProfilePage: React.FC = () => {
 
     fetchProfile();
   }, [username]);
+
+  useEffect(() => {
+    if (!followMessage) {
+      return;
+    }
+    const timeout = window.setTimeout(() => setFollowMessage(null), 1800);
+    return () => window.clearTimeout(timeout);
+  }, [followMessage]);
+
+  useEffect(() => {
+    const loadFollowState = async () => {
+      if (!user?._id || isOwnProfile || !profile?._id) {
+        setFollowed(false);
+        setFollowStateLoading(false);
+        return;
+      }
+
+      try {
+        setFollowStateLoading(true);
+        const result = await notificationsApi.getSubscription('user', String(profile._id), USER_OBJECT_TYPE);
+        setFollowed(Boolean(result.subscription?.followed));
+      } catch (_error) {
+        setFollowed(false);
+      } finally {
+        setFollowStateLoading(false);
+      }
+    };
+
+    void loadFollowState();
+  }, [isOwnProfile, profile?._id, user?._id]);
+
+  const handleToggleFollow = async () => {
+    if (!user?._id || !profile?._id || isOwnProfile) {
+      return;
+    }
+
+    try {
+      setFollowActionLoading(true);
+      const next = !followed;
+      const result = await notificationsApi.setSubscription({
+        objectName: 'user',
+        objectType: USER_OBJECT_TYPE,
+        id: String(profile._id),
+        enabled: next,
+        triggers: ['reply', 'screening', 'verdict', 'issue'],
+      });
+      const isNowFollowed = Boolean(result.subscription?.followed);
+      setFollowed(isNowFollowed);
+      setFollowMessage(isNowFollowed ? 'Following member' : 'Unfollowed member');
+    } catch (_error) {
+      setFollowMessage('Unable to update follow state');
+    } finally {
+      setFollowActionLoading(false);
+    }
+  };
 
   if (loading) {
     return <LoadingSpinner message="Loading profile..." />;
@@ -185,9 +247,35 @@ const ProfilePage: React.FC = () => {
             )}
             {!isOwnProfile && (
               <p style={{ marginBottom: 0 }}>
-                <Link to="#" className="no-underline">
-                  <i className="fa fa-rss"></i> Follow
-                </Link>
+                {user?._id ? (
+                  <>
+                    <button
+                      type="button"
+                      className="btn btn-link no-underline"
+                      style={{ padding: 0 }}
+                      onClick={() => {
+                        void handleToggleFollow();
+                      }}
+                      disabled={followActionLoading || followStateLoading}
+                    >
+                      <i className="fa fa-rss"></i>{' '}
+                      {followActionLoading || followStateLoading
+                        ? 'Updating...'
+                        : followed
+                          ? 'Unfollow'
+                          : 'Follow'}
+                    </button>
+                    {followMessage && (
+                      <small className="text-muted" style={{ display: 'block', marginTop: 6 }}>
+                        {followMessage}
+                      </small>
+                    )}
+                  </>
+                ) : (
+                  <Link to="/login" className="no-underline">
+                    <i className="fa fa-sign-in"></i> Sign in to follow
+                  </Link>
+                )}
               </p>
             )}
           </div>

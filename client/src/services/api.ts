@@ -12,6 +12,7 @@ import type {
   ArtifactEntryResponse,
   GroupEntryResponse,
   GroupPostsResponse,
+  GroupStatsResponse,
   GroupsListResponse,
   MemberProfileResponse,
   MemberTopicsResponse,
@@ -497,6 +498,10 @@ class ApiService {
 
   async getGroupPosts(id: string, limit: number = 25): Promise<GroupPostsResponse> {
     return this.request<GroupPostsResponse>(`/groups/entry/${id}/posts?limit=${encodeURIComponent(String(limit))}`);
+  }
+
+  async getGroupStats(id: string): Promise<GroupStatsResponse> {
+    return this.request<GroupStatsResponse>(`/groups/entry/${id}/stats`);
   }
 
   async createGroup(payload: { title: string; description: string; privacyType: number }): Promise<LegacyApiResponse> {

@@ -170,6 +170,19 @@ export interface GroupPostsResponse extends ApiBaseResponse {
   posts?: EntityBuckets;
 }
 
+export interface GroupStatsResponse extends ApiBaseResponse {
+  totals?: {
+    topics: number;
+    arguments: number;
+    questions: number;
+    answers: number;
+    artifacts: number;
+    issues: number;
+    opinions: number;
+    contributions: number;
+  };
+}
+
 export interface GroupsListResponse extends ApiBaseResponse {
   publicGroups?: LegacyEntity[];
   privateGroups?: LegacyEntity[];
