@@ -5,6 +5,8 @@ const path = require('path');
 const fs = require('fs');
 const { mountLegacyCompatibility } = require('./mount');
 const LEGACY_SERVER_ROOT = path.join(process.cwd(), 'legacy', 'server');
+const legacyPaths = require(path.join(LEGACY_SERVER_ROOT, 'models', 'paths'));
+const legacyFlowUtils = require(path.join(LEGACY_SERVER_ROOT, 'utils', 'flowUtils'));
 
 function toBoolean(value, fallback) {
   if (value === undefined || value === null || value === '') {
@@ -69,6 +71,61 @@ function registerLegacyCompatibility(app, options) {
   }
 
   const legacyRouter = express.Router();
+
+  legacyRouter.use(async function legacyRouteContext(req, res, next) {
+    try {
+      // Override modern app locals for all legacy templates/render paths.
+      res.locals.paths = legacyPaths;
+      res.locals.legacyBaseUrl = mountPath;
+
+      const segments = String(req.path || '').split('/').filter(Boolean);
+      let routeWikiBaseUrl = mountPath;
+      if (segments.length >= 3 && segments[0].toLowerCase() === 'members' && segments[2].toLowerCase() === 'diary') {
+        routeWikiBaseUrl = legacyFlowUtils.getDiaryBaseUrl(segments[1]);
+      } else if (
+        segments.length >= 4 &&
+        segments[0].toLowerCase() === 'groups' &&
+        segments[3].toLowerCase() === 'posts'
+      ) {
+        routeWikiBaseUrl =
+          legacyFlowUtils.buildGroupUrl({
+            friendlyUrl: segments[1],
+            _id: segments[2],
+          }) + legacyPaths.groups.group.posts;
+      }
+      res.locals.wikiBaseUrl = routeWikiBaseUrl;
+
+      if (req.user && req.user.username) {
+        res.locals.diaryBaseUrl = legacyFlowUtils.getDiaryBaseUrl(req.user.username);
+      }
+
+      if (!req.query.group && segments.length >= 3 && segments[0].toLowerCase() === 'groups') {
+        req.query.group = segments[2];
+      }
+
+      if (!res.locals.group && req.query.group) {
+        const model = {};
+        await legacyFlowUtils.setGroupModel(req, model);
+        if (model.group) {
+          res.locals.group = model.group;
+        }
+      }
+
+      next();
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  legacyRouter.get('/:username/settings', function legacyProfileSettingsAlias(req, res) {
+    const username = encodeURIComponent(String(req.params.username || '').trim());
+    if (!username) {
+      return res.redirect(mountPath + '/members');
+    }
+
+    const query = req.originalUrl.includes('?') ? req.originalUrl.slice(req.originalUrl.indexOf('?')) : '';
+    return res.redirect(`${mountPath}/members/${username}/settings${query}`);
+  });
 
   [
     ['/', 'index'],

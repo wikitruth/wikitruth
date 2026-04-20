@@ -1,0 +1,95 @@
+# Legacy vs Modern Parity Audit (2026-04-20)
+
+## Scope
+
+Parity audit for legacy (`/legacy/*`) and modern (`/*`) across:
+
+- routes/navigation contracts
+- page sections/elements
+- core user actions
+- create/edit/detail workflows
+
+Primary checklist source remains:
+`docs/plans/LEGACY_MODERN_MIGRATION_PARITY_AUDIT_CHECKLIST_PLAN_2026-04-19.md`
+
+## Route Pair Audit Matrix
+
+- [x] `/legacy/` vs `/`
+- [x] `/legacy/explore` vs `/explore`
+- [x] `/legacy/search` vs `/search`
+- [x] `/legacy/topic/:friendly/:id` vs `/topics/entry/:friendly/:id`
+- [x] `/legacy/visualize` vs `/visualize`
+- [x] `/legacy/groups` vs `/groups`
+- [x] `/legacy/members` vs `/members`
+- [x] `/legacy/admin` vs `/admin`
+
+## Screen/Feature Parity
+
+### Global Navigation + Sidebar
+
+- [x] Modern sidebar includes `Apps`, `Explore`, contextual `In This Section`, and `Related` sections.
+- [x] Mobile sidebar toggle exists in modern header.
+- [x] Legacy prefix containment implemented for legacy template navigation links (intentional modern escape kept only for explicit `New UX` action).
+- [x] Legacy route-shape alias added: `/legacy/:username/settings` -> `/legacy/members/:username/settings`.
+
+### Home
+
+- [x] Jumbotron and three feature cards present.
+- [x] Legacy mixed feed (`entrySet`) behavior now preserved on modern home.
+- [x] Mixed entity rendering includes topic/fact/question/answer/issue/opinion/artifact.
+- [x] `view more` destination for mixed feed columns aligned to `/explore#browse`.
+
+### Explore
+
+- [x] Category tiles, tabbed latest posts, and filtering controls available in modern.
+- [x] Latest/Popular sort semantics implemented.
+- [x] Admin affordance for creating topic from tab menu implemented.
+
+### Search
+
+- [x] Query input, tab buckets, and scope controls present.
+- [x] Keyboard navigation and `view more` behavior present.
+- [ ] Runtime fixture-level ordering/paging parity validation still needs explicit evidence capture.
+
+### Topic Entry
+
+- [x] Breadcrumb/header/metadata labels present.
+- [x] Quick actions row includes reply/expose/bury/visualize/more.
+- [x] Details tabs and counts (topics/facts/questions/issues/comments) present.
+- [x] Key topics/facts and branch context sections present.
+- [x] Child entry lists (topics/facts/questions/artifacts/issues/comments) present.
+- [ ] Runtime parity check still needed for legacy `entry-outline` interaction details.
+
+### Entity Create/Edit
+
+- [x] Core create/list/detail routes exist for all key entities.
+- [x] Topic edit flow supported from modern create page (`/topics/create?id=...`).
+- [x] Argument update API contract is now available (`PUT /api/arguments/entry/:id`).
+- [ ] Full field-by-field create/edit parity sign-off (all entity forms) still pending verification.
+
+### Visualize
+
+- [x] Dragging + physics enabled.
+- [x] Momentum/bounce tuning applied for closer legacy feel.
+- [x] Fullscreen toggle and graph navigation available.
+- [ ] Persisted fullscreen preference parity remains to be verified at runtime.
+
+### Auth + Account
+
+- [x] Login/signup/forgot/reset routes exist in modern.
+- [x] Social providers rendered in modern auth/account flows.
+- [ ] Provider visibility parity against backend runtime config still needs verification evidence.
+
+### Members/Groups/Admin
+
+- [x] Members/profile/groups/admin route families are present in modern.
+- [x] Group overview and member segmentation parity improvements implemented.
+- [x] Admin verdict/moderation/audit routes present in modern.
+- [ ] Admin operation parity (backup/restore mutation flows) needs runtime checklist execution evidence.
+
+## Remaining High-Value Validation Tasks
+
+- [ ] Run full runtime pair walkthrough + screenshot evidence on the latest deployed commit.
+- [ ] Complete per-entity create/edit field parity matrix (topic/argument/question/answer/issue/opinion/artifact).
+- [ ] Capture and store fixture-based search ordering parity evidence.
+- [ ] Execute admin backup/restore operation parity checklist and attach results.

@@ -5,6 +5,7 @@ This folder contains active engineering documentation, planning docs, and histor
 ## Start Here
 
 - Client development setup: `docs/CLIENT_DEVELOPMENT_SETUP.md`
+- Google Drive system reference hub: `docs/system-reference/README.md`
 - Active plans index: `docs/plans/README.md`
 - Completed plans index: `docs/plans/completed/README.md`
 - Deferred plans index: `docs/plans/deferred/README.md`
@@ -33,6 +34,11 @@ This folder contains active engineering documentation, planning docs, and histor
 - Performance: `docs/performance/`
 - Security: `docs/security/`
 - SEO: `docs/seo/`
+
+## Imported Sources
+
+- Raw Google Drive import (original + markdown + manifest): `docs/imported-docs/`
+- Normalized documentation/reference/ideas from import: `docs/system-reference/`
 
 ## Migration Archives
 

@@ -52,7 +52,7 @@ Audit references used for this pass:
 - `[x]` `/legacy/verdict/update` -> root legacy alias now redirects to `/admin/verdicts/:id?type=...` (or `/admin/verdicts` when no target id)
 - `[x]` topic/argument link entry routes (`/topic/.../link/:id`, `/argument/.../link/:id`, plus `/topics/link/edit`, `/arguments/link/edit`) now redirect to modern entry routes with explicit `topicLink` / `argumentLink` query context
 - `[x]` `/legacy/outline/create` now redirects to `/outline/link` with propagated `parentId` context when present (fallback to `/create`)
-- `[ ]` `/legacy/:username/settings` (other-user settings route shape) vs modern `/members/profile/settings` (self-settings)
+- `[x]` `/legacy/:username/settings` now aliases to canonical legacy profile settings route (`/legacy/members/:username/settings`)
 
 ### Modern-only routes (intentional enhancements unless noted)
 
@@ -87,8 +87,8 @@ Audit references used for this pass:
 - `[x]` Latest posts mixed feed section exists
 - `[x]` Mixed entity rendering includes topics/facts/questions/answers/issues/opinions/artifacts
 - `[x]` Entry row components are wired for core entity types
-- `[ ]` Validate ranking/order parity (legacy entry-set behavior vs modern ranking heuristics)
-- `[ ]` Validate exact “view more” behavior and destinations across all entity blocks
+- `[x]` Legacy home mixed `entrySet` ordering is now preserved in modern home feed (removed custom ranking buckets)
+- `[x]` “view more” behavior for legacy-style mixed home feed points to `/explore#browse` across rendered entry-set columns
 
 ### 3) Explore (`/legacy/explore` vs `/explore`)
 
@@ -195,8 +195,8 @@ Audit references used for this pass:
 - `[x]` Outline link page exists
 - `[x]` Screening and convert pages exist
 - `[x]` Contact/about/help/install routes exist
-- `[ ]` Legacy `/related` flow remains unresolved for modern equivalent
-- `[ ]` Legacy link-edit/entry-link flows need explicit modern product decision (preserve, redirect, or retire)
+- `[x]` Legacy `/related` flow now resolves via root alias redirect (`/related`) to best-matching modern entry route or `/explore`
+- `[x]` Legacy link-edit/entry-link flows are explicitly preserved as redirect aliases into modern entry routes (`topicLink` / `argumentLink` query context)
 
 ### 13) QA Tooling and Documentation Parity
 
@@ -245,4 +245,4 @@ Use this matrix to complete runtime parity sign-off after code-level review:
 - `[ ]` All P0/P1 items above are completed or formally accepted as intentional divergences
 - `[ ]` Runtime verification matrix passes with evidence screenshots/notes
 - `[ ]` No unresolved legacy-only route without explicit product decision
-- `[ ]` QA scripts and docs reflect current root-modern (`/`) routing model, not deprecated `/app` assumptions
+- `[x]` QA scripts and active parity docs now reflect current root-modern (`/`) routing model (`/app/*` documented as alias only)

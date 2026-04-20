@@ -13,6 +13,7 @@ describe('Server route contracts', function () {
     const routesSource = readProjectFile('server/src/middlewares/routes.ts');
 
     expect(routesSource).toContain('legacyRoutePatterns');
+    expect(routesSource).toContain('modernShellPatterns');
     expect(routesSource).toContain("'/home'");
     expect(routesSource).toContain("'/login'");
     expect(routesSource).toContain('/app');
@@ -20,10 +21,17 @@ describe('Server route contracts', function () {
 
   it('keeps modern app and api home handlers wired', function () {
     const apiIndexSource = readProjectFile('server/src/controllers/api/index.ts');
+    const homeApiSource = readProjectFile('server/src/controllers/api/home.ts');
     const appControllerSource = readProjectFile('server/src/controllers/app.ts');
+    const appSource = readProjectFile('server/src/app.ts');
+    const legacyBootstrapSource = readProjectFile('legacy/compatibility/server/bootstrap.js');
 
     expect(apiIndexSource).toContain("router.use('/home', homeRouter)");
+    expect(homeApiSource).toContain('flowUtils.createEntrySet(model)');
     expect(appControllerSource).toContain("router.get('/*'");
+    expect(appSource).toContain("'legacy'");
+    expect(appSource).toContain("mountPath: legacyCompatibilityConfig.mountPath || '/legacy'");
+    expect(legacyBootstrapSource).toContain("legacyRouter.get('/:username/settings'");
   });
 
   it('removes legacy shim controllers from modern server tree', function () {
