@@ -27,6 +27,7 @@
     "test:e2e": "playwright test",
     "test:parity:server": "jest --config jest.config.server.js tests/server/parity-checklist.test.js",
     "test:parity:client": "jest --config jest.config.client.js client/src/context/AuthContext.test.tsx client/src/components/Auth/SocialLoginButtons.test.tsx client/src/routes/routeConfig.test.tsx client/src/components/Entry/EntryActionsMenu.test.tsx client/src/services/api/admin.test.ts client/src/services/api/moderation.test.ts",
+    "test:parity:screenshots": "node scripts/qa/migration-parity-screenshots.mjs",
     "test:parity": "npm-run-all test:parity:server test:parity:client",
     "test:ci": "npm-run-all lint type:guardrails lint:server-paths ci:server-paths lint:compat:isolation lint:compat:imports test:server test:parity test:coverage build:client build:server",
     "storybook": "storybook dev -p 6006 -c .storybook",

@@ -32,6 +32,39 @@ const ROOT_NODE_ID = 'root';
 
 let visLoadPromise: Promise<void> | null = null;
 
+const DEFAULT_PHYSICS = {
+  enabled: true,
+  solver: 'barnesHut' as const,
+  barnesHut: {
+    gravitationalConstant: -2800,
+    centralGravity: 0.22,
+    springLength: 120,
+    springConstant: 0.035,
+    damping: 0.14,
+    avoidOverlap: 0.12,
+  },
+  stabilization: {
+    enabled: true,
+    iterations: 220,
+    updateInterval: 25,
+    fit: true,
+  },
+  minVelocity: 0.2,
+  maxVelocity: 30,
+  adaptiveTimestep: true,
+};
+
+const DRAG_PHYSICS = {
+  ...DEFAULT_PHYSICS,
+  barnesHut: {
+    ...DEFAULT_PHYSICS.barnesHut,
+    springConstant: 0.038,
+    damping: 0.095,
+  },
+  minVelocity: 0.08,
+  maxVelocity: 42,
+};
+
 function clamp(value: number, min: number, max: number): number {
   return Math.min(Math.max(value, min), max);
 }
@@ -122,6 +155,11 @@ const VisualizePage: React.FC = () => {
   const graphContainerRef = useRef<HTMLDivElement | null>(null);
   const networkRef = useRef<any>(null);
   const dragMomentumTimerRef = useRef<number | null>(null);
+  const dragMetaRef = useRef<{ startedAt: number; nodeId: string; position: { x: number; y: number } | null }>({
+    startedAt: 0,
+    nodeId: '',
+    position: null,
+  });
   const [graphHeight, setGraphHeight] = useState(560);
 
   useEffect(() => {
@@ -337,27 +375,7 @@ const VisualizePage: React.FC = () => {
           { nodes, edges },
           {
             autoResize: true,
-            physics: {
-              enabled: true,
-              solver: 'barnesHut',
-              barnesHut: {
-                gravitationalConstant: -2800,
-                centralGravity: 0.22,
-                springLength: 120,
-                springConstant: 0.035,
-                damping: 0.14,
-                avoidOverlap: 0.12,
-              },
-              stabilization: {
-                enabled: true,
-                iterations: 220,
-                updateInterval: 25,
-                fit: true,
-              },
-              minVelocity: 0.2,
-              maxVelocity: 30,
-              adaptiveTimestep: true,
-            },
+            physics: DEFAULT_PHYSICS,
             interaction: {
               dragNodes: true,
               dragView: true,
@@ -415,16 +433,68 @@ const VisualizePage: React.FC = () => {
           }
         });
 
+        network.on('dragStart', (params: any) => {
+          const nodeId = String(params?.nodes?.[0] || '');
+          if (!nodeId) {
+            dragMetaRef.current = {
+              startedAt: Date.now(),
+              nodeId: '',
+              position: null,
+            };
+            return;
+          }
+
+          let startPosition: { x: number; y: number } | null = null;
+          try {
+            const position = network.getPosition(nodeId);
+            if (position && Number.isFinite(position.x) && Number.isFinite(position.y)) {
+              startPosition = { x: position.x, y: position.y };
+            }
+          } catch (_error) {
+            startPosition = null;
+          }
+
+          dragMetaRef.current = {
+            startedAt: Date.now(),
+            nodeId: nodeId,
+            position: startPosition,
+          };
+
+          network.setOptions({ physics: DRAG_PHYSICS });
+        });
+
         // Ensure the network keeps simulating briefly after drag for legacy-like momentum.
         network.on('dragEnd', () => {
+          const dragDuration = Date.now() - dragMetaRef.current.startedAt;
+          let dragDistance = 0;
+
+          if (dragMetaRef.current.nodeId && dragMetaRef.current.position) {
+            try {
+              const endPosition = network.getPosition(dragMetaRef.current.nodeId);
+              const deltaX = Number(endPosition?.x || 0) - dragMetaRef.current.position.x;
+              const deltaY = Number(endPosition?.y || 0) - dragMetaRef.current.position.y;
+              dragDistance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            } catch (_error) {
+              dragDistance = 0;
+            }
+          }
+
+          const momentumMs = clamp(
+            Math.round(900 + dragDuration * 1.1 + dragDistance * 3),
+            950,
+            2600,
+          );
+
           network.startSimulation();
           if (dragMomentumTimerRef.current !== null) {
             window.clearTimeout(dragMomentumTimerRef.current);
           }
           dragMomentumTimerRef.current = window.setTimeout(() => {
             network.stopSimulation();
+            network.setOptions({ physics: DEFAULT_PHYSICS });
             dragMomentumTimerRef.current = null;
-          }, 950);
+            dragMetaRef.current = { startedAt: 0, nodeId: '', position: null };
+          }, momentumMs);
         });
       } catch (err) {
         if (!cancelled) {

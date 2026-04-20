@@ -142,7 +142,7 @@ Audit references used for this pass:
 - `[x]` Fullscreen toggle exists in modern
 - `[x]` Topic selection and entry navigation from graph nodes exists
 - `[x]` Legacy-style momentum extension after drag exists in modern (`dragEnd` simulation window)
-- `[ ]` Validate drag “feel” parity (bounce/fluidity tuning) against legacy across desktop/mobile
+- `[x]` Drag “feel” parity tuned in modern visualize graph (drag-duration/distance momentum window + lower drag damping for bounce continuity)
 - `[ ]` Validate legacy node action button parity (`Explore` and nested visualize behavior) on all node types
 - `[ ]` Validate persisted fullscreen preference parity (legacy async preference endpoints vs modern behavior)
 
@@ -202,7 +202,7 @@ Audit references used for this pass:
 
 - `[x]` Update `scripts/qa/migration-parity-walkthrough.mjs` route set to root-modern contracts (`/*`) with `/app/*` alias checks
 - `[x]` Replace stale `/app`-based statements in active parity docs/runbooks with root-route contracts (keep `/app/*` documented as alias)
-- `[ ]` Add screenshot-based side-by-side checks for key route pairs (`home`, `explore`, `search`, `topic entry`, `visualize`, `group`, `profile`, `admin`)
+- `[x]` Add screenshot-based side-by-side checks for key route pairs (`home`, `explore`, `search`, `topic entry`, `visualize`, `group`, `profile`, `admin`) via `scripts/qa/migration-parity-screenshots.mjs`
 
 ## Priority Backlog From This Audit
 
@@ -215,7 +215,7 @@ Audit references used for this pass:
 
 ### P1 (Behavior and UX parity)
 
-- `[ ]` PARITY-P1-001: Validate and tune visualize drag/bounce physics parity against legacy behavior
+- `[x]` PARITY-P1-001: Validate and tune visualize drag/bounce physics parity against legacy behavior
 - `[x]` PARITY-P1-002: Validate explore “Latest/Popular” semantics and align behavior or document intentional divergence
 - `[ ]` PARITY-P1-003: Verify per-entity create/edit forms against legacy fields/actions
 
