@@ -230,16 +230,16 @@ Audit references used for this pass:
 
 Use this matrix to complete runtime parity sign-off after code-level review:
 
-- `[ ]` Pair 01: `/legacy/` vs `/`
-- `[ ]` Pair 02: `/legacy/explore` vs `/explore`
-- `[ ]` Pair 03: `/legacy/search?q=<term>` vs `/search?q=<term>`
-- `[ ]` Pair 04: `/legacy/topic/<friendly>/<id>` vs `/topics/entry/<friendly>/<id>`
-- `[ ]` Pair 05: `/legacy/visualize/topic/<friendly>/<id>` vs `/visualize/topic/<friendly>/<id>`
-- `[ ]` Pair 06: `/legacy/groups/<friendly>/<id>` vs `/groups/<friendly>/<id>`
-- `[ ]` Pair 07: `/legacy/groups/<friendly>/<id>/posts` vs `/groups/<friendly>/<id>/posts`
-- `[ ]` Pair 08: `/legacy/groups/<friendly>/<id>/members` vs `/groups/<friendly>/<id>/members`
-- `[ ]` Pair 09: `/legacy/members/<username>` vs `/members/<username>`
-- `[ ]` Pair 10: `/legacy/admin` vs `/admin`
+- `[x]` Pair 01: `/legacy/` vs `/` (walkthrough PASS)
+- `[x]` Pair 02: `/legacy/explore` vs `/explore` (walkthrough PASS)
+- `[x]` Pair 03: `/legacy/search?q=<term>` vs `/search?q=<term>` (screenshot run PASS with `q=gmo`)
+- `[x]` Pair 04: `/legacy/topic/<friendly>/<id>` vs `/topics/entry/<friendly>/<id>` (screenshot run PASS)
+- `[x]` Pair 05: `/legacy/visualize/topic/<friendly>/<id>` vs `/visualize/topic/<friendly>/<id>` (route-level PASS; 200 on both sides)
+- `[ ]` Pair 06: `/legacy/groups/<friendly>/<id>` vs `/groups/<friendly>/<id>` (blocked in local fixture: no public groups)
+- `[ ]` Pair 07: `/legacy/groups/<friendly>/<id>/posts` vs `/groups/<friendly>/<id>/posts` (blocked in local fixture: no public groups)
+- `[ ]` Pair 08: `/legacy/groups/<friendly>/<id>/members` vs `/groups/<friendly>/<id>/members` (blocked in local fixture: no public groups)
+- `[x]` Pair 09: `/legacy/members/<username>` vs `/members/<username>` (route-level PASS with `dsalunga`)
+- `[ ]` Pair 10: `/legacy/admin` vs `/admin` (code alias implemented; runtime verify on latest restarted process pending)
 
 ## Exit Criteria for “Parity Complete”
 

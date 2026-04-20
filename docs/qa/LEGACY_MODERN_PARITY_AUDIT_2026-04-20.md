@@ -96,3 +96,9 @@ Primary checklist source remains:
 - [ ] Complete per-entity create/edit field parity matrix (topic/argument/question/answer/issue/opinion/artifact).
 - [ ] Capture and store fixture-based search ordering parity evidence.
 - [ ] Execute admin backup/restore operation parity checklist and attach results.
+
+## Runtime Evidence (Local, 2026-04-20)
+
+- Walkthrough script PASS: `node scripts/qa/migration-parity-walkthrough.mjs http://127.0.0.1:8000`
+- Screenshot capture PASS: `node scripts/qa/migration-parity-screenshots.mjs http://127.0.0.1:8000 docs/qa/artifacts/parity-screenshots-2026-04-20-local`
+- Evidence manifest: `docs/qa/artifacts/parity-screenshots-2026-04-20-local/manifest.json`
