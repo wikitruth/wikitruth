@@ -29,6 +29,7 @@ type GraphPayload = {
 };
 
 const ROOT_NODE_ID = 'root';
+const FULLSCREEN_PREF_KEY = 'wt.visualize.fullscreen';
 
 let visLoadPromise: Promise<void> | null = null;
 
@@ -151,7 +152,12 @@ const VisualizePage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [networkError, setNetworkError] = useState<string | null>(null);
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(() => {
+    if (typeof window === 'undefined') {
+      return false;
+    }
+    return window.localStorage.getItem(FULLSCREEN_PREF_KEY) === '1';
+  });
   const graphContainerRef = useRef<HTMLDivElement | null>(null);
   const networkRef = useRef<any>(null);
   const dragMomentumTimerRef = useRef<number | null>(null);
@@ -209,6 +215,18 @@ const VisualizePage: React.FC = () => {
       resizeObserver.disconnect();
       window.removeEventListener('resize', updateHeight);
     };
+  }, [isFullscreen]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    try {
+      window.localStorage.setItem(FULLSCREEN_PREF_KEY, isFullscreen ? '1' : '0');
+    } catch (_error) {
+      // Ignore localStorage failures (private mode / quota) and keep in-memory state only.
+    }
   }, [isFullscreen]);
 
   const topics = (data?.topics || []) as LegacyEntity[];

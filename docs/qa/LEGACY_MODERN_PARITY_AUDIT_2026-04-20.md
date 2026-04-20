@@ -73,7 +73,7 @@ Primary checklist source remains:
 - [x] Dragging + physics enabled.
 - [x] Momentum/bounce tuning applied for closer legacy feel.
 - [x] Fullscreen toggle and graph navigation available.
-- [ ] Persisted fullscreen preference parity remains to be verified at runtime.
+- [x] Fullscreen preference is persisted in modern client (`localStorage`: `wt.visualize.fullscreen`).
 
 ### Auth + Account
 

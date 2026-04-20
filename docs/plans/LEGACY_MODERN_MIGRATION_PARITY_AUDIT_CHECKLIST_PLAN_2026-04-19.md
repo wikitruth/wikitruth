@@ -144,7 +144,7 @@ Audit references used for this pass:
 - `[x]` Legacy-style momentum extension after drag exists in modern (`dragEnd` simulation window)
 - `[x]` Drag “feel” parity tuned in modern visualize graph (drag-duration/distance momentum window + lower drag damping for bounce continuity)
 - `[ ]` Validate legacy node action button parity (`Explore` and nested visualize behavior) on all node types
-- `[ ]` Validate persisted fullscreen preference parity (legacy async preference endpoints vs modern behavior)
+- `[x]` Visualize fullscreen preference now persists in modern client (`localStorage` key: `wt.visualize.fullscreen`)
 
 ### 8) Authentication, Signup, Fast Switch, Account
 
