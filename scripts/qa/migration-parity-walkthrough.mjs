@@ -4,14 +4,15 @@ import { chromium } from 'playwright';
 const baseUrl = process.argv[2] || 'https://127.0.0.1:9443';
 
 const pageChecks = [
-  { label: 'modern-home', path: '/app', pattern: /Latest Posts|Explore/i },
-  { label: 'legacy-home', path: '/', pattern: /Latest Posts|Explore/i },
-  { label: 'modern-explore', path: '/app/explore', pattern: /Explore|Topics|Facts/i },
-  { label: 'legacy-explore', path: '/explore', pattern: /Explore|Topics|Facts/i },
-  { label: 'modern-auth-page', path: '/app/login', pattern: /Sign In|Login/i },
-  { label: 'legacy-auth-page', path: '/login/', pattern: /Sign In|Login/i },
-  { label: 'modern-admin-route', path: '/app/admin', pattern: /Sign In|Admin/i },
-  { label: 'modern-moderation-route', path: '/app/admin/verdicts', pattern: /Sign In|Verdict|Moderation/i },
+  { label: 'modern-home', path: '/', pattern: /Latest Posts|Explore/i },
+  { label: 'legacy-home', path: '/legacy/', pattern: /Latest Posts|Explore/i },
+  { label: 'modern-explore', path: '/explore', pattern: /Explore|Topics|Facts/i },
+  { label: 'legacy-explore', path: '/legacy/explore', pattern: /Explore|Topics|Facts/i },
+  { label: 'modern-auth-page', path: '/login', pattern: /Sign In|Login/i },
+  { label: 'legacy-auth-page', path: '/legacy/login/', pattern: /Sign In|Login/i },
+  { label: 'modern-admin-route', path: '/admin', pattern: /Sign In|Admin/i },
+  { label: 'modern-moderation-route', path: '/admin/verdicts', pattern: /Sign In|Verdict|Moderation/i },
+  { label: 'modern-app-alias', path: '/app/explore', pattern: /Explore|Topics|Facts/i },
 ];
 
 async function run() {

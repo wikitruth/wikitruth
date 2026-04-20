@@ -50,12 +50,14 @@ Compatibility ON:
 curl -I http://127.0.0.1:8000/
 curl -I http://127.0.0.1:8000/legacy/
 curl -I http://127.0.0.1:8000/app
+curl -I http://127.0.0.1:8000/app/explore
 curl -I http://127.0.0.1:8000/explore
 curl -I http://127.0.0.1:8000/api/auth/me
 ```
 
 Expected:
-- `/`, `/explore`, `/app` return `200` (modern shell).
+- `/`, `/explore` return `200` (modern shell).
+- `/app` returns `302` to `/` and `/app/explore` returns `302` to `/explore`.
 - `/legacy/` returns `200` (legacy shell).
 - `/api/auth/me` returns `200` when authenticated, otherwise `401`.
 
@@ -70,7 +72,8 @@ curl -I http://127.0.0.1:8000/legacy/
 ```
 
 Expected:
-- `/`, `/explore`, `/app`, `/app/search` return `200` (modern shell).
+- `/`, `/explore` return `200` (modern shell).
+- `/app` and `/app/search` return `302` aliases to root modern routes.
 - `/legacy/` returns `404` (legacy compatibility disabled).
 
 ## Guardrails

@@ -78,4 +78,18 @@ describe('React shell routes', function () {
 
     expect(res.headers.location).toBe('/topics/entry/link001?topicLink=link001');
   });
+
+  it('redirects legacy topic-link edit routes into modern topic entry routes', async function () {
+    const app = createRootApp();
+    const res = await request(app).get('/topics/link/edit?id=topicLink001').expect(302);
+
+    expect(res.headers.location).toBe('/topics/entry/topicLink001?id=topicLink001&topicLink=topicLink001&mode=edit-link');
+  });
+
+  it('redirects legacy argument-link edit routes into modern argument entry routes', async function () {
+    const app = createRootApp();
+    const res = await request(app).get('/arguments/link/edit?id=argumentLink001').expect(302);
+
+    expect(res.headers.location).toBe('/arguments/entry/argumentLink001?id=argumentLink001&argumentLink=argumentLink001&mode=edit-link');
+  });
 });

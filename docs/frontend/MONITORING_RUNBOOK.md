@@ -2,7 +2,7 @@
 
 ## Scope
 
-This runbook covers monitoring for migrated React routes (`/app/*`) and supporting API endpoints.
+This runbook covers monitoring for migrated React routes (`/*`, with `/app/*` kept as alias redirects) and supporting API endpoints.
 
 ## Signals
 

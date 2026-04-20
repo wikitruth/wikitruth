@@ -5,24 +5,24 @@ Plan: `docs/plans/completed/LEGACY_COMPATIBILITY_ISOLATION_CHECKLIST_PLAN_2026-0
 
 ## Outcome
 
-Legacy runtime artifacts were isolated under `legacy/compatibility/` while preserving legacy URL behavior and keeping modern `/app` flows intact.
+Legacy runtime artifacts were isolated under `legacy/compatibility/` while preserving legacy URL behavior and keeping modern root routes (`/*`) intact (`/app/*` remains an alias).
 
 ## Before and After Mapping
 
 Source of truth: `legacy/compatibility/contracts/path-map.json`
 
 Key moves:
-- `public/templates` -> `legacy/compatibility/templates`
-- `public/views` -> `legacy/compatibility/static/views`
-- `public/layouts` -> `legacy/compatibility/static/layouts`
-- `public/js` -> `legacy/compatibility/static/js`
-- `public/css` -> `legacy/compatibility/static/css`
-- `public/less` -> `legacy/compatibility/static/less`
-- `public/fonts` -> `legacy/compatibility/static/fonts`
-- `public/components` -> `legacy/compatibility/static/components`
-- `tasks` -> `legacy/compatibility/build/tasks`
-- `Gruntfile.js` -> `legacy/compatibility/build/Gruntfile.js`
-- legacy server controllers moved to `legacy/compatibility/server/controllers/**` with seam wrappers left in `server/src/controllers/**`
+- `public/templates` -> `legacy/templates`
+- `public/views` -> `legacy/static/views`
+- `public/layouts` -> `legacy/static/layouts`
+- `public/js` -> `legacy/static/js`
+- `public/css` -> `legacy/static/css`
+- `public/less` -> `legacy/static/less`
+- `public/fonts` -> `legacy/static/fonts`
+- `public/components` -> `legacy/static/components`
+- `tasks` -> `legacy/build/tasks`
+- `Gruntfile.js` -> `legacy/build/Gruntfile.js`
+- legacy server controllers moved to `legacy/server/controllers/**` with seam wrappers left in `server/src/controllers/**`
 
 Ownership mapping:
 - `legacy/compatibility/contracts/ownership-map.md`
@@ -38,7 +38,7 @@ Ownership mapping:
 - Wired legacy route loader/template root to compatibility path:
   - `server/src/middlewares/routes.ts`
 - Added modern-only fallback mode:
-  - `LEGACY_COMPATIBILITY_ENABLED=false` redirects legacy entry routes to `/app`
+  - `LEGACY_COMPATIBILITY_ENABLED=false` redirects legacy entry routes to `/`
 
 ## Guardrails Added
 
@@ -69,21 +69,23 @@ Executed on `PORT=8124` with `LEGACY_COMPATIBILITY_ENABLED=true`:
 - `/about/` -> `200`
 - `/contact/` -> `200`
 - `/login/` -> `200`
-- `/app` -> `200`
-- `/app/explore` -> `200`
+- `/app` -> `302` (`Location: /`)
+- `/app/explore` -> `302` (`Location: /explore`)
+- `/explore` -> `200`
 - `/api/auth/me` -> `200`
 
 ### Runtime Smoke (Compatibility OFF / Modern-only)
 
 Executed on `PORT=8125` with `LEGACY_COMPATIBILITY_ENABLED=false`:
 - `/` -> `302` (`Location: /app`)
-- `/login/` -> `302` (`Location: /app`)
-- `/about/` -> `302` (`Location: /app`)
-- `/app` -> `200`
-- `/app/search` -> `200`
+- `/login/` -> `302` (`Location: /`)
+- `/about/` -> `302` (`Location: /`)
+- `/app` -> `302` (`Location: /`)
+- `/app/search` -> `302` (`Location: /search`)
+- `/search` -> `200`
 
 ## Notes
 
 - Updated legacy about page controller to mongoose-8 compatible query style:
-  - `legacy/compatibility/templates/jade/about/index.js`
+  - `legacy/templates/jade/about/index.js`
 - Legacy compatibility plan is now fully checked and ready to archive under completed plans.

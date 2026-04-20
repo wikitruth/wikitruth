@@ -5,16 +5,16 @@ Purpose: verify modern admin parity and high-risk mutation paths (`FLOW-034`, `F
 ## Coverage Scope
 
 - Routes:
-  - `/app/admin/users`
-  - `/app/admin/accounts`
-  - `/app/admin/administrators`
-  - `/app/admin/groups`
-  - `/app/admin/categories`
-  - `/app/admin/statuses`
-  - `/app/admin/verdicts`
-  - `/app/admin/db-backup`
-  - `/app/admin/audit`
-  - `/app/admin/moderation/signals`
+  - `/admin/users`
+  - `/admin/accounts`
+  - `/admin/administrators`
+  - `/admin/groups`
+  - `/admin/categories`
+  - `/admin/statuses`
+  - `/admin/verdicts`
+  - `/admin/db-backup`
+  - `/admin/audit`
+  - `/admin/moderation/signals`
 - Mutations:
   - user create/update/delete + role links
   - account link/unlink + notes + status + delete
@@ -45,3 +45,4 @@ Purpose: verify modern admin parity and high-risk mutation paths (`FLOW-034`, `F
 
 - This checklist is focused on parity and risk controls, not visual redesign.
 - Additional UX refinements can be layered without changing mutation contracts.
+- `/app/*` remains a redirect alias; root routes are the canonical modern contract.

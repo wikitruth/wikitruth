@@ -38,12 +38,12 @@ Use the UAT checklist below before production:
 - Wiki read/create/edit flows.
 - Admin dashboard and list pages.
 - Groups/member profile pages.
-- Error pages and deep-link refresh under `/app/*`.
+- Error pages and deep-link refresh under root routes (`/*`, with `/app/*` alias redirects).
 
 ## 5. Production Rollout (Gradual)
 
 1. Deploy server + static assets.
-2. Enable React app surface under `/app/*`.
+2. Enable React app surface on root routes (`/*`) and keep `/app/*` aliases active.
 3. Start with internal users, then broaden rollout.
 4. Keep legacy routes active for fallback and flow comparison.
 

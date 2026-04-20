@@ -9,8 +9,8 @@
 
 ## React routes show 404 after refresh
 
-- Verify server serves `public/react-app.html` for `/app/*` routes.
-- Verify `BrowserRouter` basename remains `/app`.
+- Verify server serves `public/react-app.html` for root routes (`/*`).
+- Verify `/app/*` alias redirects are still wired in `server/src/middlewares/routes.ts`.
 
 ## API calls fail in local dev
 

@@ -40,8 +40,8 @@ npm run dev:client
 
 - Legacy/backend app: `http://localhost:8000`
 - React dev server: `http://localhost:3001`
-- React SPA route base: `http://localhost:3001/app`
-- Opening `http://localhost:3001/` redirects to `http://localhost:3001/app`
+- React SPA route base: `http://localhost:3001/`
+- `/app/*` remains available as a compatibility alias that redirects to root routes.
 
 `/api/*` requests from the React dev server are proxied to `http://localhost:8000`.
 
@@ -56,7 +56,7 @@ npm start
 
 Then open:
 
-- `http://localhost:8000/app`
+- `http://localhost:8000/`
 
 ## Build and Test
 
@@ -103,4 +103,4 @@ See `docs/frontend/ENVIRONMENT_VARIABLES.md` for the full variable matrix.
 - If port `3001` is in use, stop conflicting processes or change `devServer.port` in `webpack.config.js`.
 - If API calls fail from the dev server, verify backend is running on `8000`.
 - If TypeScript build fails, run `npm run tsc` to isolate server-side type errors.
-- If `http://localhost:8000/app` is blank in server-only mode, rebuild assets with `npm run build:client`.
+- If `http://localhost:8000/` is blank in server-only mode, rebuild assets with `npm run build:client`.

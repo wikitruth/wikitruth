@@ -200,8 +200,8 @@ Audit references used for this pass:
 
 ### 13) QA Tooling and Documentation Parity
 
-- `[ ]` Update `scripts/qa/migration-parity-walkthrough.mjs` route set (currently still checks `/app/*` as modern baseline)
-- `[ ]` Replace stale `/app`-based statements in older parity docs with root-route contracts
+- `[x]` Update `scripts/qa/migration-parity-walkthrough.mjs` route set to root-modern contracts (`/*`) with `/app/*` alias checks
+- `[x]` Replace stale `/app`-based statements in active parity docs/runbooks with root-route contracts (keep `/app/*` documented as alias)
 - `[ ]` Add screenshot-based side-by-side checks for key route pairs (`home`, `explore`, `search`, `topic entry`, `visualize`, `group`, `profile`, `admin`)
 
 ## Priority Backlog From This Audit
@@ -221,9 +221,9 @@ Audit references used for this pass:
 
 ### P2 (Audit infra and long-tail)
 
-- `[ ]` PARITY-P2-001: Refresh migration parity QA script to root-modern route contracts
-- `[ ]` PARITY-P2-002: Consolidate/retire stale parity docs superseded by this checklist
-- `[ ]` PARITY-P2-003: Add automated smoke checks for unresolved legacy alias endpoints
+- `[x]` PARITY-P2-001: Refresh migration parity QA script to root-modern route contracts
+- `[x]` PARITY-P2-002: Consolidate/retire stale parity docs superseded by this checklist
+- `[x]` PARITY-P2-003: Add automated smoke checks for unresolved legacy alias endpoints
 
 ## Suggested Runtime Verification Matrix
 
