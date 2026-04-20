@@ -49,6 +49,7 @@ Primary checklist source remains:
 
 - [x] Query input, tab buckets, and scope controls present.
 - [x] Keyboard navigation and `view more` behavior present.
+- [x] Artifact rows now render via dedicated parity component with labels/subtitle/preview support.
 - [ ] Runtime fixture-level ordering/paging parity validation still needs explicit evidence capture.
 
 ### Topic Entry

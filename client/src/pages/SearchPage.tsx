@@ -6,6 +6,7 @@ import TopicEntryRow from '../components/EntryRow/TopicEntryRow';
 import ArgumentEntryRow from '../components/EntryRow/ArgumentEntryRow';
 import QuestionEntryRow from '../components/EntryRow/QuestionEntryRow';
 import AnswerEntryRow from '../components/EntryRow/AnswerEntryRow';
+import ArtifactEntryRow from '../components/EntryRow/ArtifactEntryRow';
 import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
 import PageMeta from '../components/common/PageMeta';
@@ -259,11 +260,7 @@ const SearchPage: React.FC = () => {
         return entries.map((answer) => <AnswerEntryRow key={answer._id} answer={answer as unknown as Answer} subtitle={true} labels={true} />);
       case 'artifacts':
         return entries.map((artifact) => (
-          <li key={artifact._id} className="list-group-item">
-            <a href={`/artifacts/entry/${(artifact as unknown as Artifact).friendlyUrl || artifact._id}/${artifact._id}`}>
-              {artifact.title || '(Untitled)'}
-            </a>
-          </li>
+          <ArtifactEntryRow key={artifact._id} artifact={artifact as unknown as Artifact} subtitle={true} labels={true} />
         ));
       case 'issues':
         return entries.map((issue) => <IssueEntryRow key={issue._id} issue={issue as unknown as Issue} subtitle={true} labels={true} />);

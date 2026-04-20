@@ -8,6 +8,7 @@ import TopicEntryRow from '../components/EntryRow/TopicEntryRow';
 import ArgumentEntryRow from '../components/EntryRow/ArgumentEntryRow';
 import QuestionEntryRow from '../components/EntryRow/QuestionEntryRow';
 import AnswerEntryRow from '../components/EntryRow/AnswerEntryRow';
+import ArtifactEntryRow from '../components/EntryRow/ArtifactEntryRow';
 import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
 import PageMeta from '../components/common/PageMeta';
@@ -34,30 +35,6 @@ interface HomeData {
   issuesMore?: boolean;
   opinionsMore?: boolean;
   artifactsMore?: boolean;
-}
-
-function getLegacyEntryPath(entry: LegacyEntity): string | null {
-  const id = encodeURIComponent(String(entry._id || ''));
-  const friendly = encodeURIComponent(String(entry.friendlyUrl || ''));
-
-  switch (String(entry.objectName || '')) {
-    case 'topic':
-      return `/topics/entry/${friendly || id}/${id}`;
-    case 'argument':
-      return `/arguments/entry/${friendly || id}/${id}`;
-    case 'question':
-      return `/questions/entry/${friendly || id}/${id}`;
-    case 'answer':
-      return `/answers/entry/${id}`;
-    case 'issue':
-      return friendly ? `/issues/entry/${friendly}/${id}` : `/issues/entry/${id}`;
-    case 'opinion':
-      return friendly ? `/opinions/entry/${friendly}/${id}` : `/opinions/entry/${id}`;
-    case 'artifact':
-      return `/artifacts/entry/${friendly || id}/${id}`;
-    default:
-      return null;
-  }
 }
 
 const HomePage: React.FC = () => {
@@ -141,36 +118,15 @@ const HomePage: React.FC = () => {
           />
         );
       case 'artifact': {
-        const entryPath = getLegacyEntryPath(entry);
         return (
-          <li key={`entry-artifact-${entry._id}`} className="list-group-item">
-            <i className="fa fa-puzzle-piece text-muted-x" aria-hidden="true"></i>
-            <div>
-              {entryPath ? (
-                <Link to={entryPath}>{entry.title || '(Untitled)'}</Link>
-              ) : (
-                <span>{entry.title || '(Untitled)'}</span>
-              )}
-              {entry.editorUsername || entry.editDate ? (
-                <div className="text-muted">
-                  <small>
-                    {entry.editorUsername ? (
-                      <>
-                        <i className="fa fa-user"></i> {entry.editorUsername}
-                      </>
-                    ) : null}
-                    {entry.editDate ? (
-                      <>
-                        {' '}
-                        <i className="fa fa-clock-o"></i>{' '}
-                        {new Date(entry.editDate).toLocaleDateString()}
-                      </>
-                    ) : null}
-                  </small>
-                </div>
-              ) : null}
-            </div>
-          </li>
+          <ArtifactEntryRow
+            key={`entry-artifact-${entry._id}`}
+            artifact={entry as unknown as Artifact}
+            subtitle={true}
+            labels={true}
+            contentPreview={String(entry.contentPreview || '')}
+            showMore={Boolean(entry.showMore)}
+          />
         );
       }
       default:
@@ -402,11 +358,7 @@ const HomePage: React.FC = () => {
                   <div>Artifacts</div>
                 </li>
                 {data.artifacts.map((artifact) => (
-                  <li key={artifact._id} className="list-group-item">
-                    <a href={`/artifacts/entry/${artifact.friendlyUrl || artifact._id}/${artifact._id}`}>
-                      {artifact.title || '(Untitled)'}
-                    </a>
-                  </li>
+                  <ArtifactEntryRow key={artifact._id} artifact={artifact} subtitle={true} labels={true} />
                 ))}
               </ul>
               {data.artifactsMore && (

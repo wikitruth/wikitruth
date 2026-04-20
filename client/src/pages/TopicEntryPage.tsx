@@ -13,6 +13,7 @@ import ArgumentEntryRow from '../components/EntryRow/ArgumentEntryRow';
 import QuestionEntryRow from '../components/EntryRow/QuestionEntryRow';
 import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
+import ArtifactEntryRow from '../components/EntryRow/ArtifactEntryRow';
 import EntryActionsMenu from '../components/Entry/EntryActionsMenu';
 import EntryQuickActions from '../components/Entry/EntryQuickActions';
 import PageMeta from '../components/common/PageMeta';
@@ -407,11 +408,7 @@ const TopicEntryPage: React.FC = () => {
           count={topic.childrenCount?.artifacts?.accepted ?? artifacts.length}
         >
           {artifacts.map((artifact) => (
-            <li key={artifact._id} className="list-group-item">
-              <Link to={`/artifacts/entry/${(artifact as unknown as Artifact).friendlyUrl || artifact._id}/${artifact._id}`}>
-                {artifact.title || '(Untitled)'}
-              </Link>
-            </li>
+            <ArtifactEntryRow key={artifact._id} artifact={artifact as unknown as Artifact} subtitle={true} labels={true} />
           ))}
         </EntryList>
       )}

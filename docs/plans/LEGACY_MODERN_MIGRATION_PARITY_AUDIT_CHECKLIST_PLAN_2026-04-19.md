@@ -109,7 +109,7 @@ Audit references used for this pass:
 - `[x]` Empty-result UX exists
 - `[x]` Modern adds keyboard result navigation (up/down/enter, escape)
 - `[ ]` Validate result ordering and paging parity with identical fixture data
-- `[ ]` Validate artifact row rendering parity depth (legacy row template vs modern simplified row)
+- `[x]` Artifact result rows now use dedicated modern `ArtifactEntryRow` with subtitle/labels/content-preview support aligned to legacy row depth
 
 ### 5) Topic Entry and Shared Entry Detail Behavior
 
