@@ -97,8 +97,8 @@ Audit references used for this pass:
 - `[x]` Tab filtering via query params
 - `[x]` Screening/verdict/relationship/tag filter controls in modern
 - `[x]` Content view selector exists in modern
-- `[ ]` Validate “Latest vs Popular” interaction parity (legacy explicit toggle vs modern behavior)
-- `[ ]` Validate admin “new topic in tab menu” affordance parity on explore page
+- `[x]` “Latest vs Popular” interaction parity implemented on modern Explore (`sort=latest|popular` with deterministic ordering)
+- `[x]` Admin “new topic in tab menu” affordance parity implemented on modern Explore tabs
 
 ### 4) Search (`/legacy/search` vs `/search`)
 
@@ -216,7 +216,7 @@ Audit references used for this pass:
 ### P1 (Behavior and UX parity)
 
 - `[ ]` PARITY-P1-001: Validate and tune visualize drag/bounce physics parity against legacy behavior
-- `[ ]` PARITY-P1-002: Validate explore “Latest/Popular” semantics and align behavior or document intentional divergence
+- `[x]` PARITY-P1-002: Validate explore “Latest/Popular” semantics and align behavior or document intentional divergence
 - `[ ]` PARITY-P1-003: Verify per-entity create/edit forms against legacy fields/actions
 
 ### P2 (Audit infra and long-tail)

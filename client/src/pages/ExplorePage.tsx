@@ -16,6 +16,7 @@ import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
 import GeoPatternBackground from '../components/common/GeoPatternBackground';
 import ContentViewFilter, { type ViewMode } from '../components/common/ContentViewFilter';
 import { useNotification } from '../context/NotificationContext';
+import { useAuth } from '../context/AuthContext';
 
 type ExploreTab = 'all' | 'topics' | 'arguments' | 'questions' | 'answers' | 'artifacts' | 'issues' | 'opinions';
 
@@ -46,6 +47,7 @@ function getArgumentEntryPath(argument: Pick<LegacyEntity, 'friendlyUrl' | '_id'
 
 const ExplorePage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const { user } = useAuth();
   const [data, setData] = useState<HomeDataResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const storedViewMode = (() => {
@@ -68,6 +70,7 @@ const ExplorePage: React.FC = () => {
   const verdictFilter = String(searchParams.get('status') || 'all').trim();
   const relationshipFilter = String(searchParams.get('relationship') || 'all').trim();
   const tagFilter = String(searchParams.get('tag') || '').trim();
+  const sortMode: 'latest' | 'popular' = String(searchParams.get('sort') || 'latest').toLowerCase() === 'popular' ? 'popular' : 'latest';
   const { addToast } = useNotification();
 
   useEffect(() => {
@@ -236,11 +239,45 @@ const ExplorePage: React.FC = () => {
   };
 
   const filteredSections = useMemo(() => {
+    const getPopularityScore = (entry: LegacyEntity): number => {
+      const buckets = entry.childrenCount || {};
+      const totals = [
+        buckets.topics?.accepted || buckets.topics?.total || 0,
+        buckets.arguments?.accepted || buckets.arguments?.total || 0,
+        buckets.questions?.accepted || buckets.questions?.total || 0,
+        buckets.answers?.accepted || buckets.answers?.total || 0,
+        buckets.artifacts?.accepted || buckets.artifacts?.total || 0,
+        buckets.issues?.accepted || buckets.issues?.total || 0,
+        buckets.opinions?.accepted || buckets.opinions?.total || 0,
+      ]
+        .map((value) => Number(value || 0))
+        .reduce((sum, value) => sum + value, 0);
+      const points = Number(entry.points || 0);
+      const verdict = Number((entry.verdict as { status?: number } | undefined)?.status || 0);
+      const verdictBoost = verdict === 1 ? 5 : 0;
+      return totals + points + verdictBoost;
+    };
+
+    const sortEntries = (items: LegacyEntity[]): LegacyEntity[] => {
+      return [...items].sort((left, right) => {
+        if (sortMode === 'popular') {
+          const scoreDelta = getPopularityScore(right) - getPopularityScore(left);
+          if (scoreDelta !== 0) {
+            return scoreDelta;
+          }
+        }
+
+        const leftDate = new Date(left.editDate || left.createDate || 0).getTime();
+        const rightDate = new Date(right.editDate || right.createDate || 0).getTime();
+        return rightDate - leftDate;
+      });
+    };
+
     return sections.map((section) => ({
       ...section,
-      items: (section.items || []).filter((entry) => filterEntry(entry as LegacyEntity)),
+      items: sortEntries((section.items || []).filter((entry) => filterEntry(entry as LegacyEntity))),
     }));
-  }, [sections, keyword, screeningFilter, verdictFilter, relationshipFilter, tagFilter]);
+  }, [sections, keyword, screeningFilter, verdictFilter, relationshipFilter, tagFilter, sortMode]);
 
   const categories: ExploreCategory[] = (data?.appCategories || []) as ExploreCategory[];
 
@@ -313,6 +350,31 @@ const ExplorePage: React.FC = () => {
 
       <h1 className="page-header wt-header" id="browse">Latest Posts</h1>
       <div style={{ marginBottom: 15 }} className="wt-btn-group">
+        <div className="btn-group" role="group" aria-label="Latest or Popular Filter" style={{ marginBottom: 5 }}>
+          <a
+            href="#browse"
+            className={`btn btn-${sortMode === 'latest' ? 'info' : 'default'} btn-sm`}
+            role="button"
+            onClick={(event) => {
+              event.preventDefault();
+              updateFilter('sort', '');
+            }}
+          >
+            Latest
+          </a>
+          <a
+            href="#browse"
+            className={`btn btn-${sortMode === 'popular' ? 'info' : 'default'} btn-sm`}
+            role="button"
+            onClick={(event) => {
+              event.preventDefault();
+              updateFilter('sort', 'popular');
+            }}
+          >
+            Popular
+          </a>
+        </div>
+        &nbsp;&nbsp;
         <ContentViewFilter value={viewMode} onChange={handleViewModeChange} />
       </div>
       <div className="panel panel-default">
@@ -412,6 +474,28 @@ const ExplorePage: React.FC = () => {
             </a>
           </li>
         ))}
+        {Boolean(user?.roles?.admin) && (
+          <li role="presentation" className="dropdown">
+            <a
+              href="#browse"
+              id="explore-tab-more"
+              className="dropdown-toggle"
+              data-toggle="dropdown"
+              aria-controls="explore-tab-more-contents"
+              aria-expanded="false"
+              onClick={(event) => event.preventDefault()}
+            >
+              <span className="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span>
+            </a>
+            <ul className="dropdown-menu dropdown-menu-right" aria-labelledby="explore-tab-more" id="explore-tab-more-contents">
+              <li role="tab">
+                <Link to="/topics/create">
+                  <span className="glyphicon glyphicon-edit" aria-hidden="true"></span> New Topic
+                </Link>
+              </li>
+            </ul>
+          </li>
+        )}
       </ul>
 
       <div>
