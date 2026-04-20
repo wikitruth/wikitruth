@@ -127,6 +127,11 @@ function registerLegacyCompatibility(app, options) {
     return res.redirect(`${mountPath}/members/${username}/settings${query}`);
   });
 
+  legacyRouter.get('/admin', function legacyAdminRootAlias(req, res) {
+    const query = req.originalUrl.includes('?') ? req.originalUrl.slice(req.originalUrl.indexOf('?')) : '';
+    return res.redirect(`/admin${query}`);
+  });
+
   [
     ['/', 'index'],
     ['/about', 'about'],

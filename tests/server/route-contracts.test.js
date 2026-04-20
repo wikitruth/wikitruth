@@ -32,6 +32,7 @@ describe('Server route contracts', function () {
     expect(appSource).toContain("'legacy'");
     expect(appSource).toContain("mountPath: legacyCompatibilityConfig.mountPath || '/legacy'");
     expect(legacyBootstrapSource).toContain("legacyRouter.get('/:username/settings'");
+    expect(legacyBootstrapSource).toContain("legacyRouter.get('/admin'");
   });
 
   it('removes legacy shim controllers from modern server tree', function () {

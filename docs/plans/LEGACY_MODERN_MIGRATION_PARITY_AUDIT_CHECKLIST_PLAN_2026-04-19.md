@@ -45,6 +45,7 @@ Audit references used for this pass:
 - `[x]` Legacy app is mounted under `/legacy/*`
 - `[x]` `/app` and `/app/*` are redirect aliases to root modern routes
 - `[x]` Legacy aliases (`/home`, `/wiki`, singular entry aliases) are redirected to modern equivalents
+- `[x]` Legacy admin root alias `/legacy/admin` now redirects to modern admin dashboard (`/admin`)
 
 ### Legacy route surface without clear modern equivalent (needs explicit decision)
 

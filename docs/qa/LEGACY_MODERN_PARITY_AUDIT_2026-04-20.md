@@ -87,6 +87,7 @@ Primary checklist source remains:
 - [x] Members/profile/groups/admin route families are present in modern.
 - [x] Group overview and member segmentation parity improvements implemented.
 - [x] Admin verdict/moderation/audit routes present in modern.
+- [x] Legacy admin root alias (`/legacy/admin`) now routes to modern admin dashboard (`/admin`).
 - [ ] Admin operation parity (backup/restore mutation flows) needs runtime checklist execution evidence.
 
 ## Remaining High-Value Validation Tasks
