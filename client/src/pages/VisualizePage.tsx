@@ -15,6 +15,8 @@ type GraphNode = {
   shape?: string;
   type: 'root' | 'topic' | 'entry';
   url?: string;
+  exploreUrl?: string;
+  visualizeUrl?: string;
 };
 
 type GraphEdge = {
@@ -167,6 +169,15 @@ const VisualizePage: React.FC = () => {
     position: null,
   });
   const [graphHeight, setGraphHeight] = useState(560);
+  const [nodeAction, setNodeAction] = useState<{
+    label: string;
+    exploreUrl: string;
+    visualizeUrl?: string;
+  }>({
+    label: 'Topics',
+    exploreUrl: '/topics',
+    visualizeUrl: '/visualize',
+  });
 
   useEffect(() => {
     const fetchVisualizationData = async () => {
@@ -296,11 +307,18 @@ const VisualizePage: React.FC = () => {
       value: 28,
       color: '#f0ad4e',
       type: 'root',
+      url: '/topics',
+      exploreUrl: '/topics',
+      visualizeUrl: '/visualize',
     });
 
     const topicNodes = topics.slice(0, 14);
     topicNodes.forEach((topic) => {
       const id = String(topic._id);
+      const topicFriendly = encodeURIComponent(String(topic.friendlyUrl || topic._id || ''));
+      const topicId = encodeURIComponent(id);
+      const topicEntryUrl = `/topics/entry/${topicFriendly}/${topicId}`;
+      const topicVisualizeUrl = `/visualize/topic/${topicFriendly}/${topicId}`;
       nodes.push({
         id: id,
         label: shortenLabel(String(topic.title || '(Untitled topic)')),
@@ -308,6 +326,9 @@ const VisualizePage: React.FC = () => {
         value: selectedTopicId === id ? 24 : 18,
         color: selectedTopicId === id ? '#d26911' : '#FB7E81',
         type: 'topic',
+        url: topicEntryUrl,
+        exploreUrl: topicEntryUrl,
+        visualizeUrl: topicVisualizeUrl,
       });
       edges.push({ from: ROOT_NODE_ID, to: id, width: 3 });
     });
@@ -324,6 +345,7 @@ const VisualizePage: React.FC = () => {
           shape: kind === 'Argument' ? 'square' : 'dot',
           type: 'entry',
           url: renderEntryUrl(entry, kind),
+          exploreUrl: renderEntryUrl(entry, kind),
         });
         edges.push({ from: selectedTopicId, to: nodeId, width: 2 });
       });
@@ -331,6 +353,25 @@ const VisualizePage: React.FC = () => {
 
     return { nodes, edges };
   }, [selectedTopicId, topicRelatedEntries, topics]);
+
+  useEffect(() => {
+    if (selectedTopic) {
+      const topicFriendly = encodeURIComponent(String(selectedTopic.friendlyUrl || selectedTopic._id || ''));
+      const topicId = encodeURIComponent(String(selectedTopic._id || ''));
+      setNodeAction({
+        label: String(selectedTopic.title || 'Topic'),
+        exploreUrl: `/topics/entry/${topicFriendly}/${topicId}`,
+        visualizeUrl: `/visualize/topic/${topicFriendly}/${topicId}`,
+      });
+      return;
+    }
+
+    setNodeAction({
+      label: 'Topics',
+      exploreUrl: '/topics',
+      visualizeUrl: '/visualize',
+    });
+  }, [selectedTopic]);
 
   useEffect(() => {
     let cancelled = false;
@@ -419,11 +460,11 @@ const VisualizePage: React.FC = () => {
         network.on('click', (params: any) => {
           const nodeId = String(params?.nodes?.[0] || '');
           if (!nodeId) {
-            return;
-          }
-
-          if (nodeId === ROOT_NODE_ID) {
-            setSelectedTopicId('');
+            setNodeAction({
+              label: 'Topics',
+              exploreUrl: '/topics',
+              visualizeUrl: '/visualize',
+            });
             return;
           }
 
@@ -432,10 +473,19 @@ const VisualizePage: React.FC = () => {
             return;
           }
 
+          setNodeAction({
+            label: clicked.title || clicked.label || 'Explore',
+            exploreUrl: clicked.exploreUrl || clicked.url || '/topics',
+            visualizeUrl: clicked.visualizeUrl,
+          });
+
+          if (clicked.type === 'root') {
+            setSelectedTopicId('');
+            return;
+          }
+
           if (clicked.type === 'topic') {
             setSelectedTopicId(nodeId);
-          } else if (clicked.type === 'entry' && clicked.url) {
-            navigate(clicked.url);
           }
         });
 
@@ -446,8 +496,22 @@ const VisualizePage: React.FC = () => {
           }
 
           const clicked = graph.nodes.find((node) => node.id === nodeId);
-          if (clicked?.type === 'entry' && clicked.url) {
-            navigate(clicked.url);
+          if (!clicked) {
+            return;
+          }
+
+          if (clicked.type === 'entry' && clicked.exploreUrl) {
+            navigate(clicked.exploreUrl);
+            return;
+          }
+
+          if (clicked.type === 'topic' && clicked.visualizeUrl) {
+            navigate(clicked.visualizeUrl);
+            return;
+          }
+
+          if (clicked.type === 'root') {
+            navigate('/visualize');
           }
         });
 
@@ -634,19 +698,27 @@ const VisualizePage: React.FC = () => {
             <button
               type="button"
               className="btn btn-link"
-              onClick={() => {
-                if (!selectedTopic) {
-                  navigate('/topics');
-                  return;
-                }
-                navigate(`/topics/entry/${encodeURIComponent(String(selectedTopic.friendlyUrl || ''))}/${encodeURIComponent(String(selectedTopic._id))}`);
-              }}
+              onClick={() => navigate(nodeAction.exploreUrl)}
               style={{ color: '#fff', textDecoration: 'none' }}
             >
-              {selectedTopic ? shortenLabel(String(selectedTopic.title || 'Explore topic'), 30) : 'Explore Topics'} <i className="fa fa-arrow-circle-right"></i>
+              {shortenLabel(String(nodeAction.label || 'Explore'), 30)} <i className="fa fa-arrow-circle-right"></i>
             </button>
           </div>
         </div>
+        {nodeAction.visualizeUrl ? (
+          <div className="wt-viz-btn-cont" style={{ left: '10px', top: '48px' }}>
+            <div className="wt-viz-btn visualize">
+              <button
+                type="button"
+                className="btn btn-link"
+                onClick={() => navigate(nodeAction.visualizeUrl || '/visualize')}
+                style={{ color: '#fff', textDecoration: 'none' }}
+              >
+                Visualize <i className="fa fa-snowflake-o"></i>
+              </button>
+            </div>
+          </div>
+        ) : null}
         <div className="wt-viz-btn-cont" style={{ right: '15px', top: '8px' }}>
           <div className="wt-viz-btn toggle-fs">
             <button

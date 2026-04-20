@@ -73,6 +73,7 @@ Primary checklist source remains:
 - [x] Dragging + physics enabled.
 - [x] Momentum/bounce tuning applied for closer legacy feel.
 - [x] Fullscreen toggle and graph navigation available.
+- [x] Legacy-style on-canvas node actions (`Explore` + contextual `Visualize`) are available on selected nodes.
 - [x] Fullscreen preference is persisted in modern client (`localStorage`: `wt.visualize.fullscreen`).
 
 ### Auth + Account
