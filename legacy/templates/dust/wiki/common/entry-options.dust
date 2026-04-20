@@ -10,43 +10,43 @@
         {?isContributor}
             {?isOpinionEntry}
                 {?isOpinionOwner}
-                    <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.opinions.create}?id={opinion._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> <span>Edit</span></a>
+                    <a class="text-muted no-underline" href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.opinions.create}?id={opinion._id}" role="tab"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> <span>Edit</span></a>
                 {/isOpinionOwner}
             {:else}
                 {?isIssueOwner}
-                    <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.issues.create}?issue={issue._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
+                    <a class="text-muted no-underline" href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.issues.create}?issue={issue._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
                 {:else}
                     {?isAnswerOwner}
-                        <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.answers.create}?answer={answer._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
+                        <a class="text-muted no-underline" href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.answers.create}?answer={answer._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
                     {:else}
                         {?question}
                             {?isQuestionOwner}
-                                <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.questions.create}?question={question._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
+                                <a class="text-muted no-underline" href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.questions.create}?question={question._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
                             {/isQuestionOwner}
                         {:else}
                             {?artifact}
                                 {?isArtifactOwner}
-                                        <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.artifacts.create}?artifact={artifact._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
+                                        <a class="text-muted no-underline" href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.artifacts.create}?artifact={artifact._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
                                 {/isArtifactOwner}
                             {:else}
                                 {?argumentLink}
                                     {?isArgumentLinkOwner}
-                                        <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.arguments.link.edit}?id={argumentLink._id}&amp;source={wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/link/{argumentLink._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
+                                        <a class="text-muted no-underline" href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.arguments.link.edit}?id={argumentLink._id}&amp;source={?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/link/{argumentLink._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
                                     {/isArgumentLinkOwner}
                                 {:else}
                                     {?argument}
                                         {?isArgumentOwner}
-                                            <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.arguments.create}?id={argument._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
+                                            <a class="text-muted no-underline" href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.arguments.create}?id={argument._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
                                         {/isArgumentOwner}
                                     {:else}
                                         {?topicLink}
                                             {?isTopicLinkOwner}
-                                                <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.topics.link.edit}?id={topicLink._id}&amp;source={wikiBaseUrl}{paths.wiki.topics.entry}/{topicLink.topic.friendlyUrl}/link/{topicLink._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
+                                                <a class="text-muted no-underline" href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.topics.link.edit}?id={topicLink._id}&amp;source={?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.topics.entry}/{topicLink.topic.friendlyUrl}/link/{topicLink._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
                                             {/isTopicLinkOwner}
                                         {:else}
                                             {?topic}
                                                 {?isTopicOwner}
-                                                    <a class="text-muted no-underline" href="{wikiBaseUrl}{paths.wiki.topics.create}?id={topic._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
+                                                    <a class="text-muted no-underline" href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.topics.create}?id={topic._id}" role="tab"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> <span>Edit</span></a>
                                                 {/isTopicOwner}
                                             {/topic}
                                         {/topicLink}
@@ -68,7 +68,7 @@
             <a href="#" class="text-muted no-underline" title="Good - something that is good or has ethical value" style="margin-right: 10px"><i class="fa fa-thumbs-o-up" aria-hidden="true"></i> <span>Good</span></a>
             <a href="#" class="text-muted no-underline" title="Bad - something that is bad or unethical" style="margin-right: 10px"><i class="fa fa-thumbs-o-down" aria-hidden="true"></i> <span>Bad</span></a>
         {/hasValue}
-        <a href="{wikiBaseUrl}{paths.wiki.visualize}{?topic}/topic/{topic.friendlyUrl}/{topic._id}{:else}{?application}/topic/{application.exploreTopicId}{/application}{/topic}" class="text-muted no-underline" title="Visualize" style="margin-right: 10px"><i class="fa fa-snowflake-o" aria-hidden="true"></i> <span>Visualize</span></a>
+        <a href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.visualize}{?topic}/topic/{topic.friendlyUrl}/{topic._id}{:else}{?application}/topic/{application.exploreTopicId}{/application}{/topic}" class="text-muted no-underline" title="Visualize" style="margin-right: 10px"><i class="fa fa-snowflake-o" aria-hidden="true"></i> <span>Visualize</span></a>
         {!<a href="#" class="text-muted no-underline" title="Timeline"><i class="fa fa-home" aria-hidden="true"></i><span class="hidden-xxs"> Timeline</span></a>!}
         {!<a href="#" class="text-muted no-underline"><i class="fa fa-comments" aria-hidden="true"></i><span class="hidden-xxs"> Discussions</span></a>
         <a href="#" class="text-muted no-underline"><i class="fa fa-exclamation-circle" aria-hidden="true"></i><span class="hidden-xxs"> Issues</span></a>

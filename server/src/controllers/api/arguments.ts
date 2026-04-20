@@ -83,6 +83,15 @@ module.exports = function (router: Router) {
       res.status(500).json({ error: 'Internal server error' });
     }
   });
+
+  router.put('/entry/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    try {
+      await PUT_argument_update(req, res);
+    } catch (error) {
+      console.error('Error in PUT /api/arguments/entry/:id:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
 };
 
 async function GET_arguments(req: WikitruthRequest, res: WikitruthResponse) {
@@ -231,6 +240,115 @@ async function POST_argument_create(req: WikitruthRequest, res: WikitruthRespons
       private: argument.private,
       createDate: argument.createDate,
       editDate: argument.editDate,
+    },
+  });
+}
+
+function mapVerdictLabelToStatus(raw: unknown): number | null {
+  const value = String(raw || '').trim().toLowerCase();
+  if (!value) {
+    return null;
+  }
+  switch (value) {
+    case 'true':
+    case 'mostly-true':
+      return constants.VERDICT_STATUS.status_true;
+    case 'false':
+    case 'mostly-false':
+      return constants.VERDICT_STATUS.status_false;
+    case 'half-true':
+    case 'unknown':
+      return constants.VERDICT_STATUS.pending;
+    default:
+      return null;
+  }
+}
+
+async function PUT_argument_update(req: WikitruthRequest, res: WikitruthResponse) {
+  if (!req.user) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  const argument = await db.Argument.findById(req.params.id);
+  if (!argument) {
+    return res.status(404).json({ error: 'Argument not found' });
+  }
+
+  const actorUserId = String(req.user._id || req.user.id || '');
+  const canEdit = Boolean(
+    (req.user.canPlayRoleOf && req.user.canPlayRoleOf('admin')) ||
+      String(argument.createUserId || '') === actorUserId
+  );
+
+  if (!canEdit) {
+    return res.status(403).json({ error: 'Not allowed to edit this argument' });
+  }
+
+  const body = (req.body || {}) as ArgumentWriteBody;
+
+  if (typeof body.title !== 'undefined') {
+    const title = String(body.title || '').trim();
+    if (!title || title.length < 5) {
+      return res.status(400).json({ error: 'Title must be at least 5 characters' });
+    }
+    argument.title = title;
+    argument.friendlyUrl = utils.urlify(title);
+  }
+
+  if (typeof body.description !== 'undefined' || typeof body.content !== 'undefined') {
+    const description = String(body.description || body.content || '').trim();
+    if (!description || description.length < 20) {
+      return res.status(400).json({ error: 'Description must be at least 20 characters' });
+    }
+    argument.content = description;
+    argument.contentPreview = description.slice(0, 240);
+  }
+
+  if (typeof body.sources !== 'undefined' || typeof body.references !== 'undefined') {
+    argument.references = String(body.sources || body.references || '').trim();
+  }
+
+  if (typeof body.topicId !== 'undefined' || typeof body.ownerId !== 'undefined') {
+    argument.ownerId = body.topicId || body.ownerId || null;
+    argument.ownerType = constants.OBJECT_TYPES.topic;
+  }
+
+  if (typeof body.groupId !== 'undefined') {
+    argument.groupId = body.groupId || null;
+  }
+
+  if (typeof body.private !== 'undefined') {
+    argument.private = Boolean(body.private);
+  }
+
+  const mappedVerdictStatus = mapVerdictLabelToStatus((req.body || {}).verdict);
+  if (mappedVerdictStatus !== null) {
+    argument.verdict = {
+      ...(argument.verdict || {}),
+      status: mappedVerdictStatus,
+      editDate: new Date(),
+      editUserId: actorUserId,
+    };
+  }
+
+  argument.editDate = new Date();
+  argument.editUserId = actorUserId;
+  await argument.save();
+
+  return res.json({
+    success: true,
+    argument: {
+      _id: argument._id,
+      title: argument.title,
+      friendlyUrl: argument.friendlyUrl || utils.urlify(argument.title || ''),
+      content: argument.content,
+      references: argument.references,
+      ownerId: argument.ownerId || null,
+      ownerType: argument.ownerType,
+      private: argument.private,
+      createDate: argument.createDate,
+      editDate: argument.editDate,
+      verdict: argument.verdict || null,
     },
   });
 }

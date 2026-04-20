@@ -192,6 +192,18 @@ app.locals.contents = contents;
 //setup passport
 require('./middlewares/passport')(app, passport);
 
+const registerLegacyCompatibility = require(
+    path.join(process.cwd(), 'legacy', 'compatibility', 'server', 'bootstrap')
+);
+const legacyCompatibilityConfig = app.config.legacyCompatibility || {};
+const legacyCompatibilityRuntime = registerLegacyCompatibility(app, {
+    enabled: legacyCompatibilityConfig.enabled !== false,
+    staticRoot: legacyCompatibilityConfig.staticRoot || undefined,
+    templatesRoot: legacyCompatibilityConfig.templatesRoot || undefined,
+    mountPath: legacyCompatibilityConfig.mountPath || '/legacy'
+});
+app.locals.legacyCompatibility = legacyCompatibilityRuntime;
+
 //setup routes
 require('./middlewares/routes')(app, passport);
 

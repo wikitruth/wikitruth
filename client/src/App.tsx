@@ -113,11 +113,6 @@ const App: React.FC = () => {
     initAnalytics();
   }, []);
 
-  if (typeof window !== 'undefined' && window.location.pathname === '/') {
-    window.location.replace(APP_BASE_PATH);
-    return null;
-  }
-
   const resolvedBasePath =
     typeof window !== 'undefined' &&
     (window.location.pathname === APP_BASE_PATH || window.location.pathname.startsWith(`${APP_BASE_PATH}/`))

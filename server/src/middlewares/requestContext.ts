@@ -6,7 +6,7 @@ const logger = require('../utils/logger') as {
   info: (event: string, fields: Record<string, unknown>) => void;
 };
 
-const KEY_PATH_PATTERNS = [/^\/home\/?$/, /^\/login\/?$/, /^\/api\/home\/?$/, /^\/app(\/|$)/];
+const KEY_PATH_PATTERNS = [/^\/$/, /^\/home\/?$/, /^\/login\/?$/, /^\/api\/home\/?$/, /^\/app(\/|$)/, /^\/legacy(\/|$)/];
 
 interface RequestWithContext extends Request {
   requestId?: string;

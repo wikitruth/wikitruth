@@ -110,7 +110,7 @@
             <textarea class="form-control" id="inputContent" name="content" rows="12">{issue.content}</textarea>
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
-        <a class="btn btn-default" href="{?issue}{wikiBaseUrl}{paths.wiki.issues.entry}{:else}{wikiBaseUrl}{paths.wiki.issues.index}{/issue}{?topic}?topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}{?issue}&amp;issue={issue._id}{/issue}" role="button">Cancel</a>
+        <a class="btn btn-default" href="{?issue}{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.issues.entry}{:else}{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.issues.index}{/issue}{?topic}?topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}{?issue}&amp;issue={issue._id}{/issue}" role="button">Cancel</a>
     </form>
 {/body}
 

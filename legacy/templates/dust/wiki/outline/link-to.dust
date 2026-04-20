@@ -49,10 +49,10 @@
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
         {?topic}
-            <a class="btn btn-default" href="{wikiBaseUrl}{paths.wiki.topics.entry}?topic={topic._id}" role="button">Cancel</a>
+            <a class="btn btn-default" href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.topics.entry}?topic={topic._id}" role="button">Cancel</a>
         {:else}
             {?parent}
-                <a class="btn btn-default" href="{wikiBaseUrl}{paths.wiki.topics.entry}?topic={parent._id}" role="button">Cancel</a>
+                <a class="btn btn-default" href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.topics.entry}?topic={parent._id}" role="button">Cancel</a>
             {:else}
                 <a class="btn btn-default" href="{paths.wiki.index}" role="button">Cancel</a>
             {/parent}

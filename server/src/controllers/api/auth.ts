@@ -1213,7 +1213,7 @@ module.exports = function (router: Router) {
       const projectName = String(appCtx.config?.projectName || 'Wikitruth').trim();
       const resetLink = buildAbsoluteUrl(
         req,
-        `/app/reset-password?email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}`
+        `/reset-password?email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}`
       );
       const emailSent = await deliverEmail(req, res, {
         to: user.email || email,
@@ -1381,7 +1381,7 @@ module.exports = function (router: Router) {
       const projectName = String(appCtx.config?.projectName || 'Wikitruth').trim();
       const verifyUrl = buildAbsoluteUrl(
         req,
-        `/app/account/verification?token=${encodeURIComponent(token)}`
+        `/account/verification?token=${encodeURIComponent(token)}`
       );
       const emailSent = await deliverEmail(req, res, {
         to: req.user.email || nextEmail,

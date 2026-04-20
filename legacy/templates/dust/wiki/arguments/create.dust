@@ -200,10 +200,10 @@
         </div>!}
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
         {?argument}
-            <a class="btn btn-default" href="{wikiBaseUrl}{paths.wiki.arguments.entry}?argument={argument._id}" role="button">Cancel</a>
+            <a class="btn btn-default" href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.arguments.entry}?argument={argument._id}" role="button">Cancel</a>
         {:else}
             {?parentArgument}
-                <a class="btn btn-default" href="{wikiBaseUrl}{paths.wiki.arguments.entry}?argument={parentArgument._id}" role="button">Cancel</a>
+                <a class="btn btn-default" href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.arguments.entry}?argument={parentArgument._id}" role="button">Cancel</a>
             {:else}
                 <a class="btn btn-default" href="{paths.wiki.index}" role="button">Cancel</a>
             {/parentArgument}

@@ -22,6 +22,10 @@ function prefix(pathname) {
 const legacyPaths = {
   ...basePaths,
   about: prefix(basePaths.about),
+  contact: prefix(basePaths.contact),
+  signup: prefix(basePaths.signup),
+  login: prefix(basePaths.login),
+  logout: prefix(basePaths.logout),
   search: prefix(basePaths.search),
   logoutSwitch: prefix(basePaths.logoutSwitch),
   fastSwitch: prefix(basePaths.fastSwitch),
@@ -29,6 +33,11 @@ const legacyPaths = {
   admin: {
     ...basePaths.admin,
     index: prefix(basePaths.admin.index),
+  },
+  account: {
+    ...basePaths.account,
+    index: prefix(basePaths.account.index),
+    settings: prefix(basePaths.account.settings),
   },
   groups: {
     ...basePaths.groups,
@@ -57,53 +66,24 @@ const legacyPaths = {
     index: prefix(basePaths.wiki.index),
     topics: {
       ...basePaths.wiki.topics,
-      index: prefix(basePaths.wiki.topics.index),
-      entry: prefix(basePaths.wiki.topics.entry),
-      create: prefix(basePaths.wiki.topics.create),
-      link: {
-        ...basePaths.wiki.topics.link,
-        edit: prefix(basePaths.wiki.topics.link.edit),
-      },
     },
     arguments: {
       ...basePaths.wiki.arguments,
-      index: prefix(basePaths.wiki.arguments.index),
-      entry: prefix(basePaths.wiki.arguments.entry),
-      create: prefix(basePaths.wiki.arguments.create),
-      link: {
-        ...basePaths.wiki.arguments.link,
-        edit: prefix(basePaths.wiki.arguments.link.edit),
-      },
     },
     artifacts: {
       ...basePaths.wiki.artifacts,
-      index: prefix(basePaths.wiki.artifacts.index),
-      entry: prefix(basePaths.wiki.artifacts.entry),
-      create: prefix(basePaths.wiki.artifacts.create),
     },
     questions: {
       ...basePaths.wiki.questions,
-      create: prefix(basePaths.wiki.questions.create),
-      index: prefix(basePaths.wiki.questions.index),
-      entry: prefix(basePaths.wiki.questions.entry),
     },
     answers: {
       ...basePaths.wiki.answers,
-      create: prefix(basePaths.wiki.answers.create),
-      index: prefix(basePaths.wiki.answers.index),
-      entry: prefix(basePaths.wiki.answers.entry),
     },
     issues: {
       ...basePaths.wiki.issues,
-      create: prefix(basePaths.wiki.issues.create),
-      index: prefix(basePaths.wiki.issues.index),
-      entry: prefix(basePaths.wiki.issues.entry),
     },
     opinions: {
       ...basePaths.wiki.opinions,
-      create: prefix(basePaths.wiki.opinions.create),
-      index: prefix(basePaths.wiki.opinions.index),
-      entry: prefix(basePaths.wiki.opinions.entry),
     },
     outline: {
       ...basePaths.wiki.outline,
@@ -114,7 +94,7 @@ const legacyPaths = {
       update: prefix(basePaths.wiki.verdict.update),
     },
     screening: prefix(basePaths.wiki.screening),
-    visualize: prefix(basePaths.wiki.visualize),
+    visualize: basePaths.wiki.visualize,
     related: prefix(basePaths.wiki.related),
     clipboard: prefix(basePaths.wiki.clipboard),
     convert: prefix(basePaths.wiki.convert),

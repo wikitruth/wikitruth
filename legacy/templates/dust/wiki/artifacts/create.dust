@@ -173,10 +173,10 @@
         </div>!}
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
         {?artifact}
-            <a class="btn btn-default" href="{wikiBaseUrl}{paths.wiki.artifacts.entry}?artifact={artifact._id}" role="button">Cancel</a>
+            <a class="btn btn-default" href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.artifacts.entry}?artifact={artifact._id}" role="button">Cancel</a>
         {:else}
             {?parentArtifact}
-                <a class="btn btn-default" href="{wikiBaseUrl}{paths.wiki.artifacts.entry}?artifact={parentArtifact._id}" role="button">Cancel</a>
+                <a class="btn btn-default" href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.artifacts.entry}?artifact={parentArtifact._id}" role="button">Cancel</a>
             {:else}
                 <a class="btn btn-default" href="{paths.wiki.index}" role="button">Cancel</a>
             {/parentArtifact}

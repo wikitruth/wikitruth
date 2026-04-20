@@ -2,39 +2,39 @@
 <div style="font-style-x: italic; font-size: smaller;" class="text-muted">
     {^isIssueEntry}
         {?opinion}
-            ...under the comment <a href="{wikiBaseUrl}{paths.wiki.opinions.entry}/{opinion.friendlyUrl}/{opinion._id}">{opinion.title}</a>
+            ...under the comment <a href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.opinions.entry}/{opinion.friendlyUrl}/{opinion._id}">{opinion.title}</a>
         {:else}
             {?parentOpinion}
-                ...under the parent comment <a href="{wikiBaseUrl}{paths.wiki.opinions.entry}/{parentOpinion.friendlyUrl}/{parentOpinion._id}">{parentOpinion.title}</a>
+                ...under the parent comment <a href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.opinions.entry}/{parentOpinion.friendlyUrl}/{parentOpinion._id}">{parentOpinion.title}</a>
             {/parentOpinion}
         {/opinion}
     {:else}
         {?issue}
-            ...under the issue <a href="{wikiBaseUrl}{paths.wiki.issues.entry}/{issue.friendlyUrl}/{issue._id}">{issue.title}</a>
+            ...under the issue <a href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.issues.entry}/{issue.friendlyUrl}/{issue._id}">{issue.title}</a>
         {:else}
             {?answer}
-                ...under the answer <a href="{wikiBaseUrl}{paths.wiki.answers.entry}/{answer.friendlyUrl}/{answer._id}">{answer.title}</a>
+                ...under the answer <a href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.answers.entry}/{answer.friendlyUrl}/{answer._id}">{answer.title}</a>
             {:else}
                 {?question}
-                    ...under the question <a href="{wikiBaseUrl}{paths.wiki.questions.entry}/{question.friendlyUrl}/{question._id}">{question.title}</a>
+                    ...under the question <a href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.questions.entry}/{question.friendlyUrl}/{question._id}">{question.title}</a>
                 {:else}
                     {?argumentLink}
-                        ...under the {contents.argument.entryL} link <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/link/{argumentLink._id}">{argumentLink.title2}</a>
+                        ...under the {contents.argument.entryL} link <a href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/link/{argumentLink._id}">{argumentLink.title2}</a>
                     {:else}
                         {?argument}
-                            ...under the {contents.argument.entryL} <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{argument.friendlyUrl}/{argument._id}">{argument.title}</a>
+                            ...under the {contents.argument.entryL} <a href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.arguments.entry}/{argument.friendlyUrl}/{argument._id}">{argument.title}</a>
                         {:else}
                             {?parentArgument}
-                                ...under the parent {contents.argument.entryL} <a href="{wikiBaseUrl}{paths.wiki.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
+                                ...under the parent {contents.argument.entryL} <a href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.arguments.entry}/{parentArgument.friendlyUrl}/{parentArgument._id}">{parentArgument.title}</a>
                             {:else}
                                 {?topicLink}
-                                    ...under the topic link <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topicLink.topic.friendlyUrl}/link/{topicLink._id}">{topicLink.title2}</a>
+                                    ...under the topic link <a href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.topics.entry}/{topicLink.topic.friendlyUrl}/link/{topicLink._id}">{topicLink.title2}</a>
                                 {:else}
                                     {?topic}
-                                        ...under the topic <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
+                                        ...under the topic <a href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}">{topic.title}</a>
                                     {:else}
                                         {?parentTopic}
-                                            ...under the topic <a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}">{parentTopic.title}</a>
+                                            ...under the topic <a href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}">{parentTopic.title}</a>
                                         {/parentTopic}
                                     {/topic}
                                 {/topicLink}

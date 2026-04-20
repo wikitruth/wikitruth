@@ -69,7 +69,7 @@ const ForgotPasswordPage: React.FC = () => {
           <p>
             Use this local link:
             {' '}
-            <a href={`/app/reset-password?email=${encodeURIComponent(email.trim().toLowerCase())}&token=${encodeURIComponent(debugToken)}`}>
+            <a href={`/reset-password?email=${encodeURIComponent(email.trim().toLowerCase())}&token=${encodeURIComponent(debugToken)}`}>
               Reset password now
             </a>
           </p>

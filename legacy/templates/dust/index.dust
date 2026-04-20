@@ -14,7 +14,7 @@
         {/application}
         <p>
             <a class="btn btn-lg btn-success wt-btn-explore" href="{paths.wiki.index}" role="button"><i class="fa fa-globe"></i> Explore</a>
-            <a class="btn btn-lg btn-info wt-btn-visualize" href="{paths.wiki.visualize}{?topic}/topic/{topic._id}{:else}{?application}/topic/{application.exploreTopicId}{/application}{/topic}" role="button"><i class="fa fa-snowflake-o"></i> Visualize</a>
+            <a class="btn btn-lg btn-info wt-btn-visualize" href="{legacyBaseUrl}{paths.wiki.visualize}{?topic}/topic/{topic._id}{:else}{?application}/topic/{application.exploreTopicId}{/application}{/topic}" role="button"><i class="fa fa-snowflake-o"></i> Visualize</a>
             <a class="btn btn-lg btn-warning" href="{?application}{application.aboutUrl}{:else}{paths.about}{/application}" role="button">Learn more</a>
         </p>
     </div>
@@ -220,16 +220,16 @@
             {#truth}
                 <div class="media wt-category">
                     <div class="media-left media-top">
-                        <a href="{paths.wiki.topics.entry}/{friendlyUrl}?topic={_id}">
+                        <a href="{legacyBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}?topic={_id}">
                             <div class="photo-placeholder"></div>
                         </a>
                     </div>
                     <div class="media-body">
-                        <h4 class="media-heading"><a href="{paths.wiki.topics.entry}/{friendlyUrl}?topic={_id}">{title}</a></h4>
+                        <h4 class="media-heading"><a href="{legacyBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}?topic={_id}">{title}</a></h4>
                         <div>
                             {?subtopics}
                                 {#subtopics}
-                                    <div><i class="fa fa-folder-open text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.wiki.topics.entry}/{friendlyUrl}?topic={_id}">{title}</a></div>
+                                    <div><i class="fa fa-folder-open text-muted" aria-hidden="true"></i>&nbsp;<a href="{legacyBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}?topic={_id}">{title}</a></div>
                                 {/subtopics}
                             {/subtopics}
                             <div><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;<a href="{paths.wiki.index}?topic={_id}" role="button">more</a></div>

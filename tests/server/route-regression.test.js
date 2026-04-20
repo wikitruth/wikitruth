@@ -13,6 +13,7 @@ describe('Route regression coverage for legacy + React shell', function () {
     const legacyRoutes = source('server/src/middlewares/routes.ts');
 
     expect(legacyRoutes).toContain('mapLegacyPathToModern');
+    expect(legacyRoutes).toContain('modernShellPatterns');
     expect(legacyRoutes).toContain("'/home'"); // /home
     expect(legacyRoutes).toContain("'/login'"); // /login
     expect(legacyRoutes).toContain('/app');

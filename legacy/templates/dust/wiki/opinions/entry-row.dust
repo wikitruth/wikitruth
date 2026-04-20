@@ -1,7 +1,7 @@
 <li class="list-group-item" data-id="{_id}" data-type="{objectType}" data-is-owner="{isItemOwner}" data-private="{private}">
     <span class="fa fa-comments-o text-primary" aria-hidden="true"></span>
     <div>
-        <a href="{?private}{wikiBaseUrl}{/private}{paths.wiki.opinions.entry}/{friendlyUrl}/{_id}">{title}
+        <a href="{?private}{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{:else}{legacyBaseUrl}{/private}{paths.wiki.opinions.entry}/{friendlyUrl}/{_id}">{title}
             {?labels}
                 {?private} <span class="label label-default">private</span>{/private}
                 {>"dust/wiki/common/entry-row-screening-label" /}

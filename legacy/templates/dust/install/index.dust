@@ -17,7 +17,7 @@
             {?done}
                 <br/>
                 <h1>Install done!</h1>
-                <a class="btn btn-success" href="/">Continue</a>
+                <a class="btn btn-success" href="{legacyBaseUrl}/">Continue</a>
             {/done}
         </form>
     {:else}

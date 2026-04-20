@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
@@ -13,6 +13,7 @@ import useForm from '../hooks/useForm';
 import apiService from '../services/api';
 import { trackEvent } from '../utils/analytics';
 import { useNotification } from '../context/NotificationContext';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 interface TopicFormValues {
   title: string;
@@ -26,8 +27,11 @@ const TopicCreatePage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const groupId = searchParams.get('group') || undefined;
+  const editId = String(searchParams.get('id') || '').trim();
+  const isEditMode = Boolean(editId);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [loadingExisting, setLoadingExisting] = useState(false);
   const { addToast } = useNotification();
 
   const validate = (values: TopicFormValues) => {
@@ -47,7 +51,7 @@ const TopicCreatePage: React.FC = () => {
       errors.description = 'Description must be at least 10 characters';
     }
 
-    if (!values.category) {
+    if (!isEditMode && !values.category) {
       errors.category = 'Category is required';
     }
 
@@ -59,6 +63,27 @@ const TopicCreatePage: React.FC = () => {
     setSubmitSuccess(false);
 
     try {
+      if (isEditMode) {
+        const response = await apiService.updateTopic(editId, {
+          title: values.title,
+          description: values.description,
+          topicId: values.category || undefined,
+          private: values.private,
+        });
+        const updatedTopic = response?.topic;
+        trackEvent('update_topic', 'content', values.title);
+        addToast('success', 'Topic updated successfully!');
+        setSubmitSuccess(true);
+        setTimeout(() => {
+          if (updatedTopic?._id) {
+            navigate(`/topics/entry/${encodeURIComponent(String(updatedTopic.friendlyUrl || updatedTopic._id))}/${encodeURIComponent(String(updatedTopic._id))}`);
+            return;
+          }
+          navigate('/topics');
+        }, 1000);
+        return;
+      }
+
       await apiService.createTopic({
         title: values.title,
         description: values.description,
@@ -67,11 +92,11 @@ const TopicCreatePage: React.FC = () => {
         tags: values.tags,
         groupId: groupId,
       });
-      
+
       trackEvent('create_topic', 'content', values.title);
       addToast('success', 'Topic created successfully!');
       setSubmitSuccess(true);
-      
+
       // Redirect after a short delay
       setTimeout(() => {
         navigate('/topics');
@@ -104,10 +129,44 @@ const TopicCreatePage: React.FC = () => {
     validate,
   });
 
+  useEffect(() => {
+    const loadExistingTopic = async () => {
+      if (!isEditMode) {
+        return;
+      }
+
+      try {
+        setLoadingExisting(true);
+        const response = await apiService.getTopicEntry(editId);
+        const topic = response?.topic;
+        if (!topic?._id) {
+          setSubmitError('Topic not found');
+          return;
+        }
+        setFieldValue('title', String(topic.title || ''));
+        setFieldValue('description', String(topic.content || topic.description || ''));
+        setFieldValue('category', String(topic.parentId || topic.ownerId || ''));
+        setFieldValue('private', Boolean(topic.private));
+        setFieldValue('tags', Array.isArray(topic.tags) ? topic.tags.join(', ') : '');
+      } catch (error) {
+        const msg = error instanceof Error ? error.message : 'Failed to load topic';
+        setSubmitError(msg);
+      } finally {
+        setLoadingExisting(false);
+      }
+    };
+
+    void loadExistingTopic();
+  }, [editId, isEditMode, setFieldValue]);
+
+  if (loadingExisting) {
+    return <LoadingSpinner message="Loading topic..." />;
+  }
+
   const breadcrumbItems = [
     { title: 'Home', url: '/' },
     { title: 'Topics', url: '/topics' },
-    { title: 'Create Topic', active: true },
+    { title: isEditMode ? 'Edit Topic' : 'Create Topic', active: true },
   ];
 
   return (
@@ -116,15 +175,15 @@ const TopicCreatePage: React.FC = () => {
       <Breadcrumb items={breadcrumbItems} />
       
       <PageHeader
-        title="Create New Topic"
-        subtitle="Share a new topic for discussion and exploration"
+        title={isEditMode ? 'Edit Topic' : 'Create New Topic'}
+        subtitle={isEditMode ? 'Update your topic details' : 'Share a new topic for discussion and exploration'}
         icon="folder-open"
         iconColor="text-success"
       />
 
       {submitSuccess && (
         <Alert type="success">
-          Topic created successfully! Redirecting to topics list...
+          {isEditMode ? 'Topic updated successfully! Redirecting...' : 'Topic created successfully! Redirecting to topics list...'}
         </Alert>
       )}
 
@@ -209,7 +268,7 @@ const TopicCreatePage: React.FC = () => {
                 disabled={isSubmitting}
                 icon={isSubmitting ? 'spinner fa-spin' : 'check'}
               >
-                {isSubmitting ? 'Creating...' : 'Create Topic'}
+                {isSubmitting ? (isEditMode ? 'Updating...' : 'Creating...') : isEditMode ? 'Update Topic' : 'Create Topic'}
               </Button>
               {' '}
               <Button

@@ -1,5 +1,18 @@
 function EntryOptionsPopover(props) {
-    var legacyPrefix = '/legacy';
+    var legacyPrefix = window.WT_LEGACY_BASE_URL || '/legacy';
+    var withLegacyPrefix = function(pathname) {
+        var value = String(pathname || '');
+        if (!value.startsWith('/')) {
+            return value;
+        }
+        if (value === '/') {
+            return legacyPrefix + '/';
+        }
+        if (value.startsWith(legacyPrefix + '/')) {
+            return value;
+        }
+        return legacyPrefix + value;
+    };
 
     var idparam = props.type == WT_CONSTANTS.OBJECT_TYPES.topic
                 || props.type == WT_CONSTANTS.OBJECT_TYPES.topicLink
@@ -19,13 +32,13 @@ function EntryOptionsPopover(props) {
             break;
     }
 
-    var screeningUrl = WT_PATHS.wiki.screening + '?' + WT_CONSTANTS.OBJECT_ID_NAME_MAP[props.type] + '=' + props.id;
+    var screeningUrl = withLegacyPrefix(WT_PATHS.wiki.screening) + '?' + WT_CONSTANTS.OBJECT_ID_NAME_MAP[props.type] + '=' + props.id;
     var renderDivider = props.isOwner || WT_USER.isAdmin;
 
     if(props.private) {
-        editUrl = WT_PATHS.members.index + '/' + WT_USER.username + WT_PATHS.members.profile.diary + editUrl;
+        editUrl = withLegacyPrefix(WT_PATHS.members.index) + '/' + WT_USER.username + WT_PATHS.members.profile.diary + editUrl;
     } else {
-        editUrl = legacyPrefix + editUrl;
+        editUrl = withLegacyPrefix(editUrl);
     }
 
     return (

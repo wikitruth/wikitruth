@@ -10,7 +10,7 @@
             {/answers}
         </ul>
         {@gt key=entry.childrenCount.answers.accepted value="15"}
-            <div class="top-list-items-more"><a href="{wikiBaseUrl}{paths.wiki.answers.index}?topic={topic._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{entry.childrenCount.answers.accepted}</span></a></div>
+            <div class="top-list-items-more"><a href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.answers.index}?topic={topic._id}" role="button" class="btn btn-default btn-sm"><i class="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more <span class="wt-label label label-default">{entry.childrenCount.answers.accepted}</span></a></div>
         {/gt}
     </div>
 {/answers}

@@ -1,6 +1,6 @@
 {!{>"dust/wiki/common/entry-new-options" /}!}
 {!<li>
-    <a href="{paths.wiki.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
+    <a href="{legacyBaseUrl}{paths.wiki.questions.index}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}" role="tab">
         <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span> Questions</a></li>
 <li>
     <a href="{paths.wiki.related}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}">
@@ -10,43 +10,43 @@
 {?isContributor}
     {?isOpinionEntry}
         {?isOpinionOwner}
-            <li><a href="#{wikiBaseUrl}{paths.wiki.opinions.create}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Comment</a></li>
+            <li><a href="#{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.opinions.create}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Comment</a></li>
         {/isOpinionOwner}
     {:else}
         {?isIssueOwner}
-            <li><a href="#{wikiBaseUrl}{paths.wiki.issues.create}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Issue</a></li>
+            <li><a href="#{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.issues.create}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Issue</a></li>
         {:else}
             {?isAnswerOwner}
-                <li><a href="#{wikiBaseUrl}{paths.wiki.answers.create}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Answer</a></li>
+                <li><a href="#{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.answers.create}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Answer</a></li>
             {:else}
                 {?question}
                     {?isQuestionOwner}
-                        <li><a href="#{wikiBaseUrl}{paths.wiki.questions.create}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Question</a></li>
+                        <li><a href="#{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.questions.create}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Question</a></li>
                     {/isQuestionOwner}
                 {:else}
                     {?artifact}
                         {?isArtifactOwner}
-                            <li><a href="#{wikiBaseUrl}{paths.wiki.artifacts.create}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Artifact</a></li>
+                            <li><a href="#{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.artifacts.create}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Artifact</a></li>
                         {/isArtifactOwner}
                     {:else}
                         {?argumentLink}
                             {?isArgumentLinkOwner}
-                                <li><a href="#{wikiBaseUrl}{paths.wiki.arguments.link.edit}?id={argumentLink._id}&amp;source={wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/link/{argumentLink._id}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit {contents.argument.entry} Link</a></li>
+                                <li><a href="#{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.arguments.link.edit}?id={argumentLink._id}&amp;source={?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.arguments.entry}/{argumentLink.argument.friendlyUrl}/link/{argumentLink._id}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit {contents.argument.entry} Link</a></li>
                             {/isArgumentLinkOwner}
                         {:else}
                             {?argument}
                                 {?isArgumentOwner}
-                                    <li><a href="#{wikiBaseUrl}{paths.wiki.arguments.create}?topic={topic._id}&amp;id={argument._id}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit {contents.argument.entry}</a></li>
+                                    <li><a href="#{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.arguments.create}?topic={topic._id}&amp;id={argument._id}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit {contents.argument.entry}</a></li>
                                 {/isArgumentOwner}
                             {:else}
                                 {?topicLink}
                                     {?isTopicLinkOwner}
-                                        <li><a href="#{wikiBaseUrl}{paths.wiki.topics.link.edit}?id={topicLink._id}&amp;source={wikiBaseUrl}{paths.wiki.topics.entry}/{topicLink.topic.friendlyUrl}/link/{topicLink._id}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Topic Link</a></li>
+                                        <li><a href="#{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.topics.link.edit}?id={topicLink._id}&amp;source={?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.topics.entry}/{topicLink.topic.friendlyUrl}/link/{topicLink._id}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Topic Link</a></li>
                                     {/isTopicLinkOwner}
                                 {:else}
                                     {?topic}
                                         {?isTopicOwner}
-                                            <li><a href="#{wikiBaseUrl}{paths.wiki.topics.create}?id={topic._id}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Topic</a></li>
+                                            <li><a href="#{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.topics.create}?id={topic._id}"><i class="glyphicon glyphicon-edit" aria-hidden="true"></i> Edit Topic</a></li>
                                         {/isTopicOwner}
                                     {/topic}
                                 {/topicLink}

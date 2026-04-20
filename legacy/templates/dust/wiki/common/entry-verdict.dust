@@ -5,13 +5,13 @@
     {!<span style="color: #f0ad4e" title="Pending review (verdict)"><span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span></span>!}
     {!{?isContributor}
         {?isTopicOwner}
-            &nbsp;<a href="{paths.wiki.topics.create}?id={topic._id}" title="Edit Outline" class="no-underline"><span class="label label-primary"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit</span></a>
+            &nbsp;<a href="{legacyBaseUrl}{paths.wiki.topics.create}?id={topic._id}" title="Edit Outline" class="no-underline"><span class="label label-primary"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit</span></a>
         {/isTopicOwner}
         {?isArgumentOwner}
-            &nbsp;<a href="{paths.wiki.arguments.create}?topic={topic._id}&amp;id={argument._id}" title="Edit Outline" class="no-underline"><span class="label label-primary"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit</span></a>
+            &nbsp;<a href="{legacyBaseUrl}{paths.wiki.arguments.create}?topic={topic._id}&amp;id={argument._id}" title="Edit Outline" class="no-underline"><span class="label label-primary"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit</span></a>
         {/isArgumentOwner}
         {?isQuestionOwner}
-            &nbsp;<a href="{paths.wiki.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}" title="Edit Outline" class="no-underline"><span class="label label-primary"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit</span></a>
+            &nbsp;<a href="{legacyBaseUrl}{paths.wiki.questions.create}?topic={topic._id}{?argument}&amp;argument={argument._id}{/argument}&amp;question={question._id}" title="Edit Outline" class="no-underline"><span class="label label-primary"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit</span></a>
         {/isQuestionOwner}
     {/isContributor}!}
     {?entry.verdict}

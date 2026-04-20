@@ -31,7 +31,7 @@
             <textarea class="form-control" id="inputReferences" name="references" rows="3">{question.references}</textarea>
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
-        <a class="btn btn-default" href="{?question}{paths.wiki.questions.entry}{:else}{paths.wiki.questions.index}{/question}{?topic}?topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="button">Cancel</a>
+        <a class="btn btn-default" href="{?question}{legacyBaseUrl}{paths.wiki.questions.entry}{:else}{legacyBaseUrl}{paths.wiki.questions.index}{/question}{?topic}?topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}" role="button">Cancel</a>
     </form>
 {/body}
 

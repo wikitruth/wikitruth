@@ -33,7 +33,7 @@
             </div>
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>&nbsp;
-        <a class="btn btn-default" href="{?opinion}{paths.wiki.opinions.entry}{:else}{paths.wiki.opinions.index}{/opinion}{?topic}?topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}{?opinion}&amp;opinion={opinion._id}{/opinion}" role="button">Cancel</a>
+        <a class="btn btn-default" href="{?opinion}{legacyBaseUrl}{paths.wiki.opinions.entry}{:else}{legacyBaseUrl}{paths.wiki.opinions.index}{/opinion}{?topic}?topic={topic._id}{/topic}{?argument}&amp;argument={argument._id}{/argument}{?question}&amp;question={question._id}{/question}{?opinion}&amp;opinion={opinion._id}{/opinion}" role="button">Cancel</a>
     </form>
 {/body}
 

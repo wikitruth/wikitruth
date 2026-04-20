@@ -72,7 +72,7 @@
                 {!<div class="list-group">
                     <a href="{?application}{application.exploreUrl}{:else}{paths.wiki.index}{/application}" class="list-group-item active">Explore</a>
                     {#appCategories}
-                        <a href="{paths.wiki.topics.entry}/{friendlyUrl}/{_id}" class="list-group-item"><i class="fa fa-folder-open text-color-3" aria-hidden="true"></i> {title}</a>
+                        <a href="{legacyBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}" class="list-group-item"><i class="fa fa-folder-open text-color-3" aria-hidden="true"></i> {title}</a>
                     {/appCategories}
                 </div>!}
                 <ul class="wt-nav nav dropdown-menu-x dropdown-menu-right-x">
@@ -83,7 +83,7 @@
                     {!<li><a href="#/switch?content=3">{?showEverything}<i class="fa fa-circle"></i>{:else}<i class="fa fa-check-square-o"></i>{/showEverything} Everything</a></li>!}
                     {!<li role="separator" class="divider light"></li>!}
                     {!<li><a href="#"><i class="fa fa-folder-o"></i> <strong>Structured</strong></a></li>!}
-                    {!<li><a href="{wikiBaseUrl}{paths.wiki.visualize}{?topic}/topic/{topic.friendlyUrl}/{topic._id}{:else}{?application}/topic/{application.exploreTopicId}{/application}{/topic}"><i class="fa fa-snowflake-o"></i> Visualize</a></li>!}
+                    {!<li><a href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.visualize}{?topic}/topic/{topic.friendlyUrl}/{topic._id}{:else}{?application}/topic/{application.exploreTopicId}{/application}{/topic}"><i class="fa fa-snowflake-o"></i> Visualize</a></li>!}
                     {! ## Apps Section ## !}
                     <li class="dropdown-header">Apps</li>
                     <li><a href="{wikitruth.homeUrl}"><img src="/img/logo-64x64.png" title="Logo" style="width: 16px; height: 16px;" /> {wikitruth.projectName}</a></li>
@@ -95,7 +95,7 @@
                     {?topic}
                         <li class="dropdown-header">In this section</li>
                         {?parentTopic}
-                            <li><a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> {?parentTopic.contextTitle}{parentTopic.contextTitle}{:else}{parentTopic.shortTitle}{/parentTopic.contextTitle}{@gt key=childrenCount.topics.accepted value="0"} <span class="wt-label label label-default">{childrenCount.topics.accepted}</span>{/gt}</a></li>
+                            <li><a href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> {?parentTopic.contextTitle}{parentTopic.contextTitle}{:else}{parentTopic.shortTitle}{/parentTopic.contextTitle}{@gt key=childrenCount.topics.accepted value="0"} <span class="wt-label label label-default">{childrenCount.topics.accepted}</span>{/gt}</a></li>
                         {:else}
                             {?username}
                                 <li><a href="{paths.members.index}/{user.username}/diary"><i class="fa fa-folder-open"></i> My Diary</a></li>
@@ -105,26 +105,26 @@
                         {/parentTopic}
                         <li>
                             <ul class="nav">
-                                <li><a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> <strong>{?topic.contextTitle}{topic.contextTitle}{:else}{topic.shortTitle}{/topic.contextTitle}</strong>{@gt key=topic.childrenCount.topics.accepted value="0"} <span class="wt-label label label-default">{topic.childrenCount.topics.accepted}</span>{/gt}</a></li>
+                                <li><a href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> <strong>{?topic.contextTitle}{topic.contextTitle}{:else}{topic.shortTitle}{/topic.contextTitle}</strong>{@gt key=topic.childrenCount.topics.accepted value="0"} <span class="wt-label label label-default">{topic.childrenCount.topics.accepted}</span>{/gt}</a></li>
                                 {?topicChildren}
                                     <li>
                                         <ul class="nav">
                                             {#topicChildren}
-                                                <li><a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}"><i class="fa fa-folder text-color-3-x" aria-hidden="true"></i> {?contextTitle}{contextTitle}{:else}{shortTitle}{/contextTitle}{@gt key=childrenCount.topics.accepted value="0"} <span class="wt-label label label-default">{childrenCount.topics.accepted}</span>{/gt}</a></li>
+                                                <li><a href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}"><i class="fa fa-folder text-color-3-x" aria-hidden="true"></i> {?contextTitle}{contextTitle}{:else}{shortTitle}{/contextTitle}{@gt key=childrenCount.topics.accepted value="0"} <span class="wt-label label label-default">{childrenCount.topics.accepted}</span>{/gt}</a></li>
                                             {/topicChildren}
                                             {?topicChildrenMore}
-                                                <li><a href="{wikiBaseUrl}{paths.wiki.topics.index}/{topic.friendlyUrl}/{topic._id}"><i class="fa fa-folder text-color-3-x" aria-hidden="true"></i> more...{@gt key=topic.childrenCount.topics.accepted value="0"} <span class="wt-label label label-default">{topic.childrenCount.topics.accepted}</span>{/gt}</a></li>
+                                                <li><a href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.topics.index}/{topic.friendlyUrl}/{topic._id}"><i class="fa fa-folder text-color-3-x" aria-hidden="true"></i> more...{@gt key=topic.childrenCount.topics.accepted value="0"} <span class="wt-label label label-default">{topic.childrenCount.topics.accepted}</span>{/gt}</a></li>
                                             {/topicChildrenMore}
                                         </ul>
                                     </li>
                                 {/topicChildren}
                                 {?topicSiblings}
                                     {#topicSiblings}
-                                        <li><a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}"><i class="fa fa-folder text-color-3-x" aria-hidden="true"></i> {?contextTitle}{contextTitle}{:else}{shortTitle}{/contextTitle}{@gt key=childrenCount.topics.accepted value="0"} <span class="wt-label label label-default">{childrenCount.topics.accepted}</span>{/gt}</a></li>
+                                        <li><a href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}"><i class="fa fa-folder text-color-3-x" aria-hidden="true"></i> {?contextTitle}{contextTitle}{:else}{shortTitle}{/contextTitle}{@gt key=childrenCount.topics.accepted value="0"} <span class="wt-label label label-default">{childrenCount.topics.accepted}</span>{/gt}</a></li>
                                     {/topicSiblings}
                                     {?topicSiblingsMore}
                                         {?parentTopic}
-                                            <li><a href="{wikiBaseUrl}{paths.wiki.topics.index}/{parentTopic.friendlyUrl}/{parentTopic._id}"><i class="fa fa-folder text-color-3-x" aria-hidden="true"></i> more...</a></li>
+                                            <li><a href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.topics.index}/{parentTopic.friendlyUrl}/{parentTopic._id}"><i class="fa fa-folder text-color-3-x" aria-hidden="true"></i> more...</a></li>
                                         {:else}
                                             {?username}
                                                 <li><a href="{paths.members.index}/{user.username}/diary"><i class="fa fa-folder-open"></i> more...</a></li>
@@ -137,11 +137,11 @@
                             </ul>
                         </li>
                         {#parentSiblings}
-                            <li><a href="{wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}"><i class="fa fa-folder text-color-3-x" aria-hidden="true"></i> {?contextTitle}{contextTitle}{:else}{shortTitle}{/contextTitle}{@gt key=childrenCount.topics.accepted value="0"} <span class="wt-label label label-default">{childrenCount.topics.accepted}</span>{/gt}</a></li>
+                            <li><a href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}"><i class="fa fa-folder text-color-3-x" aria-hidden="true"></i> {?contextTitle}{contextTitle}{:else}{shortTitle}{/contextTitle}{@gt key=childrenCount.topics.accepted value="0"} <span class="wt-label label label-default">{childrenCount.topics.accepted}</span>{/gt}</a></li>
                         {/parentSiblings}
                         {?grandParentTopic}
                             {?parentSiblingsMore}
-                                <li><a href="{wikiBaseUrl}{paths.wiki.topics.index}/{grandParentTopic.friendlyUrl}/{grandParentTopic._id}"><i class="fa fa-folder text-color-3-x" aria-hidden="true"></i> more...{@gt key=grandParentTopic.childrenCount.topics.accepted value="0"} <span class="wt-label label label-default">{grandParentTopic.childrenCount.topics.accepted}</span>{/gt}</a></li>
+                                <li><a href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.topics.index}/{grandParentTopic.friendlyUrl}/{grandParentTopic._id}"><i class="fa fa-folder text-color-3-x" aria-hidden="true"></i> more...{@gt key=grandParentTopic.childrenCount.topics.accepted value="0"} <span class="wt-label label label-default">{grandParentTopic.childrenCount.topics.accepted}</span>{/gt}</a></li>
                             {/parentSiblingsMore}
                         {/grandParentTopic}
                         <li role="separator" class="divider"></li>
@@ -171,7 +171,7 @@
                     {! ## Explore section ## !}
                     <li class="dropdown-header"><a href="{paths.wiki.index}">Explore</a></li>
                     {#appCategories}
-                        <li><a href="{paths.wiki.topics.entry}/{friendlyUrl}/{_id}"><i class="fa fa-{?icon}{icon}{:else}folder-open{/icon} text-color-3-x" aria-hidden="true"></i> {?contextTitle}{contextTitle}{:else}{title}{/contextTitle}{@gt key=childrenCount.topics.accepted value="0"} <span class="wt-label label label-default">{childrenCount.topics.accepted}</span>{/gt}</a></li>
+                        <li><a href="{legacyBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}"><i class="fa fa-{?icon}{icon}{:else}folder-open{/icon} text-color-3-x" aria-hidden="true"></i> {?contextTitle}{contextTitle}{:else}{title}{/contextTitle}{@gt key=childrenCount.topics.accepted value="0"} <span class="wt-label label label-default">{childrenCount.topics.accepted}</span>{/gt}</a></li>
                     {/appCategories}
                 </ul>
             </div><!--/.sidebar-offcanvas-->
@@ -205,6 +205,7 @@
     <script src="/js/app.min.js?{cacheBreaker}"></script>
     {! details about logged in user !}
     <script>
+        window.WT_LEGACY_BASE_URL = '{legacyBaseUrl}';
         window.WT_USER = {
             username: '{user.username}',
             isAdmin: '{user.isAdmin}' === 'true'
