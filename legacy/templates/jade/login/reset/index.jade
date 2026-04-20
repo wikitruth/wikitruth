@@ -4,7 +4,7 @@ block head
   title Reset Your Password
 
 block feet
-  script(src='/views/login/reset/index.min.js?#{cacheBreaker}')
+  script(src='/views/login/reset/index.js?#{cacheBreaker}')
 
 block body
   div.row
@@ -46,4 +46,4 @@ block body
         button.btn.btn-primary.btn-reset(type='button') Set Password
         |<% } %>
         |&nbsp;
-        a.btn.btn-link(href='/login/') Back to Login
+        a.btn.btn-link(href='/legacy/login/') Back to Login

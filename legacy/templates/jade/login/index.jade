@@ -4,7 +4,7 @@ block head
   title Login
 
 block feet
-  script(src='/views/login/index.min.js?#{cacheBreaker}')
+  script(src='/views/login/index.js?#{cacheBreaker}')
 
 block body
   div.row
@@ -31,33 +31,33 @@ block body
               button.close(type='button', data-dismiss='alert') &times;
               |#{oauthMessage}&nbsp;
               b
-                a(href='/signup/') Sign Up Here
+                a(href='#{paths.signup}') Sign Up Here
         div.form-actions
           div.btn-group.btn-group-justified
             if oauthTwitter
-              a.btn.btn-info(href='/login/twitter/')
+              a.btn.btn-info(href='/legacy/login/twitter/')
                 i.fa.fa-twitter.fa-lg
                 |  Twitter
             if oauthGitHub
-              a.btn.btn-info(href='/login/github/')
+              a.btn.btn-info(href='/legacy/login/github/')
                 i.fa.fa-github.fa-lg
                 |  GitHub
             if oauthFacebook
-              a.btn.btn-info.btn-fb(href='/login/facebook/')
+              a.btn.btn-info.btn-fb(href='/legacy/login/facebook/')
                 i.fa.fa-facebook-square.fa-lg
                 |  Facebook
             if oauthGoogle
-              a.btn.btn-info(href='/login/google/')
+              a.btn.btn-info(href='/legacy/login/google/')
                 i.fa.fa-google-plus-square.fa-lg
                 |  Google
             if oauthTumblr
-              a.btn.btn-info(href='/login/tumblr/')
+              a.btn.btn-info(href='/legacy/login/tumblr/')
                 i.fa.fa-tumblr-square.fa-lg
                 |  Tumblr
         hr
         p Don't have an account?
           div
-            a.btn.btn-primary.btn-block(href='/signup/')
+            a.btn.btn-primary.btn-block(href='#{paths.signup}')
               i.fa.fa-user.fa-lg
               |  Sign Up
 
@@ -80,4 +80,4 @@ block body
       div.form-actions
         button.btn.btn-primary.btn-login(type='button') Sign In
         |&nbsp;
-        a.btn.btn-link(href='/login/forgot/') Forgot your password?
+        a.btn.btn-link(href='/legacy/login/forgot/') Forgot your password?

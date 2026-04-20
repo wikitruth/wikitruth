@@ -71,6 +71,32 @@ function registerLegacyCompatibility(app, options) {
   }
 
   const legacyRouter = express.Router();
+  const legacyLoginController = require(path.join(
+    process.cwd(),
+    'legacy',
+    'templates',
+    'jade',
+    'login',
+    'index'
+  ));
+  const legacyForgotController = require(path.join(
+    process.cwd(),
+    'legacy',
+    'templates',
+    'jade',
+    'login',
+    'forgot',
+    'index'
+  ));
+  const legacyResetController = require(path.join(
+    process.cwd(),
+    'legacy',
+    'templates',
+    'jade',
+    'login',
+    'reset',
+    'index'
+  ));
 
   legacyRouter.use(async function legacyRouteContext(req, res, next) {
     try {
@@ -129,8 +155,36 @@ function registerLegacyCompatibility(app, options) {
 
   legacyRouter.get('/admin', function legacyAdminRootAlias(req, res) {
     const query = req.originalUrl.includes('?') ? req.originalUrl.slice(req.originalUrl.indexOf('?')) : '';
-    return res.redirect(`/admin${query}`);
+    // Keep legacy users inside the mounted legacy namespace instead of
+    // jumping to the modern /admin surface.
+    return res.redirect(`${mountPath}/admin/db-backup${query}`);
   });
+
+  legacyRouter.route('/login')
+    .get(legacyLoginController.init)
+    .post(legacyLoginController.login);
+  legacyRouter.get('/login/twitter', legacyLoginController.loginTwitter);
+  legacyRouter.get('/login/twitter/callback', legacyLoginController.loginTwitter);
+  legacyRouter.get('/login/github', legacyLoginController.loginGitHub);
+  legacyRouter.get('/login/github/callback', legacyLoginController.loginGitHub);
+  legacyRouter.get('/login/facebook', legacyLoginController.loginFacebook);
+  legacyRouter.get('/login/facebook/callback', legacyLoginController.loginFacebook);
+  legacyRouter.get('/login/google', legacyLoginController.loginGoogle);
+  legacyRouter.get('/login/google/callback', legacyLoginController.loginGoogle);
+  legacyRouter.get('/login/apple', legacyLoginController.loginApple);
+  legacyRouter.get('/login/apple/callback', legacyLoginController.loginApple);
+  legacyRouter.get('/login/microsoft', legacyLoginController.loginMicrosoft);
+  legacyRouter.get('/login/microsoft/callback', legacyLoginController.loginMicrosoft);
+  legacyRouter.get('/login/tumblr', legacyLoginController.loginTumblr);
+  legacyRouter.get('/login/tumblr/callback', legacyLoginController.loginTumblr);
+
+  legacyRouter.route('/login/forgot')
+    .get(legacyForgotController.init)
+    .post(legacyForgotController.send);
+  legacyRouter.get('/login/reset', legacyResetController.init);
+  legacyRouter.route('/login/reset/:email/:token')
+    .get(legacyResetController.init)
+    .post(legacyResetController.set);
 
   [
     ['/', 'index'],

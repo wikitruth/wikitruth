@@ -5,6 +5,18 @@
 
   app = app || {};
 
+  function getLegacyBasePath() {
+    var pathname = (window.location && window.location.pathname) || '';
+    if (pathname === '/legacy' || pathname.indexOf('/legacy/') === 0) {
+      return '/legacy';
+    }
+    return '';
+  }
+
+  function withBase(pathname) {
+    return getLegacyBasePath() + pathname;
+  }
+
   app.Reset = Backbone.Model.extend({
     defaults: {
       success: false,
@@ -16,7 +28,7 @@
       confirm: ''
     },
     url: function() {
-      return '/login/reset/'+ this.get('email') +'/'+ this.id +'/';
+      return withBase('/login/reset/'+ this.get('email') +'/'+ this.id +'/');
     }
   });
 
@@ -57,7 +69,9 @@
 
   app.Router = Backbone.Router.extend({
     routes: {
+      'login/reset': 'start',
       'login/reset/': 'start',
+      'login/reset/:email/:token': 'start',
       'login/reset/:email/:token/': 'start'
     },
     start: function(email, token) {
@@ -67,6 +81,6 @@
 
   $(document).ready(function() {
     app.router = new app.Router();
-    Backbone.history.start({ pushState: true });
+    Backbone.history.start({ pushState: true, root: withBase('/') });
   });
 }());

@@ -5,8 +5,20 @@
 
   app = app || {};
 
+  function getLegacyBasePath() {
+    var pathname = (window.location && window.location.pathname) || '';
+    if (pathname === '/legacy' || pathname.indexOf('/legacy/') === 0) {
+      return '/legacy';
+    }
+    return '';
+  }
+
+  function withBase(pathname) {
+    return getLegacyBasePath() + pathname;
+  }
+
   app.Forgot = Backbone.Model.extend({
-    url: '/login/forgot/',
+    url: withBase('/login/forgot/'),
     defaults: {
       success: false,
       errors: [],

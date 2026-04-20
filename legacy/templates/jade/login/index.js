@@ -107,7 +107,7 @@ exports.loginTwitter = function(req, res, next){
 
   req._passport.instance.authenticate('twitter', async function(err, user, info) {
     if (!info || !info.profile) {
-      return res.redirect('/login/');
+      return res.redirect('/legacy/login/');
     }
 
     const dbUser = await db.User.findOne({ 'twitter.id': info.profile.id });
@@ -129,7 +129,7 @@ exports.loginGitHub = function(req, res, next){
 
   req._passport.instance.authenticate('github', async function(err, user, info) {
     if (!info || !info.profile) {
-      return res.redirect('/login/');
+      return res.redirect('/legacy/login/');
     }
 
     const dbUser = await db.User.findOne({ 'github.id': info.profile.id });
@@ -149,9 +149,9 @@ exports.loginGitHub = function(req, res, next){
 exports.loginFacebook = function(req, res, next){
   const db = req.app.db.models;
 
-  req._passport.instance.authenticate('facebook', { callbackURL: '/login/facebook/callback/' }, async function(err, user, info) {
+  req._passport.instance.authenticate('facebook', { callbackURL: '/legacy/login/facebook/callback/' }, async function(err, user, info) {
     if (!info || !info.profile) {
-      return res.redirect('/login/');
+      return res.redirect('/legacy/login/');
     }
 
     const dbUser = await db.User.findOne({ 'facebook.id': info.profile.id });
@@ -176,9 +176,9 @@ exports.loginFacebook = function(req, res, next){
 exports.loginGoogle = function(req, res, next){
   const models = req.app.db.models;
 
-  req._passport.instance.authenticate('google', { callbackURL: '/login/google/callback/' }, async function(err, user, info) {
+  req._passport.instance.authenticate('google', { callbackURL: '/legacy/login/google/callback/' }, async function(err, user, info) {
     if (!info || !info.profile) {
-      return res.redirect('/login/');
+      return res.redirect('/legacy/login/');
     }
 
     const dbUser = await models.User.findOne({ 'google.id': info.profile.id });
@@ -199,9 +199,9 @@ exports.loginGoogle = function(req, res, next){
 exports.loginApple = function(req, res, next){
   const models = req.app.db.models;
 
-  req._passport.instance.authenticate('apple', { callbackURL: '/login/apple/callback/' }, async function(err, user, info) {
+  req._passport.instance.authenticate('apple', { callbackURL: '/legacy/login/apple/callback/' }, async function(err, user, info) {
     if (!info || !info.profile) {
-      return res.redirect('/login/');
+      return res.redirect('/legacy/login/');
     }
 
     const dbUser = await models.User.findOne({ 'apple.id': info.profile.id });
@@ -222,9 +222,9 @@ exports.loginApple = function(req, res, next){
 exports.loginMicrosoft = function(req, res, next){
   const models = req.app.db.models;
 
-  req._passport.instance.authenticate('microsoft', { callbackURL: '/login/microsoft/callback/' }, async function(err, user, info) {
+  req._passport.instance.authenticate('microsoft', { callbackURL: '/legacy/login/microsoft/callback/' }, async function(err, user, info) {
     if (!info || !info.profile) {
-      return res.redirect('/login/');
+      return res.redirect('/legacy/login/');
     }
 
     const dbUser = await models.User.findOne({ 'microsoft.id': info.profile.id });
@@ -244,9 +244,9 @@ exports.loginMicrosoft = function(req, res, next){
 exports.loginTumblr = function(req, res, next){
   const models = req.app.db.models;
 
-  req._passport.instance.authenticate('tumblr', { callbackURL: '/login/tumblr/callback/' }, async function(err, user, info) {
+  req._passport.instance.authenticate('tumblr', { callbackURL: '/legacy/login/tumblr/callback/' }, async function(err, user, info) {
     if (!info || !info.profile) {
-      return res.redirect('/login/');
+      return res.redirect('/legacy/login/');
     }
     if (!info.profile.hasOwnProperty('id')) {
       info.profile.id = info.profile.username;

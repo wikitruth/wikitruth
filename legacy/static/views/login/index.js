@@ -5,8 +5,20 @@
 
   app = app || {};
 
+  function getLegacyBasePath() {
+    var pathname = (window.location && window.location.pathname) || '';
+    if (pathname === '/legacy' || pathname.indexOf('/legacy/') === 0) {
+      return '/legacy';
+    }
+    return '';
+  }
+
+  function withBase(pathname) {
+    return getLegacyBasePath() + pathname;
+  }
+
   app.Login = Backbone.Model.extend({
-    url: '/login/',
+    url: withBase('/login/'),
     defaults: {
       errors: [],
       errfor: {},
@@ -47,7 +59,7 @@
         var pin = $(event.target).val() + String.fromCharCode(event.which);
         $.ajax({
           type: "POST",
-          url: "/async/app/fast-switch",
+          url: withBase('/async/app/fast-switch'),
           data: JSON.stringify({ pin: pin, cookie: cookie, _xcsrf: csrf }),
           contentType: 'application/json',
           success: function (data) {
@@ -71,7 +83,7 @@
       },{
         success: function(model, response) {
           if (response.success) {
-            location.href = '/login/';
+            location.href = withBase('/login/');
           }
           else {
             model.set(response);

@@ -4,7 +4,7 @@ block head
   title Forgot Your Password?
 
 block feet
-  script(src='/views/login/forgot/index.min.js?#{cacheBreaker}')
+  script(src='/views/login/forgot/index.js?#{cacheBreaker}')
 
 block body
   div.row
@@ -37,4 +37,4 @@ block body
         button.btn.btn-primary.btn-forgot(type='button') Send Reset
         |<% } %>
         |&nbsp;
-        a.btn.btn-link(href='/login/') Back to Login
+        a.btn.btn-link(href='/legacy/login/') Back to Login
