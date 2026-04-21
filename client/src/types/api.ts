@@ -211,10 +211,13 @@ export interface MemberContributionsResponse extends ApiBaseResponse, EntityBuck
   opinionsMore?: boolean;
 }
 
-export interface MemberDiaryResponse extends MemberContributionsResponse {
+export interface MemberJournalResponse extends MemberContributionsResponse {
   categories?: LegacyEntity[];
   rootTopics?: LegacyEntity[];
 }
+
+// Backward compatibility alias for legacy diary terminology.
+export type MemberDiaryResponse = MemberJournalResponse;
 
 export interface MemberFollowingGraph {
   people?: LegacyEntity[];

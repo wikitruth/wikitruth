@@ -21,14 +21,17 @@ describe('Parity checklist guardrails', function () {
     expect(authApiClient).toContain('providers: () => request<AuthProvidersResponse>');
   });
 
-  it('keeps diary parity routes and API handlers in place', function () {
+  it('keeps journal parity routes and API handlers in place', function () {
     const routeConfig = read('client/src/routes/routeConfig.tsx');
     const profileShell = read('client/src/components/Members/ProfileShell.tsx');
     const membersApi = read('server/src/controllers/api/members.ts');
 
+    expect(routeConfig).toContain("path: '/members/:username/journal'");
+    expect(routeConfig).toContain("path: '/members/profile/journal'");
     expect(routeConfig).toContain("path: '/members/:username/diary'");
     expect(routeConfig).toContain("path: '/members/profile/diary'");
-    expect(profileShell).toContain("activeTab === 'diary'");
+    expect(profileShell).toContain("activeTab === 'journal'");
+    expect(membersApi).toContain("router.get('/:username/journal'");
     expect(membersApi).toContain("router.get('/:username/diary'");
   });
 

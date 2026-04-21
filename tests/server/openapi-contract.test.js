@@ -52,6 +52,7 @@ describe('OpenAPI contract', function () {
       '/members',
       '/members/{username}',
       '/members/{username}/topics',
+      '/members/{username}/journal',
       '/members/{username}/diary',
       '/members/{username}/following',
       '/admin',

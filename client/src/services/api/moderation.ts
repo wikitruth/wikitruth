@@ -94,7 +94,7 @@ interface OwnershipMigrationResponse {
   success: boolean;
   migration?: {
     topicId: string;
-    targetScope: 'public' | 'diary';
+    targetScope: 'public' | 'journal';
     username: string | null;
     migratedTopicCount: number;
   };
@@ -251,7 +251,7 @@ export const moderationApi = {
       method: 'POST',
       body: JSON.stringify({ id, type: objectType }),
     }),
-  migrateOwnershipScope: (topicId: string, targetScope: 'public' | 'diary', username?: string) =>
+  migrateOwnershipScope: (topicId: string, targetScope: 'public' | 'journal', username?: string) =>
     request<OwnershipMigrationResponse>('/moderation/ownership-migration', {
       method: 'POST',
       body: JSON.stringify({

@@ -15,7 +15,7 @@ Define how users discover and navigate knowledge graph content.
 - Search supports multi-entity lookup over title/content/references fields.
 - Search filters by:
 - entity tab (`all`, `topics`, `arguments`, `questions`, `answers`, `artifacts`, `issues`, `opinions`)
-- content scope (`all`, `wiki`, `diary`)
+- content scope (`all`, `wiki`, `journal`)
 - optional cursor/limit pagination controls
 - Private entry visibility in search depends on current user ownership.
 

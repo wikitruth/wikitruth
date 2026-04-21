@@ -6,7 +6,7 @@ import ProfileShell from '../../../components/Members/ProfileShell';
 import apiService from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
 import type { LegacyEntity } from '../../../types/legacy';
-import type { MemberDiaryResponse } from '../../../types/api';
+import type { MemberJournalResponse } from '../../../types/api';
 import TopicEntryRow from '../../../components/EntryRow/TopicEntryRow';
 import ArgumentEntryRow from '../../../components/EntryRow/ArgumentEntryRow';
 import QuestionEntryRow from '../../../components/EntryRow/QuestionEntryRow';
@@ -15,19 +15,19 @@ import IssueEntryRow from '../../../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../../../components/EntryRow/OpinionEntryRow';
 import type { Answer, Argument, Issue, Opinion, Question, Topic } from '../../../types';
 
-const ProfileDiary: React.FC = () => {
+const ProfileJournal: React.FC = () => {
   const { username: routeUsername } = useParams<{ username?: string }>();
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const username = routeUsername || user?.username || '';
   const tab = (searchParams.get('tab') || 'all').toLowerCase();
-  const [data, setData] = useState<MemberDiaryResponse>({});
+  const [data, setData] = useState<MemberJournalResponse>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const isOwnProfile = useMemo(() => Boolean(user?.username && username && user.username === username), [user?.username, username]);
 
   useEffect(() => {
-    const loadDiary = async () => {
+    const loadJournal = async () => {
       if (!username) {
         setError('Username is required');
         setLoading(false);
@@ -36,16 +36,16 @@ const ProfileDiary: React.FC = () => {
 
       try {
         setLoading(true);
-        const result = await apiService.getMemberDiary(username, tab);
+        const result = await apiService.getMemberJournal(username, tab);
         setData(result || {});
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load diary');
+        setError(err instanceof Error ? err.message : 'Failed to load journal');
       } finally {
         setLoading(false);
       }
     };
 
-    void loadDiary();
+    void loadJournal();
   }, [tab, username]);
 
   const sections = useMemo(
@@ -64,7 +64,7 @@ const ProfileDiary: React.FC = () => {
   const categories = (data.categories || []) as LegacyEntity[];
 
   if (loading) {
-    return <LoadingSpinner message="Loading diary..." />;
+    return <LoadingSpinner message="Loading journal..." />;
   }
 
   if (error) {
@@ -72,16 +72,16 @@ const ProfileDiary: React.FC = () => {
   }
 
   return (
-    <ProfileShell username={username} activeTab="diary" isOwnProfile={isOwnProfile}>
+    <ProfileShell username={username} activeTab="journal" isOwnProfile={isOwnProfile}>
       <div style={{ marginTop: '15px' }}>
         <div className="alert alert-info">
-          My Diary keeps private entries that only you (or an admin) can access.
+          My Journal keeps private entries that only you (or an admin) can access.
         </div>
 
         {categories.length > 0 && (
           <div className="panel panel-default">
             <div className="panel-heading">
-              <strong>Diary Categories</strong>
+              <strong>Journal Categories</strong>
             </div>
             <div className="panel-body">
               <ul className="list-inline" style={{ marginBottom: 0 }}>
@@ -128,7 +128,7 @@ const ProfileDiary: React.FC = () => {
           ))}
         </ul>
 
-        {!data.results && <p className="text-muted" style={{ marginTop: '15px' }}>No diary entries found.</p>}
+        {!data.results && <p className="text-muted" style={{ marginTop: '15px' }}>No journal entries found.</p>}
 
         {sections
           .filter((section) => tab === 'all' || tab === section.key)
@@ -202,4 +202,4 @@ const ProfileDiary: React.FC = () => {
   );
 };
 
-export default ProfileDiary;
+export default ProfileJournal;

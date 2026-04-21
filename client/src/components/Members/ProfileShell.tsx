@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-type ProfileTab = 'overview' | 'contributions' | 'topics' | 'diary' | 'following' | 'pages' | 'settings';
+type ProfileTab = 'overview' | 'contributions' | 'topics' | 'journal' | 'following' | 'pages' | 'settings';
 
 interface ProfileShellProps {
   username: string;
@@ -17,7 +17,7 @@ interface ProfileShellProps {
 
 const ProfileShell: React.FC<ProfileShellProps> = ({ username, activeTab, isOwnProfile, roles, children }) => {
   const baseProfilePath = isOwnProfile ? '/members/profile' : `/members/${encodeURIComponent(username)}`;
-  const diaryPath = isOwnProfile ? '/members/profile/diary' : `/members/${encodeURIComponent(username)}/diary`;
+  const journalPath = isOwnProfile ? '/members/profile/journal' : `/members/${encodeURIComponent(username)}/journal`;
 
   return (
     <div>
@@ -45,9 +45,9 @@ const ProfileShell: React.FC<ProfileShellProps> = ({ username, activeTab, isOwnP
           </Link>
         </li>
         {isOwnProfile && (
-          <li role="presentation" className={activeTab === 'diary' ? 'active' : ''}>
-            <Link to={diaryPath} role="tab">
-              <i className="fa fa-folder-open"></i> My Diary
+          <li role="presentation" className={activeTab === 'journal' ? 'active' : ''}>
+            <Link to={journalPath} role="tab">
+              <i className="fa fa-folder-open"></i> My Journal
             </Link>
           </li>
         )}

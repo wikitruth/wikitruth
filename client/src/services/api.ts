@@ -17,7 +17,7 @@ import type {
   MemberProfileResponse,
   MemberTopicsResponse,
   MemberContributionsResponse,
-  MemberDiaryResponse,
+  MemberJournalResponse,
   MemberFollowingResponse,
   MemberPagesResponse,
   MemberPageResponse,
@@ -565,9 +565,14 @@ class ApiService {
     return this.request<MemberContributionsResponse>(`/members/${encodeURIComponent(username)}/contributions${query}`);
   }
 
-  async getMemberDiary(username: string, tab: string = 'all'): Promise<MemberDiaryResponse> {
+  async getMemberJournal(username: string, tab: string = 'all'): Promise<MemberJournalResponse> {
     const query = tab && tab !== 'all' ? `?tab=${encodeURIComponent(tab)}` : '';
-    return this.request<MemberDiaryResponse>(`/members/${encodeURIComponent(username)}/diary${query}`);
+    return this.request<MemberJournalResponse>(`/members/${encodeURIComponent(username)}/journal${query}`);
+  }
+
+  // Backward compatibility alias for legacy diary naming.
+  async getMemberDiary(username: string, tab: string = 'all'): Promise<MemberJournalResponse> {
+    return this.getMemberJournal(username, tab);
   }
 
   async getCurrentMemberProfile(): Promise<LegacyApiResponse> {

@@ -67,9 +67,9 @@ describe('SearchPage', () => {
     mockUseAuth.mockReturnValue({ user: { _id: 'u1', username: 'demo' } });
     mockSearch.mockResolvedValue({
       tab: 'topics',
-      content: 'diary',
+      content: 'journal',
       results: true,
-      topics: [{ _id: 't2', title: 'Diary Topic', friendlyUrl: 'diary-topic' }],
+      topics: [{ _id: 't2', title: 'Journal Topic', friendlyUrl: 'journal-topic' }],
       arguments: [],
       questions: [],
       answers: [],
@@ -81,12 +81,12 @@ describe('SearchPage', () => {
     render(<SearchPage />, { route: '/search?q=journal&tab=topics&content=diary' });
 
     await waitFor(() => {
-      expect(mockSearch).toHaveBeenCalledWith('journal', { tab: 'topics', content: 'diary' });
+      expect(mockSearch).toHaveBeenCalledWith('journal', { tab: 'topics', content: 'journal' });
     });
 
     expect(screen.getByLabelText(/all content/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/public wiki/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/my diary/i)).toBeInTheDocument();
-    expect(screen.getByText(/diary topic/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/my journal/i)).toBeInTheDocument();
+    expect(screen.getByText(/journal topic/i)).toBeInTheDocument();
   });
 });

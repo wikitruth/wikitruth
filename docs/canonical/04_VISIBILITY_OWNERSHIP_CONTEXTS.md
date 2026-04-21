@@ -7,7 +7,7 @@ Define how access scope and context are resolved for content.
 ## Visibility Modes
 
 - Public wiki scope: non-private content intended for shared discovery.
-- Diary scope: private, user-owned content.
+- Journal scope: private, user-owned content.
 - Group scope: group-owned content gated by group privacy/membership rules.
 
 ## API View Filter Contract
@@ -23,12 +23,12 @@ Define how access scope and context are resolved for content.
 - Context helpers derive effective base URL context:
 - global wiki
 - group wiki
-- member diary/profile wiki
+- member journal/profile wiki
 
-## Profile and Diary Privacy Rules
+## Profile and Journal Privacy Rules
 
 - Private member profiles are visible only to self/admin.
-- Diary entries are private and visible only to self/admin.
+- Journal entries are private and visible only to self/admin.
 - Non-owners are filtered away from private entries in list/discovery flows.
 
 ## Group Privacy Rules
@@ -40,5 +40,5 @@ Define how access scope and context are resolved for content.
 ## Ownership Migration Guardrails
 
 - Ownership migration is limited to root topics.
-- Group-scoped topics are excluded from diary/public migration path.
-- Diary migration requires target username and enforces creator-match policy unless ownership is explicitly transferred first.
+- Group-scoped topics are excluded from journal/public migration path.
+- Journal migration requires target username and enforces creator-match policy unless ownership is explicitly transferred first.

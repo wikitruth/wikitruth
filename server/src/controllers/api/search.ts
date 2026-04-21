@@ -14,7 +14,7 @@ type SearchModel = {
 };
 
 type SearchTab = 'all' | 'topics' | 'arguments' | 'questions' | 'answers' | 'artifacts' | 'issues' | 'opinions';
-type SearchContent = 'all' | 'wiki' | 'diary';
+type SearchContent = 'all' | 'wiki' | 'journal';
 
 function parseLimit(req: WikitruthRequest, fallback: number): number {
   const raw = req.query.limit;
@@ -60,8 +60,11 @@ function normalizeTab(value: string): SearchTab {
 }
 
 function normalizeContent(value: string): SearchContent {
-  const content = value.trim().toLowerCase() as SearchContent;
-  return content === 'wiki' || content === 'diary' ? content : 'all';
+  const content = value.trim().toLowerCase();
+  if (content === 'diary') {
+    return 'journal';
+  }
+  return content === 'wiki' || content === 'journal' ? (content as SearchContent) : 'all';
 }
 
 function buildRegexSearchFields(query: string, includeSource: boolean = false): Array<Record<string, unknown>> {
@@ -98,7 +101,7 @@ function buildPrivacyFilter(content: SearchContent, req: WikitruthRequest): Arra
   switch (content) {
     case 'wiki':
       return [{ private: false }];
-    case 'diary':
+    case 'journal':
       return currentUserId ? [{ private: true, createUserId: currentUserId }] : [{ private: false }];
     case 'all':
     default:

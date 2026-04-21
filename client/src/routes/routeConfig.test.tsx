@@ -18,6 +18,8 @@ describe('routeConfig', () => {
 
   it('keeps parity-critical modern routes wired', () => {
     const paths = appRoutes.map((route) => route.path);
+    expect(paths).toContain('/members/:username/journal');
+    expect(paths).toContain('/members/profile/journal');
     expect(paths).toContain('/members/:username/diary');
     expect(paths).toContain('/members/profile/diary');
     expect(paths).toContain('/contact');
@@ -32,10 +34,10 @@ describe('routeConfig', () => {
     expect(paths).toContain('/admin/verdicts/:id');
   });
 
-  it('maps diary routes to the dedicated diary page', () => {
+  it('maps journal routes to the dedicated journal page', () => {
     const file = fs.readFileSync(path.resolve(__dirname, 'routeConfig.tsx'), 'utf8');
-    expect(file).toContain("const ProfileDiary = lazy(() => import('../pages/Members/Profile/ProfileDiary'));");
-    expect(file).not.toContain("const ProfileDiary = lazy(() => import('../pages/Members/Profile/ProfileTopics'));");
+    expect(file).toContain("const ProfileJournal = lazy(() => import('../pages/Members/Profile/ProfileJournal'));");
+    expect(file).not.toContain("const ProfileJournal = lazy(() => import('../pages/Members/Profile/ProfileTopics'));");
   });
 
   it('includes tab-driven entry subroutes so navigation does not 404', () => {

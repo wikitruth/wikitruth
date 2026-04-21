@@ -53,7 +53,7 @@ describe('moderationApi', () => {
     });
     globalThis.fetch = fetchMock as unknown as typeof fetch;
 
-    await moderationApi.migrateOwnershipScope('topic-1', 'diary', 'alice');
+    await moderationApi.migrateOwnershipScope('topic-1', 'journal', 'alice');
 
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/moderation/ownership-migration',
@@ -62,7 +62,7 @@ describe('moderationApi', () => {
         headers: expect.objectContaining({ 'x-csrf-token': 'test-csrf-token' }),
         body: JSON.stringify({
           topicId: 'topic-1',
-          targetScope: 'diary',
+          targetScope: 'journal',
           username: 'alice',
         }),
       }),

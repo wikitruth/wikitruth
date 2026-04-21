@@ -69,7 +69,7 @@ Audit references used for this pass:
 ### 1) Global Shell, Navigation, and Context Sidebar
 
 - `[x]` Header brand + Explore + Search + More menu parity exists
-- `[x]` Signed-in account dropdown parity exists (profile, diary, admin, sign out)
+- `[x]` Signed-in account dropdown parity exists (profile, journal, admin, sign out)
 - `[x]` Mobile nav toggle exists in modern header
 - `[x]` Mobile sidebar toggle exists in modern header (`visible-sm`/`visible-xs`)
 - `[x]` Sidebar contains `Apps` section
@@ -104,7 +104,7 @@ Audit references used for this pass:
 ### 4) Search (`/legacy/search` vs `/search`)
 
 - `[x]` Search input + submit + query param contract
-- `[x]` Content scope radios (`all/wiki/diary`) for authenticated users
+- `[x]` Content scope radios (`all/wiki/journal`) for authenticated users (legacy `diary` alias supported)
 - `[x]` Tabbed result buckets for all entity types
 - `[x]` “View more” pagination-style behavior in all-tab mode
 - `[x]` Empty-result UX exists
@@ -162,12 +162,12 @@ Audit references used for this pass:
 
 - `[x]` Members index and role lists (contributors/screeners/reviewers/administrators) routes exist
 - `[x]` Profile overview route exists for self and other user
-- `[x]` Profile tabs exist (overview/topics/diary/contributions/following/pages/settings)
+- `[x]` Profile tabs exist (overview/topics/journal/contributions/following/pages/settings)
 - `[x]` Profile settings include private profile + fast switch controls
 - `[x]` Custom pages list/create/view routes exist
 - `[x]` Profile follow action for non-owner now uses notification subscriptions (`user` object) with follow-state load and toggle action
 - `[ ]` Validate contributions filtering parity against legacy tabs and counters
-- `[ ]` Validate diary navigation and context sidebar behavior parity for all diary route states
+- `[ ]` Validate journal navigation and context sidebar behavior parity for all journal route states (including legacy diary aliases)
 
 ### 10) Groups
 

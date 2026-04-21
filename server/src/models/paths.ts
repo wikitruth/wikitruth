@@ -39,6 +39,7 @@
                     page: '/pages/page',
                     create: '/pages/create'
                 },
+                journal: '/journal',
                 diary: '/diary'
             }
         },

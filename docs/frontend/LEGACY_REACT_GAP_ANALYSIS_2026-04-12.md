@@ -30,9 +30,9 @@ The React client migration is **~92% complete** (55 of 60+ routes migrated). Fiv
 | **Artifacts** | Browse, Create, Edit, Entry/Detail | ✅ All migrated |
 | **Groups** | Directory, Create, Detail, Posts, Members | ✅ All migrated |
 | **Members** | Directory, Contributors, Screeners, Reviewers, Administrators | ✅ All migrated |
-| **Profiles** | Overview, Settings, Contributions, Pages, Diary, Following | ✅ All migrated |
+| **Profiles** | Overview, Settings, Contributions, Pages, Journal, Following | ✅ All migrated |
 | **Wiki Tools** | Explore, Visualize, Screening, Convert, Fast Switch | ✅ All migrated |
-| **Search** | Multi-tab (All, Topics/Wiki, Diary) | ✅ All migrated |
+| **Search** | Multi-tab (All, Topics/Wiki, Journal) | ✅ All migrated |
 | **Admin** | Dashboard, Users, Accounts, Admins, Admin Groups, Categories, Statuses, DB Backup | ✅ All migrated |
 | **Error Pages** | 404, 500, 503 | ✅ All migrated |
 

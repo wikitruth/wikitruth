@@ -91,7 +91,31 @@ describe('Moderation ownership migration', function () {
       .expect(400);
   });
 
-  it('rejects cross-user diary migrations without ownership transfer', async function () {
+  it('treats legacy diary scope as a journal alias', async function () {
+    findTopicById.mockResolvedValue({
+      _id: 'topic-1',
+      parentId: null,
+      groupId: null,
+      ownerType: -1,
+      ownerId: null,
+      private: false,
+      createUserId: 'creator-1',
+    });
+
+    const app = createApp({
+      id: 'admin-1',
+      canPlayRoleOf: (role) => role === 'admin',
+    });
+
+    const response = await request(app)
+      .post('/api/moderation/ownership-migration')
+      .send({ topicId: 'topic-1', targetScope: 'diary' })
+      .expect(400);
+
+    expect(response.body.message).toBe('username is required when targetScope is journal');
+  });
+
+  it('rejects cross-user journal migrations without ownership transfer', async function () {
     findTopicById.mockResolvedValue({
       _id: 'topic-1',
       parentId: null,
@@ -114,7 +138,7 @@ describe('Moderation ownership migration', function () {
 
     await request(app)
       .post('/api/moderation/ownership-migration')
-      .send({ topicId: 'topic-1', targetScope: 'diary', username: 'other' })
+      .send({ topicId: 'topic-1', targetScope: 'journal', username: 'other' })
       .expect(409);
   });
 

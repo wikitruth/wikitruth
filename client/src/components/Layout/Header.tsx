@@ -214,6 +214,18 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
                       <i className="fa fa-comment"></i> Contact
                     </Link>
                   </li>
+                  <li role="separator" className="divider" aria-hidden="true"></li>
+                  <li>
+                    <a
+                      href="/legacy/"
+                      onClick={() => {
+                        setIsMoreOpen(false);
+                        setIsMobileNavOpen(false);
+                      }}
+                    >
+                      <i className="fa fa-history"></i> Legacy UX
+                    </a>
+                  </li>
                 </ul>
               </li>
             </ul>
@@ -265,11 +277,11 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
                       </Link>
                     </li>
                       <li>
-                        <Link to={`/members/${user.username}/diary`} onClick={() => {
+                        <Link to={`/members/${user.username}/journal`} onClick={() => {
                           setIsUserMenuOpen(false);
                           setIsMobileNavOpen(false);
                         }}>
-                          <i className="fa fa-folder-open"></i> My Diary
+                          <i className="fa fa-folder-open"></i> My Journal
                         </Link>
                       </li>
                       {Boolean(user.roles?.admin) && (

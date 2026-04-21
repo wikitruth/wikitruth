@@ -35,4 +35,4 @@ Define the core knowledge graph objects and how they relate.
 
 ## Graph Invariant
 
-Entries are not flat records. Every entry is expected to be in a context (topic, argument thread, group, or user/diary ownership) and that context drives visibility, routing, and child-count aggregation.
+Entries are not flat records. Every entry is expected to be in a context (topic, argument thread, group, or user/journal ownership) and that context drives visibility, routing, and child-count aggregation.

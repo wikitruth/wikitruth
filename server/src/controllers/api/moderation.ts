@@ -183,13 +183,17 @@ function areIdsEqual(left: unknown, right: unknown): boolean {
 
 function parseOwnershipMigrationRequest(req: WikitruthRequest): {
   topicId: string;
-  targetScope: 'public' | 'diary' | '';
+  targetScope: 'public' | 'journal' | '';
   username: string;
 } {
   const topicId = String(req.body?.topicId || req.body?.id || '').trim();
   const rawScope = String(req.body?.targetScope || req.body?.target || '').trim().toLowerCase();
   const username = String(req.body?.username || '').trim();
-  const targetScope = rawScope === 'public' || rawScope === 'diary' ? rawScope : '';
+  const targetScope = rawScope === 'diary'
+    ? 'journal'
+    : rawScope === 'public' || rawScope === 'journal'
+      ? rawScope
+      : '';
   return {
     topicId,
     targetScope,
@@ -1009,12 +1013,12 @@ module.exports = function (router: Router) {
     }
 
     if (!migration.targetScope) {
-      res.status(400).json({ success: false, message: 'targetScope must be either "public" or "diary"' });
+      res.status(400).json({ success: false, message: 'targetScope must be either "public" or "journal"' });
       return;
     }
 
     if (migration.targetScope === 'public' && migration.username) {
-      res.status(400).json({ success: false, message: 'username is only valid for diary ownership migrations' });
+      res.status(400).json({ success: false, message: 'username is only valid for journal ownership migrations' });
       return;
     }
 
@@ -1035,7 +1039,7 @@ module.exports = function (router: Router) {
     if (topic.groupId || topic.ownerType === constants.OBJECT_TYPES.group) {
       res.status(409).json({
         success: false,
-        message: 'Group-scoped topics must use group membership workflows instead of diary/public migration',
+        message: 'Group-scoped topics must use group membership workflows instead of journal/public migration',
       });
       return;
     }
@@ -1045,24 +1049,24 @@ module.exports = function (router: Router) {
     let targetPrivate = false;
     let targetUser: { _id: string; username: string } | null = null;
 
-    if (migration.targetScope === 'diary') {
+    if (migration.targetScope === 'journal') {
       if (!migration.username) {
-        res.status(400).json({ success: false, message: 'username is required when targetScope is diary' });
+        res.status(400).json({ success: false, message: 'username is required when targetScope is journal' });
         return;
       }
 
       targetUser = await db.User.findOne({ username: migration.username }).select('_id username').lean();
       if (!targetUser) {
-        res.status(404).json({ success: false, message: 'Diary owner account not found' });
+        res.status(404).json({ success: false, message: 'Journal owner account not found' });
         return;
       }
 
-      // Policy check: require the diary target user to be the original creator to avoid implicit cross-user transfer.
+      // Policy check: require the journal target user to be the original creator to avoid implicit cross-user transfer.
       if (!areIdsEqual(topic.createUserId, targetUser._id)) {
         res.status(409).json({
           success: false,
           message:
-            'Diary migration target must match the original topic creator. Use take-ownership first if transfer is intended.',
+            'Journal migration target must match the original topic creator. Use take-ownership first if transfer is intended.',
         });
         return;
       }

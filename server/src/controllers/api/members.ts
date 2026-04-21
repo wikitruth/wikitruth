@@ -277,16 +277,16 @@ module.exports = function (router) {
     }
   });
 
-  // Get member diary (private entries authored by the profile owner)
+  // Get member journal (private entries authored by the profile owner)
   // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/:username/diary', async function (req, res) {
+  const getMemberJournal = async function (req, res) {
     try {
       const member = await db.User.findOne({ username: req.params.username }).select('_id username preferences').lean();
       if (!member) {
         return res.status(404).json({ error: 'Member not found' });
       }
       if (!canViewPrivateEntries(member, req.user)) {
-        return res.status(403).json({ error: 'Diary is private' });
+        return res.status(403).json({ error: 'Journal is private' });
       }
 
       const tab = String(req.query?.tab || 'all').toLowerCase();
@@ -372,10 +372,13 @@ module.exports = function (router) {
 
       return res.json(model);
     } catch (err) {
-      console.error('Error fetching member diary:', err);
-      return res.status(500).json({ error: 'Failed to fetch member diary' });
+      console.error('Error fetching member journal:', err);
+      return res.status(500).json({ error: 'Failed to fetch member journal' });
     }
-  });
+  };
+
+  router.get('/:username/journal', getMemberJournal);
+  router.get('/:username/diary', getMemberJournal);
 
   // Get topics created by a member
   // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.

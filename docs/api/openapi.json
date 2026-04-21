@@ -2460,9 +2460,31 @@
         }
       }
     },
+    "/members/{username}/journal": {
+      "get": {
+        "summary": "Get journal entries for member profile",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Username"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/members/{username}/diary": {
       "get": {
-        "summary": "Get diary entries for member profile",
+        "summary": "Legacy alias for member journal entries",
         "parameters": [
           {
             "$ref": "#/components/parameters/Username"
@@ -2582,7 +2604,7 @@
     },
     "/moderation/ownership-migration": {
       "post": {
-        "summary": "Migrate root topic ownership scope between public and diary",
+        "summary": "Migrate root topic ownership scope between public and journal",
         "requestBody": {
           "required": true,
           "content": {

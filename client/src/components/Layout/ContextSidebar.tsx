@@ -314,7 +314,7 @@ const ContextSidebar: React.FC = () => {
         title: 'My Shortcuts',
         items: [
           { key: 'my-profile', label: 'My Profile', to: `/members/${encodeURIComponent(user.username)}`, icon: 'user-circle' },
-          { key: 'my-diary', label: 'My Diary', to: `/members/${encodeURIComponent(user.username)}/diary`, icon: 'book' },
+          { key: 'my-journal', label: 'My Journal', to: `/members/${encodeURIComponent(user.username)}/journal`, icon: 'book' },
           { key: 'my-groups', label: 'My Groups', to: '/groups', icon: 'group' },
         ],
       }

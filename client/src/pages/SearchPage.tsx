@@ -19,7 +19,7 @@ import type { Answer, Argument, Artifact, Issue, Opinion, Question, Topic } from
 import type { LegacyEntity } from '../types/legacy';
 
 type SearchTab = 'all' | 'topics' | 'arguments' | 'questions' | 'answers' | 'artifacts' | 'issues' | 'opinions';
-type SearchContent = 'all' | 'wiki' | 'diary';
+type SearchContent = 'all' | 'wiki' | 'journal';
 
 type SectionConfig = {
   key: Exclude<SearchTab, 'all'>;
@@ -62,7 +62,10 @@ function normalizeTab(value: string | null): SearchTab {
 
 function normalizeContent(value: string | null): SearchContent {
   const normalized = String(value || 'all').trim().toLowerCase();
-  return normalized === 'wiki' || normalized === 'diary' ? (normalized as SearchContent) : 'all';
+  if (normalized === 'diary') {
+    return 'journal';
+  }
+  return normalized === 'wiki' || normalized === 'journal' ? (normalized as SearchContent) : 'all';
 }
 
 const SearchPage: React.FC = () => {
@@ -331,11 +334,11 @@ const SearchPage: React.FC = () => {
                   <input
                     type="radio"
                     name="content"
-                    value="diary"
-                    checked={content === 'diary'}
-                    onChange={() => handleContentChange('diary')}
+                    value="journal"
+                    checked={content === 'journal'}
+                    onChange={() => handleContentChange('journal')}
                   />{' '}
-                  My Diary
+                  My Journal
                 </label>
               </div>
             )}

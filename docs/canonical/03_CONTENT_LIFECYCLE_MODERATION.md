@@ -30,7 +30,7 @@ Capture the canonical lifecycle of submitted content and moderation flow.
 - Update verdict (with optional reasoning).
 - Take ownership.
 - Delete entry.
-- Ownership migration for root topics between public and diary scope with guardrails.
+- Ownership migration for root topics between public and journal scope with guardrails.
 
 ## Data Integrity Behavior
 
