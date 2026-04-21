@@ -92,4 +92,11 @@ describe('React shell routes', function () {
 
     expect(res.headers.location).toBe('/arguments/entry/argumentLink001?id=argumentLink001&argumentLink=argumentLink001&mode=edit-link');
   });
+
+  it('redirects legacy member diary routes into canonical member journal routes', async function () {
+    const app = createRootApp();
+    const res = await request(app).get('/members/demo/diary').expect(302);
+
+    expect(res.headers.location).toBe('/members/demo/journal');
+  });
 });

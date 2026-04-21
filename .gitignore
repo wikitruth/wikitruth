@@ -62,6 +62,8 @@ legacy/static/views/**/*.min.js.map
 legacy/static/components
 legacy/static/js/react
 
+docs/qa/artifacts
+
 
 dist/
 !public/vendor/

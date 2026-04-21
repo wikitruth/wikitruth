@@ -204,6 +204,12 @@ function mapLegacyPathToModern(req: Request): string {
     return '/arguments';
   }
 
+  const memberDiaryPathMatch = normalizedPath.match(/^\/members\/([^/]+)\/diary$/);
+  if (memberDiaryPathMatch) {
+    const username = encodeURIComponent(decodeURIComponent(memberDiaryPathMatch[1] || ''));
+    return withQuery(`/members/${username}/journal`, req.originalUrl);
+  }
+
   const topicLinkEntryMatch =
     normalizedPath.match(/^\/topic(?:\/[^/]+)?\/link\/([^/]+)$/) ||
     normalizedPath.match(/^\/topics\/entry(?:\/[^/]+)?\/link\/([^/]+)$/);
@@ -226,11 +232,22 @@ function mapLegacyPathToModern(req: Request): string {
     });
   }
 
+  const answerSingularMatch = normalizedPath.match(/^\/answer\/(.+)$/);
+  if (answerSingularMatch) {
+    const candidate = String(answerSingularMatch[1] || '')
+      .split('/')
+      .filter(Boolean)
+      .pop();
+    if (candidate) {
+      const answerId = encodeURIComponent(decodeURIComponent(candidate));
+      return withQuery(`/answers/entry/${answerId}`, req.originalUrl);
+    }
+  }
+
   const singularEntryMatches: Array<{ pattern: RegExp; targetPrefix: string }> = [
     { pattern: /^\/topic\/(.+)$/, targetPrefix: '/topics/entry/' },
     { pattern: /^\/argument\/(.+)$/, targetPrefix: '/arguments/entry/' },
     { pattern: /^\/question\/(.+)$/, targetPrefix: '/questions/entry/' },
-    { pattern: /^\/answer\/(.+)$/, targetPrefix: '/answers/entry/' },
     { pattern: /^\/issue\/(.+)$/, targetPrefix: '/issues/entry/' },
     { pattern: /^\/opinion\/(.+)$/, targetPrefix: '/opinions/entry/' },
     { pattern: /^\/artifact\/(.+)$/, targetPrefix: '/artifacts/entry/' },
@@ -393,6 +410,8 @@ module.exports = function registerLegacyPathRedirects(app: AppRouteRegistrar, _p
     '/issue/*',
     '/opinion/*',
     '/artifact/*',
+    '/members/:username/diary',
+    '/members/profile/diary',
     '/comments',
     '/comments/*',
     '/comment/*',
