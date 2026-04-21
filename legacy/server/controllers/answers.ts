@@ -83,50 +83,53 @@ async function GET_index(req, res) {
   let query = flowUtils.createOwnerQueryFromQuery(req);
   if (query.ownerId) {
     flowUtils.setScreeningModel(req, model);
-    flowUtils.setEntryModels(query, req, model);
-    let results = await db.Answer.find({
-      // @ts-ignore TS(2339): Property 'question' does not exist on type '{}'.
-      questionId: model.question._id,
-      // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
-      'screening.status': model.screening.status,
-    })
-      .sort({ title: 1 })
-      .lean();
-    await flowUtils.setEditorsUsername(results);
-    // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
-    results.forEach(function (result) {
-      flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.answer, req);
-    });
-    // @ts-ignore TS(2339): Property 'answers' does not exist on type '{}'.
-    model.answers = results;
-    flowUtils.setModelOwnerEntry(req, res, model);
+    await flowUtils.setEntryModels(query, req, model);
+    // Invalid or stale owner links should not crash legacy pages.
+    if (model.question && model.question._id) {
+      let results = await db.Answer.find({
+        // @ts-ignore TS(2339): Property 'question' does not exist on type '{}'.
+        questionId: model.question._id,
+        // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
+        'screening.status': model.screening.status,
+      })
+        .sort({ title: 1 })
+        .lean();
+      await flowUtils.setEditorsUsername(results);
+      // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
+      results.forEach(function (result) {
+        flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.answer, req);
+      });
+      // @ts-ignore TS(2339): Property 'answers' does not exist on type '{}'.
+      model.answers = results;
+      flowUtils.setModelOwnerEntry(req, res, model);
 
-    // screening and children count
-    // @ts-ignore TS(2339): Property 'entry' does not exist on type '{}'.
-    flowUtils.setScreeningModelCount(model, model.entry.childrenCount.answers);
-    res.render(templates.wiki.answers.index, model);
-  } else {
-    // Top Answers
-    query = {
-      ownerType: constants.OBJECT_TYPES.topic,
-      private: false,
-      'screening.status': constants.SCREENING_STATUS.status1.code,
-    };
-    //db.Answer.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
-    let results = await db.Answer.find(query).sort({ editDate: -1 }).limit(25).lean().exec();
-    await flowUtils.setEditorsUsername(results);
-    // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
-    results.forEach(function (result) {
-      result.topic = {
-        _id: result.ownerId,
-      };
-      flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.answer, req);
-    });
-    // @ts-ignore TS(2339): Property 'answers' does not exist on type '{}'.
-    model.answers = results;
-    flowUtils.setModelContext(req, res, model);
-    res.render(templates.wiki.answers.index, model);
+      // screening and children count
+      // @ts-ignore TS(2339): Property 'entry' does not exist on type '{}'.
+      flowUtils.setScreeningModelCount(model, model.entry.childrenCount.answers);
+      return res.render(templates.wiki.answers.index, model);
+    }
   }
+
+  // Top Answers (default fallback when no owner/invalid owner)
+  query = {
+    ownerType: constants.OBJECT_TYPES.topic,
+    private: false,
+    'screening.status': constants.SCREENING_STATUS.status1.code,
+  };
+  //db.Answer.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
+  let results = await db.Answer.find(query).sort({ editDate: -1 }).limit(25).lean().exec();
+  await flowUtils.setEditorsUsername(results);
+  // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
+  results.forEach(function (result) {
+    result.topic = {
+      _id: result.ownerId,
+    };
+    flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.answer, req);
+  });
+  // @ts-ignore TS(2339): Property 'answers' does not exist on type '{}'.
+  model.answers = results;
+  flowUtils.setModelContext(req, res, model);
+  res.render(templates.wiki.answers.index, model);
 }
 
 // @ts-ignore TS(2393): Duplicate function implementation.

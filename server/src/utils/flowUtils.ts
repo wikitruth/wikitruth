@@ -547,6 +547,10 @@ async function setEditorsUsername(items) {
 
 // @ts-ignore TS(7006): Parameter 'item' implicitly has an 'any' type.
 async function setCreateUsername(item) {
+  if (!item || !item.createUserId) {
+    return;
+  }
+
   let user = await db.User.findOne({ _id: item.createUserId });
   if (user) {
     item.createUsername = user.username;
@@ -555,6 +559,10 @@ async function setCreateUsername(item) {
 
 // @ts-ignore TS(7006): Parameter 'item' implicitly has an 'any' type.
 async function setEditUsername(item) {
+  if (!item || !item.editUserId) {
+    return;
+  }
+
   let user = await db.User.findOne({ _id: item.editUserId });
   if (user) {
     item.editUsername = user.username;
@@ -563,10 +571,14 @@ async function setEditUsername(item) {
 
 // @ts-ignore TS(7006): Parameter 'item' implicitly has an 'any' type.
 async function setUsername(item) {
+  if (!item) {
+    return;
+  }
+
   await setCreateUsername(item);
-  if (item.createUserId === item.editUserId) {
+  if (item.createUserId && item.createUserId === item.editUserId) {
     item.editUsername = item.createUsername;
-  } else {
+  } else if (item.editUserId) {
     await setEditUsername(item);
   }
 }
@@ -950,7 +962,7 @@ async function setTopicModels(req, model) {
  */
 // @ts-ignore TS(7006): Parameter 'query' implicitly has an 'any' type.
 async function setEntryModels(query, req, model) {
-  if (!query.ownerType || query.ownerType === -1) { // if the query or entry does not follow owner id/type concept.
+  if (!query || !query.ownerType || query.ownerType === -1) { // if the query or entry does not follow owner id/type concept.
     return;
   }
 
@@ -960,6 +972,9 @@ async function setEntryModels(query, req, model) {
   } else if (query.ownerType === constants.OBJECT_TYPES.topicLink) {
     req.query.topicLink = query.ownerId;
     await setTopicLinkModel(req, model);
+    if (!model.topicLink) {
+      return;
+    }
     const q = { ownerType: constants.OBJECT_TYPES.topic, ownerId: model.topicLink.parentId };
     await setEntryModels(q, req, model);
   } else if (query.ownerType === constants.OBJECT_TYPES.argument) {
@@ -969,6 +984,9 @@ async function setEntryModels(query, req, model) {
   } else if (query.ownerType === constants.OBJECT_TYPES.argumentLink) {
     req.query.argumentLink = query.ownerId;
     await setArgumentLinkModel(req, model);
+    if (!model.argumentLink) {
+      return;
+    }
     const q = model.argumentLink.parentId ? {
       ownerType: constants.OBJECT_TYPES.argument,
       ownerId: model.argumentLink.parentId,
@@ -977,24 +995,34 @@ async function setEntryModels(query, req, model) {
   } else if (query.ownerType === constants.OBJECT_TYPES.artifact) {
     req.query.artifact = query.ownerId;
     await setArtifactModel(req, model);
-    await setEntryModels(model.artifact, req, model);
+    if (model.artifact) {
+      await setEntryModels(model.artifact, req, model);
+    }
   } else if (query.ownerType === constants.OBJECT_TYPES.question) {
     req.query.question = query.ownerId;
     await setQuestionModel(req, model);
-    await setEntryModels(model.question, req, model);
+    if (model.question) {
+      await setEntryModels(model.question, req, model);
+    }
   } else if (query.ownerType === constants.OBJECT_TYPES.answer) {
     req.query.answer = query.ownerId;
     await setAnswerModel(req, model);
-    const q = { ownerType: constants.OBJECT_TYPES.question, ownerId: model.answer.questionId };
-    await setEntryModels(q, req, model);
+    if (model.answer) {
+      const q = { ownerType: constants.OBJECT_TYPES.question, ownerId: model.answer.questionId };
+      await setEntryModels(q, req, model);
+    }
   } else if (query.ownerType === constants.OBJECT_TYPES.issue) {
     req.query.issue = query.ownerId;
     await setIssueModel(req, model);
-    await setEntryModels(model.issue, req, model);
+    if (model.issue) {
+      await setEntryModels(model.issue, req, model);
+    }
   } else if (query.ownerType === constants.OBJECT_TYPES.opinion) {
     req.query.opinion = query.ownerId;
     await setOpinionModel(req, model);
-    await setEntryModels(model.opinion2 || model.opinion, req, model);
+    if (model.opinion2 || model.opinion) {
+      await setEntryModels(model.opinion2 || model.opinion, req, model);
+    }
   }
 }
 
@@ -2677,7 +2705,7 @@ function setModelContext(req, res, model, mixedMode) {
   } else if (req.params.username || (mixedMode && req.user && req.user.username) || (model.entry && model.entry.private)) {
     model.username = req.params.username || req.user.username;
     model.profileBaseUrl = paths.members.index + '/' + model.username;
-    model.wikiBaseUrl = model.profileBaseUrl + paths.members.profile.diary;
+    model.wikiBaseUrl = model.profileBaseUrl + (paths.members.profile.journal || paths.members.profile.diary);
   } else {
     model.username = '';
     model.profileBaseUrl = '';
@@ -2703,7 +2731,7 @@ function buildEntryUrl(baseUrl, entry) {
 
 // @ts-ignore TS(7006): Parameter 'username' implicitly has an 'any' type.
 function getDiaryBaseUrl(username) {
-  return paths.members.index + '/' + username + paths.members.profile.diary;
+  return paths.members.index + '/' + username + (paths.members.profile.journal || paths.members.profile.diary);
 }
 
 // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
@@ -2733,7 +2761,7 @@ function buildTopicReturnUrl(model, cancelBaseUrl, entry, parent) {
 function buildParentUrl(req, entry) {
   // @ts-ignore TS(7006): Parameter 'entry' implicitly has an 'any' type.
   const getBaseUrl = function(entry) {
-    return entry.private ? paths.members.index + '/' + req.user.username + paths.members.profile.diary : '';
+    return entry.private ? paths.members.index + '/' + req.user.username + (paths.members.profile.journal || paths.members.profile.diary) : '';
   };
   // @ts-ignore TS(7006): Parameter 'entry' implicitly has an 'any' type.
   const buildRedirectUrl = function(entry) {
@@ -2776,17 +2804,43 @@ function buildParentUrl(req, entry) {
 
 // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 function buildEntryReturnUrl(req, model) {
+  const fallbackBaseUrl = model && model.wikiBaseUrl ? model.wikiBaseUrl : '/';
+  if (!model || !model.entry || !model.entryType) {
+    return fallbackBaseUrl;
+  }
+
+  const entry = model.entry;
+  const entryTitle = entry && entry.title ? entry.title : '';
+  const entryId = entry && entry._id ? entry._id : '';
+
   switch (model.entryType) {
     case constants.OBJECT_TYPES.topic:
-      return model.wikiBaseUrl + paths.wiki.topics.entry + '/' + utils.urlify(model.entry.title) + '/' + model.entry._id;
+      if (!entryTitle || !entryId) {
+        return fallbackBaseUrl;
+      }
+      return model.wikiBaseUrl + paths.wiki.topics.entry + '/' + utils.urlify(entryTitle) + '/' + entryId;
     case constants.OBJECT_TYPES.topicLink:
-      return model.wikiBaseUrl + paths.wiki.topics.entry + '/' + utils.urlify(model.entry.topic.title) + '/link/' + model.entry._id;
+      if (!entry.topic || !entry.topic.title || !entryId) {
+        return fallbackBaseUrl;
+      }
+      return model.wikiBaseUrl + paths.wiki.topics.entry + '/' + utils.urlify(entry.topic.title) + '/link/' + entryId;
     case constants.OBJECT_TYPES.argument:
-      return model.wikiBaseUrl + paths.wiki.arguments.entry + '/' + utils.urlify(model.entry.title) + '/' + req.query.argument;
+      if (!entryTitle) {
+        return fallbackBaseUrl;
+      }
+      return model.wikiBaseUrl + paths.wiki.arguments.entry + '/' + utils.urlify(entryTitle) + '/' + (req.query.argument || entryId);
     case constants.OBJECT_TYPES.argumentLink:
-      return model.wikiBaseUrl + paths.wiki.arguments.entry + '/' + utils.urlify(model.entry.argument.title) + '/link/' + req.query.argument;
-    default:
-      return model.wikiBaseUrl + paths.wiki[constants.OBJECT_NAMES_MAP[model.ownerType]].entry + '/' + utils.urlify(model.entry.title) + '/' + model.entry._id;
+      if (!entry.argument || !entry.argument.title) {
+        return fallbackBaseUrl;
+      }
+      return model.wikiBaseUrl + paths.wiki.arguments.entry + '/' + utils.urlify(entry.argument.title) + '/link/' + (req.query.argument || entryId);
+    default: {
+      const ownerName = constants.OBJECT_NAMES_MAP[model.ownerType];
+      if (!ownerName || !paths.wiki[ownerName] || !paths.wiki[ownerName].entry || !entryTitle || !entryId) {
+        return fallbackBaseUrl;
+      }
+      return model.wikiBaseUrl + paths.wiki[ownerName].entry + '/' + utils.urlify(entryTitle) + '/' + entryId;
+    }
   }
 }
 

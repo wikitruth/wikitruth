@@ -9,9 +9,9 @@ Use `legacy/compatibility/` as the single compatibility root.
 
 Target structure:
 - `legacy/compatibility/server/` (legacy-only route/controller modules)
-- `legacy/compatibility/templates/` (dust/jade templates)
-- `legacy/compatibility/static/` (legacy js/css/layouts/views/components assets)
-- `legacy/compatibility/build/` (grunt/tasks/bower-era build scripts)
+- `legacy/templates/` (dust/jade templates)
+- `legacy/static/` (legacy js/css/layouts/views/components assets)
+- `legacy/build/` (grunt/tasks/bower-era build scripts)
 - `legacy/compatibility/config/` (legacy kraken/view-engine config)
 - `legacy/compatibility/contracts/` (path map and compatibility manifest)
 
@@ -48,15 +48,15 @@ Target structure:
 
 ## Track 4: Template and Static Legacy Extraction
 
-- [x] Move Dust/Jade templates to `legacy/compatibility/templates/`.
-- [x] Move legacy static runtime assets to `legacy/compatibility/static/`.
+- [x] Move Dust/Jade templates to `legacy/templates/`.
+- [x] Move legacy static runtime assets to `legacy/static/`.
 - [x] Update kraken/view-engine config to point to compatibility template paths.
 - [x] Add static mount aliases so legacy URL paths continue to resolve.
 - [x] Verify there are no direct legacy file reads from `public/templates` after cutover.
 
 ## Track 5: Legacy Build Toolchain Extraction
 
-- [x] Move `Gruntfile.js` and `tasks/` into `legacy/compatibility/build/`.
+- [x] Move `Gruntfile.js` and `tasks/` into `legacy/build/`.
 - [x] Move bower/jshint-era config files into compatibility build folder.
 - [x] Update `npm run start:legacy-grunt` to execute toolchain from compatibility location.
 - [x] Ensure modern build scripts (`build:client`, `dev:client`, `build:server`) are unaffected by compatibility tooling.

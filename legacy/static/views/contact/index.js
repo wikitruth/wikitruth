@@ -5,8 +5,20 @@
 
   app = app || {};
 
+  function getLegacyBasePath() {
+    var pathname = (window.location && window.location.pathname) || '';
+    if (pathname === '/legacy' || pathname.indexOf('/legacy/') === 0) {
+      return '/legacy';
+    }
+    return '';
+  }
+
+  function withBase(pathname) {
+    return getLegacyBasePath() + pathname;
+  }
+
   app.Contact = Backbone.Model.extend({
-    url: '/contact/',
+    url: withBase('/contact/'),
     defaults: {
       success: false,
       errors: [],

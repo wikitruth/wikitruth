@@ -19,7 +19,7 @@ module.exports = function(router) {
     await flowUtils.setEntryModels(ownerQuery, req, model);
     flowUtils.setModelOwnerEntry(req, res, model, { hideClipboard: true });
     // @ts-ignore TS(2339): Property 'cancelUrl' does not exist on type '{}'.
-    model.cancelUrl = flowUtils.buildEntryReturnUrl(req, model);
+    model.cancelUrl = flowUtils.buildEntryReturnUrl(req, model) || flowUtils.buildReturnUrl(req, model.wikiBaseUrl || '/');
     // @ts-ignore TS(2339): Property 'hideEntryOptions' does not exist on type... Remove this comment to see the full error message
     model.hideEntryOptions = true;
     res.render(templates.wiki.convert, model);
@@ -31,6 +31,10 @@ module.exports = function(router) {
     let ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
     await flowUtils.setEntryModels(ownerQuery, req, model);
     flowUtils.setModelOwnerEntry(req, res, model);
+    // @ts-ignore TS(2339): Property 'entryType' does not exist on type '{}'.
+    if (!model.entryType || !model.entry || !model.entry._id) {
+      return res.redirect(flowUtils.buildReturnUrl(req, model.wikiBaseUrl || '/'));
+    }
     let updateQuery = {
       $set: {
         verdict: {

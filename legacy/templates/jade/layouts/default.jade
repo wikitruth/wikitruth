@@ -20,7 +20,7 @@ html
     div.navbar.navbar-default.navbar-fixed-top
       div.container-fluid
         div.navbar-header
-          a.navbar-brand(href='/')
+          a.navbar-brand(href='#{legacyBaseUrl || "/"}')
             img.navbar-logo(src='/img/logo-64x64.png', alt='Logo')
             span.navbar-brand-label
               if user && user.username

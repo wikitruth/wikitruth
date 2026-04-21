@@ -11,7 +11,6 @@ const config = require(path.join(process.cwd(), 'config/config')),
     applications = require('./models/applications'),
     express = require('express'),
     cookieParser = require('cookie-parser'),
-    bodyParser = require('body-parser'),
     session = require('express-session'),
     mongoStore = require('connect-mongo'),
     passport = require('passport'),
@@ -91,8 +90,9 @@ app.use(require('morgan')('dev'));
 app.use(require('compression')());
 //app.use(require('serve-static')(path.join(__dirname, 'public')));
 app.use(require('method-override')());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: true}));
+// Kraken wires request body parsing using Express' body-parser chain.
+// Avoid adding a second parser instance (body-parser@2) to prevent
+// "stream is not readable" errors when the same request body is read twice.
 app.use(cookieParser(config.cryptoKey));
 app.use(require('./middlewares/requestContext'));
 

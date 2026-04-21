@@ -1,6 +1,6 @@
 'use strict';
 
-const httpClient = require('../../../../../server/src/utils/httpClient');
+const httpClient = require('../../../../server/src/utils/httpClient');
 
 exports.init = function(req, res){
   res.render('jade/contact/index.jade');

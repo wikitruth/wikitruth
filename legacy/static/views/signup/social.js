@@ -5,8 +5,33 @@
 
   app = app || {};
 
+  function getLegacyBasePath() {
+    var pathname = (window.location && window.location.pathname) || '';
+    if (pathname === '/legacy' || pathname.indexOf('/legacy/') === 0) {
+      return '/legacy';
+    }
+    return '';
+  }
+
+  function withBase(pathname) {
+    return getLegacyBasePath() + pathname;
+  }
+
+  function resolveRedirect(target) {
+    if (target && /^https?:\/\//i.test(target)) {
+      return target;
+    }
+    if (target && target.charAt(0) === '/') {
+      if (target === '/legacy' || target.indexOf('/legacy/') === 0) {
+        return target;
+      }
+      return withBase(target);
+    }
+    return withBase('/account/');
+  }
+
   app.Signup = Backbone.Model.extend({
-    url: '/signup/social/',
+    url: withBase('/signup/social/'),
     defaults: {
       errors: [],
       errfor: {},
@@ -55,7 +80,7 @@
       },{
         success: function(model, response) {
           if (response.success) {
-            location.href = '/account/';
+            location.href = resolveRedirect(response.defaultReturnUrl);
           }
           else {
             model.set(response);

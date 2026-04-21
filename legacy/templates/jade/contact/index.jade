@@ -7,7 +7,7 @@ block neck
   link(rel='stylesheet', href='/views/contact/index.min.css?#{cacheBreaker}')
 
 block feet
-  script(src='/views/contact/index.min.js?#{cacheBreaker}')
+  script(src='/views/contact/index.js?#{cacheBreaker}')
   script.
     window.onloadCallback = function () {
       if ($('#recaptcha_id').length) {

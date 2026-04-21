@@ -48,7 +48,7 @@
                         {/application}
                         {>"dust/wiki/common/clipboard" /}
                         <li role="separator" class="divider"></li>
-                        <li><a href="/"><i class="fa fa-star"></i> New UX</a></li>
+                        <li><a href="/"><i class="fa fa-star"></i> Modern UX</a></li>
                     </ul>
                 </li>
                 <!--<li class="hidden-xs"><a href="/about/">About</a></li>-->

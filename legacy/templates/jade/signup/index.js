@@ -1,10 +1,19 @@
 'use strict';
 
-const httpClient = require('../../../../../server/src/utils/httpClient');
+const httpClient = require('../../../../server/src/utils/httpClient');
+
+function legacyBase(req) {
+  return req.baseUrl && String(req.baseUrl).startsWith('/legacy') ? '/legacy' : '';
+}
+
+function withLegacyBase(req, pathname) {
+  const base = legacyBase(req);
+  return base + pathname;
+}
 
 exports.init = function(req, res){
   if (req.isAuthenticated()) {
-    res.redirect(req.user.defaultReturnUrl());
+    res.redirect(withLegacyBase(req, req.user.defaultReturnUrl()));
   }
   else {
     res.render('jade/signup/index.jade', {
@@ -165,7 +174,7 @@ exports.signup = function(req, res){
       locals: {
         username: req.body.username,
         email: req.body.email,
-        loginURL: req.protocol +'://'+ req.headers.host +'/login/',
+        loginURL: req.protocol +'://'+ req.headers.host + withLegacyBase(req, '/login/'),
         projectName: req.app.config.projectName
       },
       success: function(message) {
@@ -207,7 +216,7 @@ exports.signup = function(req, res){
 exports.signupTwitter = function(req, res, next) {
   req._passport.instance.authenticate('twitter', function(err, user, info) {
     if (!info || !info.profile) {
-      return res.redirect('/signup/');
+      return res.redirect(withLegacyBase(req, '/signup/'));
     }
 
     req.app.db.models.User.findOne({ 'twitter.id': info.profile.id }, function(err, user) {
@@ -238,7 +247,7 @@ exports.signupTwitter = function(req, res, next) {
 exports.signupGitHub = function(req, res, next) {
   req._passport.instance.authenticate('github', function(err, user, info) {
     if (!info || !info.profile) {
-      return res.redirect('/signup/');
+      return res.redirect(withLegacyBase(req, '/signup/'));
     }
 
     req.app.db.models.User.findOne({ 'github.id': info.profile.id }, function(err, user) {
@@ -267,9 +276,9 @@ exports.signupGitHub = function(req, res, next) {
 };
 
 exports.signupFacebook = function(req, res, next) {
-  req._passport.instance.authenticate('facebook', { callbackURL: '/signup/facebook/callback/' }, function(err, user, info) {
+  req._passport.instance.authenticate('facebook', { callbackURL: withLegacyBase(req, '/signup/facebook/callback/') }, function(err, user, info) {
     if (!info || !info.profile) {
-      return res.redirect('/signup/');
+      return res.redirect(withLegacyBase(req, '/signup/'));
     }
 
     req.app.db.models.User.findOne({ 'facebook.id': info.profile.id }, function(err, user) {
@@ -299,9 +308,9 @@ exports.signupFacebook = function(req, res, next) {
 };
 
 exports.signupGoogle = function(req, res, next) {
-  req._passport.instance.authenticate('google', { callbackURL: '/signup/google/callback/' }, function(err, user, info) {
+  req._passport.instance.authenticate('google', { callbackURL: withLegacyBase(req, '/signup/google/callback/') }, function(err, user, info) {
     if (!info || !info.profile) {
-      return res.redirect('/signup/');
+      return res.redirect(withLegacyBase(req, '/signup/'));
     }
 
     req.app.db.models.User.findOne({ 'google.id': info.profile.id }, function(err, user) {
@@ -329,9 +338,9 @@ exports.signupGoogle = function(req, res, next) {
 };
 
 exports.signupApple = function(req, res, next) {
-  req._passport.instance.authenticate('apple', { callbackURL: '/signup/apple/callback/' }, function(err, user, info) {
+  req._passport.instance.authenticate('apple', { callbackURL: withLegacyBase(req, '/signup/apple/callback/') }, function(err, user, info) {
     if (!info || !info.profile) {
-      return res.redirect('/signup/');
+      return res.redirect(withLegacyBase(req, '/signup/'));
     }
 
     req.app.db.models.User.findOne({ 'apple.id': info.profile.id }, function(err, user) {
@@ -359,9 +368,9 @@ exports.signupApple = function(req, res, next) {
 };
 
 exports.signupMicrosoft = function(req, res, next) {
-  req._passport.instance.authenticate('microsoft', { callbackURL: '/signup/microsoft/callback/' }, function(err, user, info) {
+  req._passport.instance.authenticate('microsoft', { callbackURL: withLegacyBase(req, '/signup/microsoft/callback/') }, function(err, user, info) {
     if (!info || !info.profile) {
-      return res.redirect('/signup/');
+      return res.redirect(withLegacyBase(req, '/signup/'));
     }
 
     req.app.db.models.User.findOne({ 'microsoft.id': info.profile.id }, function(err, user) {
@@ -389,9 +398,9 @@ exports.signupMicrosoft = function(req, res, next) {
 };
 
 exports.signupTumblr = function(req, res, next) {
-  req._passport.instance.authenticate('tumblr', { callbackURL: '/signup/tumblr/callback/' }, function(err, user, info) {
+  req._passport.instance.authenticate('tumblr', { callbackURL: withLegacyBase(req, '/signup/tumblr/callback/') }, function(err, user, info) {
     if (!info || !info.profile) {
-      return res.redirect('/signup/');
+      return res.redirect(withLegacyBase(req, '/signup/'));
     }
 
     if (!info.profile.hasOwnProperty('id')) {
@@ -551,7 +560,7 @@ exports.signupSocial = function(req, res){
       locals: {
         username: workflow.user.username,
         email: req.body.email,
-        loginURL: req.protocol +'://'+ req.headers.host +'/login/',
+        loginURL: req.protocol +'://'+ req.headers.host + withLegacyBase(req, '/login/'),
         projectName: req.app.config.projectName
       },
       success: function(message) {

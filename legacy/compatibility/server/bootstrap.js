@@ -86,6 +86,30 @@ function registerLegacyCompatibility(app, options) {
     'jade',
     'login',
     'forgot',
+      'index'
+  ));
+  const legacySignupController = require(path.join(
+    process.cwd(),
+    'legacy',
+    'templates',
+    'jade',
+    'signup',
+    'index'
+  ));
+  const legacyContactController = require(path.join(
+    process.cwd(),
+    'legacy',
+    'templates',
+    'jade',
+    'contact',
+    'index'
+  ));
+  const legacyLogoutController = require(path.join(
+    process.cwd(),
+    'legacy',
+    'templates',
+    'jade',
+    'logout',
     'index'
   ));
   const legacyResetController = require(path.join(
@@ -100,6 +124,30 @@ function registerLegacyCompatibility(app, options) {
 
   legacyRouter.use(async function legacyRouteContext(req, res, next) {
     try {
+      const originalRedirect = res.redirect.bind(res);
+      res.redirect = function legacyAwareRedirect(statusOrUrl, maybeUrl) {
+        let statusCode = null;
+        let redirectUrl = statusOrUrl;
+
+        if (typeof statusOrUrl === 'number') {
+          statusCode = statusOrUrl;
+          redirectUrl = maybeUrl;
+        }
+
+        if (typeof redirectUrl === 'string' && redirectUrl.startsWith('/') && !redirectUrl.startsWith('//')) {
+          if (redirectUrl === '/') {
+            redirectUrl = mountPath + '/';
+          } else if (!redirectUrl.startsWith(mountPath + '/')) {
+            redirectUrl = mountPath + redirectUrl;
+          }
+        }
+
+        if (statusCode !== null) {
+          return originalRedirect(statusCode, redirectUrl);
+        }
+        return originalRedirect(redirectUrl);
+      };
+
       // Override modern app locals for all legacy templates/render paths.
       res.locals.paths = legacyPaths;
       res.locals.legacyBaseUrl = mountPath;
@@ -185,6 +233,31 @@ function registerLegacyCompatibility(app, options) {
   legacyRouter.route('/login/reset/:email/:token')
     .get(legacyResetController.init)
     .post(legacyResetController.set);
+
+  legacyRouter.route('/signup')
+    .get(legacySignupController.init)
+    .post(legacySignupController.signup);
+  legacyRouter.get('/signup/twitter', legacySignupController.signupTwitter);
+  legacyRouter.get('/signup/twitter/callback', legacySignupController.signupTwitter);
+  legacyRouter.get('/signup/github', legacySignupController.signupGitHub);
+  legacyRouter.get('/signup/github/callback', legacySignupController.signupGitHub);
+  legacyRouter.get('/signup/facebook', legacySignupController.signupFacebook);
+  legacyRouter.get('/signup/facebook/callback', legacySignupController.signupFacebook);
+  legacyRouter.get('/signup/google', legacySignupController.signupGoogle);
+  legacyRouter.get('/signup/google/callback', legacySignupController.signupGoogle);
+  legacyRouter.get('/signup/apple', legacySignupController.signupApple);
+  legacyRouter.get('/signup/apple/callback', legacySignupController.signupApple);
+  legacyRouter.get('/signup/microsoft', legacySignupController.signupMicrosoft);
+  legacyRouter.get('/signup/microsoft/callback', legacySignupController.signupMicrosoft);
+  legacyRouter.get('/signup/tumblr', legacySignupController.signupTumblr);
+  legacyRouter.get('/signup/tumblr/callback', legacySignupController.signupTumblr);
+  legacyRouter.post('/signup/social', legacySignupController.signupSocial);
+
+  legacyRouter.route('/contact')
+    .get(legacyContactController.init)
+    .post(legacyContactController.sendMessage);
+
+  legacyRouter.get('/logout', legacyLogoutController.init);
 
   [
     ['/', 'index'],

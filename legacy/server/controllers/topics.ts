@@ -110,9 +110,12 @@ async function GET_index(req, res) {
     },
   });
   // @ts-ignore TS(2339): Property 'topic' does not exist on type '{}'.
-  if (!model.topic || !flowUtils.isEntryOnIntendedUrl(req, res, model.topic)) return res.redirect('/');
+  if (model.topic && !flowUtils.isEntryOnIntendedUrl(req, res, model.topic)) return res.redirect('/');
   // @ts-ignore TS(2339): Property 'topic' does not exist on type '{}'.
-  flowUtils.setScreeningModelCount(model, model.topic.childrenCount.topics);
+  if (model.topic && model.topic.childrenCount) {
+    // @ts-ignore TS(2339): Property 'topic' does not exist on type '{}'.
+    flowUtils.setScreeningModelCount(model, model.topic.childrenCount.topics);
+  }
   flowUtils.setModelOwnerEntry(req, res, model);
   res.render(templates.wiki.topics.index, model);
 }

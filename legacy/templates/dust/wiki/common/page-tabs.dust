@@ -10,8 +10,13 @@
                             {^artifact}
                                 {! Topic !}
                                 <li role="presentation"{@eq key=tab value="overview"} class="active"{/eq}>
-                                    <a href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}" role="tab">
-                                        <span class="fa fa-info-circle" aria-hidden="true"></span><span class="hidden-xxs-x"> Details</span></a>
+                                    {?topic}
+                                        <a href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.topics.entry}/{topic.friendlyUrl}/{topic._id}" role="tab">
+                                            <span class="fa fa-info-circle" aria-hidden="true"></span><span class="hidden-xxs-x"> Details</span></a>
+                                    {:else}
+                                        <a href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.topics.index}" role="tab">
+                                            <span class="fa fa-info-circle" aria-hidden="true"></span><span class="hidden-xxs-x"> Details</span></a>
+                                    {/topic}
                                 </li>
                                 {@gt key=entry.childrenCount.topics.total value="0"}
                                     <li role="presentation"{@eq key=tab value="topics"} class="active"{/eq}>

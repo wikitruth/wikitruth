@@ -13,34 +13,58 @@ let flowUtils = require('../utils/flowUtils'),
 
 // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 function createReturnUrl(req, model) {
-  switch (model.ownerType) {
-    case constants.OBJECT_TYPES.topicLink:
-      return (
-        model.wikiBaseUrl +
-        paths.wiki.topics.entry +
-        '/' +
-        utils.urlify(model.entry.title2) +
-        '/link/' +
-        model.entry._id
-      );
-    case constants.OBJECT_TYPES.argumentLink:
-      return (
-        model.wikiBaseUrl +
-        paths.wiki.arguments.entry +
-        '/' +
-        utils.urlify(model.entry.title2) +
-        '/link/' +
-        model.entry._id
-      );
-    default:
-      return (
-        model.wikiBaseUrl +
-        paths.wiki[constants.OBJECT_NAMES_MAP[model.ownerType]].entry +
-        '/' +
-        utils.urlify(model.entry.title) +
-        '/' +
-        model.entry._id
-      );
+  const fallback = (model && model.wikiBaseUrl ? model.wikiBaseUrl : '') + (paths && paths.wiki ? paths.wiki.index : '/explore');
+
+  try {
+    if (!model || !model.ownerType || !model.entry || !paths || !paths.wiki) {
+      return fallback;
+    }
+
+    switch (model.ownerType) {
+      case constants.OBJECT_TYPES.topicLink:
+        if (!paths.wiki.topics || !paths.wiki.topics.entry) {
+          return fallback;
+        }
+        return (
+          model.wikiBaseUrl +
+          paths.wiki.topics.entry +
+          '/' +
+          utils.urlify(model.entry.title2) +
+          '/link/' +
+          model.entry._id
+        );
+      case constants.OBJECT_TYPES.argumentLink:
+        if (!paths.wiki.arguments || !paths.wiki.arguments.entry) {
+          return fallback;
+        }
+        return (
+          model.wikiBaseUrl +
+          paths.wiki.arguments.entry +
+          '/' +
+          utils.urlify(model.entry.title2) +
+          '/link/' +
+          model.entry._id
+        );
+      default:
+        if (
+          !constants.OBJECT_NAMES_MAP[model.ownerType] ||
+          !paths.wiki[constants.OBJECT_NAMES_MAP[model.ownerType]] ||
+          !paths.wiki[constants.OBJECT_NAMES_MAP[model.ownerType]].entry
+        ) {
+          return fallback;
+        }
+
+        return (
+          model.wikiBaseUrl +
+          paths.wiki[constants.OBJECT_NAMES_MAP[model.ownerType]].entry +
+          '/' +
+          utils.urlify(model.entry.title) +
+          '/' +
+          model.entry._id
+        );
+    }
+  } catch (_err) {
+    return fallback;
   }
 }
 

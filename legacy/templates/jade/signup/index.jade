@@ -15,7 +15,7 @@ block neck
     };
 
 block feet
-  script(src='/views/signup/index.min.js?#{cacheBreaker}')
+  script(src='/views/signup/index.js?#{cacheBreaker}')
   script(src='https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit', async, defer)
 
 block body
@@ -33,26 +33,26 @@ block body
               button.close(type='button', data-dismiss='alert') &times;
               |#{oauthMessage}&nbsp;
               b
-                a(href='/login/') Login Here
+                a(href='#{paths.login}') Login Here
         div.btn-group.btn-group-justified
           if oauthTwitter
-            a.btn.btn-info(href='/signup/twitter/')
+            a.btn.btn-info(href='/legacy/signup/twitter/')
               i.fa.fa-twitter.fa-lg
               |  Twitter
           if oauthGitHub
-            a.btn.btn-info(href='/signup/github/')
+            a.btn.btn-info(href='/legacy/signup/github/')
               i.fa.fa-github.fa-lg
               |  GitHub
           if oauthFacebook
-            a.btn.btn-info.btn-fb(href='/signup/facebook/')
+            a.btn.btn-info.btn-fb(href='/legacy/signup/facebook/')
               i.fa.fa-facebook-square.fa-lg
               |  Facebook
           if oauthGoogle
-            a.btn.btn-info(href='/signup/google/')
+            a.btn.btn-info(href='/legacy/signup/google/')
               i.fa.fa-google-plus-square.fa-lg
               |  Google
           if oauthTumblr
-            a.btn.btn-info(href='/signup/tumblr/')
+            a.btn.btn-info(href='/legacy/signup/tumblr/')
               i.fa.fa-tumblr-square.fa-lg
               |  Tumblr
     div.col-sm-6.marketing

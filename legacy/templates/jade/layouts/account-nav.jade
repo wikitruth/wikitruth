@@ -6,17 +6,17 @@ li.dropdown
         |&nbsp;
         span.caret
     ul.dropdown-menu.dropdown-menu-right
-        li: a(href='/members/#{user.username}')
+        li: a(href='#{legacyBaseUrl || ""}/members/#{user.username}')
             i.fa.fa-user-circle
             = ' '
             | My Account
         if user && user.isAdmin
-            li: a(href='/admin')
+            li: a(href='#{paths.admin.index}')
                 i.fa.fa-gear
                 = ' '
                 | Admin Area
         li.divider
-        li: a(href='/logout/')
+        li: a(href='#{paths.logout}')
             i.fa.fa-sign-out
             = ' '
             | Sign Out
