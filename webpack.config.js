@@ -18,6 +18,8 @@ module.exports = (env, argv) => {
       'process.env.REACT_APP_API_BASE_URL': JSON.stringify(process.env.REACT_APP_API_BASE_URL || '/api'),
       'process.env.REACT_APP_ERROR_REPORT_ENDPOINT': JSON.stringify(process.env.REACT_APP_ERROR_REPORT_ENDPOINT || ''),
       'process.env.REACT_APP_ENVIRONMENT': JSON.stringify(process.env.REACT_APP_ENVIRONMENT || (isProduction ? 'production' : 'development')),
+      'process.env.REACT_APP_RECAPTCHA_SITE_KEY': JSON.stringify(process.env.REACT_APP_RECAPTCHA_SITE_KEY || ''),
+      'process.env.REACT_APP_ANALYTICS_ID': JSON.stringify(process.env.REACT_APP_ANALYTICS_ID || ''),
     }),
   ];
 
