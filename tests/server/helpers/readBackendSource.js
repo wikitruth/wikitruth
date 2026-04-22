@@ -30,8 +30,9 @@ function resolveShimTarget(filePath, source) {
 function readBackendSource(relativePath) {
   const visited = new Set();
   let currentPath = path.join(process.cwd(), relativePath);
-
-  while (true) {
+  // Bounded loop to satisfy lint while still supporting arbitrary shim chains.
+  const MAX_HOPS = 32;
+  for (let hop = 0; hop < MAX_HOPS; hop += 1) {
     if (visited.has(currentPath)) {
       throw new Error(`Shim resolution cycle detected while reading ${relativePath}`);
     }
@@ -45,6 +46,7 @@ function readBackendSource(relativePath) {
 
     currentPath = nextPath;
   }
+  throw new Error(`Shim resolution exceeded ${MAX_HOPS} hops while reading ${relativePath}`);
 }
 
 module.exports = {

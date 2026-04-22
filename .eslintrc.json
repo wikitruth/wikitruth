@@ -9,6 +9,7 @@
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
     "prettier"
   ],
   "parser": "@typescript-eslint/parser",
@@ -19,7 +20,7 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": ["@typescript-eslint", "react"],
+  "plugins": ["@typescript-eslint", "react", "react-hooks"],
   "rules": {
     "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/explicit-module-boundary-types": "off",
@@ -39,5 +40,13 @@
     "react": {
       "version": "detect"
     }
-  }
+  },
+  "overrides": [
+    {
+      "files": ["**/*.stories.tsx", "**/*.stories.ts"],
+      "rules": {
+        "react-hooks/rules-of-hooks": "off"
+      }
+    }
+  ]
 } 

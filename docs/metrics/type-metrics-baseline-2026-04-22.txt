@@ -1,0 +1,55 @@
+Type Metrics Snapshot (2026-04-22T21:44:58Z)
+ts_files=460
+ts_nocheck=0
+ts_ignore=511
+ts_expect_error=2
+any_like_occurrences=195
+
+server_totals:
+  ts_ignore=511
+  ts_expect_error=0
+  ts_nocheck=0
+  any_like=167
+server_ts_ignore_by_directory:
+  controllers=147
+  middlewares=0
+  models=77
+  services=0
+  utils=287
+  types=0
+  config=0
+server_any_like_by_directory:
+  controllers=114
+  middlewares=0
+  models=11
+  services=5
+  utils=27
+  types=0
+  config=0
+
+client_totals:
+  ts_ignore=0
+  ts_expect_error=2
+  ts_nocheck=0
+  any_like=24
+client_ts_ignore_by_directory:
+  components=0
+  pages=0
+  context=0
+  hooks=0
+  services=0
+  utils=0
+  routes=0
+client_any_like_by_directory:
+  components=3
+  pages=14
+  context=6
+  hooks=0
+  services=0
+  utils=1
+  routes=0
+
+tests_server_totals:
+  ts_ignore=0
+  ts_expect_error=0
+  any_like=4
