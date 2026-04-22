@@ -1,7 +1,8 @@
 'use strict';
 
-// @ts-ignore TS(2304): Cannot find name 'exports'.
-exports = module.exports = function(app, mongoose) {
+import type { SchemaFactory } from '../factory';
+
+const factory: SchemaFactory = function (app, mongoose) {
   const adminSchema = new mongoose.Schema({
     user: {
       id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
@@ -21,8 +22,7 @@ exports = module.exports = function(app, mongoose) {
     timeCreated: { type: Date, default: Date.now },
     search: [String]
   });
-  // @ts-ignore TS(7006): Parameter 'something' implicitly has an 'any' type... Remove this comment to see the full error message
-  adminSchema.methods.hasPermissionTo = function(something) {
+  adminSchema.methods.hasPermissionTo = function (something: any) {
     //check group permissions
     let groupHasPermission = false;
     for (let i = 0 ; i < this.groups.length ; i++) {
@@ -48,8 +48,7 @@ exports = module.exports = function(app, mongoose) {
 
     return groupHasPermission;
   };
-  // @ts-ignore TS(7006): Parameter 'group' implicitly has an 'any' type.
-  adminSchema.methods.isMemberOf = function(group) {
+  adminSchema.methods.isMemberOf = function (group: any) {
     for (let i = 0 ; i < this.groups.length ; i++) {
       if (this.groups[i]._id === group) {
         return true;
@@ -58,10 +57,12 @@ exports = module.exports = function(app, mongoose) {
 
     return false;
   };
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
+  // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
   adminSchema.plugin(require('../plugins/pagedFind'));
   adminSchema.index({ 'user.id': 1 });
   adminSchema.index({ search: 1 });
   adminSchema.set('autoIndex', (app.get('env') === 'development'));
   app.db.model('Admin', adminSchema);
 };
+
+export = factory;

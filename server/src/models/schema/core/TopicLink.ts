@@ -1,10 +1,11 @@
 'use strict';
 
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'constants'... Remove this comment to see the full error message
+import type { SchemaFactory } from '../factory';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
 const constants = require('../../constants');
 
-// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
-module.exports = function (app, mongoose) {
+const factory: SchemaFactory = function (app, mongoose) {
   const schema = new mongoose.Schema({
     title: { type: String, default: '' }, // Contextual Title
     parentId: { type: mongoose.Schema.ObjectId, default: null, ref: 'Topic' }, // Used when the parent is a topic
@@ -51,8 +52,10 @@ module.exports = function (app, mongoose) {
   schema.methods.getType = function () {
     return constants.OBJECT_TYPES.topicLink;
   };
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
+  // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
   schema.plugin(require('../plugins/pagedFind'));
   schema.set('autoIndex', app.get('env') === 'development');
   app.db.model('TopicLink', schema);
 };
+
+export = factory;

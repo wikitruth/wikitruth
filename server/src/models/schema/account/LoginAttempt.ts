@@ -1,7 +1,8 @@
 'use strict';
 
-// @ts-ignore TS(2304): Cannot find name 'exports'.
-exports = module.exports = function(app, mongoose) {
+import type { SchemaFactory } from '../factory';
+
+const factory: SchemaFactory = function (app, mongoose) {
   const attemptSchema = new mongoose.Schema({
     ip: {type: String, default: ''},
     user: {type: String, default: ''},
@@ -12,3 +13,5 @@ exports = module.exports = function(app, mongoose) {
   attemptSchema.set('autoIndex', (app.get('env') === 'development'));
   app.db.model('LoginAttempt', attemptSchema);
 };
+
+export = factory;

@@ -1,10 +1,11 @@
 'use strict';
 
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'constants'... Remove this comment to see the full error message
+import type { SchemaFactory } from '../factory';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
 const constants = require('../../constants');
 
-// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
-module.exports = function (app, mongoose) {
+const factory: SchemaFactory = function (app, mongoose) {
   const schema = new mongoose.Schema({
     title: { type: String, default: '' },
     content: { type: String, default: '' },
@@ -75,12 +76,10 @@ module.exports = function (app, mongoose) {
   });
 
   // schema statics
-  // @ts-ignore TS(7006): Parameter 'username' implicitly has an 'any' type.
-  schema.statics.getFolder = function (username, entity) {
+  schema.statics.getFolder = function (username: any, entity: any) {
     return '/media/artifacts/' + (username && entity.private ? 'users/' + username + '/' : '');
   };
-  // @ts-ignore TS(7006): Parameter 'entity' implicitly has an 'any' type.
-  schema.statics.isImage = function (entity) {
+  schema.statics.isImage = function (entity: any) {
     return entity.file.type.startsWith('image');
   };
 
@@ -88,17 +87,14 @@ module.exports = function (app, mongoose) {
   schema.methods.getType = function () {
     return constants.OBJECT_TYPES.artifact;
   };
-  // @ts-ignore TS(7006): Parameter 'username' implicitly has an 'any' type.
-  schema.methods.getFolder = function (username) {
+  schema.methods.getFolder = function (username: any) {
     // router
-    return this.constructor.getFolder(username, this);
+    return (this.constructor as any).getFolder(username, this);
   };
-  // @ts-ignore TS(7006): Parameter 'username' implicitly has an 'any' type.
-  schema.methods.getFilePath = function (username) {
+  schema.methods.getFilePath = function (username: any) {
     return this.getFolder(username) + this._id + '_' + this.file.name;
   };
-  // @ts-ignore TS(7006): Parameter 'username' implicitly has an 'any' type.
-  schema.methods.getThumbnailPath = function (username) {
+  schema.methods.getThumbnailPath = function (username: any) {
     if (this.isImage()) {
       return this.getFolder(username) + this._id + '_thumbnail_' + this.file.name;
     }
@@ -106,10 +102,9 @@ module.exports = function (app, mongoose) {
   };
   schema.methods.isImage = function () {
     // router
-    return this.constructor.isImage(this);
+    return (this.constructor as any).isImage(this);
   };
-  // @ts-ignore TS(7006): Parameter 'username' implicitly has an 'any' type.
-  schema.methods.setThumbnailPath = function (username) {
+  schema.methods.setThumbnailPath = function (username: any) {
     if (this.file.name) {
       this.filePath = this.getFilePath(username);
       if (this.isImage()) {
@@ -118,7 +113,7 @@ module.exports = function (app, mongoose) {
     }
   };
 
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
+  // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
   schema.plugin(require('../plugins/pagedFind'));
   schema.index({ title: 1 });
   schema.index(
@@ -139,3 +134,5 @@ module.exports = function (app, mongoose) {
   schema.set('autoIndex', true); // (app.get('env') === 'development'));
   app.db.model('Artifact', schema);
 };
+
+export = factory;

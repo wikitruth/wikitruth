@@ -1,7 +1,8 @@
 'use strict';
 
-// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ...
-module.exports = function (app, mongoose) {
+import type { SchemaFactory } from '../factory';
+
+const factory: SchemaFactory = function (app, mongoose) {
   const schema = new mongoose.Schema({
     objectType: { type: Number, required: true },
     objectName: { type: String, required: true },
@@ -19,3 +20,5 @@ module.exports = function (app, mongoose) {
 
   app.db.model('Reaction', schema);
 };
+
+export = factory;

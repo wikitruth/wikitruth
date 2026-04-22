@@ -1,7 +1,8 @@
 'use strict';
 
-// @ts-ignore TS(2304): Cannot find name 'exports'.
-exports = module.exports = function(app, mongoose) {
+import type { SchemaFactory } from '../factory';
+
+const factory: SchemaFactory = function (app, mongoose) {
   const accountSchema = new mongoose.Schema({
     user: {
       id: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
@@ -36,7 +37,7 @@ exports = module.exports = function(app, mongoose) {
     },
     search: [String]
   });
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
+  // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
   accountSchema.plugin(require('../plugins/pagedFind'));
   accountSchema.index({ user: 1 });
   accountSchema.index({ 'status.id': 1 });
@@ -44,3 +45,5 @@ exports = module.exports = function(app, mongoose) {
   accountSchema.set('autoIndex', (app.get('env') === 'development'));
   app.db.model('Account', accountSchema);
 };
+
+export = factory;

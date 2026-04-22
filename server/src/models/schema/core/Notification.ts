@@ -1,6 +1,8 @@
 'use strict';
 
-module.exports = function (app: any, mongoose: any) {
+import type { SchemaFactory } from '../factory';
+
+const factory: SchemaFactory = function (app, mongoose) {
   const schema = new mongoose.Schema({
     userId: { type: mongoose.Schema.ObjectId, ref: 'User', required: true, index: true },
     type: { type: String, required: true, index: true },
@@ -20,3 +22,5 @@ module.exports = function (app: any, mongoose: any) {
 
   app.db.model('Notification', schema);
 };
+
+export = factory;

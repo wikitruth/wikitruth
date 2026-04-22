@@ -1,6 +1,8 @@
 'use strict';
 
-module.exports = function (app: any, mongoose: any) {
+import type { SchemaFactory } from '../factory';
+
+const factory: SchemaFactory = function (app, mongoose) {
   const schema = new mongoose.Schema({
     scope: {
       type: String,
@@ -25,3 +27,5 @@ module.exports = function (app: any, mongoose: any) {
 
   app.db.model('EntryEvent', schema);
 };
+
+export = factory;

@@ -1,7 +1,8 @@
 'use strict';
 
-// @ts-ignore TS(2304): Cannot find name 'exports'.
-exports = module.exports = function(app, mongoose) {
+import type { SchemaFactory } from '../factory';
+
+const factory: SchemaFactory = function (app, mongoose) {
   const noteSchema = new mongoose.Schema({
     data: {type: String, default: ''},
     userCreated: {
@@ -15,3 +16,5 @@ exports = module.exports = function(app, mongoose) {
   // console.log('Note schema:', noteSchema);
   // console.log('Note schema:', app.db.models.Note.schema);
 };
+
+export = factory;

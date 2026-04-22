@@ -1,7 +1,8 @@
 'use strict';
 
-// @ts-ignore TS(2304): Cannot find name 'exports'.
-exports = module.exports = function(app, mongoose) {
+import type { SchemaFactory } from '../factory';
+
+const factory: SchemaFactory = function (app, mongoose) {
   const userSchema = new mongoose.Schema({
     username: { type: String, unique: true },
     password: String,
@@ -40,8 +41,7 @@ exports = module.exports = function(app, mongoose) {
     preferences: { type: mongoose.Schema.Types.Mixed },
     search: [String],
   });
-  // @ts-ignore TS(7006): Parameter 'role' implicitly has an 'any' type.
-  userSchema.methods.canPlayRoleOf = function (role) {
+  userSchema.methods.canPlayRoleOf = function (role: any) {
     if (role === 'admin' && this.roles.admin) {
       return true;
     }
@@ -72,29 +72,25 @@ exports = module.exports = function(app, mongoose) {
   userSchema.methods.isAdmin = function() {
     return this.canPlayRoleOf('admin');
   };
-  // @ts-ignore TS(7006): Parameter 'password' implicitly has an 'any' type.
-  userSchema.statics.encryptPassword = function(password, done) {
-    // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
+  userSchema.statics.encryptPassword = function (password: any, done: any) {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
     const bcrypt = require('bcrypt');
-    // @ts-ignore TS(7006): Parameter 'err' implicitly has an 'any' type.
-    bcrypt.genSalt(10, function(err, salt) {
+    bcrypt.genSalt(10, function (err: any, salt: any) {
       if (err) {
         return done(err);
       }
 
-      // @ts-ignore TS(7006): Parameter 'err' implicitly has an 'any' type.
-      bcrypt.hash(password, salt, function(err, hash) {
+      bcrypt.hash(password, salt, function (err: any, hash: any) {
         done(err, hash);
       });
     });
   };
-  // @ts-ignore TS(7006): Parameter 'password' implicitly has an 'any' type.
-  userSchema.statics.validatePassword = async function(password, hash) {
-    // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
+  userSchema.statics.validatePassword = async function (password: any, hash: any) {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
     const bcrypt = require('bcrypt');
     return bcrypt.compare(password, hash);
   };
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
+  // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
   userSchema.plugin(require('../plugins/pagedFind'));
   // userSchema.index({ username: 1 }, { unique: true });
   // userSchema.index({ email: 1 }, { unique: true });
@@ -109,3 +105,5 @@ exports = module.exports = function(app, mongoose) {
   userSchema.set('autoIndex', (app.get('env') === 'development'));
   app.db.model('User', userSchema);
 };
+
+export = factory;
