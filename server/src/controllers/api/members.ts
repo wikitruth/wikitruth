@@ -1,17 +1,15 @@
 'use strict';
 
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'db'.
+import type { Router } from 'express';
+import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../types/http';
 const db = require('../../app').db.models;
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'utils'.
-const utils = require('../../utils/utils');
-const constants = require('../../models/constants');
-const jwt = require('jsonwebtoken');
+const utils = require('../../utils/utils') as any;
+const constants = require('../../models/constants') as any;
+const jwt = require('jsonwebtoken') as any;
 
-// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
-module.exports = function (router) {
+module.exports = function (router: Router) {
   // Get all contributors (members with public profiles)
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/', async function (req, res) {
+  router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       const contributors = await db.User
         .find({ 'preferences.privateProfile': { $ne: true } })
@@ -27,8 +25,7 @@ module.exports = function (router) {
   });
 
   // Get screeners
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/screeners', async function (req, res) {
+  router.get('/screeners', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       const screeners = await db.User
         .find({ 
@@ -47,8 +44,7 @@ module.exports = function (router) {
   });
 
   // Get reviewers
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/reviewers', async function (req, res) {
+  router.get('/reviewers', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       const reviewers = await db.User
         .find({ 
@@ -67,8 +63,7 @@ module.exports = function (router) {
   });
 
   // Get administrators
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/administrators', async function (req, res) {
+  router.get('/administrators', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       const administrators = await db.User
         .find({ 
@@ -87,8 +82,7 @@ module.exports = function (router) {
   });
 
   // Get current member profile
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/me', async function (req, res) {
+  router.get('/me', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       if (!req.user) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -111,8 +105,7 @@ module.exports = function (router) {
   });
 
   // Update current member profile preferences
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.put('/me/preferences', async function (req, res) {
+  router.put('/me/preferences', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       if (!req.user) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -146,8 +139,7 @@ module.exports = function (router) {
   });
 
   // Get current member fast-switch status
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/me/fast-switch', async function (req, res) {
+  router.get('/me/fast-switch', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       if (!req.user) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -178,8 +170,7 @@ module.exports = function (router) {
   });
 
   // Update current member fast-switch settings
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.put('/me/fast-switch', async function (req, res) {
+  router.put('/me/fast-switch', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       if (!req.user) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -203,7 +194,7 @@ module.exports = function (router) {
           return res.status(400).json({ error: 'PIN must be exactly 6 digits' });
         }
 
-        const encryptedUserId = jwt.sign({ userId: userId }, `${pin}|${req.app.config.jwtSecret}`);
+        const encryptedUserId = jwt.sign({ userId: userId }, `${pin}|${(req.app as any).config.jwtSecret}`);
         let updated = false;
 
         cookies = cookies.map(function (cookie: any) {
@@ -278,8 +269,7 @@ module.exports = function (router) {
   });
 
   // Get member journal (private entries authored by the profile owner)
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  const getMemberJournal = async function (req, res) {
+  const getMemberJournal = async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       const member = await db.User.findOne({ username: req.params.username }).select('_id username preferences').lean();
       if (!member) {
@@ -381,8 +371,7 @@ module.exports = function (router) {
   router.get('/:username/diary', getMemberJournal);
 
   // Get topics created by a member
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/:username/topics', async function (req, res) {
+  router.get('/:username/topics', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       const member = await db.User
         .findOne({ username: req.params.username })
@@ -427,8 +416,7 @@ module.exports = function (router) {
   });
 
   // Get member following overview (groups, people, topic interests)
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/:username/following', async function (req, res) {
+  router.get('/:username/following', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       const member = await db.User
         .findOne({ username: req.params.username })
@@ -527,8 +515,7 @@ module.exports = function (router) {
   });
 
   // Get member contributions across entity types
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/:username/contributions', async function (req, res) {
+  router.get('/:username/contributions', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       const member = await db.User
         .findOne({ username: req.params.username })
@@ -625,8 +612,7 @@ module.exports = function (router) {
   });
 
   // Get member custom pages
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/:username/pages', async function (req, res) {
+  router.get('/:username/pages', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       const member = await db.User.findOne({ username: req.params.username }).select('_id username').lean();
       if (!member) {
@@ -657,8 +643,7 @@ module.exports = function (router) {
   });
 
   // Create member custom page
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.post('/:username/pages', async function (req, res) {
+  router.post('/:username/pages', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       if (!req.user) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -713,8 +698,7 @@ module.exports = function (router) {
   });
 
   // Get member custom page
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/:username/pages/:id', async function (req, res) {
+  router.get('/:username/pages/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       const member = await db.User.findOne({ username: req.params.username }).select('_id username').lean();
       if (!member) {
@@ -743,8 +727,7 @@ module.exports = function (router) {
   });
 
   // Update member custom page
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.put('/:username/pages/:id', async function (req, res) {
+  router.put('/:username/pages/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       if (!req.user) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -805,8 +788,7 @@ module.exports = function (router) {
   });
 
   // Get single member profile
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/:username', async function (req, res) {
+  router.get('/:username', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       const member = await db.User
         .findOne({ username: req.params.username })

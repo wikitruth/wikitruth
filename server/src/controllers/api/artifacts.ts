@@ -1,53 +1,42 @@
 'use strict';
 
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'flowUtils'... Remove this comment to see the full error message
-const flowUtils = require('../../utils/flowUtils');
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'constants'... Remove this comment to see the full error message
-const constants = require('../../models/constants');
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'utils'.
-const utils = require('../../utils/utils');
-// @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-const artifactsService = require('../../services/artifactsService');
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'db'.
+import type { Router } from 'express';
+import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../types/http';
+const flowUtils = require('../../utils/flowUtils') as any;
+const constants = require('../../models/constants') as any;
+const utils = require('../../utils/utils') as any;
+const artifactsService = require('../../services/artifactsService') as any;
 const db = require('../../app').db.models;
 
-// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
-module.exports = function (router) {
+module.exports = function (router: Router) {
   // GET /api/artifacts - List artifacts
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/', async function (req, res) {
+  router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
-      const model = {};
+      const model: any = {};
       flowUtils.setScreeningModel(req, model);
       
-      const query = {
+      const query: any = {
         ownerType: constants.OBJECT_TYPES.topic,
         private: false,
-        // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
         'screening.status': model.screening.status,
       };
       
       if (req.query.topic) {
-        // @ts-ignore TS(2339): Property 'ownerId' does not exist on type '{ owner... Remove this comment to see the full error message
         query.ownerId = req.query.topic;
       }
       
       const results = await artifactsService.getArtifactsList(query, { limit: 50 });
-      // @ts-ignore TS(2339): Property 'artifacts' does not exist on type '{}'.
       model.artifacts = results;
       
-      // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
       delete model.screening;
       res.json(model);
     } catch (error) {
-      // @ts-ignore TS(2571): Object is of type 'unknown'.
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: (error as Error).message });
     }
   });
 
   // GET /api/artifacts/entry/:id - Get single artifact
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/entry/:id', async function (req, res) {
+  router.get('/entry/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       const artifactId = String(req.params.id || '').trim();
       if (!artifactId) {
@@ -128,30 +117,25 @@ module.exports = function (router) {
         opinions: opinions,
       });
     } catch (error) {
-      // @ts-ignore TS(2571): Object is of type 'unknown'.
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: (error as Error).message });
     }
   });
 
   // POST /api/artifacts - Create artifact
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.post('/', async function (req, res) {
+  router.post('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       await POST_artifact_create(req, res);
     } catch (error) {
-      // @ts-ignore TS(2571): Object is of type 'unknown'.
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: (error as Error).message });
     }
   });
 
   // PUT /api/artifacts/entry/:id - Update artifact
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.put('/entry/:id', async function (req, res) {
+  router.put('/entry/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       await PUT_artifact_update(req, res);
     } catch (error) {
-      // @ts-ignore TS(2571): Object is of type 'unknown'.
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: (error as Error).message });
     }
   });
 };

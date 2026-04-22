@@ -1,54 +1,43 @@
 'use strict';
 
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'flowUtils'... Remove this comment to see the full error message
-const flowUtils = require('../../utils/flowUtils');
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'constants'... Remove this comment to see the full error message
-const constants = require('../../models/constants');
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'utils'.
-const utils = require('../../utils/utils');
-// @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-const answersService = require('../../services/answersService');
+import type { Router } from 'express';
+import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../types/http';
+const flowUtils = require('../../utils/flowUtils') as any;
+const constants = require('../../models/constants') as any;
+const utils = require('../../utils/utils') as any;
+const answersService = require('../../services/answersService') as any;
 const { applyViewModeFilter } = require('./viewFilter');
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'db'.
 const db = require('../../app').db.models;
 
-// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
-module.exports = function (router) {
+module.exports = function (router: Router) {
   // GET /api/answers - List answers
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/', async function (req, res) {
+  router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
-      const model = {};
+      const model: any = {};
       flowUtils.setScreeningModel(req, model);
       
-      const query = {
+      const query: any = {
         ownerType: constants.OBJECT_TYPES.question,
         private: false,
       };
-      // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
       applyViewModeFilter(req, query, model.screening.status);
       
       if (req.query.question) {
-        // @ts-ignore TS(2339): Property 'ownerId' does not exist on type '{ owner... Remove this comment to see the full error message
         query.ownerId = req.query.question;
       }
       
       const results = await answersService.getAnswersList(query, { limit: 50 });
-      // @ts-ignore TS(2339): Property 'answers' does not exist on type '{}'.
       model.answers = results;
       
-      // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
       delete model.screening;
       res.json(model);
     } catch (error) {
-      // @ts-ignore TS(2571): Object is of type 'unknown'.
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: (error as Error).message });
     }
   });
 
   // GET /api/answers/entry/:id - Get single answer
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/entry/:id', async function (req, res) {
+  router.get('/entry/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       const answerId = String(req.params.id || '').trim();
       if (!answerId) {
@@ -93,30 +82,25 @@ module.exports = function (router) {
         opinions: opinions,
       });
     } catch (error) {
-      // @ts-ignore TS(2571): Object is of type 'unknown'.
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: (error as Error).message });
     }
   });
 
   // POST /api/answers - Create answer
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.post('/', async function (req, res) {
+  router.post('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       await POST_answer_create(req, res);
     } catch (error) {
-      // @ts-ignore TS(2571): Object is of type 'unknown'.
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: (error as Error).message });
     }
   });
 
   // PUT /api/answers/entry/:id - Update answer
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.put('/entry/:id', async function (req, res) {
+  router.put('/entry/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       await PUT_answer_update(req, res);
     } catch (error) {
-      // @ts-ignore TS(2571): Object is of type 'unknown'.
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: (error as Error).message });
     }
   });
 };

@@ -1,24 +1,19 @@
 'use strict';
 
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'flowUtils'... Remove this comment to see the full error message
-const flowUtils = require('../../utils/flowUtils');
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'constants'... Remove this comment to see the full error message
-const constants = require('../../models/constants');
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'utils'.
-const utils = require('../../utils/utils');
-// @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-const opinionsService = require('../../services/opinionsService');
+import type { Router } from 'express';
+import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../types/http';
+const flowUtils = require('../../utils/flowUtils') as any;
+const constants = require('../../models/constants') as any;
+const utils = require('../../utils/utils') as any;
+const opinionsService = require('../../services/opinionsService') as any;
 const { applyViewModeFilter } = require('./viewFilter');
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'db'.
 const db = require('../../app').db.models;
 const { logEntryEvent } = require('../../services/entryEventsService');
 const { notifySubscribers } = require('../../services/notificationsService');
 
-// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
-module.exports = function (router) {
+module.exports = function (router: Router) {
   // Get opinions list
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/', async function (req, res) {
+  router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       await GET_opinions(req, res);
     } catch (error) {
@@ -28,8 +23,7 @@ module.exports = function (router) {
   });
 
   // Get opinion entry
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/entry/:id', async function (req, res) {
+  router.get('/entry/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       await GET_opinion_entry(req, res);
     } catch (error) {
@@ -39,8 +33,7 @@ module.exports = function (router) {
   });
 
   // Create opinion entry
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.post('/', async function (req, res) {
+  router.post('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       await POST_opinion_create(req, res);
     } catch (error) {
@@ -50,8 +43,7 @@ module.exports = function (router) {
   });
 
   // Update opinion entry
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.put('/entry/:id', async function (req, res) {
+  router.put('/entry/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       await PUT_opinion_update(req, res);
     } catch (error) {
@@ -61,37 +53,31 @@ module.exports = function (router) {
   });
 };
 
-// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-async function GET_opinions(req, res) {
-  let model = {};
+async function GET_opinions(req: WikitruthRequest, res: WikitruthResponse) {
+  let model: any = {};
   flowUtils.setScreeningModel(req, model);
   
-  const query = {
+  const query: any = {
     ownerType: constants.OBJECT_TYPES.topic,
     private: false,
   };
-  // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
   applyViewModeFilter(req, query, model.screening.status);
   
   if (req.query.topic) {
-    // @ts-ignore TS(2339): Property 'ownerId' does not exist on type '{ owner... Remove this comment to see the full error message
     query.ownerId = req.query.topic;
   }
   
   const results = await opinionsService.getOpinionsList(query, { limit: 50 });
   
-  // @ts-ignore TS(2339): Property 'opinions' does not exist on type '{}'.
   model.opinions = results;
   
   // Remove screening model from response (it's server-side only)
-  // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
   delete model.screening;
   
   res.json(model);
 }
 
-// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-async function GET_opinion_entry(req, res) {
+async function GET_opinion_entry(req: WikitruthRequest, res: WikitruthResponse) {
   const opinionId = String(req.params.id || '').trim();
   if (!opinionId) {
     return res.status(400).json({ error: 'Opinion id is required' });

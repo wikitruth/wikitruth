@@ -1,43 +1,37 @@
 'use strict';
 
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'db'.
+import type { Router } from 'express';
+import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../types/http';
 const db = require('../../app').db.models;
-// @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
-const utils = require('../../utils/utils');
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'constants'... Remove this comment to see the full error message
-const constants = require('../../models/constants');
+const utils = require('../../utils/utils') as any;
+const constants = require('../../models/constants') as any;
 
-// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
-module.exports = function (router) {
+module.exports = function (router: Router) {
   // Get all groups (public and private based on user)
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/', async function (req, res) {
+  router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       let results = await db.Group
         .find({})
         .sort({ title: 1 })
         .lean();
       
-      // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
-      results.forEach(function (result) {
+      results.forEach(function (result: any) {
         result.friendlyUrl = utils.urlify(result.title);
       });
 
-      const model = {};
+      const model: any = {};
       
       if (req.user) {
-        // @ts-ignore TS(2339): Property 'privateGroups' does not exist on type '{... Remove this comment to see the full error message
-        model.privateGroups = results.filter(function (group) {
+        const currentUser: any = req.user;
+        model.privateGroups = results.filter(function (group: any) {
           return group.privacyType !== constants.GROUP_PRIVACY_TYPES.type10.code
-            // @ts-ignore TS(7006): Parameter 'member' implicitly has an 'any' type.
-            && group.members && group.members.some(function (member) {
-              return String(member.userId || '') === String(req.user.id || req.user._id || '');
+            && group.members && group.members.some(function (member: any) {
+              return String(member.userId || '') === String(currentUser.id || currentUser._id || '');
             });
         });
       }
       
-      // @ts-ignore TS(2339): Property 'publicGroups' does not exist on type '{}... Remove this comment to see the full error message
-      model.publicGroups = results.filter(function (group) {
+      model.publicGroups = results.filter(function (group: any) {
         return group.privacyType === constants.GROUP_PRIVACY_TYPES.type10.code;
       });
 
@@ -49,8 +43,7 @@ module.exports = function (router) {
   });
 
   // Get single group details
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/entry/:id', async function (req, res) {
+  router.get('/entry/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       const group = await db.Group
         .findById(req.params.id)
@@ -74,8 +67,7 @@ module.exports = function (router) {
   });
 
   // Get group posts across entity types
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/entry/:id/stats', async function (req, res) {
+  router.get('/entry/:id/stats', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       const group = await db.Group.findById(req.params.id).lean();
       if (!group) {
@@ -105,8 +97,7 @@ module.exports = function (router) {
   });
 
   // Get group posts across entity types
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.get('/entry/:id/posts', async function (req, res) {
+  router.get('/entry/:id/posts', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       const group = await db.Group.findById(req.params.id).lean();
       if (!group) {
@@ -223,8 +214,7 @@ module.exports = function (router) {
   });
 
   // Create group
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.post('/', async function (req, res) {
+  router.post('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       if (!req.user) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -276,8 +266,7 @@ module.exports = function (router) {
   });
 
   // Update group
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.put('/entry/:id', async function (req, res) {
+  router.put('/entry/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       if (!req.user) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -332,8 +321,7 @@ module.exports = function (router) {
   });
 
   // Join group as member
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.post('/entry/:id/members', async function (req, res) {
+  router.post('/entry/:id/members', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       if (!req.user) {
         return res.status(401).json({ error: 'Authentication required' });
@@ -366,8 +354,7 @@ module.exports = function (router) {
   });
 
   // Leave/remove group member
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
-  router.delete('/entry/:id/members/:userId', async function (req, res) {
+  router.delete('/entry/:id/members/:userId', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       if (!req.user) {
         return res.status(401).json({ error: 'Authentication required' });
