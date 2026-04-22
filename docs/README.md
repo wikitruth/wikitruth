@@ -35,6 +35,15 @@ This folder contains active engineering documentation, planning docs, and histor
 - Security: `docs/security/`
 - SEO: `docs/seo/`
 
+## QA and Parity
+
+- QA docs folder: `docs/qa/`
+- QA index: `docs/qa/README.md`
+- Page-by-page comparison pack index: `docs/qa/PAGE_BY_PAGE_LEGACY_MODERN_COMPARISON_INDEX_2026-04-22.md`
+- Page-by-page comparison matrix (includes common-elements side-by-side section): `docs/qa/PAGE_BY_PAGE_LEGACY_MODERN_COMPARISON_MATRIX_2026-04-22.md`
+- Page-by-page comparison checklists: `docs/qa/PAGE_BY_PAGE_LEGACY_MODERN_COMPARISON_CHECKLISTS_2026-04-22.md`
+- Latest runtime evidence bundle: `docs/qa/LEGACY_MODERN_RUNTIME_EVIDENCE_SUMMARY_2026-04-22.md`
+
 ## Imported Sources
 
 - Raw Google Drive import (original + markdown + manifest): `docs/imported-docs/`

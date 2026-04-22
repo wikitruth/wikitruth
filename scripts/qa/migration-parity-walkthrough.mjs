@@ -3,7 +3,7 @@ import { chromium } from 'playwright';
 
 const baseUrl = process.argv[2] || 'https://127.0.0.1:9443';
 
-const pageChecks = [
+const basePageChecks = [
   { label: 'modern-home', path: '/', pattern: /Latest Posts|Explore/i },
   { label: 'legacy-home', path: '/legacy/', pattern: /Latest Posts|Explore/i },
   { label: 'modern-explore', path: '/explore', pattern: /Explore|Topics|Facts/i },
@@ -15,12 +15,70 @@ const pageChecks = [
   { label: 'modern-app-alias', path: '/app/explore', pattern: /Explore|Topics|Facts/i },
 ];
 
+function resolveTopicCandidateFromHome(payload) {
+  if (!payload || typeof payload !== 'object') {
+    return null;
+  }
+
+  const topics = Array.isArray(payload.topics) ? payload.topics : [];
+  if (topics.length > 0) {
+    return topics.find((topic) => topic && topic._id) || null;
+  }
+
+  const entrySet = Array.isArray(payload.entrySet) ? payload.entrySet : [];
+  return entrySet.find((entry) => entry && entry._id && String(entry.objectName || '').toLowerCase() === 'topic') || null;
+}
+
+function escapeRegExp(value) {
+  return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+async function resolveDynamicTopicChecks(context) {
+  try {
+    const homeResponse = await context.request.get(`${baseUrl}/api/home`, {
+      failOnStatusCode: false,
+      timeout: 30000,
+    });
+    if (!homeResponse.ok()) {
+      return [];
+    }
+
+    const homePayload = await homeResponse.json();
+    const topicCandidate = resolveTopicCandidateFromHome(homePayload);
+    if (!topicCandidate || !topicCandidate._id) {
+      return [];
+    }
+
+    const topicId = encodeURIComponent(String(topicCandidate._id));
+    const topicFriendly = encodeURIComponent(String(topicCandidate.friendlyUrl || topicCandidate.title || topicCandidate._id));
+    const expectedTopicTitle = String(topicCandidate.title || topicCandidate.friendlyUrl || 'Topic');
+    const escapedTitle = escapeRegExp(expectedTopicTitle);
+
+    return [
+      {
+        label: 'modern-topic-entry-dynamic',
+        path: `/topics/entry/${topicFriendly}/${topicId}`,
+        pattern: new RegExp(`${escapedTitle}|Topics|Reply`, 'i'),
+      },
+      {
+        label: 'legacy-topic-entry-dynamic',
+        path: `/legacy/topic/${topicFriendly}/${topicId}`,
+        pattern: new RegExp(`${escapedTitle}|Topics|Reply`, 'i'),
+      },
+    ];
+  } catch (_error) {
+    return [];
+  }
+}
+
 async function run() {
   console.log(`Running migration parity walkthrough against ${baseUrl}`);
 
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({ ignoreHTTPSErrors: true });
   const page = await context.newPage();
+  const dynamicTopicChecks = await resolveDynamicTopicChecks(context);
+  const pageChecks = [...basePageChecks, ...dynamicTopicChecks];
 
   let failed = false;
 

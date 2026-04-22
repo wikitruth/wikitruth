@@ -8,11 +8,10 @@ const explicitOutDir = process.argv[3] || '';
 const runStamp = new Date().toISOString().replace(/[:.]/g, '-');
 const outDir = explicitOutDir || path.join('docs', 'qa', 'artifacts', `parity-screenshots-${runStamp}`);
 
-const routePairs = [
+const baseRoutePairs = [
   { name: 'home', modern: '/', legacy: '/legacy/' },
   { name: 'explore', modern: '/explore', legacy: '/legacy/explore' },
   { name: 'search', modern: '/search?q=gmo', legacy: '/legacy/search?q=gmo' },
-  { name: 'topic-entry', modern: '/topics/entry/Genetically%20modified%20organism%20%28GMO%29/585f106f9f8f8b346449f980', legacy: '/legacy/topic/Genetically%20modified%20organism%20%28GMO%29/585f106f9f8f8b346449f980' },
   { name: 'visualize', modern: '/visualize', legacy: '/legacy/visualize' },
   { name: 'group', modern: '/groups', legacy: '/legacy/groups' },
   { name: 'profile', modern: '/members', legacy: '/legacy/members' },
@@ -25,6 +24,53 @@ async function capturePage(page, url, outputPath) {
   await page.screenshot({ path: outputPath, fullPage: true });
 }
 
+function resolveTopicCandidateFromHome(payload) {
+  if (!payload || typeof payload !== 'object') {
+    return null;
+  }
+
+  const topics = Array.isArray(payload.topics) ? payload.topics : [];
+  if (topics.length > 0) {
+    return topics.find((topic) => topic && topic._id) || null;
+  }
+
+  const entrySet = Array.isArray(payload.entrySet) ? payload.entrySet : [];
+  return entrySet.find((entry) => entry && entry._id && String(entry.objectName || '').toLowerCase() === 'topic') || null;
+}
+
+async function resolveTopicEntryPair(context) {
+  try {
+    const homeResponse = await context.request.get(`${baseUrl}/api/home`, {
+      failOnStatusCode: false,
+      timeout: 30000,
+    });
+
+    if (!homeResponse.ok()) {
+      return null;
+    }
+
+    const homePayload = await homeResponse.json();
+    const topicCandidate = resolveTopicCandidateFromHome(homePayload);
+    if (!topicCandidate || !topicCandidate._id) {
+      return null;
+    }
+
+    const topicId = encodeURIComponent(String(topicCandidate._id));
+    const topicFriendly = encodeURIComponent(String(topicCandidate.friendlyUrl || topicCandidate.title || topicCandidate._id));
+
+    return {
+      name: 'topic-entry',
+      modern: `/topics/entry/${topicFriendly}/${topicId}`,
+      legacy: `/legacy/topic/${topicFriendly}/${topicId}`,
+      source: 'api/home',
+      topicId: String(topicCandidate._id),
+      topicFriendly: String(topicCandidate.friendlyUrl || topicCandidate.title || topicCandidate._id),
+    };
+  } catch (_error) {
+    return null;
+  }
+}
+
 async function main() {
   await fs.mkdir(outDir, { recursive: true });
   const browser = await chromium.launch({ headless: true });
@@ -33,6 +79,10 @@ async function main() {
     viewport: { width: 1366, height: 960 },
   });
   const page = await context.newPage();
+  const resolvedTopicPair = await resolveTopicEntryPair(context);
+  const routePairs = resolvedTopicPair
+    ? [...baseRoutePairs, resolvedTopicPair]
+    : baseRoutePairs;
 
   const manifest = [];
 
@@ -53,6 +103,9 @@ async function main() {
       legacyUrl,
       modernFile,
       legacyFile,
+      topicSource: pair.source,
+      topicId: pair.topicId,
+      topicFriendly: pair.topicFriendly,
     });
     console.log(`Captured ${pair.name}`);
   }
