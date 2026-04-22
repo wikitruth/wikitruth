@@ -4,32 +4,56 @@
 
 Improve overall codebase quality, maintainability, and runtime reliability without breaking legacy compatibility commitments.
 
+## Strict End-State Override (2026-04-23)
+
+This section is a hard-gate override requested on 2026-04-23 and supersedes any earlier "reduction-only" interpretation.
+
+For repository source (`server/src/**`, `client/src/**`, `legacy/**`), completion means:
+
+- `0` CommonJS usage: no `require()` and no `module.exports`.
+- `0` type suppressions: no `@ts-ignore`, no `@ts-expect-error`, no `@ts-nocheck`.
+- `0` `any` usage: no explicit `any` and no `any`-like fallback patterns.
+- typed contracts are explicit at module boundaries (requests/responses/services), with no silent type holes.
+
+Scope note:
+
+- Strict gates apply to legacy code as well.
+- No exceptions are allowed for files in `server/src/**`, `client/src/**`, or `legacy/**`.
+
 ## Tracking Rules
 
 - Every item stays unchecked (`[ ]`) until validated in code + test/lint/type outputs.
 - Each PR should reference checklist item IDs (example: `T1-03`, `T5-04`).
 - File-level execution tracker: `docs/plans/CODE_HEALTH_SOURCE_FILE_CHECKLIST_PLAN_2026-04-22.md`
+- Strict-gate items are blocking and take precedence over earlier milestone reduction targets.
 - After each merged chunk, update this doc with:
   - completion state
   - metric deltas
   - links to changed files
 
-## Current Baseline (Measured)
+## Current Baseline (Revalidated 2026-04-23)
 
-- `type:check`: passing
-- `test:server`: passing (26/26)
-- `test:client`: passing (50/50)
-- `lint`: failing (2 errors, 28 warnings)
-- Type suppression signals (server/client/tests):
-  - `@ts-ignore`: 511
-  - `@ts-expect-error`: 2
-  - `@ts-nocheck`: 0
-  - explicit-any-like patterns: 453
-- Large hotspot files:
-  - `server/src/utils/flowUtils.ts` (~3247 LOC)
-  - `server/src/controllers/api/{auth,moderation,admin}.ts` (~1k-1.5k LOC each)
-- Legacy interop density remains high (CommonJS `require/module.exports` + legacy compatibility pathways).
-- `scripts/type-metrics.sh` is currently misconfigured (scans nonexistent top-level paths).
+- `npm run lint`: exit `0` (0 errors, 51 warnings)
+- `npm run type:check`: exit `0`
+- `npm run ci:smoke`: exit `0`
+- `npm run build:server`: exit `0`
+- `npm run build:client:dev`: exit `0`
+- `npm run test:server`: failing (`1` suite / `1` test timeout in `tests/server/url-format-drift-runtime.test.js`)
+- `npm run test:client`: failing (`2` suites / `2` test timeouts in `client/src/pages/TopicCreatePage.integration.test.tsx` and `client/src/pages/OutlineLinkPage.test.tsx`)
+- Strict-gate signal totals for repository source (`server/src/**`, `client/src/**`, `legacy/**`):
+  - `@ts-ignore`: `1020` (`server/src=1`, `client/src=0`, `legacy=1019`)
+  - `@ts-expect-error`: `2` (`server/src=0`, `client/src=2`, `legacy=0`)
+  - `@ts-nocheck`: `0`
+  - explicit `any`-like patterns: `531` (`server/src=458`, `client/src=24`, `legacy=49`)
+  - `require()`: `849` (`server/src=284`, `client/src=4`, `legacy=561`)
+  - `module.exports`: `468` (`server/src=61`, `client/src=0`, `legacy=407`)
+- File-level tracker ([CODE_HEALTH_SOURCE_FILE_CHECKLIST_PLAN_2026-04-22.md](./CODE_HEALTH_SOURCE_FILE_CHECKLIST_PLAN_2026-04-22.md)) after live revalidation:
+  - `136` tracked rows total
+  - `39` rows marked complete, `97` rows reopened
+  - strict-scope tracked rows: `15/112` pass strict zero gate
+- Coverage gap:
+  - strict scope currently contains `1490` source files (`server/src=112`, `client/src=346`, `legacy=1032`)
+  - the file checklist tracks `112` strict-scope files and currently has no `legacy/**` rows
 
 ## TypeScript/Node.js Quality Assessment
 
@@ -46,7 +70,7 @@ Weaknesses:
 
 - High suppression debt (`@ts-ignore` concentration in API/controller and schema legacy modules).
 - Many explicit `any` usages in critical paths.
-- Lint gate currently broken, reducing confidence in static analysis discipline.
+- Lint warnings remain high (`51`) under policy-accepted warning mode, which weakens signal quality.
 
 ### Node.js/server quality
 
@@ -237,6 +261,8 @@ Acceptance criteria:
 
 ### Reduction Targets (T2-04)
 
+Historical note: this reduction table remains as baseline context, but strict completion now follows the 2026-04-23 hard gates above.
+
 Baseline taken 2026-04-22:
 
 | Metric | Baseline | Milestone 1 target | Milestone 2 target |
@@ -329,6 +355,32 @@ These remain tracked in Tracks 3–8 above. The Pass-2 guardrails (`lint:guardra
 
 ---
 
+## Status Revalidation — 2026-04-23 (Live)
+
+### What changed in status
+
+- Strict completion state is still far from target under the hard-zero policy for `server/src/**`, `client/src/**`, and `legacy/**`.
+- The file-level tracker was revalidated live and reopened rows that violate strict zero rules (`97` reopened rows).
+- Validation commands were rerun at HEAD, and full test suites are currently not green due timeout regressions.
+
+### Validation snapshot (2026-04-23)
+
+- `npm run lint` — exit `0`, `51` warnings.
+- `npm run type:check` — exit `0`.
+- `npm run ci:smoke` — exit `0`.
+- `npm run build:server` — exit `0`.
+- `npm run build:client:dev` — exit `0`.
+- `npm run test:server` — **fail** (`25/26` suites pass; timeout in `tests/server/url-format-drift-runtime.test.js`).
+- `npm run test:client` — **fail** (`48/50` suites pass; timeouts in `TopicCreatePage.integration` and `OutlineLinkPage`).
+
+### Immediate blockers to close before next completion pass
+
+- `M-03` and `M-04` require full server/client suite stability (resolve timeout regressions).
+- `M-05..M-08` require strict-zero migration across `server/src/**`, `client/src/**`, and `legacy/**`.
+- File-checklist strict coverage must be expanded to include `legacy/**` rows and additional untracked strict-scope files.
+
+---
+
 ## Progress Log Template
 
 Use this in PR descriptions/commits:
@@ -344,8 +396,10 @@ Use this in PR descriptions/commits:
 
 - [x] `M-01` `lint` exits 0
 - [x] `M-02` `type:check` exits 0
-- [x] `M-03` `test:server` exits 0
-- [x] `M-04` `test:client` exits 0
-- [ ] `M-05` `@ts-ignore` baseline reduced from 511
-- [ ] `M-06` explicit `any` baseline reduced from 453
-- [ ] `M-07` internal CJS usage (`module.exports/require`) reduced in modern folders
+- [ ] `M-03` `test:server` exits 0
+- [ ] `M-04` `test:client` exits 0
+- [ ] `M-05` repository source (`server/src/**`, `client/src/**`, `legacy/**`) has `0` `@ts-ignore`
+- [ ] `M-06` repository source (`server/src/**`, `client/src/**`, `legacy/**`) has `0` `@ts-expect-error` and `0` `@ts-nocheck`
+- [ ] `M-07` repository source (`server/src/**`, `client/src/**`, `legacy/**`) has `0` explicit `any` / any-like fallbacks
+- [ ] `M-08` repository source (`server/src/**`, `client/src/**`, `legacy/**`) has `0` `require()` and `0` `module.exports`
+- [ ] `M-09` strict-gate CI checks fail on any regression in M-05..M-08
