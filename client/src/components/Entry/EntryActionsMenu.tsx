@@ -11,6 +11,62 @@ interface EntryActionsMenuProps {
   editPath?: string;
 }
 
+function encodePathSegment(value: unknown): string {
+  return encodeURIComponent(String(value || '').trim());
+}
+
+function extractNestedEntryTarget(entry: LegacyEntity, key: 'topic' | 'argument'): { id: string; friendly: string } | null {
+  const nested = entry[key] as { _id?: unknown; friendlyUrl?: unknown; title?: unknown } | undefined;
+  const id = String(nested?._id || '').trim();
+  if (!id) {
+    return null;
+  }
+  const friendly = String(nested?.friendlyUrl || nested?.title || id).trim();
+  return { id, friendly: friendly || id };
+}
+
+function resolveEntryDetailsPath(entry: LegacyEntity, objectName: string): string {
+  const defaultId = String(entry._id || '').trim();
+  const defaultFriendly = String(entry.friendlyUrl || entry.title || defaultId).trim() || defaultId;
+
+  const toFriendlyPath = (prefix: string, id: string, friendly: string): string => {
+    return `${prefix}/${encodePathSegment(friendly)}/${encodePathSegment(id)}`;
+  };
+
+  if (objectName === 'topicLink') {
+    const linkedTopic = extractNestedEntryTarget(entry, 'topic');
+    if (linkedTopic) {
+      return toFriendlyPath('/topics/entry', linkedTopic.id, linkedTopic.friendly);
+    }
+  }
+
+  if (objectName === 'argumentLink') {
+    const linkedArgument = extractNestedEntryTarget(entry, 'argument');
+    if (linkedArgument) {
+      return toFriendlyPath('/arguments/entry', linkedArgument.id, linkedArgument.friendly);
+    }
+  }
+
+  switch (objectName) {
+    case 'topic':
+      return toFriendlyPath('/topics/entry', defaultId, defaultFriendly);
+    case 'argument':
+      return toFriendlyPath('/arguments/entry', defaultId, defaultFriendly);
+    case 'question':
+      return toFriendlyPath('/questions/entry', defaultId, defaultFriendly);
+    case 'issue':
+      return toFriendlyPath('/issues/entry', defaultId, defaultFriendly);
+    case 'opinion':
+      return toFriendlyPath('/opinions/entry', defaultId, defaultFriendly);
+    case 'artifact':
+      return toFriendlyPath('/artifacts/entry', defaultId, defaultFriendly);
+    case 'answer':
+      return `/answers/entry/${encodePathSegment(defaultId)}`;
+    default:
+      return `/topics/entry/${encodePathSegment(defaultId)}`;
+  }
+}
+
 const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) => {
   const { user, activeRole } = useAuth();
   const navigate = useNavigate();
@@ -18,7 +74,10 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
   const [followed, setFollowed] = useState(false);
   const [loadingFollowState, setLoadingFollowState] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
-  const objectName = useMemo(() => String(entry.objectName || '').trim(), [entry.objectName]);
+  const objectName = useMemo(() => {
+    const normalized = String(entry.objectName || '').trim();
+    return normalized || 'topic';
+  }, [entry.objectName]);
 
   useEffect(() => {
     const loadFollowState = async () => {
@@ -55,12 +114,20 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
 
   const isAdmin = Boolean(user?.roles?.admin);
   const isScreener = Boolean(user?.roles?.screener);
+  const isAuthenticated = Boolean(user?._id);
   const isReaderMode = activeRole === 'reader';
   const isOwner = Boolean(user?._id && entry.createUserId && String(user._id) === String(entry.createUserId));
   const canEdit = !isReaderMode && Boolean(editPath) && (isOwner || isAdmin);
   const objectType = typeof entry.objectType === 'number' ? entry.objectType : null;
   const canConvert = objectName === 'topic' || objectName === 'argument';
   const canReply = !isReaderMode && ['topic', 'argument', 'question', 'answer', 'issue', 'opinion'].includes(objectName);
+  const canFollow = isAuthenticated && Boolean(objectName) && Boolean(entry._id);
+  const canCopyToClipboard = isAuthenticated && !isReaderMode;
+  const canLinkEntry = isAuthenticated && !isReaderMode;
+  const canReport = isAuthenticated && Boolean(entry._id);
+  const canViewDetails = Boolean(entry._id);
+  const canSignal = isAuthenticated && Boolean(entry._id) && Boolean(objectName);
+  const canAppeal = isAuthenticated && Boolean(entry._id) && Boolean(objectName);
   const canManageEntry = !isReaderMode && (isScreener || isAdmin);
 
   const handleEdit = () => {
@@ -94,7 +161,7 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
   };
 
   const handleFollow = () => {
-    if (!objectName || !entry._id) {
+    if (!isAuthenticated || !objectName || !entry._id) {
       setStatusMessage('Unable to update follow state');
       return;
     }
@@ -158,8 +225,13 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
     void navigate('/issues/create');
   };
 
+  const handleViewDetails = () => {
+    setIsOpen(false);
+    void navigate(resolveEntryDetailsPath(entry, objectName));
+  };
+
   const handleSignal = () => {
-    if (!objectName || objectType === null) {
+    if (!objectName || !entry._id) {
       return;
     }
     const signalType = window.prompt(
@@ -191,7 +263,7 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
   };
 
   const handleAppeal = () => {
-    if (!objectName || objectType === null) {
+    if (!objectName || !entry._id) {
       return;
     }
     const note = window.prompt('Appeal note (required)', '');
@@ -303,7 +375,7 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
                 </button>
               </li>
             )}
-            {!isReaderMode && (
+            {canFollow && (
               <li>
                 <button type="button" className="btn btn-link" onClick={handleFollow}>
                   <i className="fa fa-rss" aria-hidden="true"></i>{' '}
@@ -323,17 +395,31 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
                 </button>
               </li>
             )}
-            {!isReaderMode && (
+            {canCopyToClipboard && (
               <li>
                 <button type="button" className="btn btn-link" onClick={handleCopyToClipboard}>
                   <i className="fa fa-clipboard" aria-hidden="true"></i> Copy to Clipboard
                 </button>
               </li>
             )}
-            {!isReaderMode && (
+            {canLinkEntry && (
               <li>
                 <button type="button" className="btn btn-link" onClick={handleLinkTo}>
                   <i className="fa fa-link" aria-hidden="true"></i> Link to...
+                </button>
+              </li>
+            )}
+            {canReport && (
+              <li>
+                <button type="button" className="btn btn-link" onClick={handleReport}>
+                  <i className="fa fa-flag" aria-hidden="true"></i> Report
+                </button>
+              </li>
+            )}
+            {canViewDetails && (
+              <li>
+                <button type="button" className="btn btn-link" onClick={handleViewDetails}>
+                  <i className="fa fa-info-circle" aria-hidden="true"></i> Details
                 </button>
               </li>
             )}
@@ -342,21 +428,14 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
                 <i className="fa fa-history" aria-hidden="true"></i> View History
               </button>
             </li>
-            {!isReaderMode && (
-              <li>
-                <button type="button" className="btn btn-link" onClick={handleReport}>
-                  <i className="fa fa-flag" aria-hidden="true"></i> Report
-                </button>
-              </li>
-            )}
-            {!isReaderMode && (
+            {canSignal && (
               <li>
                 <button type="button" className="btn btn-link" onClick={handleSignal}>
                   <i className="fa fa-bullhorn" aria-hidden="true"></i> Signal for Review
                 </button>
               </li>
             )}
-            {!isReaderMode && (
+            {canAppeal && (
               <li>
                 <button type="button" className="btn btn-link" onClick={handleAppeal}>
                   <i className="fa fa-gavel" aria-hidden="true"></i> Submit Appeal

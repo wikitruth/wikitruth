@@ -24,7 +24,7 @@
                             <input type="radio" name="content" value="wiki"{@eq key=content value="wiki"} checked{/eq}> Public Wiki
                         </label>
                         <label class="radio-inline">
-                            <input type="radio" name="content" value="diary"{@eq key=content value="diary"} checked{/eq}> My Diary
+                            <input type="radio" name="content" value="diary"{@eq key=content value="diary"} checked{/eq}> My Journal
                         </label>
                     </div>
                 {/user.username}

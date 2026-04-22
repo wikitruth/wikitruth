@@ -35,6 +35,23 @@
     <link rel="stylesheet" href="/css/app.min.css?{cacheBreaker}" />
     {!<link rel="stylesheet" href="/css/non-responsive.min.css" />!}
     <link rel="stylesheet" href="/layouts/core.min.css?{cacheBreaker}" />
+    <style>
+        a:focus,
+        a:focus-visible,
+        button:focus,
+        button:focus-visible,
+        .btn:focus,
+        .btn:focus-visible,
+        [role="button"]:focus,
+        [role="button"]:focus-visible,
+        .btn-link:focus,
+        .btn-link:focus-visible,
+        .nav > li > a:focus,
+        .nav > li > a:focus-visible {
+            outline: none !important;
+            box-shadow: none !important;
+        }
+    </style>
     <!--<link href="css/bootstrap.min.css" rel="stylesheet">-->
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -98,7 +115,7 @@
                             <li><a href="{?wikiBaseUrl}{wikiBaseUrl}{:else}{legacyBaseUrl}{/wikiBaseUrl}{paths.wiki.topics.entry}/{parentTopic.friendlyUrl}/{parentTopic._id}"><i class="fa fa-folder-open text-color-3-x" aria-hidden="true"></i> {?parentTopic.contextTitle}{parentTopic.contextTitle}{:else}{parentTopic.shortTitle}{/parentTopic.contextTitle}{@gt key=childrenCount.topics.accepted value="0"} <span class="wt-label label label-default">{childrenCount.topics.accepted}</span>{/gt}</a></li>
                         {:else}
                             {?username}
-                                <li><a href="{paths.members.index}/{user.username}/diary"><i class="fa fa-folder-open"></i> My Diary</a></li>
+                                <li><a href="{paths.members.index}/{user.username}/diary"><i class="fa fa-folder-open"></i> My Journal</a></li>
                             {:else}
                                 <li><a href="{paths.wiki.index}"><i class="fa fa-globe text-color-3-x" aria-hidden="true"></i> Explore</a></li>
                             {/username}
@@ -154,7 +171,7 @@
                     {/topic}
                     {! ## Diary topics section ## !}
                     {?diaryCategories}
-                        <li class="dropdown-header"><a href="{paths.members.index}/{user.username}/diary">My Diary 📒</a></li>
+                        <li class="dropdown-header"><a href="{paths.members.index}/{user.username}/diary">My Journal 📒</a></li>
                         {#diaryCategories}
                             <li><a href="{diaryBaseUrl}{paths.wiki.topics.entry}/{friendlyUrl}/{_id}"><i class="fa fa-{?icon}{icon}{:else}folder-open{/icon} text-color-3-x" aria-hidden="true"></i> {?contextTitle}{contextTitle}{:else}{title}{/contextTitle}{@gt key=childrenCount.topics.accepted value="0"} <span class="wt-label label label-default">{childrenCount.topics.accepted}</span>{/gt}</a></li>
                         {/diaryCategories}

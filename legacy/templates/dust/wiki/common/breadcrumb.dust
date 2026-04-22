@@ -7,7 +7,7 @@
         {?username}
             <li><i class="fa fa-user-circle text-muted"></i> <a href="{paths.members.index}">Members</a></li>
             <li><i class="fa fa-user-circle text-muted"></i> <a href="{paths.members.index}/{username}">{username}</a></li>
-            <li><i class="fa fa-folder-open text-muted"></i> <a href="{paths.members.index}/{username}/diary">My Diary</a></li>
+            <li><i class="fa fa-folder-open text-muted"></i> <a href="{paths.members.index}/{username}/diary">My Journal</a></li>
         {:else}
             <li><i class="fa fa-globe text-muted"></i> <a href="{paths.wiki.index}">Explore</a></li>
         {/username}

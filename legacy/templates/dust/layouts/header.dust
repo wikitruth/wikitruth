@@ -63,7 +63,7 @@
                         <ul class="dropdown-menu dropdown-menu-right">
                             <li class="dropdown-header">Account</li>
                             <li><a href="{paths.members.index}/{user.username}"><i class="fa fa-user-circle"></i> My Profile</a></li>
-                            <li><a href="{paths.members.index}/{user.username}/diary"><i class="fa fa-folder-open"></i> My Diary</a></li>
+                            <li><a href="{paths.members.index}/{user.username}/diary"><i class="fa fa-folder-open"></i> My Journal</a></li>
                             {?user.isAdmin}
                                 <li><a href="{paths.admin.index}"><i class="fa fa-gear"></i> Admin Area</a></li>
                             {/user.isAdmin}

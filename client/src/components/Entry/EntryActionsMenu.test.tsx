@@ -152,8 +152,8 @@ describe('EntryActionsMenu moderation actions', () => {
     expect(screen.queryByRole('button', { name: /convert/i })).not.toBeInTheDocument();
   });
 
-  it('routes reply/link/report/history and clipboard actions', () => {
-    renderMenu({ objectName: 'topic', _id: 'topic-1', title: 'Topic A' });
+  it('routes reply/link/report/details/history and clipboard actions', () => {
+    renderMenu({ objectName: 'topic', _id: 'topic-1', title: 'Topic A', friendlyUrl: 'topic-a' });
 
     fireEvent.click(screen.getByRole('button', { name: /actions/i }));
     fireEvent.click(screen.getByRole('button', { name: /reply/i }));
@@ -166,6 +166,10 @@ describe('EntryActionsMenu moderation actions', () => {
     fireEvent.click(screen.getByRole('button', { name: /actions/i }));
     fireEvent.click(screen.getByRole('button', { name: /report/i }));
     expect(mockNavigate).toHaveBeenCalledWith('/issues/create?topicId=topic-1');
+
+    fireEvent.click(screen.getByRole('button', { name: /actions/i }));
+    fireEvent.click(screen.getByRole('button', { name: /details/i }));
+    expect(mockNavigate).toHaveBeenCalledWith('/topics/entry/topic-a/topic-1');
 
     fireEvent.click(screen.getByRole('button', { name: /actions/i }));
     fireEvent.click(screen.getByRole('button', { name: /view history/i }));
@@ -187,7 +191,7 @@ describe('EntryActionsMenu moderation actions', () => {
     await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/topics'));
   });
 
-  it('hides editing/moderation actions in reader mode', () => {
+  it('keeps reader mode non-destructive while preserving follow/report parity actions', () => {
     mockUseAuth.mockReturnValue({
       user: {
         _id: 'user-2',
@@ -211,9 +215,13 @@ describe('EntryActionsMenu moderation actions', () => {
     expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /screening status/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /report/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /reply/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /follow/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /report/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /signal for review/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /submit appeal/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /share/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /details/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /view history/i })).toBeInTheDocument();
   });
 });

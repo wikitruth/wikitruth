@@ -29,7 +29,7 @@
     {?loggedIn}
     <li role="presentation"{@eq key=profileTab value="topics"} class="active"{/eq}>
         <a href="{paths.members.index}/{member.username}/diary" role="tab">
-            <i class="fa fa-folder-open"></i> My Diary
+            <i class="fa fa-folder-open"></i> My Journal
         </a>
     </li>
     {/loggedIn}

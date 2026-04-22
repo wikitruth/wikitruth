@@ -38,6 +38,23 @@
     <!-- Bootstrap and existing styles -->
     <link rel="stylesheet" href="/css/app.min.css" />
     <link rel="stylesheet" href="/layouts/core.min.css" />
+    <style>
+      a:focus,
+      a:focus-visible,
+      button:focus,
+      button:focus-visible,
+      .btn:focus,
+      .btn:focus-visible,
+      [role='button']:focus,
+      [role='button']:focus-visible,
+      .btn-link:focus,
+      .btn-link:focus-visible,
+      .nav > li > a:focus,
+      .nav > li > a:focus-visible {
+        outline: none !important;
+        box-shadow: none !important;
+      }
+    </style>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",

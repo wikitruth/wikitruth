@@ -4,6 +4,23 @@
   padding: 0 0 24px;
 }
 
+/* Suppress default browser focus ring for links/buttons to match legacy UI behavior. */
+a:focus,
+a:focus-visible,
+button:focus,
+button:focus-visible,
+[role='button']:focus,
+[role='button']:focus-visible,
+.btn:focus,
+.btn:focus-visible,
+.btn-link:focus,
+.btn-link:focus-visible,
+.nav > li > a:focus,
+.nav > li > a:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 .wt-context-sidebar .wt-nav.nav {
   margin: 0;
   padding: 6px 0;

@@ -108,3 +108,19 @@ select, textarea, input, .form-control {
   white-space: -o-pre-wrap; /* Opera 7 */
   word-wrap: break-word; /* Internet Explorer 5.5+ */
 }
+
+/* Avoid persistent click-focus rings on legacy links/buttons. */
+a:focus,
+a:focus-visible,
+button:focus,
+button:focus-visible,
+.btn:focus,
+[role="button"]:focus,
+[role="button"]:focus-visible,
+.btn-link:focus,
+.btn-link:focus-visible,
+.nav > li > a:focus,
+.nav > li > a:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}

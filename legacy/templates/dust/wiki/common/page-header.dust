@@ -14,7 +14,7 @@
                 Clipboard
             {:else}
                 {?username}
-                    My Diary
+                    My Journal
                 {:else}
                     {@eq key=tab value="visualize"}
                         Visualize
