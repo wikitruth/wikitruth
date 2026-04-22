@@ -188,4 +188,12 @@ describe('API endpoint smoke coverage', function () {
     expect(searchApi).toContain('issues:');
     expect(searchApi).toContain('opinions:');
   });
+
+  it('keeps topic-entry lookup resilient for friendly-url identifiers', function () {
+    const topicsApi = read('server/src/controllers/api/topics.ts');
+
+    expect(topicsApi).toContain('const looksLikeObjectId = /^[a-f0-9]{24}$/i.test(decodedIdentifier)');
+    expect(topicsApi).toContain('req.query.friendlyUrl = decodedIdentifier');
+    expect(topicsApi).toContain('const normalizedFriendlyUrl = String(utils.urlify(decodedIdentifier) || \'\').trim()');
+  });
 });

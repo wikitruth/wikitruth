@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import apiService from '../services/api';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import apiService, { ApiRequestError } from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Breadcrumb from '../components/common/Breadcrumb';
 import GeoPatternBackground from '../components/common/GeoPatternBackground';
@@ -36,7 +36,8 @@ function getTopicPath(topic: Partial<LegacyEntity>): string {
 }
 
 const TopicEntryPage: React.FC = () => {
-  const { id } = useParams();
+  const { id, friendlyUrl } = useParams<{ id: string; friendlyUrl?: string }>();
+  const navigate = useNavigate();
   const [data, setData] = useState<TopicEntryResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -52,18 +53,48 @@ const TopicEntryPage: React.FC = () => {
 
       try {
         setLoading(true);
+        setError(null);
         const result = await apiService.getTopicEntry(id);
         setData(result);
+        const resolvedTopic = (result?.topic || {}) as Partial<LegacyEntity>;
+        if (resolvedTopic?._id && resolvedTopic?.friendlyUrl) {
+          const canonicalPath = getTopicPath(resolvedTopic);
+          const currentPath = window.location.pathname;
+          if (currentPath !== canonicalPath) {
+            navigate(canonicalPath, { replace: true });
+          }
+        }
       } catch (err) {
+        const isPrimaryNotFound = err instanceof ApiRequestError && err.status === 404;
+        if (isPrimaryNotFound && friendlyUrl) {
+          try {
+            const fallbackResult = await apiService.getTopicEntry(friendlyUrl);
+            setData(fallbackResult);
+            const resolvedTopic = (fallbackResult?.topic || {}) as Partial<LegacyEntity>;
+            if (resolvedTopic?._id) {
+              navigate(getTopicPath(resolvedTopic), { replace: true });
+            }
+            return;
+          } catch (fallbackErr) {
+            console.error('Fallback topic lookup failed:', fallbackErr);
+          }
+        }
+
         console.error('Error fetching topic entry:', err);
-        setError('Failed to load topic');
+        if (err instanceof ApiRequestError) {
+          setError(err.status === 404 ? 'Topic not found' : err.message || 'Failed to load topic');
+        } else if (err instanceof Error) {
+          setError(err.message || 'Failed to load topic');
+        } else {
+          setError('Failed to load topic');
+        }
       } finally {
         setLoading(false);
       }
     };
 
     void fetchTopicEntry();
-  }, [id]);
+  }, [friendlyUrl, id, navigate]);
 
   const topic = (data?.topic || {}) as LegacyEntity;
   const topics = ((data?.topics || data?.topicChildren || []) as LegacyEntity[]).slice(0, 15);

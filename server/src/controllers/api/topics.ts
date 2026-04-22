@@ -283,9 +283,28 @@ async function PUT_topic_update(req: WikitruthRequest, res: WikitruthResponse) {
 
 async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
   const model: TopicScreeningModel = {};
-  req.query.topic = req.params.id;
+  const rawIdentifier = String(req.params.id || '').trim();
+  const decodedIdentifier = decodeURIComponent(rawIdentifier);
+  const looksLikeObjectId = /^[a-f0-9]{24}$/i.test(decodedIdentifier);
+
+  if (looksLikeObjectId) {
+    req.query.topic = decodedIdentifier;
+    delete req.query.friendlyUrl;
+  } else {
+    delete req.query.topic;
+    req.query.friendlyUrl = decodedIdentifier;
+  }
 
   await flowUtils.setTopicModels(req, model);
+
+  // If the incoming identifier was not URL-friendly text, retry with a normalized slug.
+  if (!model.topic && !looksLikeObjectId && decodedIdentifier) {
+    const normalizedFriendlyUrl = String(utils.urlify(decodedIdentifier) || '').trim();
+    if (normalizedFriendlyUrl && normalizedFriendlyUrl !== decodedIdentifier) {
+      req.query.friendlyUrl = normalizedFriendlyUrl;
+      await flowUtils.setTopicModels(req, model);
+    }
+  }
 
   if (!model.topic) {
     return res.status(404).json({ error: 'Topic not found' });
@@ -356,16 +375,7 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
 
         model.categories = results;
       } else if (model.topic?.parentId) {
-        model.categories = await flowUtils.getCategories(
-          {
-            parentId: model.topic.parentId,
-            'screening.status': screeningStatus,
-          },
-          {
-            limit: 0,
-            req: req,
-          }
-        );
+        await flowUtils.getCategories(model, model.topic.parentId, req);
       }
     })(),
     (async function loadTopics() {
