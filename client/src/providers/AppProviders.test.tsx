@@ -1,6 +1,6 @@
 import React from 'react';
 import AppProviders from './AppProviders';
-import { render, screen } from '../test-utils/render';
+import { act, render, screen } from '../test-utils/render';
 
 describe('AppProviders', () => {
   const originalFetch = globalThis.fetch;
@@ -9,7 +9,7 @@ describe('AppProviders', () => {
     globalThis.fetch = originalFetch;
   });
 
-  it('renders nested children', () => {
+  it('renders nested children', async () => {
     const fetchMock = jest.fn().mockResolvedValue({ ok: false, json: async () => ({}) });
     globalThis.fetch = fetchMock as unknown as typeof fetch;
 
@@ -20,5 +20,11 @@ describe('AppProviders', () => {
     );
 
     expect(screen.getByText('app-child')).toBeInTheDocument();
+
+    // Flush AuthProvider's checkAuthStatus promise to avoid act() warnings.
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
   });
 });

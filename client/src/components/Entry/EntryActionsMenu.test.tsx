@@ -1,6 +1,6 @@
 import React from 'react';
 import EntryActionsMenu from './EntryActionsMenu';
-import { fireEvent, render, screen, waitFor } from '../../test-utils/render';
+import { act, fireEvent, render, screen, waitFor } from '../../test-utils/render';
 import { useAuth } from '../../context/AuthContext';
 import moderationApi from '../../services/api/moderation';
 import notificationsApi from '../../services/api/notifications';
@@ -54,7 +54,7 @@ const mockedModerationApi = moderationApi as jest.Mocked<typeof moderationApi>;
 const mockedNotificationsApi = notificationsApi as jest.Mocked<typeof notificationsApi>;
 const mockedClipboard = clipboardPage as jest.Mocked<typeof clipboardPage>;
 
-function renderMenu(entry: Partial<LegacyEntity>) {
+async function renderMenu(entry: Partial<LegacyEntity>) {
   render(
     <EntryActionsMenu
       entry={
@@ -70,6 +70,9 @@ function renderMenu(entry: Partial<LegacyEntity>) {
       editPath="/topics/create?id=entry-1"
     />,
   );
+  await act(async () => {
+    await Promise.resolve();
+  });
 }
 
 describe('EntryActionsMenu moderation actions', () => {
@@ -109,8 +112,8 @@ describe('EntryActionsMenu moderation actions', () => {
     mockedClipboard.addToClipboard.mockReset();
   });
 
-  it('routes screening action through modern screening route', () => {
-    renderMenu({ objectName: 'topic', _id: 'topic-1' });
+  it('routes screening action through modern screening route', async () => {
+    await renderMenu({ objectName: 'topic', _id: 'topic-1' });
 
     fireEvent.click(screen.getByRole('button', { name: /actions/i }));
     fireEvent.click(screen.getByRole('button', { name: /screening status/i }));
@@ -118,8 +121,8 @@ describe('EntryActionsMenu moderation actions', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/screening?topic=topic-1');
   });
 
-  it('routes convert action through modern convert route', () => {
-    renderMenu({ objectName: 'argument', objectType: 2, _id: 'arg-1' });
+  it('routes convert action through modern convert route', async () => {
+    await renderMenu({ objectName: 'argument', objectType: 2, _id: 'arg-1' });
 
     fireEvent.click(screen.getByRole('button', { name: /actions/i }));
     fireEvent.click(screen.getByRole('button', { name: /convert/i }));
@@ -127,7 +130,7 @@ describe('EntryActionsMenu moderation actions', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/convert?argument=arg-1');
   });
 
-  it('hides screening and convert for non-moderators', () => {
+  it('hides screening and convert for non-moderators', async () => {
     mockUseAuth.mockReturnValue({
       user: {
         _id: 'user-2',
@@ -145,15 +148,15 @@ describe('EntryActionsMenu moderation actions', () => {
       updateUser: jest.fn(),
     });
 
-    renderMenu({ objectName: 'topic', _id: 'topic-1' });
+    await renderMenu({ objectName: 'topic', _id: 'topic-1' });
     fireEvent.click(screen.getByRole('button', { name: /actions/i }));
 
     expect(screen.queryByRole('button', { name: /screening status/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /convert/i })).not.toBeInTheDocument();
   });
 
-  it('routes reply/link/report/details/history and clipboard actions', () => {
-    renderMenu({ objectName: 'topic', _id: 'topic-1', title: 'Topic A', friendlyUrl: 'topic-a' });
+  it('routes reply/link/report/details/history and clipboard actions', async () => {
+    await renderMenu({ objectName: 'topic', _id: 'topic-1', title: 'Topic A', friendlyUrl: 'topic-a' });
 
     fireEvent.click(screen.getByRole('button', { name: /actions/i }));
     fireEvent.click(screen.getByRole('button', { name: /reply/i }));
@@ -181,7 +184,7 @@ describe('EntryActionsMenu moderation actions', () => {
   });
 
   it('handles admin delete action', async () => {
-    renderMenu({ objectName: 'topic', objectType: 1, createUserId: 'other-user', _id: 'topic-9' });
+    await renderMenu({ objectName: 'topic', objectType: 1, createUserId: 'other-user', _id: 'topic-9' });
 
     fireEvent.click(screen.getByRole('button', { name: /actions/i }));
     expect(screen.getByRole('button', { name: /take ownership/i })).toBeInTheDocument();
@@ -191,7 +194,7 @@ describe('EntryActionsMenu moderation actions', () => {
     await waitFor(() => expect(mockNavigate).toHaveBeenCalledWith('/topics'));
   });
 
-  it('keeps reader mode non-destructive while preserving follow/report parity actions', () => {
+  it('keeps reader mode non-destructive while preserving follow/report parity actions', async () => {
     mockUseAuth.mockReturnValue({
       user: {
         _id: 'user-2',
@@ -209,7 +212,7 @@ describe('EntryActionsMenu moderation actions', () => {
       updateUser: jest.fn(),
     });
 
-    renderMenu({ objectName: 'topic', _id: 'topic-1' });
+    await renderMenu({ objectName: 'topic', _id: 'topic-1' });
     fireEvent.click(screen.getByRole('button', { name: /actions/i }));
 
     expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
