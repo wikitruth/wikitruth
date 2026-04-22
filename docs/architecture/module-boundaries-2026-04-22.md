@@ -17,10 +17,9 @@ enforced by [scripts/check-no-new-cjs-modern.sh](../../scripts/check-no-new-cjs-
 Folders:
 
 - `server/src/types/**`
-- `server/src/middlewares/**` (modernization in progress)
 - `server/src/services/**` (modernization in progress)
 - `server/src/models/**` (modernization in progress)
-- `client/src/**`
+- `client/src/**` (production code)
 
 Rules:
 
@@ -30,6 +29,13 @@ Rules:
   interfaces).
 - New files MUST land here unless they explicitly belong in tier 2 or 3.
 
+Allowed exception inside tier 1: client component test files
+(`client/src/**/*.test.ts(x)`) MAY use a single inline
+`require(...)` call when invoking a fresh module instance after
+`jest.resetModules()` or `jest.doMock(...)`. ESM `import` would be
+hoisted out of the test body and break determinism. Keep the call
+local to the test body and never re-export.
+
 ### 2. Compatibility-adapter tier (typed but interop-shaped)
 
 Folders:
@@ -37,7 +43,12 @@ Folders:
 - `server/src/controllers/api/**` (Express route registrars wired in
   `server/src/app.ts` via legacy `function (router) { … }` factories)
 - `server/src/controllers/app.ts`
+- `server/src/middlewares/**` (mounted in `app.ts` via
+  `require('./middlewares/...')(app, passport)` boot sequence; cannot
+  switch to ESM until the boot module itself does)
 - `server/src/utils/flowUtils.ts` (until T4-01 decomposition)
+- `server/src/app.ts` (boot loader; intentionally CJS-shaped to control
+  legacy load order)
 
 Rules:
 
