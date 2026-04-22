@@ -2,6 +2,7 @@
 
 import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../types/http';
+import { errorMessage } from '../../types/errors';
 const flowUtils = require('../../utils/flowUtils') as any;
 const constants = require('../../models/constants') as any;
 const utils = require('../../utils/utils') as any;
@@ -31,7 +32,7 @@ module.exports = function (router: Router) {
       delete model.screening;
       res.json(model);
     } catch (error) {
-      res.status(500).json({ error: (error as Error).message });
+      res.status(500).json({ error: errorMessage(error) });
     }
   });
 
@@ -117,7 +118,7 @@ module.exports = function (router: Router) {
         opinions: opinions,
       });
     } catch (error) {
-      res.status(500).json({ error: (error as Error).message });
+      res.status(500).json({ error: errorMessage(error) });
     }
   });
 
@@ -126,7 +127,7 @@ module.exports = function (router: Router) {
     try {
       await POST_artifact_create(req, res);
     } catch (error) {
-      res.status(500).json({ error: (error as Error).message });
+      res.status(500).json({ error: errorMessage(error) });
     }
   });
 
@@ -135,7 +136,7 @@ module.exports = function (router: Router) {
     try {
       await PUT_artifact_update(req, res);
     } catch (error) {
-      res.status(500).json({ error: (error as Error).message });
+      res.status(500).json({ error: errorMessage(error) });
     }
   });
 };
