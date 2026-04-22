@@ -21,10 +21,18 @@ This file is the repository-level instruction source for coding agents in this r
 ## Canonical Cards
 
 - `Canonical card` means a concise quick-reference document for core/critical system behavior and features.
-- Canonical cards live in `docs/canonical/`.
+- Canonical cards live in `docs/canonical/`. If the folder does not exist yet, create it when adding the first canonical card; do not duplicate existing docs only to satisfy the location rule.
 - Canonical cards are intentionally brief summaries used to quickly confirm expected behavior, feature support, and system flow.
-- Canonical cards may be created or updated before implementation when planning new concepts, behaviors, or key features.
-- By default, implementation should follow what is specified in canonical cards (canonical card first), not the other way around.
-- Only treat implementation as the source of truth over canonical cards when the user explicitly asks to sync/update canonical cards to reflect existing implementation.
+- Canonical cards are the source of truth for intended behavior, feature support, and system flow in this repository.
+- Canonical cards may be created or updated before implementation when planning new concepts, behaviors, or key features, but only when the user explicitly asks for or approves canonical-card changes.
+- Implementation should follow approved canonical cards, not the other way around.
+- If implementation conflicts with a canonical card, treat the canonical card as authoritative, surface the mismatch to the user, and do not silently reinterpret the card based on current code.
+- Agents must not create, edit, sync, or refresh canonical cards unless the user explicitly asks for or approves that canonical-card work.
 - Do not put deep implementation detail in canonical cards. Detailed technical specs, design docs, and implementation notes should be outside `docs/canonical/`.
-- When behavior or feature support changes, update the related canonical card in the same work so the quick-reference stays accurate.
+- If behavior or feature support changes in implementation without prior canonical-card approval, flag the divergence and wait for user direction instead of auto-updating the canonical card.
+
+## Source File Size Rule
+
+- Keep source files at or below 1000 lines whenever practical.
+- Exception: a file may exceed 1000 lines only when it is fully justified, required, and more sensible than splitting into smaller files.
+- When adding substantial logic, prefer extracting modules/components to stay within the limit.
