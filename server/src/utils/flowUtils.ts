@@ -3019,7 +3019,7 @@ function resetCache(req?: { app?: { locals?: { appCategories?: unknown } } }) {
   });
 }
 
-module.exports = {
+export {
   getBackupDir,
   createContentPreview,
   isEntryOwner,
