@@ -1,58 +1,39 @@
-// @ts-ignore TS(6200): Definitions of the following identifiers conflict ... Remove this comment to see the full error message
 'use strict';
 
-// @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 let mongoose = require('mongoose'),
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   async = require('async'),
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   utils = require('../utils/utils'),
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   flowUtils = require('../utils/flowUtils'),
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   paths = require('../models/paths'),
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   templates = require('../models/templates'),
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   constants = require('../models/constants'),
-  // @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
   db = require('../app').db.models;
 
-// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports = function(router) {
   /* Questions */
 
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get('/', async function(req, res) {
     await GET_index(req, res);
   });
 
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get('/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', async function(req, res) {
     await GET_entry(req, res);
   });
 
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get('/create', async function(req, res) {
     await GET_create(req, res);
   });
 
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.post('/create', async function(req, res) {
     await POST_create(req, res);
   });
 };
 
-// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports.GET_entry = GET_entry;
-// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports.GET_index = GET_index;
-// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports.GET_create = GET_create;
-// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports.POST_create = POST_create;
 
-// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 async function GET_entry(req, res) {
   const model = {};
   flowUtils.ensureEntryIdParam(req, 'question');
@@ -64,7 +45,6 @@ async function GET_entry(req, res) {
       answers: async function() {
         // Top Issues
         let results = await db.Answer.find({
-          // @ts-ignore TS(2339): Property 'question' does not exist on type '{}'.
           questionId: model.question._id,
           'screening.status': constants.SCREENING_STATUS.status1.code,
         })
@@ -72,11 +52,9 @@ async function GET_entry(req, res) {
           .lean()
           .sort({ title: 1 });
         await flowUtils.setEditorsUsername(results);
-        // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
         results.forEach(function(result) {
           flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.answer, req);
         });
-        // @ts-ignore TS(2339): Property 'answers' does not exist on type '{}'.
         model.answers = results;
       },
       issues: async function() {
@@ -98,35 +76,27 @@ async function GET_entry(req, res) {
   res.render(templates.wiki.questions.entry, model);
 }
 
-// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 async function GET_index(req, res) {
   let model = {};
   let ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
   await flowUtils.setEntryModels(ownerQuery, req, model);
-  // @ts-ignore TS(2339): Property 'topic' does not exist on type '{}'.
   if (model.topic) {
     flowUtils.setScreeningModel(req, model);
     let query = req.query.argument
-      // @ts-ignore TS(2339): Property 'argument' does not exist on type '{}'.
       ? { ownerId: model.argument._id, ownerType: constants.OBJECT_TYPES.argument }
-      // @ts-ignore TS(2339): Property 'topic' does not exist on type '{}'.
       : { ownerId: model.topic._id, ownerType: constants.OBJECT_TYPES.topic };
-    // @ts-ignore TS(7053): Element implicitly has an 'any' type because expre... Remove this comment to see the full error message
     query['screening.status'] = model.screening.status;
     const results = await db.Question.find(query)
       .sort({ title: 1 })
       .lean();
     await flowUtils.setEditorsUsername(results);
-    // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
     results.forEach(function(result) {
       flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.question, req);
     });
-    // @ts-ignore TS(2339): Property 'questions' does not exist on type '{}'.
     model.questions = results;
     flowUtils.setModelOwnerEntry(req, res, model);
 
     // screening and children count
-    // @ts-ignore TS(2339): Property 'entry' does not exist on type '{}'.
     flowUtils.setScreeningModelCount(model, model.entry.childrenCount.questions);
     res.render(templates.wiki.questions.index, model);
   } else {
@@ -142,21 +112,18 @@ async function GET_index(req, res) {
       .limit(25)
       .lean();
     await flowUtils.setEditorsUsername(results);
-    // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
     results.forEach(function(result) {
       result.topic = {
         _id: result.ownerId,
       };
       flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.question, req);
     });
-    // @ts-ignore TS(2339): Property 'questions' does not exist on type '{}'.
     model.questions = results;
     flowUtils.setModelContext(req, res, model);
     res.render(templates.wiki.questions.index, model);
   }
 }
 
-// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 async function GET_create(req, res) {
   let model = {};
   await flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model);
@@ -164,7 +131,6 @@ async function GET_create(req, res) {
   res.render(templates.wiki.questions.create, model);
 }
 
-// @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
 async function POST_create(req, res) {
   let query = { _id: req.query.question || new mongoose.Types.ObjectId() };
   const result = await db.Question.findOne(query);
@@ -209,7 +175,6 @@ async function POST_create(req, res) {
   let model = {};
   flowUtils.setModelContext(req, res, model);
   let url =
-    // @ts-ignore TS(2339): Property 'wikiBaseUrl' does not exist on type '{}'... Remove this comment to see the full error message
     model.wikiBaseUrl +
     paths.wiki.questions.entry +
     '/' +

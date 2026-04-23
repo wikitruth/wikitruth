@@ -1,58 +1,39 @@
-// @ts-ignore TS(6200): Definitions of the following identifiers conflict ... Remove this comment to see the full error message
 'use strict';
 
-// @ts-ignore TS(2580): Cannot find name 'require'. Do you need to install... Remove this comment to see the full error message
 let mongoose = require('mongoose'),
-  // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'async'.
   async = require('async'),
-  // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'utils'.
   utils = require('../utils/utils'),
-  // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'flowUtils'... Remove this comment to see the full error message
   flowUtils = require('../utils/flowUtils'),
-  // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'paths'.
   paths = require('../models/paths'),
-  // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'templates'... Remove this comment to see the full error message
   templates = require('../models/templates'),
-  // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'constants'... Remove this comment to see the full error message
   constants = require('../models/constants'),
-  // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'db'.
   db = require('../app').db.models;
 
-// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports = function (router) {
   /* Answers */
 
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get('/', async function (req, res) {
     await GET_index(req, res);
   });
 
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get('/entry(/:friendlyUrl)?(/:friendlyUrl/:id)?', async function (req, res) {
     await GET_entry(req, res);
   });
 
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.get('/create', async function (req, res) {
     await GET_create(req, res);
   });
 
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.post('/create', async function (req, res) {
     await POST_create(req, res);
   });
 };
 
-// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports.GET_entry = GET_entry;
-// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports.GET_index = GET_index;
-// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports.GET_create = GET_create;
-// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports.POST_create = POST_create;
 
-// @ts-ignore TS(2393): Duplicate function implementation.
 async function GET_entry(req, res) {
   let model = {};
   flowUtils.ensureEntryIdParam(req, 'answer');
@@ -77,7 +58,6 @@ async function GET_entry(req, res) {
   res.render(templates.wiki.answers.entry, model);
 }
 
-// @ts-ignore TS(2393): Duplicate function implementation.
 async function GET_index(req, res) {
   const model = {};
   let query = flowUtils.createOwnerQueryFromQuery(req);
@@ -87,24 +67,19 @@ async function GET_index(req, res) {
     // Invalid or stale owner links should not crash legacy pages.
     if (model.question && model.question._id) {
       let results = await db.Answer.find({
-        // @ts-ignore TS(2339): Property 'question' does not exist on type '{}'.
         questionId: model.question._id,
-        // @ts-ignore TS(2339): Property 'screening' does not exist on type '{}'.
         'screening.status': model.screening.status,
       })
         .sort({ title: 1 })
         .lean();
       await flowUtils.setEditorsUsername(results);
-      // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
       results.forEach(function (result) {
         flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.answer, req);
       });
-      // @ts-ignore TS(2339): Property 'answers' does not exist on type '{}'.
       model.answers = results;
       flowUtils.setModelOwnerEntry(req, res, model);
 
       // screening and children count
-      // @ts-ignore TS(2339): Property 'entry' does not exist on type '{}'.
       flowUtils.setScreeningModelCount(model, model.entry.childrenCount.answers);
       return res.render(templates.wiki.answers.index, model);
     }
@@ -119,20 +94,17 @@ async function GET_index(req, res) {
   //db.Answer.aggregate([ {$match: query}, {$sample: { size: 25 } }, {$sort: {editDate: -1}} ], function(err, results) {
   let results = await db.Answer.find(query).sort({ editDate: -1 }).limit(25).lean().exec();
   await flowUtils.setEditorsUsername(results);
-  // @ts-ignore TS(7006): Parameter 'result' implicitly has an 'any' type.
   results.forEach(function (result) {
     result.topic = {
       _id: result.ownerId,
     };
     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.answer, req);
   });
-  // @ts-ignore TS(2339): Property 'answers' does not exist on type '{}'.
   model.answers = results;
   flowUtils.setModelContext(req, res, model);
   res.render(templates.wiki.answers.index, model);
 }
 
-// @ts-ignore TS(2393): Duplicate function implementation.
 async function GET_create(req, res) {
   let model = {};
   await flowUtils.setEntryModels(flowUtils.createOwnerQueryFromQuery(req), req, model);
@@ -140,7 +112,6 @@ async function GET_create(req, res) {
   res.render(templates.wiki.answers.create, model);
 }
 
-// @ts-ignore TS(2393): Duplicate function implementation.
 async function POST_create(req, res) {
   let query = { _id: req.query.answer || new mongoose.Types.ObjectId() };
   const result = await db.Answer.findOne(query);
@@ -176,7 +147,6 @@ async function POST_create(req, res) {
   let model = {};
   flowUtils.setModelContext(req, res, model);
   let url =
-    // @ts-ignore TS(2339): Property 'wikiBaseUrl' does not exist on type '{}'... Remove this comment to see the full error message
     model.wikiBaseUrl +
     paths.wiki.answers.entry +
     '/' +

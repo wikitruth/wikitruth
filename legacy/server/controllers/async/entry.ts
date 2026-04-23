@@ -1,15 +1,10 @@
 'use strict';
 
-// @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'constants'... Remove this comment to see the full error message
 let constants = require('../../models/constants'),
-  // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'flowUtils'... Remove this comment to see the full error message
   flowUtils = require('../../utils/flowUtils'),
-  // @ts-ignore TS(2451): Cannot redeclare block-scoped variable 'db'.
   db = require('../../app').db.models;
 
-// @ts-ignore TS(2580): Cannot find name 'module'. Do you need to install ... Remove this comment to see the full error message
 module.exports = function (router) {
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.post('/take-ownership', async function (req, res) {
     let id = req.body.id;
     let type = req.body.type;
@@ -70,7 +65,6 @@ module.exports = function (router) {
     res.send({});
   });
 
-  // @ts-ignore TS(7006): Parameter 'req' implicitly has an 'any' type.
   router.post('/delete', async function (req, res) {
     let id = req.body.id;
     let type = req.body.type;
