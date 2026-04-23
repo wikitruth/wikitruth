@@ -1296,14 +1296,21 @@ function getDbConnectionForObjectType(entryType?: number) {
   return dbModel && dbModel.db ? dbModel.db : null;
 }
 
-async function updateChildrenCount(entryId?: any, entryType?: any, specificEntryType?: any, callbackOrOptions?: any, maybeOptions?: any) {
+type ChildCountBucket = { accepted: number; pending: number; rejected: number; total: number };
+type ChildrenCountShape = { topics: ChildCountBucket; arguments: ChildCountBucket; artifacts: ChildCountBucket; questions: ChildCountBucket; answers: ChildCountBucket; issues: ChildCountBucket; opinions: ChildCountBucket };
+type EntryWithChildrenCount = { _id?: unknown; ownerId?: unknown; childrenCount: ChildrenCountShape };
+type UpdateChildrenCountModel = Record<string, unknown> & { topic?: EntryWithChildrenCount; topicLink?: EntryWithChildrenCount; argument?: EntryWithChildrenCount; argumentLink?: EntryWithChildrenCount; artifact?: EntryWithChildrenCount; question?: EntryWithChildrenCount; answer?: EntryWithChildrenCount; issue?: EntryWithChildrenCount; opinion?: EntryWithChildrenCount };
+type UpdateChildrenCountReq = { query: Record<string, unknown>; params: { username?: string }; user?: { id?: unknown } };
+
+async function updateChildrenCount(entryId: unknown, entryType: number | undefined, specificEntryType?: unknown, callbackOrOptions?: unknown, maybeOptions?: unknown) {
   const normalizedArgs = normalizeUpdateChildrenCountArgs(specificEntryType, callbackOrOptions, maybeOptions);
   specificEntryType = normalizedArgs.specificEntryType;
   const callback = normalizedArgs.callback;
   const session = normalizedArgs.options && normalizedArgs.options.session ? normalizedArgs.options.session : null;
 
-  let countNode: any = {};
-  let model: any = {}, req: any = {};
+  let countNode: { childrenCount: ChildrenCountShape } = { childrenCount: {} as ChildrenCountShape };
+  let model: UpdateChildrenCountModel = {};
+  let req: UpdateChildrenCountReq = { query: {}, params: {} };
 
   const updateTopics = async function() {
     if (!specificEntryType || specificEntryType === constants.OBJECT_TYPES.topic) {
@@ -1517,9 +1524,9 @@ async function updateChildrenCount(entryId?: any, entryType?: any, specificEntry
   try {
     switch (entryType) {
       case constants.OBJECT_TYPES.topic:
-        req = { query: { topic: entryId } };
-        await setEntryModels(createOwnerQueryFromQuery(req), req, model);
-        countNode = { childrenCount: model.topic.childrenCount };
+        req = { query: { topic: entryId }, params: {} };
+        await setEntryModels(createOwnerQueryFromQuery(req), req, model as Parameters<typeof setEntryModels>[2]);
+        countNode = { childrenCount: model.topic!.childrenCount };
         await async.parallel({
           topics: updateTopics,
           arguments: updateArguments,
@@ -1533,9 +1540,9 @@ async function updateChildrenCount(entryId?: any, entryType?: any, specificEntry
         break;
 
       case constants.OBJECT_TYPES.topicLink:
-        req = { query: { topicLink: entryId } };
-        await setEntryModels(createOwnerQueryFromQuery(req), req, model);
-        countNode = { childrenCount: model.topicLink.childrenCount };
+        req = { query: { topicLink: entryId }, params: {} };
+        await setEntryModels(createOwnerQueryFromQuery(req), req, model as Parameters<typeof setEntryModels>[2]);
+        countNode = { childrenCount: model.topicLink!.childrenCount };
         await async.parallel({
           issues: updateIssues,
           opinions: updateOpinions,
@@ -1545,9 +1552,9 @@ async function updateChildrenCount(entryId?: any, entryType?: any, specificEntry
         break;
 
       case constants.OBJECT_TYPES.argument:
-        req = { query: { argument: entryId } };
-        await setEntryModels(createOwnerQueryFromQuery(req), req, model);
-        countNode = { childrenCount: model.argument.childrenCount };
+        req = { query: { argument: entryId }, params: {} };
+        await setEntryModels(createOwnerQueryFromQuery(req), req, model as Parameters<typeof setEntryModels>[2]);
+        countNode = { childrenCount: model.argument!.childrenCount };
         await async.parallel({
           arguments: updateArguments,
           questions: updateQuestions,
@@ -1559,9 +1566,9 @@ async function updateChildrenCount(entryId?: any, entryType?: any, specificEntry
         break;
 
       case constants.OBJECT_TYPES.argumentLink:
-        req = { query: { argumentLink: entryId } };
-        await setEntryModels(createOwnerQueryFromQuery(req), req, model);
-        countNode = { childrenCount: model.argumentLink.childrenCount };
+        req = { query: { argumentLink: entryId }, params: {} };
+        await setEntryModels(createOwnerQueryFromQuery(req), req, model as Parameters<typeof setEntryModels>[2]);
+        countNode = { childrenCount: model.argumentLink!.childrenCount };
         await async.parallel({
           issues: updateIssues,
           opinions: updateOpinions,
@@ -1571,9 +1578,9 @@ async function updateChildrenCount(entryId?: any, entryType?: any, specificEntry
         break;
 
       case constants.OBJECT_TYPES.artifact:
-        req = { query: { artifact: entryId } };
-        await setEntryModels(createOwnerQueryFromQuery(req), req, model);
-        countNode = { childrenCount: model.artifact.childrenCount };
+        req = { query: { artifact: entryId }, params: {} };
+        await setEntryModels(createOwnerQueryFromQuery(req), req, model as Parameters<typeof setEntryModels>[2]);
+        countNode = { childrenCount: model.artifact!.childrenCount };
         await async.parallel({
           artifacts: updateArtifacts,
           arguments: updateArguments,
@@ -1586,9 +1593,9 @@ async function updateChildrenCount(entryId?: any, entryType?: any, specificEntry
         break;
 
       case constants.OBJECT_TYPES.question:
-        req = { query: { question: entryId } };
-        await setEntryModels(createOwnerQueryFromQuery(req), req, model);
-        countNode = { childrenCount: model.question.childrenCount };
+        req = { query: { question: entryId }, params: {} };
+        await setEntryModels(createOwnerQueryFromQuery(req), req, model as Parameters<typeof setEntryModels>[2]);
+        countNode = { childrenCount: model.question!.childrenCount };
         await async.parallel({
           answers: updateAnswers,
           issues: updateIssues,
@@ -1599,9 +1606,9 @@ async function updateChildrenCount(entryId?: any, entryType?: any, specificEntry
         break;
 
       case constants.OBJECT_TYPES.answer:
-        req = { query: { answer: entryId } };
-        await setEntryModels(createOwnerQueryFromQuery(req), req, model);
-        countNode = { childrenCount: model.answer.childrenCount };
+        req = { query: { answer: entryId }, params: {} };
+        await setEntryModels(createOwnerQueryFromQuery(req), req, model as Parameters<typeof setEntryModels>[2]);
+        countNode = { childrenCount: model.answer!.childrenCount };
         await async.parallel({
           issues: updateIssues,
           opinions: updateOpinions,
@@ -1611,9 +1618,9 @@ async function updateChildrenCount(entryId?: any, entryType?: any, specificEntry
         break;
 
       case constants.OBJECT_TYPES.issue:
-        req = { query: { issue: entryId } };
-        await setEntryModels(createOwnerQueryFromQuery(req), req, model);
-        countNode = { childrenCount: model.issue.childrenCount };
+        req = { query: { issue: entryId }, params: {} };
+        await setEntryModels(createOwnerQueryFromQuery(req), req, model as Parameters<typeof setEntryModels>[2]);
+        countNode = { childrenCount: model.issue!.childrenCount };
         await async.parallel({
           opinions: updateOpinions,
         });
@@ -1622,9 +1629,9 @@ async function updateChildrenCount(entryId?: any, entryType?: any, specificEntry
         break;
 
       case constants.OBJECT_TYPES.opinion:
-        req = { query: { opinion: entryId } };
-        await setEntryModels(createOwnerQueryFromQuery(req), req, model);
-        countNode = { childrenCount: model.opinion.childrenCount };
+        req = { query: { opinion: entryId }, params: {} };
+        await setEntryModels(createOwnerQueryFromQuery(req), req, model as Parameters<typeof setEntryModels>[2]);
+        countNode = { childrenCount: model.opinion!.childrenCount };
         await async.parallel({
           issues: updateIssues,
           opinions: updateOpinions,
