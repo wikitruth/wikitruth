@@ -162,7 +162,7 @@ Acceptance criteria:
 - [x] `T5-03` Standardize module style strategy:
   - CJS only at legacy adapters
   - typed `import`/`export` for modern internals
-- [ ] `T5-04` Migrate internal high-impact API controllers from ad hoc `require/module.exports` to typed module exports.
+- [x] `T5-04` Migrate internal high-impact API controllers from ad hoc `require/module.exports` to typed module exports.
 - [x] `T5-05` Migrate schema/service modules where safe, with no behavior drift.
 - [x] `T5-06` Add guardrail lint rule preventing new `require()` in modern folders.
 - [ ] `T5-07` Keep compatibility tests green throughout migration.
@@ -403,7 +403,7 @@ Use this in PR descriptions/commits:
 - [ ] `M-05` modern source (`server/src/**`, `client/src/**`) has `0` `@ts-ignore`
 - [ ] `M-06` modern source (`server/src/**`, `client/src/**`) has `0` `@ts-expect-error` and `0` `@ts-nocheck`
 - [x] `M-07` modern source (`server/src/**`, `client/src/**`) has `0` explicit `any` / any-like fallbacks
-- [ ] `M-08` modern source (`server/src/**`, `client/src/**`) has `0` `require()` and `0` `module.exports`
+- [x] `M-08` modern source (`server/src/**`, `client/src/**`) has `0` `require()` and `0` `module.exports`
 - [x] `M-09` strict-gate CI checks fail on any regression in M-05..M-08
   - `type:guardrails` (scripts/check-no-new-ts-nocheck.sh) — locks `@ts-nocheck` (M-06)
   - `type:guardrails:suppressions` (scripts/check-no-new-ts-suppressions.sh) — locks `@ts-ignore` + `@ts-expect-error` (M-05, M-06)
