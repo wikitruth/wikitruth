@@ -393,26 +393,26 @@ async function setEntryParents(items?: any, typeId?: any) {
 
 // Backward-compatible helper for service layers that enrich a single entry.
 // Reuses the same parent resolution path as batch operations.
-async function setEntryParent(item?: any, typeId?: any) {
+async function setEntryParent(item?: Record<string, unknown>, typeId?: number): Promise<void> {
   if (!item) {
     return;
   }
   await setEntryParents([item], typeId);
 }
 
-async function setEditorsUsername(items?: any) {
+async function setEditorsUsername(items?: Record<string, unknown>[]): Promise<void> {
   if (items && items.length > 0) {
-    let seen: Record<string, any> = {};
+    let seen: Record<string, boolean> = {};
     let userIds = items
-      .filter(function(item?: any) {
-        let id = item.editUserId ? item.editUserId.valueOf() : null;
+      .filter(function(item: Record<string, unknown>) {
+        let id = item.editUserId ? (item.editUserId as { valueOf(): string }).valueOf() : null;
         if (!id || seen[id]) {
-          return;
+          return false;
         }
         seen[id] = true;
-        return item;
+        return true;
         //return !!item.editUserId;
-      }).map(function(item?: any) {
+      }).map(function(item: Record<string, unknown>) {
           return item.editUserId;
         },
       );
@@ -426,13 +426,13 @@ async function setEditorsUsername(items?: any) {
     let results = await db.User
       .find(query, { username: 1 })
       .exec();
-    let userNames: Record<string, any> = {};
-    results.forEach(function(result?: any) {
-      userNames[result._id.valueOf()] = result.username;
+    let userNames: Record<string, unknown> = {};
+    results.forEach(function(result: Record<string, unknown>) {
+      userNames[(result._id as { valueOf(): string }).valueOf()] = result.username;
     });
-    items.forEach(function(item?: any) {
+    items.forEach(function(item: Record<string, unknown>) {
       if (item.editUserId) {
-        item.editUsername = userNames[item.editUserId.valueOf()];
+        item.editUsername = userNames[(item.editUserId as { valueOf(): string }).valueOf()];
       }
     });
   }
@@ -2733,9 +2733,9 @@ function getParent(entity?: any, type?: any) {
   return null;
 }
 
-function setMemberFullname(member?: any) {
-  if (member.roles.account) {
-    const fullname = member.roles.account.name.full;
+function setMemberFullname(member?: { username?: unknown; fullname?: unknown; roles?: { account?: { name?: { full?: unknown } } } }): void {
+  if (member?.roles?.account) {
+    const fullname = member.roles.account.name?.full;
     if (fullname && fullname !== member.username) {
       member.fullname = fullname;
     }
