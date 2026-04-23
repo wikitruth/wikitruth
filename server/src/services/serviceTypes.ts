@@ -37,3 +37,18 @@ export interface LeanModel<TEntry> {
     lean(): Promise<TEntry | null>;
   };
 }
+
+export interface IssuesServiceContract {
+  getIssuesList(query: ServiceQuery, options?: ServiceListOptions): Promise<ServiceEntry[]>;
+  getIssueEntry(issueId: string, req: Request | undefined): Promise<ServiceEntry | null>;
+}
+
+export interface OpinionsServiceContract {
+  getOpinionsList(query: ServiceQuery, options?: ServiceListOptions): Promise<ServiceEntry[]>;
+  getOpinionEntry(opinionId: string, req: Request | undefined): Promise<ServiceEntry | null>;
+}
+
+export interface ArtifactsServiceContract {
+  getArtifactsList(query: ServiceQuery, options?: ServiceListOptions): Promise<ServiceEntry[]>;
+  getArtifactEntry(artifactId: string, req: Request | undefined): Promise<ServiceEntry | null>;
+}

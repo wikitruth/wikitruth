@@ -1,5 +1,6 @@
 'use strict';
 import type { FlowUtilsModule, ConstantsModule, UtilsModule } from '../../types/legacyModules';
+import type { ArtifactsServiceContract } from '../../services/serviceTypes';
 
 import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../types/http';
@@ -7,7 +8,7 @@ import { errorMessage } from '../../types/errors';
 const flowUtils = require('../../utils/flowUtils') as FlowUtilsModule;
 const constants = require('../../models/constants') as ConstantsModule;
 const utils = require('../../utils/utils') as UtilsModule;
-const artifactsService = require('../../services/artifactsService') as any;
+const artifactsService = require('../../services/artifactsService') as ArtifactsServiceContract;
 const db = require('../../app').db.models;
 
 module.exports = function (router: Router) {
@@ -45,7 +46,7 @@ module.exports = function (router: Router) {
         return res.status(400).json({ error: 'Artifact id is required' });
       }
 
-      const artifact = await artifactsService.getArtifactEntry(req.params.id, req);
+      const artifact = await artifactsService.getArtifactEntry(artifactId, req);
       
       if (!artifact) {
         return res.status(404).json({ error: 'Artifact not found' });
