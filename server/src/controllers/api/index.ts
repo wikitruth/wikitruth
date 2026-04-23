@@ -3,13 +3,8 @@
 import type { Router } from 'express';
 
 const express = require('express') as typeof import('express');
-const apiError = require('../../middlewares/apiError') as {
-  wrapAsyncRouter: (router: Router) => Router;
-  apiEnvelopeMiddleware: import('express').RequestHandler;
-};
-const mobileContracts = require('../../middlewares/mobileApiContracts') as {
-  mobileApiContractMiddleware: import('express').RequestHandler;
-};
+import * as apiError from '../../middlewares/apiError';
+import * as mobileContracts from '../../middlewares/mobileApiContracts';
 import { sanitizeContentMiddleware } from '../../middlewares/sanitizeContent';
 
 module.exports = function (router: Router) {

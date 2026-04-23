@@ -47,7 +47,7 @@ interface AppWithConfig extends AppContext {
   };
 }
 
-module.exports = function configurePassport(app: AppWithConfig, passport: PassportLike): void {
+export default function configurePassport(app: AppWithConfig, passport: PassportLike): void {
   const db = app.db.models as unknown as {
     User: UserModelContract;
   };

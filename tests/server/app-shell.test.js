@@ -3,7 +3,7 @@
 const express = require('express');
 const request = require('supertest');
 const attachAppRoutes = require('../../server/src/controllers/app');
-const registerLegacyPathRedirects = require('../../server/src/middlewares/routes');
+const registerLegacyPathRedirects = require('../../server/src/middlewares/routes').default;
 
 describe('React shell routes', function () {
   function createApp() {

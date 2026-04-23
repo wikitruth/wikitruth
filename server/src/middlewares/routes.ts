@@ -314,7 +314,7 @@ function serveModernShell(_req: Request, res: Response): void {
   res.sendFile(reactShellPath);
 }
 
-module.exports = function registerLegacyPathRedirects(app: AppRouteRegistrar, _passport: unknown): void {
+export default function registerLegacyPathRedirects(app: AppRouteRegistrar, _passport: unknown): void {
   const modernShellPatterns = [
     '/',
     '/about',

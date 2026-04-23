@@ -3,6 +3,11 @@
 import slugify from './utils/slugify';
 import sendmail from './utils/sendmail';
 import createWorkflow from './utils/workflow';
+import requestContext from './middlewares/requestContext';
+import configureLocals from './middlewares/locals';
+import configurePassport from './middlewares/passport';
+import registerRoutes from './middlewares/routes';
+import { apiErrorHandler } from './middlewares/apiError';
 
 const path = require('path');
 
@@ -98,7 +103,7 @@ app.use(require('method-override')());
 // Avoid adding a second parser instance (body-parser@2) to prevent
 // "stream is not readable" errors when the same request body is read twice.
 app.use(cookieParser(config.cryptoKey));
-app.use(require('./middlewares/requestContext'));
+app.use(requestContext);
 
 const helmetConfig = config.security && config.security.helmet ? config.security.helmet : { enabled: true };
 if (helmetConfig.enabled) {
@@ -172,7 +177,7 @@ app.use(function (req: import('express').Request, res: import('express').Respons
 });
 
 // setup response locals
-require('./middlewares/locals')(app, passport);
+configureLocals(app, passport);
 
 //global locals
 app.locals.projectName = app.config.projectName;
@@ -194,7 +199,7 @@ app.locals.constants = constants;
 app.locals.contents = contents;
 
 //setup passport
-require('./middlewares/passport')(app, passport);
+configurePassport(app, passport);
 
 const registerLegacyCompatibility = require(
     path.join(process.cwd(), 'legacy', 'compatibility', 'server', 'bootstrap')
@@ -209,9 +214,8 @@ const legacyCompatibilityRuntime = registerLegacyCompatibility(app, {
 app.locals.legacyCompatibility = legacyCompatibilityRuntime;
 
 //setup routes
-require('./middlewares/routes')(app, passport);
+registerRoutes(app, passport);
 
-const { apiErrorHandler } = require('./middlewares/apiError');
 app.use(apiErrorHandler);
 
 //custom (friendly) error handler

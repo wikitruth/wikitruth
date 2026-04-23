@@ -90,7 +90,7 @@ function validateBody(schema: ZodTypeAny): RequestHandler {
   };
 }
 
-module.exports = {
-  schemas: schemas,
-  validateBody: validateBody,
+export {
+  schemas,
+  validateBody,
 };

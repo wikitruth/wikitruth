@@ -58,17 +58,18 @@ function looksLikePathArgument(value: unknown): boolean {
   return typeof value === 'string' || value instanceof RegExp || Array.isArray(value);
 }
 
-function wrapAsyncRouter(router: Record<string, unknown>): Record<string, unknown> {
+function wrapAsyncRouter<T>(router: T): T {
+  const target = router as unknown as Record<string, unknown>;
   const methods = ['get', 'post', 'put', 'patch', 'delete', 'all', 'use'] as const;
 
   methods.forEach(function (method) {
-    const candidate = router[method];
+    const candidate = target[method];
     if (typeof candidate !== 'function') {
       return;
     }
 
-    const original = (candidate as (...args: unknown[]) => unknown).bind(router);
-    router[method] = function (...args: unknown[]) {
+    const original = (candidate as (...args: unknown[]) => unknown).bind(target);
+    target[method] = function (...args: unknown[]) {
       const wrappedArgs = args.map(function (arg, index) {
         if (index === 0 && looksLikePathArgument(arg)) {
           return arg;
@@ -200,8 +201,8 @@ const apiEnvelopeMiddleware: RequestHandler = function (req, res, next) {
   next();
 };
 
-module.exports = {
-  wrapAsyncRouter: wrapAsyncRouter,
-  apiErrorHandler: apiErrorHandler,
-  apiEnvelopeMiddleware: apiEnvelopeMiddleware,
+export {
+  wrapAsyncRouter,
+  apiErrorHandler,
+  apiEnvelopeMiddleware,
 };

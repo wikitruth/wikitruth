@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const express = require('express');
 const request = require('supertest');
-const registerLegacyPathRedirects = require('../../server/src/middlewares/routes');
+const registerLegacyPathRedirects = require('../../server/src/middlewares/routes').default;
 
 const DRIFT_PLAN_PATH = path.join(
   process.cwd(),

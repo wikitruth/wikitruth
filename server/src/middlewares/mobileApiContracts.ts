@@ -188,7 +188,7 @@ function createMobileApiContractMiddleware(options?: Partial<MobileApiContractOp
 
 const mobileApiContractMiddleware = createMobileApiContractMiddleware();
 
-module.exports = {
-  createMobileApiContractMiddleware: createMobileApiContractMiddleware,
-  mobileApiContractMiddleware: mobileApiContractMiddleware,
+export {
+  createMobileApiContractMiddleware,
+  mobileApiContractMiddleware,
 };

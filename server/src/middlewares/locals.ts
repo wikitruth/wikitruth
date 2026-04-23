@@ -15,7 +15,7 @@ const flowUtils = require('../utils/flowUtils') as {
 const paths = require('../models/paths');
 const applications = require('../models/applications') as ApplicationsModule;
 
-module.exports = function (app: AppContext & { use: (...args: unknown[]) => void }, _passport: unknown) {
+export default function configureLocals(app: AppContext & { use: (...args: unknown[]) => void }, _passport: unknown) {
   // this code runs for all routes
   app.use(/^[^.]+$/, async function (req: Request, res: Response, next: NextFunction) {
     res.cookie('_csrfToken', req.csrfToken());

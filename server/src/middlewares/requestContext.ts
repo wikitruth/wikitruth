@@ -81,4 +81,4 @@ const requestContext: RequestHandler = function (req, res, next) {
   next();
 };
 
-module.exports = requestContext;
+export default requestContext;

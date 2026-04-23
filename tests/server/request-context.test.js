@@ -4,7 +4,7 @@ require('ts-node/register/transpile-only');
 
 const express = require('express');
 const request = require('supertest');
-const requestContext = require('../../server/src/middlewares/requestContext');
+const requestContext = require('../../server/src/middlewares/requestContext').default;
 const { apiErrorHandler, wrapAsyncRouter } = require('../../server/src/middlewares/apiError');
 
 describe('Request context middleware', function () {
