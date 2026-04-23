@@ -5,6 +5,7 @@ import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../types/http';
 import * as flowUtilsNs from '../../utils/flowUtils';
 import appModForDb from '../../app';
+import constantsMod from '../../models/constants';
 const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
 const constants = constantsMod as unknown as ConstantsModule;
 import * as utils from '../../utils/utils';
@@ -13,7 +14,6 @@ import { applyViewModeFilter } from './viewFilter';
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 import { logEntryEvent } from '../../services/entryEventsService';
 import { notifySubscribers } from '../../services/notificationsService';
-import constantsMod from '../../models/constants';
 
 export = function (router: Router) {
   // Get issues list

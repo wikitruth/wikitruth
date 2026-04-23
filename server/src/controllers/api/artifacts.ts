@@ -6,11 +6,11 @@ import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../t
 import { errorMessage } from '../../types/errors';
 import * as flowUtilsNs from '../../utils/flowUtils';
 import appModForDb from '../../app';
+import constantsMod from '../../models/constants';
 const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
 const constants = constantsMod as unknown as ConstantsModule;
 import * as utils from '../../utils/utils';
 import * as artifactsService from '../../services/artifactsService';
-import constantsMod from '../../models/constants';
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 export = function (router: Router) {
   // GET /api/artifacts - List artifacts

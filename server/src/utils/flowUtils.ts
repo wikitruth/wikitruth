@@ -1,6 +1,5 @@
 'use strict';
 
-import appModForDb from '../app';
 import * as utilsMod from './utils';
 import constantsMod from '../models/constants';
 import pathsMod from '../models/paths';
@@ -23,7 +22,37 @@ import {
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires, security/detect-non-literal-require
 import config from '../config/config';
-const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
+type DbModels = Record<string, any>;
+type AppWithDbModels = {
+  db?: {
+    models?: DbModels;
+  };
+};
+
+function resolveDbModels(): DbModels | undefined {
+  const globalModels = (globalThis as unknown as { __wikitruth_app?: AppWithDbModels }).__wikitruth_app?.db?.models;
+  if (globalModels) {
+    return globalModels;
+  }
+
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, security/detect-non-literal-require
+    const runtimeApp = require('../app') as AppWithDbModels;
+    return runtimeApp.db?.models;
+  } catch (_error) {
+    return undefined;
+  }
+}
+
+const db = new Proxy({} as DbModels, {
+  get(_target, prop: string | symbol) {
+    const models = resolveDbModels();
+    if (!models) {
+      throw new Error('Database models are not initialized yet');
+    }
+    return models[prop as keyof DbModels];
+  },
+}) as DbModels;
 const utils = utilsMod as unknown as Record<string, any>;
 const constants = constantsMod as unknown as Record<string, any>;
 const paths = pathsMod as unknown as Record<string, any>;

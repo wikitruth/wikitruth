@@ -9,11 +9,11 @@ import { applyViewModeFilter } from './viewFilter';
 
 import * as flowUtilsNs from '../../utils/flowUtils';
 import appModForDb from '../../app';
+import constantsMod from '../../models/constants';
 const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
 import * as utils from '../../utils/utils';
 const constants = constantsMod as unknown as WikitruthConstants;
 import * as argumentsService from '../../services/argumentsService';
-import constantsMod from '../../models/constants';
 
 type ArgumentDocument = {
   _id: unknown;
