@@ -44,7 +44,37 @@ function isCategoryTopic(entry?: { tags?: string[] }): boolean {
   return !!entry?.tags && entry.tags.indexOf(constants.TOPIC_TAGS.tag510.code) > -1;
 }
 
-function appendListExtras(item?: any, objectType?: any, shortTitleLength?: any, _req?: any) {
+type EntryExtras = Record<string, unknown> & {
+  title?: string;
+  contextTitle?: string;
+  friendlyUrl?: string;
+  shortTitle?: string;
+  objectType?: number;
+  objectName?: string;
+  getType?: () => number;
+  content?: string;
+  contentPreview?: string;
+  showMore?: boolean;
+  comments?: number;
+  points?: number;
+  editDate?: Date;
+  createDate?: Date;
+  editDateString?: string;
+  createDateString?: string;
+  createUserId?: { toString(): string; equals(id: unknown): boolean };
+  editUserId?: { toString(): string };
+  sameEditor?: boolean;
+  sameEditDate?: boolean;
+  referenceDate?: Date;
+  referenceDateString?: string;
+  referenceDateUTC?: string;
+  referenceDateSimple?: string;
+  childrenCount?: Record<string, { accepted?: number } | undefined>;
+  hasChildren?: boolean;
+  isItemOwner?: boolean;
+};
+
+function appendListExtras(item?: EntryExtras, objectType?: number, shortTitleLength?: number, _req?: unknown) {
   if (!item) return;
   if (item.title) {
     item.friendlyUrl = utils.urlify(item.title);
@@ -63,7 +93,7 @@ function appendListExtras(item?: any, objectType?: any, shortTitleLength?: any, 
   }
 }
 
-function appendEntryExtras(item?: any, objectType?: any, req?: any, shortTitleLength?: any) {
+function appendEntryExtras(item?: EntryExtras, objectType?: number, req?: { user?: { id?: unknown } }, shortTitleLength?: number) {
   if (!item) return;
   appendListExtras(item, objectType, shortTitleLength);
   item.comments = utils.randomInt(0, 999);
@@ -73,8 +103,8 @@ function appendEntryExtras(item?: any, objectType?: any, req?: any, shortTitleLe
   item.editDateString = utils.timeSince(item.editDate, true) + ' ago';
   item.createDateString = utils.timeSince(item.createDate, true) + ' ago';
 
-  item.sameEditor = item.createUserId.toString() === item.editUserId.toString();
-  item.sameEditDate = item.createDate.valueOf() === item.editDate.valueOf();
+  item.sameEditor = item.createUserId?.toString() === item.editUserId?.toString();
+  item.sameEditDate = item.createDate?.valueOf() === item.editDate?.valueOf();
 
   if (item.referenceDate) {
     let refDate = new Date(item.referenceDate);
@@ -86,13 +116,15 @@ function appendEntryExtras(item?: any, objectType?: any, req?: any, shortTitleLe
     } else {
       item.referenceDateSimple = item.referenceDate.toLocaleString();
     }
-    if (/,?\s*12:00 AM$/.test(item.referenceDateSimple)) {
+    if (item.referenceDateSimple && /,?\s*12:00 AM$/.test(item.referenceDateSimple)) {
       item.referenceDateSimple = item.referenceDateSimple.replace(/,?\s*12:00 AM$/, '');
     }
   }
   if (item.childrenCount) {
-    let hasChildren = function(objectName?: any) {
-      return item.childrenCount[objectName] && item.childrenCount[objectName].accepted > 0;
+    const childrenCount = item.childrenCount;
+    let hasChildren = function(objectName: string) {
+      const c = childrenCount[objectName];
+      return !!c && (c.accepted ?? 0) > 0;
     };
     if (hasChildren('topics')
       || hasChildren('arguments')
