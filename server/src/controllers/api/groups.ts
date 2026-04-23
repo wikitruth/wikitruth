@@ -16,7 +16,7 @@ module.exports = function (router: Router) {
         .sort({ title: 1 })
         .lean();
       
-      results.forEach(function (result: any) {
+      results.forEach(function (result: Record<string, unknown>) {
         result.friendlyUrl = utils.urlify(result.title);
       });
 

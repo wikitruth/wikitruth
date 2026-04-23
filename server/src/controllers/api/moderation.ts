@@ -797,7 +797,7 @@ module.exports = function (router: Router) {
 
       total += Number(count || 0);
       const objectName = String(constants.OBJECT_ID_NAME_MAP?.[targetType] || '').trim();
-      entries.forEach((entry: any) => {
+      entries.forEach((entry: Record<string, unknown>) => {
         allEntries.push(toModerationEntry(entry, { objectType: targetType, objectName, id: String(entry._id || '') }));
       });
     }

@@ -235,7 +235,7 @@ module.exports = function (router: Router) {
       }
 
       const idsToRemove = new Set<string>();
-      cookies.forEach(function (cookie: any) {
+      cookies.forEach(function (cookie: Record<string, unknown>) {
         const cookieId = String(cookie?.id || '');
         if (trustedIds.has(cookieId)) {
           idsToRemove.add(cookieId);

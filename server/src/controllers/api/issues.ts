@@ -99,7 +99,7 @@ async function GET_issue_entry(req: WikitruthRequest, res: WikitruthResponse) {
   }).sort({ editDate: -1 }).limit(5).lean();
 
   await flowUtils.setEditorsUsername(opinions);
-  opinions.forEach(function (result: any) {
+  opinions.forEach(function (result: Record<string, unknown>) {
     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.opinion, req);
   });
   
