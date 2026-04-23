@@ -4,7 +4,7 @@ import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 
 const constants = require('../../models/constants');
-const flowUtils = require('../../utils/flowUtils');
+import * as flowUtils from '../../utils/flowUtils';
 import { logEntryEvent } from '../../services/entryEventsService';
 import { notifySubscribers, createNotification } from '../../services/notificationsService';
 

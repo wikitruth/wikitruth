@@ -5,7 +5,8 @@ import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 import { applyViewModeFilter } from './viewFilter';
 
-const flowUtils = require('../../utils/flowUtils') as FlowUtilsModule;
+import * as flowUtilsNs from '../../utils/flowUtils';
+const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
 import * as utils from '../../utils/utils';
 const constants = require('../../models/constants') as ConstantsModule;
 const db = require('../../app').db.models as Record<string, any>;

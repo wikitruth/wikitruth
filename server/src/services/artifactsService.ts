@@ -3,7 +3,8 @@
 import type { FlowUtilsContract, LeanModel, ServiceEntry, ServiceListOptions, ServiceQuery, ServiceSort } from './serviceTypes';
 import type { WikitruthConstants } from '../types/constants';
 
-const flowUtils = require('../utils/flowUtils') as FlowUtilsContract;
+import * as flowUtilsNs from '../utils/flowUtils';
+const flowUtils = flowUtilsNs as unknown as FlowUtilsContract;
 const constants = require('../models/constants') as WikitruthConstants;
 const db = require('../app').db.models as {
   Artifact: LeanModel<ServiceEntry>;

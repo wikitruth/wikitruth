@@ -14,7 +14,8 @@ const constants = require('../../models/constants') as {
   };
 };
 const db = require('../../app').db.models as Record<string, any>;
-const flowUtils = require('../../utils/flowUtils') as {
+import * as flowUtilsNs from '../../utils/flowUtils';
+const flowUtils = flowUtilsNs as unknown as {
   updateChildrenCount: (entryId: unknown, entryType: unknown, specificEntryType?: unknown) => Promise<void>;
 };
 

@@ -7,7 +7,8 @@ import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../t
 const async = require('async') as {
   parallel: (tasks: Record<string, () => Promise<unknown>>) => Promise<unknown>;
 };
-const flowUtils = require('../../utils/flowUtils') as FlowUtilsModule;
+import * as flowUtilsNs from '../../utils/flowUtils';
+const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
 const constants = require('../../models/constants') as ConstantsModule;
 const applications = require('../../models/applications') as {
   getApplications: () => unknown;

@@ -3,7 +3,8 @@ import type { FlowUtilsModule, ConstantsModule, UtilsModule } from '../../types/
 
 import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../types/http';
-const flowUtils = require('../../utils/flowUtils') as FlowUtilsModule;
+import * as flowUtilsNs from '../../utils/flowUtils';
+const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
 const constants = require('../../models/constants') as ConstantsModule;
 import * as utils from '../../utils/utils';
 import * as issuesService from '../../services/issuesService';

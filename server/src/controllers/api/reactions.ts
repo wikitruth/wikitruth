@@ -6,7 +6,8 @@ import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 const constants = require('../../models/constants') as {
   OBJECT_TYPES: Record<string, number>;
 };
-const flowUtils = require('../../utils/flowUtils') as {
+import * as flowUtilsNs from '../../utils/flowUtils';
+const flowUtils = flowUtilsNs as unknown as {
   getDbModelByObjectType: (type: number) => {
     findById: (id: string) => Promise<unknown>;
   } | null;

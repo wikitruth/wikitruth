@@ -8,7 +8,8 @@ import type { ServiceEntry, ServiceQuery } from '../../services/serviceTypes';
 import type { WikitruthConstants } from '../../types/constants';
 import { applyViewModeFilter } from './viewFilter';
 
-const flowUtils = require('../../utils/flowUtils') as FlowUtilsModule;
+import * as flowUtilsNs from '../../utils/flowUtils';
+const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
 const constants = require('../../models/constants') as WikitruthConstants;
 import * as utils from '../../utils/utils';
 import * as questionsService from '../../services/questionsService';

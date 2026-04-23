@@ -5,7 +5,8 @@ import type { AppContext, ApplicationsModule } from '../types/models';
 
 const async = require('async');
 const url = require('url');
-const flowUtils = require('../utils/flowUtils') as {
+import * as flowUtilsNs from '../utils/flowUtils';
+const flowUtils = flowUtilsNs as unknown as {
   getDiaryBaseUrl(username: string): string;
   getCategories(model: { categories?: unknown[] }, topicId: string | null, req: Request): Promise<void>;
   getDiaryCategories(req: Request): Promise<unknown[]>;

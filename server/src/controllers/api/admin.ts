@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const backup = require('mongodb-backup-fixed');
 const config = require('../../config/config');
-const flowUtils = require('../../utils/flowUtils');
+import * as flowUtils from '../../utils/flowUtils';
 import { listPrivilegedEvents, logEntryEvent } from '../../services/entryEventsService';
 
 function ensureDir(dirPath: string): void {
