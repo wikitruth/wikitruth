@@ -335,7 +335,7 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
         );
 
         await Promise.all(
-          results.map(async function enrichCategory(result: any) {
+          results.map(async function enrichCategory(result: Record<string, unknown>) {
             const subTopics = await flowUtils.getTopics(
               {
                 parentId: result._id,
