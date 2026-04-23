@@ -6,7 +6,7 @@ import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../t
 const db = require('../../app').db.models;
 const utils = require('../../utils/utils') as UtilsModule;
 const constants = require('../../models/constants') as ConstantsModule;
-const jwt = require('jsonwebtoken') as any;
+const jwt = require('jsonwebtoken') as { sign(payload: object, secret: string, options?: object): string; verify(token: string, secret: string): unknown };
 
 module.exports = function (router: Router) {
   // Get all contributors (members with public profiles)
@@ -195,7 +195,8 @@ module.exports = function (router: Router) {
           return res.status(400).json({ error: 'PIN must be exactly 6 digits' });
         }
 
-        const encryptedUserId = jwt.sign({ userId: userId }, `${pin}|${(req.app as any).config.jwtSecret}`);
+        const appConfig = (req.app as unknown as { config: { jwtSecret: string } }).config;
+        const encryptedUserId = jwt.sign({ userId: userId }, `${pin}|${appConfig.jwtSecret}`);
         let updated = false;
 
         cookies = cookies.map(function (cookie: Record<string, unknown>) {
@@ -316,7 +317,7 @@ module.exports = function (router: Router) {
         shouldLoad('opinions') ? db.Opinion.find(baseQuery).sort({ editDate: -1 }).limit(limit).lean() : [],
       ]);
 
-      const withFriendlyUrl = function (entry: any) {
+      const withFriendlyUrl = function (entry: Record<string, unknown> | null | undefined) {
         if (!entry) {
           return entry;
         }
@@ -563,7 +564,7 @@ module.exports = function (router: Router) {
         shouldLoad('opinions') ? db.Opinion.find(baseQuery).sort({ editDate: -1 }).limit(limit).lean() : [],
       ]);
 
-      const withFriendlyUrl = function (entry: any) {
+      const withFriendlyUrl = function (entry: Record<string, unknown> | null | undefined) {
         if (!entry) {
           return entry;
         }
@@ -813,7 +814,9 @@ module.exports = function (router: Router) {
   });
 };
 
-function canViewProfile(member: any, currentUser: any): boolean {
+type ProfileLike = { username?: unknown; preferences?: { privateProfile?: unknown }; canPlayRoleOf?: (role: string) => boolean } | null | undefined;
+
+function canViewProfile(member: ProfileLike, currentUser: ProfileLike): boolean {
   if (!member) {
     return false;
   }
@@ -829,7 +832,7 @@ function canViewProfile(member: any, currentUser: any): boolean {
   return Boolean(currentUser.canPlayRoleOf?.('admin'));
 }
 
-function canViewPrivateEntries(member: any, currentUser: any): boolean {
+function canViewPrivateEntries(member: ProfileLike, currentUser: ProfileLike): boolean {
   if (!currentUser || !member) {
     return false;
   }
