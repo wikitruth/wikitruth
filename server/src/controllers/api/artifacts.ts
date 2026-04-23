@@ -154,7 +154,7 @@ function canEditEntry(entry: Record<string, unknown> | null | undefined, user: R
   return String(entry.createUserId || '') === String(user._id || user.id || '');
 }
 
-async function POST_artifact_create(req: any, res: any) {
+async function POST_artifact_create(req: WikitruthRequest, res: WikitruthResponse) {
   if (!req.user) {
     return res.status(401).json({ error: 'Authentication required' });
   }
@@ -209,7 +209,7 @@ async function POST_artifact_create(req: any, res: any) {
   });
 }
 
-async function PUT_artifact_update(req: any, res: any) {
+async function PUT_artifact_update(req: WikitruthRequest, res: WikitruthResponse) {
   if (!req.user) {
     return res.status(401).json({ error: 'Authentication required' });
   }
@@ -218,7 +218,7 @@ async function PUT_artifact_update(req: any, res: any) {
   if (!artifact) {
     return res.status(404).json({ error: 'Artifact not found' });
   }
-  if (!canEditEntry(artifact, req.user)) {
+  if (!canEditEntry(artifact, req.user as unknown as Record<string, unknown> | undefined)) {
     return res.status(403).json({ error: 'Not allowed to edit this artifact' });
   }
 

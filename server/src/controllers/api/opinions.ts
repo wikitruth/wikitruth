@@ -153,7 +153,7 @@ function normalizeTextForSimilarity(value: string): string {
     .trim();
 }
 
-async function POST_opinion_create(req: any, res: any) {
+async function POST_opinion_create(req: WikitruthRequest, res: WikitruthResponse) {
   if (!req.user) {
     return res.status(401).json({ error: 'Authentication required' });
   }
@@ -296,7 +296,7 @@ async function POST_opinion_create(req: any, res: any) {
   });
 }
 
-async function PUT_opinion_update(req: any, res: any) {
+async function PUT_opinion_update(req: WikitruthRequest, res: WikitruthResponse) {
   if (!req.user) {
     return res.status(401).json({ error: 'Authentication required' });
   }
@@ -305,7 +305,7 @@ async function PUT_opinion_update(req: any, res: any) {
   if (!opinion) {
     return res.status(404).json({ error: 'Opinion not found' });
   }
-  if (!canEditEntry(opinion, req.user)) {
+  if (!canEditEntry(opinion, req.user as unknown as Record<string, unknown> | undefined)) {
     return res.status(403).json({ error: 'Not allowed to edit this opinion' });
   }
 

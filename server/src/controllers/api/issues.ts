@@ -121,7 +121,7 @@ function canEditEntry(entry: Record<string, unknown> | null | undefined, user: R
   return String(entry.createUserId || '') === String(user._id || user.id || '');
 }
 
-async function POST_issue_create(req: any, res: any) {
+async function POST_issue_create(req: WikitruthRequest, res: WikitruthResponse) {
   if (!req.user) {
     return res.status(401).json({ error: 'Authentication required' });
   }
@@ -211,7 +211,7 @@ async function POST_issue_create(req: any, res: any) {
   });
 }
 
-async function PUT_issue_update(req: any, res: any) {
+async function PUT_issue_update(req: WikitruthRequest, res: WikitruthResponse) {
   if (!req.user) {
     return res.status(401).json({ error: 'Authentication required' });
   }
@@ -220,7 +220,7 @@ async function PUT_issue_update(req: any, res: any) {
   if (!issue) {
     return res.status(404).json({ error: 'Issue not found' });
   }
-  if (!canEditEntry(issue, req.user)) {
+  if (!canEditEntry(issue, req.user as unknown as Record<string, unknown> | undefined)) {
     return res.status(403).json({ error: 'Not allowed to edit this issue' });
   }
 
