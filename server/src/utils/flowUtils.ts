@@ -145,50 +145,55 @@ function appendEntryExtras(item?: EntryExtras, objectType?: number, req?: { user
     items: items to which to set the parents
     typeId: the typeId of the items
  */
-async function setEntryParents(items?: any, typeId?: any) {
+async function setEntryParents(items: Array<Record<string, unknown>> | undefined, typeId: number) {
   if (!items || items.length === 0) {
     return;
   }
 
-  let topicIds: any[] = [], topicLinkIds: any[] = [], argumentIds: any[] = [], argumentLinkIds: any[] = [], artifactIds: any[] = [], questionIds: any[] = [],
-    answerIds: any[] = [], issueIds: any[] = [], opinionIds: any[] = [];
-  let topics: Record<string, any> = {}, topicLinks: Record<string, any> = {}, args: Record<string, any> = {}, argumentLinks: Record<string, any> = {}, artifacts: Record<string, any> = {}, questions: Record<string, any> = {}, answers: Record<string, any> = {},
-    issues: Record<string, any> = {}, opinions: Record<string, any> = {};
+  type IdItem = { valueOf(): string };
+  type ParentItem = { parentId?: IdItem; ownerId?: IdItem; ownerType?: number; questionId?: IdItem; parentTopic?: unknown; parentTopicLink?: unknown; parentArtifact?: unknown; parentArgument?: unknown; parentArgumentLink?: unknown; parentQuestion?: unknown; parentAnswer?: unknown; parentIssue?: unknown; parentOpinion?: unknown };
+  type LeanDoc = Record<string, unknown> & { _id: IdItem; topicId?: IdItem; argumentId?: IdItem; topic?: { title?: string }; argument?: { title?: string }; title?: string; title2?: string };
+  let topicIds: unknown[] = [], topicLinkIds: unknown[] = [], argumentIds: unknown[] = [], argumentLinkIds: unknown[] = [], artifactIds: unknown[] = [], questionIds: unknown[] = [],
+    answerIds: unknown[] = [], issueIds: unknown[] = [], opinionIds: unknown[] = [];
+  const idLookup = (arr: unknown[]) => arr as unknown as Record<string, unknown>;
+  let topics: Record<string, LeanDoc> = {}, topicLinks: Record<string, LeanDoc> = {}, args: Record<string, LeanDoc> = {}, argumentLinks: Record<string, LeanDoc> = {}, artifacts: Record<string, LeanDoc> = {}, questions: Record<string, LeanDoc> = {}, answers: Record<string, LeanDoc> = {},
+    issues: Record<string, LeanDoc> = {}, opinions: Record<string, LeanDoc> = {};
   switch (typeId) {
     case constants.OBJECT_TYPES.topic:
-      items.forEach(function(item?: any) {
-        if (item.parentId && !topicIds[item.parentId.valueOf()]) {
+      (items as ParentItem[]).forEach(function(item: ParentItem) {
+        if (item.parentId && !idLookup(topicIds)[item.parentId.valueOf()]) {
           topicIds.push(item.parentId.valueOf());
         }
       });
       break;
     case constants.OBJECT_TYPES.argument:
-      items.forEach(function(item?: any) {
-        if (item.parentId && !argumentIds[item.parentId.valueOf()]) {
+      (items as ParentItem[]).forEach(function(item: ParentItem) {
+        if (item.parentId && !idLookup(argumentIds)[item.parentId.valueOf()]) {
           argumentIds.push(item.parentId.valueOf());
-        } else if (!topicIds[item.ownerId.valueOf()]) {
+        } else if (item.ownerId && !idLookup(topicIds)[item.ownerId.valueOf()]) {
           topicIds.push(item.ownerId.valueOf());
         }
       });
       break;
     case constants.OBJECT_TYPES.artifact:
-      items.forEach(function(item?: any) {
-        if (item.parentId && !artifactIds[item.parentId.valueOf()]) {
+      (items as ParentItem[]).forEach(function(item: ParentItem) {
+        if (item.parentId && !idLookup(artifactIds)[item.parentId.valueOf()]) {
           artifactIds.push(item.parentId.valueOf());
-        } else if (!topicIds[item.ownerId.valueOf()]) {
+        } else if (item.ownerId && !idLookup(topicIds)[item.ownerId.valueOf()]) {
           topicIds.push(item.ownerId.valueOf());
         }
       });
       break;
     case constants.OBJECT_TYPES.answer:
-      items.forEach(function(item?: any) {
-        questionIds.push(item.questionId.valueOf());
+      (items as ParentItem[]).forEach(function(item: ParentItem) {
+        if (item.questionId) questionIds.push(item.questionId.valueOf());
       });
       break;
     case constants.OBJECT_TYPES.question:
     case constants.OBJECT_TYPES.issue:
     case constants.OBJECT_TYPES.opinion:
-      items.forEach(function(item?: any) {
+      (items as ParentItem[]).forEach(function(item: ParentItem) {
+        if (!item.ownerId) return;
         switch (item.ownerType) {
           case constants.OBJECT_TYPES.topic:
             topicIds.push(item.ownerId.valueOf());
@@ -228,7 +233,7 @@ async function setEntryParents(items?: any, typeId?: any) {
         let results = await db.Topic
           .find({ _id: { $in: topicIds } })
           .exec();
-        results.forEach(function(result?: any) {
+        results.forEach(function(result: LeanDoc) {
           appendListExtras(result);
           topics[result._id.valueOf()] = result;
         });
@@ -239,21 +244,21 @@ async function setEntryParents(items?: any, typeId?: any) {
         let linkResults = await db.TopicLink
           .find({ _id: { $in: topicLinkIds } })
           .exec();
-        let topicIds2: any[] = [], topics2: Record<string, any> = {};
-        linkResults.forEach(function(result?: any) {
-          topicIds2.push(result.topicId.valueOf());
+        let topicIds2: unknown[] = [], topics2: Record<string, LeanDoc> = {};
+        linkResults.forEach(function(result: LeanDoc) {
+          if (result.topicId) topicIds2.push(result.topicId.valueOf());
         });
 
         let topicResults = await db.Topic
           .find({ _id: { $in: topicIds2 } })
           .exec();
-        topicResults.forEach(function(result?: any) {
+        topicResults.forEach(function(result: LeanDoc) {
           appendListExtras(result);
           topics2[result._id.valueOf()] = result;
         });
-        linkResults.forEach(function(result?: any) {
-          result.topic = topics2[result.topicId.valueOf()];
-          result.title2 = result.title ? result.title : result.topic.title;
+        linkResults.forEach(function(result: LeanDoc) {
+          if (result.topicId) result.topic = topics2[result.topicId.valueOf()] as { title?: string };
+          result.title2 = result.title ? result.title : (result.topic?.title ?? '');
           topicLinks[result._id.valueOf()] = result;
         });
       }
@@ -264,7 +269,7 @@ async function setEntryParents(items?: any, typeId?: any) {
         let results = await db.Argument
           .find(query)
           .exec();
-        results.forEach(function(result?: any) {
+        results.forEach(function(result: LeanDoc) {
           appendListExtras(result);
           args[result._id.valueOf()] = result;
         });
@@ -276,21 +281,21 @@ async function setEntryParents(items?: any, typeId?: any) {
           .find({ _id: { $in: argumentLinkIds } })
           .exec();
 
-        let argumentIds2: any[] = [], arguments2: Record<string, any> = {};
-        results.forEach(function(result?: any) {
-          argumentIds2.push(result.argumentId.valueOf());
+        let argumentIds2: unknown[] = [], arguments2: Record<string, LeanDoc> = {};
+        results.forEach(function(result: LeanDoc) {
+          if (result.argumentId) argumentIds2.push(result.argumentId.valueOf());
         });
 
         let results2 = await db.Argument
           .find({ _id: { $in: argumentIds2 } })
           .exec();
-        results2.forEach(function(result?: any) {
+        results2.forEach(function(result: LeanDoc) {
           appendListExtras(result);
           arguments2[result._id.valueOf()] = result;
         });
-        results.forEach(function(result?: any) {
-          result.argument = arguments2[result.argumentId.valueOf()];
-          result.title2 = result.title ? result.title : result.argument.title;
+        results.forEach(function(result: LeanDoc) {
+          if (result.argumentId) result.argument = arguments2[result.argumentId.valueOf()] as { title?: string };
+          result.title2 = result.title ? result.title : (result.argument?.title ?? '');
           argumentLinks[result._id.valueOf()] = result;
         });
       }
@@ -302,7 +307,7 @@ async function setEntryParents(items?: any, typeId?: any) {
           .find(query)
           .exec();
 
-        results.forEach(function(result?: any) {
+        results.forEach(function(result: LeanDoc) {
           appendListExtras(result);
           questions[result._id.valueOf()] = result;
         });
@@ -315,7 +320,7 @@ async function setEntryParents(items?: any, typeId?: any) {
           .find(query)
           .exec();
 
-        results.forEach(function(result?: any) {
+        results.forEach(function(result: LeanDoc) {
           appendListExtras(result);
           answers[result._id.valueOf()] = result;
         });
@@ -328,7 +333,7 @@ async function setEntryParents(items?: any, typeId?: any) {
           .find(query)
           .exec();
 
-        results.forEach(function(result?: any) {
+        results.forEach(function(result: LeanDoc) {
           appendListExtras(result);
           artifacts[result._id.valueOf()] = result;
         });
@@ -341,7 +346,7 @@ async function setEntryParents(items?: any, typeId?: any) {
           .find(query)
           .exec();
 
-        results.forEach(function(result?: any) {
+        results.forEach(function(result: LeanDoc) {
           appendListExtras(result);
           issues[result._id.valueOf()] = result;
         });
@@ -354,7 +359,7 @@ async function setEntryParents(items?: any, typeId?: any) {
           .find(query)
           .exec();
 
-        results.forEach(function(result?: any) {
+        results.forEach(function(result: LeanDoc) {
           appendListExtras(result);
           opinions[result._id.valueOf()] = result;
         });
@@ -364,31 +369,32 @@ async function setEntryParents(items?: any, typeId?: any) {
 
   switch (typeId) {
     case constants.OBJECT_TYPES.topic:
-      items.forEach(function(item?: any) {
+      (items as ParentItem[]).forEach(function(item: ParentItem) {
         if (item.parentId) {
           item.parentTopic = topics[item.parentId.valueOf()];
         }
       });
       break;
     case constants.OBJECT_TYPES.argument:
-      items.forEach(function(item?: any) {
+      (items as ParentItem[]).forEach(function(item: ParentItem) {
         if (item.parentId) {
           item.parentArgument = args[item.parentId.valueOf()];
-        } else {
+        } else if (item.ownerId) {
           item.parentTopic = topics[item.ownerId.valueOf()];
         }
       });
       break;
     case constants.OBJECT_TYPES.answer:
-      items.forEach(function(item?: any) {
-        item.parentQuestion = questions[item.questionId.valueOf()];
+      (items as ParentItem[]).forEach(function(item: ParentItem) {
+        if (item.questionId) item.parentQuestion = questions[item.questionId.valueOf()];
       });
       break;
     case constants.OBJECT_TYPES.question:
     case constants.OBJECT_TYPES.artifact:
     case constants.OBJECT_TYPES.issue:
     case constants.OBJECT_TYPES.opinion:
-      items.forEach(function(item?: any) {
+      (items as ParentItem[]).forEach(function(item: ParentItem) {
+        if (!item.ownerId) return;
         switch (item.ownerType) {
           case constants.OBJECT_TYPES.topic:
             item.parentTopic = topics[item.ownerId.valueOf()];
@@ -429,6 +435,7 @@ async function setEntryParent(item?: Record<string, unknown>, typeId?: number): 
   if (!item) {
     return;
   }
+  if (typeId === undefined) return;
   await setEntryParents([item], typeId);
 }
 
