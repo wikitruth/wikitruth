@@ -1,20 +1,32 @@
 'use strict';
 
-let db = require('../app').db.models,
-  utils = require('./utils'),
-  constants = require('../models/constants'),
-  paths = require('../models/paths'),
-  applications = require('../models/applications'),
-  config = require('../config/config'),
-  url = require('url'),
-  querystring = require('querystring'),
-  htmlToText = require('html-to-text'),
-  dateFns = require('date-fns'),
-  async = require('async');
+import appModForDb from '../app';
+import * as utilsMod from './utils';
+import constantsMod from '../models/constants';
+import pathsMod from '../models/paths';
+import applicationsMod from '../models/applications';
+import * as urlMod from 'url';
+import * as querystringMod from 'querystring';
+import htmlToTextMod from 'html-to-text';
+import * as dateFnsMod from 'date-fns';
+import async from 'async';
+import { sanitizeContent } from './sanitizeHtml';
+import {
+  normalizeChildrenCountUpdateTasks,
+  assertChildrenCountInvariants,
+} from '../services/childrenCountGuardrails';
 
-const childrenCountGuardrails = require('../services/childrenCountGuardrails'),
-  normalizeChildrenCountUpdateTasks = childrenCountGuardrails.normalizeChildrenCountUpdateTasks,
-  assertChildrenCountInvariants = childrenCountGuardrails.assertChildrenCountInvariants;
+// eslint-disable-next-line @typescript-eslint/no-var-requires, security/detect-non-literal-require
+import config from '../config/config';
+const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
+const utils = utilsMod as unknown as Record<string, any>;
+const constants = constantsMod as unknown as Record<string, any>;
+const paths = pathsMod as unknown as Record<string, any>;
+const applications = applicationsMod as unknown as Record<string, any>;
+const dateFns = dateFnsMod as unknown as Record<string, any>;
+const url = urlMod as unknown as Record<string, any>;
+const querystring = querystringMod as unknown as Record<string, any>;
+const htmlToText = htmlToTextMod as unknown as Record<string, any>;
 
 function getBackupDir(isPrivate?: boolean): string {
   let backupRoot = isPrivate && config.mongodb.privateBackupRoot ? config.mongodb.privateBackupRoot : config.mongodb.backupRoot;
@@ -2574,7 +2586,6 @@ function setModelContext(req: { params?: { username?: string }; user?: { usernam
 
 function getEditorContent(content?: string): string {
   if (!content) return '';
-  const { sanitizeContent } = require('./sanitizeHtml');
   let c = sanitizeContent(content.trim());
   if (c === '<p><br></p>') {
     c = '';

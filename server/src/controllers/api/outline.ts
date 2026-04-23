@@ -4,7 +4,8 @@ import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 
 import appModForDb from '../../app';
-const constants = require('../../models/constants') as {
+import constantsMod from '../../models/constants';
+const constants = constantsMod as unknown as {
   OBJECT_TYPES: {
     topic: number;
     argument: number;

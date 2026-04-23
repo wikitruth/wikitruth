@@ -11,7 +11,7 @@ const constants = constantsMod as unknown as ConstantsModule;
 import * as utils from '../../utils/utils';
 import * as answersService from '../../services/answersService';
 import constantsMod from '../../models/constants';
-const { applyViewModeFilter } = require('./viewFilter');
+import { applyViewModeFilter } from './viewFilter';
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 export = function (router: Router) {
   // GET /api/answers - List answers

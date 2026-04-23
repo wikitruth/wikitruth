@@ -5,14 +5,16 @@ import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../types/http';
 
 import appModForDb from '../../app';
-const async = require('async') as {
+import asyncMod from 'async';
+import applicationsMod from '../../models/applications';
+const async = asyncMod as unknown as {
   parallel: (tasks: Record<string, () => Promise<unknown>>) => Promise<unknown>;
 };
 import * as flowUtilsNs from '../../utils/flowUtils';
 import constantsMod from '../../models/constants';
 const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
 const constants = constantsMod as unknown as ConstantsModule;
-const applications = require('../../models/applications') as {
+const applications = applicationsMod as unknown as {
   getApplications: () => unknown;
 };
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;

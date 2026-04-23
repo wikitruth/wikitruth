@@ -9,7 +9,7 @@ const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
 const constants = constantsMod as unknown as ConstantsModule;
 import * as utils from '../../utils/utils';
 import * as issuesService from '../../services/issuesService';
-const { applyViewModeFilter } = require('./viewFilter');
+import { applyViewModeFilter } from './viewFilter';
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 import { logEntryEvent } from '../../services/entryEventsService';
 import { notifySubscribers } from '../../services/notificationsService';

@@ -3,14 +3,22 @@
 import type { AppContext } from '../types/models';
 import type { AuthUser } from '../types/auth';
 import jwt from 'jsonwebtoken';
+import { Strategy as LocalStrategyTyped } from 'passport-local';
+import { Strategy as TwitterStrategyTyped } from 'passport-twitter';
+import { Strategy as GitHubStrategyTyped } from 'passport-github';
+import { Strategy as FacebookStrategyTyped } from 'passport-facebook';
+import passportGoogle from 'passport-google';
+import AppleStrategyDefault from 'passport-apple';
+import passportMicrosoft from 'passport-microsoft';
 
-const LocalStrategy = require('passport-local').Strategy;
-const TwitterStrategy = require('passport-twitter').Strategy;
-const GitHubStrategy = require('passport-github').Strategy;
-const FacebookStrategy = require('passport-facebook').Strategy;
-const GoogleStrategy = require('passport-google').Strategy;
-const AppleStrategy = require('passport-apple');
-const MicrosoftStrategy = require('passport-microsoft').Strategy;
+type StrategyCtor = new (...args: unknown[]) => unknown;
+const LocalStrategy = LocalStrategyTyped as unknown as StrategyCtor;
+const TwitterStrategy = TwitterStrategyTyped as unknown as StrategyCtor;
+const GitHubStrategy = GitHubStrategyTyped as unknown as StrategyCtor;
+const FacebookStrategy = FacebookStrategyTyped as unknown as StrategyCtor;
+const GoogleStrategy = (passportGoogle as { Strategy: unknown }).Strategy as StrategyCtor;
+const AppleStrategy = AppleStrategyDefault as unknown as StrategyCtor;
+const MicrosoftStrategy = (passportMicrosoft as { Strategy: unknown }).Strategy as StrategyCtor;
 
 interface PassportLike {
   use(strategy: unknown): void;

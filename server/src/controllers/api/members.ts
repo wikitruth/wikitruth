@@ -8,7 +8,8 @@ const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).d
 import * as utils from '../../utils/utils';
 import constantsMod from '../../models/constants';
 const constants = constantsMod as unknown as ConstantsModule;
-const jwt = require('jsonwebtoken') as { sign(payload: object, secret: string, options?: object): string; verify(token: string, secret: string): unknown };
+import jwtMod from 'jsonwebtoken';
+const jwt = jwtMod as unknown as { sign(payload: object, secret: string, options?: object): string; verify(token: string, secret: string): unknown };
 
 export = function (router: Router) {
   // Get all contributors (members with public profiles)

@@ -1,7 +1,8 @@
 'use strict';
 
 import mongoose from 'mongoose';
-const appModule = require('../app') as {
+import appMod from '../app';
+const appModule = appMod as unknown as {
   kraken?: {
     get: (key: string) => string | undefined;
   };

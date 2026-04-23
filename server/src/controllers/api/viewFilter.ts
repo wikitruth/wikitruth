@@ -1,8 +1,9 @@
 'use strict';
 
 import type { WikitruthRequest } from '../../types/http';
+import constantsMod from '../../models/constants';
 
-const constants = require('../../models/constants') as {
+const constants = constantsMod as unknown as {
   SCREENING_STATUS: {
     status0: { code: number };
     status1: { code: number };

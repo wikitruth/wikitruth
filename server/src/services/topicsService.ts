@@ -9,7 +9,7 @@ import appModForDb from '../app';
 const flowUtils = flowUtilsNs as unknown as FlowUtilsContract;
 const constants = constantsMod as unknown as WikitruthConstants;
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
-const { getCoreModels } = require('../models/schema/typedModels');
+import { getCoreModels } from '../models/schema/typedModels';
 
 /**
  * Get a list of topics based on query and options
@@ -18,7 +18,7 @@ const { getCoreModels } = require('../models/schema/typedModels');
  * @returns {Promise<Array>} Array of topics with enriched data
  */
 async function getTopicsList(query: ServiceQuery, options: ServiceListOptions = {}): Promise<ServiceEntry[]> {
-  const models = getCoreModels({ db: { models: db } }) as {
+  const models = getCoreModels({ db: { models: db } } as unknown as Parameters<typeof getCoreModels>[0]) as {
     Topic: LeanModel<ServiceEntry>;
   };
   const limit = options.limit ?? 50;
@@ -46,7 +46,7 @@ async function getTopicsList(query: ServiceQuery, options: ServiceListOptions = 
  * @returns {Promise<Object>} Topic object with enriched data
  */
 async function getTopicEntry(topicId: string, req: ServiceListOptions['req']): Promise<ServiceEntry | null> {
-  const models = getCoreModels({ db: { models: db } }) as {
+  const models = getCoreModels({ db: { models: db } } as unknown as Parameters<typeof getCoreModels>[0]) as {
     Topic: LeanModel<ServiceEntry>;
   };
   const topic = await models.Topic.findById(topicId).lean();

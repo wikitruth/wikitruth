@@ -5,8 +5,8 @@ import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 
 import appModForDb from '../../app';
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
-const backup = require('mongodb-backup-fixed');
-const config = require('../../config/config');
+import backup from 'mongodb-backup-fixed';
+import config from '../../config/config';
 import * as flowUtils from '../../utils/flowUtils';
 import { listPrivilegedEvents, logEntryEvent } from '../../services/entryEventsService';
 import fs from 'fs';
