@@ -1,4 +1,5 @@
 'use strict';
+import type { FlowUtilsModule } from '../../types/legacyModules';
 
 import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
@@ -7,7 +8,7 @@ import type { ServiceEntry, ServiceQuery } from '../../services/serviceTypes';
 import type { WikitruthConstants } from '../../types/constants';
 import { applyViewModeFilter } from './viewFilter';
 
-const flowUtils = require('../../utils/flowUtils') as any;
+const flowUtils = require('../../utils/flowUtils') as FlowUtilsModule;
 const constants = require('../../models/constants') as WikitruthConstants;
 const utils = require('../../utils/utils') as {
   urlify: (value: string) => string;

@@ -1,10 +1,11 @@
 'use strict';
+import type { ConstantsModule, UtilsModule } from '../../types/legacyModules';
 
 import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../types/http';
 const db = require('../../app').db.models;
-const utils = require('../../utils/utils') as any;
-const constants = require('../../models/constants') as any;
+const utils = require('../../utils/utils') as UtilsModule;
+const constants = require('../../models/constants') as ConstantsModule;
 
 module.exports = function (router: Router) {
   // Get all groups (public and private based on user)

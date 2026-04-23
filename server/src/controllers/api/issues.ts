@@ -1,10 +1,11 @@
 'use strict';
+import type { FlowUtilsModule, ConstantsModule, UtilsModule } from '../../types/legacyModules';
 
 import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../types/http';
-const flowUtils = require('../../utils/flowUtils') as any;
-const constants = require('../../models/constants') as any;
-const utils = require('../../utils/utils') as any;
+const flowUtils = require('../../utils/flowUtils') as FlowUtilsModule;
+const constants = require('../../models/constants') as ConstantsModule;
+const utils = require('../../utils/utils') as UtilsModule;
 const issuesService = require('../../services/issuesService') as any;
 const { applyViewModeFilter } = require('./viewFilter');
 const db = require('../../app').db.models;

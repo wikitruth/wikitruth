@@ -1,4 +1,5 @@
 'use strict';
+import type { FlowUtilsModule, ConstantsModule } from '../../types/legacyModules';
 
 import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../types/http';
@@ -6,8 +7,8 @@ import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../t
 const async = require('async') as {
   parallel: (tasks: Record<string, () => Promise<unknown>>) => Promise<unknown>;
 };
-const flowUtils = require('../../utils/flowUtils') as any;
-const constants = require('../../models/constants') as any;
+const flowUtils = require('../../utils/flowUtils') as FlowUtilsModule;
+const constants = require('../../models/constants') as ConstantsModule;
 const applications = require('../../models/applications') as {
   getApplications: () => unknown;
 };
@@ -15,7 +16,7 @@ const db = require('../../app').db.models as Record<string, any>;
 
 interface HomeQuery {
   parentId?: unknown;
-  ownerType?: string;
+  ownerType?: number;
   private: boolean;
   'screening.status'?: unknown;
   categoryId?: unknown;
