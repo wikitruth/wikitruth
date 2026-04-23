@@ -24,15 +24,16 @@ module.exports = function (router: Router) {
       
       if (req.user) {
         const currentUser: any = req.user;
-        model.privateGroups = results.filter(function (group: any) {
+        model.privateGroups = results.filter(function (group: Record<string, unknown>) {
+          const members = (group.members as Array<Record<string, unknown>> | undefined) || [];
           return group.privacyType !== constants.GROUP_PRIVACY_TYPES.type10.code
-            && group.members && group.members.some(function (member: any) {
+            && members.some(function (member: Record<string, unknown>) {
               return String(member.userId || '') === String(currentUser.id || currentUser._id || '');
             });
         });
       }
       
-      model.publicGroups = results.filter(function (group: any) {
+      model.publicGroups = results.filter(function (group: Record<string, unknown>) {
         return group.privacyType === constants.GROUP_PRIVACY_TYPES.type10.code;
       });
 
@@ -334,7 +335,7 @@ module.exports = function (router: Router) {
       }
 
       const userId = String(req.body?.userId || req.user._id);
-      const exists = (group.members || []).some(function (member: any) {
+      const exists = (group.members || []).some(function (member: Record<string, unknown>) {
         return String(member.userId || '') === userId;
       });
       if (!exists) {
@@ -374,7 +375,7 @@ module.exports = function (router: Router) {
         return res.status(403).json({ error: 'Not allowed to remove this member' });
       }
 
-      group.members = (group.members || []).filter(function (member: any) {
+      group.members = (group.members || []).filter(function (member: Record<string, unknown>) {
         return String(member.userId || '') !== targetUserId;
       });
       group.editDate = new Date();
@@ -402,7 +403,7 @@ function isGroupManager(group: any, user: any) {
     return true;
   }
 
-  return (group.members || []).some(function (member: any) {
+  return (group.members || []).some(function (member: Record<string, unknown>) {
     return resolveMemberUserId(member) === userId
       && Number(member.roleType || constants.GROUP_ROLE_TYPES.type10.code) === constants.GROUP_ROLE_TYPES.type20.code;
   });
@@ -430,7 +431,7 @@ function isGroupMember(group: any, user: any): boolean {
   if (String(group.createUserId || '') === userId) {
     return true;
   }
-  return (group.members || []).some(function (member: any) {
+  return (group.members || []).some(function (member: Record<string, unknown>) {
     return resolveMemberUserId(member) === userId;
   });
 }

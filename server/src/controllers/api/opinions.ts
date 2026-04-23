@@ -204,7 +204,7 @@ async function POST_opinion_create(req: any, res: any) {
   }
 
   const incomingNormalized = normalizeTextForSimilarity(`${title} ${description}`);
-  const duplicateFound = recentEntries.some((entry: any) => {
+  const duplicateFound = recentEntries.some((entry: Record<string, unknown>) => {
     const existingNormalized = normalizeTextForSimilarity(`${entry?.title || ''} ${entry?.content || ''}`);
     return existingNormalized && existingNormalized === incomingNormalized;
   });

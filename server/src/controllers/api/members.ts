@@ -148,12 +148,12 @@ module.exports = function (router: Router) {
 
       const userId = req.user._id || req.user.id;
       const trustedClients = await db.TrustedClient.find({ userId: userId }).select('_id').lean();
-      const trustedIds = new Set(trustedClients.map(function (client: any) {
+      const trustedIds = new Set(trustedClients.map(function (client: Record<string, unknown>) {
         return String(client._id || '');
       }));
 
       const cookies = Array.isArray(req.cookies.fast_switch) ? req.cookies.fast_switch : [];
-      const enabled = cookies.some(function (cookie: any) {
+      const enabled = cookies.some(function (cookie: Record<string, unknown>) {
         return trustedIds.has(String(cookie?.id || ''));
       });
 
@@ -182,7 +182,7 @@ module.exports = function (router: Router) {
       const pin = String(req.body?.pin || '').trim();
       const cookieName = 'fast_switch';
       const trustedClients = await db.TrustedClient.find({ userId: userId }).lean();
-      const trustedIds = new Set(trustedClients.map(function (client: any) {
+      const trustedIds = new Set(trustedClients.map(function (client: Record<string, unknown>) {
         return String(client._id || '');
       }));
       let cookies = Array.isArray(req.cookies.fast_switch) ? [...req.cookies.fast_switch] : [];
@@ -198,7 +198,7 @@ module.exports = function (router: Router) {
         const encryptedUserId = jwt.sign({ userId: userId }, `${pin}|${(req.app as any).config.jwtSecret}`);
         let updated = false;
 
-        cookies = cookies.map(function (cookie: any) {
+        cookies = cookies.map(function (cookie: Record<string, unknown>) {
           if (trustedIds.has(String(cookie?.id || ''))) {
             updated = true;
             return {
@@ -246,7 +246,7 @@ module.exports = function (router: Router) {
         await db.TrustedClient.deleteMany({ _id: { $in: Array.from(idsToRemove) } });
       }
 
-      cookies = cookies.filter(function (cookie: any) {
+      cookies = cookies.filter(function (cookie: Record<string, unknown>) {
         return !idsToRemove.has(String(cookie?.id || ''));
       });
 
@@ -403,7 +403,7 @@ module.exports = function (router: Router) {
           _id: member._id,
           username: member.username,
         },
-        topics: topics.map(function (topic: any) {
+        topics: topics.map(function (topic: Record<string, unknown>) {
           return {
             ...topic,
             friendlyUrl: topic.friendlyUrl || utils.urlify(topic.title || ''),
@@ -452,7 +452,7 @@ module.exports = function (router: Router) {
         db.Opinion.distinct('ownerId', { createUserId: member._id, ownerId: { $ne: null } }),
         db.Artifact.distinct('ownerId', { createUserId: member._id, ownerId: { $ne: null } }),
       ]);
-      const topicIds = [...new Set(topicIdBuckets.flat().map((id: any) => String(id || '')).filter(Boolean))];
+      const topicIds = [...new Set(topicIdBuckets.flat().map((id: Record<string, unknown>) => String(id || '')).filter(Boolean))];
 
       const topicQuery: Record<string, unknown> = { _id: { $in: topicIds } };
       if (!canViewPrivate) {
@@ -467,7 +467,7 @@ module.exports = function (router: Router) {
         ...new Set(
           groups
             .flatMap(function (group: any) {
-              return (group.members || []).map(function (memberRow: any) {
+              return (group.members || []).map(function (memberRow: Record<string, unknown>) {
                 return String(memberRow?.userId || '');
               });
             })
@@ -492,13 +492,13 @@ module.exports = function (router: Router) {
         },
         following: {
           people: people,
-          topics: topics.map(function (topic: any) {
+          topics: topics.map(function (topic: Record<string, unknown>) {
             return {
               ...topic,
               friendlyUrl: topic.friendlyUrl || utils.urlify(topic.title || ''),
             };
           }),
-          groups: groups.map(function (group: any) {
+          groups: groups.map(function (group: Record<string, unknown>) {
             return {
               _id: group._id,
               title: group.title,
@@ -630,7 +630,7 @@ module.exports = function (router: Router) {
           _id: member._id,
           username: member.username,
         },
-        pages: pages.map(function (page: any) {
+        pages: pages.map(function (page: Record<string, unknown>) {
           return {
             ...page,
             friendlyUrl: page.friendlyUrl || utils.urlify(page.title || ''),

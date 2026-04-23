@@ -391,7 +391,7 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
         }
       );
 
-      model.keyTopics = (model.topics || []).filter(function (result: any) {
+      model.keyTopics = (model.topics || []).filter(function (result: Record<string, unknown>) {
         return Array.isArray(result.tags) && result.tags.indexOf(constants.TOPIC_TAGS.tag20.code) >= 0;
       });
 
@@ -458,7 +458,7 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
       flowUtils.sortArguments(results);
       model.arguments = results.slice(0, 15);
 
-      model.keyArguments = results.filter(function (result: any) {
+      model.keyArguments = results.filter(function (result: Record<string, unknown>) {
         return Array.isArray(result.tags) && result.tags.indexOf(constants.ARGUMENT_TAGS.tag20.code) >= 0;
       });
 
