@@ -2243,7 +2243,28 @@ function createOwnerQueryFromQuery(req?: { query?: Record<string, unknown> }): {
   return {};
 }
 
-function setModelOwnerEntry(req?: any, res?: any, model?: any, options?: any) {
+type TaggedEntry = {
+  tags?: number[];
+  ethicalStatus?: { hasValue?: boolean };
+  typeId?: number;
+  topic?: { tags?: number[]; ethicalStatus?: { hasValue?: boolean } };
+  ownerType?: number;
+  issueType?: unknown;
+};
+type ModelOwnerEntryShape = Record<string, unknown> & {
+  opinion?: TaggedEntry;
+  parentOpinion?: TaggedEntry;
+  issue?: TaggedEntry;
+  answer?: TaggedEntry;
+  question?: TaggedEntry;
+  artifact?: TaggedEntry;
+  argumentLink?: TaggedEntry;
+  argument?: TaggedEntry;
+  topicLink?: TaggedEntry;
+  topic?: TaggedEntry;
+};
+
+function setModelOwnerEntry(req: { params?: { username?: string }; user?: { username?: string; id?: unknown }; body?: { username?: string }; session?: { clipboard?: ClipboardMap } }, res: { locals?: { group?: { _id?: unknown; title?: unknown } } }, model: ModelOwnerEntryShape, options?: { hideClipboard?: boolean }) {
   if (!options) options = {};
 
   if (model.opinion && (!model.issue || model.opinion.ownerType === constants.OBJECT_TYPES.issue)) {
@@ -2300,11 +2321,11 @@ function setModelOwnerEntry(req?: any, res?: any, model?: any, options?: any) {
     const tags = model.argument.tags;
     if (tags && tags.length > 0) {
       const tagLabels = [];
-      if (model.argument.ethicalStatus.hasValue) {
+      if (model.argument.ethicalStatus?.hasValue) {
         tagLabels.push(constants.ARGUMENT_TAGS.tag10);
         model.hasValue = true;
       }
-      tags.forEach(function(tag?: any) {
+      tags.forEach(function(tag: number) {
         tagLabels.push(constants.ARGUMENT_TAGS['tag' + tag]);
         if (!model.hasValue && tag === constants.ARGUMENT_TAGS.tag10.code) {
           model.hasValue = true;
@@ -2312,7 +2333,7 @@ function setModelOwnerEntry(req?: any, res?: any, model?: any, options?: any) {
       });
       model.tagLabels = tagLabels;
     }
-    if (!model.hasValue && (model.argument.ethicalStatus.hasValue || model.argument.typeId === constants.ARGUMENT_TYPES.ethical)) {
+    if (!model.hasValue && (model.argument.ethicalStatus?.hasValue || model.argument.typeId === constants.ARGUMENT_TYPES.ethical)) {
       model.hasValue = true;
     }
   } else if (model.topicLink) {
@@ -2323,14 +2344,14 @@ function setModelOwnerEntry(req?: any, res?: any, model?: any, options?: any) {
       setClipboardModel(req, model, constants.OBJECT_TYPES.topicLink);
     setVerdictModel(model.topicLink);
     // Topic Tags
-    const topicLinkTags = model.topicLink.topic.tags;
+    const topicLinkTags = model.topicLink.topic?.tags;
     if (topicLinkTags && topicLinkTags.length > 0) {
       const topicLinkTagLabels = [];
-      if (model.topicLink.topic.ethicalStatus.hasValue) {
+      if (model.topicLink.topic?.ethicalStatus?.hasValue) {
         topicLinkTagLabels.push(constants.TOPIC_TAGS.tag10);
         model.hasValue = true;
       }
-      topicLinkTags.forEach(function(tag?: any) {
+      topicLinkTags.forEach(function(tag: number) {
         topicLinkTagLabels.push(constants.TOPIC_TAGS['tag' + tag]);
         if (tag === constants.TOPIC_TAGS.tag520.code) {
           model.mainTopic = true;
@@ -2340,7 +2361,7 @@ function setModelOwnerEntry(req?: any, res?: any, model?: any, options?: any) {
         }
       });
       model.tagLabels = topicLinkTagLabels;
-    } else if (model.topicLink.topic.ethicalStatus.hasValue) {
+    } else if (model.topicLink.topic?.ethicalStatus?.hasValue) {
       model.hasValue = true;
     }
   } else if (model.topic) {
@@ -2354,11 +2375,11 @@ function setModelOwnerEntry(req?: any, res?: any, model?: any, options?: any) {
     const topicTags = model.topic.tags;
     if (topicTags && topicTags.length > 0) {
       const topicTagLabels = [];
-      if (model.topic.ethicalStatus.hasValue) {
+      if (model.topic.ethicalStatus?.hasValue) {
         topicTagLabels.push(constants.TOPIC_TAGS.tag10);
         model.hasValue = true;
       }
-      topicTags.forEach(function(tag?: any) {
+      topicTags.forEach(function(tag: number) {
         topicTagLabels.push(constants.TOPIC_TAGS['tag' + tag]);
         if (tag === constants.TOPIC_TAGS.tag520.code) {
           model.mainTopic = true;
@@ -2368,7 +2389,7 @@ function setModelOwnerEntry(req?: any, res?: any, model?: any, options?: any) {
         }
       });
       model.tagLabels = topicTagLabels;
-    } else if (model.topic.ethicalStatus.hasValue) {
+    } else if (model.topic.ethicalStatus?.hasValue) {
       model.hasValue = true;
     }
   }
