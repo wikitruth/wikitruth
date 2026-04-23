@@ -2511,12 +2511,12 @@ function createOwnerQueryFromModel(model?: OwnerSourceModel): { ownerType?: numb
  * @param model
  * @param mixedMode The place this is called may display both public and private entries (e.g. clipboard)
  */
-function setModelContext(req?: any, res?: any, model?: any, mixedMode?: any) {
-  if (res.locals.group) {
+function setModelContext(req: { params?: { username?: string }; user?: { username?: string } }, res: { locals?: { group?: { _id?: unknown; title?: unknown } } }, model: Record<string, unknown> & { group?: unknown; wikiBaseUrl?: string; username?: string; profileBaseUrl?: string; entry?: { private?: boolean } }, mixedMode?: boolean) {
+  if (res.locals?.group) {
     model.group = res.locals.group;
-    model.wikiBaseUrl = buildGroupUrl(model.group) + paths.groups.group.posts;
-  } else if (req.params.username || (mixedMode && req.user && req.user.username) || (model.entry && model.entry.private)) {
-    model.username = req.params.username || req.user.username;
+    model.wikiBaseUrl = buildGroupUrl(res.locals.group) + paths.groups.group.posts;
+  } else if (req.params?.username || (mixedMode && req.user && req.user.username) || (model.entry && model.entry.private)) {
+    model.username = req.params?.username || req.user?.username;
     model.profileBaseUrl = paths.members.index + '/' + model.username;
     model.wikiBaseUrl = model.profileBaseUrl + (paths.members.profile.journal || paths.members.profile.diary);
   } else {
@@ -2565,11 +2565,20 @@ function buildTopicReturnUrl(model?: { username?: unknown; group?: unknown; wiki
       (model?.username || model?.group) ? (model.wikiBaseUrl || '') : '/';
 }
 
-function buildParentUrl(req?: any, entry?: any) {
-  const getBaseUrl = function(entry?: any) {
-    return entry.private ? paths.members.index + '/' + req.user.username + (paths.members.profile.journal || paths.members.profile.diary) : '';
+type ParentUrlEntry = {
+  private?: boolean;
+  ownerType?: number;
+  ownerId?: unknown;
+  parentId?: unknown;
+  questionId?: unknown;
+  getType: () => number;
+};
+
+function buildParentUrl(req: { user?: { username?: string } }, entry: ParentUrlEntry) {
+  const getBaseUrl = function(entry: ParentUrlEntry) {
+    return entry.private ? paths.members.index + '/' + req.user?.username + (paths.members.profile.journal || paths.members.profile.diary) : '';
   };
-  const buildRedirectUrl = function(entry?: any) {
+  const buildRedirectUrl = function(entry: ParentUrlEntry) {
     const wikiBaseUrl = getBaseUrl(entry);
     switch (entry.ownerType) {
       case constants.OBJECT_TYPES.topicLink:
@@ -2577,7 +2586,7 @@ function buildParentUrl(req?: any, entry?: any) {
       case constants.OBJECT_TYPES.argumentLink:
         return wikiBaseUrl + '/argument/link/' + entry.ownerId;
       default:
-        return wikiBaseUrl + '/' + constants.OBJECT_ID_NAME_MAP[entry.ownerType] + '/' + entry.ownerId;
+        return wikiBaseUrl + '/' + constants.OBJECT_ID_NAME_MAP[entry.ownerType as number] + '/' + entry.ownerId;
     }
   };
 
@@ -2607,7 +2616,7 @@ function buildParentUrl(req?: any, entry?: any) {
   return '/';
 }
 
-function buildEntryReturnUrl(req?: any, model?: any) {
+function buildEntryReturnUrl(req: { query?: { argument?: unknown } }, model: { wikiBaseUrl?: string; entry?: { title?: string; _id?: unknown; topic?: { title?: string }; argument?: { title?: string } }; entryType?: number; ownerType?: number }) {
   const fallbackBaseUrl = model && model.wikiBaseUrl ? model.wikiBaseUrl : '/';
   if (!model || !model.entry || !model.entryType) {
     return fallbackBaseUrl;
@@ -2632,14 +2641,14 @@ function buildEntryReturnUrl(req?: any, model?: any) {
       if (!entryTitle) {
         return fallbackBaseUrl;
       }
-      return model.wikiBaseUrl + paths.wiki.arguments.entry + '/' + utils.urlify(entryTitle) + '/' + (req.query.argument || entryId);
+      return model.wikiBaseUrl + paths.wiki.arguments.entry + '/' + utils.urlify(entryTitle) + '/' + (req.query?.argument || entryId);
     case constants.OBJECT_TYPES.argumentLink:
       if (!entry.argument || !entry.argument.title) {
         return fallbackBaseUrl;
       }
-      return model.wikiBaseUrl + paths.wiki.arguments.entry + '/' + utils.urlify(entry.argument.title) + '/link/' + (req.query.argument || entryId);
+      return model.wikiBaseUrl + paths.wiki.arguments.entry + '/' + utils.urlify(entry.argument.title) + '/link/' + (req.query?.argument || entryId);
     default: {
-      const ownerName = constants.OBJECT_NAMES_MAP[model.ownerType];
+      const ownerName = constants.OBJECT_NAMES_MAP[model.ownerType as number];
       if (!ownerName || !paths.wiki[ownerName] || !paths.wiki[ownerName].entry || !entryTitle || !entryId) {
         return fallbackBaseUrl;
       }
@@ -2648,7 +2657,7 @@ function buildEntryReturnUrl(req?: any, model?: any) {
   }
 }
 
-function setScreeningModel(req?: any, model?: any) {
+function setScreeningModel(req: { originalUrl?: string; query?: { screening?: string } }, model: Record<string, unknown> & { screening?: Record<string, unknown> }) {
   if (!model.screening) {
     model.screening = {};
   }
@@ -2673,7 +2682,7 @@ function setScreeningModel(req?: any, model?: any) {
   baseUrl.query = newQuery;
   model.screening.archivedUrl = url.format(baseUrl);
 
-  if (req.query.screening) {
+  if (req.query?.screening) {
     if (req.query.screening === 'pending') {
       model.screening.pending = true;
       model.screening.status = constants.SCREENING_STATUS.status0.code;
@@ -2692,8 +2701,8 @@ function setScreeningModel(req?: any, model?: any) {
   model.screening.status = constants.SCREENING_STATUS.status1.code;
 }
 
-function initScreeningStatus(req?: any, entity?: any) {
-  if (req.user.roles.reviewer || req.params.username || req.body.username) { /* req.body.username is used by clipboard */
+function initScreeningStatus(req: { user?: { roles?: { reviewer?: unknown } }; params?: { username?: string }; body?: { username?: string } }, entity: { screening?: unknown }) {
+  if (req.user?.roles?.reviewer || req.params?.username || req.body?.username) { /* req.body.username is used by clipboard */
     entity.screening = {
       status: constants.SCREENING_STATUS.status1.code,
       history: [],
@@ -2701,16 +2710,16 @@ function initScreeningStatus(req?: any, entity?: any) {
   }
 }
 
-function setScreeningModelCount(model?: any, childrenCount?: any) {
+function setScreeningModelCount(model: { childrenCount?: { pending?: number; rejected?: number; archived?: number }; screening?: { hidden?: boolean } }, childrenCount: { pending?: number; rejected?: number; archived?: number }) {
   model.childrenCount = childrenCount;
-  if (model.childrenCount.pending === 0 && model.childrenCount.rejected === 0) {
-    model.screening.hidden = true;
-  } else {
+  if (model.childrenCount?.pending === 0 && model.childrenCount?.rejected === 0) {
+    if (model.screening) model.screening.hidden = true;
+  } else if (model.childrenCount) {
     model.childrenCount.archived = utils.randomInt(1, 9);
   }
 }
 
-function getParent(entity?: any, type?: any) {
+function getParent(entity: { parentId?: unknown; ownerId?: unknown; ownerType?: number; questionId?: unknown }, type: number) {
   switch (type) {
     case constants.OBJECT_TYPES.topic:
       if (entity.parentId) {
