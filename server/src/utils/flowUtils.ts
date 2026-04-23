@@ -1655,8 +1655,10 @@ async function updateChildrenCount(entryId: unknown, entryType: number | undefin
   }
 }
 
-async function updateChildrenCountBatch(tasks?: any, options?: any) {
-  const normalizedTasks = normalizeChildrenCountUpdateTasks(tasks);
+type ChildrenCountTask = { entryId: unknown; entryType: number; specificEntryType?: unknown };
+
+async function updateChildrenCountBatch(tasks?: unknown, options?: { transactional?: boolean }) {
+  const normalizedTasks = normalizeChildrenCountUpdateTasks(tasks) as ChildrenCountTask[];
   if (normalizedTasks.length === 0) {
     return {
       processed: 0,
@@ -1666,7 +1668,7 @@ async function updateChildrenCountBatch(tasks?: any, options?: any) {
     };
   }
 
-  const runBatch = async function(session?: any) {
+  const runBatch = async function(session?: unknown) {
     for (const task of normalizedTasks) {
       await updateChildrenCount(task.entryId, task.entryType, task.specificEntryType, { session });
     }
@@ -1683,7 +1685,7 @@ async function updateChildrenCountBatch(tasks?: any, options?: any) {
     };
   }
 
-  const connection = getDbConnectionForObjectType(normalizedTasks[0].entryType);
+  const connection = getDbConnectionForObjectType(normalizedTasks[0]!.entryType);
   if (!connection || typeof connection.startSession !== 'function') {
     await runBatch(null);
     return {
@@ -1712,11 +1714,15 @@ async function updateChildrenCountBatch(tasks?: any, options?: any) {
 }
 
 // SUMMARY: updates the children of parent including the categoryId, does not touch the parent
-async function syncChildren(parent?: any, options?: any) {
+type SyncChild = Record<string, unknown> & { _id?: unknown; categoryId?: unknown; parentId?: unknown; threadId?: unknown; ownerId?: unknown; ownerType?: unknown };
+type SyncParent = SyncChild;
+type SyncOptions = { entryType: number };
+
+async function syncChildren(parent: SyncParent, options: SyncOptions) {
   const syncChildTopics = async () => {
     const children = await db.Topic.find({ parentId: parent._id });
     if (children.length === 0) return;
-    await async.each(children, async (child: any) => {
+    await async.each(children, async (child: SyncChild) => {
       let categoryChanged = false,
         oldCategoryId = child.categoryId;
       await async.series({
@@ -1741,7 +1747,7 @@ async function syncChildren(parent?: any, options?: any) {
   const syncChildTopicLinks = async function() {
     const children = await db.TopicLink.find({ parentId: parent._id });
     if (children.length === 0) return;
-    await async.each(children, async (child: any) => {
+    await async.each(children, async (child: SyncChild) => {
       let categoryChanged = false,
         oldCategoryId = child.categoryId;
       await async.series({
@@ -1771,7 +1777,7 @@ async function syncChildren(parent?: any, options?: any) {
     } : { parentId: parent._id };
     const children = await db.Argument.find(query);
     if (children.length === 0) return;
-    await async.each(children, async function(child?: any) {
+    await async.each(children, async function(child: SyncChild) {
       let categoryChanged = false, oldCategoryId = child.categoryId;
       if (!parentIsTopic) {
         child.ownerId = parent.ownerId;
@@ -1805,7 +1811,7 @@ async function syncChildren(parent?: any, options?: any) {
     } : { parentId: parent._id };
     const children = await db.Artifact.find(query);
     if (children.length === 0) return;
-    await async.each(children, async function(child?: any) {
+    await async.each(children, async function(child: SyncChild) {
       let categoryChanged = false, oldCategoryId = child.categoryId;
       if (!parentIsTopic) {
         child.ownerId = parent.ownerId;
@@ -1833,7 +1839,7 @@ async function syncChildren(parent?: any, options?: any) {
   const syncChildArgumentLinks = async function() {
     const children = await db.ArgumentLink.find({ ownerId: parent._id, ownerType: options.entryType });
     if (children.length === 0) return;
-    await async.each(children, async function(child?: any) {
+    await async.each(children, async function(child: SyncChild) {
       let categoryChanged = false, oldCategoryId = child.categoryId;
       /*
         child.ownerId = parent.ownerId;
@@ -1862,7 +1868,7 @@ async function syncChildren(parent?: any, options?: any) {
   const syncChildAnswers = async function() {
     const children = await db.Answer.find({ questionId: parent._id });
     if (children.length === 0) return;
-    await async.each(children, async function(child?: any) {
+    await async.each(children, async function(child: SyncChild) {
       let categoryChanged = false, oldCategoryId = child.categoryId;
       await async.series({
         syncCategoryId: async function() {
@@ -1883,11 +1889,11 @@ async function syncChildren(parent?: any, options?: any) {
     });
   };
 
-  const syncOwnerChildren = async function(childrenEntryType?: any) {
+  const syncOwnerChildren = async function(childrenEntryType: number) {
     const dbModel = getDbModelByObjectType(childrenEntryType);
     const children = await dbModel.find({ ownerId: parent._id, ownerType: options.entryType });
     if (children.length === 0) return;
-    await async.each(children, async function(child?: any) {
+    await async.each(children, async function(child: SyncChild) {
       let categoryChanged = false, oldCategoryId = child.categoryId;
       await async.series({
         syncCategoryId: async function() {
@@ -2026,7 +2032,7 @@ async function syncChildren(parent?: any, options?: any) {
 }
 
 // Set or update categoryId
-async function syncCategoryId(entry?: any, options?: any) {
+async function syncCategoryId(entry: SyncChild, options: SyncOptions) {
   /*if(!options) {
         options = {
             update: false,
@@ -2072,7 +2078,7 @@ async function syncCategoryId(entry?: any, options?: any) {
     case constants.OBJECT_TYPES.question:
     case constants.OBJECT_TYPES.issue:
     case constants.OBJECT_TYPES.opinion:
-      let owner = await getDbModelByObjectType(entry.ownerType).findOne({ _id: entry.ownerId });
+      let owner = await getDbModelByObjectType(entry.ownerType as number).findOne({ _id: entry.ownerId });
       if (entry.ownerType === constants.OBJECT_TYPES.topic && (!owner.parentId || isCategoryTopic(owner))) {
         // owner is a root or category topic
         entry.categoryId = owner._id;
