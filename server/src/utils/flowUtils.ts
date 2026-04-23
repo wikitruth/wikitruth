@@ -27,16 +27,16 @@ function getBackupDir(isPrivate?: boolean): string {
   return process.cwd() + '/config/mongodb' + (isPrivate ? '/users' : '');
 }
 
-function isEntryOwner(req?: any, item?: any) {
-  return item && item.createUserId && req.user && req.user.id && item.createUserId.equals(req.user.id);
+function isEntryOwner(req?: { user?: { id?: unknown } }, item?: { createUserId?: { equals(id: unknown): boolean } }) {
+  return !!item && !!item.createUserId && !!req?.user && !!req.user.id && item.createUserId.equals(req.user.id);
 }
 
-function appendOwnerFlag(req?: any, item?: any, model?: any) {
+function appendOwnerFlag(req?: { user?: { id?: unknown } }, item?: { createUserId?: { equals(id: unknown): boolean }; isItemOwner?: boolean }, model?: { isItemOwner?: boolean }) {
   if (isEntryOwner(req, item)) {
     if (!model) {
       model = item;
     }
-    model.isItemOwner = true;
+    if (model) model.isItemOwner = true;
   }
 }
 
@@ -2116,12 +2116,13 @@ function getVerdictCount(args?: any) {
   return verdictCount;
 }
 
-function ensureEntryIdParam(req?: any, entry?: any) {
+function ensureEntryIdParam(req?: { query?: Record<string, unknown>; params?: { id?: unknown; friendlyUrl?: string } }, entry?: string) {
+  if (!req?.query || !entry) return;
   if (!req.query[entry]) {
-    if (req.params.id) {
+    if (req.params?.id) {
       req.query[entry] = req.params.id;
     } else {
-      const friendlyId = req.params.friendlyUrl;
+      const friendlyId = req.params?.friendlyUrl;
       if (friendlyId) {
         if (utils.isObjectIdString(friendlyId)) {
           req.query[entry] = friendlyId;
@@ -2133,51 +2134,53 @@ function ensureEntryIdParam(req?: any, entry?: any) {
   }
 }
 
-function createOwnerQueryFromQuery(req?: any) {
-  if (req.query.opinion) {
+function createOwnerQueryFromQuery(req?: { query?: Record<string, unknown> }): { ownerType?: number; ownerId?: unknown } {
+  const q = req?.query;
+  if (!q) return {};
+  if (q.opinion) {
     return {
       ownerType: constants.OBJECT_TYPES.opinion,
-      ownerId: req.query.opinion,
+      ownerId: q.opinion,
     };
-  } else if (req.query.issue) {
+  } else if (q.issue) {
     return {
       ownerType: constants.OBJECT_TYPES.issue,
-      ownerId: req.query.issue,
+      ownerId: q.issue,
     };
-  } else if (req.query.answer) {
+  } else if (q.answer) {
     return {
       ownerType: constants.OBJECT_TYPES.answer,
-      ownerId: req.query.answer,
+      ownerId: q.answer,
     };
-  } else if (req.query.question) {
+  } else if (q.question) {
     return {
       ownerType: constants.OBJECT_TYPES.question,
-      ownerId: req.query.question,
+      ownerId: q.question,
     };
-  } else if (req.query.artifact) {
+  } else if (q.artifact) {
     return {
       ownerType: constants.OBJECT_TYPES.artifact,
-      ownerId: req.query.artifact,
+      ownerId: q.artifact,
     };
-  } else if (req.query.argumentLink) {
+  } else if (q.argumentLink) {
     return {
       ownerType: constants.OBJECT_TYPES.argumentLink,
-      ownerId: req.query.argumentLink,
+      ownerId: q.argumentLink,
     };
-  } else if (req.query.argument) {
+  } else if (q.argument) {
     return {
       ownerType: constants.OBJECT_TYPES.argument,
-      ownerId: req.query.argument,
+      ownerId: q.argument,
     };
-  } else if (req.query.topicLink) {
+  } else if (q.topicLink) {
     return {
       ownerType: constants.OBJECT_TYPES.topicLink,
-      ownerId: req.query.topicLink,
+      ownerId: q.topicLink,
     };
-  } else if (req.query.topic) {
+  } else if (q.topic) {
     return {
       ownerType: constants.OBJECT_TYPES.topic,
-      ownerId: req.query.topic,
+      ownerId: q.topic,
     };
   }
   return {};
@@ -2754,8 +2757,9 @@ function setMemberFullname(member?: { username?: unknown; fullname?: unknown; ro
   }
 }
 
-function isEntryOnIntendedUrl(req?: any, res?: any, entry?: any) {
-  return !entry.private && !req.params.username || entry.private && (res.locals.group || req.params.username && entry.createUserId.equals(req.user.id));
+function isEntryOnIntendedUrl(req?: { params?: { username?: unknown }; user?: { id?: unknown } }, res?: { locals?: { group?: unknown } }, entry?: { private?: boolean; createUserId?: { equals(id: unknown): boolean } }) {
+  if (!entry) return false;
+  return !entry.private && !req?.params?.username || !!entry.private && (!!res?.locals?.group || !!req?.params?.username && !!entry.createUserId?.equals(req.user?.id));
 }
 
 function createContentPreview(content?: string): string {
@@ -2822,8 +2826,8 @@ async function getDiaryCategories(req?: any) {
   return results;
 }
 
-async function getUserGroups(req?: any) {
-  return await db.Group.find({ 'members.userId': req.user.id }).sort({ title: 1 }).lean();
+async function getUserGroups(req?: { user?: { id?: unknown } }) {
+  return await db.Group.find({ 'members.userId': req?.user?.id }).sort({ title: 1 }).lean();
 }
 
 function createEntrySet(model?: any) {
@@ -2894,11 +2898,11 @@ async function countEntries(model?: any, groupFilter?: any) {
   model.totalCount = model.topics + model.arguments + model.questions + model.answers + model.issues + model.opinions;
 }
 
-function resetCache(req?: any) {
-  delete req.app.locals.appCategories;
+function resetCache(req?: { app?: { locals?: { appCategories?: unknown } } }) {
+  if (req?.app?.locals) delete req.app.locals.appCategories;
   const apps = applications.getApplications();
-  apps.forEach(function(app?: any) {
-    delete app.appCategories;
+  apps.forEach(function(app?: { appCategories?: unknown }) {
+    if (app) delete app.appCategories;
   });
 }
 
