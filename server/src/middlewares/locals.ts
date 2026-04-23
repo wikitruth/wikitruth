@@ -3,9 +3,11 @@
 import type { NextFunction, Request, Response } from 'express';
 import type { AppContext, ApplicationsModule } from '../types/models';
 
-const async = require('async');
-const url = require('url');
 import * as flowUtilsNs from '../utils/flowUtils';
+import applicationsMod from '../models/applications';
+import async from 'async';
+import url from 'url';
+import paths from '../models/paths';
 const flowUtils = flowUtilsNs as unknown as {
   getDiaryBaseUrl(username: string): string;
   getCategories(model: { categories?: unknown[] }, topicId: string | null, req: Request): Promise<void>;
@@ -13,9 +15,8 @@ const flowUtils = flowUtilsNs as unknown as {
   getUserGroups(req: Request): Promise<unknown[]>;
   setGroupModel(req: Request, model: { group?: unknown }): Promise<void>;
 };
-const paths = require('../models/paths');
-const applications = require('../models/applications') as ApplicationsModule;
 
+const applications = applicationsMod as unknown as ApplicationsModule;
 export default function configureLocals(app: AppContext & { use: (...args: unknown[]) => void }, _passport: unknown) {
   // this code runs for all routes
   app.use(/^[^.]+$/, async function (req: Request, res: Response, next: NextFunction) {
@@ -100,7 +101,7 @@ export default function configureLocals(app: AppContext & { use: (...args: unkno
       currentGroup: async function () {
         const baseUrl = url.parse(req.originalUrl);
         const params = (baseUrl.pathname || '').split('/');
-        if (params.length >= 4 && '/' + params[1].toLowerCase() === paths.groups.index) {
+        if (params.length >= 4 && params[1] && '/' + params[1].toLowerCase() === paths.groups.index) {
           const model: { group?: unknown } = {};
           req.query.group = params[3];
           await flowUtils.setGroupModel(req, model);

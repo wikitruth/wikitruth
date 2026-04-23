@@ -5,13 +5,14 @@ import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../types/http';
 import * as flowUtilsNs from '../../utils/flowUtils';
 const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
-const constants = require('../../models/constants') as ConstantsModule;
+const constants = constantsMod as unknown as ConstantsModule;
 import * as utils from '../../utils/utils';
 import * as opinionsService from '../../services/opinionsService';
 const { applyViewModeFilter } = require('./viewFilter');
 const db = require('../../app').db.models;
 import { logEntryEvent } from '../../services/entryEventsService';
 import { notifySubscribers } from '../../services/notificationsService';
+import constantsMod from '../../models/constants';
 
 export = function (router: Router) {
   // Get opinions list

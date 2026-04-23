@@ -2,8 +2,8 @@
 
 import type { Request, Response } from 'express';
 import type { AppContext } from '../types/models';
+import path from 'path';
 
-const path = require('path');
 const reactShellPath = path.join(process.cwd(), 'public/react-app.html');
 
 type AppRouteRegistrar = AppContext & {

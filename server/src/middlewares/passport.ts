@@ -2,6 +2,7 @@
 
 import type { AppContext } from '../types/models';
 import type { AuthUser } from '../types/auth';
+import jwt from 'jsonwebtoken';
 
 const LocalStrategy = require('passport-local').Strategy;
 const TwitterStrategy = require('passport-twitter').Strategy;
@@ -10,7 +11,6 @@ const FacebookStrategy = require('passport-facebook').Strategy;
 const GoogleStrategy = require('passport-google').Strategy;
 const AppleStrategy = require('passport-apple');
 const MicrosoftStrategy = require('passport-microsoft').Strategy;
-const jwt = require('jsonwebtoken');
 
 interface PassportLike {
   use(strategy: unknown): void;

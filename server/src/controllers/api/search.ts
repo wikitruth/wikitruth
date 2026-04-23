@@ -5,8 +5,9 @@ import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 
 import * as flowUtilsNs from '../../utils/flowUtils';
+import constantsMod from '../../models/constants';
 const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
-const constants = require('../../models/constants') as ConstantsModule;
+const constants = constantsMod as unknown as ConstantsModule;
 const db = require('../../app').db.models as Record<string, any>;
 
 type SearchModel = {

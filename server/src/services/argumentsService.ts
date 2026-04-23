@@ -4,8 +4,9 @@ import type { FlowUtilsContract, LeanModel, ServiceEntry, ServiceListOptions, Se
 import type { WikitruthConstants } from '../types/constants';
 
 import * as flowUtilsNs from '../utils/flowUtils';
+import constantsMod from '../models/constants';
 const flowUtils = flowUtilsNs as unknown as FlowUtilsContract;
-const constants = require('../models/constants') as WikitruthConstants;
+const constants = constantsMod as unknown as WikitruthConstants;
 const db = require('../app').db.models as {
   Argument: LeanModel<ServiceEntry>;
 };

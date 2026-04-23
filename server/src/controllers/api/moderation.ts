@@ -3,10 +3,10 @@
 import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 
-const constants = require('../../models/constants');
 import * as flowUtils from '../../utils/flowUtils';
 import { logEntryEvent } from '../../services/entryEventsService';
 import { notifySubscribers, createNotification } from '../../services/notificationsService';
+import constants from '../../models/constants';
 
 type ModerationTarget = {
   objectType: number;

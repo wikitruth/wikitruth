@@ -1,6 +1,6 @@
 'use strict';
+import constants from '../models/constants';
 
-const constants = require('../models/constants');
 const db = require('../app').db.models;
 
 type EntryTarget = {

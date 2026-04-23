@@ -5,8 +5,8 @@ import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../types/http';
 const db = require('../../app').db.models;
 import * as utils from '../../utils/utils';
-const constants = require('../../models/constants') as ConstantsModule;
-
+import constantsMod from '../../models/constants';
+const constants = constantsMod as unknown as ConstantsModule;
 export = function (router: Router) {
   // Get all groups (public and private based on user)
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {

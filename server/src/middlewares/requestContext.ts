@@ -2,8 +2,8 @@
 
 import type { Request, RequestHandler } from 'express';
 import * as logger from '../utils/logger';
-const crypto = require('crypto') as typeof import('crypto');
-
+import cryptoMod from 'crypto';
+const crypto = cryptoMod as unknown as typeof import('crypto');
 const KEY_PATH_PATTERNS = [/^\/$/, /^\/home\/?$/, /^\/login\/?$/, /^\/api\/home\/?$/, /^\/app(\/|$)/, /^\/legacy(\/|$)/];
 
 interface RequestWithContext extends Request {

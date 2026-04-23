@@ -8,7 +8,8 @@ import { applyViewModeFilter } from './viewFilter';
 import * as flowUtilsNs from '../../utils/flowUtils';
 const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
 import * as utils from '../../utils/utils';
-const constants = require('../../models/constants') as ConstantsModule;
+import constantsMod from '../../models/constants';
+const constants = constantsMod as unknown as ConstantsModule;
 const db = require('../../app').db.models as Record<string, any>;
 
 type TopicScreeningModel = {

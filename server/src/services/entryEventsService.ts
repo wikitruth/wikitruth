@@ -1,8 +1,8 @@
 'use strict';
+import constants from '../models/constants';
+import mongoose from 'mongoose';
 
-const constants = require('../models/constants');
 const db = require('../app').db.models;
-const mongoose = require('mongoose');
 
 type EntryEventScope = 'entry' | 'privileged';
 

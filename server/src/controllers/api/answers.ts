@@ -6,9 +6,10 @@ import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../t
 import { errorMessage } from '../../types/errors';
 import * as flowUtilsNs from '../../utils/flowUtils';
 const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
-const constants = require('../../models/constants') as ConstantsModule;
+const constants = constantsMod as unknown as ConstantsModule;
 import * as utils from '../../utils/utils';
 import * as answersService from '../../services/answersService';
+import constantsMod from '../../models/constants';
 const { applyViewModeFilter } = require('./viewFilter');
 const db = require('../../app').db.models;
 

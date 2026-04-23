@@ -34,7 +34,7 @@ describe('API endpoint smoke coverage', function () {
   it('keeps /api/v1 compatibility routed through the same handlers', function () {
     const apiV1 = read('server/src/controllers/api/v1.ts');
 
-    expect(apiV1).toContain("const mountApi = require('./index')");
+    expect(apiV1).toContain("import mountApiMod from './index'");
     expect(apiV1).toContain('mountApi(router)');
   });
 

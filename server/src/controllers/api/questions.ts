@@ -10,9 +10,10 @@ import { applyViewModeFilter } from './viewFilter';
 
 import * as flowUtilsNs from '../../utils/flowUtils';
 const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
-const constants = require('../../models/constants') as WikitruthConstants;
+const constants = constantsMod as unknown as WikitruthConstants;
 import * as utils from '../../utils/utils';
 import * as questionsService from '../../services/questionsService';
+import constantsMod from '../../models/constants';
 
 type QuestionDocument = {
   _id: unknown;

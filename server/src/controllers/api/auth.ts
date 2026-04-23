@@ -4,10 +4,11 @@ import type { Router } from 'express';
 import type { WikitruthNext, WikitruthRequest, WikitruthResponse } from '../../types/http';
 
 import * as httpClient from '../../utils/httpClient';
+import cryptoMod from 'crypto';
+import jwtMod from 'jsonwebtoken';
 
-const crypto = require('crypto') as typeof import('crypto');
-const jwt = require('jsonwebtoken') as typeof import('jsonwebtoken');
-
+const crypto = cryptoMod as unknown as typeof import('crypto');
+const jwt = jwtMod as unknown as typeof import('jsonwebtoken');
 type AuthUserLike = {
   _id: string;
   username: string;

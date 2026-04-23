@@ -3,11 +3,11 @@
 import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 
-const constants = require('../../models/constants');
 import {
   listTimelineEvents,
   getTimelineBuckets,
 } from '../../services/entryEventsService';
+import constants from '../../models/constants';
 
 function resolveObjectType(objectName: string | undefined, objectType: unknown): number {
   const direct = Number(objectType);

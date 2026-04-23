@@ -4,12 +4,13 @@ import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 
 const db = require('../../app').db.models;
-const fs = require('fs');
-const path = require('path');
+
 const backup = require('mongodb-backup-fixed');
 const config = require('../../config/config');
 import * as flowUtils from '../../utils/flowUtils';
 import { listPrivilegedEvents, logEntryEvent } from '../../services/entryEventsService';
+import fs from 'fs';
+import path from 'path';
 
 function ensureDir(dirPath: string): void {
   if (fs.existsSync(dirPath)) {

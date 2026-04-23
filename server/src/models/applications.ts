@@ -93,7 +93,7 @@ function getApplication(req: { hostname?: string }): ApplicationDefinition | nul
   return application;
 }
 
-export {
+export = {
   getApplications,
   getApplication,
 };
