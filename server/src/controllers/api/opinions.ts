@@ -1,17 +1,16 @@
 'use strict';
 import type { FlowUtilsModule, ConstantsModule, UtilsModule } from '../../types/legacyModules';
-import type { OpinionsServiceContract } from '../../services/serviceTypes';
 
 import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../types/http';
 const flowUtils = require('../../utils/flowUtils') as FlowUtilsModule;
 const constants = require('../../models/constants') as ConstantsModule;
 import * as utils from '../../utils/utils';
-const opinionsService = require('../../services/opinionsService') as OpinionsServiceContract;
+import * as opinionsService from '../../services/opinionsService';
 const { applyViewModeFilter } = require('./viewFilter');
 const db = require('../../app').db.models;
-const { logEntryEvent } = require('../../services/entryEventsService');
-const { notifySubscribers } = require('../../services/notificationsService');
+import { logEntryEvent } from '../../services/entryEventsService';
+import { notifySubscribers } from '../../services/notificationsService';
 
 module.exports = function (router: Router) {
   // Get opinions list

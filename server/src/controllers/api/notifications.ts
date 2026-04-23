@@ -4,14 +4,14 @@ import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 
 const constants = require('../../models/constants');
-const {
+import {
   setSubscription,
   getSubscription,
   listNotifications,
   markNotificationRead,
   markAllNotificationsRead,
   getUnreadCount,
-} = require('../../services/notificationsService');
+} from '../../services/notificationsService';
 
 function ensureAuthenticated(req: WikitruthRequest, res: WikitruthResponse): boolean {
   if (!req.user?._id && !req.user?.id) {

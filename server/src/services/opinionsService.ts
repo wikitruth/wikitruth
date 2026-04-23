@@ -54,7 +54,7 @@ async function getOpinionEntry(opinionId: string, req: ServiceListOptions['req']
   return opinion;
 }
 
-module.exports = {
+export {
   getOpinionsList,
   getOpinionEntry,
 };

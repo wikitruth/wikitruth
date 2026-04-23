@@ -10,16 +10,7 @@ import { applyViewModeFilter } from './viewFilter';
 const flowUtils = require('../../utils/flowUtils') as FlowUtilsModule;
 import * as utils from '../../utils/utils';
 const constants = require('../../models/constants') as WikitruthConstants;
-const argumentsService = require('../../services/argumentsService') as {
-  getArgumentsList: (
-    query: ServiceQuery,
-    options: {
-      limit?: number;
-      req?: WikitruthRequest;
-    }
-  ) => Promise<ServiceEntry[]>;
-  getArgumentEntry: (argumentId: string, req: WikitruthRequest) => Promise<ServiceEntry | null>;
-};
+import * as argumentsService from '../../services/argumentsService';
 
 type ArgumentDocument = {
   _id: unknown;

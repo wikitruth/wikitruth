@@ -259,7 +259,7 @@ async function getUnreadCount(options: { userId: string }): Promise<number> {
   });
 }
 
-module.exports = {
+export {
   setSubscription,
   getSubscription,
   createNotification,

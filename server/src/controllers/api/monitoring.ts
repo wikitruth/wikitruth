@@ -4,14 +4,7 @@ import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 
 import * as logger from '../../utils/logger';
-const { publishRealtimeEvent } = require('../../services/realtimeEvents') as {
-  publishRealtimeEvent: (event: {
-    type: string;
-    timestamp?: string;
-    requestId?: string | null;
-    data?: unknown;
-  }) => void;
-};
+import { publishRealtimeEvent } from '../../services/realtimeEvents';
 
 type MonitoringPayload = {
   type?: string;

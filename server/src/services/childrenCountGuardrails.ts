@@ -111,7 +111,7 @@ function normalizeChildrenCountUpdateTasks(tasks: unknown): NormalizedChildrenCo
   return normalized;
 }
 
-module.exports = {
+export {
   assertChildrenCountInvariants,
   normalizeChildrenCountUpdateTasks,
 };

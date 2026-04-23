@@ -149,7 +149,7 @@ async function getTimelineBuckets(options: {
   }));
 }
 
-module.exports = {
+export {
   logEntryEvent,
   listTimelineEvents,
   listPrivilegedEvents,

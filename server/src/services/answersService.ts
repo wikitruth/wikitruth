@@ -54,7 +54,7 @@ async function getAnswerEntry(answerId: string, req: ServiceListOptions['req']):
   return answer;
 }
 
-module.exports = {
+export {
   getAnswersList,
   getAnswerEntry,
 };

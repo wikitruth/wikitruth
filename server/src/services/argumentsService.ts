@@ -60,7 +60,7 @@ async function getArgumentEntry(argumentId: string, req: ServiceListOptions['req
   return argument;
 }
 
-module.exports = {
+export {
   getArgumentsList,
   getArgumentEntry,
 };

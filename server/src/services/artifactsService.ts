@@ -54,7 +54,7 @@ async function getArtifactEntry(artifactId: string, req: ServiceListOptions['req
   return artifact;
 }
 
-module.exports = {
+export {
   getArtifactsList,
   getArtifactEntry,
 };

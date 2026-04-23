@@ -5,8 +5,8 @@ import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 
 const constants = require('../../models/constants');
 const flowUtils = require('../../utils/flowUtils');
-const { logEntryEvent } = require('../../services/entryEventsService');
-const { notifySubscribers, createNotification } = require('../../services/notificationsService');
+import { logEntryEvent } from '../../services/entryEventsService';
+import { notifySubscribers, createNotification } from '../../services/notificationsService';
 
 type ModerationTarget = {
   objectType: number;

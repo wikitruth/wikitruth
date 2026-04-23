@@ -4,10 +4,10 @@ import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 
 const constants = require('../../models/constants');
-const {
+import {
   listTimelineEvents,
   getTimelineBuckets,
-} = require('../../services/entryEventsService');
+} from '../../services/entryEventsService';
 
 function resolveObjectType(objectName: string | undefined, objectType: unknown): number {
   const direct = Number(objectType);

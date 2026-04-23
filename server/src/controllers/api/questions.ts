@@ -11,16 +11,7 @@ import { applyViewModeFilter } from './viewFilter';
 const flowUtils = require('../../utils/flowUtils') as FlowUtilsModule;
 const constants = require('../../models/constants') as WikitruthConstants;
 import * as utils from '../../utils/utils';
-const questionsService = require('../../services/questionsService') as {
-  getQuestionsList: (
-    query: ServiceQuery,
-    options: {
-      limit?: number;
-      req?: WikitruthRequest;
-    }
-  ) => Promise<ServiceEntry[]>;
-  getQuestionEntry: (questionId: string, req: WikitruthRequest) => Promise<ServiceEntry | null>;
-};
+import * as questionsService from '../../services/questionsService';
 
 type QuestionDocument = {
   _id: unknown;

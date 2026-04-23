@@ -4,13 +4,10 @@ import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 import type { RealtimeEvent } from '../../services/realtimeEvents';
 
-const {
+import {
   subscribeRealtime,
   getRealtimeSubscriberCount,
-} = require('../../services/realtimeEvents') as {
-  subscribeRealtime: (subscriber: (event: RealtimeEvent) => void) => () => void;
-  getRealtimeSubscriberCount: () => number;
-};
+} from '../../services/realtimeEvents';
 
 const HEARTBEAT_INTERVAL_MS = 30_000;
 

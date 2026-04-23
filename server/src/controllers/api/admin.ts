@@ -9,7 +9,7 @@ const path = require('path');
 const backup = require('mongodb-backup-fixed');
 const config = require('../../config/config');
 const flowUtils = require('../../utils/flowUtils');
-const { listPrivilegedEvents, logEntryEvent } = require('../../services/entryEventsService');
+import { listPrivilegedEvents, logEntryEvent } from '../../services/entryEventsService';
 
 function ensureDir(dirPath: string): void {
   if (fs.existsSync(dirPath)) {

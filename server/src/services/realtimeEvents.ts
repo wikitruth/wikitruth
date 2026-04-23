@@ -38,7 +38,7 @@ function getRealtimeSubscriberCount(): number {
   return subscribers.size;
 }
 
-module.exports = {
+export {
   subscribeRealtime,
   publishRealtimeEvent,
   getRealtimeSubscriberCount,

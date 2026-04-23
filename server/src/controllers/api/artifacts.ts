@@ -1,6 +1,5 @@
 'use strict';
 import type { FlowUtilsModule, ConstantsModule, UtilsModule } from '../../types/legacyModules';
-import type { ArtifactsServiceContract } from '../../services/serviceTypes';
 
 import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../types/http';
@@ -8,7 +7,7 @@ import { errorMessage } from '../../types/errors';
 const flowUtils = require('../../utils/flowUtils') as FlowUtilsModule;
 const constants = require('../../models/constants') as ConstantsModule;
 import * as utils from '../../utils/utils';
-const artifactsService = require('../../services/artifactsService') as ArtifactsServiceContract;
+import * as artifactsService from '../../services/artifactsService';
 const db = require('../../app').db.models;
 
 module.exports = function (router: Router) {

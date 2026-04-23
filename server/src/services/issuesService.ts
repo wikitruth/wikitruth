@@ -57,7 +57,7 @@ async function getIssueEntry(issueId: string, req: ServiceListOptions['req']): P
   return issue;
 }
 
-module.exports = {
+export {
   getIssuesList,
   getIssueEntry,
 };

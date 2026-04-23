@@ -59,7 +59,7 @@ async function getTopicEntry(topicId: string, req: ServiceListOptions['req']): P
   return topic;
 }
 
-module.exports = {
+export {
   getTopicsList,
   getTopicEntry,
 };
