@@ -5,9 +5,10 @@ import type { WikitruthConstants } from '../types/constants';
 
 import * as flowUtilsNs from '../utils/flowUtils';
 import constantsMod from '../models/constants';
+import appModForDb from '../app';
 const flowUtils = flowUtilsNs as unknown as FlowUtilsContract;
 const constants = constantsMod as unknown as WikitruthConstants;
-const db = require('../app').db.models as Record<string, unknown>;
+const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 const { getCoreModels } = require('../models/schema/typedModels');
 
 /**

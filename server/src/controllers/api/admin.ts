@@ -3,8 +3,8 @@
 import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 
-const db = require('../../app').db.models;
-
+import appModForDb from '../../app';
+const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 const backup = require('mongodb-backup-fixed');
 const config = require('../../config/config');
 import * as flowUtils from '../../utils/flowUtils';

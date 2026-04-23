@@ -3,6 +3,7 @@
 import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 
+import appModForDb from '../../app';
 const constants = require('../../models/constants') as {
   OBJECT_TYPES: Record<string, number>;
 };
@@ -12,7 +13,7 @@ const flowUtils = flowUtilsNs as unknown as {
     findById: (id: string) => Promise<unknown>;
   } | null;
 };
-const db = require('../../app').db.models as {
+const db = (appModForDb as unknown as { db: { models: {
   Reaction: {
     find: (query: Record<string, unknown>) => {
       select: (projection: Record<string, 1>) => {
@@ -32,8 +33,7 @@ const db = require('../../app').db.models as {
     create: (fields: Record<string, unknown>) => Promise<unknown>;
     deleteOne: (query: Record<string, unknown>) => Promise<{ deletedCount?: number }>;
   };
-};
-
+} } }).db.models;
 type SupportedObjectName = 'topic' | 'argument' | 'question' | 'answer' | 'issue' | 'opinion' | 'artifact';
 type ReactionChannel = 'exposure' | 'vote' | 'value';
 type ExposureReaction = 'expose' | 'bury';

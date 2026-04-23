@@ -4,6 +4,7 @@ import type { FlowUtilsModule, ConstantsModule } from '../../types/legacyModules
 import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../types/http';
 
+import appModForDb from '../../app';
 const async = require('async') as {
   parallel: (tasks: Record<string, () => Promise<unknown>>) => Promise<unknown>;
 };
@@ -14,8 +15,7 @@ const constants = constantsMod as unknown as ConstantsModule;
 const applications = require('../../models/applications') as {
   getApplications: () => unknown;
 };
-const db = require('../../app').db.models as Record<string, any>;
-
+const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 interface HomeQuery {
   parentId?: unknown;
   ownerType?: number;

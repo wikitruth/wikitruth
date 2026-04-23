@@ -7,6 +7,7 @@ import * as httpClient from '../../utils/httpClient';
 import cryptoMod from 'crypto';
 import jwtMod from 'jsonwebtoken';
 
+import appModForDb from '../../app';
 const crypto = cryptoMod as unknown as typeof import('crypto');
 const jwt = jwtMod as unknown as typeof import('jsonwebtoken');
 type AuthUserLike = {
@@ -98,8 +99,7 @@ type ModelsContract = {
   };
 };
 
-const db = require('../../app').db.models as ModelsContract;
-
+const db = (appModForDb as unknown as { db: { models: ModelsContract } }).db.models;
 type TokenKind = 'access' | 'refresh';
 
 type MobileApiConfig = {

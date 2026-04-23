@@ -6,10 +6,10 @@ import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 
 import * as flowUtilsNs from '../../utils/flowUtils';
 import constantsMod from '../../models/constants';
+import appModForDb from '../../app';
 const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
 const constants = constantsMod as unknown as ConstantsModule;
-const db = require('../../app').db.models as Record<string, any>;
-
+const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 type SearchModel = {
   screening?: {
     status?: number;

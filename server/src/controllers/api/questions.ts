@@ -9,6 +9,7 @@ import type { WikitruthConstants } from '../../types/constants';
 import { applyViewModeFilter } from './viewFilter';
 
 import * as flowUtilsNs from '../../utils/flowUtils';
+import appModForDb from '../../app';
 const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
 const constants = constantsMod as unknown as WikitruthConstants;
 import * as utils from '../../utils/utils';
@@ -32,8 +33,7 @@ type QuestionDocument = {
   save: () => Promise<QuestionDocument>;
 };
 
-const db = require('../../app').db.models as Record<string, any>;
-
+const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 type QuestionListResponse = {
   screening?: {
     status?: number;

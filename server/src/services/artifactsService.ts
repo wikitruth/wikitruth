@@ -5,12 +5,12 @@ import type { WikitruthConstants } from '../types/constants';
 
 import * as flowUtilsNs from '../utils/flowUtils';
 import constantsMod from '../models/constants';
+import appModForDb from '../app';
 const flowUtils = flowUtilsNs as unknown as FlowUtilsContract;
 const constants = constantsMod as unknown as WikitruthConstants;
-const db = require('../app').db.models as {
+const db = (appModForDb as unknown as { db: { models: {
   Artifact: LeanModel<ServiceEntry>;
-};
-
+} } }).db.models;
 /**
  * Get list of artifacts
  * @param {Object} query - MongoDB query object

@@ -241,3 +241,10 @@ app.on('start', function () {
     console.log('Application ready to serve requests.');
     console.log('Environment: %s', app.kraken.get('env:env'));
 });
+
+// Expose the same configured app via a typed ESM export so internal modules
+// can `import app from './app'` instead of `require('./app')`. At runtime,
+// `module.exports` is already `app` (line ~52), and the emitted assignment
+// here reassigns module.exports to the same reference — a no-op.
+const appExport: Record<string, unknown> = app;
+export = appExport;

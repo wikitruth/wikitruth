@@ -1,8 +1,8 @@
 'use strict';
 import constants from '../models/constants';
 
-const db = require('../app').db.models;
-
+import appModForDb from '../app';
+const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 type EntryTarget = {
   objectType: number;
   objectName?: string;

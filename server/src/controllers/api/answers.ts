@@ -5,14 +5,14 @@ import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../types/http';
 import { errorMessage } from '../../types/errors';
 import * as flowUtilsNs from '../../utils/flowUtils';
+import appModForDb from '../../app';
 const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
 const constants = constantsMod as unknown as ConstantsModule;
 import * as utils from '../../utils/utils';
 import * as answersService from '../../services/answersService';
 import constantsMod from '../../models/constants';
 const { applyViewModeFilter } = require('./viewFilter');
-const db = require('../../app').db.models;
-
+const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 export = function (router: Router) {
   // GET /api/answers - List answers
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {

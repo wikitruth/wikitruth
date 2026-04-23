@@ -3,7 +3,8 @@ import type { ConstantsModule, UtilsModule } from '../../types/legacyModules';
 
 import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../types/http';
-const db = require('../../app').db.models;
+import appModForDb from '../../app';
+const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 import * as utils from '../../utils/utils';
 import constantsMod from '../../models/constants';
 const constants = constantsMod as unknown as ConstantsModule;

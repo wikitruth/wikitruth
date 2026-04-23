@@ -8,6 +8,7 @@ import { logEntryEvent } from '../../services/entryEventsService';
 import { notifySubscribers, createNotification } from '../../services/notificationsService';
 import constants from '../../models/constants';
 
+import appModForDb from '../../app';
 type ModerationTarget = {
   objectType: number;
   objectName: string;
@@ -34,8 +35,7 @@ const VERDICT_STATUS_ORDER: number[] = [
   constants.VERDICT_STATUS.misleading_invalid,
 ];
 
-const db = require('../../app').db.models as Record<string, any>;
-
+const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 function canPlayRole(req: WikitruthRequest, role: string): boolean {
   return Boolean(req.user && req.user.canPlayRoleOf && req.user.canPlayRoleOf(role));
 }

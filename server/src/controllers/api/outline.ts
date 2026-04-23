@@ -3,6 +3,7 @@
 import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 
+import appModForDb from '../../app';
 const constants = require('../../models/constants') as {
   OBJECT_TYPES: {
     topic: number;
@@ -13,7 +14,7 @@ const constants = require('../../models/constants') as {
     status1: { code: number };
   };
 };
-const db = require('../../app').db.models as Record<string, any>;
+const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 import * as flowUtilsNs from '../../utils/flowUtils';
 const flowUtils = flowUtilsNs as unknown as {
   updateChildrenCount: (entryId: unknown, entryType: unknown, specificEntryType?: unknown) => Promise<void>;

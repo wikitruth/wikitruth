@@ -2,8 +2,8 @@
 import constants from '../models/constants';
 import mongoose from 'mongoose';
 
-const db = require('../app').db.models;
-
+import appModForDb from '../app';
+const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 type EntryEventScope = 'entry' | 'privileged';
 
 type EntryEventInput = {
