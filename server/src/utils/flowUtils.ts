@@ -16,7 +16,7 @@ const childrenCountGuardrails = require('../services/childrenCountGuardrails'),
   normalizeChildrenCountUpdateTasks = childrenCountGuardrails.normalizeChildrenCountUpdateTasks,
   assertChildrenCountInvariants = childrenCountGuardrails.assertChildrenCountInvariants;
 
-function getBackupDir(isPrivate?: any) {
+function getBackupDir(isPrivate?: boolean): string {
   let backupRoot = isPrivate && config.mongodb.privateBackupRoot ? config.mongodb.privateBackupRoot : config.mongodb.backupRoot;
   if (backupRoot) {
     if (backupRoot.startsWith('~')) {
@@ -40,8 +40,8 @@ function appendOwnerFlag(req?: any, item?: any, model?: any) {
   }
 }
 
-function isCategoryTopic(entry?: any) {
-  return entry.tags.indexOf(constants.TOPIC_TAGS.tag510.code) > -1;
+function isCategoryTopic(entry?: { tags?: string[] }): boolean {
+  return !!entry?.tags && entry.tags.indexOf(constants.TOPIC_TAGS.tag510.code) > -1;
 }
 
 function appendListExtras(item?: any, objectType?: any, shortTitleLength?: any, _req?: any) {
@@ -438,7 +438,7 @@ async function setEditorsUsername(items?: any) {
   }
 }
 
-async function setCreateUsername(item?: any) {
+async function setCreateUsername(item?: Record<string, unknown>): Promise<void> {
   if (!item || !item.createUserId) {
     return;
   }
@@ -449,7 +449,7 @@ async function setCreateUsername(item?: any) {
   }
 }
 
-async function setEditUsername(item?: any) {
+async function setEditUsername(item?: Record<string, unknown>): Promise<void> {
   if (!item || !item.editUserId) {
     return;
   }
@@ -460,7 +460,7 @@ async function setEditUsername(item?: any) {
   }
 }
 
-async function setUsername(item?: any) {
+async function setUsername(item?: Record<string, unknown>): Promise<void> {
   if (!item) {
     return;
   }
@@ -473,8 +473,8 @@ async function setUsername(item?: any) {
   }
 }
 
-function buildGroupUrl(group?: any) {
-  return paths.groups.index + '/' + group.friendlyUrl + '/' + group._id;
+function buildGroupUrl(group?: { friendlyUrl?: unknown; _id?: unknown }): string {
+  return paths.groups.index + '/' + group?.friendlyUrl + '/' + group?._id;
 }
 
 async function setGroupModel(req?: any, model?: any) {
@@ -2364,7 +2364,7 @@ function getEntryByObjectType(model?: any, type?: any) {
   return null;
 }
 
-function getObjectName(type?: any) {
+function getObjectName(type?: number): string {
   switch (type) {
     case constants.OBJECT_TYPES.topic:
       return 'topic';
@@ -2454,7 +2454,7 @@ function setModelContext(req?: any, res?: any, model?: any, mixedMode?: any) {
   }
 }
 
-function getEditorContent(content?: any) {
+function getEditorContent(content?: string): string {
   if (!content) return '';
   const { sanitizeContent } = require('./sanitizeHtml');
   let c = sanitizeContent(content.trim());
@@ -2464,11 +2464,11 @@ function getEditorContent(content?: any) {
   return c;
 }
 
-function buildEntryUrl(baseUrl?: any, entry?: any) {
-  return baseUrl + '/' + entry.friendlyUrl + '/' + entry._id;
+function buildEntryUrl(baseUrl?: string, entry?: { friendlyUrl?: unknown; _id?: unknown }): string {
+  return baseUrl + '/' + entry?.friendlyUrl + '/' + entry?._id;
 }
 
-function getDiaryBaseUrl(username?: any) {
+function getDiaryBaseUrl(username?: string): string {
   return paths.members.index + '/' + username + (paths.members.profile.journal || paths.members.profile.diary);
 }
 
@@ -2746,7 +2746,7 @@ function isEntryOnIntendedUrl(req?: any, res?: any, entry?: any) {
   return !entry.private && !req.params.username || entry.private && (res.locals.group || req.params.username && entry.createUserId.equals(req.user.id));
 }
 
-function createContentPreview(content?: any) {
+function createContentPreview(content?: string): string {
   return utils.getShortText(
     htmlToText.fromString(content,
       {
