@@ -1068,33 +1068,36 @@ async function getTopics(query: Record<string, unknown>, options?: { limit?: num
   return children.concat(topicLinks).sort(utils.titleCompare);
 }
 
-async function getArguments(query?: any, options?: any) {
-  let children: any[] = [], argumentLinks: any[] = [];
+async function getArguments(query: Record<string, unknown>, options?: { limit?: number; shortTitleLength?: number; req?: { user?: { id?: unknown } } }) {
+  type ArgDoc = EntryExtras & { _id: { equals(id: unknown): boolean }; parentId?: unknown; ownerId?: unknown; ownerType?: number; parentArgument?: unknown; parentTopic?: unknown; link?: unknown; against?: unknown };
+  type ArgLinkDoc = { argumentId: { equals(id: unknown): boolean }; against?: unknown };
+  type TopicDoc = { _id: { equals(id: unknown): boolean } };
+  let children: ArgDoc[] = [], argumentLinks: ArgDoc[] = [];
   if (!options) options = {};
   await async.series({
     children: async function() {
       let results = await db.Argument
         .find(query)
-        .limit(options.limit)
+        .limit(options!.limit)
         .sort({ title: 1 })
         .lean();
       await setEditorsUsername(results);
-      results.forEach(function(result?: any) {
-        appendEntryExtras(result, constants.OBJECT_TYPES.argument, options.req, options.shortTitleLength);
+      results.forEach(function(result: EntryExtras) {
+        appendEntryExtras(result, constants.OBJECT_TYPES.argument, options?.req, options?.shortTitleLength);
         //result.against = false;
       });
-      children = results;
+      children = results as ArgDoc[];
     },
     links: async function() {
-      if (options.limit > 0 && options.limit === children.length) return;
-      const newLimit = options.limit > 0 ? options.limit - children.length : options.limit;
+      if ((options?.limit ?? 0) > 0 && options?.limit === children.length) return;
+      const newLimit = (options?.limit ?? 0) > 0 ? (options!.limit as number) - children.length : options?.limit;
       let links = await db.ArgumentLink
         .find(query)
         .limit(newLimit)
         .lean();
 
       if (links.length > 0) {
-        const ids = links.map(function(link?: any) {
+        const ids = links.map(function(link: ArgLinkDoc) {
           return link.argumentId;
         });
         let query = { _id: { $in: ids } };
@@ -1107,18 +1110,18 @@ async function getArguments(query?: any, options?: any) {
         if (results.length > 0) {
           const linkParents = await async.parallel({
             parentTopics: async () => {
-              const topicIds = results
-                .filter((result: any) => !result.parentId && result.ownerId)
-                .map((result: any) => result.ownerId);
+              const topicIds = (results as ArgDoc[])
+                .filter((result: ArgDoc) => !result.parentId && result.ownerId)
+                .map((result: ArgDoc) => result.ownerId);
               // get the topics of actual arguments
               return await db.Topic
                 .find({ _id: { $in: topicIds } })
                 .lean();
             },
             parentArguments: async () => {
-              const parentIds = results
-                .filter((result: any) => !!result.parentId)
-                .map((result: any) => result.parentId);
+              const parentIds = (results as ArgDoc[])
+                .filter((result: ArgDoc) => !!result.parentId)
+                .map((result: ArgDoc) => result.parentId);
               query = { _id: { $in: parentIds } };
               return await db.Argument
                 .find(query)
@@ -1126,17 +1129,17 @@ async function getArguments(query?: any, options?: any) {
             },
           });
           await setEditorsUsername(results);
-          results.forEach((result: any) => {
+          (results as ArgDoc[]).forEach((result: ArgDoc) => {
             appendEntryExtras(
               result,
               constants.OBJECT_TYPES.argument,
-              options.req,
-              options.shortTitleLength
+              options?.req,
+              options?.shortTitleLength
             );
-            const link = links.find((link: any) => link.argumentId.equals(result._id));
+            const link = (links as ArgLinkDoc[]).find((link: ArgLinkDoc) => link.argumentId.equals(result._id));
             if (link) {
               if (result.parentId) {
-                const parentArgument = linkParents.parentArguments.find((linkParent: any) =>
+                const parentArgument = ((linkParents as { parentArguments: ArgDoc[] }).parentArguments).find((linkParent: ArgDoc) =>
                   linkParent._id.equals(result.parentId)
                 );
                 if (parentArgument) {
@@ -1144,15 +1147,15 @@ async function getArguments(query?: any, options?: any) {
                 }
                 result.parentArgument = parentArgument;
               } else if (result.ownerType === constants.OBJECT_TYPES.topic && result.ownerId) {
-                const linkParent = linkParents.parentTopics.find((linkParent: any) =>
+                const linkParent = ((linkParents as { parentTopics: TopicDoc[] }).parentTopics).find((linkParent: TopicDoc) =>
                   linkParent._id.equals(result.ownerId)
                 );
                 if (linkParent) {
-                  appendListExtras(
+                  (appendListExtras as (...args: unknown[]) => void)(
                     linkParent,
                     constants.OBJECT_TYPES.argument,
-                    options.req,
-                    options.shortTitleLength
+                    options?.req,
+                    options?.shortTitleLength
                   );
                 }
                 result.parentTopic = linkParent;
@@ -1160,15 +1163,15 @@ async function getArguments(query?: any, options?: any) {
               appendEntryExtras(
                 link,
                 constants.OBJECT_TYPES.argumentLink,
-                options.req,
-                options.shortTitleLength
+                options?.req,
+                options?.shortTitleLength
               );
               result.link = link;
               result.against = link.against;
             }
           });
         }
-        argumentLinks = results;
+        argumentLinks = results as ArgDoc[];
       }
     },
   });
@@ -2891,7 +2894,7 @@ async function getCategories(model: Record<string, unknown>, topicId: unknown, r
       };
       let subArguments = await getArguments(query, {
         limit: constants.SETTINGS.SUBCATEGORY_LIST_SIZE,
-        rq: req,
+        req: req,
         shortTitleLength: constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN,
       });
       subArguments.forEach(function(subArgument: VerdictResult) {
