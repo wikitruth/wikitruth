@@ -62,7 +62,7 @@ Rules:
   is still tier-2 or tier-3.
 - New code that does not need router-factory shape SHOULD live in tier 1.
 
-### 3. Legacy tier (frozen CJS)
+### 3. Legacy tier (CJS, optimization-in-progress)
 
 Folders:
 
@@ -74,7 +74,13 @@ Folders:
 
 Rules:
 
-- Treat as read-only. No new files.
+- No "frozen/read-only" assumption while
+  [LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md](../plans/LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md)
+  is active. In-place type/CJS/render-safety improvements are allowed and
+  expected per that plan.
+- New cross-tier interaction still goes through compatibility adapters.
+- No new files added solely to grow legacy surface area; modernization
+  edits are landed in place.
 - All cross-tier interaction goes through compatibility adapters under
   `server/src/middlewares/` (e.g. `mobileApiContracts.ts`,
   `requestContext.ts`) or via the controller-factory shape in tier 2.

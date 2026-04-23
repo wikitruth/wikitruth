@@ -62,10 +62,10 @@ Out-of-scope for this plan:
 
 ### Track L0: Policy and Tracker Alignment (P0)
 
-- [ ] `L0-01` Update active code-health docs to state that legacy optimization is in-scope (via this plan).
-- [ ] `L0-02` Add legacy-plan reference to `docs/plans/README.md`.
-- [ ] `L0-03` Update architecture/boundary policy docs that still mark legacy as frozen/read-only.
-- [ ] `L0-04` Define "done" semantics for legacy optimization (repo-level completion requires both modern and legacy plans completed).
+- [x] `L0-01` Update active code-health docs to state that legacy optimization is in-scope (via this plan). — `CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-22.md` already cross-references this plan in its Strict End-State Override scope note.
+- [x] `L0-02` Add legacy-plan reference to `docs/plans/README.md`. — Already listed under the active plans section.
+- [x] `L0-03` Update architecture/boundary policy docs that still mark legacy as frozen/read-only. — `docs/architecture/module-boundaries-2026-04-22.md` Tier-3 section retitled to "CJS, optimization-in-progress" and reworded to remove the read-only assumption while this plan is active.
+- [x] `L0-04` Define "done" semantics for legacy optimization (repo-level completion requires both modern and legacy plans completed). — Captured in the Acceptance Gate at the bottom of this plan: repo-level code-health completion requires both this plan and `CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-22.md` to be fully checked and moved to `docs/plans/completed/`.
 
 Acceptance:
 
@@ -136,3 +136,13 @@ Acceptance:
 3. L2 + L3 (type + module debt)
 4. L4 (template/render safety)
 5. L5 (full verification)
+
+## Acceptance Gate (repo-level)
+
+Repo-level code-health completion requires BOTH plans to be fully checked
+and moved to `docs/plans/completed/`:
+
+- `docs/plans/CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-22.md` (modern)
+- this plan (legacy)
+
+Completing only one side does NOT satisfy the repo-level gate.
