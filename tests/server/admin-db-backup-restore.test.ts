@@ -81,7 +81,7 @@ const registerAdminRoutes = require('../../server/src/controllers/api/admin');
 function createApp() {
   const app = express();
   app.use(express.json());
-  app.use((req: any, _res, next) => {
+  app.use((req: { session?: Record<string, unknown> }, _res, next) => {
     req.user = {
       _id: 'admin-1',
       id: 'admin-1',

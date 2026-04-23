@@ -59,7 +59,7 @@ function createApp(options?: {
     jwtSecret: 'test-jwt-secret',
   };
 
-  app.use((req: any, _res, next) => {
+  app.use((req: { session?: Record<string, unknown> }, _res, next) => {
     req.session = req.session || {};
     req.session.preferences = req.session.preferences || {};
     req.user = options?.user || null;

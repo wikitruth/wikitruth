@@ -37,7 +37,7 @@ function createApp() {
     }),
   );
 
-  app.use((req: any, _res, next) => {
+  app.use((req: { session?: Record<string, unknown> }, _res, next) => {
     req.app.config = {
       oauth: {
         twitter: { key: 'twitter-key' },

@@ -53,7 +53,7 @@ function leanDoc<T>(doc: T) {
 function createApp(user?: { id: string; _id: string; username: string } | null) {
   const app = express();
   app.use(express.json());
-  app.use((req: any, _res, next) => {
+  app.use((req: { session?: Record<string, unknown> }, _res, next) => {
     req.user = user || null;
     next();
   });
