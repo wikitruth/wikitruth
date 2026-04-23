@@ -70,7 +70,7 @@ Exception policy:
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
 | [x] | P0-001 | `tests/server/helpers/readBackendSource.js` | 56 | 1/0 | 0 | 0 | 0 | 3 | cebaba5: ts-ignore=0; cjs=3 (tests, allowed) |
 | [x] | P0-002 | `client/src/pages/Admin/common/AdminListPage.tsx` | 345 | 1/0 | 0 | 0 | 0 | 0 | previous Pass-1: ts-ignore=0 |
-| [-] | P0-003 | `server/src/utils/flowUtils.ts` | 2961 | 0/0 | 0 | 0 | 82 | 14 | 97c4674: 242→155; further leaf typing in 70a632e/a84394a/557854e/b1d8a29/5525a7e/e09f6d3/044a292/49c387b reduced any 155→82 (clipboard/owner-query/verdict/session helpers, set{Group,Artifact,Question,Answer,Issue,Opinion,ArgumentLink,Argument,TopicLink}Model, appendListExtras/appendEntryExtras with EntryExtras shape, getTop{Questions,Artifacts,Issues,Opinions}, getCategories, getDiaryCategories, createEntrySet, countEntries fully typed); remaining ~82 anys concentrated in setEntryParents inner callbacks, setTopicModels/setEntryModels/getTopics/getArguments mongoose lean-doc handlers — pending holistic mongoose typing |
+| [x] | P0-003 | `server/src/utils/flowUtils.ts` | 2961 | 0/0 | 0 | 0 | 0 | 14 | 97c4674→bbff14a: 242→0 anys via per-function leaf typing (clipboard/owner-query/verdict/session helpers, set{Group,Artifact,Question,Answer,Issue,Opinion,ArgumentLink,Argument,TopicLink}Model, appendListExtras/appendEntryExtras, getTop{Questions,Artifacts,Issues,Opinions}, getCategories, getDiaryCategories, createEntrySet, countEntries, getTopics/getArguments, setEntryParents, setTopicModels, setEntryModels, updateChildrenCount, updateChildrenCountBatch, syncChildren, syncCategoryId); cjs=14 (tier-2 boot interop) |
 | [-] | P0-004 | `server/src/controllers/api/home.ts` | 228 | 0/0 | 0 | 0 | 0 | 6 | 6466790: any 2→0; cjs=6 (tier-2 boot interop) |
 | [x] | P0-005 | `server/src/controllers/api/members.ts` | 839 | 0/0 | 0 | 0 | 0 | 5 | 1a10246: any 28→0 (jwt/withFriendlyUrl/canViewProfile/PrivateEntries/app.config typed); cjs=5 (tier-2) |
 | [x] | P0-006 | `server/src/controllers/api/answers.ts` | 243 | 0/0 | 0 | 0 | 0 | 7 | d2437a4: any 14→0 (AnswersServiceContract); cjs=7 (tier-2) |
@@ -82,7 +82,7 @@ Exception policy:
 | [ ] | P0-012 | `server/src/models/schema/models.ts` | 44 | 0/0 | 0 | 0 | 2 | 34 | e378bbb: ts-ignore=0; cjs=34 (tier-2 boot interop) |
 | [ ] | P0-013 | `server/src/controllers/api/index.ts` | 86 | 0/0 | 0 | 0 | 0 | 25 | a2c4005: ts-ignore=0; cjs=25 (tier-2) |
 | [ ] | P0-014 | `server/src/controllers/api/admin.ts` | 1066 | 0/0 | 0 | 0 | 0 | 8 | a2c4005: ts-ignore=0; cjs=8 (tier-2) |
-| [-] | P0-015 | `server/src/controllers/api/moderation.ts` | 1477 | 0/0 | 0 | 0 | 1 | 6 | 8ff4b8f: any 4→1 (toModerationEntry/buildVoteSummary typed); residual `getDbModelByObjectType(): any` accepted (mongoose chained .findById/.find/.create); cjs=6 (tier-2) |
+| [-] | P0-015 | `server/src/controllers/api/moderation.ts` | 1477 | 0/0 | 0 | 0 | 1 | 6 | 8ff4b8f→84677ef: any 4→1 (toModerationEntry/buildVoteSummary typed; getDbModelByObjectType return tagged TODO P0-003 Tier-2); residual `getDbModelByObjectType(): any` accepted (mongoose chained .findById/.find/.create); cjs=6 (tier-2) |
 | [ ] | P0-016 | `server/src/controllers/api/auth.ts` | 1480 | 0/0 | 0 | 0 | 0 | 5 | a2c4005: ts-ignore=0; cjs=5 (tier-2) |
 
 ## P1 Files
