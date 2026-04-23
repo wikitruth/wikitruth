@@ -312,7 +312,7 @@ async function buildSummary(target: ParsedTarget, userId?: string): Promise<{
   };
 }
 
-module.exports = function (router: Router) {
+export = function (router: Router) {
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     const target = parseTarget(req);
     if (!target) {

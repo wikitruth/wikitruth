@@ -11,7 +11,7 @@ import * as utils from '../../utils/utils';
 import * as artifactsService from '../../services/artifactsService';
 const db = require('../../app').db.models;
 
-module.exports = function (router: Router) {
+export = function (router: Router) {
   // GET /api/artifacts - List artifacts
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {

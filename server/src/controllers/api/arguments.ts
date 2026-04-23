@@ -47,7 +47,7 @@ type ArgumentWriteBody = {
   private?: unknown;
 };
 
-module.exports = function (router: Router) {
+export = function (router: Router) {
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       await GET_arguments(req, res);

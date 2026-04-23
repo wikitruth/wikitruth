@@ -13,7 +13,7 @@ const db = require('../../app').db.models;
 import { logEntryEvent } from '../../services/entryEventsService';
 import { notifySubscribers } from '../../services/notificationsService';
 
-module.exports = function (router: Router) {
+export = function (router: Router) {
   // Get issues list
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {

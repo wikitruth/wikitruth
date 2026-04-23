@@ -45,7 +45,7 @@ interface HomeModel {
   [key: string]: unknown;
 }
 
-module.exports = function (router: Router) {
+export = function (router: Router) {
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse, next: WikitruthNext) {
     try {
       await GET_home(req, res);

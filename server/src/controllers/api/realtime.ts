@@ -16,7 +16,7 @@ function writeSseMessage(res: WikitruthResponse, payload: RealtimeEvent): void {
   res.write(`data: ${JSON.stringify(payload)}\n\n`);
 }
 
-module.exports = function (router: Router) {
+export = function (router: Router) {
   router.get('/events', function (req: WikitruthRequest, res: WikitruthResponse) {
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache, no-transform');

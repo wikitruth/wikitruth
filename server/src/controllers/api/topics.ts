@@ -57,7 +57,7 @@ function parseCursor(req: WikitruthRequest): Date | null {
   return parsed;
 }
 
-module.exports = function (router: Router) {
+export = function (router: Router) {
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       await GET_topics(req, res);

@@ -71,7 +71,7 @@ async function validateRecaptcha(req: WikitruthRequest, token: string): Promise<
   }
 }
 
-module.exports = function (router: Router) {
+export = function (router: Router) {
   router.post('/', async function (req: WikitruthRequest, res: WikitruthResponse): Promise<void> {
     const body = (req.body || {}) as ContactBody;
     const name = String(body.name || '').trim();

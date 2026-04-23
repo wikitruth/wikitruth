@@ -5,7 +5,7 @@ import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../type
 import * as path from 'path';
 const reactShellPath = path.join(process.cwd(), 'public/react-app.html');
 
-module.exports = function (router: Router) {
+export = function (router: Router) {
   // Serve the React app
   router.get('/', function (req: WikitruthRequest, res: WikitruthResponse) {
     res.sendFile(reactShellPath);

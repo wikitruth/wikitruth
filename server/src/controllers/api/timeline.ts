@@ -26,7 +26,7 @@ function toPositiveInt(value: unknown, fallback: number): number {
   return Math.floor(parsed);
 }
 
-module.exports = function (router: Router) {
+export = function (router: Router) {
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     const objectName = String(req.query.objectName || '').trim();
     const objectId = String(req.query.id || req.query.objectId || '').trim();

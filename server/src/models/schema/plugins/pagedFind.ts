@@ -46,7 +46,7 @@ interface PagedFindSchema {
   };
 }
 
-module.exports = function pagedFindPlugin(schema: PagedFindSchema): void {
+function pagedFindPlugin(schema: PagedFindSchema): void {
   schema.statics.pagedFind = function (options: PagedFindOptions, cb: AsyncCallback<PagedFindOutput>) {
     const self = this as unknown as PagedFindModel;
     const normalizedOptions: Required<PagedFindOptions> = {
@@ -116,4 +116,6 @@ module.exports = function pagedFindPlugin(schema: PagedFindSchema): void {
       cb(null, output);
     });
   };
-};
+}
+
+export = pagedFindPlugin;

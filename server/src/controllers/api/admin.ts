@@ -187,7 +187,7 @@ async function restoreCollectionFromDirectory(options: {
   return { restored, skipped: false };
 }
 
-module.exports = function (router: Router) {
+export = function (router: Router) {
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAdmin(req, res)) {
       return;

@@ -8,7 +8,7 @@ import * as utils from '../../utils/utils';
 const constants = require('../../models/constants') as ConstantsModule;
 const jwt = require('jsonwebtoken') as { sign(payload: object, secret: string, options?: object): string; verify(token: string, secret: string): unknown };
 
-module.exports = function (router: Router) {
+export = function (router: Router) {
   // Get all contributors (members with public profiles)
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {

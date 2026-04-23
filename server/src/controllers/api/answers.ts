@@ -12,7 +12,7 @@ import * as answersService from '../../services/answersService';
 const { applyViewModeFilter } = require('./viewFilter');
 const db = require('../../app').db.models;
 
-module.exports = function (router: Router) {
+export = function (router: Router) {
   // GET /api/answers - List answers
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {

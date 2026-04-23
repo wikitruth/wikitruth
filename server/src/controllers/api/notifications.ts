@@ -38,7 +38,7 @@ function resolveObjectType(objectName: string | undefined, objectType: unknown):
   return Number(constants.OBJECT_TYPES?.[normalized] || 0);
 }
 
-module.exports = function (router: Router) {
+export = function (router: Router) {
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAuthenticated(req, res)) {
       return;

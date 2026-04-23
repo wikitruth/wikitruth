@@ -110,7 +110,7 @@ function isRateLimited(req: WikitruthRequest): boolean {
   return false;
 }
 
-module.exports = function (router: Router) {
+export = function (router: Router) {
   router.post('/errors', function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!isTrustedOrigin(req)) {
       res.status(403).json({ error: 'Untrusted origin' });

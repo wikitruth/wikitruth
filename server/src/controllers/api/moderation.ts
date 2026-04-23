@@ -347,7 +347,7 @@ async function buildVoteSummary(entry: Record<string, unknown>): Promise<{
   };
 }
 
-module.exports = function (router: Router) {
+export = function (router: Router) {
   router.get('/entry', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureScreenerOrAdmin(req, res)) {
       return;

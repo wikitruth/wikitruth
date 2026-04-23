@@ -7,7 +7,7 @@ import * as apiError from '../../middlewares/apiError';
 import * as mobileContracts from '../../middlewares/mobileApiContracts';
 import { sanitizeContentMiddleware } from '../../middlewares/sanitizeContent';
 
-module.exports = function (router: Router) {
+export = function (router: Router) {
   router.use(apiError.apiEnvelopeMiddleware);
   router.use(mobileContracts.mobileApiContractMiddleware);
   router.use(sanitizeContentMiddleware);

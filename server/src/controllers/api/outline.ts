@@ -113,7 +113,7 @@ async function resolveTarget(targetId: string): Promise<{
   return null;
 }
 
-module.exports = function (router: Router) {
+export = function (router: Router) {
   router.get('/tree', async function (req: WikitruthRequest, res: WikitruthResponse) {
     const rootId = String(req.query.rootId || '').trim();
     const depth = sanitizeLimit(req.query.depth, 2, 4);
