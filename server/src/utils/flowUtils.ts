@@ -726,8 +726,8 @@ async function setTopicLinkModel(req: { query: Record<string, unknown>; params: 
   }
 }
 
-async function setTopicModels(req?: any, model?: any) {
-  let query: any = { _id: model.argument ? model.argument.ownerId : req.query.topic ? req.query.topic : null };
+async function setTopicModels(req: { query: Record<string, unknown>; user?: { id?: unknown } }, model: Record<string, unknown> & { argument?: { ownerId?: unknown }; topic?: Record<string, unknown>; parentTopic?: Record<string, unknown> }) {
+  let query: Record<string, unknown> = { _id: model.argument ? model.argument.ownerId : req.query.topic ? req.query.topic : null };
   if (!query._id && req.query.friendlyUrl) {
     delete query._id;
     query.friendlyUrl = req.query.friendlyUrl;
@@ -762,7 +762,7 @@ async function setTopicModels(req?: any, model?: any) {
             model.topicChildrenMore = true;
           }
           await setEditorsUsername(results);
-          results.forEach(function(result?: any) {
+          results.forEach(function(result: Record<string, unknown>) {
             appendEntryExtras(result, constants.OBJECT_TYPES.topic, req);
           });
           model.topicChildren = results;
@@ -790,7 +790,7 @@ async function setTopicModels(req?: any, model?: any) {
             model.topicSiblingsMore = true;
           }
           await setEditorsUsername(results);
-          results.forEach(function(result?: any) {
+          results.forEach(function(result: Record<string, unknown>) {
             appendEntryExtras(result, constants.OBJECT_TYPES.topic, req);
           });
           model.topicSiblings = results;
@@ -827,7 +827,7 @@ async function setTopicModels(req?: any, model?: any) {
             model.parentSiblingsMore = true;
           }
           await setEditorsUsername(results);
-          results.forEach(function(result?: any) {
+          results.forEach(function(result: Record<string, unknown>) {
             appendEntryExtras(result, constants.OBJECT_TYPES.topic, req);
           });
           model.parentSiblings = results;
@@ -853,7 +853,7 @@ async function setTopicModels(req?: any, model?: any) {
  * @param model
  * @returns void
  */
-async function setEntryModels(query?: any, req?: any, model?: any) {
+async function setEntryModels(query: Record<string, unknown> | undefined, req: { query: Record<string, unknown>; params: { username?: string }; user?: { id?: unknown } }, model: Record<string, unknown> & { topicLink?: { parentId?: unknown }; argumentLink?: { parentId?: unknown } & Record<string, unknown>; artifact?: Record<string, unknown>; question?: Record<string, unknown>; answer?: { questionId?: unknown }; issue?: Record<string, unknown>; opinion?: Record<string, unknown>; opinion2?: Record<string, unknown> }) {
   if (!query || !query.ownerType || query.ownerType === -1) { // if the query or entry does not follow owner id/type concept.
     return;
   }
