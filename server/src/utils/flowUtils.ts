@@ -1173,54 +1173,54 @@ async function getArguments(query?: any, options?: any) {
   return children.concat(argumentLinks).sort(utils.titleCompare);
 }
 
-async function getTopQuestions(query?: any, model?: any, req?: any) {
+async function getTopQuestions(query: Record<string, unknown>, model: Record<string, unknown>, req: { user?: { id?: unknown } }) {
   let results = await db.Question
     .find(query)
     .limit(15)
     .lean();
   await setEditorsUsername(results);
-  results.forEach((result: any) => {
+  results.forEach((result: EntryExtras) => {
     appendEntryExtras(result, constants.OBJECT_TYPES.question, req);
   });
   model.questions = results;
 }
 
-async function getTopArtifacts(query?: any, model?: any, req?: any) {
+async function getTopArtifacts(query: Record<string, unknown>, model: Record<string, unknown>, req: { user?: { id?: unknown }; params?: { username?: string } }) {
   let results = await db.Artifact
     .find(query)
     .limit(15)
     //.lean()
     .sort({ title: 1 });
   await setEditorsUsername(results);
-  results.forEach((result: any) => {
-    result.setThumbnailPath(req.params.username);
+  results.forEach((result: EntryExtras & { setThumbnailPath: (u?: string) => void }) => {
+    result.setThumbnailPath(req.params?.username);
     appendEntryExtras(result, constants.OBJECT_TYPES.artifact, req);
   });
   model.artifacts = results;
 }
 
-async function getTopIssues(query?: any, model?: any, req?: any) {
+async function getTopIssues(query: Record<string, unknown>, model: Record<string, unknown>, req: { user?: { id?: unknown } }) {
   let results = await db.Issue
     .find(query)
     .limit(15)
     .lean()
     .sort({ title: 1 });
   await setEditorsUsername(results);
-  results.forEach((result: any) => {
+  results.forEach((result: EntryExtras & { issueType?: unknown }) => {
     result.issueType = constants.ISSUE_TYPES['type' + result.issueType];
     appendEntryExtras(result, constants.OBJECT_TYPES.issue, req);
   });
   model.issues = results;
 }
 
-async function getTopOpinions(query?: any, model?: any, req?: any) {
+async function getTopOpinions(query: Record<string, unknown>, model: Record<string, unknown>, req: { user?: { id?: unknown } }) {
   let results = await db.Opinion
     .find(query)
     .limit(15)
     .sort({ title: 1 })
     .lean();
   await setEditorsUsername(results);
-  results.forEach((result: any) => {
+  results.forEach((result: EntryExtras) => {
     appendEntryExtras(result, constants.OBJECT_TYPES.opinion, req);
   });
   model.opinions = results;
@@ -2832,7 +2832,7 @@ function createContentPreview(content?: string): string {
   );
 }
 
-async function getCategories(model?: any, topicId?: any, req?: any) {
+async function getCategories(model: Record<string, unknown>, topicId: unknown, req: { user?: { id?: unknown } }) {
   let results = await getTopics({
     parentId: topicId,
     private: false,
@@ -2842,7 +2842,7 @@ async function getCategories(model?: any, topicId?: any, req?: any) {
     shortTitleLength: constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN,
     req: req,
   });
-  await async.each(results, async function(result?: any) {
+  await async.each(results, async function(result: EntryExtras & { _id?: unknown; subtopics?: unknown; subarguments?: unknown }) {
     let subTopics = await getTopics({ parentId: result._id }, {
       limit: constants.SETTINGS.SUBCATEGORY_LIST_SIZE,
       shortTitleLength: constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN,
@@ -2862,7 +2862,7 @@ async function getCategories(model?: any, topicId?: any, req?: any) {
         rq: req,
         shortTitleLength: constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN,
       });
-      subArguments.forEach(function(subArgument?: any) {
+      subArguments.forEach(function(subArgument: VerdictResult) {
         setVerdictModel(subArgument);
       });
       sortArguments(subArguments);
@@ -2872,12 +2872,12 @@ async function getCategories(model?: any, topicId?: any, req?: any) {
   model.categories = results;
 }
 
-async function getDiaryCategories(req?: any) {
+async function getDiaryCategories(req: { user?: { id?: unknown } }) {
   let results = await db.Topic
-    .find({ parentId: null, ownerType: constants.OBJECT_TYPES.user, ownerId: req.user.id })
+    .find({ parentId: null, ownerType: constants.OBJECT_TYPES.user, ownerId: req.user?.id })
     .sort({ title: 1 })
     .lean();
-  await async.each(results, function(result?: any) {
+  await async.each(results, function(result: { friendlyUrl?: string; title?: string }) {
     result.friendlyUrl = utils.urlify(result.title);
   });
   return results;
@@ -2887,34 +2887,35 @@ async function getUserGroups(req?: { user?: { id?: unknown } }) {
   return await db.Group.find({ 'members.userId': req?.user?.id }).sort({ title: 1 }).lean();
 }
 
-function createEntrySet(model?: any) {
-  const entries = []
-    .concat(model.topics)
-    .concat(model.arguments)
-    .concat(model.questions)
-    .concat(model.answers)
-    .concat(model.issues)
-    .concat(model.opinions)
-    .concat(model.artifacts)
-    .sort(function(a?: any, b?: any) {
-      if (a.editDate < b.editDate) {
+function createEntrySet(model: Record<string, unknown> & { topics?: unknown[]; arguments?: unknown[]; questions?: unknown[]; answers?: unknown[]; issues?: unknown[]; opinions?: unknown[]; artifacts?: unknown[]; entrySet?: unknown }) {
+  const entries = ([] as Array<{ editDate?: Date }>)
+    .concat((model.topics || []) as Array<{ editDate?: Date }>)
+    .concat((model.arguments || []) as Array<{ editDate?: Date }>)
+    .concat((model.questions || []) as Array<{ editDate?: Date }>)
+    .concat((model.answers || []) as Array<{ editDate?: Date }>)
+    .concat((model.issues || []) as Array<{ editDate?: Date }>)
+    .concat((model.opinions || []) as Array<{ editDate?: Date }>)
+    .concat((model.artifacts || []) as Array<{ editDate?: Date }>)
+    .sort(function(a: { editDate?: Date }, b: { editDate?: Date }) {
+      if ((a.editDate ?? 0) < (b.editDate ?? 0)) {
         return 1;
       }
-      if (a.editDate > b.editDate) {
+      if ((a.editDate ?? 0) > (b.editDate ?? 0)) {
         return -1;
       }
       return 0;
     });
   if (entries.length > 1) {
     const midIndex = Math.floor(entries.length / 2);
-    model.entrySet = [{ entries: entries.slice(0, midIndex - 1) }];
-    model.entrySet.push({ entries: entries.slice(midIndex) });
+    const entrySet = [{ entries: entries.slice(0, midIndex - 1) }];
+    entrySet.push({ entries: entries.slice(midIndex) });
+    model.entrySet = entrySet;
   } else {
     model.entrySet = [{ entries: entries }];
   }
 }
 
-async function countEntries(model?: any, groupFilter?: any) {
+async function countEntries(model: Record<string, unknown>, groupFilter: Record<string, unknown>) {
   await async.parallel({
     topics: async function() {
       model.topics = await db.Topic
@@ -2952,7 +2953,7 @@ async function countEntries(model?: any, groupFilter?: any) {
         .countDocuments();
     },
   });
-  model.totalCount = model.topics + model.arguments + model.questions + model.answers + model.issues + model.opinions;
+  model.totalCount = (model.topics as number) + (model.arguments as number) + (model.questions as number) + (model.answers as number) + (model.issues as number) + (model.opinions as number);
 }
 
 function resetCache(req?: { app?: { locals?: { appCategories?: unknown } } }) {
