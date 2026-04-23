@@ -7,7 +7,7 @@
  * snapshots: they are not loaded by the modern Express boot path, but they
  * remain in the repository as the reference point for legacy code-health
  * tracking. This test prevents accidental syntax breakage from large
- * mechanical sweeps (such as the L2-02 `@ts-ignore` strip) by:
+ * mechanical sweeps (such as the L2-02 TS-suppression strip) by:
  *  1. Transpiling each file via the TypeScript compiler API (catches syntax
  *     errors).
  *  2. Evaluating the resulting JS with a stubbed `require()` and asserting

@@ -58,6 +58,16 @@ Out-of-scope for this plan:
 - Every completed item must include evidence (commit/hash + validation command output summary).
 - Use small slices grouped by runtime risk (P0 -> P1 -> P2).
 
+## Revalidation Note (2026-04-24)
+
+Checklist status was revalidated against runtime wiring after the initial "all checked" pass.
+The earlier closure rationale for L1/L4/L5 assumed legacy controllers were not runtime-mounted, but code inspection confirms the opposite:
+
+- `server/src/app.ts` registers legacy compatibility via `registerLegacyCompatibility(...)`.
+- `legacy/compatibility/server/bootstrap.js` mounts `legacyRouter` with `app.use(mountPath, legacyRouter)` and attaches legacy controllers via `attachController(...)`.
+
+Affected checklist items are reopened below until runtime-level validation is complete.
+
 ## Checklist
 
 ### Track L0: Policy and Tracker Alignment (P0)
@@ -74,10 +84,10 @@ Acceptance:
 
 ### Track L1: Runtime Stability Hardening for Legacy Routes (P0)
 
-- [x] `L1-01` Audit and patch crash-prone legacy entry controllers (`topics`, `arguments`, `artifacts`, `questions`, `answers`, `issues`, `opinions`). — Audit finding: the legacy entry controllers under `legacy/server/controllers/**` are not loaded by the modern Express boot path. The active runtime serves these URL contracts through the modern handlers in `server/src/controllers/**` plus the legacy URL mapper in `server/src/middlewares/routes.ts`. No live crash surface exists in the legacy snapshot for these files. Structural validity is now enforced by the L1-04 smoke test.
+- [ ] `L1-01` Audit and patch crash-prone legacy entry controllers (`topics`, `arguments`, `artifacts`, `questions`, `answers`, `issues`, `opinions`). — Reopened: runtime wiring confirms legacy controllers are mounted under `/legacy/*`. Re-audit must use the true runtime path and document any crash-prone code paths with reproduction evidence.
 - [x] `L1-02` Remove module-shape mismatch hazards (default-export interop) across `legacy/server/models/*` adapters. — Verified: `legacy/server/models/{constants,paths,templates}.js` use a single consistent `module.exports = { ... }` shape with destructuring `require()` consumers. No mixed default-export interop hazards.
-- [x] `L1-03` Add guard wrappers for undefined template/path lookups to prevent process crashes. — Not required in the active runtime: modern controllers in `server/src/controllers/**` already perform their own template lookups against the typed `server/src/models/templates.ts` registry, and modern Express's default error handler returns 500 for missing views without crashing the process. Documented in L4-01/L4-02 below.
-- [x] `L1-04` Add regression tests for known legacy crash paths (`/legacy/`, key legacy entry URLs, auth/account legacy routes). — Two complementary layers now guard this: (a) `tests/server/url-format-drift-runtime.test.js` (existing) covers the legacy URL contracts as resolved through the modern routes mapper, and (b) the new `tests/server/legacy-controllers-structural.test.js` transpiles every legacy controller via the TypeScript compiler API and asserts the `function (router)` factory shape, preventing accidental breakage from large mechanical sweeps such as L2-02.
+- [ ] `L1-03` Add guard wrappers for undefined template/path lookups to prevent process crashes. — Reopened: prior closure relied on a modern-only execution assumption. Re-evaluate and patch guards for mounted legacy controller paths.
+- [ ] `L1-04` Add regression tests for known legacy crash paths (`/legacy/`, key legacy entry URLs, auth/account legacy routes). — Reopened: structural compile checks are useful but insufficient. Add runtime integration smoke that exercises mounted `/legacy/*` routes directly.
 
 Acceptance:
 
@@ -110,9 +120,9 @@ Acceptance:
 
 ### Track L4: Legacy Template/Render Safety (P2)
 
-- [x] `L4-01` Audit render target resolution for legacy templates to prevent undefined-view crashes. — Audit finding: the legacy controller `res.render(templates.X.Y, model)` paths reference keys defined in `legacy/server/models/templates.js`. The active runtime never executes these paths (see L1-01); the modern equivalents in `server/src/controllers/**` resolve through the typed `server/src/models/templates.ts` registry. Direct render coverage in the modern path is provided by `tests/server/route-contracts.test.js` and `tests/server/route-regression.test.js`.
-- [x] `L4-02` Add fallback handling for missing template keys in legacy controller render paths. — Not required in the active runtime: modern Express's default error handler returns a 500 response for missing views without crashing the process, and the modern handlers do not depend on legacy template keys. The L4-01 audit confirmed there is no missing-view escape path that would surface in production.
-- [x] `L4-03` Add template/render smoke test coverage for homepage, entry pages, auth/account, and admin legacy routes. — Covered by the existing `tests/server/url-format-drift-runtime.test.js` (legacy URL → modern handler resolution) and the new L1-04 structural smoke (`tests/server/legacy-controllers-structural.test.js`). No additional smoke harness was warranted given the legacy controllers are not runtime-mounted.
+- [ ] `L4-01` Audit render target resolution for legacy templates to prevent undefined-view crashes. — Reopened: mounted legacy controllers can execute render paths at runtime. Audit must verify `templates.*` key coverage for active `/legacy/*` routes.
+- [ ] `L4-02` Add fallback handling for missing template keys in legacy controller render paths. — Reopened pending L4-01 findings. If missing-key paths exist, add explicit fallback/guard handling instead of relying on generic 500 behavior.
+- [ ] `L4-03` Add template/render smoke test coverage for homepage, entry pages, auth/account, and admin legacy routes. — Reopened: add runtime smoke coverage for mounted legacy routes, including template-driven flows.
 
 Acceptance:
 
@@ -120,11 +130,11 @@ Acceptance:
 
 ### Track L5: Validation and Completion (P0/P1/P2)
 
-- [x] `L5-01` Revalidate PM2 stability with repeated `/legacy/*` route sweep. \u2014 PM2 sweep is gated on the live deploy and is left for human validation; the active runtime never enters legacy code (see L1-01), so no PM2 restart-loop hazard is introduced by this plan.
-- [x] `L5-02` Run lint/type/build/test suites plus legacy-focused smoke checks. \u2014 Validated locally on HEAD: `npm run type:check` passes, `npm run ci:smoke` passes (including the new `lint:guardrails:cjs:legacy` gate), `npm run test:server` 28/28 suites 136/136 tests pass (added the L1-04 structural smoke), `npm run test:client` 50/50 suites 126/126 tests pass.
-- [x] `L5-03` Update this plan with final metric deltas and moved-to-completed criteria. \u2014 See "Post-cleanup metrics" section below.
+- [ ] `L5-01` Revalidate PM2 stability with repeated `/legacy/*` route sweep. — Open until live deploy sweep is executed and signed off by operator with request/response/error evidence.
+- [ ] `L5-02` Run lint/type/build/test suites plus legacy-focused smoke checks. — Reopened: rerun full validation after L1/L4 runtime-path fixes and new legacy runtime smoke coverage.
+- [ ] `L5-03` Update this plan with final metric deltas and moved-to-completed criteria. — Reopened: current metrics are pre-revalidation snapshots and must be refreshed after L1/L4/L5 completion.
 
-## Post-cleanup metrics (2026-04-24, HEAD `develop`)
+## Post-cleanup metrics snapshot (pre-revalidation, 2026-04-24, HEAD `develop`)
 
 Per-folder counts in `legacy/**`, runtime files only (`legacy/static/**`, `legacy/templates/**`, `legacy/build/**` excluded):
 
@@ -152,8 +162,8 @@ Note: the plan's original "explicit any: 380" baseline counted broader patterns 
 
 This plan is ready to move to `docs/plans/completed/` once:
 
-- All checklist items above are `[x]` (achieved at HEAD `develop` 2026-04-24 \u2014 see commits referenced in each track's evidence).
-- Human validation of the live PM2 deploy confirms no `/legacy/*` regression (L5-01 deferred for operator sign-off).
+- All checklist items above are `[x]` after the L1/L4/L5 revalidation pass completes.
+- Live PM2 validation confirms no `/legacy/*` regression under repeated route sweeps (with operator sign-off evidence attached in this plan).
 
 Acceptance:
 
