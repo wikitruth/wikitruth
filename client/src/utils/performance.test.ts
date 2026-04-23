@@ -1,23 +1,24 @@
 import { startPerformanceMonitoring } from './performance';
 
+type MutableObserverHost = { PerformanceObserver: typeof PerformanceObserver | undefined };
+
 describe('performance monitoring', () => {
   const originalObserver = globalThis.PerformanceObserver;
 
   afterEach(() => {
-    globalThis.PerformanceObserver = originalObserver;
+    (globalThis as MutableObserverHost).PerformanceObserver = originalObserver;
     jest.restoreAllMocks();
   });
 
   it('does not throw when observer is unavailable', () => {
-    // @ts-expect-error test override
-    globalThis.PerformanceObserver = undefined;
+    (globalThis as MutableObserverHost).PerformanceObserver = undefined;
     expect(() => startPerformanceMonitoring()).not.toThrow();
   });
 
   it('subscribes to navigation entries when observer exists', () => {
     const observe = jest.fn();
-    // @ts-expect-error test override
-    globalThis.PerformanceObserver = jest.fn(() => ({ observe }));
+    (globalThis as MutableObserverHost).PerformanceObserver =
+      jest.fn(() => ({ observe })) as unknown as typeof PerformanceObserver;
 
     expect(() => startPerformanceMonitoring()).not.toThrow();
     expect(observe).toHaveBeenCalledWith({ type: 'navigation', buffered: true });

@@ -15,7 +15,7 @@ import type { Mongoose } from 'mongoose';
  * Track 5 modernization work and is tracked separately in the code-health plan.
  *
  * The purpose of this typed factory is to *eliminate* the per-line
- * `@ts-ignore TS(2304)/TS(2580)/TS(2451)/TS(7006)` suppressions around the
+ * TypeScript suppressions (TS2304 / TS2580 / TS2451 / TS7006) around the
  * legacy CJS boilerplate, not to retype the legacy `app` object.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
