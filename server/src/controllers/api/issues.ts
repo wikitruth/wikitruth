@@ -55,14 +55,14 @@ module.exports = function (router: Router) {
 };
 
 async function GET_issues(req: WikitruthRequest, res: WikitruthResponse) {
-  let model: any = {};
+  let model: Record<string, unknown> = {};
   flowUtils.setScreeningModel(req, model);
   
-  const query: any = {
+  const query: Record<string, unknown> = {
     ownerType: constants.OBJECT_TYPES.topic,
     private: false,
   };
-  applyViewModeFilter(req, query, model.screening.status);
+  applyViewModeFilter(req, query, (model.screening as { status?: unknown } | undefined)?.status);
   
   if (req.query.topic) {
     query.ownerId = req.query.topic;

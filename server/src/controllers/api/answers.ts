@@ -15,14 +15,14 @@ module.exports = function (router: Router) {
   // GET /api/answers - List answers
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
-      const model: any = {};
+      const model: Record<string, unknown> = {};
       flowUtils.setScreeningModel(req, model);
       
-      const query: any = {
+      const query: Record<string, unknown> = {
         ownerType: constants.OBJECT_TYPES.question,
         private: false,
       };
-      applyViewModeFilter(req, query, model.screening.status);
+      applyViewModeFilter(req, query, (model.screening as { status?: unknown } | undefined)?.status);
       
       if (req.query.question) {
         query.ownerId = req.query.question;

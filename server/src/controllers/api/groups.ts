@@ -20,7 +20,7 @@ module.exports = function (router: Router) {
         result.friendlyUrl = utils.urlify(result.title);
       });
 
-      const model: any = {};
+      const model: Record<string, unknown> = {};
       
       if (req.user) {
         const currentUser: any = req.user;

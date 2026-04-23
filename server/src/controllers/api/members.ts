@@ -284,7 +284,7 @@ module.exports = function (router: Router) {
       const validTabs = ['all', 'topics', 'arguments', 'questions', 'answers', 'artifacts', 'issues', 'opinions'];
       const normalizedTab = validTabs.includes(tab) ? tab : 'all';
       const limit = normalizedTab === 'all' ? 15 : 100;
-      const baseQuery: any = { createUserId: member._id, private: true };
+      const baseQuery: Record<string, unknown> = { createUserId: member._id, private: true };
       const shouldLoad = function (name: string) {
         return normalizedTab === 'all' || normalizedTab === name;
       };
@@ -387,7 +387,7 @@ module.exports = function (router: Router) {
       }
 
       const limit = Math.min(Math.max(Number(req.query?.limit || 50), 1), 200);
-      const query: any = { createUserId: member._id };
+      const query: Record<string, unknown> = { createUserId: member._id };
       if (!canViewPrivateEntries(member, req.user)) {
         query.private = { $ne: true };
       }
@@ -433,7 +433,7 @@ module.exports = function (router: Router) {
 
       const canViewPrivate = canViewPrivateEntries(member, req.user);
 
-      const groupsQuery: any = { 'members.userId': member._id };
+      const groupsQuery: Record<string, unknown> = { 'members.userId': member._id };
       if (!canViewPrivate) {
         groupsQuery.privacyType = 10;
       }
@@ -454,7 +454,7 @@ module.exports = function (router: Router) {
       ]);
       const topicIds = [...new Set(topicIdBuckets.flat().map((id: any) => String(id || '')).filter(Boolean))];
 
-      const topicQuery: any = { _id: { $in: topicIds } };
+      const topicQuery: Record<string, unknown> = { _id: { $in: topicIds } };
       if (!canViewPrivate) {
         topicQuery.private = { $ne: true };
       }
@@ -535,7 +535,7 @@ module.exports = function (router: Router) {
       const normalizedTab = validTabs.includes(tab) ? tab : 'all';
       const limit = normalizedTab === 'all' ? 15 : 100;
       const canViewPrivate = canViewPrivateEntries(member, req.user);
-      const baseQuery: any = { createUserId: member._id };
+      const baseQuery: Record<string, unknown> = { createUserId: member._id };
       if (!canViewPrivate) {
         baseQuery.private = { $ne: true };
       }

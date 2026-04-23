@@ -14,13 +14,13 @@ module.exports = function (router: Router) {
   // GET /api/artifacts - List artifacts
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
-      const model: any = {};
+      const model: Record<string, unknown> = {};
       flowUtils.setScreeningModel(req, model);
       
-      const query: any = {
+      const query: Record<string, unknown> = {
         ownerType: constants.OBJECT_TYPES.topic,
         private: false,
-        'screening.status': model.screening.status,
+        'screening.status': (model.screening as { status?: unknown } | undefined)?.status,
       };
       
       if (req.query.topic) {
