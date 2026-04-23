@@ -7,7 +7,7 @@ import type { Mongoose } from 'mongoose';
  * `server/src/models/schema/**`.
  *
  * Each schema module exports a function with this signature via `export =`,
- * which mirrors the historical CJS shape `module.exports = function (app, mongoose) {...}`.
+ * which mirrors the historical CJS shape (the legacy factory export).
  *
  * `app` is intentionally `any` because the schema modules touch a heterogeneous
  * surface (Express Application + Kraken `app.config` + `db.model` / `db.models` +

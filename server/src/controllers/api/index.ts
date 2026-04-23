@@ -2,10 +2,32 @@
 
 import type { Router } from 'express';
 
-const express = require('express') as typeof import('express');
+import express from 'express';
 import * as apiError from '../../middlewares/apiError';
 import * as mobileContracts from '../../middlewares/mobileApiContracts';
 import { sanitizeContentMiddleware } from '../../middlewares/sanitizeContent';
+
+import attachHome from './home';
+import attachTopics from './topics';
+import attachArguments from './arguments';
+import attachQuestions from './questions';
+import attachSearch from './search';
+import attachIssues from './issues';
+import attachOpinions from './opinions';
+import attachAnswers from './answers';
+import attachArtifacts from './artifacts';
+import attachGroups from './groups';
+import attachMembers from './members';
+import attachAuth from './auth';
+import attachContact from './contact';
+import attachAdmin from './admin';
+import attachModeration from './moderation';
+import attachOutline from './outline';
+import attachMonitoring from './monitoring';
+import attachRealtime from './realtime';
+import attachReactions from './reactions';
+import attachNotifications from './notifications';
+import attachTimeline from './timeline';
 
 export = function (router: Router) {
   router.use(apiError.apiEnvelopeMiddleware);
@@ -34,27 +56,27 @@ export = function (router: Router) {
   const notificationsRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const timelineRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
 
-  (require('./home') as (routerArg: Router) => void)(homeRouter);
-  (require('./topics') as (routerArg: Router) => void)(topicsRouter);
-  (require('./arguments') as (routerArg: Router) => void)(argumentsRouter);
-  (require('./questions') as (routerArg: Router) => void)(questionsRouter);
-  (require('./search') as (routerArg: Router) => void)(searchRouter);
-  (require('./issues') as (routerArg: Router) => void)(issuesRouter);
-  (require('./opinions') as (routerArg: Router) => void)(opinionsRouter);
-  (require('./answers') as (routerArg: Router) => void)(answersRouter);
-  (require('./artifacts') as (routerArg: Router) => void)(artifactsRouter);
-  (require('./groups') as (routerArg: Router) => void)(groupsRouter);
-  (require('./members') as (routerArg: Router) => void)(membersRouter);
-  (require('./auth') as (routerArg: Router) => void)(authRouter);
-  (require('./contact') as (routerArg: Router) => void)(contactRouter);
-  (require('./admin') as (routerArg: Router) => void)(adminRouter);
-  (require('./moderation') as (routerArg: Router) => void)(moderationRouter);
-  (require('./outline') as (routerArg: Router) => void)(outlineRouter);
-  (require('./monitoring') as (routerArg: Router) => void)(monitoringRouter);
-  (require('./realtime') as (routerArg: Router) => void)(realtimeRouter);
-  (require('./reactions') as (routerArg: Router) => void)(reactionsRouter);
-  (require('./notifications') as (routerArg: Router) => void)(notificationsRouter);
-  (require('./timeline') as (routerArg: Router) => void)(timelineRouter);
+  attachHome(homeRouter);
+  attachTopics(topicsRouter);
+  attachArguments(argumentsRouter);
+  attachQuestions(questionsRouter);
+  attachSearch(searchRouter);
+  attachIssues(issuesRouter);
+  attachOpinions(opinionsRouter);
+  attachAnswers(answersRouter);
+  attachArtifacts(artifactsRouter);
+  attachGroups(groupsRouter);
+  attachMembers(membersRouter);
+  attachAuth(authRouter);
+  attachContact(contactRouter);
+  attachAdmin(adminRouter);
+  attachModeration(moderationRouter);
+  attachOutline(outlineRouter);
+  attachMonitoring(monitoringRouter);
+  attachRealtime(realtimeRouter);
+  attachReactions(reactionsRouter);
+  attachNotifications(notificationsRouter);
+  attachTimeline(timelineRouter);
 
   router.use('/home', homeRouter);
   router.use('/topics', topicsRouter);
