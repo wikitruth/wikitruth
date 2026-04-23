@@ -1192,44 +1192,44 @@ async function getTopOpinions(query?: any, model?: any, req?: any) {
  * @param entryType: parent entryType
  * @param specificEntryType: specific child entries to update
  */
-function applySessionToQuery(query?: any, session?: any) {
-  if (session && query && typeof query.session === 'function') {
-    return query.session(session);
+function applySessionToQuery(query?: { session?: (s: unknown) => unknown } | unknown, session?: unknown) {
+  if (session && query && typeof (query as { session?: unknown }).session === 'function') {
+    return (query as { session: (s: unknown) => unknown }).session(session);
   }
   return query;
 }
 
-async function countDocumentsWithSession(dbModel?: any, query?: any, session?: any) {
-  return await applySessionToQuery(dbModel.countDocuments(query), session);
+async function countDocumentsWithSession(dbModel?: { countDocuments: (q: unknown) => unknown }, query?: unknown, session?: unknown): Promise<number> {
+  return await applySessionToQuery(dbModel?.countDocuments(query), session) as Promise<number> as unknown as number;
 }
 
-async function updateOneWithSession(dbModel?: any, filter?: any, update?: any, session?: any) {
-  return await applySessionToQuery(dbModel.updateOne(filter, update), session);
+async function updateOneWithSession(dbModel?: { updateOne: (f: unknown, u: unknown) => unknown }, filter?: unknown, update?: unknown, session?: unknown) {
+  return await applySessionToQuery(dbModel?.updateOne(filter, update), session);
 }
 
-function normalizeUpdateChildrenCountArgs(specificEntryType?: any, callbackOrOptions?: any, maybeOptions?: any) {
-  let normalizedSpecificEntryType = specificEntryType;
-  let callback = null;
-  let options: any = {};
+function normalizeUpdateChildrenCountArgs(specificEntryType?: unknown, callbackOrOptions?: unknown, maybeOptions?: unknown) {
+  let normalizedSpecificEntryType: unknown = specificEntryType;
+  let callback: ((...args: unknown[]) => unknown) | null = null;
+  let options: Record<string, unknown> = {};
 
   if (typeof normalizedSpecificEntryType === 'function') {
-    callback = normalizedSpecificEntryType;
+    callback = normalizedSpecificEntryType as (...args: unknown[]) => unknown;
     normalizedSpecificEntryType = null;
   } else if (normalizedSpecificEntryType && typeof normalizedSpecificEntryType === 'object') {
-    options = normalizedSpecificEntryType;
+    options = normalizedSpecificEntryType as Record<string, unknown>;
     normalizedSpecificEntryType = null;
   }
 
   if (typeof callbackOrOptions === 'function') {
-    callback = callbackOrOptions;
+    callback = callbackOrOptions as (...args: unknown[]) => unknown;
   } else if (callbackOrOptions && typeof callbackOrOptions === 'object') {
-    options = callbackOrOptions;
+    options = callbackOrOptions as Record<string, unknown>;
   }
 
   if (typeof maybeOptions === 'function') {
-    callback = maybeOptions;
+    callback = maybeOptions as (...args: unknown[]) => unknown;
   } else if (maybeOptions && typeof maybeOptions === 'object') {
-    options = maybeOptions;
+    options = maybeOptions as Record<string, unknown>;
   }
 
   return {
@@ -1239,7 +1239,7 @@ function normalizeUpdateChildrenCountArgs(specificEntryType?: any, callbackOrOpt
   };
 }
 
-function getDbConnectionForObjectType(entryType?: any) {
+function getDbConnectionForObjectType(entryType?: number) {
   const dbModel = getDbModelByObjectType(entryType);
   return dbModel && dbModel.db ? dbModel.db : null;
 }
@@ -2029,7 +2029,24 @@ async function syncCategoryId(entry?: any, options?: any) {
   }
 }
 
-function setVerdictModel(result?: any) {
+type VerdictResult = {
+  verdict?: {
+    status?: number;
+    true?: boolean;
+    false?: boolean;
+    pending?: boolean;
+    category?: number;
+    label?: string;
+    theme?: string;
+    icon?: string;
+  };
+  typeId?: number;
+  typeUX?: unknown;
+  title?: string;
+};
+
+function setVerdictModel(result?: VerdictResult) {
+  if (!result) return;
   if (!result.verdict || !result.verdict.status) {
     result.verdict = {
       status: constants.VERDICT_STATUS.pending,
@@ -2059,37 +2076,37 @@ function setVerdictModel(result?: any) {
   }
 }
 
-function sortArguments(results?: any) {
-  results.sort(function(a?: any, b?: any) {
+function sortArguments(results?: VerdictResult[]) {
+  results?.sort(function(a: VerdictResult, b: VerdictResult) {
     if (a.typeId === constants.ARGUMENT_TYPES.artifact && b.typeId !== constants.ARGUMENT_TYPES.artifact) {
       return 1;
     }
     if (a.typeId !== constants.ARGUMENT_TYPES.artifact && b.typeId === constants.ARGUMENT_TYPES.artifact) {
       return -1;
     }
-    if (a.verdict.category > b.verdict.category) {
+    if ((a.verdict?.category ?? 0) > (b.verdict?.category ?? 0)) {
       return -1;
     }
-    if (a.verdict.category < b.verdict.category) {
+    if ((a.verdict?.category ?? 0) < (b.verdict?.category ?? 0)) {
       return 1;
     }
-    if (a.title > b.title) {
+    if ((a.title ?? '') > (b.title ?? '')) {
       return 1;
     }
-    if (a.title < b.title) {
+    if ((a.title ?? '') < (b.title ?? '')) {
       return -1;
     }
     return 0;
   });
 }
 
-function getVerdictCount(args?: any) {
+function getVerdictCount(args?: VerdictResult[]) {
   const verdictCount: { true?: number; false?: number; pending?: number } = {
     true: 0,
     false: 0,
     pending: 0,
   };
-  args.forEach(function(arg?: any) {
+  args?.forEach(function(arg: VerdictResult) {
     const varg = arg.verdict && arg.verdict.status ? arg.verdict.status : constants.VERDICT_STATUS.pending;
     const category = constants.VERDICT_STATUS.getCategory(varg);
     switch (category) {
