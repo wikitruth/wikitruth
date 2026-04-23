@@ -907,7 +907,7 @@ function setClipboardModel(req?: any, model?: any, entryType?: any) {
         const items = clipboard[key];
         const keyType = parseInt(key.substring('object'.length - 1));
         const keyEntry = getEntryByObjectType(model, keyType);
-        if (entryType === keyType && keyEntry && items.indexOf(keyEntry._id.toString()) > -1) {
+        if (entryType === keyType && keyEntry && items.indexOf((keyEntry as { _id: { toString(): string } })._id.toString()) > -1) {
           model.clipboard.marked = true;
           marked = true;
         }
@@ -2316,7 +2316,7 @@ function setModelOwnerEntry(req?: any, res?: any, model?: any, options?: any) {
   setModelContext(req, res, model);
 }
 
-function getDbModelByObjectType(type?: any) {
+function getDbModelByObjectType(type?: number) {
   switch (type) {
     case constants.OBJECT_TYPES.topic:
       return db.Topic;
@@ -2340,26 +2340,26 @@ function getDbModelByObjectType(type?: any) {
   return null;
 }
 
-function getEntryByObjectType(model?: any, type?: any) {
+function getEntryByObjectType(model?: { topic?: unknown; topicLink?: unknown; argument?: unknown; argumentLink?: unknown; artifact?: unknown; question?: unknown; answer?: unknown; issue?: unknown; opinion?: unknown }, type?: number) {
   switch (type) {
     case constants.OBJECT_TYPES.topic:
-      return model.topic;
+      return model?.topic;
     case constants.OBJECT_TYPES.topicLink:
-      return model.topicLink;
+      return model?.topicLink;
     case constants.OBJECT_TYPES.argument:
-      return model.argument;
+      return model?.argument;
     case constants.OBJECT_TYPES.argumentLink:
-      return model.argumentLink;
+      return model?.argumentLink;
     case constants.OBJECT_TYPES.artifact:
-      return model.artifact;
+      return model?.artifact;
     case constants.OBJECT_TYPES.question:
-      return model.question;
+      return model?.question;
     case constants.OBJECT_TYPES.answer:
-      return model.answer;
+      return model?.answer;
     case constants.OBJECT_TYPES.issue:
-      return model.issue;
+      return model?.issue;
     case constants.OBJECT_TYPES.opinion:
-      return model.opinion;
+      return model?.opinion;
   }
   return null;
 }
@@ -2388,43 +2388,55 @@ function getObjectName(type?: number): string {
   return '';
 }
 
-function createOwnerQueryFromModel(model?: any) {
-  if (model.issue) {
+type EntryRef = { _id?: unknown };
+type OwnerSourceModel = {
+  issue?: EntryRef;
+  opinion?: EntryRef;
+  question?: EntryRef;
+  artifact?: EntryRef;
+  argumentLink?: EntryRef;
+  argument?: EntryRef;
+  topicLink?: EntryRef;
+  topic?: EntryRef;
+};
+
+function createOwnerQueryFromModel(model?: OwnerSourceModel): { ownerType?: number; ownerId?: unknown } {
+  if (model?.issue) {
     return {
       ownerType: constants.OBJECT_TYPES.issue,
       ownerId: model.issue._id,
     };
-  } else if (model.opinion) {
+  } else if (model?.opinion) {
     return {
       ownerType: constants.OBJECT_TYPES.opinion,
       ownerId: model.opinion._id,
     };
-  } else if (model.question) {
+  } else if (model?.question) {
     return {
       ownerType: constants.OBJECT_TYPES.question,
       ownerId: model.question._id,
     };
-  } else if (model.artifact) {
+  } else if (model?.artifact) {
     return {
       ownerType: constants.OBJECT_TYPES.artifact,
       ownerId: model.artifact._id,
     };
-  } else if (model.argumentLink) {
+  } else if (model?.argumentLink) {
     return {
       ownerType: constants.OBJECT_TYPES.argumentLink,
       ownerId: model.argumentLink._id,
     };
-  } else if (model.argument) {
+  } else if (model?.argument) {
     return {
       ownerType: constants.OBJECT_TYPES.argument,
       ownerId: model.argument._id,
     };
-  } else if (model.topicLink) {
+  } else if (model?.topicLink) {
     return {
       ownerType: constants.OBJECT_TYPES.topicLink,
       ownerId: model.topicLink._id,
     };
-  } else if (model.topic) {
+  } else if (model?.topic) {
     return {
       ownerType: constants.OBJECT_TYPES.topic,
       ownerId: model.topic._id,
@@ -2472,8 +2484,8 @@ function getDiaryBaseUrl(username?: string): string {
   return paths.members.index + '/' + username + (paths.members.profile.journal || paths.members.profile.diary);
 }
 
-function buildReturnUrl(req?: any, defaultBaseUrl?: any) {
-  const nextUrl = url.parse(req.originalUrl);
+function buildReturnUrl(req?: { originalUrl?: string }, defaultBaseUrl?: string): string {
+  const nextUrl = url.parse(req?.originalUrl);
   const nextQuery = querystring.parse(nextUrl.query);
   delete nextQuery.id;
   if (nextQuery.source) {
@@ -2487,10 +2499,10 @@ function buildReturnUrl(req?: any, defaultBaseUrl?: any) {
   return url.format(nextUrl);
 }
 
-function buildTopicReturnUrl(model?: any, cancelBaseUrl?: any, entry?: any, parent?: any) {
+function buildTopicReturnUrl(model?: { username?: unknown; group?: unknown; wikiBaseUrl?: string }, cancelBaseUrl?: string, entry?: { friendlyUrl?: unknown; _id?: unknown }, parent?: { friendlyUrl?: unknown; _id?: unknown }): string {
   return entry ? buildEntryUrl(cancelBaseUrl, entry) :
     parent ? buildEntryUrl(cancelBaseUrl, parent) :
-      (model.username || model.group) ? model.wikiBaseUrl : '/';
+      (model?.username || model?.group) ? (model.wikiBaseUrl || '') : '/';
 }
 
 function buildParentUrl(req?: any, entry?: any) {
