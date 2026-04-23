@@ -466,8 +466,9 @@ module.exports = function (router: Router) {
       const relatedUserIds = [
         ...new Set(
           groups
-            .flatMap(function (group: any) {
-              return (group.members || []).map(function (memberRow: Record<string, unknown>) {
+            .flatMap(function (group: Record<string, unknown>) {
+              const members = (group.members as Array<Record<string, unknown>> | undefined) || [];
+              return members.map(function (memberRow: Record<string, unknown>) {
                 return String(memberRow?.userId || '');
               });
             })

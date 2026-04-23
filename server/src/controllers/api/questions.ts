@@ -163,17 +163,17 @@ async function GET_question_entry(req: WikitruthRequest, res: WikitruthResponse)
   ]);
 
   await flowUtils.setEditorsUsername(answers);
-  answers.forEach(function (result: any) {
+  answers.forEach(function (result: Record<string, unknown>) {
     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.answer, req);
   });
 
   await flowUtils.setEditorsUsername(issues);
-  issues.forEach(function (result: any) {
+  issues.forEach(function (result: Record<string, unknown>) {
     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.issue, req);
   });
 
   await flowUtils.setEditorsUsername(opinions);
-  opinions.forEach(function (result: any) {
+  opinions.forEach(function (result: Record<string, unknown>) {
     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.opinion, req);
   });
 

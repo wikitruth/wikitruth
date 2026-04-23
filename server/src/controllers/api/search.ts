@@ -202,44 +202,44 @@ async function GET_search(req: WikitruthRequest, res: WikitruthResponse) {
 
   await flowUtils.setEditorsUsername(topicResults);
   await flowUtils.setEntryParents(topicResults, constants.OBJECT_TYPES.topic);
-  topicResults.forEach(function (result: any) {
+  topicResults.forEach(function (result: Record<string, unknown>) {
     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.topic, req);
   });
 
   await flowUtils.setEditorsUsername(argumentResults);
   await flowUtils.setEntryParents(argumentResults, constants.OBJECT_TYPES.argument);
-  argumentResults.forEach(function (result: any) {
+  argumentResults.forEach(function (result: Record<string, unknown>) {
     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.argument, req);
     flowUtils.setVerdictModel(result);
   });
 
   await flowUtils.setEditorsUsername(questionResults);
   await flowUtils.setEntryParents(questionResults, constants.OBJECT_TYPES.question);
-  questionResults.forEach(function (result: any) {
+  questionResults.forEach(function (result: Record<string, unknown>) {
     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.question, req);
   });
 
   await flowUtils.setEditorsUsername(answerResults);
   await flowUtils.setEntryParents(answerResults, constants.OBJECT_TYPES.answer);
-  answerResults.forEach(function (result: any) {
+  answerResults.forEach(function (result: Record<string, unknown>) {
     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.answer, req);
   });
 
   await flowUtils.setEditorsUsername(artifactResults);
   await flowUtils.setEntryParents(artifactResults, constants.OBJECT_TYPES.artifact);
-  artifactResults.forEach(function (result: any) {
+  artifactResults.forEach(function (result: Record<string, unknown>) {
     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.artifact, req);
   });
 
   await flowUtils.setEditorsUsername(issueResults);
   await flowUtils.setEntryParents(issueResults, constants.OBJECT_TYPES.issue);
-  issueResults.forEach(function (result: any) {
+  issueResults.forEach(function (result: Record<string, unknown>) {
     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.issue, req);
   });
 
   await flowUtils.setEditorsUsername(opinionResults);
   await flowUtils.setEntryParents(opinionResults, constants.OBJECT_TYPES.opinion);
-  opinionResults.forEach(function (result: any) {
+  opinionResults.forEach(function (result: Record<string, unknown>) {
     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.opinion, req);
   });
 

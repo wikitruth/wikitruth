@@ -365,7 +365,7 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
                 }
               );
 
-              subArguments.forEach(function (subArgument: any) {
+              subArguments.forEach(function (subArgument: Record<string, unknown>) {
                 flowUtils.setVerdictModel(subArgument);
               });
               flowUtils.sortArguments(subArguments);
@@ -410,7 +410,7 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
       }
 
       const relatedTopicIdSet = new Set<string>();
-      links.forEach(function (link: any) {
+      links.forEach(function (link: Record<string, unknown>) {
         const topicId = String(link.topicId || '');
         const parentId = String(link.parentId || '');
         const currentTopicId = String(req.query.topic || '');
@@ -431,7 +431,7 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
         .lean();
 
       await flowUtils.setEditorsUsername(results);
-      results.forEach(function (result: any) {
+      results.forEach(function (result: Record<string, unknown>) {
         flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.topic, req);
       });
 
@@ -452,7 +452,7 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
         }
       );
 
-      results.forEach(function (result: any) {
+      results.forEach(function (result: Record<string, unknown>) {
         flowUtils.setVerdictModel(result);
       });
       flowUtils.sortArguments(results);
@@ -480,7 +480,7 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
         .limit(15)
         .lean();
       await flowUtils.setEditorsUsername(results);
-      results.forEach(function (result: any) {
+      results.forEach(function (result: Record<string, unknown>) {
         flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.question, req);
       });
       model.questions = results;
@@ -495,7 +495,7 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
         .limit(15)
         .lean();
       await flowUtils.setEditorsUsername(results);
-      results.forEach(function (result: any) {
+      results.forEach(function (result: Record<string, unknown>) {
         flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.artifact, req);
       });
       model.artifacts = results;
@@ -510,7 +510,7 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
         .limit(15)
         .lean();
       await flowUtils.setEditorsUsername(results);
-      results.forEach(function (result: any) {
+      results.forEach(function (result: Record<string, unknown>) {
         flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.issue, req);
       });
       model.issues = results;
@@ -526,7 +526,7 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
         .limit(15)
         .lean();
       await flowUtils.setEditorsUsername(results);
-      results.forEach(function (result: any) {
+      results.forEach(function (result: Record<string, unknown>) {
         flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.opinion, req);
       });
       model.opinions = results;
