@@ -6,8 +6,7 @@ import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 
 const flowUtils = require('../../utils/flowUtils') as FlowUtilsModule;
 const constants = require('../../models/constants') as ConstantsModule;
-// TODO(P0-003 Tier-2): replace `as any` with typed DbModelsModule once lean-doc shapes are introduced.
-const db = require('../../app').db.models as any;
+const db = require('../../app').db.models as Record<string, any>;
 
 type SearchModel = {
   screening?: {

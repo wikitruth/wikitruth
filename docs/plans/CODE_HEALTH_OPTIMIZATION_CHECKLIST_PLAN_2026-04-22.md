@@ -402,7 +402,7 @@ Use this in PR descriptions/commits:
 - [x] `M-04` `test:client` exits 0
 - [ ] `M-05` modern source (`server/src/**`, `client/src/**`) has `0` `@ts-ignore`
 - [ ] `M-06` modern source (`server/src/**`, `client/src/**`) has `0` `@ts-expect-error` and `0` `@ts-nocheck`
-- [ ] `M-07` modern source (`server/src/**`, `client/src/**`) has `0` explicit `any` / any-like fallbacks
+- [x] `M-07` modern source (`server/src/**`, `client/src/**`) has `0` explicit `any` / any-like fallbacks
 - [ ] `M-08` modern source (`server/src/**`, `client/src/**`) has `0` `require()` and `0` `module.exports`
 - [x] `M-09` strict-gate CI checks fail on any regression in M-05..M-08
   - `type:guardrails` (scripts/check-no-new-ts-nocheck.sh) — locks `@ts-nocheck` (M-06)
