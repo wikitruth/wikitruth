@@ -1,6 +1,6 @@
 "use strict";
 
-module.exports = {
+export default {
     // TODO: Create 30 questions. Check all that apply for answers.
     questions: [
         {

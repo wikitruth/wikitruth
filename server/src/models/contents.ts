@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = {
+export default {
   argument: {
     /*shortList: 'Statements',
     //longList: 'Statements: Facts, Claims, and Arguments',

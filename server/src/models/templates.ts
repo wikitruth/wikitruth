@@ -1,7 +1,7 @@
 'use strict';
 
 
-module.exports = {
+export default {
     index: 'dust/index',
     help: 'dust/help-us',
     admin: {

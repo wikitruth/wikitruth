@@ -9,14 +9,15 @@ import configurePassport from './middlewares/passport';
 import registerRoutes from './middlewares/routes';
 import { apiErrorHandler } from './middlewares/apiError';
 
+import contents from './models/contents';
+import templates from './models/templates';
+
 const path = require('path');
 
 //dependencies
 const config = require(path.join(process.cwd(), 'config/config')),
     paths = require('./models/paths'),
     constants = require('./models/constants'),
-    contents = require('./models/contents'),
-    templates = require('./models/templates'),
     applications = require('./models/applications'),
     express = require('express'),
     cookieParser = require('cookie-parser'),
