@@ -70,19 +70,19 @@ Exception policy:
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
 | [x] | P0-001 | `tests/server/helpers/readBackendSource.js` | 56 | 1/0 | 0 | 0 | 0 | 3 | cebaba5: ts-ignore=0; cjs=3 (tests, allowed) |
 | [x] | P0-002 | `client/src/pages/Admin/common/AdminListPage.tsx` | 345 | 1/0 | 0 | 0 | 0 | 0 | previous Pass-1: ts-ignore=0 |
-| [ ] | P0-003 | `server/src/utils/flowUtils.ts` | 2961 | 0/0 | 0 | 0 | 242 | 14 | de16a2a: ts-ignore=0; cjs=14 (tier-2 boot interop) |
-| [ ] | P0-004 | `server/src/controllers/api/home.ts` | 228 | 0/0 | 0 | 0 | 2 | 6 | c59b865: ts-ignore=0; cjs=6 (tier-2) |
-| [ ] | P0-005 | `server/src/controllers/api/members.ts` | 839 | 0/0 | 0 | 0 | 28 | 5 | c59b865: ts-ignore=0; cjs=5 (tier-2) |
-| [ ] | P0-006 | `server/src/controllers/api/answers.ts` | 243 | 0/0 | 0 | 0 | 14 | 7 | c59b865: ts-ignore=0; cjs=7 (tier-2) |
-| [ ] | P0-007 | `server/src/controllers/api/artifacts.ts` | 272 | 0/0 | 0 | 0 | 17 | 6 | c59b865: ts-ignore=0; cjs=6 (tier-2) |
-| [ ] | P0-008 | `server/src/controllers/api/opinions.ts` | 361 | 0/0 | 0 | 0 | 15 | 9 | c59b865: ts-ignore=0; cjs=9 (tier-2) |
-| [ ] | P0-009 | `server/src/controllers/api/issues.ts` | 274 | 0/0 | 0 | 0 | 13 | 9 | c59b865: ts-ignore=0; cjs=9 (tier-2) |
-| [ ] | P0-010 | `server/src/controllers/api/groups.ts` | 512 | 0/0 | 0 | 0 | 24 | 4 | c59b865: ts-ignore=0; cjs=4 (tier-2) |
+| [-] | P0-003 | `server/src/utils/flowUtils.ts` | 2961 | 0/0 | 0 | 0 | 155 | 14 | 97c4674: any 242→155 (forEach/.some/.filter/.map narrowed); remaining requires Tier-2 holistic refactor (session.clipboard typing, appendListExtras arity, optional-after-required ordering) |
+| [-] | P0-004 | `server/src/controllers/api/home.ts` | 228 | 0/0 | 0 | 0 | 0 | 6 | 6466790: any 2→0; cjs=6 (tier-2 boot interop) |
+| [x] | P0-005 | `server/src/controllers/api/members.ts` | 839 | 0/0 | 0 | 0 | 0 | 5 | 1a10246: any 28→0 (jwt/withFriendlyUrl/canViewProfile/PrivateEntries/app.config typed); cjs=5 (tier-2) |
+| [x] | P0-006 | `server/src/controllers/api/answers.ts` | 243 | 0/0 | 0 | 0 | 0 | 7 | d2437a4: any 14→0 (AnswersServiceContract); cjs=7 (tier-2) |
+| [x] | P0-007 | `server/src/controllers/api/artifacts.ts` | 272 | 0/0 | 0 | 0 | 0 | 6 | d7071bb: any 17→0 (ArtifactsServiceContract+canEditEntry+POST/PUT); cjs=6 (tier-2) |
+| [x] | P0-008 | `server/src/controllers/api/opinions.ts` | 361 | 0/0 | 0 | 0 | 0 | 9 | d7071bb: any 15→0 (OpinionsServiceContract+canEditEntry+POST/PUT); cjs=9 (tier-2) |
+| [x] | P0-009 | `server/src/controllers/api/issues.ts` | 274 | 0/0 | 0 | 0 | 0 | 9 | d7071bb: any 13→0 (IssuesServiceContract+canEditEntry+POST/PUT); cjs=9 (tier-2) |
+| [x] | P0-010 | `server/src/controllers/api/groups.ts` | 512 | 0/0 | 0 | 0 | 0 | 4 | 13b3cd3: any 24→0 (GroupLike/UserLike/GroupMemberLike helpers); cjs=4 (tier-2) |
 | [ ] | P0-011 | `server/src/app.ts` | 235 | 0/0 | 0 | 0 | 7 | 34 | e378bbb: ts-ignore=0; cjs=34 (tier-2) |
 | [ ] | P0-012 | `server/src/models/schema/models.ts` | 44 | 0/0 | 0 | 0 | 2 | 34 | e378bbb: ts-ignore=0; cjs=34 (tier-2 boot interop) |
 | [ ] | P0-013 | `server/src/controllers/api/index.ts` | 86 | 0/0 | 0 | 0 | 0 | 25 | a2c4005: ts-ignore=0; cjs=25 (tier-2) |
 | [ ] | P0-014 | `server/src/controllers/api/admin.ts` | 1066 | 0/0 | 0 | 0 | 0 | 8 | a2c4005: ts-ignore=0; cjs=8 (tier-2) |
-| [ ] | P0-015 | `server/src/controllers/api/moderation.ts` | 1477 | 0/0 | 0 | 0 | 4 | 6 | a2c4005: ts-ignore=0; cjs=6 (tier-2) |
+| [-] | P0-015 | `server/src/controllers/api/moderation.ts` | 1477 | 0/0 | 0 | 0 | 1 | 6 | 8ff4b8f: any 4→1 (toModerationEntry/buildVoteSummary typed); residual `getDbModelByObjectType(): any` accepted (mongoose chained .findById/.find/.create); cjs=6 (tier-2) |
 | [ ] | P0-016 | `server/src/controllers/api/auth.ts` | 1480 | 0/0 | 0 | 0 | 0 | 5 | a2c4005: ts-ignore=0; cjs=5 (tier-2) |
 
 ## P1 Files
@@ -103,7 +103,7 @@ Exception policy:
 | [ ] | P1-012 | `server/src/models/schema/core/Topic.ts` | 142 | 0/0 | 0 | 0 | 0 | 2 | be9c762: ts-ignore=0; cjs=2 (tier-2 boot interop) |
 | [ ] | P1-013 | `server/src/models/schema/core/TopicLink.ts` | 62 | 0/0 | 0 | 0 | 0 | 2 | be9c762: ts-ignore=0; cjs=2 (tier-2 boot interop) |
 | [ ] | P1-014 | `server/src/middlewares/passport.ts` | 260 | 0/0 | 0 | 0 | 0 | 9 | a2c4005: ts-ignore=0; cjs=9 (tier-2) |
-| [ ] | P1-015 | `server/src/controllers/api/topics.ts` | 538 | 0/0 | 0 | 0 | 29 | 5 | a2c4005: ts-ignore=0; cjs=5 (tier-2) |
+| [-] | P1-015 | `server/src/controllers/api/topics.ts` | 538 | 0/0 | 0 | 0 | 5 | 5 | 97c4674: any 29→5 (enrichCategory cb typed; remaining TopicScreeningModel index sig + nested any tied to flowUtils Tier-2); cjs=5 (tier-2) |
 | [ ] | P1-016 | `server/src/models/schema/account/Account.ts` | 50 | 0/0 | 0 | 0 | 0 | 1 | be9c762: ts-ignore=0; cjs=1 (tier-2 boot interop) |
 | [ ] | P1-017 | `server/src/models/schema/account/AccountCategory.ts` | 20 | 0/0 | 0 | 0 | 0 | 1 | be9c762: ts-ignore=0; cjs=1 (tier-2 boot interop) |
 | [ ] | P1-018 | `server/src/models/schema/account/AdminGroup.ts` | 19 | 0/0 | 0 | 0 | 0 | 1 | be9c762: ts-ignore=0; cjs=1 (tier-2 boot interop) |
@@ -117,8 +117,8 @@ Exception policy:
 | [ ] | P1-026 | `server/src/models/schema/core/Word.ts` | 24 | 0/0 | 0 | 0 | 0 | 1 | be9c762: ts-ignore=0; cjs=1 (tier-2 boot interop) |
 | [x] | P1-027 | `tests/server/session-csrf-policy.test.js` | 108 | 0/0 | 0 | 0 | 0 | 7 | a2c4005: ts-ignore=0; cjs=7 (tests, allowed) |
 | [ ] | P1-028 | `server/src/server.ts` | 89 | 0/0 | 0 | 0 | 7 | 6 | a2c4005: ts-ignore=0; cjs=6 |
-| [ ] | P1-029 | `server/src/controllers/api/arguments.ts` | 355 | 0/0 | 0 | 0 | 5 | 6 | a2c4005: ts-ignore=0; cjs=6 (tier-2) |
-| [ ] | P1-030 | `server/src/controllers/api/questions.ts` | 328 | 0/0 | 0 | 0 | 5 | 6 | a2c4005: ts-ignore=0; cjs=6 (tier-2) |
+| [-] | P1-029 | `server/src/controllers/api/arguments.ts` | 355 | 0/0 | 0 | 0 | 1 | 6 | 6466790: any 5→1 (forEach cbs typed; residual `db.models as any` deferred to DbModelsModule contract widening); cjs=6 (tier-2) |
+| [-] | P1-030 | `server/src/controllers/api/questions.ts` | 328 | 0/0 | 0 | 0 | 1 | 6 | 6466790: any 5→1 (forEach cbs typed; residual `db.models as any` deferred to DbModelsModule contract widening); cjs=6 (tier-2) |
 | [ ] | P1-031 | `server/src/middlewares/locals.ts` | 113 | 0/0 | 0 | 0 | 0 | 6 | a2c4005: ts-ignore=0; cjs=6 (tier-2) |
 | [x] | P1-032 | `tests/server/mobile-api-contracts.test.js` | 80 | 0/0 | 0 | 0 | 0 | 6 | a2c4005: ts-ignore=0; cjs=6 (tests, allowed) |
 | [ ] | P1-033 | `server/src/services/topicsService.ts` | 66 | 0/0 | 0 | 0 | 0 | 5 | a2c4005: ts-ignore=0; cjs=5 (tier-2 boot interop) |
@@ -147,7 +147,7 @@ Exception policy:
 
 | Status | ID | File | LOC | lint(E/W) | ts-ignore | ts-exp | any-like | cjs | Evidence |
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| [ ] | P2-001 | `server/src/controllers/api/search.ts` | 274 | 0/0 | 0 | 0 | 10 | 4 | a2c4005: ts-ignore=0; cjs=4 (tier-2) |
+| [-] | P2-001 | `server/src/controllers/api/search.ts` | 274 | 0/0 | 0 | 0 | 1 | 4 | 9d85760+6466790: any 10→1 (forEach/map cbs typed; residual `db.models as any` deferred); cjs=4 (tier-2) |
 | [ ] | P2-002 | `server/src/controllers/api/outline.ts` | 349 | 0/0 | 0 | 0 | 4 | 4 | a2c4005: ts-ignore=0; cjs=4 (tier-2) |
 | [ ] | P2-003 | `server/src/services/entryEventsService.ts` | 158 | 0/0 | 0 | 0 | 2 | 4 | a2c4005: ts-ignore=0; cjs=4 (tier-2 boot interop) |
 | [x] | P2-004 | `tests/server/moderation-ownership-migration.test.js` | 196 | 0/0 | 0 | 0 | 0 | 4 | a2c4005: ts-ignore=0; cjs=4 (tests, allowed) |

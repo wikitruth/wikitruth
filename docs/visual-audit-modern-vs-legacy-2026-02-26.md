@@ -5,8 +5,8 @@
 - Compared legacy routes (`/…`) against modern routes (`/app/…`) on the same local dataset.
 - Captured full-page screenshots for list/index routes and detail/entry routes.
 - Screenshot set:
-  - `/Users/dsalunga/Projects/Wikitruth/wikitruth/.build/visual-audit/2026-02-26/legacy`
-  - `/Users/dsalunga/Projects/Wikitruth/wikitruth/.build/visual-audit/2026-02-26/modern`
+  - `.build/visual-audit/2026-02-26/legacy`
+  - `.build/visual-audit/2026-02-26/modern`
 
 ## Summary
 

@@ -159,7 +159,7 @@ exports.mongodb = {
       email: 'email@somedomain.com',
     },
     branch: 'test',
-    remote: 'dsalunga',
+    remote: 'username',
   },
 };
 
