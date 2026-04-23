@@ -1,6 +1,9 @@
 'use strict';
 
-module.exports = function (app: any, mongoose: any) {
+import type { Mongoose } from 'mongoose';
+import type { Application } from 'express';
+
+module.exports = function (app: Application, mongoose: Mongoose) {
   // embeddable docs first
   require('./account/Note')(app, mongoose);
   require('./account/Status')(app, mongoose);

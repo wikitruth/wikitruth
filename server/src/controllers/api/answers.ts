@@ -107,11 +107,12 @@ module.exports = function (router: Router) {
   });
 };
 
-function canEditEntry(entry: any, user: any): boolean {
+function canEditEntry(entry: Record<string, unknown> | null | undefined, user: Record<string, unknown> | null | undefined): boolean {
   if (!entry || !user) {
     return false;
   }
-  if (user.canPlayRoleOf && user.canPlayRoleOf('admin')) {
+  const canPlayRoleOf = user.canPlayRoleOf as ((role: string) => boolean) | undefined;
+  if (typeof canPlayRoleOf === 'function' && canPlayRoleOf('admin')) {
     return true;
   }
   return String(entry.createUserId || '') === String(user._id || user.id || '');

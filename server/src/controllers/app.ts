@@ -2,7 +2,7 @@
 
 import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../types/http';
-const path = require('path') as any;
+import * as path from 'path';
 const reactShellPath = path.join(process.cwd(), 'public/react-app.html');
 
 module.exports = function (router: Router) {

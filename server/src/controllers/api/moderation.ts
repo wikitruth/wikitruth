@@ -147,27 +147,31 @@ function escapeRegex(raw: string): string {
   return raw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function toModerationEntry(entry: any, target: ModerationTarget): Record<string, unknown> {
+function toModerationEntry(entry: Record<string, unknown> | null | undefined, target: ModerationTarget): Record<string, unknown> {
+  const e = (entry || {}) as Record<string, unknown> & {
+    screening?: { status?: unknown };
+    verdict?: { status?: unknown; reasoning?: unknown };
+  };
   return {
-    _id: entry?._id,
-    title: entry?.title || entry?.title2 || '',
-    friendlyUrl: entry?.friendlyUrl || '',
+    _id: e._id,
+    title: e.title || e.title2 || '',
+    friendlyUrl: e.friendlyUrl || '',
     objectType: target.objectType,
     objectName: target.objectName,
-    createDate: entry?.createDate || null,
-    editDate: entry?.editDate || null,
+    createDate: e.createDate || null,
+    editDate: e.editDate || null,
     screening: {
-      status: toNumber(entry?.screening?.status),
+      status: toNumber(e.screening?.status),
     },
     verdict: {
-      status: toNumber(entry?.verdict?.status),
-      reasoning: entry?.verdict?.reasoning || entry?.verdictReasoning || null,
+      status: toNumber(e.verdict?.status),
+      reasoning: e.verdict?.reasoning || e.verdictReasoning || null,
     },
-    verdictReasoning: entry?.verdict?.reasoning || entry?.verdictReasoning || null,
-    ownerId: entry?.ownerId || null,
-    ownerType: toNumber(entry?.ownerType),
-    parentId: entry?.parentId || null,
-    questionId: entry?.questionId || null,
+    verdictReasoning: e.verdict?.reasoning || e.verdictReasoning || null,
+    ownerId: e.ownerId || null,
+    ownerType: toNumber(e.ownerType),
+    parentId: e.parentId || null,
+    questionId: e.questionId || null,
   };
 }
 
@@ -303,7 +307,7 @@ function computeConsensus(votes: Array<{ verdictStatus: number; voterUserId?: un
   };
 }
 
-async function buildVoteSummary(entry: any): Promise<{
+async function buildVoteSummary(entry: Record<string, unknown>): Promise<{
   totalVotes: number;
   threshold: number;
   consensusReached: boolean;
