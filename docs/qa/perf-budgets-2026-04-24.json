@@ -1,0 +1,26 @@
+{
+  "defaults": {
+    "connections": 10,
+    "durationSeconds": 5
+  },
+  "endpoints": [
+    {
+      "name": "auth-me",
+      "path": "/api/auth/me",
+      "p95MsMax": 350,
+      "avgReqPerSecMin": 30
+    },
+    {
+      "name": "topics-list",
+      "path": "/api/topics",
+      "p95MsMax": 500,
+      "avgReqPerSecMin": 20
+    },
+    {
+      "name": "search",
+      "path": "/api/search?q=truth",
+      "p95MsMax": 650,
+      "avgReqPerSecMin": 15
+    }
+  ]
+}
