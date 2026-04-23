@@ -10,9 +10,7 @@ import { applyViewModeFilter } from './viewFilter';
 
 const flowUtils = require('../../utils/flowUtils') as FlowUtilsModule;
 const constants = require('../../models/constants') as WikitruthConstants;
-const utils = require('../../utils/utils') as {
-  urlify: (value: string) => string;
-};
+import * as utils from '../../utils/utils';
 const questionsService = require('../../services/questionsService') as {
   getQuestionsList: (
     query: ServiceQuery,

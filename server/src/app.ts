@@ -1,6 +1,8 @@
 'use strict';
 
 import slugify from './utils/slugify';
+import sendmail from './utils/sendmail';
+import createWorkflow from './utils/workflow';
 
 const path = require('path');
 
@@ -218,9 +220,9 @@ app.use(apiErrorHandler);
 
 //setup utilities
 app.utility = {};
-app.utility.sendmail = require('./utils/sendmail');
+app.utility.sendmail = sendmail;
 app.utility.slugify = slugify;
-app.utility.workflow = require('./utils/workflow');
+app.utility.workflow = createWorkflow;
 
 //listen up
 /*

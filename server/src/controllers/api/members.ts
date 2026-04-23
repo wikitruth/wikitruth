@@ -4,7 +4,7 @@ import type { ConstantsModule, UtilsModule } from '../../types/legacyModules';
 import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../types/http';
 const db = require('../../app').db.models;
-const utils = require('../../utils/utils') as UtilsModule;
+import * as utils from '../../utils/utils';
 const constants = require('../../models/constants') as ConstantsModule;
 const jwt = require('jsonwebtoken') as { sign(payload: object, secret: string, options?: object): string; verify(token: string, secret: string): unknown };
 

@@ -34,7 +34,4 @@ function error(event: string, fields: LogFields = {}): void {
   emit('error', event, fields);
 }
 
-module.exports = {
-  info: info,
-  error: error,
-};
+export { info, error };

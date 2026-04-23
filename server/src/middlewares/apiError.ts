@@ -3,10 +3,9 @@
 import type { ErrorRequestHandler, NextFunction, Request, RequestHandler, Response } from 'express';
 import { API_ERROR_CODES, type ApiErrorCode, isAppError } from '../types/errors';
 
+import * as logger from '../utils/logger';
+
 const API_ROUTE_PREFIX = /^\/api(\/|$)/;
-const logger = require('../utils/logger') as {
-  error: (event: string, fields: Record<string, unknown>) => void;
-};
 
 type PromiseLikeResult = {
   then?: unknown;

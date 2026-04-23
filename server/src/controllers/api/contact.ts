@@ -3,12 +3,7 @@
 import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 
-const httpClient = require('../../utils/httpClient') as {
-  postForm: (
-    url: string,
-    formData: Record<string, string>,
-  ) => Promise<{ statusCode: number; body?: { success?: boolean } }>;
-};
+import * as httpClient from '../../utils/httpClient';
 
 type ContactBody = {
   name?: unknown;
@@ -65,7 +60,7 @@ async function validateRecaptcha(req: WikitruthRequest, token: string): Promise<
   }
 
   try {
-    const captchaResult = await httpClient.postForm('https://www.google.com/recaptcha/api/siteverify', {
+    const captchaResult = await httpClient.postForm<{ success?: boolean }>('https://www.google.com/recaptcha/api/siteverify', {
       secret: secret,
       response: token,
     });

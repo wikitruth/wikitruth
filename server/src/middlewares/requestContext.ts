@@ -1,10 +1,8 @@
 'use strict';
 
 import type { Request, RequestHandler } from 'express';
+import * as logger from '../utils/logger';
 const crypto = require('crypto') as typeof import('crypto');
-const logger = require('../utils/logger') as {
-  info: (event: string, fields: Record<string, unknown>) => void;
-};
 
 const KEY_PATH_PATTERNS = [/^\/$/, /^\/home\/?$/, /^\/login\/?$/, /^\/api\/home\/?$/, /^\/app(\/|$)/, /^\/legacy(\/|$)/];
 

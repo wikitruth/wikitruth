@@ -1,13 +1,13 @@
 'use strict';
 
-const mongoose = require('mongoose') as typeof import('mongoose');
+import mongoose from 'mongoose';
 const appModule = require('../app') as {
   kraken?: {
     get: (key: string) => string | undefined;
   };
 };
 
-module.exports = async function connectMongoose(): Promise<void> {
+export default async function connectMongoose(): Promise<void> {
   const uri = appModule.kraken?.get('mongodb:uri') || 'mongodb://127.0.0.1:27017/wikitruth';
 
   console.log('[mongoose] connecting');

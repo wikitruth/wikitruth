@@ -3,14 +3,10 @@
 import type { Router } from 'express';
 import type { WikitruthNext, WikitruthRequest, WikitruthResponse } from '../../types/http';
 
+import * as httpClient from '../../utils/httpClient';
+
 const crypto = require('crypto') as typeof import('crypto');
 const jwt = require('jsonwebtoken') as typeof import('jsonwebtoken');
-const httpClient = require('../../utils/httpClient') as {
-  postForm: (
-    url: string,
-    formData: Record<string, string>,
-  ) => Promise<{ statusCode: number; body?: { success?: boolean } }>;
-};
 
 type AuthUserLike = {
   _id: string;
@@ -240,7 +236,7 @@ async function validateRecaptcha(req: WikitruthRequest, token: string): Promise<
   }
 
   try {
-    const captchaResult = await httpClient.postForm('https://www.google.com/recaptcha/api/siteverify', {
+    const captchaResult = await httpClient.postForm<{ success?: boolean }>('https://www.google.com/recaptcha/api/siteverify', {
       secret: secret,
       response: token,
     });

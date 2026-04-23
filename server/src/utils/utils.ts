@@ -48,12 +48,13 @@ function timeSince(date: number | Date, fullWord?: boolean): string {
   return Math.floor(seconds) + (fullWord ? ' seconds' : 's');
 }
 
-function urlify(text: string | null | undefined): string {
-  if (!text) {
+function urlify(text: unknown): string {
+  if (text === null || text === undefined || text === '') {
     return '';
   }
+  const str = typeof text === 'string' ? text : String(text);
 
-  return text
+  return str
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '-')
@@ -85,13 +86,13 @@ function getShortText(text: string | null | undefined, size = 45): string | null
   return text;
 }
 
-module.exports = {
-  randomInt: randomInt,
-  randomBool: randomBool,
-  numberWithCommas: numberWithCommas,
-  timeSince: timeSince,
-  urlify: urlify,
-  isObjectIdString: isObjectIdString,
-  titleCompare: titleCompare,
-  getShortText: getShortText,
+export {
+  randomInt,
+  randomBool,
+  numberWithCommas,
+  timeSince,
+  urlify,
+  isObjectIdString,
+  titleCompare,
+  getShortText,
 };

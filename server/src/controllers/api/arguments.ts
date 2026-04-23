@@ -8,9 +8,7 @@ import type { WikitruthConstants } from '../../types/constants';
 import { applyViewModeFilter } from './viewFilter';
 
 const flowUtils = require('../../utils/flowUtils') as FlowUtilsModule;
-const utils = require('../../utils/utils') as {
-  urlify: (value: string) => string;
-};
+import * as utils from '../../utils/utils';
 const constants = require('../../models/constants') as WikitruthConstants;
 const argumentsService = require('../../services/argumentsService') as {
   getArgumentsList: (

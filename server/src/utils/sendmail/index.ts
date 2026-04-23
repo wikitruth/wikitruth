@@ -1,11 +1,7 @@
 'use strict';
 
-const asyncLib = require('async') as {
-  parallel: (
-    tasks: Array<(callback: (err: unknown, result: string | null) => void) => void>,
-    callback: (err: unknown, results: unknown) => void
-  ) => void;
-};
+import asyncLib from 'async';
+import emailjs from 'emailjs/email';
 
 interface MailOptions {
   from: string;
@@ -24,7 +20,7 @@ interface MailOptions {
   error: (message: string) => void;
 }
 
-module.exports = function sendmail(
+export default function sendmail(
   req: import('express').Request & { app: { config: { smtp: { credentials: unknown } } } },
   res: import('express').Response,
   options: MailOptions
@@ -87,14 +83,6 @@ module.exports = function sendmail(
         attachments.push(attachment);
       });
     }
-
-    const emailjs = require('emailjs/email') as {
-      server: {
-        connect: (credentials: unknown) => {
-          send: (payload: Record<string, unknown>, callback: (sendError: unknown, message: unknown) => void) => void;
-        };
-      };
-    };
 
     const emailer = emailjs.server.connect(req.app.config.smtp.credentials);
     emailer.send(

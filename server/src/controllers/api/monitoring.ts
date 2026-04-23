@@ -3,9 +3,7 @@
 import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 
-const logger = require('../../utils/logger') as {
-  error: (event: string, fields: Record<string, unknown>) => void;
-};
+import * as logger from '../../utils/logger';
 const { publishRealtimeEvent } = require('../../services/realtimeEvents') as {
   publishRealtimeEvent: (event: {
     type: string;

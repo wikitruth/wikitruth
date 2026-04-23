@@ -44,6 +44,4 @@ async function postForm<TBody = unknown>(url: string, formData: FormPayload): Pr
   };
 }
 
-module.exports = {
-  postForm: postForm,
-};
+export { postForm };

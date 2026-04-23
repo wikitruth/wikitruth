@@ -1,6 +1,6 @@
 'use strict';
 
-const events = require('events') as typeof import('events');
+import * as events from 'events';
 
 interface WorkflowOutcome {
   success: boolean;
@@ -13,7 +13,7 @@ interface Workflow extends InstanceType<typeof events.EventEmitter> {
   hasErrors: () => boolean;
 }
 
-module.exports = function createWorkflow(
+export default function createWorkflow(
   _req: import('express').Request,
   res: import('express').Response
 ): Workflow {

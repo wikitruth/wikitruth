@@ -7,7 +7,7 @@ import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../t
 import { errorMessage } from '../../types/errors';
 const flowUtils = require('../../utils/flowUtils') as FlowUtilsModule;
 const constants = require('../../models/constants') as ConstantsModule;
-const utils = require('../../utils/utils') as UtilsModule;
+import * as utils from '../../utils/utils';
 const answersService = require('../../services/answersService') as AnswersServiceContract;
 const { applyViewModeFilter } = require('./viewFilter');
 const db = require('../../app').db.models;
