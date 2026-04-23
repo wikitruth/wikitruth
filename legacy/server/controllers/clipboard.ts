@@ -1,12 +1,16 @@
 'use strict';
 
-let templates = require('../models/templates'),
-  constants = require('../models/constants'),
-  flowUtils = require('../utils/flowUtils'),
-  db = require('../app').db.models,
-  async = require('async');
+import type { LegacyControllerFactory } from '../../../server/src/types/legacyControllers';
 
-module.exports = function(router) {
+import asyncLib from 'async';
+import templates = require('../models/templates');
+import constants = require('../models/constants');
+import flowUtils = require('../utils/flowUtils');
+import app = require('../app');
+
+const db = (app as { db: { models: Record<string, { find: (query: unknown) => Promise<unknown[]> }> } }).db.models;
+
+const mountClipboardController: LegacyControllerFactory = function (router) {
 
   router.get('/', async function(req, res) {
     let model = {};
@@ -22,7 +26,7 @@ module.exports = function(router) {
     }*/
     flowUtils.setModelContext(req, res, model, true);
 
-    await async.parallel({
+    await asyncLib.parallel({
       topics: async function() {
         if (topicIds && topicIds.length > 0) {
           let query = {
@@ -108,3 +112,5 @@ module.exports = function(router) {
     }
   });
 };
+
+export default mountClipboardController;

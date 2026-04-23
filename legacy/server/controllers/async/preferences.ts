@@ -1,19 +1,21 @@
 'use strict';
 
-function setupPreferences(req) {
-    var preferences = req.session.preferences;
-    if(!preferences) {
-        preferences = {};
-    }
-    return preferences;
+import type { LegacyControllerFactory } from '../../../../server/src/types/legacyControllers';
+
+function setupPreferences(req: { session: { preferences?: Record<string, unknown> } }): Record<string, unknown> {
+  const preferences = req.session.preferences;
+  if (!preferences) {
+    return {};
+  }
+  return preferences;
 }
 
-module.exports = function (router) {
+const mountAsyncPreferencesController: LegacyControllerFactory = function (router) {
 
     router.post('/update', function (req, res) {
-        var fullscreen = req.body.fullscreen;
+        const fullscreen = req.body.fullscreen;
 
-        var preferences = setupPreferences(req);
+        const preferences = setupPreferences(req);
         preferences.fullscreen = !!fullscreen;
 
         req.session.preferences = preferences;
@@ -29,3 +31,5 @@ module.exports = function (router) {
         res.send(req.session.preferences);
     });
 };
+
+export default mountAsyncPreferencesController;

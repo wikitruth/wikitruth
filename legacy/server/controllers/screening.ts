@@ -1,10 +1,12 @@
 'use strict';
 
-let flowUtils = require('../utils/flowUtils'),
-  utils = require('../utils/utils'),
-  constants = require('../models/constants'),
-  templates = require('../models/templates'),
-  paths = require('../models/paths');
+import type { LegacyControllerFactory } from '../../../server/src/types/legacyControllers';
+
+import flowUtils = require('../utils/flowUtils');
+import * as utils from '../utils/utils';
+import constants = require('../models/constants');
+import templates = require('../models/templates');
+import paths = require('../models/paths');
 
 function createReturnUrl(req, model) {
   const fallback = (model && model.wikiBaseUrl ? model.wikiBaseUrl : '') + (paths && paths.wiki ? paths.wiki.index : '/explore');
@@ -62,7 +64,7 @@ function createReturnUrl(req, model) {
   }
 }
 
-module.exports = function (router) {
+const mountScreeningController: LegacyControllerFactory = function (router) {
   router.get('/', async function (req, res) {
     let model = {};
     let ownerQuery = flowUtils.createOwnerQueryFromQuery(req);
@@ -100,3 +102,5 @@ module.exports = function (router) {
     }
   });
 };
+
+export default mountScreeningController;

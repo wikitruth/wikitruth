@@ -10,7 +10,7 @@ This directory is the bridge layer between modern runtime and the legacy stack.
 
 ## Structure
 
-- `server/bootstrap.js` compatibility bootstrap entrypoint
-- `server/mount.js` static/template mount adapter
-- `server/pathResolver.js` legacy-root path resolver utility
+- `server/bootstrap.ts` compatibility bootstrap entrypoint
+- `server/mount.ts` static/template mount adapter
+- `server/pathResolver.ts` legacy-root path resolver utility
 - `contracts/` path map and compatibility manifests

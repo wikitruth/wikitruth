@@ -1,0 +1,33 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noUncheckedIndexedAccess": true,
+    "allowJs": false,
+    "checkJs": false,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "baseUrl": "."
+  },
+  "include": [
+    "legacy/compatibility/server/**/*.ts",
+    "legacy/server/app.ts",
+    "legacy/server/config/config.ts",
+    "legacy/server/models/**/*.ts",
+    "legacy/server/utils/utils.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "legacy/templates",
+    "legacy/static",
+    "legacy/build",
+    "client",
+    "tests"
+  ]
+}

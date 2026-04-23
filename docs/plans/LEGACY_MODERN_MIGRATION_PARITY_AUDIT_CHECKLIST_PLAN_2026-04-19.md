@@ -19,7 +19,7 @@ Audit references used for this pass:
 
 - Modern routes: `client/src/routes/routeConfig.tsx`
 - Modern shell + redirects: `server/src/middlewares/routes.ts`
-- Legacy compatibility mount: `legacy/compatibility/server/bootstrap.js`
+- Legacy compatibility mount: `legacy/compatibility/server/bootstrap.ts`
 - Legacy route controllers: `legacy/server/controllers/**`
 - Legacy global layout/nav: `legacy/templates/dust/layouts/master.dust`, `legacy/templates/dust/layouts/header.dust`
 - Modern global layout/nav: `client/src/components/Layout/Layout.tsx`, `client/src/components/Layout/Header.tsx`, `client/src/components/Layout/ContextSidebar.tsx`

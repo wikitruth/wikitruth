@@ -7,5 +7,5 @@
 | Legacy templates | `legacy/templates/**` | Legacy layer |
 | Legacy static assets | `legacy/static/**` | Legacy layer |
 | Legacy build scripts | `legacy/build/**` | Legacy layer |
-| Compatibility bridge adapters | `legacy/compatibility/server/{bootstrap.js,mount.js,pathResolver.js}` | Compatibility layer |
+| Compatibility bridge adapters | `legacy/compatibility/server/{bootstrap.ts,mount.ts,pathResolver.ts}` | Compatibility layer |
 | Modern compatibility hooks | `server/src/app.ts`, `server/src/middlewares/routes.ts`, `server/src/config/{config.js,development.json}` | Modern runtime (seam only) |

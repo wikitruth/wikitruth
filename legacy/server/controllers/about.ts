@@ -1,9 +1,13 @@
 'use strict';
 
-const templates = require('../models/templates'),
-  db = require('../app').db.models;
+import type { LegacyControllerFactory } from '../../../server/src/types/legacyControllers';
 
-module.exports = function (router) {
+import templates = require('../models/templates');
+import app = require('../app');
+
+const db = (app as { db: { models: { Page: { findOne: (query: Record<string, unknown>) => Promise<unknown> } } } }).db.models;
+
+const mountAboutController: LegacyControllerFactory = function (router) {
 
     router.get('/:id', async function(req, res) {
       const model = {};
@@ -11,3 +15,5 @@ module.exports = function (router) {
       res.render(templates.about.index, model);
     });
 };
+
+export default mountAboutController;

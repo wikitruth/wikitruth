@@ -1,10 +1,14 @@
 'use strict';
 
-let constants = require('../../models/constants'),
-  flowUtils = require('../../utils/flowUtils'),
-  db = require('../../app').db.models;
+import type { LegacyControllerFactory } from '../../../../server/src/types/legacyControllers';
 
-module.exports = function (router) {
+import constants = require('../../models/constants');
+import flowUtils = require('../../utils/flowUtils');
+import app = require('../../app');
+
+const db = (app as { db: { models: Record<string, any> } }).db.models;
+
+const mountAsyncEntryController: LegacyControllerFactory = function (router) {
   router.post('/take-ownership', async function (req, res) {
     let id = req.body.id;
     let type = req.body.type;
@@ -165,3 +169,5 @@ module.exports = function (router) {
     res.send({});
   });
 };
+
+export default mountAsyncEntryController;

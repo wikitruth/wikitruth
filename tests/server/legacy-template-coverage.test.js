@@ -6,7 +6,7 @@
  * Statically scans every legacy controller under `legacy/server/controllers/**`
  * for `res.render(templates.X[.Y[.Z]], …)` references and asserts that each
  * referenced key resolves to a non-empty string in the legacy templates
- * registry (`legacy/server/models/templates.js` -> `server/src/models/templates.ts`).
+ * registry (`legacy/server/models/templates.ts` -> `server/src/models/templates.ts`).
  *
  * This catches typo regressions and key-path drift that would otherwise produce
  * a runtime "undefined view" crash inside a mounted /legacy/* request.

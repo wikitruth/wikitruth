@@ -64,7 +64,7 @@ Checklist status was revalidated against runtime wiring after the initial "all c
 The earlier closure rationale for L1/L4/L5 assumed legacy controllers were not runtime-mounted, but code inspection confirms the opposite:
 
 - `server/src/app.ts` registers legacy compatibility via `registerLegacyCompatibility(...)`.
-- `legacy/compatibility/server/bootstrap.js` mounts `legacyRouter` with `app.use(mountPath, legacyRouter)` and attaches legacy controllers via `attachController(...)`.
+- `legacy/compatibility/server/bootstrap.ts` mounts `legacyRouter` with `app.use(mountPath, legacyRouter)` and attaches legacy controllers via `attachController(...)`.
 
 Affected checklist items are reopened below until runtime-level validation is complete.
 
@@ -85,9 +85,9 @@ Acceptance:
 ### Track L1: Runtime Stability Hardening for Legacy Routes (P0)
 
 - [x] `L1-01` Audit and patch crash-prone legacy entry controllers (`topics`, `arguments`, `artifacts`, `questions`, `answers`, `issues`, `opinions`). — Re-audited via runtime mount smoke (`tests/server/legacy-runtime-mount.test.js`): every controller in the bootstrap mount table loads and attaches under `/legacy/*` against a stubbed `globalThis.__wikitruth_app`. No top-level load crashes were observed across all 25 controllers. Per-route handler execution against a real DB is reserved for the operator PM2 sweep (L5-01).
-- [x] `L1-02` Remove module-shape mismatch hazards (default-export interop) across `legacy/server/models/*` adapters. — Verified: `legacy/server/models/{constants,paths,templates}.js` use a single consistent `module.exports = { ... }` shape with destructuring `require()` consumers. No mixed default-export interop hazards.
-- [x] `L1-03` Add guard wrappers for undefined template/path lookups to prevent process crashes. — Validated structurally rather than wrapped: `tests/server/legacy-template-coverage.test.js` resolves every `templates.X.Y[.Z]` reference in mounted legacy controllers against the registry (`legacy/server/models/templates.js`) and asserts a non-empty string. Coverage is 100%, so the undefined-view crash class no longer requires a defensive runtime wrapper; the regression test now locks the registry against future drift.
-- [x] `L1-04` Add regression tests for known legacy crash paths (`/legacy/`, key legacy entry URLs, auth/account legacy routes). — Added `tests/server/legacy-runtime-mount.test.js` (boots `registerLegacyCompatibility` against an Express app + stubbed db/config; asserts `mounted=true`, `mountPath='/legacy'`, and that all 24 declared sub-mount points are attached). Combined with the structural test (`legacy-controllers-structural.test.js`) and template-coverage test (`legacy-template-coverage.test.js`), this gives load-time / mount-time / template-resolution coverage at unit-test scope. Live request sweep stays in L5-01.
+- [x] `L1-02` Remove module-shape mismatch hazards (default-export interop) across `legacy/server/models/*` adapters. — Verified after wrapper conversion: `legacy/server/models/{constants,paths,templates}.ts` now expose consistent typed export contracts for legacy consumers; no mixed default-export interop hazards remain in these adapters.
+- [x] `L1-03` Add guard wrappers for undefined template/path lookups to prevent process crashes. — Validated structurally rather than wrapped: `tests/server/legacy-template-coverage.test.js` resolves every `templates.X.Y[.Z]` reference in mounted legacy controllers against the registry (`legacy/server/models/templates.ts`) and asserts a non-empty string. Coverage is 100%, so the undefined-view crash class no longer requires a defensive runtime wrapper; the regression test now locks the registry against future drift.
+- [x] `L1-04` Add regression tests for known legacy crash paths (`/legacy/`, key legacy entry URLs, auth/account legacy routes). — Coverage now includes: `tests/server/legacy-runtime-mount.test.js` (mounts `registerLegacyCompatibility` on an Express app + stubbed db/config; asserts `mounted=true`, `mountPath='/legacy'`, and that all 25 declared sub-mount points are attached), `tests/server/legacy-controllers-structural.test.js` (controller factory shape, CJS + default-export aware), and `tests/server/legacy-auth-account-admin-request-smoke.test.js` (request-level reachability for `/legacy/login`, `/legacy/signup`, `/legacy/logout`, `/legacy/contact`, plus account/admin aliases). Live PM2 request sweep remains L5-01.
 
 Acceptance:
 
@@ -108,9 +108,9 @@ Acceptance:
 
 ### Track L3: Module Style and Interop Rationalization (P1)
 
-- [x] `L3-01` Inventory `require()/module.exports` by legacy runtime folder and classify by necessity. — See post-cleanup metrics below. All remaining CJS usage is intentional: `legacy/server/controllers/**` follows the `module.exports = function(router){…}` factory shape consumed by `legacy/server/utils/setupEntryRouters.js`; `legacy/compatibility/server/**` is the active runtime mount layer that deliberately uses CJS for predictable Node load order; `legacy/server/{utils,models,config}/**` are CJS modules consumed via `require()` from the controllers above.
-- [x] `L3-02` Convert low-risk legacy runtime modules to typed exports where load-order permits. — No conversions performed in this pass. The legacy CJS runtime is consumed dynamically (`require(path.join(process.cwd(), 'app'))` in `legacy/server/app.js`) and via the `function (router)` factory shape; converting to ESM would require parallel boot-loader rewrites that exceed the L3 risk envelope. Locked at the post-cleanup baseline by `L3-04` instead.
-- [x] `L3-03` Keep compatibility adapters explicit; remove accidental mixed import/export patterns. — Verified: `legacy/compatibility/server/{bootstrap,mount,pathResolver}.js` use a single consistent `module.exports = { … }` style with destructuring `require()` consumers. No mixed import/export patterns detected.
+- [x] `L3-01` Inventory `require()/module.exports` by legacy runtime folder and classify by necessity. — See post-cleanup metrics below. Remaining CJS usage is now concentrated in legacy controller/runtime adapters: `legacy/server/controllers/**` keeps the `module.exports = function(router){…}` factory shape consumed by `legacy/server/utils/setupEntryRouters.js`; `legacy/server/utils/flowUtils.js` and `setupEntryRouters.js` remain CJS for load-order compatibility; low-risk boundary wrappers in `legacy/compatibility/server/**` and `legacy/server/{models,config,app,utils/utils}` were converted to typed TS modules.
+- [x] `L3-02` Convert low-risk legacy runtime modules to typed exports where load-order permits. — Converted the low-risk compatibility boundary and legacy wrappers to TypeScript modules: `legacy/compatibility/server/{bootstrap,mount,pathResolver}.ts`, `legacy/server/models/{constants,paths,templates}.ts`, `legacy/server/{app,config/config}.ts`, and `legacy/server/utils/utils.ts`. This gives typed boundary contracts without changing the legacy controller factory runtime shape.
+- [x] `L3-03` Keep compatibility adapters explicit; remove accidental mixed import/export patterns. — Verified after TS conversion: `legacy/compatibility/server/{bootstrap,mount,pathResolver}.ts` use consistent typed exports/imports. Remaining runtime `require()` calls are deliberate dynamic bridges (legacy controllers/templates), not mixed module-style accidents.
 - [x] `L3-04` Add guardrail checks to block net-new ad hoc CJS in modernized legacy files. — Added [scripts/check-no-new-cjs-legacy.sh](../../scripts/check-no-new-cjs-legacy.sh) (mirrors `check-no-new-cjs-modern.sh`, scoped to `legacy/server/{controllers,utils,models,config}` + `legacy/compatibility/server`). Wired into `npm run ci:smoke` via the new `lint:guardrails:cjs:legacy` script.
 
 Acceptance:
@@ -122,7 +122,7 @@ Acceptance:
 
 - [x] `L4-01` Audit render target resolution for legacy templates to prevent undefined-view crashes. — Done via `tests/server/legacy-template-coverage.test.js`: every `templates.X[.Y[.Z]]` reference in `legacy/server/controllers/**` resolves to a non-empty string in the registry. The two non-registry render targets (`'dust/test/index'` and `'vash/test.vash'`, both inside diagnostic-only `/legacy/test` and `/legacy/vash` routes) are documented as intentional literal paths and excluded from the assertion.
 - [x] `L4-02` Add fallback handling for missing template keys in legacy controller render paths. — Not required: L4-01 confirmed 100% registry coverage for non-diagnostic routes, so there is no missing-key path to guard. The L4-01 regression test acts as the equivalent of a fallback by failing build whenever a controller drifts to an unresolved key, which is preferable to runtime-only fallback for behavior-preserving legacy code.
-- [x] `L4-03` Add template/render smoke test coverage for homepage, entry pages, auth/account, and admin legacy routes. — Coverage delivered as a test triplet at unit-test scope: `legacy-runtime-mount.test.js` (mount + load smoke), `legacy-template-coverage.test.js` (registry resolution), `legacy-controllers-structural.test.js` (controller factory shape). Real request/response template render under `/legacy/*` requires the live deploy and remains part of L5-01.
+- [x] `L4-03` Add template/render smoke test coverage for homepage, entry pages, auth/account, and admin legacy routes. — Coverage delivered as a test quartet at unit-test scope: `legacy-runtime-mount.test.js` (mount + load smoke), `legacy-template-coverage.test.js` (registry resolution), `legacy-controllers-structural.test.js` (controller factory shape), and `legacy-auth-account-admin-request-smoke.test.js` (request-level auth/account/admin route reachability). Real request/response template rendering under `/legacy/*` still requires the live deploy and remains part of L5-01.
 
 Acceptance:
 
@@ -131,7 +131,7 @@ Acceptance:
 ### Track L5: Validation and Completion (P0/P1/P2)
 
 - [ ] `L5-01` Revalidate PM2 stability with repeated `/legacy/*` route sweep. — Open until live deploy sweep is executed and signed off by operator with request/response/error evidence. This is the explicit human-validation gate for this plan.
-- [x] `L5-02` Run lint/type/build/test suites plus legacy-focused smoke checks. — Validated locally on HEAD: `npm run type:check` ✓, `npm run ci:smoke` ✓ (incl. `lint:guardrails:cjs:legacy`, `type:guardrails:suppressions` net 0, `type:guardrails:any` net 0, `lint:guardrails:filesize` ok), `npm run test:server` 30/30 suites · 143/143 tests ✓, `npm run test:client` 50/50 suites · 126/126 tests ✓.
+- [x] `L5-02` Run lint/type/build/test suites plus legacy-focused smoke checks. — Validated locally on HEAD: `npm run type:check` ✓, `npm run type:check:legacy` ✓, `npm run ci:smoke` ✓ (incl. `type:check:legacy`, `lint:guardrails:cjs:legacy`, `type:guardrails:suppressions` net 0, `type:guardrails:any` net 0, `lint:guardrails:filesize` ok), `npm run test:server` 31/31 suites · 145/145 tests ✓, `npm run test:client` 50/50 suites · 126/126 tests ✓.
 - [x] `L5-03` Update this plan with final metric deltas and moved-to-completed criteria. — See refreshed "Post-cleanup metrics" section below; move-to-completed criteria are restated to make the L5-01 human-validation gate explicit.
 
 ## Post-cleanup metrics (revalidated, 2026-04-24, HEAD `develop`)
@@ -140,11 +140,11 @@ Per-folder counts in `legacy/**`, runtime files only (`legacy/static/**`, `legac
 
 | Folder | `require()` | `module.exports` | Notes |
 |---|---|---|---|
-| `legacy/server/controllers/**` | 157 | 60 | Factory-shape contract (`function (router) { ... }`); locked by `lint:guardrails:cjs:legacy`. |
-| `legacy/server/utils/**` | 14 | 3 | CJS helpers (setupEntryRouters, flowUtils, utils); load-order critical. |
-| `legacy/server/models/**` | 6 | 3 | constants/paths/templates registries; `module.exports = { ... }` shape. |
-| `legacy/server/config/**` | 2 | 1 | Config bridge. |
-| `legacy/compatibility/server/**` | 19 | 3 | Active runtime mount layer; intentional CJS for predictable Node load order. |
+| `legacy/server/controllers/**` | 151 | 50 | Factory-shape contract still dominant (`function (router) { ... }`) with partial typed default-export migration in lower-risk controllers. |
+| `legacy/server/utils/**` | 12 | 2 | CJS helpers (setupEntryRouters, flowUtils) remain; `utils.ts` wrapper is now typed TS. |
+| `legacy/server/models/**` | 2 | 0 | Typed TS wrappers (`constants.ts`, `paths.ts`, `templates.ts`) now hold the boundary. |
+| `legacy/server/config/**` | 1 | 0 | Typed TS config bridge (`config.ts`). |
+| `legacy/compatibility/server/**` | 4 | 0 | Typed TS mount layer; remaining `require()` calls are dynamic bridges for legacy controllers/templates. |
 
 Type-debt counters in `legacy/**` runtime source (`.ts` + `.js`, excluding static/templates/build):
 
@@ -153,8 +153,8 @@ Type-debt counters in `legacy/**` runtime source (`.ts` + `.js`, excluding stati
 | `@ts-ignore` | 1019 | 0 | -1019 |
 | `@ts-expect-error` | 0 | 0 | 0 |
 | explicit `any` (legacy `.ts`) | 18 (matched by modern guardrail patterns) | 0 | -18 |
-| `require()` | 200 | 198 | -2 (cosmetic) |
-| `module.exports` | 71 | 70 | -1 (cosmetic) |
+| `require()` | 200 | 170 | -30 |
+| `module.exports` | 71 | 52 | -19 |
 
 Note: the plan's original "explicit any: 380" baseline counted broader patterns including identifier substrings; the modern-guardrail-equivalent pattern (`: any\b|<any>|\bas any\b|any\[\]`) is what is locked at 0 here.
 
@@ -169,7 +169,8 @@ Test evidence files added in this revalidation pass:
 
 - `tests/server/legacy-runtime-mount.test.js` \u2014 mount + load smoke for the entire `/legacy/*` controller table.
 - `tests/server/legacy-template-coverage.test.js` \u2014 registry coverage for every `templates.X[.Y[.Z]]` reference in mounted legacy controllers.
-- `tests/server/legacy-controllers-structural.test.js` \u2014 controller factory-shape contract (added in the prior pass; locks `function (router) { ... }` shape).
+- `tests/server/legacy-controllers-structural.test.js` \u2014 controller factory-shape contract (supports both CJS mount exports and typed default-export mounts).
+- `tests/server/legacy-auth-account-admin-request-smoke.test.js` \u2014 request-level smoke for mounted auth/account/admin legacy routes.
 
 Acceptance:
 

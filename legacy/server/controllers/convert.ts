@@ -1,11 +1,15 @@
 'use strict';
 
-let flowUtils = require('../utils/flowUtils'),
-  constants = require('../models/constants'),
-  templates = require('../models/templates'),
-  db = require('../app').db.models;
+import type { LegacyControllerFactory } from '../../../server/src/types/legacyControllers';
 
-module.exports = function(router) {
+import flowUtils = require('../utils/flowUtils');
+import constants = require('../models/constants');
+import templates = require('../models/templates');
+import app = require('../app');
+
+const db = (app as { db: { models: Record<string, { updateOne: (query: unknown, payload: unknown) => Promise<void> }> } }).db.models;
+
+const mountConvertController: LegacyControllerFactory = function (router) {
 
   router.get('/', async function(req, res) {
     let model = {};
@@ -45,3 +49,5 @@ module.exports = function(router) {
     res.redirect(flowUtils.buildEntryReturnUrl(req, model));
   });
 };
+
+export default mountConvertController;

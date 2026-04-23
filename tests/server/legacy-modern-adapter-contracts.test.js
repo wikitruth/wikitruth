@@ -16,7 +16,7 @@ describe('Legacy-modern adapter contracts', function () {
   });
 
   it('keeps legacy bootstrap routes available for account/admin fallbacks', function () {
-    const legacyBootstrap = read('legacy/compatibility/server/bootstrap.js');
+    const legacyBootstrap = read('legacy/compatibility/server/bootstrap.ts');
 
     expect(legacyBootstrap).toContain("legacyRouter.get('/:username/settings'");
     expect(legacyBootstrap).toContain("legacyRouter.get('/admin'");

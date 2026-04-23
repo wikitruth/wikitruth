@@ -1,15 +1,12 @@
 'use strict';
 
-const path = require('path');
+import path from 'path';
 
 const LEGACY_ROOT = path.join(process.cwd(), 'legacy');
 
-function resolveCompatibilityPath(relativePath) {
+function resolveCompatibilityPath(relativePath: string): string {
   const normalized = String(relativePath || '').replace(/^\/+/, '');
   return path.join(LEGACY_ROOT, normalized);
 }
 
-module.exports = {
-  LEGACY_ROOT,
-  resolveCompatibilityPath,
-};
+export { LEGACY_ROOT, resolveCompatibilityPath };

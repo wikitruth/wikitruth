@@ -3,7 +3,7 @@
 /*
  * Legacy runtime mount integrity smoke (L1-04 / L4-03).
  *
- * Boots `registerLegacyCompatibility` from `legacy/compatibility/server/bootstrap.js`
+ * Boots `registerLegacyCompatibility` from `legacy/compatibility/server/bootstrap.ts`
  * against an Express app with a deeply-stubbed `globalThis.__wikitruth_app`
  * (db.models, config, utility) so every legacy controller in the runtime
  * mount list is loaded and attached without requiring a live MongoDB.
@@ -98,7 +98,7 @@ describe('Legacy compatibility runtime mount (L1-04 / L4-03)', function () {
     // Force a clean require cache for the legacy mount module so the stub
     // is observed during the controller require chain.
     const bootstrapId = require.resolve(
-      path.join(PROJECT_ROOT, 'legacy', 'compatibility', 'server', 'bootstrap.js'),
+      path.join(PROJECT_ROOT, 'legacy', 'compatibility', 'server', 'bootstrap'),
     );
     delete require.cache[bootstrapId];
 

@@ -30,9 +30,9 @@ Ownership mapping:
 ## Compatibility Runtime Changes
 
 - Added compatibility mount module:
-  - `legacy/compatibility/server/mount.js`
+  - `legacy/compatibility/server/mount.ts`
 - Added compatibility path resolver:
-  - `legacy/compatibility/server/pathResolver.js`
+  - `legacy/compatibility/server/pathResolver.ts`
 - Wired mount seam into modern app bootstrap:
   - `server/src/app.ts`
 - Wired legacy route loader/template root to compatibility path:

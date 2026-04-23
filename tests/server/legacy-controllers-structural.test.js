@@ -4,15 +4,14 @@
  * Legacy controller structural smoke (L1-04).
  *
  * The legacy controllers under `legacy/server/controllers/**` are historical
- * snapshots: they are not loaded by the modern Express boot path, but they
- * remain in the repository as the reference point for legacy code-health
- * tracking. This test prevents accidental syntax breakage from large
+ * snapshots loaded by the legacy compatibility mount path (`/legacy/*`). This
+ * test prevents accidental syntax breakage from large
  * mechanical sweeps (such as the L2-02 TS-suppression strip) by:
  *  1. Transpiling each file via the TypeScript compiler API (catches syntax
  *     errors).
  *  2. Evaluating the resulting JS with a stubbed `require()` and asserting
- *     that the module exports the `function (router) { ... }` factory shape
- *     consumed by `legacy/server/utils/setupEntryRouters.js`.
+ *     that the module exports a router-factory mount function, either as
+ *     CommonJS `module.exports = function (...)` or as `export default`.
  */
 
 const fs = require('fs');
@@ -89,6 +88,16 @@ function loadFactory(filePath) {
 
   vm.createContext(sandbox);
   vm.runInContext(transpiled, sandbox, { filename: filePath });
+  if (typeof sandboxModule.exports === 'function') {
+    return sandboxModule.exports;
+  }
+  if (
+    sandboxModule.exports &&
+    typeof sandboxModule.exports === 'object' &&
+    typeof sandboxModule.exports.default === 'function'
+  ) {
+    return sandboxModule.exports.default;
+  }
   return sandboxModule.exports;
 }
 

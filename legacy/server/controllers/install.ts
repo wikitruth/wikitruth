@@ -1,13 +1,16 @@
 'use strict';
 
-let templates = require('../models/templates'),
-    config = require('../config/config'),
-    flowUtils = require('../utils/flowUtils'),
-    db = require('../app').db.models,
-    fs = require('fs'),
-    async = require('async');
+import fs from 'fs';
+import asyncLib from 'async';
+import type { LegacyControllerFactory } from '../../../server/src/types/legacyControllers';
 
-let cols = config.mongodb.collections;
+import templates = require('../models/templates');
+import config = require('../config/config');
+import flowUtils = require('../utils/flowUtils');
+import app = require('../app');
+
+const db = (app as { db: { models: Record<string, any> } }).db.models;
+const cols = (config as { mongodb: { collections: any } }).mongodb.collections;
 
 function requestLogin(req, res) {
     // redirect to login
@@ -16,7 +19,7 @@ function requestLogin(req, res) {
     res.redirect('/login/');
 }
 
-module.exports = function (router) {
+const mountInstallController: LegacyControllerFactory = function (router) {
 
     router.get('/', async function (req, res) {
         let model = {};
@@ -56,7 +59,7 @@ module.exports = function (router) {
                 let collection = db[cols.modelMapping[col]];
                 if (collection) {
                     await collection.deleteMany({});
-                    async.eachSeries(jsons, async function (json, callback) {
+                    asyncLib.eachSeries(jsons, async function (json, callback) {
                         let file = coldir + '/' + json;
                         let obj = JSON.parse(fs.readFileSync(file, 'utf8'));
                         try {
@@ -77,16 +80,16 @@ module.exports = function (router) {
         };
 
         let next = function () {
-            async.series({
+            asyncLib.series({
                 backupSystemData: function (callback) {
-                    async.eachSeries(cols.backupList, function (col, callback) {
+                    asyncLib.eachSeries(cols.backupList, function (col, callback) {
                         restoreTask(col, callback);
                     }, function (err) {
                         callback();
                     });
                 },
                 backupPublicData: function (callback) {
-                    async.eachSeries(cols.privateBackupList, function (col, callback) {
+                    asyncLib.eachSeries(cols.privateBackupList, function (col, callback) {
                         restoreTask(col, callback);
                     }, function (err) {
                         callback();
@@ -125,3 +128,5 @@ module.exports = function (router) {
         }
     });
 };
+
+export default mountInstallController;

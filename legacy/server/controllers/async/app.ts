@@ -1,9 +1,11 @@
 'use strict';
 
-const jwt = require('jsonwebtoken'),
-  cookieParser = require('cookie-parser');
+import type { LegacyControllerFactory } from '../../../../server/src/types/legacyControllers';
 
-module.exports = function (router) {
+import jwt from 'jsonwebtoken';
+import cookieParser from 'cookie-parser';
+
+const mountAsyncAppController: LegacyControllerFactory = function (router) {
   router.post('/fast-switch', async function (req, res) {
     let cookieString = req.body.cookie;
     let pin = req.body.pin;
@@ -29,3 +31,5 @@ module.exports = function (router) {
     }
   });
 };
+
+export default mountAsyncAppController;

@@ -24,7 +24,7 @@ describe('Server route contracts', function () {
     const homeApiSource = readProjectFile('server/src/controllers/api/home.ts');
     const appControllerSource = readProjectFile('server/src/controllers/app.ts');
     const appSource = readProjectFile('server/src/app.ts');
-    const legacyBootstrapSource = readProjectFile('legacy/compatibility/server/bootstrap.js');
+    const legacyBootstrapSource = readProjectFile('legacy/compatibility/server/bootstrap.ts');
 
     expect(apiIndexSource).toContain("router.use('/home', homeRouter)");
     expect(homeApiSource).toContain('flowUtils.createEntrySet(model)');
