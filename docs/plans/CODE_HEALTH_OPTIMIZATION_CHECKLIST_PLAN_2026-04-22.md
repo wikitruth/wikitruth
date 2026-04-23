@@ -404,4 +404,9 @@ Use this in PR descriptions/commits:
 - [ ] `M-06` modern source (`server/src/**`, `client/src/**`) has `0` `@ts-expect-error` and `0` `@ts-nocheck`
 - [ ] `M-07` modern source (`server/src/**`, `client/src/**`) has `0` explicit `any` / any-like fallbacks
 - [ ] `M-08` modern source (`server/src/**`, `client/src/**`) has `0` `require()` and `0` `module.exports`
-- [ ] `M-09` strict-gate CI checks fail on any regression in M-05..M-08
+- [x] `M-09` strict-gate CI checks fail on any regression in M-05..M-08
+  - `type:guardrails` (scripts/check-no-new-ts-nocheck.sh) — locks `@ts-nocheck` (M-06)
+  - `type:guardrails:suppressions` (scripts/check-no-new-ts-suppressions.sh) — locks `@ts-ignore` + `@ts-expect-error` (M-05, M-06)
+  - `type:guardrails:any` (scripts/check-no-new-any.sh) — locks any-like additions in `server/src` + `client/src` (M-07)
+  - `lint:guardrails:cjs` (scripts/check-no-new-cjs-modern.sh) — locks `require()` / `module.exports` in modern folders (M-08)
+  - All four are wired into `npm run ci:smoke` (validated on develop @ a00d98f).
