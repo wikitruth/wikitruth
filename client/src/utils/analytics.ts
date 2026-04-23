@@ -1,7 +1,10 @@
 type EventParams = Record<string, string | number | boolean | undefined>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const win = typeof window !== 'undefined' ? (window as any) : undefined;
+interface AnalyticsWindow extends Window {
+  dataLayer?: unknown[];
+}
+
+const win: AnalyticsWindow | undefined = typeof window !== 'undefined' ? (window as AnalyticsWindow) : undefined;
 
 let initialized = false;
 const trackingId = typeof process !== 'undefined' ? process.env.REACT_APP_ANALYTICS_ID : undefined;

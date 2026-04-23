@@ -5,9 +5,9 @@ describe('analytics utils', () => {
     (window as unknown as { dataLayer?: unknown[] }).dataLayer = [];
   });
 
-  it('initializes analytics and tracks page views/events', () => {
+  it('initializes analytics and tracks page views/events', async () => {
     process.env.REACT_APP_ANALYTICS_ID = 'G-TEST123';
-    const analytics = require('./analytics') as typeof import('./analytics');
+    const analytics = await import('./analytics');
 
     analytics.initAnalytics();
     analytics.trackPageView('/topics', 'Topics');
@@ -34,9 +34,9 @@ describe('analytics utils', () => {
     );
   });
 
-  it('does not initialize when tracking id is absent', () => {
+  it('does not initialize when tracking id is absent', async () => {
     delete process.env.REACT_APP_ANALYTICS_ID;
-    const analytics = require('./analytics') as typeof import('./analytics');
+    const analytics = await import('./analytics');
 
     analytics.initAnalytics();
     analytics.trackPageView('/topics');

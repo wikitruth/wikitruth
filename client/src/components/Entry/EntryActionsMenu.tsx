@@ -1,10 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import moderationApi from '../../services/api/moderation';
+import moderationApi, { type ModerationTargetKey } from '../../services/api/moderation';
 import notificationsApi from '../../services/api/notifications';
 import { addToClipboard } from '../../pages/ClipboardPage';
 import type { LegacyEntity } from '../../types/legacy';
+
+type ReaderSignalType = 'controversial' | 'incorrect_verdict' | 'needs_reevaluation' | 'wrong_category';
 
 interface EntryActionsMenuProps {
   entry: LegacyEntity;
@@ -247,11 +249,11 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
       try {
         await moderationApi.submitReaderSignal(
           {
-            key: objectName as any,
+            key: objectName as ModerationTargetKey,
             id: entry._id,
           },
           {
-            signalType: signalType as any,
+            signalType: signalType as ReaderSignalType,
             note,
           },
         );
@@ -275,7 +277,7 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
       try {
         await moderationApi.submitAppeal(
           {
-            key: objectName as any,
+            key: objectName as ModerationTargetKey,
             id: entry._id,
           },
           {

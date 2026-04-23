@@ -6,6 +6,53 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import type { HomeDataResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
 
+interface VisDataSet {
+  add(items: unknown): void;
+  clear(): void;
+}
+
+interface VisNetworkClickParams {
+  nodes?: Array<string | number>;
+  edges?: Array<string | number>;
+  pointer?: { canvas?: { x: number; y: number } };
+  event?: Event;
+}
+
+interface VisNetwork {
+  destroy(): void;
+  on(event: string, handler: (params: VisNetworkClickParams) => void): void;
+  setOptions(options: Record<string, unknown>): void;
+  getPosition(nodeId: string): { x: number; y: number };
+  startSimulation(): void;
+  stopSimulation(): void;
+}
+
+interface VisNetworkConstructor {
+  new (
+    container: HTMLElement,
+    data: { nodes: VisDataSet; edges: VisDataSet },
+    options: Record<string, unknown>,
+  ): VisNetwork;
+}
+
+interface VisDataSetConstructor {
+  new (items: unknown[]): VisDataSet;
+}
+
+interface VisLibrary {
+  Network: VisNetworkConstructor;
+  DataSet: VisDataSetConstructor;
+}
+
+interface VisualizeWindow extends Window {
+  vis?: VisLibrary;
+  __wtNetwork?: VisNetwork;
+}
+
+function getVisWindow(): VisualizeWindow | undefined {
+  return typeof window !== 'undefined' ? (window as VisualizeWindow) : undefined;
+}
+
 type GraphNode = {
   id: string;
   label: string;
@@ -100,11 +147,12 @@ function nodeColor(kind: string | undefined): string {
 }
 
 function ensureVisAssetsLoaded(): Promise<void> {
-  if (typeof window === 'undefined') {
+  const visWindow = getVisWindow();
+  if (!visWindow) {
     return Promise.resolve();
   }
 
-  if ((window as any).vis) {
+  if (visWindow.vis) {
     return Promise.resolve();
   }
 
@@ -125,7 +173,7 @@ function ensureVisAssetsLoaded(): Promise<void> {
     const scriptId = 'wt-vis-network-js';
     const existingScript = document.getElementById(scriptId) as HTMLScriptElement | null;
     if (existingScript) {
-      if ((window as any).vis) {
+      if (visWindow.vis) {
         resolve();
       } else {
         existingScript.addEventListener('load', () => resolve(), { once: true });
@@ -161,7 +209,7 @@ const VisualizePage: React.FC = () => {
     return window.localStorage.getItem(FULLSCREEN_PREF_KEY) === '1';
   });
   const graphContainerRef = useRef<HTMLDivElement | null>(null);
-  const networkRef = useRef<any>(null);
+  const networkRef = useRef<VisNetwork | null>(null);
   const dragMomentumTimerRef = useRef<number | null>(null);
   const dragMetaRef = useRef<{ startedAt: number; nodeId: string; position: { x: number; y: number } | null }>({
     startedAt: 0,
@@ -388,7 +436,8 @@ const VisualizePage: React.FC = () => {
           return;
         }
 
-        const vis = (window as any).vis;
+        const visWindow = getVisWindow();
+        const vis = visWindow?.vis;
         if (!vis || !vis.Network || !vis.DataSet) {
           throw new Error('vis-network library is unavailable');
         }
@@ -455,9 +504,11 @@ const VisualizePage: React.FC = () => {
         );
 
         networkRef.current = network;
-        (window as any).__wtNetwork = network;
+        if (visWindow) {
+          visWindow.__wtNetwork = network;
+        }
 
-        network.on('click', (params: any) => {
+        network.on('click', (params: VisNetworkClickParams) => {
           const nodeId = String(params?.nodes?.[0] || '');
           if (!nodeId) {
             setNodeAction({
@@ -489,7 +540,7 @@ const VisualizePage: React.FC = () => {
           }
         });
 
-        network.on('doubleClick', (params: any) => {
+        network.on('doubleClick', (params: VisNetworkClickParams) => {
           const nodeId = String(params?.nodes?.[0] || '');
           if (!nodeId) {
             return;
@@ -515,7 +566,7 @@ const VisualizePage: React.FC = () => {
           }
         });
 
-        network.on('dragStart', (params: any) => {
+        network.on('dragStart', (params: VisNetworkClickParams) => {
           const nodeId = String(params?.nodes?.[0] || '');
           if (!nodeId) {
             dragMetaRef.current = {
@@ -599,7 +650,10 @@ const VisualizePage: React.FC = () => {
         dragMomentumTimerRef.current = null;
       }
       if (typeof window !== 'undefined') {
-        delete (window as any).__wtNetwork;
+        const visWindow = getVisWindow();
+        if (visWindow) {
+          delete visWindow.__wtNetwork;
+        }
       }
     };
   }, [graph, navigate]);

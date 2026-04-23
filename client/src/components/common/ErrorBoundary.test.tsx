@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen } from '../../test-utils/render';
 import ErrorBoundary from './ErrorBoundary';
+import { trackEvent } from '../../utils/analytics';
 
 // Suppress console.error for expected errors in tests
 const originalError = console.error;
@@ -14,6 +15,8 @@ afterAll(() => {
 jest.mock('../../utils/analytics', () => ({
   trackEvent: jest.fn(),
 }));
+
+const trackEventMock = trackEvent as jest.MockedFunction<typeof trackEvent>;
 
 const ThrowError: React.FC<{ shouldThrow?: boolean }> = ({ shouldThrow }) => {
   if (shouldThrow) {
@@ -42,12 +45,11 @@ describe('ErrorBoundary', () => {
   });
 
   it('tracks error via analytics', () => {
-    const { trackEvent } = require('../../utils/analytics');
     render(
       <ErrorBoundary>
         <ThrowError shouldThrow />
       </ErrorBoundary>
     );
-    expect(trackEvent).toHaveBeenCalledWith('render_crash', 'error', 'Test render crash');
+    expect(trackEventMock).toHaveBeenCalledWith('render_crash', 'error', 'Test render crash');
   });
 });

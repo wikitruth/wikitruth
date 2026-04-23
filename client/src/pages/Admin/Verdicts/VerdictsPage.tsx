@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PageMeta from '../../../components/common/PageMeta';
-import moderationApi, { type ModerationEntry, type ModerationStatusOption } from '../../../services/api/moderation';
+import moderationApi, { type ModerationEntry, type ModerationStatusOption, type ModerationTargetKey } from '../../../services/api/moderation';
 import { useAuth } from '../../../context/AuthContext';
 
 const TOPIC_OBJECT_TYPE = 1;
@@ -229,7 +229,7 @@ const VerdictsPage: React.FC = () => {
       setMessage(null);
       const response = await moderationApi.submitVerdictVote(
         {
-          key: (entry.objectName || 'argument') as any,
+          key: (entry.objectName || 'argument') as ModerationTargetKey,
           id: String(entry._id),
         },
         {
@@ -271,7 +271,7 @@ const VerdictsPage: React.FC = () => {
     }
     try {
       const response = await moderationApi.listVerdictVotes({
-        key: (entry.objectName || 'argument') as any,
+        key: (entry.objectName || 'argument') as ModerationTargetKey,
         id: String(entry._id),
       });
       const lines = response.votes.map((vote) => {

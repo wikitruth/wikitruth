@@ -1,12 +1,15 @@
 import React from 'react';
 import { render, screen } from '../../test-utils/render';
 import GeoPatternBackground from './GeoPatternBackground';
+import GeoPattern from 'geopattern';
 
 jest.mock('geopattern', () => ({
   generate: jest.fn(() => ({
     toDataUrl: () => 'url("data:image/svg+xml;base64,abc")',
   })),
 }));
+
+const generateMock = (GeoPattern as unknown as { generate: jest.Mock }).generate;
 
 describe('GeoPatternBackground', () => {
   it('renders with default height', () => {
@@ -43,8 +46,7 @@ describe('GeoPatternBackground', () => {
   });
 
   it('generates pattern from seed', () => {
-    const GeoPattern = require('geopattern');
     render(<GeoPatternBackground seed="my-seed" />);
-    expect(GeoPattern.generate).toHaveBeenCalledWith('my-seed');
+    expect(generateMock).toHaveBeenCalledWith('my-seed');
   });
 });

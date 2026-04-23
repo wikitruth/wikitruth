@@ -35,9 +35,10 @@ const UserDetails: React.FC = () => {
         updateAction={{
           onUpdate: async (userId, payload) => {
             const updated = await adminApi.updateUser(userId, payload);
+            const roles = (payload as { roles?: { screener?: unknown; reviewer?: unknown } }).roles;
             await adminApi.updateUserRoles(userId, {
-              screener: Boolean((payload.roles as any)?.screener),
-              reviewer: Boolean((payload.roles as any)?.reviewer),
+              screener: Boolean(roles?.screener),
+              reviewer: Boolean(roles?.reviewer),
             });
             return updated;
           },

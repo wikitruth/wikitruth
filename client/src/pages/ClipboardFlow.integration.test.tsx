@@ -5,6 +5,7 @@ import EntryActionsMenu from '../components/Entry/EntryActionsMenu';
 import ClipboardPage from './ClipboardPage';
 import { useAuth } from '../context/AuthContext';
 import { useNotification } from '../context/NotificationContext';
+import type { LegacyEntity } from '../types/legacy';
 
 const mockNavigate = jest.fn();
 
@@ -76,7 +77,7 @@ describe('Clipboard integration flow', () => {
           title: 'Climate Change',
           friendlyUrl: 'climate-change',
           createUserId: 'owner-1',
-        } as any}
+        } as unknown as LegacyEntity}
       />,
       { route: '/topics/entry/climate-change/topic-1' },
     );

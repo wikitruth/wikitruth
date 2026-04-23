@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { AuthProvider, useAuth } from './AuthContext';
 import { render, screen, waitFor } from '../test-utils/render';
 import authApi from '../services/api/auth';
+import type { User } from '../types';
 
 jest.mock('../services/api/auth', () => ({
   __esModule: true,
@@ -58,9 +59,12 @@ describe('AuthContext', () => {
     const user = userEvent.setup();
 
     authApiMock.me.mockRejectedValueOnce(new Error('Not authenticated'));
-    authApiMock.login.mockResolvedValueOnce({ user: { _id: '1', username: 'demo' } as any, activeRole: 'contributor' });
-    authApiMock.logout.mockResolvedValueOnce({} as any);
-    authApiMock.roleSwitch.mockResolvedValue({ success: true, activeRole: 'reader' } as any);
+    authApiMock.login.mockResolvedValueOnce({
+      user: { _id: '1', username: 'demo' } as unknown as User,
+      activeRole: 'contributor',
+    });
+    authApiMock.logout.mockResolvedValueOnce({ success: true, user: null });
+    authApiMock.roleSwitch.mockResolvedValue({ success: true, activeRole: 'reader' });
 
     render(
       <AuthProvider>
@@ -93,7 +97,7 @@ describe('AuthContext', () => {
         _id: '1',
         username: 'demo',
         roles: { admin: 'admin-1' },
-      } as any,
+      } as unknown as User,
       activeRole: 'admin',
     });
 
@@ -114,8 +118,8 @@ describe('AuthContext', () => {
         _id: '1',
         username: 'demo',
         roles: {},
-      } as any,
-    } as any);
+      } as unknown as User,
+    });
 
     render(
       <AuthProvider>
