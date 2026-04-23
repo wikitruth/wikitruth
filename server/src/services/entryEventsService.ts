@@ -50,7 +50,7 @@ async function listTimelineEvents(options: {
   page?: number;
   limit?: number;
   eventTypes?: string[];
-}): Promise<{ items: any[]; total: number; page: number; limit: number }> {
+}): Promise<{ items: unknown[]; total: number; page: number; limit: number }> {
   const page = Math.max(Number(options.page || 1), 1);
   const limit = Math.min(Math.max(Number(options.limit || 20), 1), 100);
   const query: Record<string, unknown> = {
@@ -79,7 +79,7 @@ async function listPrivilegedEvents(options: {
   limit?: number;
   eventTypes?: string[];
   objectType?: number | null;
-}): Promise<{ items: any[]; total: number; page: number; limit: number }> {
+}): Promise<{ items: unknown[]; total: number; page: number; limit: number }> {
   const page = Math.max(Number(options.page || 1), 1);
   const limit = Math.min(Math.max(Number(options.limit || 20), 1), 100);
   const query: Record<string, unknown> = {

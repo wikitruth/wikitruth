@@ -165,7 +165,7 @@ async function notifySubscribers(options: {
     active: true,
   }).lean();
 
-  const candidates = subscriptions.filter((subscription: any) => {
+  const candidates = subscriptions.filter((subscription: { userId?: unknown; triggers?: unknown }) => {
     if (excludeSet.has(String(subscription.userId || ''))) {
       return false;
     }
@@ -183,7 +183,7 @@ async function notifySubscribers(options: {
   }
 
   await db.Notification.insertMany(
-    candidates.map((subscription: any) => ({
+    candidates.map((subscription: { userId?: unknown }) => ({
       userId: subscription.userId,
       type: options.type,
       title: options.title,
@@ -206,7 +206,7 @@ async function listNotifications(options: {
   page?: number;
   limit?: number;
   unreadOnly?: boolean;
-}): Promise<{ items: any[]; total: number; unreadCount: number; page: number; limit: number }> {
+}): Promise<{ items: unknown[]; total: number; unreadCount: number; page: number; limit: number }> {
   const page = Math.max(Number(options.page || 1), 1);
   const limit = Math.min(Math.max(Number(options.limit || 20), 1), 100);
   const query: Record<string, unknown> = {

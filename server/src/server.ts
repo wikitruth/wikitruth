@@ -1,5 +1,8 @@
 'use strict';
 
+import type { IncomingMessage, ServerResponse } from 'http';
+import type { AddressInfo } from 'net';
+
 const app = require('./app');
 const path = require('path');
 const config = require(path.join(process.cwd(), 'config/config'));
@@ -7,7 +10,7 @@ const fs = require('fs');
 const http = require('http');
 const https = require('https');
 
-function getRedirectHost(req: any) {
+function getRedirectHost(req: IncomingMessage) {
   const forwardedHostHeader = req.headers['x-forwarded-host'];
   const candidateHost = Array.isArray(forwardedHostHeader)
     ? forwardedHostHeader[0]
@@ -30,7 +33,7 @@ function getRedirectHost(req: any) {
   return firstHost;
 }
 
-function buildHttpsLocation(req: any, httpsPort: number) {
+function buildHttpsLocation(req: IncomingMessage, httpsPort: number) {
   const host = getRedirectHost(req);
   const portSegment = httpsPort === 443 ? '' : ':' + httpsPort;
   return 'https://' + host + portSegment + (req.url || '/');
@@ -45,7 +48,7 @@ const httpsPort = Number(process.env.HTTPS_PORT || httpsConfig.port || 8443) || 
 const httpToHttpsRedirectEnabled = httpsEnabled && httpsConfig.redirectHttp === true;
 
 const httpHandler = httpToHttpsRedirectEnabled
-  ? function (req: any, res: any) {
+  ? function (req: IncomingMessage, res: ServerResponse) {
     res.statusCode = 301;
     res.setHeader('Location', buildHttpsLocation(req, httpsPort));
     res.end();
@@ -55,8 +58,10 @@ const httpHandler = httpToHttpsRedirectEnabled
 const httpPort = Number(process.env.PORT || config.port || 8000) || 8000;
 const httpServer = http.createServer(httpHandler);
 httpServer.listen(httpPort);
-httpServer.on('listening', function (this: any) {
-  console.log('Server listening on http://localhost:%d', this.address().port);
+httpServer.on('listening', function (this: { address: () => AddressInfo | string | null }) {
+  const addr = this.address();
+  const port = addr && typeof addr === 'object' ? addr.port : addr;
+  console.log('Server listening on http://localhost:%s', port);
   if (httpToHttpsRedirectEnabled) {
     console.log('HTTP to HTTPS redirect is enabled.');
   }
@@ -78,11 +83,13 @@ if (httpsEnabled) {
       };
       const httpsServer = https.createServer(httpsOptions, app);
       httpsServer.listen(httpsPort);
-      httpsServer.on('listening', function (this: any) {
-        console.log('Server listening on https://localhost:%d', this.address().port);
+      httpsServer.on('listening', function (this: { address: () => AddressInfo | string | null }) {
+        const addr = this.address();
+        const port = addr && typeof addr === 'object' ? addr.port : addr;
+        console.log('Server listening on https://localhost:%s', port);
       });
-    } catch (error: any) {
-      console.error('Failed to start HTTPS server:', error?.message || String(error));
+    } catch (error: unknown) {
+      console.error('Failed to start HTTPS server:', error instanceof Error ? error.message : String(error));
     }
   }
 }

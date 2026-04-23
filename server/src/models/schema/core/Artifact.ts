@@ -76,10 +76,10 @@ const factory: SchemaFactory = function (app, mongoose) {
   });
 
   // schema statics
-  schema.statics.getFolder = function (username: any, entity: any) {
+  schema.statics.getFolder = function (username: string, entity: { private?: boolean }) {
     return '/media/artifacts/' + (username && entity.private ? 'users/' + username + '/' : '');
   };
-  schema.statics.isImage = function (entity: any) {
+  schema.statics.isImage = function (entity: { file: { type: string } }) {
     return entity.file.type.startsWith('image');
   };
 
@@ -87,14 +87,14 @@ const factory: SchemaFactory = function (app, mongoose) {
   schema.methods.getType = function () {
     return constants.OBJECT_TYPES.artifact;
   };
-  schema.methods.getFolder = function (username: any) {
+  schema.methods.getFolder = function (username: string) {
     // router
-    return (this.constructor as any).getFolder(username, this);
+    return (this.constructor as unknown as { getFolder: (u: string, e: unknown) => string }).getFolder(username, this);
   };
-  schema.methods.getFilePath = function (username: any) {
+  schema.methods.getFilePath = function (username: string) {
     return this.getFolder(username) + this._id + '_' + this.file.name;
   };
-  schema.methods.getThumbnailPath = function (username: any) {
+  schema.methods.getThumbnailPath = function (username: string) {
     if (this.isImage()) {
       return this.getFolder(username) + this._id + '_thumbnail_' + this.file.name;
     }
@@ -102,9 +102,9 @@ const factory: SchemaFactory = function (app, mongoose) {
   };
   schema.methods.isImage = function () {
     // router
-    return (this.constructor as any).isImage(this);
+    return (this.constructor as unknown as { isImage: (e: unknown) => boolean }).isImage(this);
   };
-  schema.methods.setThumbnailPath = function (username: any) {
+  schema.methods.setThumbnailPath = function (username: string) {
     if (this.file.name) {
       this.filePath = this.getFilePath(username);
       if (this.isImage()) {

@@ -75,9 +75,16 @@ async function buildTopicTree(topicId: string, depth: number): Promise<OutlineTr
   return node;
 }
 
+type OutlineEntry = {
+  _id: unknown;
+  ownerId?: unknown;
+  ownerType?: unknown;
+  [key: string]: unknown;
+};
+
 async function resolveParent(parentId: string): Promise<{
   kind: 'topic' | 'argument';
-  entry: any;
+  entry: OutlineEntry;
 } | null> {
   const topic = await db.Topic.findById(parentId);
   if (topic) {
@@ -92,7 +99,7 @@ async function resolveParent(parentId: string): Promise<{
 
 async function resolveTarget(targetId: string): Promise<{
   kind: 'topic' | 'argument';
-  entry: any;
+  entry: OutlineEntry;
 } | null> {
   const topic = await db.Topic.findById(targetId);
   if (topic) {
@@ -176,13 +183,13 @@ module.exports = function (router: Router) {
     ]);
 
     const results = [
-      ...topics.map((topic: any) => ({
+      ...topics.map((topic: { _id: unknown; title?: unknown; friendlyUrl?: unknown }) => ({
         _id: String(topic._id),
         title: String(topic.title || ''),
         friendlyUrl: topic.friendlyUrl || '',
         objectName: 'topic',
       })),
-      ...argumentsList.map((argument: any) => ({
+      ...argumentsList.map((argument: { _id: unknown; title?: unknown; friendlyUrl?: unknown }) => ({
         _id: String(argument._id),
         title: String(argument.title || ''),
         friendlyUrl: argument.friendlyUrl || '',

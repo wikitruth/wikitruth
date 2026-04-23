@@ -41,7 +41,7 @@ const factory: SchemaFactory = function (app, mongoose) {
     preferences: { type: mongoose.Schema.Types.Mixed },
     search: [String],
   });
-  userSchema.methods.canPlayRoleOf = function (role: any) {
+  userSchema.methods.canPlayRoleOf = function (role: string) {
     if (role === 'admin' && this.roles.admin) {
       return true;
     }
@@ -72,20 +72,20 @@ const factory: SchemaFactory = function (app, mongoose) {
   userSchema.methods.isAdmin = function() {
     return this.canPlayRoleOf('admin');
   };
-  userSchema.statics.encryptPassword = function (password: any, done: any) {
+  userSchema.statics.encryptPassword = function (password: string, done: (err: Error | null, hash?: string) => void) {
     // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
     const bcrypt = require('bcrypt');
-    bcrypt.genSalt(10, function (err: any, salt: any) {
+    bcrypt.genSalt(10, function (err: Error | null, salt: string) {
       if (err) {
         return done(err);
       }
 
-      bcrypt.hash(password, salt, function (err: any, hash: any) {
+      bcrypt.hash(password, salt, function (err: Error | null, hash: string) {
         done(err, hash);
       });
     });
   };
-  userSchema.statics.validatePassword = async function (password: any, hash: any) {
+  userSchema.statics.validatePassword = async function (password: string, hash: string) {
     // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
     const bcrypt = require('bcrypt');
     return bcrypt.compare(password, hash);

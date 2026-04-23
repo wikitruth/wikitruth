@@ -22,7 +22,7 @@ const factory: SchemaFactory = function (app, mongoose) {
     timeCreated: { type: Date, default: Date.now },
     search: [String]
   });
-  adminSchema.methods.hasPermissionTo = function (something: any) {
+  adminSchema.methods.hasPermissionTo = function (something: string) {
     //check group permissions
     let groupHasPermission = false;
     for (let i = 0 ; i < this.groups.length ; i++) {
@@ -48,7 +48,7 @@ const factory: SchemaFactory = function (app, mongoose) {
 
     return groupHasPermission;
   };
-  adminSchema.methods.isMemberOf = function (group: any) {
+  adminSchema.methods.isMemberOf = function (group: string) {
     for (let i = 0 ; i < this.groups.length ; i++) {
       if (this.groups[i]._id === group) {
         return true;

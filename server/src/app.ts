@@ -30,7 +30,7 @@ let options, app;
 options = {
     // Ensure kraken resolves basedir to the project root regardless of compiled location
     basedir: process.cwd(),
-    onconfig: function (config: any, next: any) {
+    onconfig: function (config: unknown, next: (err: Error | null, config?: unknown) => void) {
         /*
          * Add any additional config setup or overrides here. `config` is an initialized
          * `confit` (https://github.com/krakenjs/confit/) configuration object.
@@ -40,7 +40,7 @@ options = {
 };
 
 app = module.exports = express();
-(globalThis as any).__wikitruth_app = app;
+(globalThis as unknown as Record<string, unknown>).__wikitruth_app = app;
 app.use(kraken(options));
 
 
@@ -125,7 +125,7 @@ if (helmetConfig.enabled) {
 }
 
 let sessionStore = mongoStore.create({mongoUrl: config.mongodb.uri});
-sessionStore.on('error', function (error: any) {
+sessionStore.on('error', function (error: unknown) {
     console.error('Mongo session store error:', error);
     // You can implement fallback logic here, like switching to a MemoryStore
 });
@@ -159,7 +159,7 @@ const csrfProtection = csrf({
         sameSite: csrfCookie.sameSite || 'lax'
     }
 }); // kraken-js:lusca is already using csrf module
-app.use(function (req: any, res: any, next: any) {
+app.use(function (req: import('express').Request, res: import('express').Response, next: import('express').NextFunction) {
     // Runtime error beacons may come from sendBeacon and cannot reliably attach CSRF headers.
     if (/^\/api\/(?:v1\/)?monitoring\/(?:errors|csp)\/?$/.test(req.path)) {
         return next();

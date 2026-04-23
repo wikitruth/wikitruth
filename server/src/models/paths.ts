@@ -103,6 +103,6 @@
     if (typeof module !== 'undefined') {
         module.exports = exports;
     } else if (typeof window !== 'undefined') {
-        (window as any).WT_PATHS = exports;
+        (window as unknown as Record<string, unknown>).WT_PATHS = exports;
     }
 })();

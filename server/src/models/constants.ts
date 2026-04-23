@@ -1,7 +1,7 @@
 'use strict';
 
 (function () {
-  const VERDICT_STATUS: any = {
+  const VERDICT_STATUS: Record<string, unknown> = {
     pending: 0,
     status_true: 1,
     status_false: 2,
@@ -88,22 +88,22 @@
       case VERDICT_STATUS.very_likely:
       case VERDICT_STATUS.likely:
       case VERDICT_STATUS.makes_sense:
-        return VERDICT_STATUS.categories.true;
+        return (VERDICT_STATUS.categories as Record<string, number>).true;
 
       case VERDICT_STATUS.status_false:
       case VERDICT_STATUS.unlikely:
       case VERDICT_STATUS.very_unlikely:
       case VERDICT_STATUS.most_likely_false:
       case VERDICT_STATUS.misleading_invalid:
-        return VERDICT_STATUS.categories.false;
+        return (VERDICT_STATUS.categories as Record<string, number>).false;
 
       case VERDICT_STATUS.claim:
       case VERDICT_STATUS.pending:
-        return VERDICT_STATUS.categories.pending;
+        return (VERDICT_STATUS.categories as Record<string, number>).pending;
     }
   };
 
-  const ARGUMENT_TYPES: any = {
+  const ARGUMENT_TYPES: Record<string, unknown> = {
     // Types of arguments:
     // * A moral or ethical argument (something that should or should not/ought/this becomes a voting then? E.g. ought or ought not)
     // * A statement of a reality or phenomenon (current)
@@ -128,7 +128,7 @@
         theme = 'warning';
         break;
       case ARGUMENT_TYPES.artifact:
-        label = ARGUMENT_TYPES.artifactLabel;
+        label = String(ARGUMENT_TYPES.artifactLabel);
         break;
       case ARGUMENT_TYPES.experience:
         label = 'testimony';
@@ -421,6 +421,6 @@
   if (typeof module !== 'undefined') {
     module.exports = exports;
   } else if (typeof window !== 'undefined') {
-    (window as any).WT_CONSTANTS = exports;
+    (window as unknown as Record<string, unknown>).WT_CONSTANTS = exports;
   }
 })();
