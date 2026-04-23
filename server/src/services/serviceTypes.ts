@@ -52,3 +52,8 @@ export interface ArtifactsServiceContract {
   getArtifactsList(query: ServiceQuery, options?: ServiceListOptions): Promise<ServiceEntry[]>;
   getArtifactEntry(artifactId: string, req: Request | undefined): Promise<ServiceEntry | null>;
 }
+
+export interface AnswersServiceContract {
+  getAnswersList(query: ServiceQuery, options?: ServiceListOptions): Promise<ServiceEntry[]>;
+  getAnswerEntry(answerId: string, req: Request | undefined): Promise<ServiceEntry | null>;
+}

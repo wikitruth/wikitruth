@@ -1,5 +1,6 @@
 'use strict';
 import type { FlowUtilsModule, ConstantsModule, UtilsModule } from '../../types/legacyModules';
+import type { AnswersServiceContract } from '../../services/serviceTypes';
 
 import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../types/http';
@@ -7,7 +8,7 @@ import { errorMessage } from '../../types/errors';
 const flowUtils = require('../../utils/flowUtils') as FlowUtilsModule;
 const constants = require('../../models/constants') as ConstantsModule;
 const utils = require('../../utils/utils') as UtilsModule;
-const answersService = require('../../services/answersService') as any;
+const answersService = require('../../services/answersService') as AnswersServiceContract;
 const { applyViewModeFilter } = require('./viewFilter');
 const db = require('../../app').db.models;
 
@@ -46,7 +47,7 @@ module.exports = function (router: Router) {
         return res.status(400).json({ error: 'Answer id is required' });
       }
 
-      const answer = await answersService.getAnswerEntry(req.params.id, req);
+      const answer = await answersService.getAnswerEntry(answerId, req);
       
       if (!answer) {
         return res.status(404).json({ error: 'Answer not found' });
