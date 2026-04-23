@@ -2,627 +2,51 @@
 
 import type { Router } from 'express';
 import type { WikitruthNext, WikitruthRequest, WikitruthResponse } from '../../types/http';
-
-import * as httpClient from '../../utils/httpClient';
-import cryptoMod from 'crypto';
+import {
+  bodyOf,
+  type AccountSettingsContactBodyContract,
+  type AccountSettingsIdentityBodyContract,
+  type AccountSettingsPasswordBodyContract,
+  type FastSwitchBodyContract,
+  type ForgotPasswordBodyContract,
+  type LoginBodyContract,
+  type RefreshTokenBodyContract,
+  type ResetPasswordBodyContract,
+  type RoleSwitchBodyContract,
+  type SignupBodyContract,
+  type VerificationConfirmBodyContract,
+  type VerificationResendBodyContract,
+} from '../../types/controllerContracts';
 import jwtMod from 'jsonwebtoken';
+import {
+  db,
+  sanitizeUser,
+  normalizeActiveRole,
+  getSessionActiveRole,
+  setSessionActiveRole,
+  validateRecaptcha,
+  isValidUsername,
+  isValidEmail,
+  encryptPassword,
+  parseFastSwitchCookies,
+  getOauthProviders,
+  getSocialConnections,
+  isLoginAttemptBlocked,
+  recordFailedLoginAttempt,
+  getAccountIdFromUser,
+  buildAbsoluteUrl,
+  deliverEmail,
+  type AuthAppContext,
+  type AuthUserDocument,
+} from './authHelpers';
+import {
+  createResetToken,
+  issueTokenPair,
+  rotateRefreshToken,
+  revokeRefreshToken,
+} from './authTokenHelpers';
 
-import appModForDb from '../../app';
-const crypto = cryptoMod as unknown as typeof import('crypto');
 const jwt = jwtMod as unknown as typeof import('jsonwebtoken');
-type AuthUserLike = {
-  _id: string;
-  username: string;
-  email?: string;
-  roles?: unknown;
-};
-
-type AuthUserDocument = {
-  _id: string;
-  id: string;
-  username: string;
-  email?: string;
-  roles?: Record<string, unknown>;
-  canPlayRoleOf?: (role: string) => boolean;
-  defaultReturnUrl?: () => string;
-  isAdmin?: () => boolean;
-  password?: string;
-  search?: string[];
-  resetPasswordToken?: string;
-  resetPasswordExpires?: number;
-  mobileTokens?: MobileRefreshTokenRecord[];
-  twitter?: { id?: string };
-  github?: { id?: string };
-  facebook?: { id?: string };
-  google?: { id?: string };
-  apple?: { id?: string };
-  microsoft?: { id?: string };
-  save: () => Promise<AuthUserDocument>;
-};
-
-type MobileRefreshTokenRecord = {
-  tokenId?: string;
-  tokenHash?: string;
-  issuedAt?: Date;
-  expiresAt?: Date;
-  revokedAt?: Date | null;
-  client?: {
-    platform?: string;
-    version?: string;
-    build?: string;
-  };
-};
-
-type AccountDocument = {
-  _id: unknown;
-  isVerified?: string;
-  verificationToken?: string;
-  name?: {
-    first?: string;
-    middle?: string;
-    last?: string;
-    full?: string;
-  };
-  company?: string;
-  phone?: string;
-  zip?: string;
-  user?: {
-    id?: unknown;
-    name?: string;
-  };
-  save: () => Promise<AccountDocument>;
-};
-
-type ModelsContract = {
-  User: {
-    findById: (id: unknown) => Promise<AuthUserDocument | null>;
-    findOne: (query: Record<string, unknown>) => Promise<AuthUserDocument | null>;
-    create: (fields: Record<string, unknown>) => Promise<AuthUserDocument>;
-    encryptPassword: (password: string, done: (err: unknown, hash?: string) => void) => void;
-    validatePassword: (password: string, hash: string) => Promise<boolean>;
-  };
-  Account: {
-    create: (fields: Record<string, unknown>) => Promise<AccountDocument>;
-    findById: (id: unknown) => Promise<AccountDocument | null>;
-    findByIdAndUpdate: (
-      id: unknown,
-      fields: Record<string, unknown>,
-      options?: Record<string, unknown>
-    ) => Promise<AccountDocument | null>;
-  };
-  Admin?: {
-    findByIdAndUpdate: (id: unknown, fields: Record<string, unknown>) => Promise<unknown>;
-  };
-  LoginAttempt?: {
-    countDocuments: (query: Record<string, unknown>) => Promise<number>;
-    create: (fields: Record<string, unknown>) => Promise<unknown>;
-  };
-};
-
-const db = (appModForDb as unknown as { db: { models: ModelsContract } }).db.models;
-type TokenKind = 'access' | 'refresh';
-
-type MobileApiConfig = {
-  accessTokenTtlSeconds: number;
-  refreshTokenTtlSeconds: number;
-  maxRefreshSessionsPerUser: number;
-};
-
-type MobileClientTelemetry = {
-  platform: string;
-  version: string;
-  build: string;
-};
-
-type FastSwitchCookie = {
-  id?: string;
-  data?: string;
-  created?: string | Date;
-};
-
-type SendmailPayload = {
-  from: string;
-  to: string;
-  replyTo?: string;
-  subject: string;
-  textPath: string;
-  htmlPath: string;
-  locals: Record<string, string>;
-  success: () => void;
-  error: (err: unknown) => void;
-};
-
-type AuthAppContext = {
-  config?: {
-    loginAttempts?: {
-      forIp?: number;
-      forIpAndUser?: number;
-    };
-    smtp?: {
-      from?: {
-        name?: string;
-        address?: string;
-      };
-    };
-    projectName?: string;
-    oauth?: Record<string, { key?: string }>;
-    grecaptcha?: {
-      secret?: string;
-    };
-    requireAccountVerification?: boolean;
-    jwtSecret?: string;
-    mobileApi?: Partial<MobileApiConfig>;
-  };
-  utility?: {
-    sendmail?: (
-      req: WikitruthRequest,
-      res: WikitruthResponse,
-      options: SendmailPayload
-    ) => void;
-  };
-};
-
-type ActiveRole = 'reader' | 'contributor' | 'screener' | 'reviewer' | 'admin';
-
-type SignupBody = {
-  username?: unknown;
-  email?: unknown;
-  password?: unknown;
-  recaptchaResponse?: unknown;
-};
-
-function sanitizeUser(user: AuthUserLike | null | undefined) {
-  if (!user) {
-    return null;
-  }
-
-  return {
-    _id: user._id,
-    username: user.username,
-    email: user.email,
-    roles: user.roles,
-  };
-}
-
-function getAvailableRoles(user: AuthUserDocument | AuthUserLike | null | undefined): ActiveRole[] {
-  const roles: ActiveRole[] = ['reader', 'contributor'];
-  const roleSet = user?.roles as Record<string, unknown> | undefined;
-  if (roleSet?.screener) {
-    roles.push('screener');
-  }
-  if (roleSet?.reviewer) {
-    roles.push('reviewer');
-  }
-  if (roleSet?.admin) {
-    roles.push('admin');
-  }
-  return roles;
-}
-
-function normalizeActiveRole(
-  role: unknown,
-  user: AuthUserDocument | AuthUserLike | null | undefined,
-): ActiveRole | null {
-  const normalizedRole = String(role || '').trim().toLowerCase();
-  if (!normalizedRole) {
-    return null;
-  }
-  if (!['reader', 'contributor', 'screener', 'reviewer', 'admin'].includes(normalizedRole)) {
-    return null;
-  }
-  const allowedRoles = getAvailableRoles(user);
-  return allowedRoles.includes(normalizedRole as ActiveRole) ? (normalizedRole as ActiveRole) : null;
-}
-
-function getSessionActiveRole(req: WikitruthRequest): ActiveRole | null {
-  const stored = req.session?.preferences?.activeRole;
-  return normalizeActiveRole(stored, req.user as unknown as AuthUserDocument | null);
-}
-
-function setSessionActiveRole(req: WikitruthRequest, role: ActiveRole): void {
-  if (!req.session.preferences || typeof req.session.preferences !== 'object') {
-    req.session.preferences = {};
-  }
-  req.session.preferences.activeRole = role;
-}
-
-async function validateRecaptcha(req: WikitruthRequest, token: string): Promise<boolean> {
-  const appCtx = req.app as unknown as AuthAppContext;
-  const secret = String(appCtx.config?.grecaptcha?.secret || '').trim();
-  if (!secret) {
-    return true;
-  }
-  if (!token) {
-    return false;
-  }
-
-  try {
-    const captchaResult = await httpClient.postForm<{ success?: boolean }>('https://www.google.com/recaptcha/api/siteverify', {
-      secret: secret,
-      response: token,
-    });
-    return Boolean(captchaResult.statusCode === 200 && captchaResult.body?.success);
-  } catch (_error) {
-    return false;
-  }
-}
-
-function isValidUsername(username: string): boolean {
-  return /^[a-zA-Z0-9\-_]+$/.test(username);
-}
-
-function isValidEmail(email: string): boolean {
-  return /^[a-zA-Z0-9\-_.+]+@[a-zA-Z0-9\-_.]+\.[a-zA-Z0-9\-_]+$/.test(email);
-}
-
-function encryptPassword(password: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    db.User.encryptPassword(password, function (err, hash) {
-      if (err) {
-        reject(err);
-        return;
-      }
-
-      if (!hash) {
-        reject(new Error('Password hashing failed'));
-        return;
-      }
-
-      resolve(hash);
-    });
-  });
-}
-
-function createResetToken(): string {
-  return crypto.randomBytes(21).toString('hex');
-}
-
-function hashToken(token: string): string {
-  return crypto.createHash('sha256').update(token).digest('hex');
-}
-
-function getAccountIdFromUser(user: { roles?: unknown } | null | undefined): unknown {
-  if (!user?.roles) {
-    return null;
-  }
-
-  const accountRole = (user.roles as Record<string, unknown>).account;
-  if (!accountRole) {
-    return null;
-  }
-
-  if (typeof accountRole === 'string') {
-    return accountRole;
-  }
-
-  if (typeof accountRole === 'object') {
-    const accountRecord = accountRole as { id?: unknown; _id?: unknown };
-    return accountRecord.id || accountRecord._id || null;
-  }
-
-  return null;
-}
-
-function getMobileApiConfig(req: WikitruthRequest): MobileApiConfig {
-  const appConfig = (req.app as unknown as AuthAppContext).config?.mobileApi || {};
-  return {
-    accessTokenTtlSeconds: Number(appConfig.accessTokenTtlSeconds || 900),
-    refreshTokenTtlSeconds: Number(appConfig.refreshTokenTtlSeconds || 2592000),
-    maxRefreshSessionsPerUser: Number(appConfig.maxRefreshSessionsPerUser || 10),
-  };
-}
-
-function getJwtSecret(req: WikitruthRequest): string {
-  const secret = String((req.app as unknown as AuthAppContext).config?.jwtSecret || '').trim();
-  if (!secret) {
-    throw new Error('JWT secret is not configured');
-  }
-  return secret;
-}
-
-function resolveUserId(user: AuthUserDocument | AuthUserLike): string {
-  return String((user as { _id?: unknown })._id || (user as { id?: unknown }).id || '').trim();
-}
-
-function getClientTelemetry(req: WikitruthRequest): MobileClientTelemetry {
-  return {
-    platform: String(req.header('x-client-platform') || '').trim(),
-    version: String(req.header('x-client-version') || '').trim(),
-    build: String(req.header('x-client-build') || '').trim(),
-  };
-}
-
-function parseFastSwitchCookies(rawValue: unknown): FastSwitchCookie[] {
-  if (Array.isArray(rawValue)) {
-    return rawValue as FastSwitchCookie[];
-  }
-
-  if (typeof rawValue === 'string') {
-    try {
-      const parsed = JSON.parse(rawValue) as unknown;
-      if (Array.isArray(parsed)) {
-        return parsed as FastSwitchCookie[];
-      }
-    } catch (_err) {
-      return [];
-    }
-  }
-
-  return [];
-}
-
-function getOauthProviders(req: WikitruthRequest): Record<string, boolean> {
-  const oauthConfig = (req.app as unknown as AuthAppContext).config?.oauth || {};
-  return {
-    twitter: Boolean(oauthConfig.twitter?.key),
-    github: Boolean(oauthConfig.github?.key),
-    facebook: Boolean(oauthConfig.facebook?.key),
-    google: Boolean(oauthConfig.google?.key),
-    apple: Boolean(oauthConfig.apple?.key),
-    microsoft: Boolean(oauthConfig.microsoft?.key),
-  };
-}
-
-function getSocialConnections(user: AuthUserDocument | null): Record<string, boolean> {
-  return {
-    twitter: Boolean(user?.twitter?.id),
-    github: Boolean(user?.github?.id),
-    facebook: Boolean(user?.facebook?.id),
-    google: Boolean(user?.google?.id),
-    apple: Boolean(user?.apple?.id),
-    microsoft: Boolean(user?.microsoft?.id),
-  };
-}
-
-function getLoginAttemptLimits(req: WikitruthRequest): { forIp: number; forIpAndUser: number } {
-  const appCtx = req.app as unknown as AuthAppContext;
-  return {
-    forIp: Number(appCtx.config?.loginAttempts?.forIp || 50),
-    forIpAndUser: Number(appCtx.config?.loginAttempts?.forIpAndUser || 7),
-  };
-}
-
-async function isLoginAttemptBlocked(req: WikitruthRequest, userKey: string): Promise<boolean> {
-  if (!db.LoginAttempt?.countDocuments) {
-    return false;
-  }
-
-  try {
-    const limits = getLoginAttemptLimits(req);
-    const [ipAttempts, ipUserAttempts] = await Promise.all([
-      db.LoginAttempt.countDocuments({ ip: req.ip }),
-      db.LoginAttempt.countDocuments({ ip: req.ip, user: userKey }),
-    ]);
-    return ipAttempts >= limits.forIp || ipUserAttempts >= limits.forIpAndUser;
-  } catch (_error) {
-    return false;
-  }
-}
-
-async function recordFailedLoginAttempt(req: WikitruthRequest, userKey: string): Promise<void> {
-  if (!db.LoginAttempt?.create) {
-    return;
-  }
-  try {
-    await db.LoginAttempt.create({ ip: req.ip, user: userKey });
-  } catch (_error) {
-    // Login should still respond even if attempt tracking write fails.
-  }
-}
-
-function getRequestOrigin(req: WikitruthRequest): string {
-  const forwardedProto = (String(req.get('x-forwarded-proto') || '').split(',')[0] || '').trim();
-  const forwardedHost = (String(req.get('x-forwarded-host') || '').split(',')[0] || '').trim();
-  const directHost = (String(req.get('host') || '').split(',')[0] || '').trim();
-  const protocol = forwardedProto || req.protocol || 'http';
-  const host = forwardedHost || directHost;
-  if (!host) {
-    return '';
-  }
-  return `${protocol}://${host}`;
-}
-
-function buildAbsoluteUrl(req: WikitruthRequest, path: string): string {
-  const origin = getRequestOrigin(req);
-  const normalizedPath = `/${String(path || '').replace(/^\/+/, '')}`;
-  if (!origin) {
-    return normalizedPath;
-  }
-  return `${origin}${normalizedPath}`;
-}
-
-async function deliverEmail(req: WikitruthRequest, res: WikitruthResponse, payload: {
-  to: string;
-  subject: string;
-  textPath: string;
-  htmlPath: string;
-  locals: Record<string, string>;
-}): Promise<boolean> {
-  const appCtx = req.app as unknown as AuthAppContext;
-  const sendmail = appCtx.utility?.sendmail;
-  if (!sendmail) {
-    return false;
-  }
-
-  const fromName = String(appCtx.config?.smtp?.from?.name || appCtx.config?.projectName || 'Wikitruth').trim();
-  const fromAddress = String(appCtx.config?.smtp?.from?.address || '').trim();
-  if (!fromAddress) {
-    return false;
-  }
-
-  return new Promise((resolve) => {
-    sendmail(req, res, {
-      from: `${fromName} <${fromAddress}>`,
-      to: payload.to,
-      subject: payload.subject,
-      textPath: payload.textPath,
-      htmlPath: payload.htmlPath,
-      locals: payload.locals,
-      success: () => resolve(true),
-      error: () => resolve(false),
-    });
-  });
-}
-
-function signToken(req: WikitruthRequest, user: AuthUserDocument, kind: TokenKind, tokenId: string, expiresInSeconds: number): string {
-  const jwtSecret = getJwtSecret(req);
-  const now = Math.floor(Date.now() / 1000);
-  const subject = resolveUserId(user);
-
-  return jwt.sign(
-    {
-      type: kind,
-      jti: tokenId,
-      scope: 'mobile',
-      iat: now,
-      sub: subject,
-    },
-    jwtSecret,
-    {
-      expiresIn: expiresInSeconds,
-      issuer: 'wikitruth',
-      audience: 'wikitruth-mobile',
-    }
-  );
-}
-
-function parseVerifiedToken(req: WikitruthRequest, token: string, expectedType: TokenKind): { sub?: string; jti?: string } | null {
-  const jwtSecret = getJwtSecret(req);
-  const payload = jwt.verify(token, jwtSecret, {
-    issuer: 'wikitruth',
-    audience: 'wikitruth-mobile',
-  }) as { type?: TokenKind; sub?: string; jti?: string };
-
-  if (!payload || payload.type !== expectedType || !payload.sub || !payload.jti) {
-    return null;
-  }
-
-  return payload;
-}
-
-function issueTokenPair(req: WikitruthRequest, user: AuthUserDocument): {
-  accessToken: string;
-  refreshToken: string;
-  accessTokenExpiresIn: number;
-  refreshTokenExpiresIn: number;
-} {
-  const mobileApiConfig = getMobileApiConfig(req);
-  const accessTokenId = createResetToken();
-  const refreshTokenId = createResetToken();
-
-  const accessToken = signToken(req, user, 'access', accessTokenId, mobileApiConfig.accessTokenTtlSeconds);
-  const refreshToken = signToken(req, user, 'refresh', refreshTokenId, mobileApiConfig.refreshTokenTtlSeconds);
-
-  const mobileTokens = Array.isArray(user.mobileTokens) ? user.mobileTokens : [];
-  const now = new Date();
-  const expiresAt = new Date(now.getTime() + mobileApiConfig.refreshTokenTtlSeconds * 1000);
-  const clientTelemetry = getClientTelemetry(req);
-
-  const activeTokens = mobileTokens.filter(function (entry) {
-    if (!entry?.tokenId || !entry?.tokenHash) {
-      return false;
-    }
-    if (entry.revokedAt) {
-      return false;
-    }
-    if (entry.expiresAt && entry.expiresAt.getTime() <= now.getTime()) {
-      return false;
-    }
-    return true;
-  });
-
-  const boundedTokens = activeTokens.slice(-Math.max(0, mobileApiConfig.maxRefreshSessionsPerUser - 1));
-  boundedTokens.push({
-    tokenId: refreshTokenId,
-    tokenHash: hashToken(refreshToken),
-    issuedAt: now,
-    expiresAt: expiresAt,
-    revokedAt: null,
-    client: clientTelemetry,
-  });
-
-  user.mobileTokens = boundedTokens;
-
-  return {
-    accessToken: accessToken,
-    refreshToken: refreshToken,
-    accessTokenExpiresIn: mobileApiConfig.accessTokenTtlSeconds,
-    refreshTokenExpiresIn: mobileApiConfig.refreshTokenTtlSeconds,
-  };
-}
-
-async function rotateRefreshToken(req: WikitruthRequest, refreshToken: string): Promise<{
-  user: AuthUserDocument;
-  accessToken: string;
-  nextRefreshToken: string;
-  accessTokenExpiresIn: number;
-  refreshTokenExpiresIn: number;
-} | null> {
-  const payload = parseVerifiedToken(req, refreshToken, 'refresh');
-  if (!payload?.sub || !payload.jti) {
-    return null;
-  }
-
-  const user = await db.User.findById(payload.sub);
-  if (!user) {
-    return null;
-  }
-
-  const now = new Date();
-  const records = Array.isArray(user.mobileTokens) ? user.mobileTokens : [];
-  const tokenHash = hashToken(refreshToken);
-  const matchingRecord = records.find(function (record) {
-    return (
-      String(record?.tokenId || '') === payload.jti &&
-      String(record?.tokenHash || '') === tokenHash &&
-      !record?.revokedAt &&
-      (!record?.expiresAt || record.expiresAt.getTime() > now.getTime())
-    );
-  });
-
-  if (!matchingRecord) {
-    return null;
-  }
-
-  matchingRecord.revokedAt = now;
-
-  const issued = issueTokenPair(req, user);
-  await user.save();
-
-  return {
-    user: user,
-    accessToken: issued.accessToken,
-    nextRefreshToken: issued.refreshToken,
-    accessTokenExpiresIn: issued.accessTokenExpiresIn,
-    refreshTokenExpiresIn: issued.refreshTokenExpiresIn,
-  };
-}
-
-async function revokeRefreshToken(req: WikitruthRequest, refreshToken: string): Promise<boolean> {
-  const payload = parseVerifiedToken(req, refreshToken, 'refresh');
-  if (!payload?.sub || !payload.jti) {
-    return false;
-  }
-
-  const user = await db.User.findById(payload.sub);
-  if (!user) {
-    return false;
-  }
-
-  const records = Array.isArray(user.mobileTokens) ? user.mobileTokens : [];
-  const tokenHash = hashToken(refreshToken);
-  const record = records.find(function (entry) {
-    return String(entry?.tokenId || '') === payload.jti && String(entry?.tokenHash || '') === tokenHash && !entry?.revokedAt;
-  });
-
-  if (!record) {
-    return false;
-  }
-
-  record.revokedAt = new Date();
-  await user.save();
-  return true;
-}
 
 export = function (router: Router) {
   router.get('/me', async function (req: WikitruthRequest, res: WikitruthResponse) {
@@ -646,7 +70,7 @@ export = function (router: Router) {
 
   router.post('/signup', async function (req: WikitruthRequest, res: WikitruthResponse, next: WikitruthNext) {
     try {
-      const body = (req.body || {}) as SignupBody;
+      const body = bodyOf<SignupBodyContract>(req);
       const username = String(body.username || '').trim();
       const email = String(body.email || '').trim().toLowerCase();
       const password = String(body.password || '');
@@ -733,8 +157,9 @@ export = function (router: Router) {
 
   router.post('/login', async function (req: WikitruthRequest, res: WikitruthResponse, next: WikitruthNext) {
     try {
-      const username = String(req.body?.username || '').trim();
-      const password = String(req.body?.password || '');
+      const body = bodyOf<LoginBodyContract>(req);
+      const username = String(body.username || '').trim();
+      const password = String(body.password || '');
       const normalizedLoginIdentity = username.toLowerCase();
 
       if (!username || !password) {
@@ -786,7 +211,8 @@ export = function (router: Router) {
       return;
     }
 
-    const requestedRole = String(req.body?.role || '').trim().toLowerCase();
+    const body = bodyOf<RoleSwitchBodyContract>(req);
+    const requestedRole = String(body.role || '').trim().toLowerCase();
     const role = normalizeActiveRole(requestedRole, req.user as unknown as AuthUserDocument);
     if (!role) {
       res.status(400).json({ success: false, message: 'Invalid role switch request' });
@@ -799,7 +225,8 @@ export = function (router: Router) {
 
   router.post('/fast-switch', async function (req: WikitruthRequest, res: WikitruthResponse, next: WikitruthNext) {
     try {
-      const pin = String(req.body?.pin || '').trim();
+      const body = bodyOf<FastSwitchBodyContract>(req);
+      const pin = String(body.pin || '').trim();
       if (!/^\d{6}$/.test(pin)) {
         res.status(400).json({ success: false, message: 'PIN must be 6 digits' });
         return;
@@ -899,12 +326,13 @@ export = function (router: Router) {
         return;
       }
 
-      const first = String(req.body?.first || '').trim();
-      const middle = String(req.body?.middle || '').trim();
-      const last = String(req.body?.last || '').trim();
-      const company = String(req.body?.company || '').trim();
-      const phone = String(req.body?.phone || '').trim();
-      const zip = String(req.body?.zip || '').trim();
+      const body = bodyOf<AccountSettingsContactBodyContract>(req);
+      const first = String(body.first || '').trim();
+      const middle = String(body.middle || '').trim();
+      const last = String(body.last || '').trim();
+      const company = String(body.company || '').trim();
+      const phone = String(body.phone || '').trim();
+      const zip = String(body.zip || '').trim();
 
       if (!first) {
         res.status(400).json({ success: false, message: 'First name is required' });
@@ -966,8 +394,9 @@ export = function (router: Router) {
         return;
       }
 
-      const username = String(req.body?.username || '').trim();
-      const email = String(req.body?.email || '').trim().toLowerCase();
+      const body = bodyOf<AccountSettingsIdentityBodyContract>(req);
+      const username = String(body.username || '').trim();
+      const email = String(body.email || '').trim().toLowerCase();
 
       if (!username) {
         res.status(400).json({ success: false, message: 'Username is required' });
@@ -1045,8 +474,9 @@ export = function (router: Router) {
         return;
       }
 
-      const newPassword = String(req.body?.newPassword || '');
-      const confirm = String(req.body?.confirm || '');
+      const body = bodyOf<AccountSettingsPasswordBodyContract>(req);
+      const newPassword = String(body.newPassword || '');
+      const confirm = String(body.confirm || '');
       if (!newPassword) {
         res.status(400).json({ success: false, message: 'New password is required' });
         return;
@@ -1082,8 +512,9 @@ export = function (router: Router) {
   router.post('/token', async function (req: WikitruthRequest, res: WikitruthResponse, next: WikitruthNext) {
     try {
       let user: AuthUserDocument | null = null;
-      const username = String(req.body?.username || '').trim();
-      const password = String(req.body?.password || '');
+      const body = bodyOf<LoginBodyContract>(req);
+      const username = String(body.username || '').trim();
+      const password = String(body.password || '');
 
       if (username && password) {
         user = await db.User.findOne({
@@ -1128,7 +559,8 @@ export = function (router: Router) {
 
   router.post('/token/refresh', async function (req: WikitruthRequest, res: WikitruthResponse, next: WikitruthNext) {
     try {
-      const refreshToken = String(req.body?.refreshToken || '').trim();
+      const body = bodyOf<RefreshTokenBodyContract>(req);
+      const refreshToken = String(body.refreshToken || '').trim();
       if (!refreshToken) {
         res.status(400).json({ success: false, message: 'refreshToken is required' });
         return;
@@ -1156,7 +588,8 @@ export = function (router: Router) {
 
   router.post('/token/revoke', async function (req: WikitruthRequest, res: WikitruthResponse, next: WikitruthNext) {
     try {
-      const refreshToken = String(req.body?.refreshToken || '').trim();
+      const body = bodyOf<RefreshTokenBodyContract>(req);
+      const refreshToken = String(body.refreshToken || '').trim();
       if (!refreshToken) {
         res.status(400).json({ success: false, message: 'refreshToken is required' });
         return;
@@ -1189,7 +622,8 @@ export = function (router: Router) {
 
   router.post('/forgot-password', async function (req: WikitruthRequest, res: WikitruthResponse, next: WikitruthNext) {
     try {
-      const email = String(req.body?.email || '').trim().toLowerCase();
+      const body = bodyOf<ForgotPasswordBodyContract>(req);
+      const email = String(body.email || '').trim().toLowerCase();
       if (!email || !isValidEmail(email)) {
         res.status(400).json({ success: false, message: 'A valid email is required' });
         return;
@@ -1246,9 +680,10 @@ export = function (router: Router) {
 
   router.post('/reset-password', async function (req: WikitruthRequest, res: WikitruthResponse, next: WikitruthNext) {
     try {
-      const email = String(req.body?.email || '').trim().toLowerCase();
-      const token = String(req.body?.token || '').trim();
-      const password = String(req.body?.password || '');
+      const body = bodyOf<ResetPasswordBodyContract>(req);
+      const email = String(body.email || '').trim().toLowerCase();
+      const token = String(body.token || '').trim();
+      const password = String(body.password || '');
 
       if (!email || !token || !password) {
         res.status(400).json({ success: false, message: 'Email, token, and password are required' });
@@ -1343,7 +778,8 @@ export = function (router: Router) {
         return;
       }
 
-      const nextEmail = String(req.body?.email || req.user.email || '').trim().toLowerCase();
+      const body = bodyOf<VerificationResendBodyContract>(req);
+      const nextEmail = String(body.email || req.user.email || '').trim().toLowerCase();
       if (!nextEmail || !isValidEmail(nextEmail)) {
         res.status(400).json({ success: false, message: 'A valid email is required' });
         return;
@@ -1440,7 +876,8 @@ export = function (router: Router) {
         return;
       }
 
-      const token = String(req.body?.token || '').trim();
+      const body = bodyOf<VerificationConfirmBodyContract>(req);
+      const token = String(body.token || '').trim();
       if (!token) {
         res.status(400).json({ success: false, message: 'Verification token is required' });
         return;

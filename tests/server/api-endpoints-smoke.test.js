@@ -58,6 +58,7 @@ describe('API endpoint smoke coverage', function () {
 
   it('exposes admin API handlers required by client admin services', function () {
     const adminApi = read('server/src/controllers/api/admin.ts');
+    const adminBackupRoutes = read('server/src/controllers/api/adminBackupRoutes.ts');
 
     [
       "router.get('/'",
@@ -93,9 +94,14 @@ describe('API endpoint smoke coverage', function () {
       "router.post('/statuses'",
       "router.put('/statuses/:id'",
       "router.delete('/statuses/:id'",
+      'registerAdminBackupRoutes(router, ensureAdmin)',
+    ].forEach((contract) => expect(adminApi).toContain(contract));
+
+    [
       "router.get('/db-backup'",
       "router.post('/db-backup'",
-    ].forEach((contract) => expect(adminApi).toContain(contract));
+      "router.get('/audit-events'",
+    ].forEach((contract) => expect(adminBackupRoutes).toContain(contract));
   });
 
   it('exposes profile and custom-page member APIs required by modern client', function () {
@@ -123,6 +129,7 @@ describe('API endpoint smoke coverage', function () {
 
   it('exposes moderation API handlers used by modern entry actions', function () {
     const moderationApi = read('server/src/controllers/api/moderation.ts');
+    const moderationSignalsRoutes = read('server/src/controllers/api/moderationSignalsRoutes.ts');
 
     [
       "router.get('/entry'",
@@ -131,7 +138,19 @@ describe('API endpoint smoke coverage', function () {
       "router.post('/take-ownership'",
       "router.post('/ownership-migration'",
       "router.post('/delete'",
+      'registerModerationSignalsRoutes(router)',
     ].forEach((contract) => expect(moderationApi).toContain(contract));
+
+    [
+      "router.post('/verdict-votes'",
+      "router.get('/verdict-votes'",
+      "router.post('/signals'",
+      "router.get('/signals'",
+      "router.put('/signals/:id'",
+      "router.post('/appeals'",
+      "router.get('/appeals'",
+      "router.put('/appeals/:id'",
+    ].forEach((contract) => expect(moderationSignalsRoutes).toContain(contract));
   });
 
   it('exposes realtime SSE endpoint for React clients', function () {

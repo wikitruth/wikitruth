@@ -96,6 +96,13 @@ describe('auth captcha and role-switch endpoints', () => {
       _id: 'account-1',
       save: jest.fn().mockResolvedValue(undefined),
     }));
+    mockDb.Account.findByIdAndUpdate.mockResolvedValue({
+      _id: 'account-1',
+      name: { first: 'Demo', middle: '', last: 'User' },
+      company: 'Test Co',
+      phone: '',
+      zip: '',
+    });
   });
 
   it('rejects signup when captcha token is missing and captcha secret is configured', async () => {
@@ -151,5 +158,36 @@ describe('auth captcha and role-switch endpoints', () => {
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);
     expect(response.body.activeRole).toBe('reader');
+  });
+
+  it('requires refreshToken for mobile token refresh flow', async () => {
+    const app = createApp();
+
+    const response = await request(app).post('/auth/token/refresh').send({});
+
+    expect(response.status).toBe(400);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toContain('refreshToken');
+  });
+
+  it('validates account contact payload for account-settings update', async () => {
+    const app = createApp({
+      user: {
+        _id: 'user-1',
+        id: 'user-1',
+        username: 'demo_user',
+        email: 'demo@example.com',
+        roles: { account: 'account-1' },
+      },
+    });
+
+    const response = await request(app).put('/auth/account-settings/contact').send({
+      first: '',
+      last: '',
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body.success).toBe(false);
+    expect(response.body.message).toBe('First name is required');
   });
 });

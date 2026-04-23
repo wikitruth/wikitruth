@@ -2,22 +2,20 @@
 
 import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
+import {
+  bodyOf,
+  type AdminAccountNoteBodyContract,
+  type AdminAccountStatusBodyContract,
+  type AdminCreateUserBodyContract,
+  type AdminPermissionsBodyContract,
+  type AdminRoleBindingBodyContract,
+  type AdminRoleMutationBodyContract,
+  type AdminSetPasswordBodyContract,
+} from '../../types/controllerContracts';
 
 import appModForDb from '../../app';
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
-import backup from 'mongodb-backup-fixed';
-import config from '../../config/config';
-import * as flowUtils from '../../utils/flowUtils';
-import { listPrivilegedEvents, logEntryEvent } from '../../services/entryEventsService';
-import fs from 'fs';
-import path from 'path';
-
-function ensureDir(dirPath: string): void {
-  if (fs.existsSync(dirPath)) {
-    return;
-  }
-  fs.mkdirSync(dirPath, { recursive: true });
-}
+import { registerAdminBackupRoutes } from './adminBackupRoutes';
 
 function ensureAdmin(req: WikitruthRequest, res: WikitruthResponse): boolean {
   if (!req.user || !req.user.canPlayRoleOf || !req.user.canPlayRoleOf('admin')) {
@@ -122,72 +120,6 @@ function encryptPassword(password: string): Promise<string> {
   });
 }
 
-function toPositiveInt(value: unknown, fallback: number): number {
-  const parsed = Number(value);
-  if (!Number.isFinite(parsed) || parsed <= 0) {
-    return fallback;
-  }
-  return Math.floor(parsed);
-}
-
-function toRestoreBoolean(value: unknown, fallback: boolean): boolean {
-  if (typeof value === 'boolean') {
-    return value;
-  }
-  if (typeof value === 'string') {
-    const normalized = value.trim().toLowerCase();
-    if (!normalized) {
-      return fallback;
-    }
-    if (['1', 'true', 'yes', 'on'].includes(normalized)) {
-      return true;
-    }
-    if (['0', 'false', 'no', 'off'].includes(normalized)) {
-      return false;
-    }
-  }
-  return fallback;
-}
-
-async function restoreCollectionFromDirectory(options: {
-  collectionName: string;
-  collectionDir: string;
-  overwriteQuery?: Record<string, unknown>;
-  modelMapping: Record<string, string>;
-}): Promise<{ restored: number; skipped: boolean }> {
-  const { collectionName, collectionDir, overwriteQuery, modelMapping } = options;
-  if (!fs.existsSync(collectionDir)) {
-    return { restored: 0, skipped: true };
-  }
-
-  const modelName = modelMapping[collectionName];
-  if (!modelName || !db[modelName]) {
-    return { restored: 0, skipped: true };
-  }
-
-  const files = fs
-    .readdirSync(collectionDir)
-    .filter((name: string) => name.endsWith('.json'))
-    .sort((a: string, b: string) => a.localeCompare(b));
-
-  if (overwriteQuery) {
-    await db[modelName].deleteMany(overwriteQuery);
-  } else {
-    await db[modelName].deleteMany({});
-  }
-
-  let restored = 0;
-  for (const jsonFile of files) {
-    const file = path.join(collectionDir, jsonFile);
-    const raw = fs.readFileSync(file, 'utf8');
-    const doc = JSON.parse(raw);
-    await db[modelName].create(doc);
-    restored += 1;
-  }
-
-  return { restored, skipped: false };
-}
-
 export = function (router: Router) {
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAdmin(req, res)) {
@@ -221,9 +153,10 @@ export = function (router: Router) {
       return;
     }
 
-    const username = String(req.body?.username || '').trim();
-    const email = String(req.body?.email || '').trim().toLowerCase();
-    const password = String(req.body?.password || '').trim();
+    const body = bodyOf<AdminCreateUserBodyContract>(req);
+    const username = String(body.username || '').trim();
+    const email = String(body.email || '').trim().toLowerCase();
+    const password = String(body.password || '').trim();
 
     if (!username || !email || !password) {
       res.status(400).json({ success: false, message: 'username, email and password are required' });
@@ -250,8 +183,8 @@ export = function (router: Router) {
       password: passwordHash,
       isActive: 'yes',
       roles: {
-        screener: toBoolean(req.body?.roles?.screener),
-        reviewer: toBoolean(req.body?.roles?.reviewer),
+        screener: toBoolean(body.roles?.screener),
+        reviewer: toBoolean(body.roles?.reviewer),
       },
       search: [username, email],
     });
@@ -291,7 +224,8 @@ export = function (router: Router) {
       return;
     }
 
-    const password = String(req.body?.password || req.body?.newPassword || '').trim();
+    const body = bodyOf<AdminSetPasswordBodyContract>(req);
+    const password = String(body.password || body.newPassword || '').trim();
     if (!password || password.length < 6) {
       res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
       return;
@@ -312,7 +246,8 @@ export = function (router: Router) {
       return;
     }
 
-    const adminId = String(req.body?.adminId || '').trim();
+    const body = bodyOf<AdminRoleBindingBodyContract>(req);
+    const adminId = String(body.adminId || '').trim();
     if (!adminId) {
       res.status(400).json({ success: false, message: 'adminId is required' });
       return;
@@ -380,7 +315,8 @@ export = function (router: Router) {
       return;
     }
 
-    const accountId = String(req.body?.accountId || '').trim();
+    const body = bodyOf<AdminRoleBindingBodyContract>(req);
+    const accountId = String(body.accountId || '').trim();
     if (!accountId) {
       res.status(400).json({ success: false, message: 'accountId is required' });
       return;
@@ -448,6 +384,7 @@ export = function (router: Router) {
       return;
     }
 
+    const body = bodyOf<AdminRoleMutationBodyContract>(req);
     const user = await db.User.findById(req.params.id);
     if (!user) {
       res.status(404).json({ success: false, message: 'User not found' });
@@ -457,8 +394,8 @@ export = function (router: Router) {
     if (!user.roles) {
       user.roles = {};
     }
-    user.roles.screener = toBoolean(req.body?.screener ?? req.body?.roles?.screener);
-    user.roles.reviewer = toBoolean(req.body?.reviewer ?? req.body?.roles?.reviewer);
+    user.roles.screener = toBoolean(body.screener ?? body.roles?.screener);
+    user.roles.reviewer = toBoolean(body.reviewer ?? body.roles?.reviewer);
     await user.save();
 
     res.json({ success: true, user: await db.User.findById(user._id).lean() });
@@ -478,7 +415,8 @@ export = function (router: Router) {
       return;
     }
 
-    const userId = String(req.body?.userId || '').trim();
+    const body = bodyOf<AdminRoleBindingBodyContract>(req);
+    const userId = String(body.userId || '').trim();
     if (!userId) {
       res.status(400).json({ success: false, message: 'userId is required' });
       return;
@@ -549,7 +487,8 @@ export = function (router: Router) {
       return;
     }
 
-    const data = String(req.body?.data || req.body?.note || '').trim();
+    const body = bodyOf<AdminAccountNoteBodyContract>(req);
+    const data = String(body.data || body.note || '').trim();
     if (!data) {
       res.status(400).json({ success: false, message: 'note data is required' });
       return;
@@ -579,7 +518,8 @@ export = function (router: Router) {
       return;
     }
 
-    const statusId = String(req.body?.statusId || req.body?.id || '').trim();
+    const body = bodyOf<AdminAccountStatusBodyContract>(req);
+    const statusId = String(body.statusId || body.id || '').trim();
     if (!statusId) {
       res.status(400).json({ success: false, message: 'statusId is required' });
       return;
@@ -634,7 +574,8 @@ export = function (router: Router) {
       return;
     }
 
-    admin.permissions = parsePermissions(req.body?.permissions);
+    const body = bodyOf<AdminPermissionsBodyContract>(req);
+    admin.permissions = parsePermissions(body.permissions);
     await admin.save();
     res.json({ success: true, admin: await db.Admin.findById(admin._id).lean() });
   });
@@ -650,7 +591,8 @@ export = function (router: Router) {
       return;
     }
 
-    admin.groups = parseList(req.body?.groups);
+    const body = bodyOf<AdminPermissionsBodyContract>(req);
+    admin.groups = parseList(body.groups);
     await admin.save();
     res.json({ success: true, admin: await db.Admin.findById(admin._id).lean() });
   });
@@ -660,7 +602,8 @@ export = function (router: Router) {
       return;
     }
 
-    const userId = String(req.body?.userId || '').trim();
+    const body = bodyOf<AdminRoleBindingBodyContract>(req);
+    const userId = String(body.userId || '').trim();
     if (!userId) {
       res.status(400).json({ success: false, message: 'userId is required' });
       return;
@@ -848,219 +791,5 @@ export = function (router: Router) {
     res.json({ success: true });
   });
 
-  router.get('/db-backup', async function (req: WikitruthRequest, res: WikitruthResponse) {
-    if (!ensureAdmin(req, res)) {
-      return;
-    }
-
-    const backupDir = flowUtils.getBackupDir();
-    const privateBackupDir = path.join(flowUtils.getBackupDir(true), 'users');
-    const hasGitBackup = Boolean(config.mongodb?.gitBackup);
-
-    res.json({
-      success: true,
-      backup: {
-        backupDir: backupDir,
-        privateBackupDir: privateBackupDir,
-        hasGitBackup: hasGitBackup,
-      },
-    });
-  });
-
-  router.post('/db-backup', async function (req: WikitruthRequest, res: WikitruthResponse) {
-    if (!ensureAdmin(req, res)) {
-      return;
-    }
-
-    const action = String(req.body?.action || req.body?.buttonAction || 'backup');
-    const backupDir = flowUtils.getBackupDir();
-    const privateBackupDir = path.join(flowUtils.getBackupDir(true), 'users');
-    ensureDir(backupDir);
-    ensureDir(privateBackupDir);
-
-    const collections = config.mongodb?.collections || {};
-    const userId = String(req.user?._id || req.user?.id || '');
-    const username = String(req.user?.username || '');
-
-    if (action === 'backup') {
-      backup({
-        uri: config.mongodb.uri,
-        root: backupDir,
-        collections: collections.backupList || [],
-        parser: 'json',
-      });
-
-      backup({
-        uri: config.mongodb.uri,
-        root: backupDir,
-        collections: collections.privateBackupList || [],
-        parser: 'json',
-        query: { private: false },
-      });
-
-      backup({
-        uri: config.mongodb.uri,
-        root: privateBackupDir,
-        collections: collections.privateBackupList || [],
-        parser: 'json',
-        query: { private: true },
-      });
-
-      await logEntryEvent({
-        scope: 'privileged',
-        eventType: 'admin.backup.started',
-        objectType: 1,
-        objectName: 'topic',
-        objectId: String(req.user?._id || req.user?.id || req.user?.username || 'admin'),
-        actorUserId: userId,
-        actorUsername: username,
-        message: 'Started database backup',
-        payload: {
-          backupDir,
-          privateBackupDir,
-        },
-      });
-
-      res.status(202).json({
-        success: true,
-        message: 'Backup tasks started',
-        backup: {
-          backupDir: backupDir,
-          privateBackupDir: privateBackupDir,
-          startedAt: new Date().toISOString(),
-        },
-      });
-      return;
-    }
-
-    if (action === 'restore') {
-      const confirmText = String(req.body?.confirmText || req.body?.confirm || '').trim().toUpperCase();
-      if (confirmText !== 'RESTORE') {
-        res.status(400).json({
-          success: false,
-          message: 'Restore confirmation failed. Type RESTORE to continue.',
-        });
-        return;
-      }
-
-      const restorePublicData = toRestoreBoolean(req.body?.restorePublicData, true);
-      const restorePrivateData = toRestoreBoolean(req.body?.restorePrivateData, true);
-      if (!restorePublicData && !restorePrivateData) {
-        res.status(400).json({
-          success: false,
-          message: 'At least one restore scope must be selected.',
-        });
-        return;
-      }
-
-      const dbName = String(config.mongodb?.dbname || '').trim();
-      const modelMapping = (collections.modelMapping || {}) as Record<string, string>;
-      const summary = {
-        public: {} as Record<string, { restored: number; skipped: boolean }>,
-        private: {} as Record<string, { restored: number; skipped: boolean }>,
-      };
-
-      if (restorePublicData) {
-        const publicRoot = path.join(backupDir, dbName);
-        const publicCollections = Array.from(
-          new Set([...(collections.backupList || []), ...(collections.privateBackupList || [])])
-        ) as string[];
-
-        for (const collectionName of publicCollections) {
-          const collectionDir = path.join(publicRoot, collectionName);
-          summary.public[collectionName] = await restoreCollectionFromDirectory({
-            collectionName,
-            collectionDir,
-            modelMapping,
-          });
-        }
-      }
-
-      if (restorePrivateData) {
-        const users = await db.User.find({}).sort({ username: 1 }).select('_id username').lean();
-        for (const user of users) {
-          const usernameKey = String(user.username || '').trim();
-          if (!usernameKey) {
-            continue;
-          }
-          const userRoot = path.join(privateBackupDir, usernameKey, dbName);
-          for (const collectionName of (collections.privateBackupList || []) as string[]) {
-            const collectionDir = path.join(userRoot, collectionName);
-            const key = `${usernameKey}:${collectionName}`;
-            summary.private[key] = await restoreCollectionFromDirectory({
-              collectionName,
-              collectionDir,
-              modelMapping,
-              overwriteQuery: {
-                private: true,
-                createUserId: user._id,
-              },
-            });
-          }
-        }
-      }
-
-      await logEntryEvent({
-        scope: 'privileged',
-        eventType: 'admin.backup.restore',
-        objectType: 1,
-        objectName: 'topic',
-        objectId: String(req.user?._id || req.user?.id || req.user?.username || 'admin'),
-        actorUserId: userId,
-        actorUsername: username,
-        message: 'Executed backup restore',
-        payload: {
-          restorePublicData,
-          restorePrivateData,
-          summary,
-        },
-      });
-
-      res.json({
-        success: true,
-        message: 'Restore completed',
-        restore: {
-          restorePublicData,
-          restorePrivateData,
-          completedAt: new Date().toISOString(),
-          summary,
-        },
-      });
-      return;
-    }
-
-    res.status(400).json({
-      success: false,
-      message: `Unsupported backup action: ${action}`,
-    });
-  });
-
-  router.get('/audit-events', async function (req: WikitruthRequest, res: WikitruthResponse) {
-    if (!ensureAdmin(req, res)) {
-      return;
-    }
-
-    const page = toPositiveInt(req.query.page, 1);
-    const limit = Math.min(toPositiveInt(req.query.limit, 25), 100);
-    const objectType = Number(req.query.objectType || 0);
-    const eventTypes = String(req.query.eventTypes || '')
-      .split(',')
-      .map((item) => item.trim())
-      .filter(Boolean);
-
-    const result = await listPrivilegedEvents({
-      page,
-      limit,
-      eventTypes,
-      objectType: objectType > 0 ? objectType : null,
-    });
-
-    res.json({
-      success: true,
-      events: result.items,
-      total: result.total,
-      page: result.page,
-      limit: result.limit,
-    });
-  });
+  registerAdminBackupRoutes(router, ensureAdmin);
 };

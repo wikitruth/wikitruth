@@ -15,6 +15,11 @@ import {
   normalizeChildrenCountUpdateTasks,
   assertChildrenCountInvariants,
 } from '../services/childrenCountGuardrails';
+import {
+  appendEntryExtrasCore,
+  appendListExtrasCore,
+  type EntryExtras,
+} from './flow/entryExtras';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires, security/detect-non-literal-require
 import config from '../config/config';
@@ -56,101 +61,48 @@ function isCategoryTopic(entry?: { tags?: string[] }): boolean {
   return !!entry?.tags && entry.tags.indexOf(constants.TOPIC_TAGS.tag510.code) > -1;
 }
 
-type EntryExtras = Record<string, unknown> & {
-  title?: string;
-  contextTitle?: string;
-  friendlyUrl?: string;
-  shortTitle?: string;
-  objectType?: number;
-  objectName?: string;
-  getType?: () => number;
-  content?: string;
-  contentPreview?: string;
-  showMore?: boolean;
-  comments?: number;
-  points?: number;
-  editDate?: Date;
-  createDate?: Date;
-  editDateString?: string;
-  createDateString?: string;
-  createUserId?: { toString(): string; equals(id: unknown): boolean };
-  editUserId?: { toString(): string };
-  sameEditor?: boolean;
-  sameEditDate?: boolean;
-  referenceDate?: Date;
-  referenceDateString?: string;
-  referenceDateUTC?: string;
-  referenceDateSimple?: string;
-  childrenCount?: Record<string, { accepted?: number } | undefined>;
-  hasChildren?: boolean;
-  isItemOwner?: boolean;
-};
-
 function appendListExtras(item?: EntryExtras, objectType?: number, shortTitleLength?: number, _req?: unknown) {
-  if (!item) return;
-  if (item.title) {
-    item.friendlyUrl = utils.urlify(item.title);
-    item.shortTitle = utils.getShortText(item.contextTitle || item.title, shortTitleLength || constants.SETTINGS.TILE_MAX_ENTRY_LEN);
-  }
-  if (objectType) {
-    item.objectType = objectType;
-    item.objectName = getObjectName(objectType);
-  } else if (item.getType) {
-    objectType = item.getType();
-    item.objectType = objectType;
-    item.objectName = getObjectName(objectType);
-  }
-  if (item.content && item.contentPreview && item.content.length > constants.SETTINGS.contentPreviewLength && item.contentPreview !== item.content) {
-    item.showMore = true;
-  }
+  appendListExtrasCore(item, objectType, shortTitleLength, {
+    constants: constants as unknown as {
+      SETTINGS: {
+        TILE_MAX_ENTRY_LEN: number;
+        contentPreviewLength: number;
+      };
+    },
+    utils: utils as unknown as {
+      urlify: (value: unknown) => string;
+      getShortText: (text: unknown, length: number) => string;
+      randomInt: (min: number, max: number) => number;
+      timeSince: (value: unknown, short?: boolean) => string;
+    },
+    dateFns: dateFns as unknown as {
+      format: (value: Date, format: string) => string;
+    },
+    getObjectName,
+    appendOwnerFlag,
+  });
 }
 
 function appendEntryExtras(item?: EntryExtras, objectType?: number, req?: { user?: { id?: unknown } }, shortTitleLength?: number) {
-  if (!item) return;
-  appendListExtras(item, objectType, shortTitleLength);
-  item.comments = utils.randomInt(0, 999);
-  item.points = utils.randomInt(0, 9999);
-
-  //let editDateString = result.editDate.toUTCString();
-  item.editDateString = utils.timeSince(item.editDate, true) + ' ago';
-  item.createDateString = utils.timeSince(item.createDate, true) + ' ago';
-
-  item.sameEditor = item.createUserId?.toString() === item.editUserId?.toString();
-  item.sameEditDate = item.createDate?.valueOf() === item.editDate?.valueOf();
-
-  if (item.referenceDate) {
-    let refDate = new Date(item.referenceDate);
-    item.referenceDateString = item.referenceDate.toLocaleString(); // FIXME: using this on front-end might produce an issue when the locale of the server does not match the locale of the client.
-    item.referenceDateUTC = item.referenceDate.toUTCString();
-    // Aligns with prior `moment(...).format('lll')` style using date-fns server-side formatting.
-    if (!Number.isNaN(refDate.getTime())) {
-      item.referenceDateSimple = dateFns.format(refDate, 'PP p');
-    } else {
-      item.referenceDateSimple = item.referenceDate.toLocaleString();
-    }
-    if (item.referenceDateSimple && /,?\s*12:00 AM$/.test(item.referenceDateSimple)) {
-      item.referenceDateSimple = item.referenceDateSimple.replace(/,?\s*12:00 AM$/, '');
-    }
-  }
-  if (item.childrenCount) {
-    const childrenCount = item.childrenCount;
-    let hasChildren = function(objectName: string) {
-      const c = childrenCount[objectName];
-      return !!c && (c.accepted ?? 0) > 0;
-    };
-    if (hasChildren('topics')
-      || hasChildren('arguments')
-      || hasChildren('questions')
-      || hasChildren('answers')
-      || hasChildren('issues')
-      || hasChildren('opinions')) {
-      item.hasChildren = true;
-    }
-  }
-
-  if (req) {
-    appendOwnerFlag(req, item);
-  }
+  appendEntryExtrasCore(item, objectType, req, shortTitleLength, {
+    constants: constants as unknown as {
+      SETTINGS: {
+        TILE_MAX_ENTRY_LEN: number;
+        contentPreviewLength: number;
+      };
+    },
+    utils: utils as unknown as {
+      urlify: (value: unknown) => string;
+      getShortText: (text: unknown, length: number) => string;
+      randomInt: (min: number, max: number) => number;
+      timeSince: (value: unknown, short?: boolean) => string;
+    },
+    dateFns: dateFns as unknown as {
+      format: (value: Date, format: string) => string;
+    },
+    getObjectName,
+    appendOwnerFlag,
+  });
 }
 
 /*
