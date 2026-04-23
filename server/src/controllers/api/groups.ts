@@ -23,7 +23,7 @@ module.exports = function (router: Router) {
       const model: Record<string, unknown> = {};
       
       if (req.user) {
-        const currentUser: any = req.user;
+        const currentUser = req.user as unknown as { id?: unknown; _id?: unknown };
         model.privateGroups = results.filter(function (group: Record<string, unknown>) {
           const members = (group.members as Array<Record<string, unknown>> | undefined) || [];
           return group.privacyType !== constants.GROUP_PRIVACY_TYPES.type10.code
@@ -174,11 +174,11 @@ module.exports = function (router: Router) {
           .lean(),
       ]);
 
-      const mapFriendlyUrl = function (entry: any) {
+      const mapFriendlyUrl = function (entry: Record<string, unknown> | null | undefined) {
         if (!entry) return entry;
         return {
           ...entry,
-          friendlyUrl: entry.friendlyUrl || utils.urlify(entry.title || ''),
+          friendlyUrl: entry.friendlyUrl || utils.urlify(String(entry.title || '')),
         };
       };
 
@@ -390,7 +390,11 @@ module.exports = function (router: Router) {
   });
 };
 
-function isGroupManager(group: any, user: any) {
+type GroupMemberLike = { userId?: unknown; roleType?: unknown };
+type GroupLike = { _id?: unknown; createUserId?: unknown; privacyType?: unknown; members?: GroupMemberLike[] } | null | undefined;
+type UserLike = { _id?: unknown; id?: unknown; canPlayRoleOf?: (role: string) => boolean } | null | undefined;
+
+function isGroupManager(group: GroupLike, user: UserLike) {
   if (!group || !user) {
     return false;
   }
@@ -403,27 +407,28 @@ function isGroupManager(group: any, user: any) {
     return true;
   }
 
-  return (group.members || []).some(function (member: Record<string, unknown>) {
+  return (group.members || []).some(function (member: GroupMemberLike) {
     return resolveMemberUserId(member) === userId
       && Number(member.roleType || constants.GROUP_ROLE_TYPES.type10.code) === constants.GROUP_ROLE_TYPES.type20.code;
   });
 }
 
-function resolveUserId(user: any): string {
+function resolveUserId(user: UserLike): string {
   return String(user?._id || user?.id || '');
 }
 
-function resolveMemberUserId(member: any): string {
+function resolveMemberUserId(member: GroupMemberLike | null | undefined): string {
   if (!member) {
     return '';
   }
   if (typeof member.userId === 'object' && member.userId !== null) {
-    return String(member.userId._id || member.userId.id || '');
+    const obj = member.userId as { _id?: unknown; id?: unknown };
+    return String(obj._id || obj.id || '');
   }
   return String(member.userId || '');
 }
 
-function isGroupMember(group: any, user: any): boolean {
+function isGroupMember(group: GroupLike, user: UserLike): boolean {
   const userId = resolveUserId(user);
   if (!userId || !group) {
     return false;
@@ -431,12 +436,12 @@ function isGroupMember(group: any, user: any): boolean {
   if (String(group.createUserId || '') === userId) {
     return true;
   }
-  return (group.members || []).some(function (member: Record<string, unknown>) {
+  return (group.members || []).some(function (member: GroupMemberLike) {
     return resolveMemberUserId(member) === userId;
   });
 }
 
-function canViewGroup(group: any, user: any): boolean {
+function canViewGroup(group: GroupLike, user: UserLike): boolean {
   if (!group) {
     return false;
   }
@@ -452,7 +457,7 @@ function canViewGroup(group: any, user: any): boolean {
   return isGroupMember(group, user);
 }
 
-function buildGroupContentFilter(group: any, user: any): Record<string, unknown> {
+function buildGroupContentFilter(group: GroupLike, user: UserLike): Record<string, unknown> {
   if (!user) {
     return { private: { $ne: true } };
   }
@@ -465,7 +470,7 @@ function buildGroupContentFilter(group: any, user: any): Record<string, unknown>
   return { private: { $ne: true } };
 }
 
-async function countGroupContributions(groupId: any, filter: Record<string, unknown>) {
+async function countGroupContributions(groupId: unknown, filter: Record<string, unknown>) {
   const groupOrPrivateOwnerQuery = {
     $or: [{ groupId: groupId }, { private: true, createUserId: groupId }],
   };
