@@ -990,8 +990,10 @@ function setClipboardModel(req?: { session?: { clipboard?: ClipboardMap } }, mod
   }
 }
 
-async function getTopics(query?: any, options?: any) {
-  let children: any[] = [], topicLinks: any[] = [];
+async function getTopics(query: Record<string, unknown>, options?: { limit?: number; shortTitleLength?: number; req?: { user?: { id?: unknown } } }) {
+  type TopicDoc = EntryExtras & { _id: { equals(id: unknown): boolean }; parentId?: unknown; parentTopic?: unknown; link?: unknown };
+  type TopicLinkDoc = { topicId: { equals(id: unknown): boolean } };
+  let children: TopicDoc[] = [], topicLinks: TopicDoc[] = [];
   //limit, shortTitleLength, req
   if (!options) options = {};
   await async.series({
@@ -1003,22 +1005,22 @@ async function getTopics(query?: any, options?: any) {
         .lean();
 
       await setEditorsUsername(results);
-      results.forEach(function(result?: any) {
-        appendEntryExtras(result, constants.OBJECT_TYPES.topic, options.req, options.shortTitleLength);
+      results.forEach(function(result: EntryExtras) {
+        appendEntryExtras(result, constants.OBJECT_TYPES.topic, options?.req, options?.shortTitleLength);
       });
-      children = results;
+      children = results as TopicDoc[];
     },
     links: async function() {
-      if (options.limit > 0 && options.limit === children.length) return;
+      if ((options?.limit ?? 0) > 0 && options?.limit === children.length) return;
 
-      let newLimit = options.limit > 0 ? options.limit - children.length : options.limit;
+      let newLimit = (options?.limit ?? 0) > 0 ? (options!.limit as number) - children.length : options?.limit;
       let links = await db.TopicLink
         .find(query)
         .limit(newLimit)
         .lean();
 
       if (links.length > 0) {
-        const ids = links.map(function(link?: any) {
+        const ids = links.map(function(link: TopicLinkDoc) {
           return link.topicId;
         });
         query = { _id: { $in: ids } };
@@ -1030,9 +1032,9 @@ async function getTopics(query?: any, options?: any) {
           .lean();
         if (results.length > 0) {
           // Get parents for rendering the subtitle
-          const parentIds = results.filter(function(result?: any) {
+          const parentIds = (results as TopicDoc[]).filter(function(result: TopicDoc) {
             return !!result.parentId;
-          }).map(function(result?: any) {
+          }).map(function(result: TopicDoc) {
             return result.parentId;
           });
           query = { _id: { $in: parentIds } };
@@ -1041,25 +1043,25 @@ async function getTopics(query?: any, options?: any) {
             .find(query)
             .lean();
           await setEditorsUsername(results);
-          results.forEach(function(result?: any) {
-            appendEntryExtras(result, constants.OBJECT_TYPES.topic, options.req, options.shortTitleLength);
-            const link = links.find(function(link?: any) {
+          (results as TopicDoc[]).forEach(function(result: TopicDoc) {
+            appendEntryExtras(result, constants.OBJECT_TYPES.topic, options?.req, options?.shortTitleLength);
+            const link = (links as TopicLinkDoc[]).find(function(link: TopicLinkDoc) {
               return link.topicId.equals(result._id);
             });
             if (link) {
-              const linkParent = linkParents.find(function(linkParent?: any) {
+              const linkParent = (linkParents as TopicDoc[]).find(function(linkParent: TopicDoc) {
                 return linkParent._id.equals(result.parentId);
               });
               if (linkParent) {
-                appendListExtras(linkParent, constants.OBJECT_TYPES.topic, options.req, options.shortTitleLength);
+                (appendListExtras as (...args: unknown[]) => void)(linkParent, constants.OBJECT_TYPES.topic, options?.req, options?.shortTitleLength);
               }
-              appendListExtras(link, constants.OBJECT_TYPES.topicLink, options.req, options.shortTitleLength);
+              (appendListExtras as (...args: unknown[]) => void)(link, constants.OBJECT_TYPES.topicLink, options?.req, options?.shortTitleLength);
               result.parentTopic = linkParent;
               result.link = link;
             }
           });
         }
-        topicLinks = results;
+        topicLinks = results as TopicDoc[];
       }
     },
   });
