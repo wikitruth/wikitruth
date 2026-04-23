@@ -477,7 +477,7 @@ function buildGroupUrl(group?: { friendlyUrl?: unknown; _id?: unknown }): string
   return paths.groups.index + '/' + group?.friendlyUrl + '/' + group?._id;
 }
 
-async function setGroupModel(req?: any, model?: any) {
+async function setGroupModel(req: { query: Record<string, unknown>; params: { username?: string }; user?: { id?: unknown } }, model: Record<string, unknown>) {
   if (req.query.group) {
     let result = await db.Group.findOne({ _id: req.query.group });
     model.group = result;
@@ -485,7 +485,7 @@ async function setGroupModel(req?: any, model?: any) {
   }
 }
 
-async function setArtifactModel(req?: any, model?: any) {
+async function setArtifactModel(req: { query: Record<string, unknown>; params: { username?: string }; user?: { id?: unknown } }, model: Record<string, unknown>) {
   if (req.query.artifact) {
     let result = await db.Artifact.findOne({ _id: req.query.artifact });
     model.artifact = result;
@@ -498,7 +498,7 @@ async function setArtifactModel(req?: any, model?: any) {
   }
 }
 
-async function setQuestionModel(req?: any, model?: any) {
+async function setQuestionModel(req: { query: Record<string, unknown>; params: { username?: string }; user?: { id?: unknown } }, model: Record<string, unknown>) {
   if (req.query.question) {
     let result = await db.Question.findOne({ _id: req.query.question });
     model.question = result;
@@ -510,7 +510,7 @@ async function setQuestionModel(req?: any, model?: any) {
   }
 }
 
-async function setAnswerModel(req?: any, model?: any) {
+async function setAnswerModel(req: { query: Record<string, unknown>; params: { username?: string }; user?: { id?: unknown } }, model: Record<string, unknown>) {
   if (req.query.answer) {
     let result = await db.Answer.findOne({ _id: req.query.answer });
     model.answer = result;
@@ -522,7 +522,7 @@ async function setAnswerModel(req?: any, model?: any) {
   }
 }
 
-async function setIssueModel(req?: any, model?: any) {
+async function setIssueModel(req: { query: Record<string, unknown>; params: { username?: string }; user?: { id?: unknown } }, model: Record<string, unknown>) {
   if (req.query.issue) {
     let result = await db.Issue.findOne({ _id: req.query.issue });
     model.issue = result;
@@ -534,7 +534,7 @@ async function setIssueModel(req?: any, model?: any) {
   }
 }
 
-async function setOpinionModel(req?: any, model?: any) {
+async function setOpinionModel(req: { query: Record<string, unknown>; params: { username?: string }; user?: { id?: unknown } }, model: Record<string, unknown>) {
   if (req.query.opinion) {
     await async.series({
       opinion: async function() {
@@ -558,7 +558,7 @@ async function setOpinionModel(req?: any, model?: any) {
         await setUsername(result);
       },
       parentOpinion: async function() {
-        const opinion = model.opinion2 || model.opinion;
+        const opinion = (model.opinion2 || model.opinion) as { parentId?: unknown } | undefined;
         if (opinion && opinion.parentId) {
           let result = await db.Opinion.findOne({ _id: opinion.parentId });
           if (result) {
@@ -572,7 +572,7 @@ async function setOpinionModel(req?: any, model?: any) {
         }
       },
       grandParentOpinion: async function() {
-        const parentOpinion = model.parentOpinion2 || model.parentOpinion;
+        const parentOpinion = (model.parentOpinion2 || model.parentOpinion) as { parentId?: unknown } | undefined;
         if (parentOpinion && parentOpinion.parentId) {
           let result = await db.Opinion.findOne({ _id: parentOpinion.parentId });
           if (result) {
@@ -589,7 +589,7 @@ async function setOpinionModel(req?: any, model?: any) {
   }
 }
 
-async function setArgumentLinkModel(req?: any, model?: any) {
+async function setArgumentLinkModel(req: { query: Record<string, unknown>; params: { username?: string }; user?: { id?: unknown } }, model: Record<string, unknown>) {
   if (req.query.argumentLink) {
     await async.series({
       argumentLink: async function() {
@@ -603,13 +603,14 @@ async function setArgumentLinkModel(req?: any, model?: any) {
       },
       argument: async function() {
         if (model.argumentLink) {
-          let result = await db.Argument.findOne({ _id: model.argumentLink.argumentId });
+          const argumentLink = model.argumentLink as { argumentId?: unknown; argument?: unknown; references?: unknown; title?: unknown; title2?: unknown; content2?: unknown };
+          let result = await db.Argument.findOne({ _id: argumentLink.argumentId });
           if (result) {
             appendEntryExtras(result);
-            model.argumentLink.argument = result;
-            model.argumentLink.references = result.references;
-            model.argumentLink.title2 = model.argumentLink.title ? model.argumentLink.title : result.title;
-            model.argumentLink.content2 = result.content;
+            argumentLink.argument = result;
+            argumentLink.references = result.references;
+            argumentLink.title2 = argumentLink.title ? argumentLink.title : result.title;
+            argumentLink.content2 = result.content;
           }
         }
       },
@@ -617,7 +618,7 @@ async function setArgumentLinkModel(req?: any, model?: any) {
   }
 }
 
-async function setArgumentModels(req?: any, model?: any) {
+async function setArgumentModels(req: { query: Record<string, unknown>; params: { username?: string }; user?: { id?: unknown } }, model: Record<string, unknown>) {
   if (req.query.argument) {
     await async.series({
       argument: async function() {
@@ -633,8 +634,9 @@ async function setArgumentModels(req?: any, model?: any) {
         await setUsername(result);
       },
       parentArgument: async function() {
-        if (model.argument && model.argument.parentId) {
-          let result = await db.Argument.findOne({ _id: model.argument.parentId });
+        const arg = model.argument as { parentId?: unknown } | undefined;
+        if (arg && arg.parentId) {
+          let result = await db.Argument.findOne({ _id: arg.parentId });
           if (result) {
             appendEntryExtras(result);
             model.parentArgument = result;
@@ -642,8 +644,9 @@ async function setArgumentModels(req?: any, model?: any) {
         }
       },
       grandParentArgument: async function() {
-        if (model.parentArgument && model.parentArgument.parentId) {
-          let result = await db.Argument.findOne({ _id: model.parentArgument.parentId });
+        const parentArg = model.parentArgument as { parentId?: unknown } | undefined;
+        if (parentArg && parentArg.parentId) {
+          let result = await db.Argument.findOne({ _id: parentArg.parentId });
           if (result) {
             appendEntryExtras(result);
             model.grandParentArgument = result;
@@ -654,7 +657,7 @@ async function setArgumentModels(req?: any, model?: any) {
   }
 }
 
-async function setTopicLinkModel(req?: any, model?: any) {
+async function setTopicLinkModel(req: { query: Record<string, unknown>; params: { username?: string }; user?: { id?: unknown } }, model: Record<string, unknown>) {
   if (req.query.topicLink) {
     await async.series({
       topicLink: async function() {
@@ -667,15 +670,16 @@ async function setTopicLinkModel(req?: any, model?: any) {
       },
       topic: async function() {
         if (model.topicLink) {
-          let result = await db.Topic.findOne({ _id: model.topicLink.topicId });
+          const topicLink = model.topicLink as { topicId?: unknown; topic?: unknown; references?: unknown; referenceDate?: unknown; title?: unknown; title2?: unknown; content2?: unknown };
+          let result = await db.Topic.findOne({ _id: topicLink.topicId });
           if (result) {
-            model.topicLink.topic = result;
-            model.topicLink.references = result.references;
-            model.topicLink.referenceDate = result.referenceDate;
-            model.topicLink.title2 = model.topicLink.title ? model.topicLink.title : result.title;
-            model.topicLink.content2 = result.content;
+            topicLink.topic = result;
+            topicLink.references = result.references;
+            topicLink.referenceDate = result.referenceDate;
+            topicLink.title2 = topicLink.title ? topicLink.title : result.title;
+            topicLink.content2 = result.content;
             appendEntryExtras(result);
-            appendEntryExtras(model.topicLink);
+            appendEntryExtras(model.topicLink as Record<string, unknown>);
           }
         }
       },
@@ -875,10 +879,12 @@ async function setEntryModels(query?: any, req?: any, model?: any) {
   }
 }
 
-function setupClipboard(req?: any, type?: any) {
-  let clipboard = req.session.clipboard;
+type ClipboardMap = Record<string, string[]>;
+
+function setupClipboard(req?: { session?: { clipboard?: ClipboardMap } }, type?: number): ClipboardMap {
+  let clipboard = req?.session?.clipboard;
   if (!clipboard) {
-    clipboard = {};
+    clipboard = {} as ClipboardMap;
     clipboard['object' + constants.OBJECT_TYPES.topic] = [];
     clipboard['object' + constants.OBJECT_TYPES.argument] = [];
   }
@@ -888,25 +894,27 @@ function setupClipboard(req?: any, type?: any) {
   return clipboard;
 }
 
-function getClipboard(req?: any) {
-  const clipboard = req.session.clipboard;
+function getClipboard(req?: { session?: { clipboard?: ClipboardMap } }): ClipboardMap | undefined {
+  const clipboard = req?.session?.clipboard;
   if (clipboard && !clipboard['object' + constants.OBJECT_TYPES.artifact]) {
     clipboard['object' + constants.OBJECT_TYPES.artifact] = [];
   }
   return clipboard;
 }
 
-function setClipboardModel(req?: any, model?: any, entryType?: any) {
+function setClipboardModel(req?: { session?: { clipboard?: ClipboardMap } }, model?: { clipboard?: { marked?: boolean; count?: number; canPaste?: boolean; visible?: boolean }; entry?: unknown } & Record<string, unknown>, entryType?: number) {
+  if (!model) return;
   model.clipboard = {};
   const clipboard = getClipboard(req);
   if (clipboard) {
     let marked = false;
     let count = 0;
     for (const key in clipboard) {
-      if (clipboard.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(clipboard, key)) {
         const items = clipboard[key];
+        if (!items) continue;
         const keyType = parseInt(key.substring('object'.length - 1));
-        const keyEntry = getEntryByObjectType(model, keyType);
+        const keyEntry = getEntryByObjectType(model as { topic?: unknown; topicLink?: unknown; argument?: unknown; argumentLink?: unknown; artifact?: unknown; question?: unknown; answer?: unknown; issue?: unknown; opinion?: unknown }, keyType);
         if (entryType === keyType && keyEntry && items.indexOf((keyEntry as { _id: { toString(): string } })._id.toString()) > -1) {
           model.clipboard.marked = true;
           marked = true;
