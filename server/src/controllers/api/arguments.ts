@@ -36,6 +36,7 @@ type ArgumentDocument = {
   editDate?: Date;
 };
 
+// TODO(P0-003 Tier-2): replace `as any` with typed DbModelsModule once lean-doc shapes are introduced.
 const db = require('../../app').db.models as any;
 
 type ArgumentListResponse = {

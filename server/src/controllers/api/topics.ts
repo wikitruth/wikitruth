@@ -8,14 +8,15 @@ import { applyViewModeFilter } from './viewFilter';
 const flowUtils = require('../../utils/flowUtils') as FlowUtilsModule;
 const utils = require('../../utils/utils') as UtilsModule;
 const constants = require('../../models/constants') as ConstantsModule;
+// TODO(P0-003 Tier-2): replace `as any` with typed DbModelsModule once lean-doc shapes are introduced.
 const db = require('../../app').db.models as any;
 
 type TopicScreeningModel = {
-  [key: string]: any;
+  [key: string]: unknown;
   screening?: {
     status?: number;
   };
-  topic?: any;
+  topic?: Record<string, unknown>;
   topics?: Record<string, unknown>[];
   categories?: Record<string, unknown>[];
   keyTopics?: Record<string, unknown>[];
@@ -23,14 +24,14 @@ type TopicScreeningModel = {
   linkCount?: number;
   arguments?: Record<string, unknown>[];
   keyArguments?: Record<string, unknown>[];
-  verdict?: any;
+  verdict?: Record<string, unknown>;
   questions?: Record<string, unknown>[];
   artifacts?: Record<string, unknown>[];
   issues?: Record<string, unknown>[];
   opinions?: Record<string, unknown>[];
   mainTopic?: boolean;
   hasKeyEntries?: boolean;
-  entry?: any;
+  entry?: Record<string, unknown>;
 };
 
 function parseLimit(req: WikitruthRequest): number {
@@ -120,8 +121,9 @@ async function GET_topics(req: WikitruthRequest, res: WikitruthResponse) {
     req: req,
   });
 
-  if (model.topic?.childrenCount?.topics) {
-    flowUtils.setScreeningModelCount(model, model.topic.childrenCount.topics);
+  const childrenCountTopics = (model.topic?.childrenCount as { topics?: unknown } | undefined)?.topics;
+  if (childrenCountTopics) {
+    flowUtils.setScreeningModelCount(model, childrenCountTopics);
   }
 
   delete model.screening;
@@ -312,7 +314,7 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
   }
 
   if (!req.query.topic) {
-    req.query.topic = model.topic._id;
+    req.query.topic = model.topic._id as string;
   }
 
   // Keep parity with legacy topic-entry model flags and labels.
@@ -324,7 +326,7 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
       if (model.mainTopic) {
         const results = await flowUtils.getTopics(
           {
-            parentId: model.topic._id,
+            parentId: model.topic!._id,
             'screening.status': screeningStatus,
           },
           {
@@ -473,7 +475,7 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
     (async function loadQuestions() {
       const results = await db.Question.find({
         ownerType: constants.OBJECT_TYPES.topic,
-        ownerId: model.topic._id,
+        ownerId: model.topic!._id,
         'screening.status': screeningStatus,
       })
         .sort({ editDate: -1 })
@@ -488,7 +490,7 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
     (async function loadArtifacts() {
       const results = await db.Artifact.find({
         ownerType: constants.OBJECT_TYPES.topic,
-        ownerId: model.topic._id,
+        ownerId: model.topic!._id,
         'screening.status': screeningStatus,
       })
         .sort({ editDate: -1 })
@@ -503,7 +505,7 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
     (async function loadIssues() {
       const results = await db.Issue.find({
         ownerType: constants.OBJECT_TYPES.topic,
-        ownerId: model.topic._id,
+        ownerId: model.topic!._id,
         'screening.status': screeningStatus,
       })
         .sort({ editDate: -1 })
@@ -519,7 +521,7 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
       const results = await db.Opinion.find({
         parentId: null,
         ownerType: constants.OBJECT_TYPES.topic,
-        ownerId: model.topic._id,
+        ownerId: model.topic!._id,
         'screening.status': screeningStatus,
       })
         .sort({ editDate: -1 })

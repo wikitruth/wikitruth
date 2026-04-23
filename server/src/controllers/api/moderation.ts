@@ -64,6 +64,7 @@ function ensureReviewerOrAdmin(req: WikitruthRequest, res: WikitruthResponse): b
   return false;
 }
 
+// TODO(P0-003 Tier-2): replace `any` return with typed Mongoose model surface (lean-doc shapes).
 function getDbModelByObjectType(objectType: number): any {
   return flowUtils.getDbModelByObjectType(objectType);
 }
