@@ -1,15 +1,20 @@
 'use strict';
 
-const mongoose = require('mongoose'),
-  async = require('async'),
-  utils = require('../utils/utils'),
-  flowUtils = require('../utils/flowUtils'),
-  paths = require('../models/paths'),
-  templates = require('../models/templates'),
-  constants = require('../models/constants'),
-  db = require('../app').db.models;
+import type { LegacyControllerFactory } from '../../../server/src/types/legacyControllers';
 
-module.exports = function (router) {
+import mongoose from 'mongoose';
+import async from 'async';
+
+import utils from '../utils/utils';
+import flowUtils from '../utils/flowUtils';
+import paths from '../models/paths';
+import templates from '../models/templates';
+import constants from '../models/constants';
+import app from '../app';
+
+const db = app.db.models;
+
+const mountIssuesController: LegacyControllerFactory = function (router) {
   router.get('/', async function (req, res) {
     await GET_index(req, res);
   });
@@ -26,11 +31,6 @@ module.exports = function (router) {
     await POST_create(req, res);
   });
 };
-
-module.exports.GET_entry = GET_entry;
-module.exports.GET_index = GET_index;
-module.exports.GET_create = GET_create;
-module.exports.POST_create = POST_create;
 
 async function GET_entry(req, res) {
   let model = {};
@@ -147,3 +147,6 @@ async function POST_create(req, res) {
   }
   updateRedirect();
 }
+
+export { GET_entry, GET_index, GET_create, POST_create };
+export default mountIssuesController;

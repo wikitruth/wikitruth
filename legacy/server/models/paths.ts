@@ -1,6 +1,6 @@
 'use strict';
 
-import basePaths = require('../../../server/src/models/paths');
+import basePaths from '../../../server/src/models/paths';
 
 const LEGACY_PREFIX = '/legacy';
 

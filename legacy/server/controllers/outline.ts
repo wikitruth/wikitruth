@@ -3,8 +3,8 @@
 import type { LegacyControllerFactory } from '../../../server/src/types/legacyControllers';
 import type { FlowUtilsModule } from '../../../server/src/types/legacyModules';
 
-import templates = require('../models/templates');
-import flowUtilsMod = require('../utils/flowUtils');
+import templates from '../models/templates';
+import flowUtilsMod from '../utils/flowUtils';
 
 const flowUtils = flowUtilsMod as FlowUtilsModule;
 

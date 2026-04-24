@@ -1,18 +1,20 @@
 'use strict';
 
-let backup = require('mongodb-backup-fixed'),
-  fs = require('fs'),
-  path = require('path'),
-  async = require('async'),
-  // Git             = require("nodegit"),
-  templates = require('../models/templates'),
-  config = require('../config/config'),
-  //constants       = require('../models/constants'),
-  flowUtils = require('../utils/flowUtils'),
-  db = require('../app').db.models;
+import type { LegacyControllerFactory } from '../../../server/src/types/legacyControllers';
+
+import fs from 'fs';
+import path from 'path';
+import async from 'async';
+import backup from 'mongodb-backup-fixed';
+
+import templates from '../models/templates';
+import config from '../config/config';
+import flowUtils from '../utils/flowUtils';
+import app from '../app';
 
 let collectionsConfig = config.mongodb.collections,
   privateDirName = 'users';
+const db = app.db.models;
 
 /**
  * make dir
@@ -152,7 +154,7 @@ function performGitBackup(backupDir, pathspec, gitConfig) {
   //     });
 }
 
-module.exports = function(router) {
+const mountAdminController: LegacyControllerFactory = function(router) {
 
   router.get('/db-backup', function(req, res) {
     let model = {};
@@ -400,3 +402,5 @@ module.exports = function(router) {
     }
   });
 };
+
+export default mountAdminController;

@@ -2,11 +2,11 @@
 
 import type { LegacyControllerFactory } from '../../../server/src/types/legacyControllers';
 
-import flowUtils = require('../utils/flowUtils');
+import flowUtils from '../utils/flowUtils';
 import * as utils from '../utils/utils';
-import constants = require('../models/constants');
-import templates = require('../models/templates');
-import paths = require('../models/paths');
+import constants from '../models/constants';
+import templates from '../models/templates';
+import paths from '../models/paths';
 
 function createReturnUrl(req, model) {
   const fallback = (model && model.wikiBaseUrl ? model.wikiBaseUrl : '') + (paths && paths.wiki ? paths.wiki.index : '/explore');

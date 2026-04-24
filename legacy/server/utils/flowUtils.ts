@@ -1,12 +1,13 @@
 'use strict';
 
-const path = require('path');
-const url = require('url');
-const setupEntryRouters = require('./setupEntryRouters');
-const modernFlowUtils = require(path.join(process.cwd(), 'server/src/utils/flowUtils'));
+import * as url from 'url';
+
+import setupEntryRouters from './setupEntryRouters';
+import * as modernFlowUtils from '../../../server/src/utils/flowUtils';
+
 const LEGACY_PREFIX = '/legacy';
 
-function prefixPathname(pathname) {
+function prefixPathname(pathname: string | undefined): string {
   const value = String(pathname || '');
   if (!value.startsWith('/')) {
     return value;
@@ -20,22 +21,22 @@ function prefixPathname(pathname) {
   return LEGACY_PREFIX + value;
 }
 
-function prefixLegacyUrl(input) {
+function prefixLegacyUrl(input: string | undefined): string {
   const value = String(input || '');
   if (!value.startsWith('/')) {
     return value;
   }
 
   const parsed = url.parse(value);
-  parsed.pathname = prefixPathname(parsed.pathname);
+  parsed.pathname = prefixPathname(parsed.pathname || undefined);
   return url.format(parsed);
 }
 
-function buildGroupUrl(group) {
+function buildGroupUrl(group: Record<string, unknown>): string {
   return prefixLegacyUrl(modernFlowUtils.buildGroupUrl(group));
 }
 
-function setModelContext(req, res, model, mixedMode) {
+function setModelContext(req: unknown, res: unknown, model: Record<string, unknown>, mixedMode?: boolean): void {
   modernFlowUtils.setModelContext(req, res, model, mixedMode);
 
   if (!model || typeof model !== 'object') {
@@ -43,21 +44,21 @@ function setModelContext(req, res, model, mixedMode) {
   }
 
   if (model.profileBaseUrl) {
-    model.profileBaseUrl = prefixLegacyUrl(model.profileBaseUrl);
+    model.profileBaseUrl = prefixLegacyUrl(String(model.profileBaseUrl));
   }
 
   if (model.wikiBaseUrl) {
-    model.wikiBaseUrl = prefixLegacyUrl(model.wikiBaseUrl);
+    model.wikiBaseUrl = prefixLegacyUrl(String(model.wikiBaseUrl));
   } else {
     model.wikiBaseUrl = LEGACY_PREFIX;
   }
 }
 
-function getDiaryBaseUrl(username) {
+function getDiaryBaseUrl(username?: string): string {
   return prefixLegacyUrl(modernFlowUtils.getDiaryBaseUrl(username));
 }
 
-function buildReturnUrl(req, defaultBaseUrl) {
+function buildReturnUrl(req: unknown, defaultBaseUrl?: string): string {
   const result = modernFlowUtils.buildReturnUrl(
     req,
     defaultBaseUrl ? prefixLegacyUrl(defaultBaseUrl) : defaultBaseUrl,
@@ -65,7 +66,12 @@ function buildReturnUrl(req, defaultBaseUrl) {
   return prefixLegacyUrl(result);
 }
 
-function buildTopicReturnUrl(model, cancelBaseUrl, entry, parent) {
+function buildTopicReturnUrl(
+  model: Record<string, unknown>,
+  cancelBaseUrl: string | undefined,
+  entry: unknown,
+  parent: unknown,
+): string {
   const result = modernFlowUtils.buildTopicReturnUrl(
     model,
     cancelBaseUrl ? prefixLegacyUrl(cancelBaseUrl) : cancelBaseUrl,
@@ -75,19 +81,19 @@ function buildTopicReturnUrl(model, cancelBaseUrl, entry, parent) {
   return prefixLegacyUrl(result);
 }
 
-function buildEntryUrl(baseUrl, entry) {
+function buildEntryUrl(baseUrl: string, entry: unknown): string {
   return prefixLegacyUrl(modernFlowUtils.buildEntryUrl(baseUrl, entry));
 }
 
-function buildParentUrl(req, entry) {
+function buildParentUrl(req: unknown, entry: unknown): string {
   return prefixLegacyUrl(modernFlowUtils.buildParentUrl(req, entry));
 }
 
-function buildEntryReturnUrl(req, model) {
+function buildEntryReturnUrl(req: unknown, model: Record<string, unknown>): string {
   return prefixLegacyUrl(modernFlowUtils.buildEntryReturnUrl(req, model));
 }
 
-module.exports = {
+const legacyFlowUtils = {
   ...modernFlowUtils,
   buildGroupUrl,
   setModelContext,
@@ -99,3 +105,5 @@ module.exports = {
   buildEntryReturnUrl,
   setupEntryRouters,
 };
+
+export = legacyFlowUtils;

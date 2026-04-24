@@ -74,9 +74,8 @@ type LegacyAppModule = {
   db?: unknown;
   config?: unknown;
 };
-
-const typedLegacyFlowUtils = require('../../server/utils/flowUtils') as LegacyFlowUtilsModule;
-const typedLegacyApp = require('../../server/app') as LegacyAppModule;
+const legacyFlowUtilsModule = require('../../server/utils/flowUtils') as LegacyFlowUtilsModule;
+const legacyAppModule = require('../../server/app') as LegacyAppModule;
 
 function toBoolean(value: unknown, fallback: boolean): boolean {
   if (value === undefined || value === null || value === '') {
@@ -142,11 +141,11 @@ function registerLegacyCompatibility(app: Express, options: LegacyCompatibilityO
     return disabledStatus;
   }
 
-  if (typedLegacyApp && !typedLegacyApp.db && (app as unknown as { db?: unknown }).db) {
-    typedLegacyApp.db = (app as unknown as { db?: unknown }).db;
+  if (legacyAppModule && !legacyAppModule.db && (app as unknown as { db?: unknown }).db) {
+    legacyAppModule.db = (app as unknown as { db?: unknown }).db;
   }
-  if (typedLegacyApp && !typedLegacyApp.config && (app as unknown as { config?: unknown }).config) {
-    typedLegacyApp.config = (app as unknown as { config?: unknown }).config;
+  if (legacyAppModule && !legacyAppModule.config && (app as unknown as { config?: unknown }).config) {
+    legacyAppModule.config = (app as unknown as { config?: unknown }).config;
   }
 
   const legacyRouter = express.Router();
@@ -191,10 +190,10 @@ function registerLegacyCompatibility(app: Express, options: LegacyCompatibilityO
       const segments = (req.path || '').split('/').filter(Boolean);
       let routeWikiBaseUrl = mountPath;
       if (segments.length >= 2 && segments[0] === 'members' && segments[1]) {
-        routeWikiBaseUrl = typedLegacyFlowUtils.getDiaryBaseUrl(segments[1]);
+        routeWikiBaseUrl = legacyFlowUtilsModule.getDiaryBaseUrl(segments[1]);
       } else if (segments.length >= 2 && segments[0] === 'groups' && segments[1]) {
         routeWikiBaseUrl =
-          typedLegacyFlowUtils.buildGroupUrl({
+          legacyFlowUtilsModule.buildGroupUrl({
             _id: segments[1],
           }) + (legacyPaths as unknown as { groups: { group: { posts: string } } }).groups.group.posts;
       }
@@ -202,13 +201,13 @@ function registerLegacyCompatibility(app: Express, options: LegacyCompatibilityO
 
       const requestWithUser = req as Request & { user?: { username?: string } };
       if (requestWithUser.user && requestWithUser.user.username) {
-        locals.diaryBaseUrl = typedLegacyFlowUtils.getDiaryBaseUrl(requestWithUser.user.username);
+        locals.diaryBaseUrl = legacyFlowUtilsModule.getDiaryBaseUrl(requestWithUser.user.username);
       }
 
       const model = {
         wikiBaseUrl: routeWikiBaseUrl,
       } as Record<string, unknown>;
-      await typedLegacyFlowUtils.setGroupModel(req, model);
+      await legacyFlowUtilsModule.setGroupModel(req, model);
       locals.model = model;
 
       next();

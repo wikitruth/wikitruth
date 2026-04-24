@@ -1,15 +1,17 @@
 'use strict';
 
-module.exports = function setupEntryRouters(router, prefix) {
-  const topics = require('../controllers/topics');
-  const argumentsController = require('../controllers/arguments');
-  const artifacts = require('../controllers/artifacts');
-  const questions = require('../controllers/questions');
-  const answers = require('../controllers/answers');
-  const issues = require('../controllers/issues');
-  const opinions = require('../controllers/opinions');
-  const visualize = require('../controllers/visualize');
+import type { Router } from 'express';
 
+import * as topics from '../controllers/topics';
+import * as argumentsController from '../controllers/arguments';
+import * as artifacts from '../controllers/artifacts';
+import * as questions from '../controllers/questions';
+import * as answers from '../controllers/answers';
+import * as issues from '../controllers/issues';
+import * as opinions from '../controllers/opinions';
+import * as visualize from '../controllers/visualize';
+
+function setupEntryRouters(router: Router, prefix: string): void {
   router.get(prefix + '/visualize(/topic)?(/:friendlyUrl)?(/:friendlyUrl/:id)?', async function(req, res) {
     await visualize.GET_index(req, res);
   });
@@ -153,4 +155,6 @@ module.exports = function setupEntryRouters(router, prefix) {
   router.get(prefix + '/opinion(/:friendlyUrl)?(/:friendlyUrl/:id)?', async function(req, res) {
     await opinions.GET_entry(req, res);
   });
-};
+}
+
+export default setupEntryRouters;

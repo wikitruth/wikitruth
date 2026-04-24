@@ -4,13 +4,13 @@ import fs from 'fs';
 import asyncLib from 'async';
 import type { LegacyControllerFactory } from '../../../server/src/types/legacyControllers';
 
-import templates = require('../models/templates');
-import config = require('../config/config');
-import flowUtils = require('../utils/flowUtils');
-import app = require('../app');
+import templates from '../models/templates';
+import config from '../config/config';
+import flowUtils from '../utils/flowUtils';
+import app from '../app';
 
 const db = (app as { db: { models: Record<string, any> } }).db.models;
-const cols = (config as { mongodb: { collections: any } }).mongodb.collections;
+const cols = (config as { mongodb: { collections: Record<string, unknown> } }).mongodb.collections;
 
 function requestLogin(req, res) {
     // redirect to login

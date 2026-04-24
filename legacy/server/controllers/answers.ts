@@ -1,15 +1,20 @@
 'use strict';
 
-let mongoose = require('mongoose'),
-  async = require('async'),
-  utils = require('../utils/utils'),
-  flowUtils = require('../utils/flowUtils'),
-  paths = require('../models/paths'),
-  templates = require('../models/templates'),
-  constants = require('../models/constants'),
-  db = require('../app').db.models;
+import type { LegacyControllerFactory } from '../../../server/src/types/legacyControllers';
 
-module.exports = function (router) {
+import mongoose from 'mongoose';
+import async from 'async';
+
+import utils from '../utils/utils';
+import flowUtils from '../utils/flowUtils';
+import paths from '../models/paths';
+import templates from '../models/templates';
+import constants from '../models/constants';
+import app from '../app';
+
+const db = app.db.models;
+
+const mountAnswersController: LegacyControllerFactory = function (router) {
   /* Answers */
 
   router.get('/', async function (req, res) {
@@ -28,11 +33,6 @@ module.exports = function (router) {
     await POST_create(req, res);
   });
 };
-
-module.exports.GET_entry = GET_entry;
-module.exports.GET_index = GET_index;
-module.exports.GET_create = GET_create;
-module.exports.POST_create = POST_create;
 
 async function GET_entry(req, res) {
   let model = {};
@@ -157,6 +157,9 @@ async function POST_create(req, res) {
   /*res.redirect((result ? paths.wiki.answers.entry : paths.wiki.answers.index) +
    '?topic=' + req.query.topic +
    (req.query.argument ? '&argument=' + req.query.argument : '') +
-   (result ? '&answer=' + req.query.answer : '')
+  (result ? '&answer=' + req.query.answer : '')
    );*/
 }
+
+export { GET_entry, GET_index, GET_create, POST_create };
+export default mountAnswersController;

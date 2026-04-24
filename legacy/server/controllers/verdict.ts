@@ -2,10 +2,10 @@
 
 import type { LegacyControllerFactory } from '../../../server/src/types/legacyControllers';
 
-import flowUtils = require('../utils/flowUtils');
-import constants = require('../models/constants');
-import templates = require('../models/templates');
-import app = require('../app');
+import flowUtils from '../utils/flowUtils';
+import constants from '../models/constants';
+import templates from '../models/templates';
+import app from '../app';
 
 const db = (app as { db: { models: Record<string, { updateOne: (query: unknown, payload: unknown) => Promise<void> }> } }).db.models;
 

@@ -1,16 +1,21 @@
 'use strict';
 
-var mongoose = require('mongoose'),
-    templates = require('../models/templates'),
-    paths = require('../models/paths'),
-    async = require('async'),
-    url = require('url'),
-    flowUtils = require('../utils/flowUtils'),
-    utils = require('../utils/utils'),
-    constants = require('../models/constants'),
-    db = require('../app').db.models;
+import type { LegacyControllerFactory } from '../../../server/src/types/legacyControllers';
 
-module.exports = function (router) {
+import * as url from 'url';
+import mongoose from 'mongoose';
+import async from 'async';
+
+import templates from '../models/templates';
+import paths from '../models/paths';
+import flowUtils from '../utils/flowUtils';
+import utils from '../utils/utils';
+import constants from '../models/constants';
+import app from '../app';
+
+const db = app.db.models;
+
+const mountGroupsController: LegacyControllerFactory = function (router) {
 
     const prefix = '/:groupTitleUrl/:group/posts';
 
@@ -76,6 +81,8 @@ module.exports = function (router) {
 
     flowUtils.setupEntryRouters(router, prefix);
 };
+
+export default mountGroupsController;
 
 function POST_create(req, res) {
     var query = {_id: req.query.id || new mongoose.Types.ObjectId()};

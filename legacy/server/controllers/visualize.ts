@@ -1,19 +1,22 @@
 'use strict';
 
-let templates = require('../models/templates'),
-  constants = require('../models/constants'),
-  flowUtils = require('../utils/flowUtils'),
-  utils = require('../utils/utils'),
-  db = require('../app').db.models,
-  async = require('async');
+import type { LegacyControllerFactory } from '../../../server/src/types/legacyControllers';
 
-module.exports = function (router) {
+import async from 'async';
+
+import templates from '../models/templates';
+import constants from '../models/constants';
+import flowUtils from '../utils/flowUtils';
+import utils from '../utils/utils';
+import app from '../app';
+
+const db = app.db.models;
+
+const mountVisualizeController: LegacyControllerFactory = function (router) {
   router.get('(/topic)?(/:friendlyUrl)?(/:friendlyUrl/:id)?', async function (req, res) {
     await GET_index(req, res);
   });
 };
-
-module.exports.GET_index = GET_index;
 
 async function GET_index(req, res) {
   flowUtils.ensureEntryIdParam(req, 'topic');
@@ -254,3 +257,6 @@ async function GET_index(req, res) {
   flowUtils.setModelOwnerEntry(req, res, model);
   res.render(templates.wiki.visualize, model);
 }
+
+export { GET_index };
+export default mountVisualizeController;

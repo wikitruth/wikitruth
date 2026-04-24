@@ -1,18 +1,23 @@
 'use strict';
 
-let mongoose = require('mongoose'),
-  templates = require('../models/templates'),
-  paths = require('../models/paths'),
-  config = require('../config/config'),
-  async = require('async'),
-  url = require('url'),
-  jwt = require('jsonwebtoken'),
-  flowUtils = require('../utils/flowUtils'),
-  utils = require('../utils/utils'),
-  constants = require('../models/constants'),
-  db = require('../app').db.models;
+import type { LegacyControllerFactory } from '../../../server/src/types/legacyControllers';
 
-module.exports = function(router) {
+import * as url from 'url';
+import mongoose from 'mongoose';
+import async from 'async';
+import jwt from 'jsonwebtoken';
+
+import templates from '../models/templates';
+import paths from '../models/paths';
+import config from '../config/config';
+import flowUtils from '../utils/flowUtils';
+import utils from '../utils/utils';
+import constants from '../models/constants';
+import app from '../app';
+
+const db = app.db.models;
+
+const mountMembersController: LegacyControllerFactory = function(router) {
   let prefix = '/:username/diary';
 
   router.get('/', async function(req, res) {
@@ -730,6 +735,8 @@ module.exports = function(router) {
 
   flowUtils.setupEntryRouters(router, prefix);
 };
+
+export default mountMembersController;
 
 async function findMembers(memberFilter) {
   const results = await db.User.find(memberFilter)

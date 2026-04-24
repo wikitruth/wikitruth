@@ -1,23 +1,28 @@
 'use strict';
 
-let mongoose = require('mongoose'),
-  async = require('async'),
-  path = require('path'),
-  fs = require('fs'),
-  imagemagick = require('imagemagick'),
-  mv = require('mv'),
-  utils = require('../utils/utils'),
-  flowUtils = require('../utils/flowUtils'),
-  paths = require('../models/paths'),
-  templates = require('../models/templates'),
-  constants = require('../models/constants'),
-  db = require('../app').db.models;
+import type { LegacyControllerFactory } from '../../../server/src/types/legacyControllers';
+
+import fs from 'fs';
+import path from 'path';
+import mongoose from 'mongoose';
+import async from 'async';
+import imagemagick from 'imagemagick';
+import mv from 'mv';
+
+import utils from '../utils/utils';
+import flowUtils from '../utils/flowUtils';
+import paths from '../models/paths';
+import templates from '../models/templates';
+import constants from '../models/constants';
+import app from '../app';
+
+const db = app.db.models;
 const publicRoot = path.join(process.cwd(), 'public');
 function resolvePublicPath(relativePath: string) {
   return path.join(publicRoot, String(relativePath || '').replace(/^\/+/, ''));
 }
 
-module.exports = function(router) {
+const mountArtifactsController: LegacyControllerFactory = function(router) {
   /* Artifacts */
 
   router.get('/', async function(req, res) {
@@ -36,11 +41,6 @@ module.exports = function(router) {
     await POST_create(req, res);
   });
 };
-
-module.exports.GET_entry = GET_entry;
-module.exports.GET_index = GET_index;
-module.exports.GET_create = GET_create;
-module.exports.POST_create = POST_create;
 
 async function GET_entry(req, res) {
   let model = {};
@@ -258,3 +258,6 @@ async function POST_create(req, res) {
     updatedEntity._id;
   res.redirect(url);
 }
+
+export { GET_entry, GET_index, GET_create, POST_create };
+export default mountArtifactsController;

@@ -2,8 +2,8 @@
 
 import type { LegacyControllerFactory } from '../../../server/src/types/legacyControllers';
 
-import templates = require('../models/templates');
-import app = require('../app');
+import templates from '../models/templates';
+import app from '../app';
 
 const db = (app as { db: { models: { Page: { findOne: (query: Record<string, unknown>) => Promise<unknown> } } } }).db.models;
 

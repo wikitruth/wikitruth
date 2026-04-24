@@ -2,9 +2,9 @@
 
 import type { LegacyControllerFactory } from '../../../../server/src/types/legacyControllers';
 
-import constants = require('../../models/constants');
-import flowUtils = require('../../utils/flowUtils');
-import app = require('../../app');
+import constants from '../../models/constants';
+import flowUtils from '../../utils/flowUtils';
+import app from '../../app';
 
 const db = (app as { db: { models: Record<string, any> } }).db.models;
 

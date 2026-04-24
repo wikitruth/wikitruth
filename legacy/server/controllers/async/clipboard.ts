@@ -1,9 +1,14 @@
 'use strict';
 
-const constants = require('../../models/constants'),
-    flowUtils = require('../../utils/flowUtils'),
-    db = require('../../app').db.models,
-    async = require('async');
+import type { LegacyControllerFactory } from '../../../../server/src/types/legacyControllers';
+
+import async from 'async';
+
+import constants from '../../models/constants';
+import flowUtils from '../../utils/flowUtils';
+import app from '../../app';
+
+const db = app.db.models;
 
 function createNewArrayExcludeId(sourceIds, excludeId) {
     const ids = [];
@@ -16,7 +21,7 @@ function createNewArrayExcludeId(sourceIds, excludeId) {
     return ids;
 }
 
-module.exports = function (router) {
+const mountAsyncClipboardController: LegacyControllerFactory = function (router) {
 
     router.post('/mark', function (req, res) {
         const id = req.body.id;
@@ -459,3 +464,5 @@ module.exports = function (router) {
         res.send(req.session.clipboard);
     });
 };
+
+export default mountAsyncClipboardController;

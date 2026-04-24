@@ -1,12 +1,17 @@
 'use strict';
 
-let templates = require('../models/templates'),
-  constants = require('../models/constants'),
-  flowUtils = require('../utils/flowUtils'),
-  db = require('../app').db.models,
-  async = require('async');
+import type { LegacyControllerFactory } from '../../../server/src/types/legacyControllers';
 
-module.exports = function(router) {
+import async from 'async';
+
+import templates from '../models/templates';
+import constants from '../models/constants';
+import flowUtils from '../utils/flowUtils';
+import app from '../app';
+
+const db = app.db.models;
+
+const mountSearchController: LegacyControllerFactory = function(router) {
 
   router.get('/', async function(req, res) {
     const MAX_RESULT = 15;
@@ -212,3 +217,5 @@ module.exports = function(router) {
   });
 
 };
+
+export default mountSearchController;

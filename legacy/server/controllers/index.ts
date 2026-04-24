@@ -1,22 +1,27 @@
 'use strict';
 
-const templates = require('../models/templates'),
-  paths = require('../models/paths'),
-  constants = require('../models/constants'),
-  flowUtils = require('../utils/flowUtils'),
-  db = require('../app').db.models,
-  jwt = require('jsonwebtoken'),
-  async = require('async');
+import type { LegacyControllerFactory } from '../../../server/src/types/legacyControllers';
 
-const topicController = require('./topics'),
-  argumentController = require('./arguments'),
-  artifactController = require('./artifacts'),
-  opinionController = require('./opinions'),
-  questionController = require('./questions'),
-  answerController = require('./answers'),
-  issueController = require('./issues');
+import async from 'async';
+import jwt from 'jsonwebtoken';
 
-module.exports = function (router) {
+import templates from '../models/templates';
+import paths from '../models/paths';
+import constants from '../models/constants';
+import flowUtils from '../utils/flowUtils';
+import app from '../app';
+
+import * as topicController from './topics';
+import * as argumentController from './arguments';
+import * as artifactController from './artifacts';
+import * as opinionController from './opinions';
+import * as questionController from './questions';
+import * as answerController from './answers';
+import * as issueController from './issues';
+
+const db = app.db.models;
+
+const mountIndexController: LegacyControllerFactory = function (router) {
   router.get('/', async function (req, res) {
     let injectCategoryId = function (query) {
       if (res.locals.application) {
@@ -317,3 +322,5 @@ module.exports = function (router) {
     res.render('vash/test.vash', model);
   });
 };
+
+export default mountIndexController;

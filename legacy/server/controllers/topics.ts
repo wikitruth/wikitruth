@@ -1,16 +1,20 @@
 'use strict';
 
-let mongoose = require('mongoose'),
-  async = require('async'),
-  paths = require('../models/paths'),
-  templates = require('../models/templates'),
-  utils = require('../utils/utils'),
-  flowUtils = require('../utils/flowUtils'),
-  constants = require('../models/constants'),
-  db = require('../app').db.models;
+import type { LegacyControllerFactory } from '../../../server/src/types/legacyControllers';
 
+import mongoose from 'mongoose';
+import async from 'async';
 
-module.exports = function(router) {
+import paths from '../models/paths';
+import templates from '../models/templates';
+import utils from '../utils/utils';
+import flowUtils from '../utils/flowUtils';
+import constants from '../models/constants';
+import app from '../app';
+
+const db = app.db.models;
+
+const mountTopicsController: LegacyControllerFactory = function(router) {
 
   router.get('/', async function(req, res) {
     await GET_index(req, res);
@@ -51,14 +55,6 @@ module.exports = function(router) {
     await GET_index(req, res);
   });
 };
-
-module.exports.GET_index = GET_index;
-module.exports.GET_entry = GET_entry;
-module.exports.GET_create = GET_create;
-module.exports.POST_create = POST_create;
-module.exports.GET_link_entry = GET_link_entry;
-module.exports.GET_link_edit = GET_link_edit;
-module.exports.POST_link_edit = POST_link_edit;
 
 async function GET_index(req, res) {
   let model = {};
@@ -566,3 +562,14 @@ async function POST_link_edit(req, res) {
     res.redirect(flowUtils.buildReturnUrl(req));
   }
 }
+
+export {
+  GET_index,
+  GET_entry,
+  GET_create,
+  POST_create,
+  GET_link_entry,
+  GET_link_edit,
+  POST_link_edit,
+};
+export default mountTopicsController;

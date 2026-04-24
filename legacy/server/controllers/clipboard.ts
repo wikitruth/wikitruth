@@ -3,10 +3,10 @@
 import type { LegacyControllerFactory } from '../../../server/src/types/legacyControllers';
 
 import asyncLib from 'async';
-import templates = require('../models/templates');
-import constants = require('../models/constants');
-import flowUtils = require('../utils/flowUtils');
-import app = require('../app');
+import templates from '../models/templates';
+import constants from '../models/constants';
+import flowUtils from '../utils/flowUtils';
+import app from '../app';
 
 const db = (app as { db: { models: Record<string, { find: (query: unknown) => Promise<unknown[]> }> } }).db.models;
 
