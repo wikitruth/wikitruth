@@ -143,6 +143,7 @@ Per-folder counts in `legacy/**`, runtime files only (`legacy/static/**`, `legac
 | `legacy/server/controllers/**` | 0 | 0 | Controller factories migrated to typed TS mount contracts with `export default` + named handler exports. |
 | `legacy/server/utils/**` | 0 | 0 | Utility adapters fully migrated to TypeScript modules (`flowUtils.ts`, `setupEntryRouters.ts`, `utils.ts`). |
 | `legacy/server/models/**` | 0 | 0 | Typed TS wrappers (`constants.ts`, `paths.ts`, `templates.ts`) now hold the boundary. |
+| `legacy/server/app.ts` | 1 | 0 | Thin bridge to root `app.js` remains a deliberate CJS interop point. |
 | `legacy/server/config/**` | 1 | 0 | `config.ts` remains a thin bridge to root JS config (`require('../../../config/config')`). |
 | `legacy/compatibility/server/**` | 4 | 0 | Typed TS mount layer; remaining `require()` calls are explicit runtime dynamic bridges. |
 
