@@ -108,9 +108,9 @@ Acceptance:
 
 ### Track L3: Module Style and Interop Rationalization (P1)
 
-- [x] `L3-01` Inventory `require()/module.exports` by legacy runtime folder and classify by necessity. — See post-cleanup metrics below. Remaining CJS usage is now concentrated in legacy controller/runtime adapters: `legacy/server/controllers/**` keeps the `module.exports = function(router){…}` factory shape consumed by `legacy/server/utils/setupEntryRouters.js`; `legacy/server/utils/flowUtils.js` and `setupEntryRouters.js` remain CJS for load-order compatibility; low-risk boundary wrappers in `legacy/compatibility/server/**` and `legacy/server/{models,config,app,utils/utils}` were converted to typed TS modules.
-- [x] `L3-02` Convert low-risk legacy runtime modules to typed exports where load-order permits. — Converted the low-risk compatibility boundary and legacy wrappers to TypeScript modules: `legacy/compatibility/server/{bootstrap,mount,pathResolver}.ts`, `legacy/server/models/{constants,paths,templates}.ts`, `legacy/server/{app,config/config}.ts`, and `legacy/server/utils/utils.ts`. This gives typed boundary contracts without changing the legacy controller factory runtime shape.
-- [x] `L3-03` Keep compatibility adapters explicit; remove accidental mixed import/export patterns. — Verified after TS conversion: `legacy/compatibility/server/{bootstrap,mount,pathResolver}.ts` use consistent typed exports/imports. Remaining runtime `require()` calls are deliberate dynamic bridges (legacy controllers/templates), not mixed module-style accidents.
+- [x] `L3-01` Inventory `require()/module.exports` by legacy runtime folder and classify by necessity. — See post-cleanup metrics below. Legacy runtime source now has zero `module.exports` and no CJS in controllers/utils/models. Remaining `require()` is limited to explicit dynamic bootstrap bridges plus two wrapper bridge files (`legacy/server/app.ts`, `legacy/server/config/config.ts`).
+- [x] `L3-02` Convert low-risk legacy runtime modules to typed exports where load-order permits. — Extended beyond low-risk wrappers: the remaining legacy controller factories were migrated to typed TS mount contracts (`export default`), and legacy utility adapters were upgraded to TypeScript (`legacy/server/utils/{flowUtils,setupEntryRouters}.ts`) while preserving route behavior and mount compatibility.
+- [x] `L3-03` Keep compatibility adapters explicit; remove accidental mixed import/export patterns. — Verified after migration: compatibility modules use consistent typed imports/exports, and the only remaining `require()` in compatibility is deliberate dynamic loading for legacy templates/controllers at runtime.
 - [x] `L3-04` Add guardrail checks to block net-new ad hoc CJS in modernized legacy files. — Added [scripts/check-no-new-cjs-legacy.sh](../../scripts/check-no-new-cjs-legacy.sh) (mirrors `check-no-new-cjs-modern.sh`, scoped to `legacy/server/{controllers,utils,models,config}` + `legacy/compatibility/server`). Wired into `npm run ci:smoke` via the new `lint:guardrails:cjs:legacy` script.
 
 Acceptance:
@@ -140,11 +140,11 @@ Per-folder counts in `legacy/**`, runtime files only (`legacy/static/**`, `legac
 
 | Folder | `require()` | `module.exports` | Notes |
 |---|---|---|---|
-| `legacy/server/controllers/**` | 151 | 50 | Factory-shape contract still dominant (`function (router) { ... }`) with partial typed default-export migration in lower-risk controllers. |
-| `legacy/server/utils/**` | 12 | 2 | CJS helpers (setupEntryRouters, flowUtils) remain; `utils.ts` wrapper is now typed TS. |
-| `legacy/server/models/**` | 2 | 0 | Typed TS wrappers (`constants.ts`, `paths.ts`, `templates.ts`) now hold the boundary. |
-| `legacy/server/config/**` | 1 | 0 | Typed TS config bridge (`config.ts`). |
-| `legacy/compatibility/server/**` | 4 | 0 | Typed TS mount layer; remaining `require()` calls are dynamic bridges for legacy controllers/templates. |
+| `legacy/server/controllers/**` | 0 | 0 | Controller factories migrated to typed TS mount contracts with `export default` + named handler exports. |
+| `legacy/server/utils/**` | 0 | 0 | Utility adapters fully migrated to TypeScript modules (`flowUtils.ts`, `setupEntryRouters.ts`, `utils.ts`). |
+| `legacy/server/models/**` | 0 | 0 | Typed TS wrappers (`constants.ts`, `paths.ts`, `templates.ts`) now hold the boundary. |
+| `legacy/server/config/**` | 1 | 0 | `config.ts` remains a thin bridge to root JS config (`require('../../../config/config')`). |
+| `legacy/compatibility/server/**` | 4 | 0 | Typed TS mount layer; remaining `require()` calls are explicit runtime dynamic bridges. |
 
 Type-debt counters in `legacy/**` runtime source (`.ts` + `.js`, excluding static/templates/build):
 
@@ -153,8 +153,8 @@ Type-debt counters in `legacy/**` runtime source (`.ts` + `.js`, excluding stati
 | `@ts-ignore` | 1019 | 0 | -1019 |
 | `@ts-expect-error` | 0 | 0 | 0 |
 | explicit `any` (legacy `.ts`) | 18 (matched by modern guardrail patterns) | 0 | -18 |
-| `require()` | 200 | 170 | -30 |
-| `module.exports` | 71 | 52 | -19 |
+| `require()` | 200 | 6 | -194 |
+| `module.exports` | 71 | 0 | -71 |
 
 Note: the plan's original "explicit any: 380" baseline counted broader patterns including identifier substrings; the modern-guardrail-equivalent pattern (`: any\b|<any>|\bas any\b|any\[\]`) is what is locked at 0 here.
 

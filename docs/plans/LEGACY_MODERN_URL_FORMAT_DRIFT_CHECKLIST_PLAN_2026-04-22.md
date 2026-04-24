@@ -20,7 +20,7 @@ Examples:
 ## Evidence Sources
 
 - Modern routes: `client/src/routes/routeConfig.tsx`
-- Legacy entry routes: `legacy/server/utils/setupEntryRouters.js`
+- Legacy entry routes: `legacy/server/utils/setupEntryRouters.ts`
 - Redirect/alias rules: `server/src/middlewares/routes.ts`
 - Existing parity audit context: `docs/plans/LEGACY_MODERN_MIGRATION_PARITY_AUDIT_CHECKLIST_PLAN_2026-04-19.md`
 
