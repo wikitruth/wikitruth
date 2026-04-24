@@ -75,7 +75,7 @@ Folders:
 Rules:
 
 - No "frozen/read-only" assumption while
-  [LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md](../plans/LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md)
+  [LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md](../plans/completed/LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md)
   is active. In-place type/CJS/render-safety improvements are allowed and
   expected per that plan.
 - New cross-tier interaction still goes through compatibility adapters.

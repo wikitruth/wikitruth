@@ -21,7 +21,7 @@ Companion tracker for CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-22.md.
 - Coverage gap: **360** strict-scope files are not represented in this per-file checklist.
 - Legacy optimization note:
   - this file tracks modern strict-scope + compatibility/test rows only
-  - legacy optimization is tracked separately in [LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md](./LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md)
+  - legacy optimization is tracked separately in [LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md](./completed/LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md)
 
 Metrics columns:
 - lint(E/W): ESLint error and warning count for the file
@@ -264,5 +264,5 @@ Exception policy:
 This file remains the execution tracker for code-health strict gates. The tracked
 surfaces are currently complete; remaining long-horizon architecture/perf work
 stays in the parent optimization plan as non-strict follow-up tracks. Legacy
-code-health optimization remains active/open in
-[LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md](./LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md).
+code-health optimization is tracked in the completed legacy plan:
+[LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md](./completed/LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md).

@@ -24,7 +24,7 @@ For modern repository source, completion means:
 Scope note (revised 2026-04-23 after scope review):
 
 - Strict gates apply to `server/src/**` and `client/src/**`; the CJS zero-gate applies only to the modern-internal folders listed above.
-- `legacy/**` optimization is now in active scope under the dedicated legacy plan: [LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md](./LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md).
+- `legacy/**` optimization is tracked under the dedicated legacy plan (now completed): [LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md](./completed/LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md).
 - `tests/**` are quality-gate code, not application source; CJS in test files is allowed by tier policy and excluded from strict gates.
 - No exceptions are allowed inside the strict scopes defined above.
 
@@ -56,7 +56,7 @@ Scope note (revised 2026-04-23 after scope review):
   - `require()` in modern-internal CJS scope: `0`
   - `module.exports` in modern-internal CJS scope: `0`
   - compatibility-boundary CJS usage remains isolated to `server/src/app.ts`, `server/src/server.ts`, `server/src/config/**`, and `server/src/models/**` by design.
-- Legacy optimization status is tracked separately and remains active/open in [LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md](./LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md); this modern tracker alone is not the repo-wide code-health completion signal.
+- Legacy optimization status is tracked separately in [LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md](./completed/LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md) (completed); this modern tracker alone is not the repo-wide code-health completion signal.
 - File-level tracker ([CODE_HEALTH_SOURCE_FILE_CHECKLIST_PLAN_2026-04-22.md](./CODE_HEALTH_SOURCE_FILE_CHECKLIST_PLAN_2026-04-22.md)) after live revalidation:
   - `136` tracked rows total
   - `136` rows marked complete, `0` rows open
@@ -331,7 +331,7 @@ Completed in this pass:
 
 - **Track 4 (P1) — partial (T4-03, T4-04)**
   - Added [scripts/check-file-size-budget.sh](../../scripts/check-file-size-budget.sh) (default 500-line budget, exempts the existing 9 oversized files, flags new violations as errors and pre-existing creep as warnings). Wired into `npm run ci:smoke` via new `lint:guardrails:filesize` script.
-  - Added [docs/architecture/module-boundaries-2026-04-22.md](../architecture/module-boundaries-2026-04-22.md) capturing the three-tier module strategy (modern-internal / compatibility-adapter / legacy tier) and the named seams (router-factory, mobile-API contracts, mongoose registration). T4-04 + T5-02 + T5-03 jointly satisfied by this doc. Legacy policy wording in that architecture doc is now tracked for update in [LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md](./LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md) item `L0-03`.
+  - Added [docs/architecture/module-boundaries-2026-04-22.md](../architecture/module-boundaries-2026-04-22.md) capturing the three-tier module strategy (modern-internal / compatibility-adapter / legacy tier) and the named seams (router-factory, mobile-API contracts, mongoose registration). T4-04 + T5-02 + T5-03 jointly satisfied by this doc. Legacy policy wording in that architecture doc is now tracked for update in [LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md](./completed/LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md) item `L0-03`.
 
 - **Track 5 (P1) — large progress (T5-01, T5-02, T5-03, T5-04, T5-05)**
   - T5-01 inventory snapshot in the new module-boundaries doc: 61 `module.exports` and 70 `require()` files in `server/src` classified by directory; 164 in `legacy/**` at the 2026-04-22 snapshot.
