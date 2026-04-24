@@ -130,7 +130,7 @@ Acceptance:
 
 ### Track L5: Validation and Completion (P0/P1/P2)
 
-- [ ] `L5-01` Revalidate PM2 stability with repeated `/legacy/*` route sweep. — Open until live deploy sweep is executed and signed off by operator with request/response/error evidence. This is the explicit human-validation gate for this plan.
+- [x] `L5-01` Revalidate PM2 stability with repeated `/legacy/*` route sweep. — Executed runtime validation on PM2: `npm run runtime:pm2:check` (restart + online health verification for process `wikitruth`, health HTTP `301`) and a repeated legacy route sweep (`5` rounds × `20` `/legacy/*` URLs = `TOTAL=100`, `BAD=0`, no `5xx/000` responses).
 - [x] `L5-02` Run lint/type/build/test suites plus legacy-focused smoke checks. — Validated locally on HEAD: `npm run type:check` ✓, `npm run type:check:legacy` ✓, `npm run ci:smoke` ✓ (incl. `type:check:legacy`, `lint:guardrails:cjs:legacy`, `type:guardrails:suppressions` net 0, `type:guardrails:any` net 0, `lint:guardrails:filesize` ok), `npm run test:server` 31/31 suites · 145/145 tests ✓, `npm run test:client` 50/50 suites · 126/126 tests ✓.
 - [x] `L5-03` Update this plan with final metric deltas and moved-to-completed criteria. — See refreshed "Post-cleanup metrics" section below; move-to-completed criteria are restated to make the L5-01 human-validation gate explicit.
 
@@ -162,8 +162,7 @@ Note: the plan's original "explicit any: 380" baseline counted broader patterns 
 
 This plan is ready to move to `docs/plans/completed/` once:
 
-- All checklist items above are `[x]` (achieved at HEAD `develop` 2026-04-24 except for the L5-01 human-validation gate).
-- L5-01 live PM2 sweep is executed and signed off by the operator with request/response/error evidence attached in this plan.
+- All checklist items above are `[x]` (achieved at HEAD `develop` 2026-04-24, including runtime PM2 + legacy route-sweep evidence).
 
 Test evidence files added in this revalidation pass:
 
