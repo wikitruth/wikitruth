@@ -1,12 +1,13 @@
-const CACHE_NAME = 'wikitruth-app-shell-v1';
+const CACHE_NAME = 'wikitruth-app-shell-v2';
 const APP_SHELL_ASSETS = [
   '/app',
   '/react-app.html',
-  '/dist/bundle.js',
+  '/dist/bundle.js?v=navbar-20260426',
   '/css/app.min.css',
   '/layouts/core.min.css',
   '/manifest.webmanifest',
 ];
+const NETWORK_FIRST_ASSETS = new Set(['/app', '/react-app.html', '/dist/bundle.js']);
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -52,6 +53,21 @@ self.addEventListener('fetch', (event) => {
     requestUrl.pathname === '/react-app.html';
 
   if (!isAssetRequest) {
+    return;
+  }
+
+  if (NETWORK_FIRST_ASSETS.has(requestUrl.pathname)) {
+    event.respondWith(
+      fetch(request)
+        .then((networkResponse) => {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(request, responseToCache);
+          });
+          return networkResponse;
+        })
+        .catch(() => caches.match(request))
+    );
     return;
   }
 

@@ -231,11 +231,11 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
             </ul>
           </nav>
           <nav aria-label="Account navigation">
-            <ul className="nav navbar-nav navbar-right">
+            <ul className="nav navbar-nav navbar-right wt-account-nav">
             {user ? (
               <>
                 <li>
-                  <Link to="/notifications" title="Notifications" className="btn btn-link navbar-btn" aria-label="Notifications">
+                  <Link to="/notifications" title="Notifications" aria-label="Notifications">
                     <i className="fa fa-bell-o"></i>
                     {unreadNotifications > 0 ? (
                       <span className="badge" style={{ marginLeft: 6, background: '#d9534f' }}>
@@ -247,8 +247,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
                 <li className={`dropdown ${isUserMenuOpen ? 'open' : ''}`}>
                   <button
                     type="button"
-                    className="dropdown-toggle"
-                    style={{ background: 'transparent', border: 0 }}
+                    className="dropdown-toggle wt-navbar-control"
                     aria-label={`Account menu for ${user.username}`}
                     aria-haspopup="true"
                     aria-expanded={isUserMenuOpen}
