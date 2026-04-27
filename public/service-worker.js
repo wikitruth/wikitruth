@@ -1,8 +1,8 @@
-const CACHE_NAME = 'wikitruth-app-shell-v2';
+const CACHE_NAME = 'wikitruth-app-shell-v3';
 const APP_SHELL_ASSETS = [
   '/app',
   '/react-app.html',
-  '/dist/bundle.js?v=navbar-20260426',
+  '/dist/bundle.js?v=navbar-20260426-entryparity-1',
   '/css/app.min.css',
   '/layouts/core.min.css',
   '/manifest.webmanifest',
@@ -56,7 +56,9 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  if (NETWORK_FIRST_ASSETS.has(requestUrl.pathname)) {
+  const shouldUseNetworkFirst = NETWORK_FIRST_ASSETS.has(requestUrl.pathname) || requestUrl.pathname.startsWith('/dist/');
+
+  if (shouldUseNetworkFirst) {
     event.respondWith(
       fetch(request)
         .then((networkResponse) => {
