@@ -130,6 +130,11 @@ button:focus-visible,
   color: #fff;
 }
 
+/* Tighten entry-page spacing between geo-pattern bar and main header. */
+.wt-geo-pattern + .page-header.wt-header:not(.wt-profile-header) {
+  margin-top: 16px;
+}
+
 @media (max-width: 991px) {
   .wt-entry-header .pull-left,
   .wt-entry-header .pull-right {
