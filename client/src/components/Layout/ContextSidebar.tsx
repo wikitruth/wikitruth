@@ -2,7 +2,16 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import apiService from '../../services/api';
-import type { HomeDataResponse, TopicEntryResponse } from '../../types/api';
+import type {
+  AnswerEntryResponse,
+  ArgumentEntryResponse,
+  ArtifactEntryResponse,
+  HomeDataResponse,
+  IssueEntryResponse,
+  OpinionEntryResponse,
+  QuestionEntryResponse,
+  TopicEntryResponse,
+} from '../../types/api';
 import type { LegacyEntity } from '../../types/legacy';
 
 type SidebarApplication = LegacyEntity & {
@@ -68,6 +77,13 @@ function buildSectionLink(section: SidebarSection): string | undefined {
   return section.titleTo;
 }
 
+function normalizeEntryTopicLinks(raw: unknown): SidebarCategory[] {
+  if (!Array.isArray(raw)) {
+    return [];
+  }
+  return raw as SidebarCategory[];
+}
+
 const ContextSidebar: React.FC = () => {
   const location = useLocation();
   const { user } = useAuth();
@@ -75,6 +91,8 @@ const ContextSidebar: React.FC = () => {
   const entryId = getEntryIdFromPath(location.pathname);
   const [homeContext, setHomeContext] = useState<HomeDataResponse | null>(null);
   const [topicContext, setTopicContext] = useState<TopicEntryResponse | null>(null);
+  const [contextTopicId, setContextTopicId] = useState<string | null>(null);
+  const [contextTopicLinks, setContextTopicLinks] = useState<SidebarCategory[]>([]);
 
   useEffect(() => {
     let mounted = true;
@@ -97,7 +115,95 @@ const ContextSidebar: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (section !== 'topics' || !entryId) {
+    if (!entryId) {
+      setContextTopicId(null);
+      setContextTopicLinks([]);
+      return;
+    }
+
+    if (section === 'topics') {
+      setContextTopicId(entryId);
+      setContextTopicLinks(normalizeEntryTopicLinks(topicContext?.topicLinks || []));
+      return;
+    }
+
+    if (!['arguments', 'questions', 'answers', 'artifacts', 'issues', 'opinions'].includes(section)) {
+      setContextTopicId(null);
+      setContextTopicLinks([]);
+      return;
+    }
+
+    let mounted = true;
+    const loadEntryContext = async () => {
+      try {
+        let response:
+          | ArgumentEntryResponse
+          | QuestionEntryResponse
+          | AnswerEntryResponse
+          | ArtifactEntryResponse
+          | IssueEntryResponse
+          | OpinionEntryResponse;
+
+        switch (section) {
+          case 'arguments':
+            response = await apiService.getArgumentEntry(entryId);
+            break;
+          case 'questions':
+            response = await apiService.getQuestionEntry(entryId);
+            break;
+          case 'answers':
+            response = await apiService.getAnswerEntry(entryId);
+            break;
+          case 'artifacts':
+            response = await apiService.getArtifactEntry(entryId);
+            break;
+          case 'issues':
+            response = await apiService.getIssueEntry(entryId);
+            break;
+          case 'opinions':
+            response = await apiService.getOpinionEntry(entryId);
+            break;
+          default:
+            return;
+        }
+
+        const responseRecord = response as Record<string, unknown>;
+        const entityBySection: Partial<Record<string, LegacyEntity | undefined>> = {
+          arguments: responseRecord.argument as LegacyEntity | undefined,
+          questions: responseRecord.question as LegacyEntity | undefined,
+          answers: responseRecord.answer as LegacyEntity | undefined,
+          artifacts: responseRecord.artifact as LegacyEntity | undefined,
+          issues: responseRecord.issue as LegacyEntity | undefined,
+          opinions: responseRecord.opinion as LegacyEntity | undefined,
+        };
+
+        const entryEntity = entityBySection[section];
+        const responseTopic = ((responseRecord.topic as SidebarCategory | undefined) || entryEntity?.parentTopic || null) as SidebarCategory | null;
+        const topicId = String(responseTopic?._id || '').trim();
+        const topicLinks = normalizeEntryTopicLinks(responseRecord.topicLinks || entryEntity?.topicLinks || []);
+
+        if (!mounted) {
+          return;
+        }
+        setContextTopicId(topicId || null);
+        setContextTopicLinks(topicLinks);
+      } catch (_error) {
+        if (!mounted) {
+          return;
+        }
+        setContextTopicId(null);
+        setContextTopicLinks([]);
+      }
+    };
+
+    void loadEntryContext();
+    return () => {
+      mounted = false;
+    };
+  }, [section, entryId, topicContext?.topicLinks]);
+
+  useEffect(() => {
+    if (!contextTopicId) {
       setTopicContext(null);
       return;
     }
@@ -105,7 +211,7 @@ const ContextSidebar: React.FC = () => {
     let mounted = true;
     const loadTopicContext = async () => {
       try {
-        const data = await apiService.getTopicEntry(entryId);
+        const data = await apiService.getTopicEntry(contextTopicId);
         if (mounted) {
           setTopicContext(data);
         }
@@ -120,7 +226,7 @@ const ContextSidebar: React.FC = () => {
     return () => {
       mounted = false;
     };
-  }, [section, entryId]);
+  }, [contextTopicId]);
 
   const appsSection = useMemo<SidebarSection>(() => {
     const appItems: SidebarNavItem[] = [
@@ -228,36 +334,41 @@ const ContextSidebar: React.FC = () => {
   };
 
   const topicInSection = useMemo<SidebarSection | null>(() => {
-    if (section !== 'topics') {
-      return null;
-    }
-
-    const fallback: SidebarSection = {
-      title: 'In This Section',
-      items: [
-        { key: 'topics-list', label: 'Topics', to: '/topics', icon: 'folder-open' },
-        { key: 'topics-create', label: 'Create Topic', to: '/topics/create', icon: 'plus-circle' },
-      ],
-    };
-
-    if (!topicContext?.topic) {
+    const fallback = sectionItemsByRoot[section] || null;
+    if (!contextTopicId || !topicContext?.topic) {
       return fallback;
     }
 
     const topic = topicContext.topic as SidebarCategory;
+    const parentTopic = (topic.parentTopic || null) as SidebarCategory | null;
     const children = ((topicContext.topicChildren || topicContext.topics || []) as SidebarCategory[]).slice(0, 8);
     const siblings = ((topicContext.topicSiblings || []) as SidebarCategory[]).slice(0, 8);
-    const items: SidebarNavItem[] = [
-      { key: 'topic-explore', label: 'Explore', to: '/explore', icon: 'globe' },
-      {
-        key: `topic-current-${String(topic._id)}`,
-        label: String(topic.title || topic.contextTitle || '(Untitled)'),
-        to: buildTopicLink(topic),
-        icon: String(topic.icon || '').trim() || 'folder-open',
-        badge: Number(topic.childrenCount?.topics?.accepted || 0) || undefined,
-        emphasize: true,
-      },
-    ];
+    const items: SidebarNavItem[] = [];
+
+    if (section === 'topics' && !parentTopic?._id) {
+      items.push({ key: 'topic-explore', label: 'Explore', to: '/explore', icon: 'globe' });
+    }
+
+    if (parentTopic?._id) {
+      items.push({
+        key: `topic-parent-${String(parentTopic._id)}`,
+        label: String(parentTopic.title || parentTopic.contextTitle || '(Untitled)'),
+        to: buildTopicLink(parentTopic),
+        icon: String(parentTopic.icon || '').trim() || 'folder-open',
+        badge: Number(parentTopic.childrenCount?.topics?.accepted || 0) || undefined,
+      });
+    }
+
+    const currentLevel = parentTopic?._id ? 1 : 0;
+    items.push({
+      key: `topic-current-${String(topic._id)}`,
+      label: String(topic.title || topic.contextTitle || '(Untitled)'),
+      to: buildTopicLink(topic),
+      icon: String(topic.icon || '').trim() || 'folder-open',
+      badge: Number(topic.childrenCount?.topics?.accepted || 0) || undefined,
+      emphasize: true,
+      level: currentLevel,
+    });
 
     children.forEach((child, index) => {
       items.push({
@@ -266,7 +377,7 @@ const ContextSidebar: React.FC = () => {
         to: buildTopicLink(child),
         icon: String(child.icon || '').trim() || 'folder-open',
         badge: Number(child.childrenCount?.topics?.accepted || 0) || undefined,
-        level: 1,
+        level: currentLevel + 1,
       });
     });
 
@@ -277,6 +388,7 @@ const ContextSidebar: React.FC = () => {
         to: buildTopicLink(sibling),
         icon: String(sibling.icon || '').trim() || 'folder-open',
         badge: Number(sibling.childrenCount?.topics?.accepted || 0) || undefined,
+        level: currentLevel,
       });
     });
 
@@ -286,28 +398,61 @@ const ContextSidebar: React.FC = () => {
         label: 'more...',
         to: `/topics/${encodeURIComponent(String(topic.friendlyUrl || ''))}/${encodeURIComponent(String(topic._id || ''))}`,
         icon: 'ellipsis-h',
+        level: currentLevel,
       });
     }
-
-    items.push({
-      key: 'topic-create',
-      label: 'Create Topic',
-      to: `/topics/create?topic=${encodeURIComponent(String(topic._id || ''))}`,
-      icon: 'plus-circle',
-    });
 
     return {
       title: 'In This Section',
       items,
     };
-  }, [section, topicContext]);
+  }, [contextTopicId, section, sectionItemsByRoot, topicContext]);
 
-  const relatedItems: SidebarNavItem[] = [];
-  if (section === 'topics' && entryId) {
-    relatedItems.push({ key: 'related-facts', label: 'Related Facts', to: `/arguments?topic=${encodeURIComponent(entryId)}`, icon: 'flash' });
-    relatedItems.push({ key: 'related-questions', label: 'Related Questions', to: `/questions?topic=${encodeURIComponent(entryId)}`, icon: 'question-circle' });
-    relatedItems.push({ key: 'related-artifacts', label: 'Related Artifacts', to: `/artifacts?topic=${encodeURIComponent(entryId)}`, icon: 'puzzle-piece' });
-  }
+  const relatedItems = useMemo<SidebarNavItem[]>(() => {
+    const entrySection = ['topics', 'arguments', 'questions', 'answers', 'artifacts', 'issues', 'opinions'].includes(section);
+    if (!entrySection || !entryId) {
+      return [];
+    }
+
+    const resolvedTopicId = contextTopicId || entryId;
+    if (!resolvedTopicId) {
+      return [];
+    }
+
+    const topicLinks = section === 'topics'
+      ? normalizeEntryTopicLinks(topicContext?.topicLinks || [])
+      : contextTopicLinks;
+    const firstRelatedTopic = topicLinks[0];
+    const fallbackTopic = topicContext?.topic as SidebarCategory | undefined;
+    const relatedTopic = firstRelatedTopic || fallbackTopic;
+
+    return [
+      {
+        key: 'related-topic',
+        label: String(relatedTopic?.contextTitle || relatedTopic?.title || 'Related topic'),
+        to: relatedTopic?._id ? buildTopicLink(relatedTopic) : `/topics/entry/${encodeURIComponent(resolvedTopicId)}/${encodeURIComponent(resolvedTopicId)}`,
+        icon: 'folder-open',
+      },
+      {
+        key: 'related-fact',
+        label: 'Related fact',
+        to: `/arguments?topic=${encodeURIComponent(resolvedTopicId)}`,
+        icon: 'flash',
+      },
+      {
+        key: 'related-question',
+        label: 'Related question',
+        to: `/questions?topic=${encodeURIComponent(resolvedTopicId)}`,
+        icon: 'question-circle',
+      },
+      {
+        key: 'related-more',
+        label: 'more...',
+        to: '/explore',
+        icon: 'arrow-circle-right',
+      },
+    ];
+  }, [contextTopicId, contextTopicLinks, entryId, section, topicContext?.topic, topicContext?.topicLinks]);
 
   const personalSection: SidebarSection | null = user
     ? {
@@ -321,16 +466,16 @@ const ContextSidebar: React.FC = () => {
     : null;
 
   const sections: SidebarSection[] = [appsSection];
-  if (exploreSection.items.length > 0) {
-    sections.push(exploreSection);
-  }
-  if (section === 'topics' && topicInSection) {
+  if (topicInSection) {
     sections.push(topicInSection);
   } else if (sectionItemsByRoot[section]) {
     sections.push(sectionItemsByRoot[section]);
   }
   if (relatedItems.length > 0) {
     sections.push({ title: 'Related', items: relatedItems });
+  }
+  if (exploreSection.items.length > 0) {
+    sections.push(exploreSection);
   }
   if (personalSection) {
     sections.push(personalSection);

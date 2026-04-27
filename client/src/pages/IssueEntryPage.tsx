@@ -15,8 +15,8 @@ import apiService from '../services/api';
 import type { IssueEntryResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
 import type { Opinion } from '../types';
-import { formatRelativeTime } from '../utils/dateFormat';
 import { sanitizeHtml } from '../utils/sanitizeHtml';
+import { EntryContextLine, EntryMetaBlock, EntryRelatedTopics } from '../components/Entry/EntryLegacyParity';
 
 const IssueEntryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -58,21 +58,25 @@ const IssueEntryPage: React.FC = () => {
   const opinions = (data.opinions || []) as LegacyEntity[];
   
   // Build breadcrumb items
-  const breadcrumbItems = [
+  const breadcrumbItems: Array<{ title: string; url?: string; active?: boolean }> = [
     { title: 'Home', url: '/' },
     { title: 'Issues', url: '/issues' },
-    { title: issue.title, active: true }
   ];
+  if (issue.parentTopic?._id) {
+    breadcrumbItems.push({
+      title: String(issue.parentTopic.title || 'Topic'),
+      url: `/topics/entry/${encodeURIComponent(String(issue.parentTopic.friendlyUrl || issue.parentTopic._id))}/${encodeURIComponent(String(issue.parentTopic._id))}`,
+    });
+  }
+  breadcrumbItems.push({ title: issue.title, active: true });
 
-  // Build tabs
   const tabs = [
-    { id: 'overview', title: 'Overview', url: `/issues/entry/${issue.friendlyUrl}/${issue._id}` },
     {
-      id: 'discussion',
-      title: 'Discussion',
-      url: `/issues/entry/${issue.friendlyUrl}/${issue._id}/discussion`,
-      count: issue.childrenCount?.opinions?.accepted ?? opinions.length,
-    }
+      id: 'details',
+      title: 'Details',
+      icon: 'info-circle',
+      url: `/issues/entry/${encodeURIComponent(String(issue.friendlyUrl || issue._id))}/${encodeURIComponent(String(issue._id))}`,
+    },
   ];
 
   return (
@@ -87,6 +91,7 @@ const IssueEntryPage: React.FC = () => {
         icon="exclamation-triangle"
         iconColor="text-warning"
       />
+      <EntryContextLine entry={issue} objectName="issue" />
 
       <EntryQuickActions
         entry={issue}
@@ -95,7 +100,7 @@ const IssueEntryPage: React.FC = () => {
         moreActions={<EntryActionsMenu entry={issue} editPath={`/issues/edit/${encodeURIComponent(issue._id)}`} />}
       />
       
-      <PageTabs tabs={tabs} />
+      <PageTabs tabs={tabs} activeTab="details" />
 
       {/* Issue content */}
       <div className="text-body collapsible" style={{ marginTop: '20px' }}>
@@ -107,6 +112,7 @@ const IssueEntryPage: React.FC = () => {
           <p className="lead">{issue.description}</p>
         )}
       </div>
+      <EntryRelatedTopics entry={issue} />
 
       {opinions.length > 0 && (
         <EntryList
@@ -121,24 +127,7 @@ const IssueEntryPage: React.FC = () => {
         </EntryList>
       )}
 
-      {/* Footer meta information */}
-      <div className="wt-entry-meta" style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid #eee' }}>
-        {issue.editorUsername && (
-          <p className="text-muted">
-            <i className="fa fa-user"></i> Reported by: <strong>{issue.editorUsername}</strong>
-          </p>
-        )}
-        {issue.editDate && (
-          <p className="text-muted">
-            <i className="fa fa-clock-o"></i> Last updated: {formatRelativeTime(issue.editDate)}
-          </p>
-        )}
-        {issue.private && (
-          <p>
-            <span className="label label-default">Private</span>
-          </p>
-        )}
-      </div>
+      <EntryMetaBlock entry={issue} />
 
       <div style={{ marginTop: '30px' }}>
         <Link to="/issues" className="btn btn-default">

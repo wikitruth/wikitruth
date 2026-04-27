@@ -17,8 +17,8 @@ import EntryActionsMenu from '../components/Entry/EntryActionsMenu';
 import EntryQuickActions from '../components/Entry/EntryQuickActions';
 import PageMeta from '../components/common/PageMeta';
 import type { Answer, Issue, Opinion } from '../types';
-import { formatRelativeTime } from '../utils/dateFormat';
 import { sanitizeHtml } from '../utils/sanitizeHtml';
+import { EntryContextLine, EntryMetaBlock, EntryRelatedTopics } from '../components/Entry/EntryLegacyParity';
 
 const QuestionEntryPage: React.FC = () => {
   const { id } = useParams();
@@ -59,27 +59,25 @@ const QuestionEntryPage: React.FC = () => {
   const opinions = (data.opinions || []) as LegacyEntity[];
   
   // Build breadcrumb items
-  const breadcrumbItems = [
+  const breadcrumbItems: Array<{ title: string; url?: string; active?: boolean }> = [
     { title: 'Home', url: '/' },
     { title: 'Questions', url: '/questions' },
-    { title: question.title, active: true }
   ];
+  if (question.parentTopic?._id) {
+    breadcrumbItems.push({
+      title: String(question.parentTopic.title || 'Topic'),
+      url: `/topics/entry/${encodeURIComponent(String(question.parentTopic.friendlyUrl || question.parentTopic._id))}/${encodeURIComponent(String(question.parentTopic._id))}`,
+    });
+  }
+  breadcrumbItems.push({ title: question.title, active: true });
 
-  // Build tabs
   const tabs = [
-    { id: 'overview', title: 'Overview', url: `/questions/entry/${question.friendlyUrl}/${question._id}` },
     {
-      id: 'answers',
-      title: 'Answers',
-      url: `/questions/entry/${question.friendlyUrl}/${question._id}/answers`,
-      count: question.childrenCount?.answers?.accepted ?? answers.length,
+      id: 'details',
+      title: 'Details',
+      icon: 'info-circle',
+      url: `/questions/entry/${encodeURIComponent(String(question.friendlyUrl || question._id))}/${encodeURIComponent(String(question._id))}`,
     },
-    {
-      id: 'discussion',
-      title: 'Discussion',
-      url: `/questions/entry/${question.friendlyUrl}/${question._id}/discussion`,
-      count: question.childrenCount?.opinions?.accepted ?? opinions.length,
-    }
   ];
 
   return (
@@ -94,6 +92,7 @@ const QuestionEntryPage: React.FC = () => {
         icon="question-circle"
         iconColor="text-success-x"
       />
+      <EntryContextLine entry={question} objectName="question" />
 
       <EntryQuickActions
         entry={question}
@@ -102,7 +101,7 @@ const QuestionEntryPage: React.FC = () => {
         moreActions={<EntryActionsMenu entry={question} editPath={`/questions/edit/${encodeURIComponent(question._id)}`} />}
       />
       
-      <PageTabs tabs={tabs} />
+      <PageTabs tabs={tabs} activeTab="details" />
 
       {/* Question content */}
       <div className="text-body collapsible" style={{ marginTop: '20px' }}>
@@ -112,6 +111,7 @@ const QuestionEntryPage: React.FC = () => {
           <p className="lead">{question.description}</p>
         )}
       </div>
+      <EntryRelatedTopics entry={question} />
 
       {answers.length > 0 && (
         <EntryList
@@ -152,24 +152,7 @@ const QuestionEntryPage: React.FC = () => {
         </EntryList>
       )}
 
-      {/* Footer meta information */}
-      <div className="wt-entry-meta" style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid #eee' }}>
-        {question.editorUsername && (
-          <p className="text-muted">
-            <i className="fa fa-user"></i> Asked by: <strong>{question.editorUsername}</strong>
-          </p>
-        )}
-        {question.editDate && (
-          <p className="text-muted">
-            <i className="fa fa-clock-o"></i> Last updated: {formatRelativeTime(question.editDate)}
-          </p>
-        )}
-        {question.private && (
-          <p>
-            <span className="label label-default">Private</span>
-          </p>
-        )}
-      </div>
+      <EntryMetaBlock entry={question} />
 
       <div style={{ marginTop: '30px' }}>
         <Link to="/questions" className="btn btn-default">

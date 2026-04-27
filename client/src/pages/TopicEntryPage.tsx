@@ -20,8 +20,8 @@ import PageMeta from '../components/common/PageMeta';
 import type { TopicEntryResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
 import type { Argument, Artifact, Issue, Opinion, Question, Topic } from '../types';
-import { formatRelativeTime } from '../utils/dateFormat';
 import { sanitizeHtml } from '../utils/sanitizeHtml';
+import { EntryMetaBlock } from '../components/Entry/EntryLegacyParity';
 
 const CONTENT_COLLAPSE_THRESHOLD = 1200;
 
@@ -470,23 +470,7 @@ const TopicEntryPage: React.FC = () => {
         </EntryList>
       )}
 
-      <div className="wt-entry-meta" style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid #eee' }}>
-        {topic.editorUsername && (
-          <p className="text-muted">
-            <i className="fa fa-user"></i> Edited by: <strong>{topic.editorUsername}</strong>
-          </p>
-        )}
-        {topic.editDate && (
-          <p className="text-muted">
-            <i className="fa fa-clock-o"></i> Last updated: {formatRelativeTime(topic.editDate)}
-          </p>
-        )}
-        {topic.private && (
-          <p>
-            <span className="label label-default">Private</span>
-          </p>
-        )}
-      </div>
+      <EntryMetaBlock entry={topic} />
 
       <div style={{ marginTop: '30px' }}>
         <Link to="/topics" className="btn btn-default">

@@ -17,8 +17,8 @@ import EntryActionsMenu from '../components/Entry/EntryActionsMenu';
 import EntryQuickActions from '../components/Entry/EntryQuickActions';
 import PageMeta from '../components/common/PageMeta';
 import type { Issue, Opinion, Question } from '../types';
-import { formatRelativeTime } from '../utils/dateFormat';
 import { sanitizeHtml } from '../utils/sanitizeHtml';
+import { EntryContextLine, EntryMetaBlock, EntryRelatedTopics } from '../components/Entry/EntryLegacyParity';
 
 const ArgumentEntryPage: React.FC = () => {
   const { id } = useParams();
@@ -59,21 +59,25 @@ const ArgumentEntryPage: React.FC = () => {
   const opinions = (data.opinions || []) as LegacyEntity[];
   
   // Build breadcrumb items
-  const breadcrumbItems = [
+  const breadcrumbItems: Array<{ title: string; url?: string; active?: boolean }> = [
     { title: 'Home', url: '/' },
     { title: 'Arguments', url: '/arguments' },
-    { title: argument.title, active: true }
   ];
+  if (argument.parentTopic?._id) {
+    breadcrumbItems.push({
+      title: String(argument.parentTopic.title || 'Topic'),
+      url: `/topics/entry/${encodeURIComponent(String(argument.parentTopic.friendlyUrl || argument.parentTopic._id))}/${encodeURIComponent(String(argument.parentTopic._id))}`,
+    });
+  }
+  breadcrumbItems.push({ title: argument.title, active: true });
 
-  // Build tabs
   const tabs = [
-    { id: 'overview', title: 'Overview', url: `/arguments/entry/${argument.friendlyUrl}/${argument._id}` },
     {
-      id: 'discussion',
-      title: 'Discussion',
-      url: `/arguments/entry/${argument.friendlyUrl}/${argument._id}/discussion`,
-      count: argument.childrenCount?.opinions?.accepted ?? opinions.length,
-    }
+      id: 'details',
+      title: 'Details',
+      icon: 'info-circle',
+      url: `/arguments/entry/${encodeURIComponent(String(argument.friendlyUrl || argument._id))}/${encodeURIComponent(String(argument._id))}`,
+    },
   ];
 
   return (
@@ -88,6 +92,7 @@ const ArgumentEntryPage: React.FC = () => {
         icon="flash"
         iconColor="text-primary"
       />
+      <EntryContextLine entry={argument} objectName="argument" />
 
       <EntryQuickActions
         entry={argument}
@@ -96,7 +101,7 @@ const ArgumentEntryPage: React.FC = () => {
         moreActions={<EntryActionsMenu entry={argument} editPath={`/arguments/create?id=${encodeURIComponent(argument._id)}`} />}
       />
       
-      <PageTabs tabs={tabs} />
+      <PageTabs tabs={tabs} activeTab="details" />
 
       {/* Verdict Badge */}
       {argument.verdict?.result && (
@@ -121,6 +126,7 @@ const ArgumentEntryPage: React.FC = () => {
           <p className="lead">{argument.description}</p>
         )}
       </div>
+      <EntryRelatedTopics entry={argument} />
 
       {questions.length > 0 && (
         <EntryList
@@ -161,24 +167,7 @@ const ArgumentEntryPage: React.FC = () => {
         </EntryList>
       )}
 
-      {/* Footer meta information */}
-      <div className="wt-entry-meta" style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid #eee' }}>
-        {argument.editorUsername && (
-          <p className="text-muted">
-            <i className="fa fa-user"></i> Edited by: <strong>{argument.editorUsername}</strong>
-          </p>
-        )}
-        {argument.editDate && (
-          <p className="text-muted">
-            <i className="fa fa-clock-o"></i> Last updated: {formatRelativeTime(argument.editDate)}
-          </p>
-        )}
-        {argument.private && (
-          <p>
-            <span className="label label-default">Private</span>
-          </p>
-        )}
-      </div>
+      <EntryMetaBlock entry={argument} />
 
       <div style={{ marginTop: '30px' }}>
         <Link to="/arguments" className="btn btn-default">

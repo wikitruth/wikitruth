@@ -163,19 +163,12 @@ const EntryQuickActions: React.FC<EntryQuickActionsProps> = ({
   const objectName = normalizeObjectName(providedObjectName || entry.objectName);
   const entryId = String(entry._id || '');
   const topicIdForReply = getTopicIdForReply(entry, objectName);
-  const replyPath = `/opinions/create?topicId=${encodeURIComponent(topicIdForReply)}&parentId=${encodeURIComponent(String(entry._id || ''))}`;
   const visualizePath = getVisualizePath(entry, objectName);
   const [counts, setCounts] = useState<EntryReactionCounts>(() => createEmptyCounts());
   const [myReactions, setMyReactions] = useState<EntryReactionState>(() => createEmptyState());
   const [pendingKey, setPendingKey] = useState<string | null>(null);
-  const [showReplyComposer, setShowReplyComposer] = useState(false);
-  const [showIssueComposer, setShowIssueComposer] = useState(false);
+  const [showReplyMenu, setShowReplyMenu] = useState(false);
   const [showQuickEdit, setShowQuickEdit] = useState(false);
-  const [replyTitle, setReplyTitle] = useState('');
-  const [replyContent, setReplyContent] = useState('');
-  const [replyClassification, setReplyClassification] = useState<'general' | 'supplement' | 'objection' | 'question'>('general');
-  const [issueTitle, setIssueTitle] = useState('');
-  const [issueContent, setIssueContent] = useState('');
   const [editTitle, setEditTitle] = useState(String(entry.title || ''));
   const [editContent, setEditContent] = useState(String(entry.content || ''));
   const [isSubmittingInlineAction, setIsSubmittingInlineAction] = useState(false);
@@ -196,6 +189,94 @@ const EntryQuickActions: React.FC<EntryQuickActionsProps> = ({
     const actorId = String(actor._id || actor.id || '');
     return Boolean(actorId && actorId === String(entry.createUserId || ''));
   }, [entry.createUserId, user]);
+
+  const replyMenuItems = useMemo(() => {
+    const items: Array<{
+      key: string;
+      label: string;
+      iconClass: string;
+      to: string;
+      dividerBefore?: boolean;
+    }> = [];
+
+    const encodeCurrentContext = (basePath: string) =>
+      `${basePath}?${encodeURIComponent(objectName)}=${encodeURIComponent(entryId)}`;
+    const createTopicId = encodeURIComponent(topicIdForReply || entryId);
+    const hasQuestionContext = Boolean(entry.parentQuestion?._id) || objectName === 'question';
+
+    if (objectName !== 'issue' && objectName !== 'opinion') {
+      if (!hasQuestionContext) {
+        if (objectName !== 'argument') {
+          items.push({
+            key: 'new-topic',
+            label: 'New Topic',
+            iconClass: 'glyphicon glyphicon-edit',
+            to: `/topics/create?topic=${createTopicId}`,
+          });
+        }
+        items.push(
+          {
+            key: 'new-fact',
+            label: 'New Fact',
+            iconClass: 'glyphicon glyphicon-flash',
+            to: encodeCurrentContext('/arguments/create'),
+          },
+          {
+            key: 'new-question',
+            label: 'New Question',
+            iconClass: 'fa fa-question-circle',
+            to: encodeCurrentContext('/questions/create'),
+          },
+          {
+            key: 'new-artifact',
+            label: 'New Artifact',
+            iconClass: 'fa fa-puzzle-piece',
+            to: encodeCurrentContext('/artifacts/create'),
+          },
+          {
+            key: 'new-issue',
+            label: 'New Issue',
+            iconClass: 'fa fa-exclamation-circle',
+            to: encodeCurrentContext('/issues/create'),
+            dividerBefore: true,
+          },
+        );
+      } else if (objectName !== 'answer') {
+        items.push(
+          {
+            key: 'new-answer',
+            label: 'New Answer',
+            iconClass: 'fa fa-question-circle',
+            to: encodeCurrentContext('/answers/create'),
+          },
+          {
+            key: 'new-issue',
+            label: 'New Issue',
+            iconClass: 'fa fa-exclamation-circle',
+            to: encodeCurrentContext('/issues/create'),
+            dividerBefore: true,
+          },
+        );
+      } else {
+        items.push({
+          key: 'new-issue',
+          label: 'New Issue',
+          iconClass: 'fa fa-exclamation-circle',
+          to: encodeCurrentContext('/issues/create'),
+        });
+      }
+    }
+
+    items.push({
+      key: 'new-comment',
+      label: 'New Comment',
+      iconClass: 'fa fa-comments-o',
+      to: encodeCurrentContext('/opinions/create'),
+      dividerBefore: items.length > 0 && !items[items.length - 1].dividerBefore,
+    });
+
+    return items;
+  }, [objectName, entryId, topicIdForReply, entry.parentQuestion?._id]);
 
   useEffect(() => {
     setEditTitle(String(entry.title || ''));
@@ -317,82 +398,6 @@ const EntryQuickActions: React.FC<EntryQuickActionsProps> = ({
     );
   };
 
-  const submitInlineReply = async (): Promise<void> => {
-    if (!user) {
-      addToast('warning', 'Please sign in to reply.');
-      return;
-    }
-    if (!topicIdForReply) {
-      addToast('warning', 'This entry has no topic context for inline reply.');
-      return;
-    }
-    if (replyTitle.trim().length < 3 || replyContent.trim().length < 10) {
-      addToast('warning', 'Reply title/content is too short.');
-      return;
-    }
-
-    setIsSubmittingInlineAction(true);
-    try {
-      await apiService.createOpinion({
-        title: replyTitle.trim(),
-        description: replyContent.trim(),
-        topicId: topicIdForReply,
-        parentId: entryId,
-        private: false,
-        classification: replyClassification,
-      } as {
-        title: string;
-        description: string;
-        topicId?: string;
-        parentId?: string;
-        private?: boolean;
-      });
-      addToast('success', 'Reply submitted.');
-      setReplyTitle('');
-      setReplyContent('');
-      setReplyClassification('general');
-      setShowReplyComposer(false);
-      window.location.reload();
-    } catch (error) {
-      addToast('danger', error instanceof Error ? error.message : 'Unable to submit reply');
-    } finally {
-      setIsSubmittingInlineAction(false);
-    }
-  };
-
-  const submitInlineIssue = async (): Promise<void> => {
-    if (!user) {
-      addToast('warning', 'Please sign in to create issues.');
-      return;
-    }
-    if (!topicIdForReply) {
-      addToast('warning', 'This entry has no topic context for issue creation.');
-      return;
-    }
-    if (issueTitle.trim().length < 3 || issueContent.trim().length < 10) {
-      addToast('warning', 'Issue title/content is too short.');
-      return;
-    }
-
-    setIsSubmittingInlineAction(true);
-    try {
-      await apiService.createIssue({
-        title: issueTitle.trim(),
-        description: issueContent.trim(),
-        topicId: topicIdForReply,
-      });
-      addToast('success', 'Issue created.');
-      setIssueTitle('');
-      setIssueContent('');
-      setShowIssueComposer(false);
-      window.location.reload();
-    } catch (error) {
-      addToast('danger', error instanceof Error ? error.message : 'Unable to create issue');
-    } finally {
-      setIsSubmittingInlineAction(false);
-    }
-  };
-
   const submitQuickEdit = async (): Promise<void> => {
     if (!canQuickEdit) {
       addToast('warning', 'You are not allowed to edit this entry.');
@@ -443,38 +448,46 @@ const EntryQuickActions: React.FC<EntryQuickActionsProps> = ({
   return (
     <>
       <div className="wt-entry-options-container clearfix" style={{ marginTop: '6px' }}>
-        <div className="pull-left entry-options">
-          <button
-            type="button"
-            className="btn btn-link text-muted no-underline"
-            style={{ padding: 0 }}
-            onClick={() => {
-              setShowReplyComposer((value) => !value);
-              setShowIssueComposer(false);
+        <div className={`dropdown pull-left entry-options ${showReplyMenu ? 'open' : ''}`}>
+          <a
+            href="#"
+            className="text-muted no-underline dropdown-toggle"
+            aria-haspopup="true"
+            aria-expanded={showReplyMenu}
+            onClick={(event) => {
+              event.preventDefault();
+              setShowReplyMenu((value) => !value);
               setShowQuickEdit(false);
+            }}
+            onBlur={() => {
+              window.setTimeout(() => setShowReplyMenu(false), 120);
             }}
           >
             <i className="fa fa-reply" aria-hidden="true"></i> <span>Reply</span>
-          </button>
-        </div>
-        <div className="pull-left entry-options">
-          <button
-            type="button"
-            className="btn btn-link text-muted no-underline"
-            style={{ padding: 0 }}
-            onClick={() => {
-              setShowIssueComposer((value) => !value);
-              setShowReplyComposer(false);
-              setShowQuickEdit(false);
-            }}
-          >
-            <i className="fa fa-exclamation-circle" aria-hidden="true"></i> <span>Create Issue</span>
-          </button>
+          </a>
+          {showReplyMenu ? (
+            <ul className="dropdown-menu dropdown-menu-right-x">
+              <li className="dropdown-header">Reply With...</li>
+              {replyMenuItems.map((item) => (
+                <React.Fragment key={item.key}>
+                  {item.dividerBefore ? <li role="separator" className="divider"></li> : null}
+                  <li>
+                    <Link
+                      to={item.to}
+                      onClick={() => {
+                        setShowReplyMenu(false);
+                      }}
+                    >
+                      <span className={item.iconClass} aria-hidden="true"></span> {item.label}
+                    </Link>
+                  </li>
+                </React.Fragment>
+              ))}
+            </ul>
+          ) : null}
         </div>
         {renderReactionAction('exposure', 'expose', 'Expose', 'fa-arrow-circle-o-up')}
         {renderReactionAction('exposure', 'bury', 'Bury', 'fa-arrow-circle-o-down')}
-        {renderReactionAction('vote', 'upvote', 'Upvote', 'fa-hand-o-up')}
-        {renderReactionAction('vote', 'downvote', 'Downvote', 'fa-hand-o-down')}
         {supportsValueReactions ? renderReactionAction('value', 'good', 'Good', 'fa-thumbs-o-up') : null}
         {supportsValueReactions ? renderReactionAction('value', 'bad', 'Bad', 'fa-thumbs-o-down') : null}
         {visualizePath ? (
@@ -484,9 +497,7 @@ const EntryQuickActions: React.FC<EntryQuickActionsProps> = ({
             </Link>
           </div>
         ) : null}
-        {moreActions ? (
-          <div className="pull-left entry-options">{moreActions}</div>
-        ) : null}
+        {moreActions || null}
         {canQuickEdit ? (
           <div className="pull-left entry-options">
             <button
@@ -495,8 +506,7 @@ const EntryQuickActions: React.FC<EntryQuickActionsProps> = ({
               style={{ padding: 0 }}
               onClick={() => {
                 setShowQuickEdit((value) => !value);
-                setShowReplyComposer(false);
-                setShowIssueComposer(false);
+                setShowReplyMenu(false);
               }}
             >
               <i className="fa fa-pencil" aria-hidden="true"></i> <span>Quick Edit</span>
@@ -504,106 +514,6 @@ const EntryQuickActions: React.FC<EntryQuickActionsProps> = ({
           </div>
         ) : null}
       </div>
-      {showReplyComposer ? (
-        <div className="panel panel-default">
-          <div className="panel-heading">
-            <strong>Inline Reply</strong>{' '}
-            <small className="text-muted">
-              (full editor available at <Link to={replyPath}>reply page</Link>)
-            </small>
-          </div>
-          <div className="panel-body">
-            <div className="form-group">
-              <label htmlFor={`inline-reply-title-${entryId}`}>Title</label>
-              <input
-                id={`inline-reply-title-${entryId}`}
-                className="form-control"
-                value={replyTitle}
-                onChange={(event) => setReplyTitle(event.target.value)}
-                placeholder="Reply title"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor={`inline-reply-content-${entryId}`}>Reply</label>
-              <textarea
-                id={`inline-reply-content-${entryId}`}
-                className="form-control"
-                rows={4}
-                value={replyContent}
-                onChange={(event) => setReplyContent(event.target.value)}
-                placeholder="Write your reply"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor={`inline-reply-classification-${entryId}`}>Classification</label>
-              <select
-                id={`inline-reply-classification-${entryId}`}
-                className="form-control"
-                value={replyClassification}
-                onChange={(event) => {
-                  const next = event.target.value;
-                  if (next === 'supplement' || next === 'objection' || next === 'question') {
-                    setReplyClassification(next);
-                  } else {
-                    setReplyClassification('general');
-                  }
-                }}
-              >
-                <option value="general">General</option>
-                <option value="supplement">Supplement</option>
-                <option value="objection">Objection</option>
-                <option value="question">Question</option>
-              </select>
-            </div>
-            <div>
-              <button type="button" className="btn btn-primary" disabled={isSubmittingInlineAction} onClick={() => void submitInlineReply()}>
-                {isSubmittingInlineAction ? 'Submitting...' : 'Submit Reply'}
-              </button>{' '}
-              <button type="button" className="btn btn-default" onClick={() => setShowReplyComposer(false)}>
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
-      {showIssueComposer ? (
-        <div className="panel panel-default">
-          <div className="panel-heading">
-            <strong>Inline Issue</strong>
-          </div>
-          <div className="panel-body">
-            <div className="form-group">
-              <label htmlFor={`inline-issue-title-${entryId}`}>Title</label>
-              <input
-                id={`inline-issue-title-${entryId}`}
-                className="form-control"
-                value={issueTitle}
-                onChange={(event) => setIssueTitle(event.target.value)}
-                placeholder="Issue title"
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor={`inline-issue-content-${entryId}`}>Description</label>
-              <textarea
-                id={`inline-issue-content-${entryId}`}
-                className="form-control"
-                rows={4}
-                value={issueContent}
-                onChange={(event) => setIssueContent(event.target.value)}
-                placeholder="Describe the issue"
-              />
-            </div>
-            <div>
-              <button type="button" className="btn btn-primary" disabled={isSubmittingInlineAction} onClick={() => void submitInlineIssue()}>
-                {isSubmittingInlineAction ? 'Submitting...' : 'Create Issue'}
-              </button>{' '}
-              <button type="button" className="btn btn-default" onClick={() => setShowIssueComposer(false)}>
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
       {showQuickEdit ? (
         <div className="panel panel-default">
           <div className="panel-heading">

@@ -123,10 +123,10 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
   const objectType = typeof entry.objectType === 'number' ? entry.objectType : null;
   const canConvert = objectName === 'topic' || objectName === 'argument';
   const canReply = !isReaderMode && ['topic', 'argument', 'question', 'answer', 'issue', 'opinion'].includes(objectName);
-  const canFollow = isAuthenticated && Boolean(objectName) && Boolean(entry._id);
+  const canFollow = Boolean(objectName) && Boolean(entry._id);
   const canCopyToClipboard = isAuthenticated && !isReaderMode;
   const canLinkEntry = isAuthenticated && !isReaderMode;
-  const canReport = isAuthenticated && Boolean(entry._id);
+  const canReport = Boolean(entry._id);
   const canViewDetails = Boolean(entry._id);
   const canSignal = isAuthenticated && Boolean(entry._id) && Boolean(objectName);
   const canAppeal = isAuthenticated && Boolean(entry._id) && Boolean(objectName);
@@ -163,8 +163,12 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
   };
 
   const handleFollow = () => {
-    if (!isAuthenticated || !objectName || !entry._id) {
+    if (!objectName || !entry._id) {
       setStatusMessage('Unable to update follow state');
+      return;
+    }
+    if (!isAuthenticated) {
+      setStatusMessage('Please sign in to follow this entry.');
       return;
     }
     void (async () => {
@@ -204,21 +208,12 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
     void navigate(`/outline/link?parentId=${encodeURIComponent(entry._id)}&parentTitle=${encodeURIComponent(entry.title || '')}`);
   };
 
-  const handleViewHistory = () => {
-    setIsOpen(false);
-    if (!objectName || !entry._id) {
+  const handleReport = () => {
+    if (!isAuthenticated) {
+      setStatusMessage('Please sign in to report this entry.');
+      setIsOpen(false);
       return;
     }
-    const params = new URLSearchParams();
-    params.set('objectName', objectName);
-    params.set('id', entry._id);
-    if (objectType !== null) {
-      params.set('objectType', String(objectType));
-    }
-    void navigate(`/timeline?${params.toString()}`);
-  };
-
-  const handleReport = () => {
     setIsOpen(false);
     if (objectName === 'topic') {
       void navigate(`/issues/create?topicId=${encodeURIComponent(entry._id)}`);
@@ -354,22 +349,26 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
   };
 
   return (
-    <div style={{ display: 'inline-block', textAlign: 'left' }}>
-      <div className={`dropdown ${isOpen ? 'open' : ''}`}>
-        <button
-          type="button"
-          className="btn btn-default dropdown-toggle"
-          aria-haspopup="true"
-          aria-expanded={isOpen}
-          onClick={() => setIsOpen((value) => !value)}
-          onBlur={() => {
-            window.setTimeout(() => setIsOpen(false), 120);
-          }}
-        >
-          <i className="glyphicon glyphicon-option-horizontal" aria-hidden="true"></i> Actions <span className="caret"></span>
-        </button>
-        {isOpen && (
-          <ul className="dropdown-menu dropdown-menu-right">
+    <div className={`dropdown pull-left entry-options ${isOpen ? 'open' : ''}`} style={{ textAlign: 'left' }}>
+      <a
+        href="#"
+        className="text-muted no-underline dropdown-toggle"
+        title="See more options"
+        aria-haspopup="true"
+        aria-expanded={isOpen}
+        onClick={(event) => {
+          event.preventDefault();
+          setIsOpen((value) => !value);
+        }}
+        onBlur={() => {
+          window.setTimeout(() => setIsOpen(false), 120);
+        }}
+      >
+        <i className="glyphicon glyphicon-option-horizontal" aria-hidden="true"></i><span> more</span>
+      </a>
+      {isOpen && (
+        <ul className="dropdown-menu dropdown-menu-right">
+            <li className="dropdown-header">MORE OPTIONS</li>
             {canEdit && (
               <li>
                 <button type="button" className="btn btn-link" onClick={handleEdit}>
@@ -425,11 +424,6 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
                 </button>
               </li>
             )}
-            <li>
-              <button type="button" className="btn btn-link" onClick={handleViewHistory}>
-                <i className="fa fa-history" aria-hidden="true"></i> View History
-              </button>
-            </li>
             {canSignal && (
               <li>
                 <button type="button" className="btn btn-link" onClick={handleSignal}>
@@ -477,9 +471,8 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
                 )}
               </>
             )}
-          </ul>
-        )}
-      </div>
+        </ul>
+      )}
       {statusMessage && (
         <div style={{ marginTop: '6px' }}>
           <small className="text-muted">{statusMessage}</small>

@@ -16,8 +16,8 @@ import apiService from '../services/api';
 import type { OpinionEntryResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
 import type { Issue, Opinion } from '../types';
-import { formatRelativeTime } from '../utils/dateFormat';
 import { sanitizeHtml } from '../utils/sanitizeHtml';
+import { EntryContextLine, EntryMetaBlock, EntryRelatedTopics } from '../components/Entry/EntryLegacyParity';
 
 const OpinionEntryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -60,21 +60,25 @@ const OpinionEntryPage: React.FC = () => {
   const opinions = (data.opinions || []) as LegacyEntity[];
   
   // Build breadcrumb items
-  const breadcrumbItems = [
+  const breadcrumbItems: Array<{ title: string; url?: string; active?: boolean }> = [
     { title: 'Home', url: '/' },
     { title: 'Opinions', url: '/opinions' },
-    { title: opinion.title, active: true }
   ];
+  if (opinion.parentTopic?._id) {
+    breadcrumbItems.push({
+      title: String(opinion.parentTopic.title || 'Topic'),
+      url: `/topics/entry/${encodeURIComponent(String(opinion.parentTopic.friendlyUrl || opinion.parentTopic._id))}/${encodeURIComponent(String(opinion.parentTopic._id))}`,
+    });
+  }
+  breadcrumbItems.push({ title: opinion.title, active: true });
 
-  // Build tabs
   const tabs = [
-    { id: 'overview', title: 'Overview', url: `/opinions/entry/${opinion.friendlyUrl}/${opinion._id}` },
     {
-      id: 'discussion',
-      title: 'Discussion',
-      url: `/opinions/entry/${opinion.friendlyUrl}/${opinion._id}/discussion`,
-      count: opinion.childrenCount?.opinions?.accepted ?? opinions.length,
-    }
+      id: 'details',
+      title: 'Details',
+      icon: 'info-circle',
+      url: `/opinions/entry/${encodeURIComponent(String(opinion.friendlyUrl || opinion._id))}/${encodeURIComponent(String(opinion._id))}`,
+    },
   ];
 
   return (
@@ -89,6 +93,7 @@ const OpinionEntryPage: React.FC = () => {
         icon="comment"
         iconColor="text-info"
       />
+      <EntryContextLine entry={opinion} objectName="opinion" />
 
       <EntryQuickActions
         entry={opinion}
@@ -97,7 +102,7 @@ const OpinionEntryPage: React.FC = () => {
         moreActions={<EntryActionsMenu entry={opinion} editPath={`/opinions/edit/${encodeURIComponent(opinion._id)}`} />}
       />
       
-      <PageTabs tabs={tabs} />
+      <PageTabs tabs={tabs} activeTab="details" />
 
       {/* Opinion content */}
       <div className="text-body collapsible" style={{ marginTop: '20px' }}>
@@ -109,6 +114,7 @@ const OpinionEntryPage: React.FC = () => {
           <p className="lead">{opinion.description}</p>
         )}
       </div>
+      <EntryRelatedTopics entry={opinion} />
 
       {issues.length > 0 && (
         <EntryList
@@ -136,24 +142,7 @@ const OpinionEntryPage: React.FC = () => {
         </EntryList>
       )}
 
-      {/* Footer meta information */}
-      <div className="wt-entry-meta" style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid #eee' }}>
-        {opinion.editorUsername && (
-          <p className="text-muted">
-            <i className="fa fa-user"></i> Authored by: <strong>{opinion.editorUsername}</strong>
-          </p>
-        )}
-        {opinion.editDate && (
-          <p className="text-muted">
-            <i className="fa fa-clock-o"></i> Last updated: {formatRelativeTime(opinion.editDate)}
-          </p>
-        )}
-        {opinion.private && (
-          <p>
-            <span className="label label-default">Private</span>
-          </p>
-        )}
-      </div>
+      <EntryMetaBlock entry={opinion} />
 
       <div style={{ marginTop: '30px' }}>
         <Link to="/opinions" className="btn btn-default">

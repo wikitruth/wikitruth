@@ -5,6 +5,7 @@ import Alert from '../components/common/Alert';
 import Breadcrumb from '../components/common/Breadcrumb';
 import GeoPatternBackground from '../components/common/GeoPatternBackground';
 import PageHeader from '../components/common/PageHeader';
+import PageTabs from '../components/common/PageTabs';
 import EntryList from '../components/common/EntryList';
 import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
@@ -15,8 +16,8 @@ import apiService from '../services/api';
 import type { LegacyEntity } from '../types/legacy';
 import type { AnswerEntryResponse } from '../types/api';
 import type { Issue, Opinion } from '../types';
-import { formatRelativeTime } from '../utils/dateFormat';
 import { sanitizeHtml } from '../utils/sanitizeHtml';
+import { EntryContextLine, EntryMetaBlock, EntryRelatedTopics } from '../components/Entry/EntryLegacyParity';
 
 const AnswerEntryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -55,17 +56,37 @@ const AnswerEntryPage: React.FC = () => {
   const answer = data.answer as LegacyEntity;
   const issues = (data.issues || []) as LegacyEntity[];
   const opinions = (data.opinions || []) as LegacyEntity[];
+  const detailsTab = [
+    {
+      id: 'details',
+      title: 'Details',
+      icon: 'info-circle',
+      url: `/answers/entry/${encodeURIComponent(String(answer.friendlyUrl || answer._id))}/${encodeURIComponent(String(answer._id))}`,
+    },
+  ];
+  const breadcrumbItems: Array<{ title: string; url?: string; active?: boolean }> = [
+    { title: 'Home', url: '/' },
+    { title: 'Answers', url: '/answers' },
+  ];
+  if (answer.parentQuestion?._id) {
+    breadcrumbItems.push({
+      title: String(answer.parentQuestion.title || 'Question'),
+      url: `/questions/entry/${encodeURIComponent(String(answer.parentQuestion.friendlyUrl || answer.parentQuestion._id))}/${encodeURIComponent(String(answer.parentQuestion._id))}`,
+    });
+  }
+  breadcrumbItems.push({ title: answer.title, active: true });
 
   return (
     <div>
       <PageMeta title={answer.title} description={answer.description || answer.contentPreview} />
-      <Breadcrumb items={[{ title: 'Home', url: '/' }, { title: 'Answers', url: '/answers' }, { title: answer.title, active: true }]} />
+      <Breadcrumb items={breadcrumbItems} />
       <GeoPatternBackground seed={answer.title || 'answer'} height={100} />
       <PageHeader
         title={answer.title}
         icon="list-alt"
         iconColor="text-primary"
       />
+      <EntryContextLine entry={answer} objectName="answer" />
 
       <EntryQuickActions
         entry={answer}
@@ -73,10 +94,12 @@ const AnswerEntryPage: React.FC = () => {
         hasValue={Boolean(data?.hasValue)}
         moreActions={<EntryActionsMenu entry={answer} editPath={`/answers/edit/${encodeURIComponent(answer._id)}`} />}
       />
+      <PageTabs tabs={detailsTab} activeTab="details" />
 
       <div className="text-body" style={{ marginTop: '20px' }}>
         <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(answer.content || answer.description || '') }} />
       </div>
+      <EntryRelatedTopics entry={answer} />
 
       {issues.length > 0 && (
         <EntryList
@@ -104,23 +127,7 @@ const AnswerEntryPage: React.FC = () => {
         </EntryList>
       )}
 
-      <div className="wt-entry-meta" style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid #eee' }}>
-        {answer.editorUsername && (
-          <p className="text-muted">
-            <i className="fa fa-user"></i> Authored by: <strong>{answer.editorUsername}</strong>
-          </p>
-        )}
-        {answer.editDate && (
-          <p className="text-muted">
-            <i className="fa fa-clock-o"></i> Last updated: {formatRelativeTime(answer.editDate)}
-          </p>
-        )}
-        {answer.private && (
-          <p>
-            <span className="label label-default">Private</span>
-          </p>
-        )}
-      </div>
+      <EntryMetaBlock entry={answer} />
 
       <Link to="/answers" className="btn btn-default" style={{ marginTop: '20px' }}>
         <i className="fa fa-arrow-left"></i> Back to Answers
