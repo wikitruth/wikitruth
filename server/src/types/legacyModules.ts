@@ -104,6 +104,7 @@ export interface FlowUtilsModule {
   appendEntryExtras: LooseFn;
   setVerdictModel: LooseFn;
   setTopicModels: LooseFn;
+  setEntryModels: LooseFn;
   setModelOwnerEntry: LooseFn;
   setModelContext: LooseFn;
   getTopics: (query: unknown, options?: unknown) => Promise<LegacyEntry[]>;

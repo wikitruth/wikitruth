@@ -12,6 +12,7 @@ const constants = constantsMod as unknown as ConstantsModule;
 import * as utils from '../../utils/utils';
 import * as answersService from '../../services/answersService';
 import { applyViewModeFilter } from './viewFilter';
+import { applyLegacyEntryContext, resolveLegacyEntryContext } from './entryContext';
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 export = function (router: Router) {
   // GET /api/answers - List answers
@@ -54,6 +55,9 @@ export = function (router: Router) {
         return res.status(404).json({ error: 'Answer not found' });
       }
 
+      const context = await resolveLegacyEntryContext(req, constants.OBJECT_TYPES.answer, answerId);
+      applyLegacyEntryContext(answer, context);
+
       const [issues, opinions] = await Promise.all([
         db.Issue.find({
           ownerType: constants.OBJECT_TYPES.answer,
@@ -80,7 +84,13 @@ export = function (router: Router) {
         flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.opinion, req);
       });
 
+      const topicLinks = context.topicLink?.topic ? [context.topicLink.topic] : [];
+
       res.json({
+        topic: context.topic || answer.parentTopic || null,
+        parentTopic: context.parentTopic || null,
+        grandParentTopic: context.grandParentTopic || null,
+        topicLinks: topicLinks,
         answer: answer,
         issues: issues,
         opinions: opinions,

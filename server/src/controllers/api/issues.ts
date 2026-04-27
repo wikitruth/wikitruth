@@ -14,6 +14,7 @@ import { applyViewModeFilter } from './viewFilter';
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 import { logEntryEvent } from '../../services/entryEventsService';
 import { notifySubscribers } from '../../services/notificationsService';
+import { applyLegacyEntryContext, resolveLegacyEntryContext } from './entryContext';
 
 export = function (router: Router) {
   // Get issues list
@@ -93,6 +94,9 @@ async function GET_issue_entry(req: WikitruthRequest, res: WikitruthResponse) {
     return res.status(404).json({ error: 'Issue not found' });
   }
 
+  const context = await resolveLegacyEntryContext(req, constants.OBJECT_TYPES.issue, issueId);
+  applyLegacyEntryContext(issue, context);
+
   const opinions = await db.Opinion.find({
     parentId: null,
     ownerType: constants.OBJECT_TYPES.issue,
@@ -106,7 +110,13 @@ async function GET_issue_entry(req: WikitruthRequest, res: WikitruthResponse) {
     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.opinion, req);
   });
   
+  const topicLinks = context.topicLink?.topic ? [context.topicLink.topic] : [];
+
   res.json({
+    topic: context.topic || issue.parentTopic || null,
+    parentTopic: context.parentTopic || null,
+    grandParentTopic: context.grandParentTopic || null,
+    topicLinks: topicLinks,
     issue: issue,
     opinions: opinions,
   });

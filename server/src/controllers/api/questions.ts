@@ -15,6 +15,7 @@ const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
 const constants = constantsMod as unknown as WikitruthConstants;
 import * as utils from '../../utils/utils';
 import * as questionsService from '../../services/questionsService';
+import { applyLegacyEntryContext, resolveLegacyEntryContext } from './entryContext';
 
 type QuestionDocument = {
   _id: unknown;
@@ -129,6 +130,9 @@ async function GET_question_entry(req: WikitruthRequest, res: WikitruthResponse)
     return res.status(404).json({ error: 'Question not found' });
   }
 
+  const context = await resolveLegacyEntryContext(req, constants.OBJECT_TYPES.question, questionId);
+  applyLegacyEntryContext(question, context);
+
   const [answers, issues, opinions] = await Promise.all([
     db.Answer.find({
       $or: [
@@ -168,7 +172,13 @@ async function GET_question_entry(req: WikitruthRequest, res: WikitruthResponse)
     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.opinion, req);
   });
 
+  const topicLinks = context.topicLink?.topic ? [context.topicLink.topic] : [];
+
   res.json({
+    topic: context.topic || question.parentTopic || null,
+    parentTopic: context.parentTopic || null,
+    grandParentTopic: context.grandParentTopic || null,
+    topicLinks: topicLinks,
     question: question,
     answers: answers,
     issues: issues,

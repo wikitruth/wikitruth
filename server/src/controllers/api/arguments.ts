@@ -14,6 +14,11 @@ const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
 import * as utils from '../../utils/utils';
 const constants = constantsMod as unknown as WikitruthConstants;
 import * as argumentsService from '../../services/argumentsService';
+import {
+  applyLegacyEntryContext,
+  loadArgumentTopicLinks,
+  resolveLegacyEntryContext,
+} from './entryContext';
 
 type ArgumentDocument = {
   _id: unknown;
@@ -125,6 +130,9 @@ async function GET_argument_entry(req: WikitruthRequest, res: WikitruthResponse)
     return res.status(404).json({ error: 'Argument not found' });
   }
 
+  const context = await resolveLegacyEntryContext(req, constants.OBJECT_TYPES.argument, argumentId);
+  applyLegacyEntryContext(argument, context);
+
   const [questions, issues, opinions] = await Promise.all([
     db.Question.find({
       ownerType: constants.OBJECT_TYPES.argument,
@@ -162,7 +170,22 @@ async function GET_argument_entry(req: WikitruthRequest, res: WikitruthResponse)
     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.opinion, req);
   });
 
+  const contextTopicLinks = context.topicLink?.topic ? [context.topicLink.topic] : [];
+  const argumentTopicLinks = await loadArgumentTopicLinks(argumentId, req);
+  const topicLinks = [...contextTopicLinks, ...argumentTopicLinks];
+  const dedupedTopicLinks = topicLinks.filter(function (topic, index, all) {
+    const topicId = String(topic?._id || '');
+    if (!topicId) {
+      return false;
+    }
+    return all.findIndex((candidate) => String(candidate?._id || '') === topicId) === index;
+  });
+
   res.json({
+    topic: context.topic || argument.parentTopic || null,
+    parentTopic: context.parentTopic || null,
+    grandParentTopic: context.grandParentTopic || null,
+    topicLinks: dedupedTopicLinks,
     argument: argument,
     questions: questions,
     issues: issues,
