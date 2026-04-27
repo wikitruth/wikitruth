@@ -11,6 +11,29 @@ const constants = constantsMod as unknown as WikitruthConstants;
 const db = (appModForDb as unknown as { db: { models: {
   Artifact: LeanModel<ServiceEntry>;
 } } }).db.models;
+
+function setArtifactMediaPaths(artifact?: ServiceEntry | null): void {
+  if (!artifact) {
+    return;
+  }
+  const file = (artifact.file || {}) as { name?: unknown; type?: unknown };
+  const fileName = String(file.name || '').trim();
+  if (!fileName) {
+    return;
+  }
+  const id = String(artifact._id || '').trim();
+  if (!id) {
+    return;
+  }
+  const baseFolder = '/media/artifacts/';
+  if (!artifact.filePath) {
+    artifact.filePath = `${baseFolder}${id}_${fileName}`;
+  }
+  const fileType = String(file.type || '').toLowerCase();
+  if (fileType.startsWith('image') && !artifact.thumbnailPath) {
+    artifact.thumbnailPath = `${baseFolder}${id}_thumbnail_${fileName}`;
+  }
+}
 /**
  * Get list of artifacts
  * @param {Object} query - MongoDB query object
@@ -31,6 +54,7 @@ async function getArtifactsList(query: ServiceQuery, options: ServiceListOptions
   
   results.forEach(function (result) {
     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.artifact);
+    setArtifactMediaPaths(result);
   });
   
   return results;
@@ -52,6 +76,7 @@ async function getArtifactEntry(artifactId: string, req: ServiceListOptions['req
   await flowUtils.setUsername(artifact);
   await flowUtils.setEntryParent(artifact, constants.OBJECT_TYPES.artifact);
   flowUtils.appendEntryExtras(artifact, constants.OBJECT_TYPES.artifact, req);
+  setArtifactMediaPaths(artifact);
   
   return artifact;
 }

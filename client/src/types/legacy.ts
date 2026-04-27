@@ -19,6 +19,10 @@ export interface LegacyEntity {
   editDate: string | Date;
   createDate: string | Date;
   editorUsername: string;
+  editUsername?: string;
+  createUsername?: string;
+  editDateString?: string;
+  createDateString?: string;
   username: string;
   email: string;
   points?: number;
@@ -31,8 +35,21 @@ export interface LegacyEntity {
   file: {
     type: string;
     name: string;
+    size?: number;
+    lastModifiedDate?: string | Date;
   };
+  filePath?: string | null;
+  thumbnailPath?: string | null;
   parentTopic?: LegacyEntity;
+  parentTopicLink?: LegacyEntity;
+  parentArgument?: LegacyEntity;
+  parentArgumentLink?: LegacyEntity;
+  parentArtifact?: LegacyEntity;
+  parentQuestion?: LegacyEntity;
+  parentAnswer?: LegacyEntity;
+  parentIssue?: LegacyEntity;
+  parentOpinion?: LegacyEntity;
+  topicLinks?: LegacyEntity[];
   childrenCount?: {
     topics?: { total?: number; accepted?: number; pending?: number; rejected?: number; archived?: number };
     arguments?: { total?: number; accepted?: number; pending?: number; rejected?: number; archived?: number };

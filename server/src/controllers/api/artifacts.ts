@@ -112,7 +112,10 @@ export = function (router: Router) {
         flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.opinion, req);
       });
 
+      const topic = (artifact.parentTopic || null) as Record<string, unknown> | null;
       res.json({
+        topic: topic,
+        topicLinks: [],
         artifact: artifact,
         artifacts: artifacts,
         arguments: argumentsList,

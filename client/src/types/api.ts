@@ -117,6 +117,8 @@ export interface TopicEntryResponse extends ApiBaseResponse {
 export interface ArgumentEntryResponse extends ApiBaseResponse {
   argument?: LegacyEntity;
   hasValue?: boolean;
+  topic?: LegacyEntity;
+  topicLinks?: LegacyEntity[];
   questions?: LegacyEntity[];
   issues?: LegacyEntity[];
   opinions?: LegacyEntity[];
@@ -125,6 +127,8 @@ export interface ArgumentEntryResponse extends ApiBaseResponse {
 export interface QuestionEntryResponse extends ApiBaseResponse {
   question?: LegacyEntity;
   hasValue?: boolean;
+  topic?: LegacyEntity;
+  topicLinks?: LegacyEntity[];
   answers?: LegacyEntity[];
   issues?: LegacyEntity[];
   opinions?: LegacyEntity[];
@@ -133,12 +137,16 @@ export interface QuestionEntryResponse extends ApiBaseResponse {
 export interface IssueEntryResponse extends ApiBaseResponse {
   issue?: LegacyEntity;
   hasValue?: boolean;
+  topic?: LegacyEntity;
+  topicLinks?: LegacyEntity[];
   opinions?: LegacyEntity[];
 }
 
 export interface OpinionEntryResponse extends ApiBaseResponse {
   opinion?: LegacyEntity;
   hasValue?: boolean;
+  topic?: LegacyEntity;
+  topicLinks?: LegacyEntity[];
   issues?: LegacyEntity[];
   opinions?: LegacyEntity[];
 }
@@ -146,6 +154,8 @@ export interface OpinionEntryResponse extends ApiBaseResponse {
 export interface AnswerEntryResponse extends ApiBaseResponse {
   answer?: LegacyEntity;
   hasValue?: boolean;
+  topic?: LegacyEntity;
+  topicLinks?: LegacyEntity[];
   issues?: LegacyEntity[];
   opinions?: LegacyEntity[];
 }
@@ -153,6 +163,8 @@ export interface AnswerEntryResponse extends ApiBaseResponse {
 export interface ArtifactEntryResponse extends ApiBaseResponse {
   artifact?: LegacyEntity;
   hasValue?: boolean;
+  topic?: LegacyEntity;
+  topicLinks?: LegacyEntity[];
   artifacts?: LegacyEntity[];
   arguments?: LegacyEntity[];
   questions?: LegacyEntity[];
