@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import GeoPattern from 'geopattern';
 import apiService from '../services/api';
 import type { Answer, Application, Argument, Artifact, Issue, Opinion, Question, Topic } from '../types';
 import type { LegacyEntity } from '../types/legacy';
@@ -37,12 +38,55 @@ interface HomeData {
   artifactsMore?: boolean;
 }
 
+const FALLBACK_FEATURE_SECTION_TITLES = [
+  'Truth & Reality',
+  'Religion & Worldviews',
+  'Morality & Ethics',
+];
+
+const buildFeatureHeaderStyle = (title: string): React.CSSProperties => {
+  const seed = String(title || 'feature');
+  try {
+    const pattern = GeoPattern.generate(seed);
+    return {
+      backgroundImage: pattern.toDataUrl(),
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+    };
+  } catch (_error) {
+    return {};
+  }
+};
+
 const HomePage: React.FC = () => {
   const [data, setData] = useState<HomeData>({});
   const [loading, setLoading] = useState(true);
   const { addToast } = useNotification();
   const { application } = data;
   const entrySetColumns = (data.entrySet || []) as HomeEntrySetColumn[];
+  const featureHeaderStyles = useMemo(() => {
+    const styleMap = new Map<string, React.CSSProperties>();
+    const sectionTitles =
+      application?.sections?.map((section) => String(section.title || '').trim()) ||
+      FALLBACK_FEATURE_SECTION_TITLES;
+
+    sectionTitles.forEach((title) => {
+      if (!title || styleMap.has(title)) {
+        return;
+      }
+      styleMap.set(title, buildFeatureHeaderStyle(title));
+    });
+
+    return styleMap;
+  }, [application?.sections]);
+  const getFeatureHeaderStyle = (title: string): React.CSSProperties => {
+    const normalizedTitle = String(title || '').trim();
+    if (!normalizedTitle) {
+      return {};
+    }
+
+    return featureHeaderStyles.get(normalizedTitle) || buildFeatureHeaderStyle(normalizedTitle);
+  };
 
   useEffect(() => {
     fetchHomeData();
@@ -175,7 +219,11 @@ const HomePage: React.FC = () => {
         <div className="row">
           {application.sections.map((section, index: number) => (
             <div key={index} className="col-lg-4 col-md-6 col-sm-6 wt-section-col text-body">
-              <h2 className="wt-feature-header" data-title={section.title}>
+              <h2
+                className="wt-feature-header"
+                data-title={section.title}
+                style={getFeatureHeaderStyle(section.title)}
+              >
                 <i className={section.iconClass}></i> {section.title}
               </h2>
               <p>{section.description}</p>
@@ -192,7 +240,11 @@ const HomePage: React.FC = () => {
       ) : (
         <div className="row">
           <div className="col-lg-4 col-md-6 col-sm-6 wt-section-col text-body">
-            <h2 className="wt-feature-header" data-title="Truth & Reality">
+            <h2
+              className="wt-feature-header"
+              data-title="Truth & Reality"
+              style={getFeatureHeaderStyle('Truth & Reality')}
+            >
               <i className="fa fa-globe"></i> Truth &amp; Reality
             </h2>
             <p>
@@ -202,7 +254,11 @@ const HomePage: React.FC = () => {
             </p>
           </div>
           <div className="col-lg-4 col-md-6 col-sm-6 wt-section-col text-body">
-            <h2 className="wt-feature-header" data-title="Religion & Worldviews">
+            <h2
+              className="wt-feature-header"
+              data-title="Religion & Worldviews"
+              style={getFeatureHeaderStyle('Religion & Worldviews')}
+            >
               <i className="fa fa-book"></i> Religion &amp; Worldviews
             </h2>
             <p>
@@ -212,7 +268,11 @@ const HomePage: React.FC = () => {
             </p>
           </div>
           <div className="col-lg-4 col-md-6 col-sm-6 wt-section-col text-body">
-            <h2 className="wt-feature-header" data-title="Morality & Ethics">
+            <h2
+              className="wt-feature-header"
+              data-title="Morality & Ethics"
+              style={getFeatureHeaderStyle('Morality & Ethics')}
+            >
               <i className="fa fa-balance-scale"></i> Morality &amp; Ethics
             </h2>
             <p>
