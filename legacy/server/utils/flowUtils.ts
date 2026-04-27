@@ -93,8 +93,48 @@ function buildEntryReturnUrl(req: unknown, model: Record<string, unknown>): stri
   return prefixLegacyUrl(modernFlowUtils.buildEntryReturnUrl(req, model));
 }
 
+type LegacyEntryParamRequest = {
+  query?: Record<string, unknown>;
+  params?: {
+    id?: unknown;
+    friendlyUrl?: unknown;
+  };
+};
+
+function ensureEntryIdParam(req?: LegacyEntryParamRequest, entry?: string): void {
+  const modernEnsureEntryIdParam = (modernFlowUtils as Record<string, unknown>).ensureEntryIdParam;
+  if (typeof modernEnsureEntryIdParam === 'function') {
+    (
+      modernEnsureEntryIdParam as (
+        request?: LegacyEntryParamRequest,
+        entryKey?: string,
+      ) => void
+    )(req, entry);
+    return;
+  }
+
+  if (!req || !entry) {
+    return;
+  }
+
+  if (!req.query) {
+    req.query = {};
+  }
+
+  const id = req.params?.id;
+  if (id !== undefined && id !== null && String(id) !== '') {
+    req.query[entry] = id;
+  }
+
+  const friendlyUrl = req.params?.friendlyUrl;
+  if (friendlyUrl !== undefined && friendlyUrl !== null && String(friendlyUrl) !== '') {
+    req.query.friendlyUrl = friendlyUrl;
+  }
+}
+
 const legacyFlowUtils = {
   ...modernFlowUtils,
+  ensureEntryIdParam,
   buildGroupUrl,
   setModelContext,
   getDiaryBaseUrl,
@@ -106,4 +146,6 @@ const legacyFlowUtils = {
   setupEntryRouters,
 };
 
-export = legacyFlowUtils;
+const legacyFlowUtilsModule = module.exports as Record<string, unknown>;
+Object.assign(legacyFlowUtilsModule, legacyFlowUtils);
+legacyFlowUtilsModule.default = legacyFlowUtils;

@@ -163,4 +163,11 @@ describe('Legacy compatibility runtime mount (L1-04 / L4-03)', function () {
       expect({ routePath, matched }).toEqual({ routePath, matched: true });
     });
   });
+
+  it('keeps legacy flowUtils.ensureEntryIdParam callable for legacy entry routes', function () {
+    const flowUtilsModule = require(path.join(PROJECT_ROOT, 'legacy', 'server', 'utils', 'flowUtils'));
+    const flowUtils = flowUtilsModule && flowUtilsModule.default ? flowUtilsModule.default : flowUtilsModule;
+
+    expect(typeof flowUtils.ensureEntryIdParam).toBe('function');
+  });
 });
