@@ -16,7 +16,11 @@ import type { IssueEntryResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
 import type { Opinion } from '../types';
 import { sanitizeHtml } from '../utils/sanitizeHtml';
-import { EntryContextLine, EntryMetaBlock, EntryRelatedTopics } from '../components/Entry/EntryLegacyParity';
+import {
+  EntryContextLine,
+  EntryMetaBlock,
+  buildLegacyEntryBreadcrumb,
+} from '../components/Entry/EntryLegacyParity';
 
 const IssueEntryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -58,17 +62,12 @@ const IssueEntryPage: React.FC = () => {
   const opinions = (data.opinions || []) as LegacyEntity[];
   
   // Build breadcrumb items
-  const breadcrumbItems: Array<{ title: string; url?: string; active?: boolean }> = [
-    { title: 'Home', url: '/' },
-    { title: 'Issues', url: '/issues' },
-  ];
-  if (issue.parentTopic?._id) {
-    breadcrumbItems.push({
-      title: String(issue.parentTopic.title || 'Topic'),
-      url: `/topics/entry/${encodeURIComponent(String(issue.parentTopic.friendlyUrl || issue.parentTopic._id))}/${encodeURIComponent(String(issue.parentTopic._id))}`,
-    });
-  }
-  breadcrumbItems.push({ title: issue.title, active: true });
+  const breadcrumbItems = buildLegacyEntryBreadcrumb(issue, 'issue', {
+    sectionTopic: (data.topic || issue.parentTopic || null) as LegacyEntity | null,
+    grandParentTopic: (data.parentTopic || data.grandParentTopic || null) as LegacyEntity | null,
+    parentArgument: (issue.parentArgument || null) as LegacyEntity | null,
+    parentQuestion: (issue.parentQuestion || null) as LegacyEntity | null,
+  });
 
   const tabs = [
     {
@@ -112,8 +111,6 @@ const IssueEntryPage: React.FC = () => {
           <p className="lead">{issue.description}</p>
         )}
       </div>
-      <EntryRelatedTopics entry={issue} />
-
       {opinions.length > 0 && (
         <EntryList
           title="Comments"

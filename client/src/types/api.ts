@@ -105,6 +105,7 @@ export interface TopicEntryResponse extends ApiBaseResponse {
   topicSiblingsMore?: boolean;
   topicLinks?: LegacyEntity[];
   parentTopic?: LegacyEntity;
+  grandParentTopic?: LegacyEntity;
   mainTopic?: boolean;
   arguments?: LegacyEntity[];
   keyArguments?: LegacyEntity[];
@@ -118,6 +119,8 @@ export interface ArgumentEntryResponse extends ApiBaseResponse {
   argument?: LegacyEntity;
   hasValue?: boolean;
   topic?: LegacyEntity;
+  parentTopic?: LegacyEntity;
+  grandParentTopic?: LegacyEntity;
   topicLinks?: LegacyEntity[];
   questions?: LegacyEntity[];
   issues?: LegacyEntity[];
@@ -128,6 +131,8 @@ export interface QuestionEntryResponse extends ApiBaseResponse {
   question?: LegacyEntity;
   hasValue?: boolean;
   topic?: LegacyEntity;
+  parentTopic?: LegacyEntity;
+  grandParentTopic?: LegacyEntity;
   topicLinks?: LegacyEntity[];
   answers?: LegacyEntity[];
   issues?: LegacyEntity[];
@@ -138,6 +143,8 @@ export interface IssueEntryResponse extends ApiBaseResponse {
   issue?: LegacyEntity;
   hasValue?: boolean;
   topic?: LegacyEntity;
+  parentTopic?: LegacyEntity;
+  grandParentTopic?: LegacyEntity;
   topicLinks?: LegacyEntity[];
   opinions?: LegacyEntity[];
 }
@@ -146,6 +153,8 @@ export interface OpinionEntryResponse extends ApiBaseResponse {
   opinion?: LegacyEntity;
   hasValue?: boolean;
   topic?: LegacyEntity;
+  parentTopic?: LegacyEntity;
+  grandParentTopic?: LegacyEntity;
   topicLinks?: LegacyEntity[];
   issues?: LegacyEntity[];
   opinions?: LegacyEntity[];
@@ -155,6 +164,8 @@ export interface AnswerEntryResponse extends ApiBaseResponse {
   answer?: LegacyEntity;
   hasValue?: boolean;
   topic?: LegacyEntity;
+  parentTopic?: LegacyEntity;
+  grandParentTopic?: LegacyEntity;
   topicLinks?: LegacyEntity[];
   issues?: LegacyEntity[];
   opinions?: LegacyEntity[];

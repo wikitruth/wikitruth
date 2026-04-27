@@ -18,7 +18,11 @@ import EntryQuickActions from '../components/Entry/EntryQuickActions';
 import PageMeta from '../components/common/PageMeta';
 import type { Answer, Issue, Opinion } from '../types';
 import { sanitizeHtml } from '../utils/sanitizeHtml';
-import { EntryContextLine, EntryMetaBlock, EntryRelatedTopics } from '../components/Entry/EntryLegacyParity';
+import {
+  EntryContextLine,
+  EntryMetaBlock,
+  buildLegacyEntryBreadcrumb,
+} from '../components/Entry/EntryLegacyParity';
 
 const QuestionEntryPage: React.FC = () => {
   const { id } = useParams();
@@ -59,17 +63,11 @@ const QuestionEntryPage: React.FC = () => {
   const opinions = (data.opinions || []) as LegacyEntity[];
   
   // Build breadcrumb items
-  const breadcrumbItems: Array<{ title: string; url?: string; active?: boolean }> = [
-    { title: 'Home', url: '/' },
-    { title: 'Questions', url: '/questions' },
-  ];
-  if (question.parentTopic?._id) {
-    breadcrumbItems.push({
-      title: String(question.parentTopic.title || 'Topic'),
-      url: `/topics/entry/${encodeURIComponent(String(question.parentTopic.friendlyUrl || question.parentTopic._id))}/${encodeURIComponent(String(question.parentTopic._id))}`,
-    });
-  }
-  breadcrumbItems.push({ title: question.title, active: true });
+  const breadcrumbItems = buildLegacyEntryBreadcrumb(question, 'question', {
+    sectionTopic: (data.topic || question.parentTopic || null) as LegacyEntity | null,
+    grandParentTopic: (data.parentTopic || data.grandParentTopic || null) as LegacyEntity | null,
+    parentArgument: (question.parentArgument || null) as LegacyEntity | null,
+  });
 
   const tabs = [
     {
@@ -78,7 +76,28 @@ const QuestionEntryPage: React.FC = () => {
       icon: 'info-circle',
       url: `/questions/entry/${encodeURIComponent(String(question.friendlyUrl || question._id))}/${encodeURIComponent(String(question._id))}`,
     },
-  ];
+    {
+      id: 'answers',
+      title: 'Answers',
+      icon: 'check-circle-o',
+      url: `/answers?question=${encodeURIComponent(String(question._id || ''))}`,
+      count: Number(question.childrenCount?.answers?.accepted || 0),
+    },
+    {
+      id: 'issues',
+      title: 'Issues',
+      icon: 'exclamation-circle',
+      url: `/issues?question=${encodeURIComponent(String(question._id || ''))}`,
+      count: Number(question.childrenCount?.issues?.accepted || 0),
+    },
+    {
+      id: 'comments',
+      title: 'Comments',
+      icon: 'comments-o',
+      url: `/opinions?question=${encodeURIComponent(String(question._id || ''))}`,
+      count: Number(question.childrenCount?.opinions?.accepted || 0),
+    },
+  ].filter((tab) => tab.id === 'details' || Number(tab.count || 0) > 0);
 
   return (
     <div>
@@ -111,8 +130,6 @@ const QuestionEntryPage: React.FC = () => {
           <p className="lead">{question.description}</p>
         )}
       </div>
-      <EntryRelatedTopics entry={question} />
-
       {answers.length > 0 && (
         <EntryList
           title="Answers"

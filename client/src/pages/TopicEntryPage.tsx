@@ -21,7 +21,7 @@ import type { TopicEntryResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
 import type { Argument, Artifact, Issue, Opinion, Question, Topic } from '../types';
 import { sanitizeHtml } from '../utils/sanitizeHtml';
-import { EntryMetaBlock } from '../components/Entry/EntryLegacyParity';
+import { EntryMetaBlock, buildLegacyEntryBreadcrumb } from '../components/Entry/EntryLegacyParity';
 
 const CONTENT_COLLAPSE_THRESHOLD = 1200;
 
@@ -107,15 +107,15 @@ const TopicEntryPage: React.FC = () => {
   const issues = (data?.issues || []) as LegacyEntity[];
   const opinions = (data?.opinions || []) as LegacyEntity[];
   const topicLinks = (data?.topicLinks || []) as LegacyEntity[];
+  const relatedParentTopic = (data?.parentTopic || topic.parentTopic || null) as LegacyEntity | null;
   const categories = (data?.categories || []) as LegacyEntity[];
   const isMainTopic = Boolean(data?.mainTopic);
   const tagLabels = Array.isArray(data?.tagLabels) ? (data?.tagLabels as LegacyEntity[]) : [];
 
-  const breadcrumbItems = [
-    { title: 'Home', url: '/' },
-    { title: 'Topics', url: '/topics' },
-    { title: topic.title, active: true },
-  ];
+  const breadcrumbItems = buildLegacyEntryBreadcrumb(topic, 'topic', {
+    sectionTopic: (data?.parentTopic || null) as LegacyEntity | null,
+    grandParentTopic: ((data as { grandParentTopic?: LegacyEntity } | null)?.grandParentTopic || null) as LegacyEntity | null,
+  });
 
   const tabs = [
     {
@@ -139,6 +139,13 @@ const TopicEntryPage: React.FC = () => {
       count: getCount(topic.childrenCount?.arguments?.accepted),
     },
     {
+      id: 'artifacts',
+      title: 'Artifacts',
+      icon: 'puzzle-piece',
+      url: `/artifacts?topic=${encodeURIComponent(String(topic._id || ''))}`,
+      count: getCount(topic.childrenCount?.artifacts?.accepted),
+    },
+    {
       id: 'questions',
       title: 'Questions',
       icon: 'question-circle',
@@ -159,7 +166,7 @@ const TopicEntryPage: React.FC = () => {
       url: `/opinions?topic=${encodeURIComponent(String(topic._id || ''))}`,
       count: getCount(topic.childrenCount?.opinions?.accepted),
     },
-  ];
+  ].filter((tab) => tab.id === 'details' || Number(tab.count || 0) > 0);
 
   const content = String(topic.content || topic.description || '');
   const showSeeMore = content.length > CONTENT_COLLAPSE_THRESHOLD;
@@ -295,9 +302,9 @@ const TopicEntryPage: React.FC = () => {
 
       <div className="wt-related" style={{ marginTop: '20px' }}>
         <span title="Related Topics">Topics</span>&nbsp;
-        {topic.parentTopic && (
-          <Link to={getTopicPath(topic.parentTopic)}>
-            <span className="wt-label label label-default">{topic.parentTopic.title}</span>
+        {relatedParentTopic && (
+          <Link to={getTopicPath(relatedParentTopic)}>
+            <span className="wt-label label label-default">{relatedParentTopic.title}</span>
           </Link>
         )}
         {topicLinks.map((link) => (
@@ -305,7 +312,7 @@ const TopicEntryPage: React.FC = () => {
             <span className="wt-label label label-default">{link.title}</span>
           </Link>
         ))}
-        {!topic.parentTopic && topicLinks.length === 0 && <span className="text-muted">No linked topics</span>}
+        {!relatedParentTopic && topicLinks.length === 0 && <span className="text-muted">No linked topics</span>}
       </div>
 
       {isMainTopic && categories.length > 0 && (

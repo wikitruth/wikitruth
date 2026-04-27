@@ -4,6 +4,12 @@ import type { LegacyEntity } from '../../types/legacy';
 import { formatRelativeTime } from '../../utils/dateFormat';
 
 export type EntryObjectName = 'topic' | 'argument' | 'question' | 'answer' | 'artifact' | 'issue' | 'opinion';
+export interface EntryBreadcrumbItem {
+  title: string;
+  url?: string;
+  active?: boolean;
+  icon?: string;
+}
 
 type EntryLinkRef = Pick<LegacyEntity, '_id' | 'friendlyUrl' | 'title'>;
 
@@ -15,8 +21,32 @@ function toTopicEntryPath(topic?: EntryLinkRef | null): string {
 
 function toEntryPath(basePath: string, item?: EntryLinkRef | null): string {
   const id = encodeURIComponent(String(item?._id || ''));
+  if (basePath === '/answers/entry') {
+    return `${basePath}/${id}`;
+  }
   const friendly = encodeURIComponent(String(item?.friendlyUrl || item?._id || ''));
   return `${basePath}/${friendly}/${id}`;
+}
+
+function buildEntryRoute(objectName: EntryObjectName, item?: EntryLinkRef | null): string {
+  switch (objectName) {
+    case 'topic':
+      return toTopicEntryPath(item);
+    case 'argument':
+      return toEntryPath('/arguments/entry', item);
+    case 'question':
+      return toEntryPath('/questions/entry', item);
+    case 'answer':
+      return toEntryPath('/answers/entry', item);
+    case 'artifact':
+      return toEntryPath('/artifacts/entry', item);
+    case 'issue':
+      return toEntryPath('/issues/entry', item);
+    case 'opinion':
+      return toEntryPath('/opinions/entry', item);
+    default:
+      return '/explore';
+  }
 }
 
 function getLinkTitle(item?: EntryLinkRef | null, fallback = '(Untitled)'): string {
@@ -26,27 +56,117 @@ function getLinkTitle(item?: EntryLinkRef | null, fallback = '(Untitled)'): stri
 
 function getContextTarget(entry: LegacyEntity): { kind: string; icon: string; item?: EntryLinkRef | null; href: string } | null {
   if (entry.parentOpinion?._id) {
-    return { kind: 'parent comment', icon: 'comments-o', item: entry.parentOpinion, href: toEntryPath('/opinions/entry', entry.parentOpinion) };
+    return { kind: 'parent comment', icon: 'comments-o', item: entry.parentOpinion, href: buildEntryRoute('opinion', entry.parentOpinion) };
   }
   if (entry.parentIssue?._id) {
-    return { kind: 'issue', icon: 'exclamation-circle', item: entry.parentIssue, href: toEntryPath('/issues/entry', entry.parentIssue) };
+    return { kind: 'issue', icon: 'exclamation-circle', item: entry.parentIssue, href: buildEntryRoute('issue', entry.parentIssue) };
   }
   if (entry.parentAnswer?._id) {
-    return { kind: 'answer', icon: 'check-circle-o', item: entry.parentAnswer, href: toEntryPath('/answers/entry', entry.parentAnswer) };
+    return { kind: 'answer', icon: 'check-circle-o', item: entry.parentAnswer, href: buildEntryRoute('answer', entry.parentAnswer) };
   }
   if (entry.parentQuestion?._id) {
-    return { kind: 'question', icon: 'question-circle-o', item: entry.parentQuestion, href: toEntryPath('/questions/entry', entry.parentQuestion) };
+    return { kind: 'question', icon: 'question-circle-o', item: entry.parentQuestion, href: buildEntryRoute('question', entry.parentQuestion) };
   }
   if (entry.parentArtifact?._id) {
-    return { kind: 'artifact', icon: 'puzzle-piece', item: entry.parentArtifact, href: toEntryPath('/artifacts/entry', entry.parentArtifact) };
+    return { kind: 'artifact', icon: 'puzzle-piece', item: entry.parentArtifact, href: buildEntryRoute('artifact', entry.parentArtifact) };
   }
   if (entry.parentArgument?._id) {
-    return { kind: 'fact', icon: 'bolt', item: entry.parentArgument, href: toEntryPath('/arguments/entry', entry.parentArgument) };
+    return { kind: 'fact', icon: 'bolt', item: entry.parentArgument, href: buildEntryRoute('argument', entry.parentArgument) };
   }
   if (entry.parentTopic?._id) {
-    return { kind: 'topic', icon: 'folder-open-o', item: entry.parentTopic, href: toTopicEntryPath(entry.parentTopic) };
+    return { kind: 'topic', icon: 'folder-open-o', item: entry.parentTopic, href: buildEntryRoute('topic', entry.parentTopic) };
   }
   return null;
+}
+
+function getEntryIcon(objectName: EntryObjectName): string {
+  switch (objectName) {
+    case 'topic':
+      return 'folder-open';
+    case 'argument':
+      return 'flash';
+    case 'question':
+      return 'question-circle-o';
+    case 'answer':
+      return 'check-circle-o';
+    case 'artifact':
+      return 'puzzle-piece';
+    case 'issue':
+      return 'exclamation-circle';
+    case 'opinion':
+      return 'comments-o';
+    default:
+      return 'file-text-o';
+  }
+}
+
+export function buildLegacyEntryBreadcrumb(
+  entry: LegacyEntity,
+  objectName: EntryObjectName,
+  options?: {
+    sectionTopic?: LegacyEntity | null;
+    grandParentTopic?: LegacyEntity | null;
+    parentArgument?: LegacyEntity | null;
+    parentQuestion?: LegacyEntity | null;
+    parentIssue?: LegacyEntity | null;
+  }
+): EntryBreadcrumbItem[] {
+  const items: EntryBreadcrumbItem[] = [{ title: 'Explore', url: '/explore', icon: 'globe' }];
+  const sectionTopic = (options?.sectionTopic || entry.parentTopic || null) as LegacyEntity | null;
+  const grandParentTopic = (
+    options?.grandParentTopic
+    || sectionTopic?.parentTopic
+    || null
+  ) as LegacyEntity | null;
+
+  if (grandParentTopic?._id && grandParentTopic._id !== sectionTopic?._id) {
+    items.push({
+      title: getLinkTitle(grandParentTopic, 'Topic'),
+      url: buildEntryRoute('topic', grandParentTopic),
+    });
+  }
+
+  if (sectionTopic?._id) {
+    items.push({
+      title: getLinkTitle(sectionTopic, 'Topic'),
+      url: buildEntryRoute('topic', sectionTopic),
+    });
+  }
+
+  const parentArgument = (options?.parentArgument || entry.parentArgument || null) as LegacyEntity | null;
+  if (parentArgument?._id && (objectName === 'argument' || objectName === 'question' || objectName === 'issue' || objectName === 'opinion')) {
+    items.push({
+      title: getLinkTitle(parentArgument, 'Fact'),
+      url: buildEntryRoute('argument', parentArgument),
+      icon: 'flash',
+    });
+  }
+
+  const parentQuestion = (options?.parentQuestion || entry.parentQuestion || null) as LegacyEntity | null;
+  if (parentQuestion?._id && (objectName === 'answer' || objectName === 'issue' || objectName === 'opinion')) {
+    items.push({
+      title: getLinkTitle(parentQuestion, 'Question'),
+      url: buildEntryRoute('question', parentQuestion),
+      icon: 'question-circle-o',
+    });
+  }
+
+  const parentIssue = (options?.parentIssue || entry.parentIssue || null) as LegacyEntity | null;
+  if (parentIssue?._id && objectName === 'opinion') {
+    items.push({
+      title: getLinkTitle(parentIssue, 'Issue'),
+      url: buildEntryRoute('issue', parentIssue),
+      icon: 'exclamation-circle',
+    });
+  }
+
+  items.push({
+    title: getLinkTitle(entry, '(Untitled)'),
+    active: true,
+    icon: getEntryIcon(objectName),
+  });
+
+  return items;
 }
 
 export const EntryContextLine: React.FC<{ entry: LegacyEntity; objectName: EntryObjectName }> = ({

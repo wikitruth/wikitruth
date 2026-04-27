@@ -17,7 +17,11 @@ import type { OpinionEntryResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
 import type { Issue, Opinion } from '../types';
 import { sanitizeHtml } from '../utils/sanitizeHtml';
-import { EntryContextLine, EntryMetaBlock, EntryRelatedTopics } from '../components/Entry/EntryLegacyParity';
+import {
+  EntryContextLine,
+  EntryMetaBlock,
+  buildLegacyEntryBreadcrumb,
+} from '../components/Entry/EntryLegacyParity';
 
 const OpinionEntryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -60,17 +64,13 @@ const OpinionEntryPage: React.FC = () => {
   const opinions = (data.opinions || []) as LegacyEntity[];
   
   // Build breadcrumb items
-  const breadcrumbItems: Array<{ title: string; url?: string; active?: boolean }> = [
-    { title: 'Home', url: '/' },
-    { title: 'Opinions', url: '/opinions' },
-  ];
-  if (opinion.parentTopic?._id) {
-    breadcrumbItems.push({
-      title: String(opinion.parentTopic.title || 'Topic'),
-      url: `/topics/entry/${encodeURIComponent(String(opinion.parentTopic.friendlyUrl || opinion.parentTopic._id))}/${encodeURIComponent(String(opinion.parentTopic._id))}`,
-    });
-  }
-  breadcrumbItems.push({ title: opinion.title, active: true });
+  const breadcrumbItems = buildLegacyEntryBreadcrumb(opinion, 'opinion', {
+    sectionTopic: (data.topic || opinion.parentTopic || null) as LegacyEntity | null,
+    grandParentTopic: (data.parentTopic || data.grandParentTopic || null) as LegacyEntity | null,
+    parentArgument: (opinion.parentArgument || null) as LegacyEntity | null,
+    parentQuestion: (opinion.parentQuestion || null) as LegacyEntity | null,
+    parentIssue: (opinion.parentIssue || null) as LegacyEntity | null,
+  });
 
   const tabs = [
     {
@@ -114,8 +114,6 @@ const OpinionEntryPage: React.FC = () => {
           <p className="lead">{opinion.description}</p>
         )}
       </div>
-      <EntryRelatedTopics entry={opinion} />
-
       {issues.length > 0 && (
         <EntryList
           title="Issues"

@@ -19,7 +19,12 @@ import type { LegacyEntity } from '../types/legacy';
 import type { ArtifactEntryResponse } from '../types/api';
 import type { Argument, Artifact, Issue, Opinion, Question } from '../types';
 import { sanitizeHtml } from '../utils/sanitizeHtml';
-import { EntryContextLine, EntryMetaBlock, EntryRelatedTopics } from '../components/Entry/EntryLegacyParity';
+import {
+  EntryContextLine,
+  EntryMetaBlock,
+  EntryRelatedTopics,
+  buildLegacyEntryBreadcrumb,
+} from '../components/Entry/EntryLegacyParity';
 
 function formatFileSize(bytes?: number): string {
   const size = Number(bytes || 0);
@@ -154,32 +159,52 @@ const ArtifactEntryPage: React.FC = () => {
       icon: 'info-circle',
       url: `/artifacts/entry/${encodeURIComponent(String(artifact.friendlyUrl || artifact._id))}/${encodeURIComponent(String(artifact._id))}`,
     },
-  ];
+    {
+      id: 'artifacts',
+      title: 'Artifacts',
+      icon: 'puzzle-piece',
+      url: `/artifacts?artifact=${encodeURIComponent(String(artifact._id || ''))}`,
+      count: Number(artifact.childrenCount?.artifacts?.accepted || 0),
+    },
+    {
+      id: 'facts',
+      title: 'Facts',
+      icon: 'flash',
+      url: `/arguments?artifact=${encodeURIComponent(String(artifact._id || ''))}`,
+      count: Number(artifact.childrenCount?.arguments?.accepted || 0),
+    },
+    {
+      id: 'questions',
+      title: 'Questions',
+      icon: 'question-circle',
+      url: `/questions?artifact=${encodeURIComponent(String(artifact._id || ''))}`,
+      count: Number(artifact.childrenCount?.questions?.accepted || 0),
+    },
+    {
+      id: 'issues',
+      title: 'Issues',
+      icon: 'exclamation-circle',
+      url: `/issues?artifact=${encodeURIComponent(String(artifact._id || ''))}`,
+      count: Number(artifact.childrenCount?.issues?.accepted || 0),
+    },
+    {
+      id: 'comments',
+      title: 'Comments',
+      icon: 'comments-o',
+      url: `/opinions?artifact=${encodeURIComponent(String(artifact._id || ''))}`,
+      count: Number(artifact.childrenCount?.opinions?.accepted || 0),
+    },
+  ].filter((tab) => tab.id === 'details' || Number(tab.count || 0) > 0);
   const sectionTopic = (artifact.parentTopic || data.topic || null) as LegacyEntity | null;
   const grandParentTopic = (
     artifact.parentTopic?.parentTopic
     || ancestorTopic
     || null
   ) as LegacyEntity | null;
-  const breadcrumbItems: Array<{ title: string; url?: string; active?: boolean; icon?: string }> = [
-    { title: 'Explore', url: '/explore', icon: 'globe' },
-  ];
-  if (
-    grandParentTopic?._id
-    && grandParentTopic._id !== sectionTopic?._id
-  ) {
-    breadcrumbItems.push({
-      title: String(grandParentTopic.title || 'Topic'),
-      url: `/topics/entry/${encodeURIComponent(String(grandParentTopic.friendlyUrl || grandParentTopic._id))}/${encodeURIComponent(String(grandParentTopic._id))}`,
-    });
-  }
-  if (sectionTopic?._id) {
-    breadcrumbItems.push({
-      title: String(sectionTopic.title || 'Topic'),
-      url: `/topics/entry/${encodeURIComponent(String(sectionTopic.friendlyUrl || sectionTopic._id))}/${encodeURIComponent(String(sectionTopic._id))}`,
-    });
-  }
-  breadcrumbItems.push({ title: artifact.title, active: true, icon: 'puzzle-piece' });
+  const breadcrumbItems = buildLegacyEntryBreadcrumb(artifact, 'artifact', {
+    sectionTopic,
+    grandParentTopic,
+  });
   const friendlyModifiedDate = formatFriendlyDate(file.lastModifiedDate);
   const fullModifiedDateTooltip = formatFullDateTooltip(file.lastModifiedDate);
 

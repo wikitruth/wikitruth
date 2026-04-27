@@ -17,7 +17,11 @@ import type { LegacyEntity } from '../types/legacy';
 import type { AnswerEntryResponse } from '../types/api';
 import type { Issue, Opinion } from '../types';
 import { sanitizeHtml } from '../utils/sanitizeHtml';
-import { EntryContextLine, EntryMetaBlock, EntryRelatedTopics } from '../components/Entry/EntryLegacyParity';
+import {
+  EntryContextLine,
+  EntryMetaBlock,
+  buildLegacyEntryBreadcrumb,
+} from '../components/Entry/EntryLegacyParity';
 
 const AnswerEntryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -61,20 +65,29 @@ const AnswerEntryPage: React.FC = () => {
       id: 'details',
       title: 'Details',
       icon: 'info-circle',
-      url: `/answers/entry/${encodeURIComponent(String(answer.friendlyUrl || answer._id))}/${encodeURIComponent(String(answer._id))}`,
+      url: `/answers/entry/${encodeURIComponent(String(answer._id || ''))}`,
     },
-  ];
-  const breadcrumbItems: Array<{ title: string; url?: string; active?: boolean }> = [
-    { title: 'Home', url: '/' },
-    { title: 'Answers', url: '/answers' },
-  ];
-  if (answer.parentQuestion?._id) {
-    breadcrumbItems.push({
-      title: String(answer.parentQuestion.title || 'Question'),
-      url: `/questions/entry/${encodeURIComponent(String(answer.parentQuestion.friendlyUrl || answer.parentQuestion._id))}/${encodeURIComponent(String(answer.parentQuestion._id))}`,
-    });
-  }
-  breadcrumbItems.push({ title: answer.title, active: true });
+    {
+      id: 'issues',
+      title: 'Issues',
+      icon: 'exclamation-circle',
+      url: `/issues?answer=${encodeURIComponent(String(answer._id || ''))}`,
+      count: Number(answer.childrenCount?.issues?.accepted || 0),
+    },
+    {
+      id: 'comments',
+      title: 'Comments',
+      icon: 'comments-o',
+      url: `/opinions?answer=${encodeURIComponent(String(answer._id || ''))}`,
+      count: Number(answer.childrenCount?.opinions?.accepted || 0),
+    },
+  ].filter((tab) => tab.id === 'details' || Number(tab.count || 0) > 0);
+  const breadcrumbItems = buildLegacyEntryBreadcrumb(answer, 'answer', {
+    sectionTopic: (data.topic || answer.parentTopic || null) as LegacyEntity | null,
+    grandParentTopic: (data.parentTopic || data.grandParentTopic || null) as LegacyEntity | null,
+    parentArgument: (answer.parentArgument || null) as LegacyEntity | null,
+    parentQuestion: (answer.parentQuestion || null) as LegacyEntity | null,
+  });
 
   return (
     <div>
@@ -99,8 +112,6 @@ const AnswerEntryPage: React.FC = () => {
       <div className="text-body" style={{ marginTop: '20px' }}>
         <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(answer.content || answer.description || '') }} />
       </div>
-      <EntryRelatedTopics entry={answer} />
-
       {issues.length > 0 && (
         <EntryList
           title="Issues"
