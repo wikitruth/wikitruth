@@ -13,6 +13,7 @@ coverage/client/
 .webpack-cache/
 playwright-report/
 test-results/
+.playwright-mcp/
 
 # Environment variables
 .env
