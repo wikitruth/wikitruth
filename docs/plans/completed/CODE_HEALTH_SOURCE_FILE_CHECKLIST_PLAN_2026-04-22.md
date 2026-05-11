@@ -21,7 +21,7 @@ Companion tracker for CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-22.md.
 - Coverage gap: **360** strict-scope files are not represented in this per-file checklist.
 - Legacy optimization note:
   - this file tracks modern strict-scope + compatibility/test rows only
-  - legacy optimization is tracked separately in [LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md](./completed/LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md)
+  - legacy optimization is tracked separately in [LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md](./LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md)
 
 Metrics columns:
 - lint(E/W): ESLint error and warning count for the file
@@ -89,7 +89,7 @@ Exception policy:
 | --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
 | [x] | P0-001 | `tests/server/helpers/readBackendSource.js` | 56 | 1/0 | 0 | 0 | 0 | 3 | cebaba5: ts-ignore=0; cjs=3 (tests, allowed) |
 | [x] | P0-002 | `client/src/pages/Admin/common/AdminListPage.tsx` | 345 | 1/0 | 0 | 0 | 0 | 0 | previous Pass-1: ts-ignore=0 |
-| [x] | P0-003 | `server/src/utils/flowUtils.ts` | 3052 | 0/0 | 0 | 0 | 0 | 0 | 97c4674→bbff14a + 2026-04-24 decomposition pass: extracted [server/src/utils/flow/entryExtras.ts](../../server/src/utils/flow/entryExtras.ts) and delegated `appendListExtras`/`appendEntryExtras` to core flow module; strict-gate metrics remain zero |
+| [x] | P0-003 | `server/src/utils/flowUtils.ts` | 3052 | 0/0 | 0 | 0 | 0 | 0 | 97c4674→bbff14a + 2026-04-24 decomposition pass: extracted [server/src/utils/flow/entryExtras.ts](../../../server/src/utils/flow/entryExtras.ts) and delegated `appendListExtras`/`appendEntryExtras` to core flow module; strict-gate metrics remain zero |
 | [x] | P0-004 | `server/src/controllers/api/home.ts` | 233 | 0/0 | 0 | 0 | 0 | 0 | 6466790: any 2→0; cjs=6 (tier-2 boot interop) |
 | [x] | P0-005 | `server/src/controllers/api/members.ts` | 847 | 0/0 | 0 | 0 | 0 | 0 | 1a10246: any 28→0 (jwt/withFriendlyUrl/canViewProfile/PrivateEntries/app.config typed); cjs=5 (tier-2) |
 | [x] | P0-006 | `server/src/controllers/api/answers.ts` | 247 | 0/0 | 0 | 0 | 0 | 0 | d2437a4: any 14→0 (AnswersServiceContract); cjs=7 (tier-2) |
@@ -100,9 +100,9 @@ Exception policy:
 | [x] | P0-011 | `server/src/app.ts` | 251 | 0/0 | 0 | 0 | 0 | 27 | e378bbb: ts-ignore=0; cjs=34 (tier-2) |
 | [x] | P0-012 | `server/src/models/schema/models.ts` | 47 | 0/0 | 0 | 0 | 0 | 33 | e378bbb: ts-ignore=0; cjs=34 (tier-2 boot interop) |
 | [x] | P0-013 | `server/src/controllers/api/index.ts` | 103 | 0/0 | 0 | 0 | 0 | 0 | a2c4005: ts-ignore=0; cjs=25 (tier-2) |
-| [x] | P0-014 | `server/src/controllers/api/admin.ts` | 795 | 0/0 | 0 | 0 | 0 | 0 | 2026-04-24 decomposition: admin backup/audit routes moved to [server/src/controllers/api/adminBackupRoutes.ts](../../server/src/controllers/api/adminBackupRoutes.ts); admin API parity preserved via route smoke + full test suite |
-| [x] | P0-015 | `server/src/controllers/api/moderation.ts` | 841 | 0/0 | 0 | 0 | 0 | 0 | 2026-04-24 decomposition: shared moderation logic moved to [moderationShared.ts](../../server/src/controllers/api/moderationShared.ts) and vote/signal/appeal routes moved to [moderationSignalsRoutes.ts](../../server/src/controllers/api/moderationSignalsRoutes.ts); contract/smoke tests updated and passing |
-| [x] | P0-016 | `server/src/controllers/api/auth.ts` | 913 | 0/0 | 0 | 0 | 0 | 0 | 2026-04-24 decomposition: helper and token/session logic moved to [authHelpers.ts](../../server/src/controllers/api/authHelpers.ts) and [authTokenHelpers.ts](../../server/src/controllers/api/authTokenHelpers.ts); typed contracts retained; full validation green |
+| [x] | P0-014 | `server/src/controllers/api/admin.ts` | 795 | 0/0 | 0 | 0 | 0 | 0 | 2026-04-24 decomposition: admin backup/audit routes moved to [server/src/controllers/api/adminBackupRoutes.ts](../../../server/src/controllers/api/adminBackupRoutes.ts); admin API parity preserved via route smoke + full test suite |
+| [x] | P0-015 | `server/src/controllers/api/moderation.ts` | 841 | 0/0 | 0 | 0 | 0 | 0 | 2026-04-24 decomposition: shared moderation logic moved to [moderationShared.ts](../../../server/src/controllers/api/moderationShared.ts) and vote/signal/appeal routes moved to [moderationSignalsRoutes.ts](../../../server/src/controllers/api/moderationSignalsRoutes.ts); contract/smoke tests updated and passing |
+| [x] | P0-016 | `server/src/controllers/api/auth.ts` | 913 | 0/0 | 0 | 0 | 0 | 0 | 2026-04-24 decomposition: helper and token/session logic moved to [authHelpers.ts](../../../server/src/controllers/api/authHelpers.ts) and [authTokenHelpers.ts](../../../server/src/controllers/api/authTokenHelpers.ts); typed contracts retained; full validation green |
 
 ## P1 Files
 
@@ -197,7 +197,7 @@ Exception policy:
 | [x] | P2-029 | `server/src/middlewares/routes.ts` | 440 | 0/0 | 0 | 0 | 0 | 0 | a2c4005: ts-ignore=0; cjs=2 (tier-2) |
 | [x] | P2-030 | `server/src/models/schema/plugins/pagedFind.ts` | 122 | 0/0 | 0 | 0 | 0 | 1 | be9c762: ts-ignore=0; cjs=2 (tier-2 boot interop) |
 | [x] | P2-031 | `server/src/utils/workflow/index.ts` | 44 | 0/0 | 0 | 0 | 0 | 0 | a2c4005: ts-ignore=0; cjs=2 (tier-2 boot interop) |
-| [x] | P2-032 | `tests/server/api-endpoints-smoke.test.js` | 218 | 0/0 | 0 | 0 | 0 | 1 | 2026-04-24 parity update: asserts `registerAdminBackupRoutes(router, ensureAdmin)` + moderation split `registerModerationSignalsRoutes(router)` and route presence in [moderationSignalsRoutes.ts](../../server/src/controllers/api/moderationSignalsRoutes.ts) |
+| [x] | P2-032 | `tests/server/api-endpoints-smoke.test.js` | 218 | 0/0 | 0 | 0 | 0 | 1 | 2026-04-24 parity update: asserts `registerAdminBackupRoutes(router, ensureAdmin)` + moderation split `registerModerationSignalsRoutes(router)` and route presence in [moderationSignalsRoutes.ts](../../../server/src/controllers/api/moderationSignalsRoutes.ts) |
 | [x] | P2-033 | `tests/server/children-count-guardrails.test.js` | 53 | 0/0 | 0 | 0 | 0 | 2 | a2c4005: ts-ignore=0; cjs=2 (tests, allowed) |
 | [x] | P2-034 | `tests/server/legacy-client-security.test.js` | 18 | 0/0 | 0 | 0 | 0 | 2 | a2c4005: ts-ignore=0; cjs=2 (tests, allowed) |
 | [x] | P2-035 | `tests/server/openapi-contract.test.js` | 130 | 0/0 | 0 | 0 | 0 | 2 | a2c4005: ts-ignore=0; cjs=2 (tests, allowed) |
@@ -265,4 +265,4 @@ This file remains the execution tracker for code-health strict gates. The tracke
 surfaces are currently complete; remaining long-horizon architecture/perf work
 stays in the parent optimization plan as non-strict follow-up tracks. Legacy
 code-health optimization is tracked in the completed legacy plan:
-[LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md](./completed/LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md).
+[LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md](./LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md).

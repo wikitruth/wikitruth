@@ -26,4 +26,4 @@ Capture cross-cutting platform targets beyond feature workflows.
 ## Target State Status
 
 - Mixed: many foundations are `implemented` or `partial`, while delivery expansion remains `planned`.
-- Source baseline: `docs/plans/MIGRATION_COMPLETION_PLAN_2026-04-12.md`, `docs/plans/DEPENDENCY_UPGRADE_PLAN_2026-02-24.md`, `docs/plans/MOBILE_APP_STRATEGY_2026-02-24.md`.
+- Source baseline: `docs/plans/completed/MIGRATION_COMPLETION_PLAN_2026-04-12.md`, `docs/plans/DEPENDENCY_UPGRADE_PLAN_2026-02-24.md`, `docs/strategy/MOBILE_APP_STRATEGY_2026-02-24.md`.

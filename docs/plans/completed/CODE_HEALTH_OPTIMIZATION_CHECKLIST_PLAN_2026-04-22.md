@@ -24,7 +24,7 @@ For modern repository source, completion means:
 Scope note (revised 2026-04-23 after scope review):
 
 - Strict gates apply to `server/src/**` and `client/src/**`; the CJS zero-gate applies only to the modern-internal folders listed above.
-- `legacy/**` optimization is tracked under the dedicated legacy plan (now completed): [LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md](./completed/LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md).
+- `legacy/**` optimization is tracked under the dedicated legacy plan (now completed): [LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md](./LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md).
 - `tests/**` are quality-gate code, not application source; CJS in test files is allowed by tier policy and excluded from strict gates.
 - No exceptions are allowed inside the strict scopes defined above.
 
@@ -32,7 +32,7 @@ Scope note (revised 2026-04-23 after scope review):
 
 - Every item stays unchecked (`[ ]`) until validated in code + test/lint/type outputs.
 - Each PR should reference checklist item IDs (example: `T1-03`, `T5-04`).
-- File-level execution tracker: `docs/plans/CODE_HEALTH_SOURCE_FILE_CHECKLIST_PLAN_2026-04-22.md`
+- File-level execution tracker: `docs/plans/completed/CODE_HEALTH_SOURCE_FILE_CHECKLIST_PLAN_2026-04-22.md`
 - Strict-gate items are blocking and take precedence over earlier milestone reduction targets.
 - After each merged chunk, update this doc with:
   - completion state
@@ -56,7 +56,7 @@ Scope note (revised 2026-04-23 after scope review):
   - `require()` in modern-internal CJS scope: `0`
   - `module.exports` in modern-internal CJS scope: `0`
   - compatibility-boundary CJS usage remains isolated to `server/src/app.ts`, `server/src/server.ts`, `server/src/config/**`, and `server/src/models/**` by design.
-- Legacy optimization status is tracked separately in [LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md](./completed/LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md) (completed); this modern tracker alone is not the repo-wide code-health completion signal.
+- Legacy optimization status is tracked separately in [LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md](./LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md) (completed); this modern tracker alone is not the repo-wide code-health completion signal.
 - File-level tracker ([CODE_HEALTH_SOURCE_FILE_CHECKLIST_PLAN_2026-04-22.md](./CODE_HEALTH_SOURCE_FILE_CHECKLIST_PLAN_2026-04-22.md)) after live revalidation:
   - `136` tracked rows total
   - `136` rows marked complete, `0` rows open
@@ -238,27 +238,27 @@ Acceptance criteria:
 - **Track 1 (P0) — full**
   - Installed `eslint-plugin-react-hooks@^4.6.2` and wired `plugin:react-hooks/recommended` in `.eslintrc.json`.
   - Added override disabling `react-hooks/rules-of-hooks` for `**/*.stories.{ts,tsx}` (Storybook render arrow false-positives).
-  - Replaced `while (true)` with bounded loop in [tests/server/helpers/readBackendSource.js](../../tests/server/helpers/readBackendSource.js) (`MAX_HOPS = 32`).
-  - Added [docs/qa/eslint-warning-policy.md](../qa/eslint-warning-policy.md) describing why warnings stay non-blocking and the criteria to promote rules to `error`.
+  - Replaced `while (true)` with bounded loop in [tests/server/helpers/readBackendSource.js](../../../tests/server/helpers/readBackendSource.js) (`MAX_HOPS = 32`).
+  - Added [docs/qa/eslint-warning-policy.md](../../qa/eslint-warning-policy.md) describing why warnings stay non-blocking and the criteria to promote rules to `error`.
   - Added `npm run ci:smoke` aggregating `lint + type:check + type:guardrails + type:guardrails:suppressions + lint:guardrails:cjs`.
   - Lint now exits 0 (0 errors, 51 warnings — see warning policy doc).
 
 - **Track 2 (P0) — full**
-  - Rewrote [scripts/type-metrics.sh](../../scripts/type-metrics.sh) to scan `server/src`, `client/src`, and `tests/server` (also includes `.tsx`).
+  - Rewrote [scripts/type-metrics.sh](../../../scripts/type-metrics.sh) to scan `server/src`, `client/src`, and `tests/server` (also includes `.tsx`).
   - Added per-directory breakdown for both server and client subtrees (controllers / middlewares / models / services / utils / types / config and components / pages / context / hooks / services / utils / routes).
   - Tightened `any-like` regex to reduce false positives (was matching the bare word `any`).
-  - Saved baseline snapshot at [docs/metrics/type-metrics-baseline-2026-04-22.txt](../metrics/type-metrics-baseline-2026-04-22.txt).
+  - Saved baseline snapshot at [docs/metrics/type-metrics-baseline-2026-04-22.txt](../../metrics/type-metrics-baseline-2026-04-22.txt).
   - Reduction targets recorded below under "Reduction Targets".
 
 - **Track 3 (P1) — partial (T3-05)**
-  - Added [scripts/check-no-new-ts-suppressions.sh](../../scripts/check-no-new-ts-suppressions.sh) blocking net-new `@ts-ignore` / `@ts-expect-error` per PR via diff-based net counter.
+  - Added [scripts/check-no-new-ts-suppressions.sh](../../../scripts/check-no-new-ts-suppressions.sh) blocking net-new `@ts-ignore` / `@ts-expect-error` per PR via diff-based net counter.
 
 - **Track 5 (P1) — partial (T5-06)**
-  - Added [scripts/check-no-new-cjs-modern.sh](../../scripts/check-no-new-cjs-modern.sh) blocking net-new `require()` / `module.exports` in modern folders (`server/src/{controllers,middlewares,services,utils,types}` and `client/src`). Schema folder explicitly excluded until T5-04/T5-05 migration begins.
+  - Added [scripts/check-no-new-cjs-modern.sh](../../../scripts/check-no-new-cjs-modern.sh) blocking net-new `require()` / `module.exports` in modern folders (`server/src/{controllers,middlewares,services,utils,types}` and `client/src`). Schema folder explicitly excluded until T5-04/T5-05 migration begins.
 
 - **Track 7 (P1) — partial (T7-03, T7-04)**
-  - Added [scripts/runtime/preflight-check.sh](../../scripts/runtime/preflight-check.sh) verifying engine ranges, bcrypt loadability, and macOS brew dylib presence.
-  - Added [docs/runbooks/RUNTIME_PREFLIGHT_2026-04-22.md](../runbooks/RUNTIME_PREFLIGHT_2026-04-22.md) defining the rollback-safe deploy gate (`preflight → build → pm2 restart-check → publish`).
+  - Added [scripts/runtime/preflight-check.sh](../../../scripts/runtime/preflight-check.sh) verifying engine ranges, bcrypt loadability, and macOS brew dylib presence.
+  - Added [docs/runbooks/RUNTIME_PREFLIGHT_2026-04-22.md](../../runbooks/RUNTIME_PREFLIGHT_2026-04-22.md) defining the rollback-safe deploy gate (`preflight → build → pm2 restart-check → publish`).
   - Wired `npm run runtime:preflight`.
 
 ### Validation snapshot
@@ -290,24 +290,24 @@ This pass completed all previously open tracks and removed the last deferred sta
 
 Completed in this pass:
 
-- **Track 3 (T3-03, T3-06)** — introduced explicit controller boundary contracts in [server/src/types/controllerContracts.ts](../../server/src/types/controllerContracts.ts), then wired typed `bodyOf<T>()` / `queryOf<T>()` payload aliases through `auth`, `admin`, and `moderation` controllers.
+- **Track 3 (T3-03, T3-06)** — introduced explicit controller boundary contracts in [server/src/types/controllerContracts.ts](../../../server/src/types/controllerContracts.ts), then wired typed `bodyOf<T>()` / `queryOf<T>()` payload aliases through `auth`, `admin`, and `moderation` controllers.
 - **Track 4 (T4-01, T4-02)** — completed decomposition slices:
-  - `admin.ts` split with [adminBackupRoutes.ts](../../server/src/controllers/api/adminBackupRoutes.ts).
-  - `auth.ts` split with [authHelpers.ts](../../server/src/controllers/api/authHelpers.ts) and [authTokenHelpers.ts](../../server/src/controllers/api/authTokenHelpers.ts).
-  - `moderation.ts` split with [moderationShared.ts](../../server/src/controllers/api/moderationShared.ts) and [moderationSignalsRoutes.ts](../../server/src/controllers/api/moderationSignalsRoutes.ts).
-  - `flowUtils.ts` decomposition continued via [server/src/utils/flow/entryExtras.ts](../../server/src/utils/flow/entryExtras.ts).
+  - `admin.ts` split with [adminBackupRoutes.ts](../../../server/src/controllers/api/adminBackupRoutes.ts).
+  - `auth.ts` split with [authHelpers.ts](../../../server/src/controllers/api/authHelpers.ts) and [authTokenHelpers.ts](../../../server/src/controllers/api/authTokenHelpers.ts).
+  - `moderation.ts` split with [moderationShared.ts](../../../server/src/controllers/api/moderationShared.ts) and [moderationSignalsRoutes.ts](../../../server/src/controllers/api/moderationSignalsRoutes.ts).
+  - `flowUtils.ts` decomposition continued via [server/src/utils/flow/entryExtras.ts](../../../server/src/utils/flow/entryExtras.ts).
   - hotspot file-size outcome: `admin.ts=795`, `auth.ts=913`, `moderation.ts=841`.
 - **Track 6 (T6-03, T6-04)** — major upgrade batches are now planned and executable through:
-  - [dep-upgrade-classification-2026-04-22.md](dep-upgrade-classification-2026-04-22.md)
-  - [scripts/qa/upgrade-regression-batch.sh](../../scripts/qa/upgrade-regression-batch.sh)
-  - `test:upgrade:regression:*` npm scripts in [package.json](../../package.json)
+  - [dep-upgrade-classification-2026-04-22.md](../../dependencies/dep-upgrade-classification-2026-04-22.md)
+  - [scripts/qa/upgrade-regression-batch.sh](../../../scripts/qa/upgrade-regression-batch.sh)
+  - `test:upgrade:regression:*` npm scripts in [package.json](../../../package.json)
 - **Track 7 (T7-01, T7-02)** — PM2 incident reproduction/matrix hardening completed:
-  - [PM2_INCIDENT_REPRO_MATRIX_2026-04-24.md](../runbooks/PM2_INCIDENT_REPRO_MATRIX_2026-04-24.md)
-  - extended [pm2-restart-check.sh](../../scripts/runtime/pm2-restart-check.sh) with runtime matrix checks + optional preflight enforcement.
+  - [PM2_INCIDENT_REPRO_MATRIX_2026-04-24.md](../../runbooks/PM2_INCIDENT_REPRO_MATRIX_2026-04-24.md)
+  - extended [pm2-restart-check.sh](../../../scripts/runtime/pm2-restart-check.sh) with runtime matrix checks + optional preflight enforcement.
 - **Track 8 (T8-02, T8-03, T8-04)** — test and perf signal depth completed:
-  - focused controller coverage updates in [auth-recaptcha-role-switch.test.ts](../../tests/server/auth-recaptcha-role-switch.test.ts) and [api-endpoints-smoke.test.js](../../tests/server/api-endpoints-smoke.test.js)
-  - adapter contract suite [legacy-modern-adapter-contracts.test.js](../../tests/server/legacy-modern-adapter-contracts.test.js)
-  - perf budget config + checker via [docs/qa/perf-budgets-2026-04-24.json](../qa/perf-budgets-2026-04-24.json) and [scripts/perf/check-perf-budgets.mjs](../../scripts/perf/check-perf-budgets.mjs)
+  - focused controller coverage updates in [auth-recaptcha-role-switch.test.ts](../../../tests/server/auth-recaptcha-role-switch.test.ts) and [api-endpoints-smoke.test.js](../../../tests/server/api-endpoints-smoke.test.js)
+  - adapter contract suite [legacy-modern-adapter-contracts.test.js](../../../tests/server/legacy-modern-adapter-contracts.test.js)
+  - perf budget config + checker via [docs/qa/perf-budgets-2026-04-24.json](../../qa/perf-budgets-2026-04-24.json) and [scripts/perf/check-perf-budgets.mjs](../../../scripts/perf/check-perf-budgets.mjs)
 
 ---
 
@@ -330,20 +330,20 @@ Completed in this pass:
   - All commits referenced the relevant `T3-XX` IDs.
 
 - **Track 4 (P1) — partial (T4-03, T4-04)**
-  - Added [scripts/check-file-size-budget.sh](../../scripts/check-file-size-budget.sh) (default 500-line budget, exempts the existing 9 oversized files, flags new violations as errors and pre-existing creep as warnings). Wired into `npm run ci:smoke` via new `lint:guardrails:filesize` script.
-  - Added [docs/architecture/module-boundaries-2026-04-22.md](../architecture/module-boundaries-2026-04-22.md) capturing the three-tier module strategy (modern-internal / compatibility-adapter / legacy tier) and the named seams (router-factory, mobile-API contracts, mongoose registration). T4-04 + T5-02 + T5-03 jointly satisfied by this doc. Legacy policy wording in that architecture doc is now tracked for update in [LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md](./completed/LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md) item `L0-03`.
+  - Added [scripts/check-file-size-budget.sh](../../../scripts/check-file-size-budget.sh) (default 500-line budget, exempts the existing 9 oversized files, flags new violations as errors and pre-existing creep as warnings). Wired into `npm run ci:smoke` via new `lint:guardrails:filesize` script.
+  - Added [docs/architecture/module-boundaries-2026-04-22.md](../../architecture/module-boundaries-2026-04-22.md) capturing the three-tier module strategy (modern-internal / compatibility-adapter / legacy tier) and the named seams (router-factory, mobile-API contracts, mongoose registration). T4-04 + T5-02 + T5-03 jointly satisfied by this doc. Legacy policy wording in that architecture doc is now tracked for update in [LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md](./LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md) item `L0-03`.
 
 - **Track 5 (P1) — large progress (T5-01, T5-02, T5-03, T5-04, T5-05)**
   - T5-01 inventory snapshot in the new module-boundaries doc: 61 `module.exports` and 70 `require()` files in `server/src` classified by directory; 164 in `legacy/**` at the 2026-04-22 snapshot.
   - T5-04/T5-05 — schema factory migration completed in commit `be9c762` (Pass-1 follow-up). 75 → 1 `@ts-ignore` in `server/src/models/**`.
 
 - **Track 6 (P2) — partial (T6-01, T6-02, T6-05)**
-  - Added [docs/plans/dep-upgrade-classification-2026-04-22.md](dep-upgrade-classification-2026-04-22.md) classifying every outdated dep into Bucket A (low-risk patch/minor), B (medium), C (major / staged).
+  - Added [docs/dependencies/dep-upgrade-classification-2026-04-22.md](../../dependencies/dep-upgrade-classification-2026-04-22.md) classifying every outdated dep into Bucket A (low-risk patch/minor), B (medium), C (major / staged).
   - Applied Bucket A via `npm update` (commit `7a9702c`) — package-lock refreshed; package.json declared ranges unchanged.
-  - Added [docs/runbooks/node-engine-matrix-2026-04-22.md](../runbooks/node-engine-matrix-2026-04-22.md) documenting the supported Node + npm tiers, the rationale for the upper bounds, and the procedure to lift them.
+  - Added [docs/runbooks/node-engine-matrix-2026-04-22.md](../../runbooks/node-engine-matrix-2026-04-22.md) documenting the supported Node + npm tiers, the rationale for the upper bounds, and the procedure to lift them.
 
 - **Track 8 (P2) — partial (T8-01)**
-  - Eliminated all React `act(...)` warnings in the client suite. Touched [client/src/components/Entry/EntryActionsMenu.test.tsx](../../client/src/components/Entry/EntryActionsMenu.test.tsx) (async `renderMenu` that flushes the follow-state effect) and [client/src/providers/AppProviders.test.tsx](../../client/src/providers/AppProviders.test.tsx) (flush AuthProvider's `checkAuthStatus` promise). Warning count: 5 → 0.
+  - Eliminated all React `act(...)` warnings in the client suite. Touched [client/src/components/Entry/EntryActionsMenu.test.tsx](../../../client/src/components/Entry/EntryActionsMenu.test.tsx) (async `renderMenu` that flushes the follow-state effect) and [client/src/providers/AppProviders.test.tsx](../../../client/src/providers/AppProviders.test.tsx) (flush AuthProvider's `checkAuthStatus` promise). Warning count: 5 → 0.
 
 ### Validation snapshot — Pass 2
 

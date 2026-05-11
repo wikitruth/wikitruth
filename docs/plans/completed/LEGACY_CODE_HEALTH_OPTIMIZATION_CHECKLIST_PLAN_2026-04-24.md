@@ -190,7 +190,7 @@ Acceptance:
 Repo-level code-health completion requires BOTH plans to be fully checked
 and moved to `docs/plans/completed/`:
 
-- `docs/plans/CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-22.md` (modern)
+- `docs/plans/completed/CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-22.md` (modern)
 - this plan (legacy)
 
 Completing only one side does NOT satisfy the repo-level gate.

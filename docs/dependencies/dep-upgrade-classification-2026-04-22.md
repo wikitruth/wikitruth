@@ -122,5 +122,5 @@ For every batch:
 
 ## Tracking
 
-- Update `docs/plans/CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-22.md` after each batch lands; mark sub-items of T6-02..T6-05 accordingly.
+- Update `docs/plans/completed/CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-22.md` after each batch lands; mark sub-items of T6-02..T6-05 accordingly.
 - Re-run `npm outdated` after each batch and append a "Snapshot after Batch N" section here showing the delta.

@@ -11,12 +11,21 @@ This folder contains active engineering documentation, planning docs, and histor
 - Deferred plans index: `docs/plans/deferred/README.md`
 - Dependency upgrade plan (active): `docs/plans/DEPENDENCY_UPGRADE_PLAN_2026-02-24.md`
 - Deprecation replacement plan (active): `docs/plans/DEPRECATION_REPLACEMENT_PLAN.md`
-- Mobile app strategy (active): `docs/plans/MOBILE_APP_STRATEGY_2026-02-24.md`
-- Rollback plan (active): `docs/plans/ROLLBACK_PLAN.md`
+- Mobile app strategy: `docs/strategy/MOBILE_APP_STRATEGY_2026-02-24.md`
+- Rollback runbook: `docs/runbooks/ROLLBACK_PLAN.md`
+- Dependency upgrade classification: `docs/dependencies/dep-upgrade-classification-2026-04-22.md`
 
 ## Architecture Decisions
 
 - ADR index: `docs/adr/README.md`
+
+## Strategy Docs
+
+- Strategy docs index: `docs/strategy/README.md`
+
+## Dependency Docs
+
+- Dependency docs index: `docs/dependencies/README.md`
 
 ## Frontend Docs
 

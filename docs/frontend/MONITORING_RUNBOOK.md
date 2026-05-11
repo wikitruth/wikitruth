@@ -42,4 +42,4 @@ Initiate rollback when:
 - P0/P1 incidents persist without mitigation.
 - Error volume spikes materially above baseline after release.
 
-Follow `docs/plans/ROLLBACK_PLAN.md`.
+Follow `docs/runbooks/ROLLBACK_PLAN.md`.

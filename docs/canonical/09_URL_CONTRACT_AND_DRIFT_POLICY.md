@@ -35,4 +35,4 @@ Example:
 
 ## Source of Record
 
-- Drift matrix and approvals: `docs/plans/LEGACY_MODERN_URL_FORMAT_DRIFT_CHECKLIST_PLAN_2026-04-22.md`
+- Drift matrix and approvals: `docs/plans/completed/LEGACY_MODERN_URL_FORMAT_DRIFT_CHECKLIST_PLAN_2026-04-22.md`

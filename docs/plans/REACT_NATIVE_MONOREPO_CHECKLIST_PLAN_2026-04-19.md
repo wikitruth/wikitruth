@@ -12,7 +12,7 @@ Deliver a React Native client using Expo with low risk to current web/server flo
 
 ## References
 
-- `docs/plans/MOBILE_APP_STRATEGY_2026-02-24.md`
+- `docs/strategy/MOBILE_APP_STRATEGY_2026-02-24.md`
 - `docs/api/openapi.json`
 - `client/src/services/api/*`
 - `client/src/types/api.ts`

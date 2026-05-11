@@ -107,7 +107,7 @@ Close remaining parity gaps between legacy and modern flows, harden API contract
     - Runtime errors caused by payload shape mismatch are reduced.
 
 - [x] **P2.3 Mobile-readiness contract backlog**
-  - Execute unresolved items from `docs/plans/MOBILE_APP_STRATEGY_2026-02-24.md`:
+  - Execute unresolved items from `docs/strategy/MOBILE_APP_STRATEGY_2026-02-24.md`:
     - token lifecycle model
     - pagination/rate-limit/deprecation contracts
     - mobile observability tags

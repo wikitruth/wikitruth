@@ -21,7 +21,7 @@ Instead, we use targeted guardrails:
 
 - `scripts/check-no-new-ts-suppressions.sh` blocks net-new `@ts-ignore` / `@ts-expect-error` per PR.
 - `scripts/check-no-new-cjs-modern.sh` blocks net-new `require()` / `module.exports` in modern folders.
-- Per-file checklist (`docs/plans/CODE_HEALTH_SOURCE_FILE_CHECKLIST_PLAN_2026-04-22.md`) tracks file-level cleanups.
+- Per-file checklist (`docs/plans/completed/CODE_HEALTH_SOURCE_FILE_CHECKLIST_PLAN_2026-04-22.md`) tracks file-level cleanups.
 
 ## When may a rule be promoted to `error`?
 

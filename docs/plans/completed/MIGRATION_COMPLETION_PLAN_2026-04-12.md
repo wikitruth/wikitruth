@@ -1,7 +1,7 @@
 # React Client Migration Completion Plan
 
 **Date:** 2026-04-12
-**Reference:** [LEGACY_REACT_GAP_ANALYSIS_2026-04-12.md](../frontend/LEGACY_REACT_GAP_ANALYSIS_2026-04-12.md)
+**Reference:** [LEGACY_REACT_GAP_ANALYSIS_2026-04-12.md](../../frontend/LEGACY_REACT_GAP_ANALYSIS_2026-04-12.md)
 **Goal:** Close all remaining gaps between legacy frontend and modern React client
 
 > Status update (2026-04-18): phases below document completed remediation work for this plan scope.  
@@ -633,7 +633,7 @@ Each item is considered **done** when:
 
 ## Related Documents
 
-- [../frontend/LEGACY_REACT_GAP_ANALYSIS_2026-04-12.md](../frontend/LEGACY_REACT_GAP_ANALYSIS_2026-04-12.md)
-- [../frontend/LEGACY_PARITY_MATRIX_2026-02-24.md](../frontend/LEGACY_PARITY_MATRIX_2026-02-24.md)
+- [../../frontend/LEGACY_REACT_GAP_ANALYSIS_2026-04-12.md](../../frontend/LEGACY_REACT_GAP_ANALYSIS_2026-04-12.md)
+- [../../frontend/LEGACY_PARITY_MATRIX_2026-02-24.md](../../frontend/LEGACY_PARITY_MATRIX_2026-02-24.md)
 - [completed/CORE_GAP_REMEDIATION_PLAN_2026-03-27.md](completed/CORE_GAP_REMEDIATION_PLAN_2026-03-27.md)
 - [completed/MIGRATION_CHECKLIST.md](completed/MIGRATION_CHECKLIST.md)

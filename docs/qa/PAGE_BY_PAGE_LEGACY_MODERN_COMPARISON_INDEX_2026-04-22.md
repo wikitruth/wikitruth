@@ -26,7 +26,7 @@ This pack is intended for parity execution, not just route listing.
 - Existing parity audit source: `docs/plans/LEGACY_MODERN_MIGRATION_PARITY_AUDIT_CHECKLIST_PLAN_2026-04-19.md`
 - Existing runtime audit: `docs/qa/LEGACY_MODERN_PARITY_AUDIT_2026-04-20.md`
 - Runtime evidence bundle for this comparison pass: `docs/qa/LEGACY_MODERN_RUNTIME_EVIDENCE_SUMMARY_2026-04-22.md`
-- URL drift approvals: `docs/plans/LEGACY_MODERN_URL_FORMAT_DRIFT_CHECKLIST_PLAN_2026-04-22.md`
+- URL drift approvals: `docs/plans/completed/LEGACY_MODERN_URL_FORMAT_DRIFT_CHECKLIST_PLAN_2026-04-22.md`
 - Signed-in parity runner: `scripts/qa/migration-authenticated-parity.mjs`
 - Reusable parity credential setup: `scripts/qa/setup-parity-test-creds.mjs`, `docs/qa/PARITY_TEST_CREDENTIALS_RUNBOOK_2026-04-22.md`
 
@@ -42,7 +42,7 @@ This pack is intended for parity execution, not just route listing.
 
 - For route-shape comparison, legacy paths are normalized by removing the `/legacy` prefix.
 - URL-format drift decisions are tracked in:
-  - `docs/plans/LEGACY_MODERN_URL_FORMAT_DRIFT_CHECKLIST_PLAN_2026-04-22.md`
+  - `docs/plans/completed/LEGACY_MODERN_URL_FORMAT_DRIFT_CHECKLIST_PLAN_2026-04-22.md`
 
 ## How to Use This Pack
 
