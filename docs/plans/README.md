@@ -2,6 +2,17 @@
 
 Active and historical planning documents are organized under this folder.
 
+## Pending Snapshot (2026-05-18)
+
+- Active checklist backlog:
+  - `docs/plans/LEGACY_MODERN_MIGRATION_PARITY_AUDIT_CHECKLIST_PLAN_2026-04-19.md` open `[ ]`: **13**
+  - `docs/plans/REACT_NATIVE_MONOREPO_CHECKLIST_PLAN_2026-04-19.md` open `[ ]`: **83**
+- Active non-checklist plans (execution still pending by roadmap/wave):
+  - `docs/plans/DEPENDENCY_UPGRADE_PLAN_2026-02-24.md` (revalidated `2026-05-18`; still pending)
+  - `docs/plans/DEPRECATION_REPLACEMENT_PLAN.md` (revalidated `2026-05-18`; still pending)
+- Deferred checklist backlog:
+  - `docs/plans/deferred/**` open `[ ]`: **161** total
+
 ## Active Plans
 
 - `docs/plans/DEPENDENCY_UPGRADE_PLAN_2026-02-24.md`

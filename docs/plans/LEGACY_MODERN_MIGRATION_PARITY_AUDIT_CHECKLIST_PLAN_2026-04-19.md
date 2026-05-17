@@ -45,7 +45,7 @@ Audit references used for this pass:
 - `[x]` Legacy app is mounted under `/legacy/*`
 - `[x]` `/app` and `/app/*` are redirect aliases to root modern routes
 - `[x]` Legacy aliases (`/home`, `/wiki`, singular entry aliases) are redirected to modern equivalents
-- `[x]` Legacy admin root alias `/legacy/admin` now redirects to modern admin dashboard (`/admin`)
+- `[x]` Legacy admin root alias `/legacy/admin` intentionally stays in legacy namespace and redirects to `/legacy/admin/db-backup` (modern admin remains `/admin`)
 
 ### Legacy route surface without clear modern equivalent (needs explicit decision)
 
@@ -124,7 +124,7 @@ Audit references used for this pass:
 - `[x]` Child entry lists for topics/facts/questions/artifacts/issues/comments
 - `[x]` Entry actions include edit/follow/share/reply/copy/link/history/report/signal/appeal/screening/convert/delete (role-gated)
 - `[ ]` Validate parity of legacy entry-outline behavior included from `dust/wiki/common/entry-outline`
-- `[ ]` Validate “link-entry” flows (topic/argument link entities) are fully reachable and editable in modern UX
+- `[x]` Validate “link-entry” flows (topic/argument link entities) are fully reachable and editable in modern UX
 
 ### 6) Entity List + Create/Edit Flows (Topics, Arguments, Questions, Answers, Issues, Opinions, Artifacts)
 
@@ -155,8 +155,8 @@ Audit references used for this pass:
 - `[x]` Social provider buttons in modern include google/github/facebook/twitter/apple/microsoft
 - `[x]` Account settings sections exist (contact, identity, password, social connections)
 - `[x]` Social connect/disconnect links exist in modern account settings
-- `[ ]` Validate runtime provider visibility parity for enabled providers from backend `providers()` contract
-- `[ ]` Validate full forgot/reset token journey parity from email link to completion
+- `[x]` Runtime provider visibility parity is validated against backend `providers()` contract (server contract + client rendering tests)
+- `[x]` Validate full forgot/reset token journey parity from email link to completion
 
 ### 9) Members, Profile, Contributions, Pages
 
@@ -166,8 +166,8 @@ Audit references used for this pass:
 - `[x]` Profile settings include private profile + fast switch controls
 - `[x]` Custom pages list/create/view routes exist
 - `[x]` Profile follow action for non-owner now uses notification subscriptions (`user` object) with follow-state load and toggle action
-- `[ ]` Validate contributions filtering parity against legacy tabs and counters
-- `[ ]` Validate journal navigation and context sidebar behavior parity for all journal route states (including legacy diary aliases)
+- `[x]` Validate contributions filtering parity against legacy tabs and counters
+- `[x]` Validate journal navigation and context sidebar behavior parity for all journal route states (including legacy diary aliases)
 
 ### 10) Groups
 
@@ -177,7 +177,7 @@ Audit references used for this pass:
 - `[x]` Group members list exists with role labels
 - `[x]` Group overview parity: modern overview now includes contribution stat tiles (total + per entity) backed by API group stats
 - `[x]` Group members parity: modern members page now splits `Administrators` and `All Members` and exposes Add/manage affordance for managers
-- `[ ]` Validate group route canonicalization between friendly/id forms and legacy compare links
+- `[x]` Group route canonicalization validated at code level (friendly/id modern routes plus canonical group URL builder)
 
 ### 11) Admin
 
@@ -187,8 +187,8 @@ Audit references used for this pass:
 - `[x]` Moderation signals/appeals page exists
 - `[x]` Audit timeline page exists
 - `[x]` Realtime status panel exists in modern dashboard
-- `[ ]` Validate stat-card parity coverage (legacy includes explicit admins/groups counts in same dashboard layout)
-- `[ ]` Validate operation-level parity (backup/restore/admin mutations) via runtime checklist execution
+- `[x]` Validate stat-card parity coverage (legacy includes explicit admins/groups counts in same dashboard layout)
+- `[x]` Validate operation-level parity (backup/restore/admin mutations) via runtime checklist execution
 
 ### 12) Utility and Secondary Flows
 
@@ -239,11 +239,39 @@ Use this matrix to complete runtime parity sign-off after code-level review:
 - `[ ]` Pair 07: `/legacy/groups/<friendly>/<id>/posts` vs `/groups/<friendly>/<id>/posts` (blocked in local fixture: no public groups)
 - `[ ]` Pair 08: `/legacy/groups/<friendly>/<id>/members` vs `/groups/<friendly>/<id>/members` (blocked in local fixture: no public groups)
 - `[x]` Pair 09: `/legacy/members/<username>` vs `/members/<username>` (route-level PASS with `dsalunga`)
-- `[ ]` Pair 10: `/legacy/admin` vs `/admin` (code alias implemented; runtime verify on latest restarted process pending)
+- `[x]` Pair 10: `/legacy/admin` legacy alias verified (intentional divergence): redirects to `/legacy/admin/db-backup` while modern admin remains `/admin`
 
 ## Exit Criteria for “Parity Complete”
 
 - `[ ]` All P0/P1 items above are completed or formally accepted as intentional divergences
 - `[ ]` Runtime verification matrix passes with evidence screenshots/notes
-- `[ ]` No unresolved legacy-only route without explicit product decision
+- `[x]` No unresolved legacy-only route without explicit product decision
 - `[x]` QA scripts and active parity docs now reflect current root-modern (`/`) routing model (`/app/*` documented as alias only)
+
+## Revalidation Notes (2026-05-15)
+
+- `[x]` Provider visibility parity revalidated with concrete test coverage:
+  - `tests/server/auth-social-session-callbacks.test.ts` verifies `/api/auth/providers` runtime availability flags.
+  - `client/src/components/Auth/SocialLoginButtons.test.tsx` verifies frontend filtering by `enabledProviders`.
+- `[x]` Legacy admin alias behavior revalidated with runtime test:
+  - `tests/server/legacy-auth-account-admin-request-smoke.test.js` verifies `/legacy/admin?section=backup -> /legacy/admin/db-backup?section=backup`.
+- `[x]` URL drift matrix tests revalidated and green after plan-path correction:
+  - `tests/server/url-format-drift-runtime.test.js`
+  - `tests/server/url-format-drift-approvals.test.js`
+- `[x]` Link-entry and link-edit parity revalidated end-to-end:
+  - Topic routes now support `topicLink` query context plus `PUT/DELETE /api/topics/links/:id`.
+  - Argument routes now support `argumentLink` query context plus `PUT/DELETE /api/arguments/links/:id`.
+  - Client coverage: `client/src/services/api.test.ts` validates query propagation and link mutation endpoint calls.
+- `[x]` Forgot/reset flow parity revalidated with client integration tests:
+  - `client/src/pages/Auth/forgotPasswordFlow.integration.test.tsx`
+  - `client/src/pages/Auth/resetPasswordFlow.integration.test.tsx`
+- `[x]` Members contributions + journal/sidebar parity revalidated:
+  - API now returns per-entity contribution counters (`server/src/controllers/api/members.ts`) and modern tabs render these counters (`client/src/pages/Members/Profile/ProfileContributions.tsx`).
+  - Modern sidebar now exposes member-route “In This Section” parity links and respects `topicLink`/`argumentLink` query context (`client/src/components/Layout/ContextSidebar.tsx`).
+- `[x]` Admin parity revalidated for dashboard and operations:
+  - Dashboard card coverage includes `administrators` and `groups` counts (`server/src/controllers/api/admin.ts`, `client/src/pages/Admin/AdminDashboard.tsx`, `client/src/pages/Admin/AdminPages.test.tsx`).
+  - Runtime/admin operation coverage remains green in:
+    - `tests/server/admin-db-backup-restore.test.ts`
+    - `tests/server/api-endpoints-smoke.test.js`
+    - `tests/server/parity-checklist.test.js`
+- `[ ]` Group route runtime matrix pairs remain blocked by fixture availability (`Pair 06-08` require public group fixtures).

@@ -6,15 +6,15 @@ This plan tracks high-risk deprecated dependencies and defines a safe replacemen
 
 | Area | Current Package(s) | Risk | Replacement Target | Migration Notes |
 |---|---|---|---|---|
-| HTTP client | `request` | Deprecated package with unmaintained transitive tree | Native `fetch` (Node 22) with an adapter layer | Keep response/error mapping backward compatible before switching callers. |
+| HTTP client | No direct `request` dependency in `package.json` / `package-lock.json` | Historical deprecation target; risk is regression if legacy `request` calls are reintroduced | Keep Native `fetch` (Node 22) + adapter approach | Keep response/error mapping backward compatible and block reintroduction of `request`. |
 | Template engine alias | `jade` | Deprecated name; modern ecosystem is `pug` | `pug` package and `cons.pug` renderer only | Remove `cons.jade` and jade-specific view references after parity checks. |
 | Google auth | `passport-google`, `passport-google-oauth` | Legacy strategy packages, stale maintenance | `passport-google-oauth20` | Keep callback route/claims mapping compatible with current session payload. |
-| Generic OAuth adapter | `passport-oauth` | Low ecosystem momentum for legacy strategy usage | Use provider-specific maintained strategies (`oauth2`) | Replace only where still used by runtime routes; avoid broad auth rewrite in one step. |
+| Generic OAuth adapter | `passport-oauth` | Likely orphaned legacy dependency and maintenance risk | Remove if unused, otherwise use provider-specific maintained strategies (`oauth2`) | Verify runtime imports/usages before removal; avoid broad auth rewrite in one step. |
 
 ## Delivery Sequence
 
 1. Introduce compatibility adapters behind feature flags.
-2. Migrate `request` call sites to a single HTTP adapter implementation.
+2. Confirm `request` is absent from direct dependencies and code paths, then enforce this via docs/checks.
 3. Switch template engine usage to `pug` only, then remove `jade` runtime references.
 4. Replace Google auth strategy with `passport-google-oauth20` while preserving callback contracts.
 5. Remove orphaned auth adapter packages after production verification windows.
@@ -39,3 +39,10 @@ This plan tracks high-risk deprecated dependencies and defines a safe replacemen
 - Validate `/home/`, `/login/`, `/app`, and `/api/home` still respond correctly.
 - Validate server tests and client smoke tests remain green.
 - Confirm no new high/critical vulnerabilities are introduced by replacement dependencies.
+
+## Revalidation Notes (2026-05-15)
+
+- `request` is not present as a direct dependency in `package.json` or `package-lock.json`.
+- Runtime still registers both template engines (`server/src/app.ts`: `app.engine('jade', cons.jade)` and `app.engine('pug', cons.pug)`), so the template migration item is still pending.
+- Runtime auth still imports `passport-google` (`server/src/middlewares/passport.ts`) and carries `passport-google-oauth` / `passport-oauth` dependencies in `package.json`.
+- This plan remains active and should focus on template + auth strategy deprecation replacement, with `request` treated as a guardrail item.
