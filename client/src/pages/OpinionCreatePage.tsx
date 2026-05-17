@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import Input from '../components/Form/Input';
@@ -22,6 +22,14 @@ interface OpinionFormValues {
 
 const OpinionCreatePage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const parentIdFromQuery = String(searchParams.get('parentId') || '').trim();
+  const parentTypeFromQuery = String(searchParams.get('parentType') || '').trim().toLowerCase();
+  const topicIdFromQuery = String(
+    searchParams.get('topic') ||
+      searchParams.get('topicId') ||
+      (parentTypeFromQuery === 'topic' ? parentIdFromQuery : ''),
+  ).trim();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const { addToast } = useNotification();
@@ -45,17 +53,23 @@ const OpinionCreatePage: React.FC = () => {
     setSubmitSuccess(false);
 
     try {
-      await apiService.createOpinion({
+      const response = await apiService.createOpinion({
         title: values.title,
         description: values.description,
         topicId: values.topicId || undefined,
+        parentId: parentIdFromQuery || undefined,
         private: values.private,
       });
+      const createdOpinion = response?.opinion as { _id?: unknown; friendlyUrl?: unknown } | undefined;
 
       trackEvent('create_opinion', 'content', values.title);
       addToast('success', 'Opinion created successfully!');
       setSubmitSuccess(true);
       setTimeout(() => {
+        if (createdOpinion?._id) {
+          navigate(`/opinions/entry/${encodeURIComponent(String(createdOpinion.friendlyUrl || createdOpinion._id))}/${encodeURIComponent(String(createdOpinion._id))}`);
+          return;
+        }
         navigate('/opinions');
       }, 1200);
     } catch (error) {
@@ -69,7 +83,7 @@ const OpinionCreatePage: React.FC = () => {
     initialValues: {
       title: '',
       description: '',
-      topicId: '',
+      topicId: topicIdFromQuery,
       private: false,
     },
     validate,

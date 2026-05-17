@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import Input from '../components/Form/Input';
@@ -24,6 +24,8 @@ interface AnswerFormValues {
 
 const AnswerCreatePage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const questionIdFromQuery = String(searchParams.get('question') || searchParams.get('questionId') || '').trim();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const { addToast } = useNotification();
@@ -51,18 +53,23 @@ const AnswerCreatePage: React.FC = () => {
     setSubmitSuccess(false);
 
     try {
-      await apiService.createAnswer({
+      const response = await apiService.createAnswer({
         title: values.title,
         description: values.description,
         questionId: values.questionId,
         references: values.references,
         private: values.private,
       });
+      const createdAnswer = response?.answer as { _id?: unknown } | undefined;
 
       trackEvent('create_answer', 'content', values.title);
       addToast('success', 'Answer created successfully!');
       setSubmitSuccess(true);
       setTimeout(() => {
+        if (createdAnswer?._id) {
+          navigate(`/answers/entry/${encodeURIComponent(String(createdAnswer._id))}`);
+          return;
+        }
         navigate('/answers');
       }, 1200);
     } catch (error) {
@@ -76,7 +83,7 @@ const AnswerCreatePage: React.FC = () => {
     initialValues: {
       title: '',
       description: '',
-      questionId: '',
+      questionId: questionIdFromQuery,
       references: '',
       private: false,
     },

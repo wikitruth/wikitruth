@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import Input from '../components/Form/Input';
@@ -24,6 +24,8 @@ interface IssueFormValues {
 
 const IssueCreatePage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const topicIdFromQuery = String(searchParams.get('topicId') || searchParams.get('topic') || '').trim();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const { addToast } = useNotification();
@@ -47,18 +49,23 @@ const IssueCreatePage: React.FC = () => {
     setSubmitSuccess(false);
 
     try {
-      await apiService.createIssue({
+      const response = await apiService.createIssue({
         title: values.title,
         description: values.description,
         topicId: values.topicId || undefined,
         issueType: Number(values.issueType || '100'),
         private: values.private,
       });
+      const createdIssue = response?.issue as { _id?: unknown; friendlyUrl?: unknown } | undefined;
 
       trackEvent('create_issue', 'content', values.title);
       addToast('success', 'Issue created successfully!');
       setSubmitSuccess(true);
       setTimeout(() => {
+        if (createdIssue?._id) {
+          navigate(`/issues/entry/${encodeURIComponent(String(createdIssue.friendlyUrl || createdIssue._id))}/${encodeURIComponent(String(createdIssue._id))}`);
+          return;
+        }
         navigate('/issues');
       }, 1200);
     } catch (error) {
@@ -72,7 +79,7 @@ const IssueCreatePage: React.FC = () => {
     initialValues: {
       title: '',
       description: '',
-      topicId: '',
+      topicId: topicIdFromQuery,
       issueType: '100',
       private: false,
     },

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import Input from '../components/Form/Input';
@@ -23,6 +23,8 @@ interface ArtifactFormValues {
 
 const ArtifactCreatePage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const topicIdFromQuery = String(searchParams.get('topic') || searchParams.get('topicId') || '').trim();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const { addToast } = useNotification();
@@ -46,18 +48,23 @@ const ArtifactCreatePage: React.FC = () => {
     setSubmitSuccess(false);
 
     try {
-      await apiService.createArtifact({
+      const response = await apiService.createArtifact({
         title: values.title,
         description: values.description,
         source: values.source,
         topicId: values.topicId || undefined,
         private: values.private,
       });
+      const createdArtifact = response?.artifact as { _id?: unknown; friendlyUrl?: unknown } | undefined;
 
       trackEvent('create_artifact', 'content', values.title);
       addToast('success', 'Artifact created successfully!');
       setSubmitSuccess(true);
       setTimeout(() => {
+        if (createdArtifact?._id) {
+          navigate(`/artifacts/entry/${encodeURIComponent(String(createdArtifact.friendlyUrl || createdArtifact._id))}/${encodeURIComponent(String(createdArtifact._id))}`);
+          return;
+        }
         navigate('/artifacts');
       }, 1200);
     } catch (error) {
@@ -72,7 +79,7 @@ const ArtifactCreatePage: React.FC = () => {
       title: '',
       description: '',
       source: '',
-      topicId: '',
+      topicId: topicIdFromQuery,
       private: false,
     },
     validate,

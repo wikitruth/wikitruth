@@ -27,6 +27,7 @@ const TopicCreatePage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const groupId = searchParams.get('group') || undefined;
+  const parentTopicFromQuery = String(searchParams.get('topic') || searchParams.get('topicId') || '').trim();
   const editId = String(searchParams.get('id') || '').trim();
   const isEditMode = Boolean(editId);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -84,7 +85,7 @@ const TopicCreatePage: React.FC = () => {
         return;
       }
 
-      await apiService.createTopic({
+      const response = await apiService.createTopic({
         title: values.title,
         description: values.description,
         category: values.category,
@@ -92,6 +93,7 @@ const TopicCreatePage: React.FC = () => {
         tags: values.tags,
         groupId: groupId,
       });
+      const createdTopic = response?.topic as { _id?: unknown; friendlyUrl?: unknown } | undefined;
 
       trackEvent('create_topic', 'content', values.title);
       addToast('success', 'Topic created successfully!');
@@ -99,6 +101,10 @@ const TopicCreatePage: React.FC = () => {
 
       // Redirect after a short delay
       setTimeout(() => {
+        if (createdTopic?._id) {
+          navigate(`/topics/entry/${encodeURIComponent(String(createdTopic.friendlyUrl || createdTopic._id))}/${encodeURIComponent(String(createdTopic._id))}`);
+          return;
+        }
         navigate('/topics');
       }, 1500);
     } catch (error) {
@@ -121,7 +127,7 @@ const TopicCreatePage: React.FC = () => {
     initialValues: {
       title: '',
       description: '',
-      category: '',
+      category: parentTopicFromQuery,
       private: false,
       tags: '',
     },

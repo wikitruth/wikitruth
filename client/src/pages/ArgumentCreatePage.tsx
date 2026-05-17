@@ -28,6 +28,7 @@ const ArgumentCreatePage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const groupId = searchParams.get('group') || undefined;
+  const topicIdFromQuery = String(searchParams.get('topic') || searchParams.get('topicId') || '').trim();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const { addToast } = useNotification();
@@ -61,7 +62,7 @@ const ArgumentCreatePage: React.FC = () => {
     setSubmitSuccess(false);
 
     try {
-      await apiService.createArgument({
+      const response = await apiService.createArgument({
         title: values.title,
         description: values.description,
         verdict: values.verdict,
@@ -70,6 +71,7 @@ const ArgumentCreatePage: React.FC = () => {
         sources: values.sources,
         groupId: groupId,
       });
+      const createdArgument = response?.argument as { _id?: unknown; friendlyUrl?: unknown } | undefined;
       
       trackEvent('create_argument', 'content', values.title);
       addToast('success', 'Argument created successfully!');
@@ -77,6 +79,10 @@ const ArgumentCreatePage: React.FC = () => {
       
       // Redirect after a short delay
       setTimeout(() => {
+        if (createdArgument?._id) {
+          navigate(`/arguments/entry/${encodeURIComponent(String(createdArgument.friendlyUrl || createdArgument._id))}/${encodeURIComponent(String(createdArgument._id))}`);
+          return;
+        }
         navigate('/arguments');
       }, 1500);
     } catch (error) {
@@ -100,7 +106,7 @@ const ArgumentCreatePage: React.FC = () => {
       title: '',
       description: '',
       verdict: '',
-      topicId: '',
+      topicId: topicIdFromQuery,
       private: false,
       sources: '',
     },

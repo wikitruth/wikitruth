@@ -26,6 +26,7 @@ const QuestionCreatePage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const groupId = searchParams.get('group') || undefined;
+  const topicIdFromQuery = String(searchParams.get('topic') || searchParams.get('topicId') || '').trim();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const { addToast } = useNotification();
@@ -49,7 +50,7 @@ const QuestionCreatePage: React.FC = () => {
     setSubmitSuccess(false);
 
     try {
-      await apiService.createQuestion({
+      const response = await apiService.createQuestion({
         title: values.title,
         description: values.description,
         topicId: values.topicId || undefined,
@@ -57,11 +58,16 @@ const QuestionCreatePage: React.FC = () => {
         private: values.private,
         groupId: groupId,
       });
+      const createdQuestion = response?.question as { _id?: unknown; friendlyUrl?: unknown } | undefined;
 
       trackEvent('create_question', 'content', values.title);
       addToast('success', 'Question created successfully!');
       setSubmitSuccess(true);
       setTimeout(() => {
+        if (createdQuestion?._id) {
+          navigate(`/questions/entry/${encodeURIComponent(String(createdQuestion.friendlyUrl || createdQuestion._id))}/${encodeURIComponent(String(createdQuestion._id))}`);
+          return;
+        }
         navigate('/questions');
       }, 1200);
     } catch (error) {
@@ -75,7 +81,7 @@ const QuestionCreatePage: React.FC = () => {
     initialValues: {
       title: '',
       description: '',
-      topicId: '',
+      topicId: topicIdFromQuery,
       references: '',
       private: false,
     },
