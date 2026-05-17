@@ -78,4 +78,66 @@ describe('apiService', () => {
       status: 500,
     } satisfies Partial<ApiRequestError>);
   });
+
+  it('passes legacy topic-link context query when loading topic entry', async () => {
+    await apiService.getTopicEntry('topic-link-id', { topicLink: 'topic-link-id', mode: 'edit-link', id: 'topic-link-id' });
+
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      '/api/topics/entry/topic-link-id?topicLink=topic-link-id&mode=edit-link&id=topic-link-id',
+      expect.any(Object)
+    );
+  });
+
+  it('passes legacy argument-link context query when loading argument entry', async () => {
+    await apiService.getArgumentEntry('argument-link-id', {
+      argumentLink: 'argument-link-id',
+      mode: 'edit-link',
+      id: 'argument-link-id',
+    });
+
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      '/api/arguments/entry/argument-link-id?argumentLink=argument-link-id&mode=edit-link&id=argument-link-id',
+      expect.any(Object)
+    );
+  });
+
+  it('calls dedicated topic-link mutation endpoints', async () => {
+    await apiService.updateTopicLink('topic-link-1', { title: 'Renamed link' });
+    await apiService.deleteTopicLink('topic-link-1');
+
+    expect(globalThis.fetch).toHaveBeenNthCalledWith(
+      1,
+      '/api/topics/links/topic-link-1',
+      expect.objectContaining({
+        method: 'PUT',
+      })
+    );
+    expect(globalThis.fetch).toHaveBeenNthCalledWith(
+      2,
+      '/api/topics/links/topic-link-1',
+      expect.objectContaining({
+        method: 'DELETE',
+      })
+    );
+  });
+
+  it('calls dedicated argument-link mutation endpoints', async () => {
+    await apiService.updateArgumentLink('argument-link-1', { title: 'Context title', supportsParent: true });
+    await apiService.deleteArgumentLink('argument-link-1');
+
+    expect(globalThis.fetch).toHaveBeenNthCalledWith(
+      1,
+      '/api/arguments/links/argument-link-1',
+      expect.objectContaining({
+        method: 'PUT',
+      })
+    );
+    expect(globalThis.fetch).toHaveBeenNthCalledWith(
+      2,
+      '/api/arguments/links/argument-link-1',
+      expect.objectContaining({
+        method: 'DELETE',
+      })
+    );
+  });
 });

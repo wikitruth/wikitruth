@@ -41,7 +41,7 @@ const mockedCreateRealtimeChannel = createRealtimeChannel as jest.MockedFunction
 beforeEach(() => {
   mockedCreateRealtimeChannel.mockClear();
   mockedAdminApi.dashboard.mockResolvedValue({
-    counts: { users: 2, accounts: 1, categories: 3, statuses: 1 },
+    counts: { users: 2, accounts: 1, categories: 3, statuses: 1, administrators: 1, groups: 4 },
   } as Record<string, unknown>);
   mockedAdminApi.users.mockResolvedValue([]);
   mockedAdminApi.accounts.mockResolvedValue([]);
@@ -56,6 +56,8 @@ describe('Admin pages', () => {
     render(<AdminDashboard />);
     expect(await screen.findByRole('heading', { name: /admin dashboard/i })).toBeInTheDocument();
     expect(screen.getByText(/realtime status/i)).toBeInTheDocument();
+    expect(await screen.findByText(/administrators/i)).toBeInTheDocument();
+    expect(await screen.findByText(/groups/i)).toBeInTheDocument();
     expect(mockedCreateRealtimeChannel).toHaveBeenCalledTimes(1);
   });
 

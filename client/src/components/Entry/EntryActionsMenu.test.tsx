@@ -75,6 +75,10 @@ async function renderMenu(entry: Partial<LegacyEntity>) {
   });
 }
 
+function openMenu() {
+  fireEvent.click(screen.getByRole('link', { name: /more/i }));
+}
+
 describe('EntryActionsMenu moderation actions', () => {
   const confirmSpy = jest.spyOn(window, 'confirm').mockImplementation(() => true);
 
@@ -115,7 +119,7 @@ describe('EntryActionsMenu moderation actions', () => {
   it('routes screening action through modern screening route', async () => {
     await renderMenu({ objectName: 'topic', _id: 'topic-1' });
 
-    fireEvent.click(screen.getByRole('button', { name: /actions/i }));
+    openMenu();
     fireEvent.click(screen.getByRole('button', { name: /screening status/i }));
 
     expect(mockNavigate).toHaveBeenCalledWith('/screening?topic=topic-1');
@@ -124,7 +128,7 @@ describe('EntryActionsMenu moderation actions', () => {
   it('routes convert action through modern convert route', async () => {
     await renderMenu({ objectName: 'argument', objectType: 2, _id: 'arg-1' });
 
-    fireEvent.click(screen.getByRole('button', { name: /actions/i }));
+    openMenu();
     fireEvent.click(screen.getByRole('button', { name: /convert/i }));
 
     expect(mockNavigate).toHaveBeenCalledWith('/convert?argument=arg-1');
@@ -149,7 +153,7 @@ describe('EntryActionsMenu moderation actions', () => {
     });
 
     await renderMenu({ objectName: 'topic', _id: 'topic-1' });
-    fireEvent.click(screen.getByRole('button', { name: /actions/i }));
+    openMenu();
 
     expect(screen.queryByRole('button', { name: /screening status/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /convert/i })).not.toBeInTheDocument();
@@ -158,27 +162,23 @@ describe('EntryActionsMenu moderation actions', () => {
   it('routes reply/link/report/details/history and clipboard actions', async () => {
     await renderMenu({ objectName: 'topic', _id: 'topic-1', title: 'Topic A', friendlyUrl: 'topic-a' });
 
-    fireEvent.click(screen.getByRole('button', { name: /actions/i }));
+    openMenu();
     fireEvent.click(screen.getByRole('button', { name: /reply/i }));
     expect(mockNavigate).toHaveBeenCalledWith('/opinions/create?parentId=topic-1&parentType=topic');
 
-    fireEvent.click(screen.getByRole('button', { name: /actions/i }));
+    openMenu();
     fireEvent.click(screen.getByRole('button', { name: /link to/i }));
     expect(mockNavigate).toHaveBeenCalledWith('/outline/link?parentId=topic-1&parentTitle=Topic%20A');
 
-    fireEvent.click(screen.getByRole('button', { name: /actions/i }));
+    openMenu();
     fireEvent.click(screen.getByRole('button', { name: /report/i }));
     expect(mockNavigate).toHaveBeenCalledWith('/issues/create?topicId=topic-1');
 
-    fireEvent.click(screen.getByRole('button', { name: /actions/i }));
+    openMenu();
     fireEvent.click(screen.getByRole('button', { name: /details/i }));
     expect(mockNavigate).toHaveBeenCalledWith('/topics/entry/topic-a/topic-1');
 
-    fireEvent.click(screen.getByRole('button', { name: /actions/i }));
-    fireEvent.click(screen.getByRole('button', { name: /view history/i }));
-    expect(mockNavigate).toHaveBeenCalledWith('/timeline?objectName=topic&id=topic-1&objectType=1');
-
-    fireEvent.click(screen.getByRole('button', { name: /actions/i }));
+    openMenu();
     fireEvent.click(screen.getByRole('button', { name: /copy to clipboard/i }));
     expect(mockedClipboard.addToClipboard).toHaveBeenCalled();
   });
@@ -186,7 +186,7 @@ describe('EntryActionsMenu moderation actions', () => {
   it('handles admin delete action', async () => {
     await renderMenu({ objectName: 'topic', objectType: 1, createUserId: 'other-user', _id: 'topic-9' });
 
-    fireEvent.click(screen.getByRole('button', { name: /actions/i }));
+    openMenu();
     expect(screen.getByRole('button', { name: /take ownership/i })).toBeInTheDocument();
     const deleteButton = screen.getByText(/delete/i);
     fireEvent.click(deleteButton);
@@ -213,7 +213,7 @@ describe('EntryActionsMenu moderation actions', () => {
     });
 
     await renderMenu({ objectName: 'topic', _id: 'topic-1' });
-    fireEvent.click(screen.getByRole('button', { name: /actions/i }));
+    openMenu();
 
     expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /screening status/i })).not.toBeInTheDocument();
@@ -225,6 +225,5 @@ describe('EntryActionsMenu moderation actions', () => {
     expect(screen.getByRole('button', { name: /submit appeal/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /share/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /details/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /view history/i })).toBeInTheDocument();
   });
 });

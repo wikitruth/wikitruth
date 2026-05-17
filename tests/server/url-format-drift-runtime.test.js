@@ -8,7 +8,7 @@ const registerLegacyPathRedirects = require('../../server/src/middlewares/routes
 
 const DRIFT_PLAN_PATH = path.join(
   process.cwd(),
-  'docs/plans/LEGACY_MODERN_URL_FORMAT_DRIFT_CHECKLIST_PLAN_2026-04-22.md'
+  'docs/plans/completed/LEGACY_MODERN_URL_FORMAT_DRIFT_CHECKLIST_PLAN_2026-04-22.md'
 );
 
 const FIXTURE_CASES_BY_AREA = {
