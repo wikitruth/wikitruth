@@ -274,4 +274,7 @@ Use this matrix to complete runtime parity sign-off after code-level review:
     - `tests/server/admin-db-backup-restore.test.ts`
     - `tests/server/api-endpoints-smoke.test.js`
     - `tests/server/parity-checklist.test.js`
+- `[x]` Modern create flows now preserve more legacy-style context and redirect behavior:
+  - Create pages now prefill context ids from route query params when available.
+  - Successful create actions now redirect to the newly created entry route for `topic`, `argument`, `question`, `answer`, `issue`, `opinion`, and `artifact` entities instead of only returning to list pages.
 - `[ ]` Group route runtime matrix pairs remain blocked by fixture availability (`Pair 06-08` require public group fixtures).
