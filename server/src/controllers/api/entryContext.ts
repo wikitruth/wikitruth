@@ -16,6 +16,7 @@ export type LegacyEntryContextModel = {
   grandParentTopic?: LegacyEntry;
   topicLink?: LegacyEntry & { topic?: LegacyEntry };
   argument?: LegacyEntry;
+  argumentLink?: LegacyEntry & { argument?: LegacyEntry; argumentId?: unknown };
   parentArgument?: LegacyEntry;
   grandParentArgument?: LegacyEntry;
   artifact?: LegacyEntry;
@@ -109,4 +110,3 @@ export async function loadArgumentTopicLinks(argumentId: string, req: WikitruthR
 
   return topics as LegacyEntry[];
 }
-

@@ -67,6 +67,18 @@ function getSectionFromPath(pathname: string): string {
   return parts[0] || 'home';
 }
 
+function getMemberUsernameFromPath(pathname: string): string | null {
+  const parts = pathname.split('/').filter(Boolean);
+  if (parts[0] !== 'members') {
+    return null;
+  }
+  const username = parts[1];
+  if (!username || username === 'profile') {
+    return null;
+  }
+  return decodeURIComponent(username);
+}
+
 function buildTopicLink(topic: Pick<SidebarCategory, '_id' | 'friendlyUrl'>): string {
   const friendly = encodeURIComponent(String(topic.friendlyUrl || topic._id || ''));
   const id = encodeURIComponent(String(topic._id || ''));
@@ -89,6 +101,12 @@ const ContextSidebar: React.FC = () => {
   const { user } = useAuth();
   const section = getSectionFromPath(location.pathname);
   const entryId = getEntryIdFromPath(location.pathname);
+  const memberUsernameFromPath = getMemberUsernameFromPath(location.pathname);
+  const profileUsername = memberUsernameFromPath || user?.username || '';
+  const profileBasePath = profileUsername ? `/members/${encodeURIComponent(profileUsername)}` : '/members/profile';
+  const locationQuery = useMemo(() => new URLSearchParams(location.search), [location.search]);
+  const topicLinkQuery = String(locationQuery.get('topicLink') || '').trim();
+  const argumentLinkQuery = String(locationQuery.get('argumentLink') || '').trim();
   const [homeContext, setHomeContext] = useState<HomeDataResponse | null>(null);
   const [topicContext, setTopicContext] = useState<TopicEntryResponse | null>(null);
   const [contextTopicId, setContextTopicId] = useState<string | null>(null);
@@ -122,9 +140,39 @@ const ContextSidebar: React.FC = () => {
     }
 
     if (section === 'topics') {
-      setContextTopicId(entryId);
-      setContextTopicLinks(normalizeEntryTopicLinks(topicContext?.topicLinks || []));
-      return;
+      if (!topicLinkQuery) {
+        setContextTopicId(entryId);
+        setContextTopicLinks(normalizeEntryTopicLinks(topicContext?.topicLinks || []));
+        return;
+      }
+
+      let mounted = true;
+      const loadLinkedTopicContext = async () => {
+        try {
+          const response = await apiService.getTopicEntry(entryId, {
+            topicLink: topicLinkQuery,
+            id: topicLinkQuery,
+          });
+          if (!mounted) {
+            return;
+          }
+          const topic = (response?.topic || null) as SidebarCategory | null;
+          const topicId = String(topic?._id || '').trim();
+          setContextTopicId(topicId || null);
+          setContextTopicLinks(normalizeEntryTopicLinks(response?.topicLinks || []));
+        } catch (_error) {
+          if (!mounted) {
+            return;
+          }
+          setContextTopicId(null);
+          setContextTopicLinks([]);
+        }
+      };
+
+      void loadLinkedTopicContext();
+      return () => {
+        mounted = false;
+      };
     }
 
     if (!['arguments', 'questions', 'answers', 'artifacts', 'issues', 'opinions'].includes(section)) {
@@ -146,7 +194,10 @@ const ContextSidebar: React.FC = () => {
 
         switch (section) {
           case 'arguments':
-            response = await apiService.getArgumentEntry(entryId);
+            response = await apiService.getArgumentEntry(entryId, {
+              argumentLink: argumentLinkQuery || undefined,
+              id: argumentLinkQuery || undefined,
+            });
             break;
           case 'questions':
             response = await apiService.getQuestionEntry(entryId);
@@ -200,7 +251,7 @@ const ContextSidebar: React.FC = () => {
     return () => {
       mounted = false;
     };
-  }, [section, entryId, topicContext?.topicLinks]);
+  }, [argumentLinkQuery, section, entryId, topicContext?.topicLinks, topicLinkQuery]);
 
   useEffect(() => {
     if (!contextTopicId) {
@@ -329,6 +380,20 @@ const ContextSidebar: React.FC = () => {
       items: [
         { key: 'opinions-list', label: 'Comments', to: '/opinions', icon: 'comments-o' },
         { key: 'opinions-create', label: 'Share Opinion', to: '/opinions/create', icon: 'plus-circle' },
+      ],
+    },
+    members: {
+      title: 'In This Section',
+      items: [
+        { key: 'members-overview', label: 'Overview', to: profileBasePath, icon: 'user' },
+        { key: 'members-topics', label: 'Topics', to: `${profileBasePath}/topics`, icon: 'folder-open' },
+        { key: 'members-journal', label: 'Journal', to: `${profileBasePath}/journal`, icon: 'book' },
+        { key: 'members-contributions', label: 'Contributions', to: `${profileBasePath}/contributions`, icon: 'bolt' },
+        { key: 'members-following', label: 'Following', to: `${profileBasePath}/following`, icon: 'feed' },
+        { key: 'members-pages', label: 'Pages', to: `${profileBasePath}/pages`, icon: 'file-text-o' },
+        ...(user?.username && profileUsername === user.username
+          ? [{ key: 'members-settings', label: 'Settings', to: '/members/profile/settings', icon: 'cog' }]
+          : []),
       ],
     },
   };

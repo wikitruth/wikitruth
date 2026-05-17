@@ -18,6 +18,7 @@ type TopicScreeningModel = {
     status?: number;
   };
   topic?: Record<string, unknown>;
+  topicLink?: Record<string, unknown>;
   topics?: Record<string, unknown>[];
   categories?: Record<string, unknown>[];
   keyTopics?: Record<string, unknown>[];
@@ -91,6 +92,24 @@ export = function (router: Router) {
       await PUT_topic_update(req, res);
     } catch (error) {
       console.error('Error in PUT /api/topics/entry/:id:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  router.put('/links/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    try {
+      await PUT_topic_link_update(req, res);
+    } catch (error) {
+      console.error('Error in PUT /api/topics/links/:id:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  router.delete('/links/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    try {
+      await DELETE_topic_link(req, res);
+    } catch (error) {
+      console.error('Error in DELETE /api/topics/links/:id:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -287,11 +306,28 @@ async function PUT_topic_update(req: WikitruthRequest, res: WikitruthResponse) {
 
 async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
   const model: TopicScreeningModel = {};
+  const topicLinkId = String(req.query.topicLink || req.query.id || '').trim();
   const rawIdentifier = String(req.params.id || '').trim();
   const decodedIdentifier = decodeURIComponent(rawIdentifier);
   const looksLikeObjectId = /^[a-f0-9]{24}$/i.test(decodedIdentifier);
+  let topicIdFromLink = '';
 
-  if (looksLikeObjectId) {
+  if (topicLinkId) {
+    const topicLink = await db.TopicLink.findOne({ _id: topicLinkId }).lean();
+    if (!topicLink) {
+      return res.status(404).json({ error: 'Topic link not found' });
+    }
+    topicIdFromLink = String(topicLink.topicId || '').trim();
+    if (!topicIdFromLink) {
+      return res.status(404).json({ error: 'Topic link target not found' });
+    }
+    model.topicLink = topicLink;
+  }
+
+  if (topicIdFromLink) {
+    req.query.topic = topicIdFromLink;
+    delete req.query.friendlyUrl;
+  } else if (looksLikeObjectId) {
     req.query.topic = decodedIdentifier;
     delete req.query.friendlyUrl;
   } else {
@@ -302,11 +338,22 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
   await flowUtils.setTopicModels(req, model);
 
   // If the incoming identifier was not URL-friendly text, retry with a normalized slug.
-  if (!model.topic && !looksLikeObjectId && decodedIdentifier) {
+  if (!model.topic && !topicIdFromLink && !looksLikeObjectId && decodedIdentifier) {
     const normalizedFriendlyUrl = String(utils.urlify(decodedIdentifier) || '').trim();
     if (normalizedFriendlyUrl && normalizedFriendlyUrl !== decodedIdentifier) {
       req.query.friendlyUrl = normalizedFriendlyUrl;
       await flowUtils.setTopicModels(req, model);
+    }
+  }
+
+  if (topicLinkId) {
+    const linkedTopicIdSnapshot = req.query.topic;
+    const linkedTopicSnapshot = model.topic;
+    const ownerQuery = { ownerId: topicLinkId, ownerType: constants.OBJECT_TYPES.topicLink };
+    await flowUtils.setEntryModels(ownerQuery, req, model);
+    req.query.topic = linkedTopicIdSnapshot;
+    if (linkedTopicSnapshot) {
+      model.topic = linkedTopicSnapshot;
     }
   }
 
@@ -474,9 +521,12 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
       };
     })(),
     (async function loadQuestions() {
+      const questionOwnerId = topicLinkId
+        ? String((model.topicLink as { topicId?: unknown } | undefined)?.topicId || model.topic!._id)
+        : model.topic!._id;
       const results = await db.Question.find({
         ownerType: constants.OBJECT_TYPES.topic,
-        ownerId: model.topic!._id,
+        ownerId: questionOwnerId,
         'screening.status': screeningStatus,
       })
         .sort({ editDate: -1 })
@@ -504,9 +554,11 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
       model.artifacts = results;
     })(),
     (async function loadIssues() {
+      const issueOwnerType = topicLinkId ? constants.OBJECT_TYPES.topicLink : constants.OBJECT_TYPES.topic;
+      const issueOwnerId = topicLinkId ? topicLinkId : model.topic!._id;
       const results = await db.Issue.find({
-        ownerType: constants.OBJECT_TYPES.topic,
-        ownerId: model.topic!._id,
+        ownerType: issueOwnerType,
+        ownerId: issueOwnerId,
         'screening.status': screeningStatus,
       })
         .sort({ editDate: -1 })
@@ -519,10 +571,12 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
       model.issues = results;
     })(),
     (async function loadOpinions() {
+      const opinionOwnerType = topicLinkId ? constants.OBJECT_TYPES.topicLink : constants.OBJECT_TYPES.topic;
+      const opinionOwnerId = topicLinkId ? topicLinkId : model.topic!._id;
       const results = await db.Opinion.find({
         parentId: null,
-        ownerType: constants.OBJECT_TYPES.topic,
-        ownerId: model.topic!._id,
+        ownerType: opinionOwnerType,
+        ownerId: opinionOwnerId,
         'screening.status': screeningStatus,
       })
         .sort({ editDate: -1 })
@@ -538,4 +592,92 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
 
   delete model.screening;
   res.json(model);
+}
+
+async function PUT_topic_link_update(req: WikitruthRequest, res: WikitruthResponse) {
+  if (!req.user) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  const linkId = String(req.params.id || '').trim();
+  if (!linkId) {
+    return res.status(400).json({ error: 'Topic link id is required' });
+  }
+
+  const topicLink = await db.TopicLink.findById(linkId);
+  if (!topicLink) {
+    return res.status(404).json({ error: 'Topic link not found' });
+  }
+
+  const actorUserId = String(req.user._id || req.user.id || '');
+  const canEdit = Boolean(
+    (req.user.canPlayRoleOf && req.user.canPlayRoleOf('admin')) ||
+      String(topicLink.createUserId || '') === actorUserId
+  );
+  if (!canEdit) {
+    return res.status(403).json({ error: 'Not allowed to edit this topic link' });
+  }
+
+  if (Object.prototype.hasOwnProperty.call(req.body || {}, 'title')) {
+    topicLink.title = String(req.body?.title || '').trim();
+  }
+
+  topicLink.editDate = new Date();
+  topicLink.editUserId = req.user._id || req.user.id;
+  await topicLink.save();
+
+  res.json({
+    success: true,
+    topicLink: {
+      _id: topicLink._id,
+      title: topicLink.title || '',
+      topicId: topicLink.topicId || null,
+      parentId: topicLink.parentId || null,
+      editDate: topicLink.editDate,
+    },
+  });
+}
+
+async function DELETE_topic_link(req: WikitruthRequest, res: WikitruthResponse) {
+  if (!req.user) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+
+  if (!req.user.canPlayRoleOf || !req.user.canPlayRoleOf('admin')) {
+    return res.status(403).json({ error: 'Admin privileges required to delete topic links' });
+  }
+
+  const linkId = String(req.params.id || '').trim();
+  if (!linkId) {
+    return res.status(400).json({ error: 'Topic link id is required' });
+  }
+
+  const topicLink = await db.TopicLink.findByIdAndDelete(linkId);
+  if (!topicLink) {
+    return res.status(404).json({ error: 'Topic link not found' });
+  }
+
+  if (topicLink.parentId) {
+    await flowUtils.updateChildrenCount(
+      topicLink.parentId,
+      constants.OBJECT_TYPES.topic,
+      constants.OBJECT_TYPES.topic
+    );
+  } else {
+    await flowUtils.updateChildrenCount(
+      topicLink.ownerId,
+      topicLink.ownerType,
+      constants.OBJECT_TYPES.topic
+    );
+  }
+
+  res.json({
+    success: true,
+    deleted: true,
+    topicLink: {
+      _id: topicLink._id,
+      parentId: topicLink.parentId || null,
+      topicId: topicLink.topicId || null,
+    },
+  });
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useSearchParams, useNavigate } from 'react-router-dom';
 import apiService from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Breadcrumb from '../components/common/Breadcrumb';
@@ -27,20 +27,35 @@ import {
 
 const ArgumentEntryPage: React.FC = () => {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [data, setData] = useState<ArgumentEntryResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [linkTitleDraft, setLinkTitleDraft] = useState('');
+  const [supportsParent, setSupportsParent] = useState(true);
+  const [linkMutationBusy, setLinkMutationBusy] = useState(false);
+  const [linkMutationError, setLinkMutationError] = useState<string | null>(null);
+  const [linkMutationSuccess, setLinkMutationSuccess] = useState<string | null>(null);
+  const argumentLinkId = String(searchParams.get('argumentLink') || searchParams.get('id') || '').trim();
+  const mode = String(searchParams.get('mode') || '').trim().toLowerCase();
+  const isArgumentLinkMode = Boolean(argumentLinkId);
+  const isArgumentLinkEditMode = isArgumentLinkMode && mode === 'edit-link';
 
   useEffect(() => {
     fetchArgumentEntry();
-  }, [id]);
+  }, [id, argumentLinkId, mode]);
 
   const fetchArgumentEntry = async () => {
     if (!id) return;
     
     try {
       setLoading(true);
-      const result = await apiService.getArgumentEntry(id);
+      const result = await apiService.getArgumentEntry(id, {
+        argumentLink: argumentLinkId || undefined,
+        mode: mode || undefined,
+        id: argumentLinkId || undefined,
+      });
       setData(result);
       setLoading(false);
     } catch (err) {
@@ -49,6 +64,17 @@ const ArgumentEntryPage: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const entry = (data?.entry || null) as LegacyEntity | null;
+    if (entry?.objectName === 'argumentLink') {
+      setLinkTitleDraft(String(entry.title || ''));
+      setSupportsParent(!Boolean(entry.against));
+    } else {
+      setLinkTitleDraft('');
+      setSupportsParent(true);
+    }
+  }, [data?.entry]);
 
   if (loading) {
     return <LoadingSpinner message="Loading argument..." />;
@@ -59,9 +85,13 @@ const ArgumentEntryPage: React.FC = () => {
   }
 
   const argument = data.argument as LegacyEntity;
+  const entry = ((data.entry || data.argument || {}) as LegacyEntity);
   const questions = (data.questions || []) as LegacyEntity[];
   const issues = (data.issues || []) as LegacyEntity[];
   const opinions = (data.opinions || []) as LegacyEntity[];
+  const entryObjectName = String(entry.objectName || argument.objectName || 'argument').trim() || 'argument';
+  const isArgumentLinkEntry = entryObjectName === 'argumentLink';
+  const quickActionObjectName: 'argument' = 'argument';
   
   // Build breadcrumb items
   const breadcrumbItems = buildLegacyEntryBreadcrumb(argument, 'argument', {
@@ -107,6 +137,58 @@ const ArgumentEntryPage: React.FC = () => {
     },
   ].filter((tab) => tab.id === 'details' || Number(tab.count || 0) > 0);
 
+  const refreshArgumentEntry = async () => {
+    if (!id) {
+      return;
+    }
+    const refreshed = await apiService.getArgumentEntry(id, {
+      argumentLink: argumentLinkId || undefined,
+      mode: mode || undefined,
+      id: argumentLinkId || undefined,
+    });
+    setData(refreshed);
+  };
+
+  const handleUpdateArgumentLink = async () => {
+    if (!argumentLinkId) {
+      return;
+    }
+    try {
+      setLinkMutationBusy(true);
+      setLinkMutationError(null);
+      setLinkMutationSuccess(null);
+      await apiService.updateArgumentLink(argumentLinkId, {
+        title: linkTitleDraft.trim(),
+        supportsParent: supportsParent,
+      });
+      await refreshArgumentEntry();
+      setLinkMutationSuccess('Link updated.');
+    } catch (mutationError) {
+      setLinkMutationError(mutationError instanceof Error ? mutationError.message : 'Failed to update link');
+    } finally {
+      setLinkMutationBusy(false);
+    }
+  };
+
+  const handleDeleteArgumentLink = async () => {
+    if (!argumentLinkId) {
+      return;
+    }
+    if (!window.confirm('Delete this link? This action cannot be undone.')) {
+      return;
+    }
+    try {
+      setLinkMutationBusy(true);
+      setLinkMutationError(null);
+      setLinkMutationSuccess(null);
+      await apiService.deleteArgumentLink(argumentLinkId);
+      navigate('/arguments');
+    } catch (mutationError) {
+      setLinkMutationError(mutationError instanceof Error ? mutationError.message : 'Failed to delete link');
+      setLinkMutationBusy(false);
+    }
+  };
+
   return (
     <div>
       <PageMeta title={argument.title} description={argument.description || argument.contentPreview} />
@@ -114,19 +196,94 @@ const ArgumentEntryPage: React.FC = () => {
       <GeoPatternBackground seed={argument.title || 'argument'} height={100} />
       
       <PageHeader 
-        title={argument.title}
+        title={String((isArgumentLinkEntry ? entry.title2 || entry.title : argument.title) || argument.title)}
         subtitle={argument.subtitle}
-        icon="flash"
+        icon={isArgumentLinkEntry ? 'link' : 'flash'}
         iconColor="text-primary"
       />
       <EntryContextLine entry={argument} objectName="argument" />
 
       <EntryQuickActions
-        entry={argument}
-        objectName="argument"
+        entry={entry}
+        objectName={quickActionObjectName}
         hasValue={Boolean(data?.hasValue)}
-        moreActions={<EntryActionsMenu entry={argument} editPath={`/arguments/create?id=${encodeURIComponent(argument._id)}`} />}
+        moreActions={
+          <EntryActionsMenu
+            entry={entry}
+            editPath={
+              isArgumentLinkEntry
+                ? undefined
+                : `/arguments/create?id=${encodeURIComponent(argument._id)}`
+            }
+          />
+        }
       />
+
+      {isArgumentLinkEditMode && isArgumentLinkEntry && (
+        <div className="panel panel-default" style={{ marginTop: '12px' }}>
+          <div className="panel-heading">
+            <strong>Edit Link</strong>
+          </div>
+          <div className="panel-body">
+            <div className="form-group">
+              <label htmlFor="argument-link-title">Contextual Title</label>
+              <input
+                id="argument-link-title"
+                className="form-control"
+                value={linkTitleDraft}
+                onChange={(event) => setLinkTitleDraft(event.target.value)}
+                placeholder="Optional contextual title"
+                disabled={linkMutationBusy}
+              />
+            </div>
+            <div className="form-group">
+              <label>Correlation To Parent</label>
+              <div className="radio">
+                <label className="text-success">
+                  <input
+                    type="radio"
+                    checked={supportsParent}
+                    onChange={() => setSupportsParent(true)}
+                    disabled={linkMutationBusy}
+                  />{' '}
+                  Supporting argument (for)
+                </label>
+              </div>
+              <div className="radio">
+                <label className="text-primary">
+                  <input
+                    type="radio"
+                    checked={!supportsParent}
+                    onChange={() => setSupportsParent(false)}
+                    disabled={linkMutationBusy}
+                  />{' '}
+                  Opposing argument (against)
+                </label>
+              </div>
+            </div>
+            {linkMutationError ? <Alert type="danger">{linkMutationError}</Alert> : null}
+            {linkMutationSuccess ? <Alert type="success">{linkMutationSuccess}</Alert> : null}
+            <div>
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                onClick={handleUpdateArgumentLink}
+                disabled={linkMutationBusy}
+              >
+                {linkMutationBusy ? 'Saving...' : 'Update'}
+              </button>{' '}
+              <button
+                type="button"
+                className="btn btn-danger btn-sm"
+                onClick={handleDeleteArgumentLink}
+                disabled={linkMutationBusy}
+              >
+                Delete Link
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       
       <PageTabs tabs={tabs} activeTab="details" />
 

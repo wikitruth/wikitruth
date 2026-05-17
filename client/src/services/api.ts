@@ -153,8 +153,26 @@ class ApiService {
     return this.request<LegacyApiResponse>(url);
   }
 
-  async getTopicEntry(id: string): Promise<TopicEntryResponse> {
-    return this.request<TopicEntryResponse>(`/topics/entry/${id}`);
+  async getTopicEntry(
+    id: string,
+    options?: {
+      topicLink?: string;
+      mode?: string;
+      id?: string;
+    }
+  ): Promise<TopicEntryResponse> {
+    const params = new URLSearchParams();
+    if (options?.topicLink) {
+      params.set('topicLink', String(options.topicLink));
+    }
+    if (options?.mode) {
+      params.set('mode', String(options.mode));
+    }
+    if (options?.id) {
+      params.set('id', String(options.id));
+    }
+    const suffix = params.toString();
+    return this.request<TopicEntryResponse>(`/topics/entry/${id}${suffix ? `?${suffix}` : ''}`);
   }
 
   async createTopic(payload: {
@@ -187,6 +205,24 @@ class ApiService {
     });
   }
 
+  async updateTopicLink(
+    id: string,
+    payload: {
+      title?: string;
+    }
+  ): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>(`/topics/links/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async deleteTopicLink(id: string): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>(`/topics/links/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    });
+  }
+
   // Arguments
   async getArguments(topicId?: string, view?: string): Promise<LegacyApiResponse> {
     const params = new URLSearchParams();
@@ -197,8 +233,26 @@ class ApiService {
     return this.request<LegacyApiResponse>(url);
   }
 
-  async getArgumentEntry(id: string): Promise<ArgumentEntryResponse> {
-    return this.request<ArgumentEntryResponse>(`/arguments/entry/${id}`);
+  async getArgumentEntry(
+    id: string,
+    options?: {
+      argumentLink?: string;
+      mode?: string;
+      id?: string;
+    }
+  ): Promise<ArgumentEntryResponse> {
+    const params = new URLSearchParams();
+    if (options?.argumentLink) {
+      params.set('argumentLink', String(options.argumentLink));
+    }
+    if (options?.mode) {
+      params.set('mode', String(options.mode));
+    }
+    if (options?.id) {
+      params.set('id', String(options.id));
+    }
+    const suffix = params.toString();
+    return this.request<ArgumentEntryResponse>(`/arguments/entry/${id}${suffix ? `?${suffix}` : ''}`);
   }
 
   async createArgument(payload: {
@@ -231,6 +285,25 @@ class ApiService {
     return this.request<LegacyApiResponse>(`/arguments/entry/${id}`, {
       method: 'PUT',
       body: JSON.stringify(payload),
+    });
+  }
+
+  async updateArgumentLink(
+    id: string,
+    payload: {
+      title?: string;
+      supportsParent?: boolean;
+    }
+  ): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>(`/arguments/links/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async deleteArgumentLink(id: string): Promise<LegacyApiResponse> {
+    return this.request<LegacyApiResponse>(`/arguments/links/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
     });
   }
 

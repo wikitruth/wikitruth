@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import apiService, { ApiRequestError } from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Breadcrumb from '../components/common/Breadcrumb';
@@ -38,10 +38,20 @@ function getTopicPath(topic: Partial<LegacyEntity>): string {
 const TopicEntryPage: React.FC = () => {
   const { id, friendlyUrl } = useParams<{ id: string; friendlyUrl?: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [data, setData] = useState<TopicEntryResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showFullContent, setShowFullContent] = useState(false);
+  const [linkTitleDraft, setLinkTitleDraft] = useState('');
+  const [linkMutationBusy, setLinkMutationBusy] = useState(false);
+  const [linkMutationError, setLinkMutationError] = useState<string | null>(null);
+  const [linkMutationSuccess, setLinkMutationSuccess] = useState<string | null>(null);
+
+  const topicLinkId = String(searchParams.get('topicLink') || searchParams.get('id') || '').trim();
+  const mode = String(searchParams.get('mode') || '').trim().toLowerCase();
+  const isTopicLinkMode = Boolean(topicLinkId);
+  const isTopicLinkEditMode = isTopicLinkMode && mode === 'edit-link';
 
   useEffect(() => {
     const fetchTopicEntry = async () => {
@@ -54,10 +64,14 @@ const TopicEntryPage: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        const result = await apiService.getTopicEntry(id);
+        const result = await apiService.getTopicEntry(id, {
+          topicLink: topicLinkId || undefined,
+          mode: mode || undefined,
+          id: topicLinkId || undefined,
+        });
         setData(result);
         const resolvedTopic = (result?.topic || {}) as Partial<LegacyEntity>;
-        if (resolvedTopic?._id && resolvedTopic?.friendlyUrl) {
+        if (!isTopicLinkMode && resolvedTopic?._id && resolvedTopic?.friendlyUrl) {
           const canonicalPath = getTopicPath(resolvedTopic);
           const currentPath = window.location.pathname;
           if (currentPath !== canonicalPath) {
@@ -68,10 +82,14 @@ const TopicEntryPage: React.FC = () => {
         const isPrimaryNotFound = err instanceof ApiRequestError && err.status === 404;
         if (isPrimaryNotFound && friendlyUrl) {
           try {
-            const fallbackResult = await apiService.getTopicEntry(friendlyUrl);
+            const fallbackResult = await apiService.getTopicEntry(friendlyUrl, {
+              topicLink: topicLinkId || undefined,
+              mode: mode || undefined,
+              id: topicLinkId || undefined,
+            });
             setData(fallbackResult);
             const resolvedTopic = (fallbackResult?.topic || {}) as Partial<LegacyEntity>;
-            if (resolvedTopic?._id) {
+            if (!isTopicLinkMode && resolvedTopic?._id) {
               navigate(getTopicPath(resolvedTopic), { replace: true });
             }
             return;
@@ -94,9 +112,19 @@ const TopicEntryPage: React.FC = () => {
     };
 
     void fetchTopicEntry();
-  }, [friendlyUrl, id, navigate]);
+  }, [friendlyUrl, id, isTopicLinkMode, mode, navigate, topicLinkId]);
+
+  useEffect(() => {
+    const entry = (data?.entry || null) as LegacyEntity | null;
+    if (entry?.objectName === 'topicLink') {
+      setLinkTitleDraft(String(entry.title || ''));
+    } else {
+      setLinkTitleDraft('');
+    }
+  }, [data?.entry]);
 
   const topic = (data?.topic || {}) as LegacyEntity;
+  const entry = ((data?.entry || data?.topic || {}) as LegacyEntity);
   const topics = ((data?.topics || data?.topicChildren || []) as LegacyEntity[]).slice(0, 15);
   const keyTopics = ((data?.keyTopics || []) as LegacyEntity[]).slice(0, 6);
   const keyArguments = ((data?.keyArguments || []) as LegacyEntity[]).slice(0, 6);
@@ -111,6 +139,9 @@ const TopicEntryPage: React.FC = () => {
   const categories = (data?.categories || []) as LegacyEntity[];
   const isMainTopic = Boolean(data?.mainTopic);
   const tagLabels = Array.isArray(data?.tagLabels) ? (data?.tagLabels as LegacyEntity[]) : [];
+  const entryObjectName = String(entry.objectName || topic.objectName || 'topic').trim() || 'topic';
+  const isTopicLinkEntry = entryObjectName === 'topicLink';
+  const quickActionObjectName: 'topic' = 'topic';
 
   const breadcrumbItems = buildLegacyEntryBreadcrumb(topic, 'topic', {
     sectionTopic: (data?.parentTopic || null) as LegacyEntity | null,
@@ -174,6 +205,55 @@ const TopicEntryPage: React.FC = () => {
     ? { maxHeight: '450px', overflow: 'hidden', position: 'relative' as const }
     : undefined;
 
+  const refreshTopicEntry = async () => {
+    if (!id) {
+      return;
+    }
+    const refreshed = await apiService.getTopicEntry(id, {
+      topicLink: topicLinkId || undefined,
+      mode: mode || undefined,
+      id: topicLinkId || undefined,
+    });
+    setData(refreshed);
+  };
+
+  const handleUpdateTopicLink = async () => {
+    if (!topicLinkId) {
+      return;
+    }
+    try {
+      setLinkMutationBusy(true);
+      setLinkMutationError(null);
+      setLinkMutationSuccess(null);
+      await apiService.updateTopicLink(topicLinkId, { title: linkTitleDraft.trim() });
+      await refreshTopicEntry();
+      setLinkMutationSuccess('Link updated.');
+    } catch (mutationError) {
+      setLinkMutationError(mutationError instanceof Error ? mutationError.message : 'Failed to update link');
+    } finally {
+      setLinkMutationBusy(false);
+    }
+  };
+
+  const handleDeleteTopicLink = async () => {
+    if (!topicLinkId) {
+      return;
+    }
+    if (!window.confirm('Delete this link? This action cannot be undone.')) {
+      return;
+    }
+    try {
+      setLinkMutationBusy(true);
+      setLinkMutationError(null);
+      setLinkMutationSuccess(null);
+      await apiService.deleteTopicLink(topicLinkId);
+      navigate('/topics');
+    } catch (mutationError) {
+      setLinkMutationError(mutationError instanceof Error ? mutationError.message : 'Failed to delete link');
+      setLinkMutationBusy(false);
+    }
+  };
+
   if (loading) {
     return <LoadingSpinner message="Loading topic..." />;
   }
@@ -189,9 +269,9 @@ const TopicEntryPage: React.FC = () => {
       <GeoPatternBackground seed={topic.title || 'topic'} height={100} />
 
       <PageHeader
-        title={topic.title}
+        title={String((isTopicLinkEntry ? entry.title2 || entry.title : topic.title) || topic.title)}
         subtitle={topic.subtitle}
-        icon="folder-open"
+        icon={isTopicLinkEntry ? 'link' : 'folder-open'}
         iconColor="text-success-x"
       />
 
@@ -238,11 +318,61 @@ const TopicEntryPage: React.FC = () => {
       </div>
 
       <EntryQuickActions
-        entry={topic}
-        objectName="topic"
+        entry={entry}
+        objectName={quickActionObjectName}
         hasValue={Boolean(data?.hasValue)}
-        moreActions={<EntryActionsMenu entry={topic} editPath={`/topics/create?id=${encodeURIComponent(String(topic._id || ''))}`} />}
+        moreActions={
+          <EntryActionsMenu
+            entry={entry}
+            editPath={
+              isTopicLinkEntry
+                ? undefined
+                : `/topics/create?id=${encodeURIComponent(String(topic._id || ''))}`
+            }
+          />
+        }
       />
+
+      {isTopicLinkEditMode && isTopicLinkEntry && (
+        <div className="panel panel-default" style={{ marginTop: '12px' }}>
+          <div className="panel-heading">
+            <strong>Edit Link</strong>
+          </div>
+          <div className="panel-body">
+            <div className="form-group" style={{ marginBottom: '12px' }}>
+              <label htmlFor="topic-link-title">Contextual Title</label>
+              <input
+                id="topic-link-title"
+                className="form-control"
+                value={linkTitleDraft}
+                onChange={(event) => setLinkTitleDraft(event.target.value)}
+                placeholder="Optional contextual title"
+                disabled={linkMutationBusy}
+              />
+            </div>
+            {linkMutationError ? <Alert type="danger">{linkMutationError}</Alert> : null}
+            {linkMutationSuccess ? <Alert type="success">{linkMutationSuccess}</Alert> : null}
+            <div>
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                onClick={handleUpdateTopicLink}
+                disabled={linkMutationBusy}
+              >
+                {linkMutationBusy ? 'Saving...' : 'Update'}
+              </button>{' '}
+              <button
+                type="button"
+                className="btn btn-danger btn-sm"
+                onClick={handleDeleteTopicLink}
+                disabled={linkMutationBusy}
+              >
+                Delete Link
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <PageTabs tabs={tabs} activeTab="details" />
 

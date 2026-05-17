@@ -93,6 +93,7 @@ export interface SearchResponse extends ApiBaseResponse, EntityBuckets {
 export interface TopicEntryResponse extends ApiBaseResponse {
   topic?: LegacyEntity;
   entry?: LegacyEntity;
+  topicLink?: LegacyEntity;
   tagLabels?: LegacyEntity[];
   hasValue?: boolean;
   linkCount?: number;
@@ -117,6 +118,8 @@ export interface TopicEntryResponse extends ApiBaseResponse {
 
 export interface ArgumentEntryResponse extends ApiBaseResponse {
   argument?: LegacyEntity;
+  entry?: LegacyEntity;
+  argumentLink?: LegacyEntity;
   hasValue?: boolean;
   topic?: LegacyEntity;
   parentTopic?: LegacyEntity;
@@ -222,6 +225,16 @@ export interface MemberTopicsResponse extends ApiBaseResponse {
 }
 
 export interface MemberContributionsResponse extends ApiBaseResponse, EntityBuckets {
+  counts?: {
+    all?: number;
+    topics?: number;
+    arguments?: number;
+    questions?: number;
+    answers?: number;
+    artifacts?: number;
+    issues?: number;
+    opinions?: number;
+  };
   member?: LegacyEntity;
   tab?: string;
   results?: boolean;

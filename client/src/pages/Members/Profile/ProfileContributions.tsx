@@ -15,6 +15,8 @@ import IssueEntryRow from '../../../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../../../components/EntryRow/OpinionEntryRow';
 import type { Answer, Argument, Issue, Opinion, Question, Topic } from '../../../types';
 
+type ContributionSectionKey = 'topics' | 'arguments' | 'questions' | 'answers' | 'artifacts' | 'issues' | 'opinions';
+
 const ProfileContributions: React.FC = () => {
   const { username: routeUsername } = useParams<{ username?: string }>();
   const { user } = useAuth();
@@ -50,7 +52,13 @@ const ProfileContributions: React.FC = () => {
     load();
   }, [username, tab]);
 
-  const sections = useMemo(
+  const sections = useMemo<Array<{
+    key: ContributionSectionKey;
+    label: string;
+    icon: string;
+    entries: LegacyEntity[];
+    more: boolean;
+  }>>(
     () => {
       const applyScreeningAndSort = (entries: LegacyEntity[]): LegacyEntity[] => {
         const filtered = entries.filter((entry) => {
@@ -91,6 +99,16 @@ const ProfileContributions: React.FC = () => {
     },
     [data, screening, sort],
   );
+  const sectionCountMap: Record<ContributionSectionKey, number> = {
+    topics: Number(data.counts?.topics || 0),
+    arguments: Number(data.counts?.arguments || 0),
+    questions: Number(data.counts?.questions || 0),
+    answers: Number(data.counts?.answers || 0),
+    artifacts: Number(data.counts?.artifacts || 0),
+    issues: Number(data.counts?.issues || 0),
+    opinions: Number(data.counts?.opinions || 0),
+  };
+  const allCount = Number(data.counts?.all || 0);
 
   if (loading) {
     return <LoadingSpinner message="Loading contributions..." />;
@@ -163,7 +181,8 @@ const ProfileContributions: React.FC = () => {
                 setSearchParams(next);
               }}
             >
-              <i className="fa fa-globe" aria-hidden="true"></i> All
+              <i className="fa fa-globe" aria-hidden="true"></i> All{' '}
+              {allCount > 0 ? <span className="wt-label label label-default">{allCount}</span> : null}
             </a>
           </li>
           {sections.map((section) => (
@@ -177,7 +196,10 @@ const ProfileContributions: React.FC = () => {
                   setSearchParams(next);
                 }}
               >
-                {section.label}
+                {section.label}{' '}
+                {sectionCountMap[section.key] > 0 ? (
+                  <span className="wt-label label label-default">{sectionCountMap[section.key]}</span>
+                ) : null}
               </a>
             </li>
           ))}

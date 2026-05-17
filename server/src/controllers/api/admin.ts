@@ -126,16 +126,18 @@ export = function (router: Router) {
       return;
     }
 
-    const [users, accounts, categories, statuses] = await Promise.all([
+    const [users, accounts, categories, statuses, administrators, groups] = await Promise.all([
       db.User.countDocuments(),
       db.Account.countDocuments(),
       db.Category.countDocuments(),
       db.Status.countDocuments(),
+      db.Admin.countDocuments(),
+      db.Group.countDocuments(),
     ]);
 
     res.json({
       success: true,
-      counts: { users, accounts, categories, statuses },
+      counts: { users, accounts, categories, statuses, administrators, groups },
     });
   });
 

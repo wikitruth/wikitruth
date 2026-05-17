@@ -511,7 +511,11 @@ function buildGroupUrl(group?: { friendlyUrl?: unknown; _id?: unknown }): string
 
 async function setGroupModel(req: { query: Record<string, unknown>; params: { username?: string }; user?: { id?: unknown } }, model: Record<string, unknown>) {
   if (req.query.group) {
-    let result = await db.Group.findOne({ _id: req.query.group });
+    const groupId = String(req.query.group || '').trim();
+    if (!/^[a-f0-9]{24}$/i.test(groupId)) {
+      return;
+    }
+    let result = await db.Group.findOne({ _id: groupId });
     model.group = result;
     await setUsername(result);
   }

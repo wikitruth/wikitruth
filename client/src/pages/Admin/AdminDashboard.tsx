@@ -10,6 +10,8 @@ interface DashboardCounts {
   accounts?: number;
   categories?: number;
   statuses?: number;
+  administrators?: number;
+  groups?: number;
 }
 
 const AdminDashboard: React.FC = () => {
@@ -156,6 +158,22 @@ const AdminDashboard: React.FC = () => {
               <div className="panel-heading">Statuses</div>
               <div className="panel-body">
                 <strong>{counts.statuses || 0}</strong>
+              </div>
+            </div>
+          </div>
+          <div className="col-sm-3">
+            <div className="panel panel-default">
+              <div className="panel-heading">Administrators</div>
+              <div className="panel-body">
+                <strong>{counts.administrators || 0}</strong>
+              </div>
+            </div>
+          </div>
+          <div className="col-sm-3">
+            <div className="panel panel-default">
+              <div className="panel-heading">Groups</div>
+              <div className="panel-body">
+                <strong>{counts.groups || 0}</strong>
               </div>
             </div>
           </div>

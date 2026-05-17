@@ -557,6 +557,13 @@ export = function (router: Router) {
         artifacts,
         issues,
         opinions,
+        topicsCount,
+        argumentsCount,
+        questionsCount,
+        answersCount,
+        artifactsCount,
+        issuesCount,
+        opinionsCount,
       ] = await Promise.all([
         shouldLoad('topics') ? db.Topic.find(baseQuery).sort({ editDate: -1 }).limit(limit).lean() : [],
         shouldLoad('arguments') ? db.Argument.find(baseQuery).sort({ editDate: -1 }).limit(limit).lean() : [],
@@ -565,6 +572,13 @@ export = function (router: Router) {
         shouldLoad('artifacts') ? db.Artifact.find(baseQuery).sort({ editDate: -1 }).limit(limit).lean() : [],
         shouldLoad('issues') ? db.Issue.find(baseQuery).sort({ editDate: -1 }).limit(limit).lean() : [],
         shouldLoad('opinions') ? db.Opinion.find(baseQuery).sort({ editDate: -1 }).limit(limit).lean() : [],
+        db.Topic.countDocuments(baseQuery),
+        db.Argument.countDocuments(baseQuery),
+        db.Question.countDocuments(baseQuery),
+        db.Answer.countDocuments(baseQuery),
+        db.Artifact.countDocuments(baseQuery),
+        db.Issue.countDocuments(baseQuery),
+        db.Opinion.countDocuments(baseQuery),
       ]);
 
       const withFriendlyUrl = function (entry: Record<string, unknown> | null | undefined) {
@@ -591,6 +605,23 @@ export = function (router: Router) {
         artifacts: artifacts.map(withFriendlyUrl),
         issues: issues.map(withFriendlyUrl),
         opinions: opinions.map(withFriendlyUrl),
+        counts: {
+          topics: topicsCount,
+          arguments: argumentsCount,
+          questions: questionsCount,
+          answers: answersCount,
+          artifacts: artifactsCount,
+          issues: issuesCount,
+          opinions: opinionsCount,
+          all:
+            Number(topicsCount || 0) +
+            Number(argumentsCount || 0) +
+            Number(questionsCount || 0) +
+            Number(answersCount || 0) +
+            Number(artifactsCount || 0) +
+            Number(issuesCount || 0) +
+            Number(opinionsCount || 0),
+        },
         topicsMore: normalizedTab === 'all' && topics.length >= limit,
         argumentsMore: normalizedTab === 'all' && argumentsList.length >= limit,
         questionsMore: normalizedTab === 'all' && questions.length >= limit,
