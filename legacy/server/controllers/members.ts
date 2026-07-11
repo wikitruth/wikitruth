@@ -2,7 +2,6 @@
 
 import type { LegacyControllerFactory } from '../../../server/src/types/legacyControllers';
 
-import * as url from 'url';
 import mongoose from 'mongoose';
 import async from 'async';
 import jwt from 'jsonwebtoken';
@@ -501,7 +500,7 @@ const mountMembersController: LegacyControllerFactory = function(router) {
     let LIMIT = req.query.tab ? 25 : 15;
     let allTabs = !req.query.tab;
     let tab = req.query.tab ? req.query.tab : 'all';
-    let baseUrl = url.parse(req.originalUrl);
+    let baseUrl = new URL(req.originalUrl, 'http://legacy.local');
     let model = {
       tab: tab,
       url: baseUrl.pathname,

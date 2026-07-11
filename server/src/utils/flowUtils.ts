@@ -4,8 +4,6 @@ import * as utilsMod from './utils';
 import constantsMod from '../models/constants';
 import pathsMod from '../models/paths';
 import applicationsMod from '../models/applications';
-import * as urlMod from 'url';
-import * as querystringMod from 'querystring';
 import htmlToTextMod from 'html-to-text';
 import * as dateFnsMod from 'date-fns';
 import async from 'async';
@@ -58,8 +56,6 @@ const constants = constantsMod as unknown as Record<string, any>;
 const paths = pathsMod as unknown as Record<string, any>;
 const applications = applicationsMod as unknown as Record<string, any>;
 const dateFns = dateFnsMod as unknown as Record<string, any>;
-const url = urlMod as unknown as Record<string, any>;
-const querystring = querystringMod as unknown as Record<string, any>;
 const htmlToText = htmlToTextMod as unknown as Record<string, any>;
 
 function getBackupDir(isPrivate?: boolean): string {
@@ -2587,18 +2583,16 @@ function getDiaryBaseUrl(username?: string): string {
 }
 
 function buildReturnUrl(req?: { originalUrl?: string }, defaultBaseUrl?: string): string {
-  const nextUrl = url.parse(req?.originalUrl);
-  const nextQuery = querystring.parse(nextUrl.query);
-  delete nextQuery.id;
-  if (nextQuery.source) {
-    nextUrl.pathname = nextQuery.source;
-    delete nextQuery.source;
+  const nextUrl = new URL(req?.originalUrl || '/', 'http://wikitruth.local');
+  const source = nextUrl.searchParams.get('source');
+  nextUrl.searchParams.delete('id');
+  nextUrl.searchParams.delete('source');
+  if (source) {
+    nextUrl.pathname = source;
   } else if (defaultBaseUrl) {
     nextUrl.pathname = defaultBaseUrl;
   }
-  nextUrl.query = nextQuery;
-  nextUrl.search = null; // important, ensures new 'query' to take effect
-  return url.format(nextUrl);
+  return `${nextUrl.pathname}${nextUrl.search}${nextUrl.hash}`;
 }
 
 function buildTopicReturnUrl(model?: { username?: unknown; group?: unknown; wikiBaseUrl?: string }, cancelBaseUrl?: string, entry?: { friendlyUrl?: unknown; _id?: unknown }, parent?: { friendlyUrl?: unknown; _id?: unknown }): string {
@@ -2704,25 +2698,15 @@ function setScreeningModel(req: { originalUrl?: string; query?: { screening?: st
     model.screening = {};
   }
 
-  const baseUrl = url.parse(req.originalUrl);
-  const newQuery = querystring.parse(baseUrl.query);
-  baseUrl.search = null; // important, ensures new 'query' to take effect
-
-  newQuery.screening = 'pending';
-  baseUrl.query = newQuery;
-  model.screening.pendingUrl = url.format(baseUrl);
-
-  newQuery.screening = 'approved';
-  baseUrl.query = newQuery;
-  model.screening.approvedUrl = url.format(baseUrl);
-
-  newQuery.screening = 'rejected';
-  baseUrl.query = newQuery;
-  model.screening.rejectedUrl = url.format(baseUrl);
-
-  newQuery.screening = 'archived';
-  baseUrl.query = newQuery;
-  model.screening.archivedUrl = url.format(baseUrl);
+  const baseUrl = new URL(req.originalUrl || '/', 'http://wikitruth.local');
+  const screeningUrl = (status: string) => {
+    baseUrl.searchParams.set('screening', status);
+    return `${baseUrl.pathname}${baseUrl.search}${baseUrl.hash}`;
+  };
+  model.screening.pendingUrl = screeningUrl('pending');
+  model.screening.approvedUrl = screeningUrl('approved');
+  model.screening.rejectedUrl = screeningUrl('rejected');
+  model.screening.archivedUrl = screeningUrl('archived');
 
   if (req.query?.screening) {
     if (req.query.screening === 'pending') {

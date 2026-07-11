@@ -6,7 +6,6 @@ import type { AppContext, ApplicationsModule } from '../types/models';
 import * as flowUtilsNs from '../utils/flowUtils';
 import applicationsMod from '../models/applications';
 import async from 'async';
-import url from 'url';
 import paths from '../models/paths';
 const flowUtils = flowUtilsNs as unknown as {
   getDiaryBaseUrl(username: string): string;
@@ -99,7 +98,7 @@ export default function configureLocals(app: AppContext & { use: (...args: unkno
         }
       },
       currentGroup: async function () {
-        const baseUrl = url.parse(req.originalUrl);
+        const baseUrl = new URL(req.originalUrl, 'http://wikitruth.local');
         const params = (baseUrl.pathname || '').split('/');
         if (params.length >= 4 && params[1] && '/' + params[1].toLowerCase() === paths.groups.index) {
           const model: { group?: unknown } = {};

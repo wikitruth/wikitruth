@@ -1,7 +1,5 @@
 'use strict';
 
-import * as url from 'url';
-
 import setupEntryRouters from './setupEntryRouters';
 import * as modernFlowUtils from '../../../server/src/utils/flowUtils';
 
@@ -27,9 +25,9 @@ function prefixLegacyUrl(input: string | undefined): string {
     return value;
   }
 
-  const parsed = url.parse(value);
+  const parsed = new URL(value, 'http://legacy.local');
   parsed.pathname = prefixPathname(parsed.pathname || undefined);
-  return url.format(parsed);
+  return `${parsed.pathname}${parsed.search}${parsed.hash}`;
 }
 
 function buildGroupUrl(group: Record<string, unknown>): string {
