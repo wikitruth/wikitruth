@@ -5,6 +5,7 @@ import crypto from 'crypto';
 import appModForDb from '../app';
 import constants from '../models/constants';
 import { logEntryEvent } from './entryEventsService';
+import { captureEntryRevision } from './entryRevisionService';
 
 type EntryRecord = Record<string, unknown> & {
   _id?: unknown;
@@ -348,6 +349,23 @@ export async function mergeEntries(options: {
     throw new Error('Entry changed after the merge preview was loaded');
   }
 
+  const [sourceRevision, targetRevision] = await Promise.all([
+    captureEntryRevision({
+      objectType,
+      objectId: sourceId,
+      entry: source,
+      source: 'bootstrap',
+      summary: 'Pre-merge source snapshot',
+    }),
+    captureEntryRevision({
+      objectType,
+      objectId: targetId,
+      entry: target,
+      source: 'bootstrap',
+      summary: 'Pre-merge target snapshot',
+    }),
+  ]);
+
   const redirectModel = db.EntryRedirect;
   if (!redirectModel) {
     throw new Error('Entry redirect model is unavailable');
@@ -360,6 +378,8 @@ export async function mergeEntries(options: {
     status: 'pending',
     reason: reason.trim(),
     createUserId: actor.id,
+    sourceRevisionId: sourceRevision._id,
+    targetRevisionId: targetRevision._id,
   });
 
   try {
@@ -382,6 +402,19 @@ export async function mergeEntries(options: {
         },
       }
     );
+    const mergedSource = await modelFor(objectType).findById(sourceId).lean();
+    if (!mergedSource) {
+      throw new Error('Merged source could not be reloaded');
+    }
+    const mergedSourceRevision = await captureEntryRevision({
+      objectType,
+      objectId: sourceId,
+      entry: mergedSource,
+      source: 'merge',
+      summary: reason.trim(),
+      actorId: actor.id,
+      actorUsername: actor.username,
+    });
     await redirectModel.updateOne(
       { _id: redirect._id },
       {
@@ -389,6 +422,7 @@ export async function mergeEntries(options: {
           status: 'completed',
           completedDate: now,
           movedRelationships,
+          mergedSourceRevisionId: mergedSourceRevision._id,
         },
       }
     );
@@ -408,6 +442,9 @@ export async function mergeEntries(options: {
         reason: reason.trim(),
         movedRelationships,
         redirectId: String(redirect._id || ''),
+        sourceRevisionId: sourceRevision._id,
+        targetRevisionId: targetRevision._id,
+        mergedSourceRevisionId: mergedSourceRevision._id,
       },
     });
 

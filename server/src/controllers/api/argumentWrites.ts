@@ -6,6 +6,7 @@ import constantsMod from '../../models/constants';
 import * as utils from '../../utils/utils';
 import { parseNumericTags, parseOptionalDate } from './entryWriteHelpers';
 import { rejectBlockingDuplicate } from './duplicateWriteGuard';
+import { recordEntryRevision } from './revisionWriteRecorder';
 
 const constants = constantsMod as unknown as WikitruthConstants;
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
@@ -105,6 +106,14 @@ export async function createArgument(req: WikitruthRequest, res: WikitruthRespon
       editUserId: req.user._id,
     },
     private: isPrivate || Boolean(groupId),
+  });
+
+  await recordEntryRevision({
+    req,
+    objectType: constants.OBJECT_TYPES.argument,
+    entry: argument,
+    source: 'create',
+    summary: 'Argument created',
   });
 
   res.status(201).json({
@@ -249,6 +258,13 @@ export async function updateArgument(req: WikitruthRequest, res: WikitruthRespon
   argument.editDate = new Date();
   argument.editUserId = actorUserId;
   await argument.save();
+  await recordEntryRevision({
+    req,
+    objectType: constants.OBJECT_TYPES.argument,
+    entry: argument,
+    source: 'update',
+    summary: 'Argument updated',
+  });
 
   return res.json({
     success: true,

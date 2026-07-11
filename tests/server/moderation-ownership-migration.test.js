@@ -25,6 +25,11 @@ jest.mock('../../server/src/app', () => ({
       },
       EntryEvent: {
         create: (...args) => createEntryEvent(...args),
+        findOne: () => ({
+          sort: () => ({
+            lean: async () => null,
+          }),
+        }),
       },
     },
   },

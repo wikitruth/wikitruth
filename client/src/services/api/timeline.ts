@@ -27,6 +27,19 @@ export type TimelineEvent = {
   createDate?: string;
 };
 
+export type EntryRevision = {
+  _id: string;
+  revisionNumber: number;
+  parentRevisionId?: string | null;
+  source: 'bootstrap' | 'create' | 'update' | 'merge' | 'change_request' | 'rollback';
+  summary?: string;
+  snapshotHash: string;
+  changedFields: string[];
+  createDate?: string;
+  createUserId?: string | null;
+  createUsername?: string;
+};
+
 export const timelineApi = {
   list: (params: {
     objectName: string;
@@ -74,6 +87,27 @@ export const timelineApi = {
       days: number;
       buckets: Array<{ day: string; count: number }>;
     }>(`/timeline/visualization?${query.toString()}`);
+  },
+  revisions: (params: { objectName: string; objectType?: number; id: string; page?: number; limit?: number }) => {
+    const query = new URLSearchParams();
+    query.set('objectName', params.objectName);
+    query.set('id', params.id);
+    if (typeof params.objectType === 'number') {
+      query.set('objectType', String(params.objectType));
+    }
+    if (typeof params.page === 'number') {
+      query.set('page', String(params.page));
+    }
+    if (typeof params.limit === 'number') {
+      query.set('limit', String(params.limit));
+    }
+    return request<{
+      success: boolean;
+      revisions: EntryRevision[];
+      total: number;
+      page: number;
+      limit: number;
+    }>(`/timeline/revisions?${query.toString()}`);
   },
 };
 

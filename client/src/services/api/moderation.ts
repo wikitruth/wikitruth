@@ -167,6 +167,21 @@ interface MergeResponse {
   };
 }
 
+export interface ChangeRequest {
+  _id: string;
+  objectType: number;
+  objectId: string;
+  baseRevisionId: string;
+  baseRevisionNumber: number;
+  proposedChanges: Record<string, unknown>;
+  summary: string;
+  status: 'open' | 'accepted' | 'partially_accepted' | 'rejected' | 'stale' | 'withdrawn';
+  acceptedFields?: string[];
+  decisionNote?: string;
+  createDate?: string;
+  createUsername?: string;
+}
+
 const getCsrfToken = (): string | null => {
   if (typeof document === 'undefined') {
     return null;
@@ -191,7 +206,8 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
   });
 
   if (!response.ok) {
-    throw new Error(`Moderation request failed: ${response.status}`);
+    const errorPayload = await response.json().catch(() => null) as { message?: unknown } | null;
+    throw new Error(String(errorPayload?.message || `Moderation request failed: ${response.status}`));
   }
 
   return response.json();
@@ -220,6 +236,39 @@ export const moderationApi = {
     reason: string;
   }) =>
     request<MergeResponse>('/moderation/merge', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+  submitChangeRequest: (
+    target: ModerationTarget,
+    payload: { proposedChanges: Record<string, unknown>; summary: string },
+  ) =>
+    request<{ success: boolean; request: ChangeRequest }>(`/moderation/change-requests?${toQuery(target)}`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+  listChangeRequests: (target: ModerationTarget, status?: ChangeRequest['status']) => {
+    const query = new URLSearchParams(toQuery(target));
+    if (status) {
+      query.set('status', status);
+    }
+    return request<{ success: boolean; requests: ChangeRequest[] }>(`/moderation/change-requests?${query.toString()}`);
+  },
+  resolveChangeRequest: (
+    id: string,
+    payload: { action: 'accept' | 'reject'; acceptedFields?: string[]; decisionNote: string },
+  ) =>
+    request<{ success: boolean; request: ChangeRequest }>(`/moderation/change-requests/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+  rollbackEntry: (payload: {
+    objectType: number;
+    objectId: string;
+    revisionId: string;
+    reason: string;
+  }) =>
+    request<{ success: boolean; revision: Record<string, unknown> }>('/moderation/rollback', {
       method: 'POST',
       body: JSON.stringify(payload),
     }),

@@ -137,6 +137,28 @@ export const adminApi = {
       limit: number;
     }>(`${API_BASE_URL}/admin/audit-events${suffix ? `?${suffix}` : ''}`);
   },
+  verifyAuditEvents: async () => {
+    const response = await fetch(`${API_BASE_URL}/admin/audit-events/verify`, {
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    const payload = await response.json() as {
+      success: boolean;
+      verification: {
+        valid: boolean;
+        verifiedEvents: number;
+        legacyEvents: number;
+        headSequence: number;
+        headHash: string;
+        brokenAtSequence: number | null;
+        reason: string | null;
+      };
+    };
+    if (!payload.verification) {
+      throw new Error(`Audit verification failed: ${response.status}`);
+    }
+    return payload;
+  },
   updateUser: async (id: string, payload: AdminMutationPayload) => {
     const response = await request<MutationResponse>(`${API_BASE_URL}/admin/users/${encodeURIComponent(id)}`, {
       method: 'PUT',

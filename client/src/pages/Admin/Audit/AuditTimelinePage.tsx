@@ -13,12 +13,26 @@ type AuditEvent = {
   message?: string;
   createDate?: string;
   payload?: Record<string, unknown>;
+  chainSequence?: number;
+  eventHash?: string;
+};
+
+type AuditVerification = {
+  valid: boolean;
+  verifiedEvents: number;
+  legacyEvents: number;
+  headSequence: number;
+  headHash: string;
+  brokenAtSequence: number | null;
+  reason: string | null;
 };
 
 const AuditTimelinePage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [events, setEvents] = useState<AuditEvent[]>([]);
+  const [verification, setVerification] = useState<AuditVerification | null>(null);
+  const [verifying, setVerifying] = useState(false);
 
   const load = async () => {
     try {
@@ -37,6 +51,19 @@ const AuditTimelinePage: React.FC = () => {
     void load();
   }, []);
 
+  const verify = async () => {
+    try {
+      setVerifying(true);
+      setError(null);
+      const result = await adminApi.verifyAuditEvents();
+      setVerification(result.verification);
+    } catch (verifyError) {
+      setError(verifyError instanceof Error ? verifyError.message : 'Failed to verify audit chain');
+    } finally {
+      setVerifying(false);
+    }
+  };
+
   return (
     <div className="container">
       <PageMeta title="Admin Audit Timeline" description="Immutable privileged action timeline." />
@@ -50,7 +77,20 @@ const AuditTimelinePage: React.FC = () => {
         <button type="button" className="btn btn-default btn-sm" onClick={() => void load()} disabled={loading}>
           <i className="fa fa-refresh" aria-hidden="true"></i> Refresh
         </button>
+        {' '}
+        <button type="button" className="btn btn-primary btn-sm" onClick={() => void verify()} disabled={verifying}>
+          <i className="fa fa-shield" aria-hidden="true"></i> {verifying ? 'Verifying...' : 'Verify Chain'}
+        </button>
       </div>
+
+      {verification ? (
+        <Alert type={verification.valid ? 'success' : 'danger'}>
+          {verification.valid
+            ? `Audit chain verified: ${verification.verifiedEvents} hashed events, ${verification.legacyEvents} legacy events.`
+            : `Audit chain failed at sequence ${verification.brokenAtSequence || 'unknown'}: ${verification.reason || 'unknown reason'}`}
+          {verification.headHash ? <><br /><small>Head: <code>{verification.headHash}</code></small></> : null}
+        </Alert>
+      ) : null}
 
       {!loading && events.length === 0 ? <Alert type="info">No audit events found.</Alert> : null}
 
@@ -64,6 +104,7 @@ const AuditTimelinePage: React.FC = () => {
                 <th>Actor</th>
                 <th>Target</th>
                 <th>Summary</th>
+                <th>Integrity</th>
               </tr>
             </thead>
             <tbody>
@@ -80,6 +121,10 @@ const AuditTimelinePage: React.FC = () => {
                     <small className="text-muted">{event.objectId || '-'}</small>
                   </td>
                   <td>{event.message || '-'}</td>
+                  <td>
+                    {event.chainSequence ? <><code>#{event.chainSequence}</code><br /></> : null}
+                    <small className="text-muted">{event.eventHash ? event.eventHash.slice(0, 12) : 'legacy'}</small>
+                  </td>
                 </tr>
               ))}
             </tbody>

@@ -13,7 +13,11 @@ import {
 import appModForDb from '../../app';
 import config from '../../config/config';
 import * as flowUtils from '../../utils/flowUtils';
-import { listPrivilegedEvents, logEntryEvent } from '../../services/entryEventsService';
+import {
+  listPrivilegedEvents,
+  logEntryEvent,
+  verifyPrivilegedEventChain,
+} from '../../services/entryEventsService';
 import {
   createDatabaseBackup,
   type BackupDatabaseConnection,
@@ -387,6 +391,17 @@ export function registerAdminBackupRoutes(router: Router, ensureAdmin: EnsureAdm
       total: result.total,
       page: result.page,
       limit: result.limit,
+    });
+  });
+
+  router.get('/audit-events/verify', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureAdmin(req, res)) {
+      return;
+    }
+    const verification = await verifyPrivilegedEventChain();
+    res.status(verification.valid ? 200 : 409).json({
+      success: verification.valid,
+      verification,
     });
   });
 }

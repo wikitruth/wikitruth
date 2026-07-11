@@ -62,6 +62,12 @@ jest.mock('../../server/src/services/entryEventsService', () => ({
   logEntryEvent: (...args: unknown[]) => logEntryEvent(...args),
 }));
 
+jest.mock('../../server/src/services/entryRevisionService', () => ({
+  captureEntryRevision: jest.fn(async (options: { objectId: string; source: string }) => ({
+    _id: `${options.objectId}-${options.source}-revision`,
+  })),
+}));
+
 import {
   buildDuplicateScope,
   compareDuplicateEntries,

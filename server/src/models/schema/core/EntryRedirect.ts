@@ -16,6 +16,9 @@ const factory: SchemaFactory = function (app, mongoose) {
     },
     reason: { type: String, required: true },
     movedRelationships: { type: mongoose.Schema.Types.Mixed, default: {} },
+    sourceRevisionId: { type: mongoose.Schema.ObjectId, ref: 'EntryRevision', default: null },
+    targetRevisionId: { type: mongoose.Schema.ObjectId, ref: 'EntryRevision', default: null },
+    mergedSourceRevisionId: { type: mongoose.Schema.ObjectId, ref: 'EntryRevision', default: null },
     createDate: { type: Date, default: Date.now, index: true },
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User', required: true },
     completedDate: { type: Date, default: null },
@@ -29,4 +32,3 @@ const factory: SchemaFactory = function (app, mongoose) {
 };
 
 export = factory;
-

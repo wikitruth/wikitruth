@@ -14,6 +14,7 @@ import { applyViewModeFilter } from './viewFilter';
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 import { logEntryEvent } from '../../services/entryEventsService';
 import { rejectBlockingDuplicate } from './duplicateWriteGuard';
+import { recordEntryRevision } from './revisionWriteRecorder';
 import { notifySubscribers } from '../../services/notificationsService';
 import { applyLegacyEntryContext, resolveLegacyEntryContext } from './entryContext';
 
@@ -184,6 +185,14 @@ async function POST_issue_create(req: WikitruthRequest, res: WikitruthResponse) 
     private: isPrivate,
   });
 
+  await recordEntryRevision({
+    req,
+    objectType: constants.OBJECT_TYPES.issue,
+    entry: issue,
+    source: 'create',
+    summary: 'Issue created',
+  });
+
   await logEntryEvent({
     eventType: 'issue.created',
     objectType: constants.OBJECT_TYPES.topic,
@@ -282,6 +291,13 @@ async function PUT_issue_update(req: WikitruthRequest, res: WikitruthResponse) {
   issue.editDate = new Date();
   issue.editUserId = req.user._id;
   await issue.save();
+  await recordEntryRevision({
+    req,
+    objectType: constants.OBJECT_TYPES.issue,
+    entry: issue,
+    source: 'update',
+    summary: 'Issue updated',
+  });
 
   res.json({
     success: true,

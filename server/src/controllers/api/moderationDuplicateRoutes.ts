@@ -7,6 +7,7 @@ import {
   findDuplicateCandidates,
   mergeEntries,
 } from '../../services/entryMergeService';
+import { logEntryEvent } from '../../services/entryEventsService';
 import {
   ensureModerator,
   parseModerationTarget,
@@ -56,6 +57,16 @@ export function registerModerationDuplicateRoutes(router: Router): void {
       });
       res.json({ success: true, merge });
     } catch (error) {
+      await logEntryEvent({
+        scope: 'privileged',
+        eventType: 'moderation.entry.merge-rejected',
+        objectType,
+        objectId: targetId || sourceId,
+        actorUserId: String(req.user?.id || req.user?._id || ''),
+        actorUsername: String(req.user?.username || ''),
+        message: error instanceof Error ? error.message : 'Unable to merge entries',
+        payload: { sourceId, targetId, reason },
+      });
       res.status(409).json({
         success: false,
         message: error instanceof Error ? error.message : 'Unable to merge entries',
@@ -63,4 +74,3 @@ export function registerModerationDuplicateRoutes(router: Router): void {
     }
   });
 }
-

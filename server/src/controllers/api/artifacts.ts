@@ -18,6 +18,7 @@ import {
 } from '../../services/artifactFileService';
 import { parseBoolean, parseNumericTags } from './entryWriteHelpers';
 import { rejectBlockingDuplicate } from './duplicateWriteGuard';
+import { recordEntryRevision } from './revisionWriteRecorder';
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 export = function (router: Router) {
   // GET /api/artifacts - List artifacts
@@ -237,6 +238,14 @@ async function POST_artifact_create(req: WikitruthRequest, res: WikitruthRespons
     }
   }
 
+  await recordEntryRevision({
+    req,
+    objectType: constants.OBJECT_TYPES.artifact,
+    entry: artifact,
+    source: 'create',
+    summary: 'Artifact created',
+  });
+
   res.status(201).json({
     success: true,
     artifact: {
@@ -324,6 +333,13 @@ async function PUT_artifact_update(req: WikitruthRequest, res: WikitruthResponse
   artifact.editDate = new Date();
   artifact.editUserId = req.user._id;
   await artifact.save();
+  await recordEntryRevision({
+    req,
+    objectType: constants.OBJECT_TYPES.artifact,
+    entry: artifact,
+    source: 'update',
+    summary: 'Artifact updated',
+  });
 
   res.json({
     success: true,

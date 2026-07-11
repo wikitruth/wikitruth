@@ -36,9 +36,11 @@ import {
 } from './moderationShared';
 import { registerModerationSignalsRoutes } from './moderationSignalsRoutes';
 import { registerModerationDuplicateRoutes } from './moderationDuplicateRoutes';
+import { registerModerationRevisionRoutes } from './moderationRevisionRoutes';
 
 export = function (router: Router) {
   registerModerationDuplicateRoutes(router);
+  registerModerationRevisionRoutes(router);
   router.get('/entry', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureModerator(req, res)) {
       return;

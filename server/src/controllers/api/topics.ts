@@ -6,6 +6,7 @@ import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 import { applyViewModeFilter } from './viewFilter';
 import { parseNumericTags, parseOptionalDate } from './entryWriteHelpers';
 import { rejectBlockingDuplicate } from './duplicateWriteGuard';
+import { recordEntryRevision } from './revisionWriteRecorder';
 
 import * as flowUtilsNs from '../../utils/flowUtils';
 import appModForDb from '../../app';
@@ -240,6 +241,14 @@ async function POST_topic_create(req: WikitruthRequest, res: WikitruthResponse) 
     },
   });
 
+  await recordEntryRevision({
+    req,
+    objectType: constants.OBJECT_TYPES.topic,
+    entry: topic,
+    source: 'create',
+    summary: 'Topic created',
+  });
+
   res.status(201).json({
     success: true,
     topic: {
@@ -332,6 +341,13 @@ async function PUT_topic_update(req: WikitruthRequest, res: WikitruthResponse) {
   topic.editDate = new Date();
   topic.editUserId = actorUserId;
   await topic.save();
+  await recordEntryRevision({
+    req,
+    objectType: constants.OBJECT_TYPES.topic,
+    entry: topic,
+    source: 'update',
+    summary: 'Topic updated',
+  });
 
   return res.json({
     success: true,

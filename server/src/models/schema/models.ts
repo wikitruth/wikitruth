@@ -18,6 +18,9 @@ export = function (app: Application, mongoose: Mongoose) {
   require('./account/LoginAttempt')(app, mongoose);
 
   // core
+  require('./core/EntryRevisionCounter')(app, mongoose);
+  require('./core/EntryRevision')(app, mongoose);
+  require('./core/ChangeRequest')(app, mongoose);
   require('./core/Topic')(app, mongoose);
   require('./core/TopicLink')(app, mongoose);
   require('./core/Argument')(app, mongoose);

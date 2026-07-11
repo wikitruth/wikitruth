@@ -11,6 +11,7 @@ const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
 const constants = constantsMod as unknown as ConstantsModule;
 import * as utils from '../../utils/utils';
 import { rejectBlockingDuplicate } from './duplicateWriteGuard';
+import { recordEntryRevision } from './revisionWriteRecorder';
 import * as answersService from '../../services/answersService';
 import { applyViewModeFilter } from './viewFilter';
 import { applyLegacyEntryContext, resolveLegacyEntryContext } from './entryContext';
@@ -187,6 +188,14 @@ async function POST_answer_create(req: WikitruthRequest, res: WikitruthResponse)
     private: isPrivate,
   });
 
+  await recordEntryRevision({
+    req,
+    objectType: constants.OBJECT_TYPES.answer,
+    entry: answer,
+    source: 'create',
+    summary: 'Answer created',
+  });
+
   res.status(201).json({
     success: true,
     answer: {
@@ -249,6 +258,13 @@ async function PUT_answer_update(req: WikitruthRequest, res: WikitruthResponse) 
   answer.editDate = new Date();
   answer.editUserId = req.user._id;
   await answer.save();
+  await recordEntryRevision({
+    req,
+    objectType: constants.OBJECT_TYPES.answer,
+    entry: answer,
+    source: 'update',
+    summary: 'Answer updated',
+  });
 
   res.json({
     success: true,

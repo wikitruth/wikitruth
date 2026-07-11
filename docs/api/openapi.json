@@ -2504,6 +2504,43 @@
         }
       }
     },
+    "/timeline/revisions": {
+      "get": {
+        "summary": "List immutable entry revision metadata",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/admin/audit-events/verify": {
+      "get": {
+        "summary": "Verify the privileged audit-event hash chain",
+        "responses": {
+          "200": {
+            "description": "Chain valid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Chain integrity failure"
+          }
+        }
+      }
+    },
     "/moderation/entry": {
       "get": {
         "summary": "Get moderation metadata for an entry target",
@@ -2564,6 +2601,110 @@
           },
           "409": {
             "description": "Merge conflict or stale preview"
+          }
+        }
+      }
+    },
+    "/moderation/change-requests": {
+      "get": {
+        "summary": "List change requests for moderation",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Submit a suggestion-only change request",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericMutationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/moderation/change-requests/{id}": {
+      "put": {
+        "summary": "Accept selected change-request fields or reject the request",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/Id"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericMutationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Resolved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stale base revision"
+          }
+        }
+      }
+    },
+    "/moderation/rollback": {
+      "post": {
+        "summary": "Create a new revision by restoring a reviewed snapshot",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericMutationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Rolled back",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
           }
         }
       }

@@ -14,6 +14,7 @@ import { applyViewModeFilter } from './viewFilter';
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 import { logEntryEvent } from '../../services/entryEventsService';
 import { rejectBlockingDuplicate } from './duplicateWriteGuard';
+import { recordEntryRevision } from './revisionWriteRecorder';
 import { notifySubscribers } from '../../services/notificationsService';
 import { applyLegacyEntryContext, resolveLegacyEntryContext } from './entryContext';
 
@@ -257,6 +258,14 @@ async function POST_opinion_create(req: WikitruthRequest, res: WikitruthResponse
     },
   });
 
+  await recordEntryRevision({
+    req,
+    objectType: constants.OBJECT_TYPES.opinion,
+    entry: opinion,
+    source: 'create',
+    summary: 'Comment created',
+  });
+
   const timelineObjectType = ownerId ? ownerType : constants.OBJECT_TYPES.opinion;
   const timelineObjectName = ownerId ? (constants.OBJECT_ID_NAME_MAP[ownerType] || parentType || 'topic') : 'opinion';
   const timelineObjectId = String(ownerId || opinion._id);
@@ -362,6 +371,13 @@ async function PUT_opinion_update(req: WikitruthRequest, res: WikitruthResponse)
   opinion.editDate = new Date();
   opinion.editUserId = req.user._id;
   await opinion.save();
+  await recordEntryRevision({
+    req,
+    objectType: constants.OBJECT_TYPES.opinion,
+    entry: opinion,
+    source: 'update',
+    summary: 'Comment updated',
+  });
 
   res.json({
     success: true,
