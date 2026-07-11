@@ -4,7 +4,7 @@ import type { AppContext } from '../types/models';
 import type { AuthUser } from '../types/auth';
 import jwt from 'jsonwebtoken';
 import { Strategy as LocalStrategyTyped } from 'passport-local';
-import { Strategy as TwitterStrategyTyped } from 'passport-twitter';
+import TwitterStrategyTyped from '../auth/twitterStrategy';
 import { Strategy as GitHubStrategyTyped } from 'passport-github';
 import { Strategy as FacebookStrategyTyped } from 'passport-facebook';
 import { Strategy as GoogleStrategyTyped } from 'passport-google-oauth20';
