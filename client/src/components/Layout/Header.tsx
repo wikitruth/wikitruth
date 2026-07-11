@@ -375,12 +375,20 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
                 </li>
               </>
             ) : (
-              <li>
-                <Link to="/login" className="nav-narrow" aria-label="Sign in">
-                  <i className="fa fa-user"></i>
-                  <span className="hidden-xxxxs"> Sign In</span>
-                </Link>
-              </li>
+              <>
+                <li>
+                  <Link to="/contribute" className="nav-narrow" aria-label="Contribute anonymously">
+                    <i className="fa fa-user-secret"></i>
+                    <span className="hidden-xs"> Contribute</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/login" className="nav-narrow" aria-label="Sign in">
+                    <i className="fa fa-user"></i>
+                    <span className="hidden-xxxxs"> Sign In</span>
+                  </Link>
+                </li>
+              </>
             )}
               <li className="dropdown visible-sm visible-xs">
                 <button

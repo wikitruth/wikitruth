@@ -18,6 +18,7 @@ import { useNotification } from '../context/NotificationContext';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { FACT_TAG_OPTIONS, FACT_TYPE_OPTIONS } from '../constants/entryFormOptions';
 import { toDateTimeLocal } from '../utils/formDates';
+import useAnonymousContributionPrefill from '../hooks/useAnonymousContributionPrefill';
 
 interface ArgumentFormValues {
   title: string;
@@ -45,6 +46,7 @@ const ArgumentCreatePage: React.FC = () => {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [loadingExisting, setLoadingExisting] = useState(false);
   const { addToast } = useNotification();
+  const anonymousPrefill = useAnonymousContributionPrefill('argument');
 
   const validate = (values: ArgumentFormValues) => {
     const errors: Partial<Record<keyof ArgumentFormValues, string>> = {};
@@ -89,6 +91,9 @@ const ArgumentCreatePage: React.FC = () => {
         ? await apiService.updateArgument(editId, payload)
         : await apiService.createArgument(payload);
       const createdArgument = response?.argument as { _id?: unknown; friendlyUrl?: unknown } | undefined;
+      if (!isEditMode && anonymousPrefill.submissionId && createdArgument?._id) {
+        await apiService.markAnonymousContributionPublished(anonymousPrefill.submissionId, 'argument', String(createdArgument._id));
+      }
       
       trackEvent(isEditMode ? 'update_argument' : 'create_argument', 'content', values.title);
       addToast('success', `Argument ${isEditMode ? 'updated' : 'created'} successfully!`);
@@ -135,6 +140,17 @@ const ArgumentCreatePage: React.FC = () => {
     onSubmit: handleSubmit,
     validate,
   });
+
+  useEffect(() => {
+    if (anonymousPrefill.error) setSubmitError(anonymousPrefill.error);
+    if (!anonymousPrefill.submission) return;
+    setFieldValue('title', anonymousPrefill.submission.title);
+    setFieldValue('description', anonymousPrefill.submission.content || '');
+    setFieldValue('sources', anonymousPrefill.submission.references || '');
+    if (anonymousPrefill.submission.parentId) {
+      setFieldValue(anonymousPrefill.submission.parentType === 'argument' ? 'parentId' : 'topicId', anonymousPrefill.submission.parentId);
+    }
+  }, [anonymousPrefill.error, anonymousPrefill.submission, setFieldValue]);
 
   useEffect(() => {
     const loadExistingArgument = async () => {

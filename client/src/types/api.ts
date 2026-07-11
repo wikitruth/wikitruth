@@ -7,6 +7,54 @@ export interface ApiBaseResponse {
   error?: unknown;
 }
 
+export type AnonymousEntryType = 'topic' | 'argument' | 'question' | 'answer' | 'issue' | 'opinion' | 'artifact';
+export type AnonymousContributionStatus = 'pending' | 'in_review' | 'accepted' | 'rejected';
+
+export interface AnonymousContribution {
+  _id?: string;
+  id?: string;
+  entryType: AnonymousEntryType;
+  title: string;
+  content?: string;
+  references?: string;
+  parentType?: string;
+  parentId?: string;
+  contactEmail?: string;
+  status: AnonymousContributionStatus;
+  risk?: { score?: number; flags?: string[] };
+  moderation?: {
+    reviewerUsername?: string;
+    reason?: string;
+    reviewedAt?: string;
+    publishedEntryType?: string;
+    publishedEntryId?: string | null;
+  };
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface AnonymousContributionConfigResponse extends ApiBaseResponse {
+  enabled: boolean;
+  entryTypes: AnonymousEntryType[];
+  limits: {
+    perHour: number;
+    perDay: number;
+    minimumFormAgeMs: number;
+    maximumTitleLength: number;
+    maximumContentLength: number;
+    maximumReferencesLength: number;
+    maximumLinks: number;
+  };
+}
+
+export interface AnonymousContributionResponse extends ApiBaseResponse {
+  submission?: AnonymousContribution;
+  submissions?: AnonymousContribution[];
+  adoptionUrl?: string | null;
+  receipt?: { id: string; token: string };
+  status?: string;
+}
+
 export type LegacyApiResponse = LegacyResponse & ApiBaseResponse;
 
 export type ReactionChannel = 'exposure' | 'vote' | 'value';

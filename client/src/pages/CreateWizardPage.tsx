@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import PageMeta from '../components/common/PageMeta';
 import Alert from '../components/common/Alert';
+import { useAuth } from '../context/AuthContext';
 
 type CreateTarget = {
   label: string;
@@ -16,6 +17,7 @@ function useQueryParam(name: string): string {
 }
 
 const CreateWizardPage: React.FC = () => {
+  const { user } = useAuth();
   const topicId = useQueryParam('topic');
   const encodedTopic = topicId ? `?topic=${encodeURIComponent(topicId)}` : '';
 
@@ -70,6 +72,11 @@ const CreateWizardPage: React.FC = () => {
       <h2>Create</h2>
       <p className="text-muted">Pick what you want to create. The wizard keeps context when started from a topic.</p>
       {topicId ? <Alert type="info">Context target detected: topic <code>{topicId}</code></Alert> : null}
+      {!user ? (
+        <Alert type="info">
+          Want to contribute without an account? <Link to="/contribute">Submit an anonymous proposal for screening</Link>.
+        </Alert>
+      ) : null}
 
       <div className="row">
         {targets.map((target) => (

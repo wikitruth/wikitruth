@@ -30,6 +30,7 @@ import attachNotifications from './notifications';
 import attachTimeline from './timeline';
 import attachInstall from './install';
 import attachPages from './pages';
+import attachAnonymousContributions from './anonymousContributions';
 import { registerEntryRedirectMiddleware } from './entryRedirectMiddleware';
 import constants from '../../models/constants';
 import { requireContributorOnboarding } from '../../middlewares/onboarding';
@@ -62,6 +63,7 @@ export = function (router: Router) {
   const timelineRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const installRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const pagesRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
+  const anonymousContributionsRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
 
   [topicsRouter, argumentsRouter, questionsRouter, answersRouter, issuesRouter, opinionsRouter, artifactsRouter]
     .forEach((entryRouter) => entryRouter.use(requireContributorOnboarding));
@@ -96,6 +98,7 @@ export = function (router: Router) {
   attachTimeline(timelineRouter);
   attachInstall(installRouter);
   attachPages(pagesRouter);
+  attachAnonymousContributions(anonymousContributionsRouter);
 
   router.use('/home', homeRouter);
   router.use('/topics', topicsRouter);
@@ -120,4 +123,5 @@ export = function (router: Router) {
   router.use('/timeline', timelineRouter);
   router.use('/install', installRouter);
   router.use('/pages', pagesRouter);
+  router.use('/anonymous-contributions', anonymousContributionsRouter);
 };

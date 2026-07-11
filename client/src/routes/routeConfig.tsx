@@ -93,6 +93,8 @@ const VerdictUpdatePage = lazy(() => import('../pages/Admin/Verdicts/VerdictUpda
 const ServerError500 = lazy(() => import('../pages/Errors/ServerError500'));
 const ServiceUnavailable503 = lazy(() => import('../pages/Errors/ServiceUnavailable503'));
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
+const AnonymousContributionPage = lazy(() => import('../pages/AnonymousContributionPage'));
+const AnonymousContributionsPage = lazy(() => import('../pages/Admin/AnonymousContributions/AnonymousContributionsPage'));
 
 export interface AppRoute {
   path: string;
@@ -127,6 +129,7 @@ export const appRoutes: AppRoute[] = [
   { path: '/admin/db-backup', element: <DBBackupPage /> },
   { path: '/admin/audit', element: <AuditTimelinePage /> },
   { path: '/admin/moderation/signals', element: <SignalsAppealsPage /> },
+  { path: '/admin/anonymous-contributions', element: <AnonymousContributionsPage /> },
   { path: '/topics', element: <TopicsPage /> },
   { path: '/topics/create', element: <TopicCreatePage /> },
   { path: '/topics/entry/:friendlyUrl/:id', element: <TopicEntryPage /> },
@@ -218,6 +221,7 @@ export const appRoutes: AppRoute[] = [
   { path: '/install', element: <InstallPage /> },
   { path: '/fast-switch', element: <FastSwitchPage /> },
   { path: '/create', element: <CreateWizardPage /> },
+  { path: '/contribute', element: <AnonymousContributionPage /> },
   { path: '/clipboard', element: <ClipboardPage /> },
   { path: '/notifications', element: <NotificationsPage /> },
   { path: '/timeline', element: <EntryTimelinePage /> },

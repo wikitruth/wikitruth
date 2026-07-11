@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
@@ -13,6 +13,7 @@ import useForm from '../hooks/useForm';
 import apiService from '../services/api';
 import { trackEvent } from '../utils/analytics';
 import { useNotification } from '../context/NotificationContext';
+import useAnonymousContributionPrefill from '../hooks/useAnonymousContributionPrefill';
 
 interface AnswerFormValues {
   title: string;
@@ -29,6 +30,7 @@ const AnswerCreatePage: React.FC = () => {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const { addToast } = useNotification();
+  const anonymousPrefill = useAnonymousContributionPrefill('answer');
 
   const validate = (values: AnswerFormValues) => {
     const errors: Partial<Record<keyof AnswerFormValues, string>> = {};
@@ -61,6 +63,9 @@ const AnswerCreatePage: React.FC = () => {
         private: values.private,
       });
       const createdAnswer = response?.answer as { _id?: unknown } | undefined;
+      if (anonymousPrefill.submissionId && createdAnswer?._id) {
+        await apiService.markAnonymousContributionPublished(anonymousPrefill.submissionId, 'answer', String(createdAnswer._id));
+      }
 
       trackEvent('create_answer', 'content', values.title);
       addToast('success', 'Answer created successfully!');
@@ -90,6 +95,15 @@ const AnswerCreatePage: React.FC = () => {
     validate,
     onSubmit: handleSubmit,
   });
+
+  useEffect(() => {
+    if (anonymousPrefill.error) setSubmitError(anonymousPrefill.error);
+    if (!anonymousPrefill.submission) return;
+    setFieldValue('title', anonymousPrefill.submission.title);
+    setFieldValue('description', anonymousPrefill.submission.content || '');
+    setFieldValue('references', anonymousPrefill.submission.references || '');
+    if (anonymousPrefill.submission.parentId) setFieldValue('questionId', anonymousPrefill.submission.parentId);
+  }, [anonymousPrefill.error, anonymousPrefill.submission, setFieldValue]);
 
   return (
     <div>

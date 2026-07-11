@@ -28,6 +28,10 @@ import type {
   InstallStatusResponse,
   InstallRestoreResponse,
   PublicPageResponse,
+  AnonymousContributionConfigResponse,
+  AnonymousContributionResponse,
+  AnonymousContributionStatus,
+  AnonymousEntryType,
 } from '../types/api';
 
 export class ApiRequestError extends Error {
@@ -193,6 +197,65 @@ class ApiService {
 
   async getAboutPage(id: string): Promise<PublicPageResponse> {
     return this.request<PublicPageResponse>(`/pages/about/${encodeURIComponent(id)}`);
+  }
+
+  async getAnonymousContributionConfig(): Promise<AnonymousContributionConfigResponse> {
+    return this.request<AnonymousContributionConfigResponse>('/anonymous-contributions/config');
+  }
+
+  async submitAnonymousContribution(payload: {
+    entryType: AnonymousEntryType;
+    title: string;
+    content: string;
+    references?: string;
+    parentType?: string;
+    parentId?: string;
+    contactEmail?: string;
+    formStartedAt: number;
+    website?: string;
+  }): Promise<AnonymousContributionResponse> {
+    return this.request<AnonymousContributionResponse>('/anonymous-contributions', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async getAnonymousContributionStatus(id: string, receipt: string): Promise<AnonymousContributionResponse> {
+    return this.request<AnonymousContributionResponse>(
+      `/anonymous-contributions/status/${encodeURIComponent(id)}?receipt=${encodeURIComponent(receipt)}`,
+    );
+  }
+
+  async listAnonymousContributions(status: AnonymousContributionStatus | 'all'): Promise<AnonymousContributionResponse> {
+    return this.request<AnonymousContributionResponse>(
+      `/anonymous-contributions?status=${encodeURIComponent(status)}`,
+    );
+  }
+
+  async getAnonymousContribution(id: string): Promise<AnonymousContributionResponse> {
+    return this.request<AnonymousContributionResponse>(`/anonymous-contributions/${encodeURIComponent(id)}`);
+  }
+
+  async reviewAnonymousContribution(
+    id: string,
+    status: Exclude<AnonymousContributionStatus, 'pending'>,
+    reason: string,
+  ): Promise<AnonymousContributionResponse> {
+    return this.request<AnonymousContributionResponse>(`/anonymous-contributions/${encodeURIComponent(id)}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status, reason }),
+    });
+  }
+
+  async markAnonymousContributionPublished(
+    id: string,
+    entryType: AnonymousEntryType,
+    entryId: string,
+  ): Promise<AnonymousContributionResponse> {
+    return this.request<AnonymousContributionResponse>(`/anonymous-contributions/${encodeURIComponent(id)}/published`, {
+      method: 'POST',
+      body: JSON.stringify({ entryType, entryId }),
+    });
   }
 
   // Topics

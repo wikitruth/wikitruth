@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
@@ -12,6 +12,7 @@ import useForm from '../hooks/useForm';
 import apiService from '../services/api';
 import { trackEvent } from '../utils/analytics';
 import { useNotification } from '../context/NotificationContext';
+import useAnonymousContributionPrefill from '../hooks/useAnonymousContributionPrefill';
 
 interface OpinionFormValues {
   title: string;
@@ -33,6 +34,7 @@ const OpinionCreatePage: React.FC = () => {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const { addToast } = useNotification();
+  const anonymousPrefill = useAnonymousContributionPrefill('opinion');
 
   const validate = (values: OpinionFormValues) => {
     const errors: Partial<Record<keyof OpinionFormValues, string>> = {};
@@ -62,6 +64,9 @@ const OpinionCreatePage: React.FC = () => {
         private: values.private,
       });
       const createdOpinion = response?.opinion as { _id?: unknown; friendlyUrl?: unknown } | undefined;
+      if (anonymousPrefill.submissionId && createdOpinion?._id) {
+        await apiService.markAnonymousContributionPublished(anonymousPrefill.submissionId, 'opinion', String(createdOpinion._id));
+      }
 
       trackEvent('create_opinion', 'content', values.title);
       addToast('success', 'Opinion created successfully!');
@@ -90,6 +95,16 @@ const OpinionCreatePage: React.FC = () => {
     validate,
     onSubmit: handleSubmit,
   });
+
+  useEffect(() => {
+    if (anonymousPrefill.error) setSubmitError(anonymousPrefill.error);
+    if (!anonymousPrefill.submission) return;
+    setFieldValue('title', anonymousPrefill.submission.title);
+    setFieldValue('description', anonymousPrefill.submission.content || '');
+    if (anonymousPrefill.submission.parentType === 'topic' && anonymousPrefill.submission.parentId) {
+      setFieldValue('topicId', anonymousPrefill.submission.parentId);
+    }
+  }, [anonymousPrefill.error, anonymousPrefill.submission, setFieldValue]);
 
   return (
     <div>

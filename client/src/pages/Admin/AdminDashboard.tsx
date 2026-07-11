@@ -138,6 +138,19 @@ const AdminDashboard: React.FC = () => {
             </div>
           </div>
           <div className="col-sm-3">
+            <div className="panel panel-info">
+              <div className="panel-heading">Anonymous Contributions</div>
+              <div className="panel-body">
+                <p className="text-muted" style={{ marginBottom: 10 }}>
+                  Screen privacy-preserving public proposals.
+                </p>
+                <Link to="/admin/anonymous-contributions" className="btn btn-info btn-xs">
+                  Open Queue
+                </Link>
+              </div>
+            </div>
+          </div>
+          <div className="col-sm-3">
             <div className="panel panel-default">
               <div className="panel-heading">Accounts</div>
               <div className="panel-body">

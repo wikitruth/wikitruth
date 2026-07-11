@@ -109,6 +109,16 @@ exports.csrf = {
     sameSite: process.env.CSRF_COOKIE_SAMESITE || 'lax'
   }
 };
+exports.anonymousContributions = {
+  enabled: process.env.ANONYMOUS_CONTRIBUTIONS_ENABLED === 'true',
+  perHour: Number(process.env.ANONYMOUS_CONTRIBUTIONS_PER_HOUR || 3),
+  perDay: Number(process.env.ANONYMOUS_CONTRIBUTIONS_PER_DAY || 10),
+  minimumFormAgeMs: Number(process.env.ANONYMOUS_CONTRIBUTIONS_MIN_FORM_AGE_MS || 3000),
+  maximumTitleLength: Number(process.env.ANONYMOUS_CONTRIBUTIONS_MAX_TITLE_LENGTH || 180),
+  maximumContentLength: Number(process.env.ANONYMOUS_CONTRIBUTIONS_MAX_CONTENT_LENGTH || 12000),
+  maximumReferencesLength: Number(process.env.ANONYMOUS_CONTRIBUTIONS_MAX_REFERENCES_LENGTH || 4000),
+  maximumLinks: Number(process.env.ANONYMOUS_CONTRIBUTIONS_MAX_LINKS || 8)
+};
 exports.security = {
   helmet: {
     enabled: process.env.SECURITY_HELMET_ENABLED

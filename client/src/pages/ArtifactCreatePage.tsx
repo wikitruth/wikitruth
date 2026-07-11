@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
@@ -21,6 +21,7 @@ import {
   EMPTY_ARTIFACT_PROVENANCE,
   type ArtifactProvenanceInput,
 } from '../constants/artifactOptions';
+import useAnonymousContributionPrefill from '../hooks/useAnonymousContributionPrefill';
 
 interface ArtifactFormValues {
   title: string;
@@ -44,6 +45,7 @@ const ArtifactCreatePage: React.FC = () => {
   const [inlineFile, setInlineFile] = useState<File | null>(null);
   const [provenance, setProvenance] = useState<ArtifactProvenanceInput>({ ...EMPTY_ARTIFACT_PROVENANCE });
   const { addToast } = useNotification();
+  const anonymousPrefill = useAnonymousContributionPrefill('artifact');
 
   const validate = (values: ArtifactFormValues) => {
     const errors: Partial<Record<keyof ArtifactFormValues, string>> = {};
@@ -79,6 +81,9 @@ const ArtifactCreatePage: React.FC = () => {
         ...provenance,
       });
       const createdArtifact = response?.artifact as { _id?: unknown; friendlyUrl?: unknown } | undefined;
+      if (anonymousPrefill.submissionId && createdArtifact?._id) {
+        await apiService.markAnonymousContributionPublished(anonymousPrefill.submissionId, 'artifact', String(createdArtifact._id));
+      }
 
       trackEvent('create_artifact', 'content', values.title);
       addToast('success', 'Artifact created successfully!');
@@ -111,6 +116,19 @@ const ArtifactCreatePage: React.FC = () => {
     validate,
     onSubmit: handleSubmit,
   });
+
+  useEffect(() => {
+    if (anonymousPrefill.error) setSubmitError(anonymousPrefill.error);
+    if (!anonymousPrefill.submission) return;
+    setFieldValue('title', anonymousPrefill.submission.title);
+    setFieldValue('description', anonymousPrefill.submission.content || '');
+    setFieldValue('source', anonymousPrefill.submission.references || '');
+    if (anonymousPrefill.submission.parentType === 'topic' && anonymousPrefill.submission.parentId) {
+      setFieldValue('topicId', anonymousPrefill.submission.parentId);
+    } else if (anonymousPrefill.submission.parentId) {
+      setFieldValue('parentId', anonymousPrefill.submission.parentId);
+    }
+  }, [anonymousPrefill.error, anonymousPrefill.submission, setFieldValue]);
 
   return (
     <div>

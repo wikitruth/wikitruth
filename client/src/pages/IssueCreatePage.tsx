@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
@@ -13,6 +13,7 @@ import useForm from '../hooks/useForm';
 import apiService from '../services/api';
 import { trackEvent } from '../utils/analytics';
 import { useNotification } from '../context/NotificationContext';
+import useAnonymousContributionPrefill from '../hooks/useAnonymousContributionPrefill';
 
 interface IssueFormValues {
   title: string;
@@ -33,6 +34,7 @@ const IssueCreatePage: React.FC = () => {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const { addToast } = useNotification();
+  const anonymousPrefill = useAnonymousContributionPrefill('issue');
 
   const validate = (values: IssueFormValues) => {
     const errors: Partial<Record<keyof IssueFormValues, string>> = {};
@@ -62,6 +64,9 @@ const IssueCreatePage: React.FC = () => {
         private: values.private,
       });
       const createdIssue = response?.issue as { _id?: unknown; friendlyUrl?: unknown } | undefined;
+      if (anonymousPrefill.submissionId && createdIssue?._id) {
+        await apiService.markAnonymousContributionPublished(anonymousPrefill.submissionId, 'issue', String(createdIssue._id));
+      }
 
       trackEvent('create_issue', 'content', values.title);
       addToast('success', 'Issue created successfully!');
@@ -91,6 +96,14 @@ const IssueCreatePage: React.FC = () => {
     validate,
     onSubmit: handleSubmit,
   });
+
+  useEffect(() => {
+    if (anonymousPrefill.error) setSubmitError(anonymousPrefill.error);
+    if (!anonymousPrefill.submission) return;
+    setFieldValue('title', anonymousPrefill.submission.title);
+    setFieldValue('description', anonymousPrefill.submission.content || '');
+    if (anonymousPrefill.submission.parentId) setFieldValue('ownerId', anonymousPrefill.submission.parentId);
+  }, [anonymousPrefill.error, anonymousPrefill.submission, setFieldValue]);
 
   return (
     <div>

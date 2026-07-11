@@ -17,6 +17,7 @@ import { useNotification } from '../context/NotificationContext';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { TOPIC_TAG_OPTIONS } from '../constants/entryFormOptions';
 import { toDateTimeLocal } from '../utils/formDates';
+import useAnonymousContributionPrefill from '../hooks/useAnonymousContributionPrefill';
 
 interface TopicFormValues {
   title: string;
@@ -42,6 +43,7 @@ const TopicCreatePage: React.FC = () => {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [loadingExisting, setLoadingExisting] = useState(false);
   const { addToast } = useNotification();
+  const anonymousPrefill = useAnonymousContributionPrefill('topic');
 
   const validate = (values: TopicFormValues) => {
     const errors: Partial<Record<keyof TopicFormValues, string>> = {};
@@ -112,6 +114,10 @@ const TopicCreatePage: React.FC = () => {
       });
       const createdTopic = response?.topic as { _id?: unknown; friendlyUrl?: unknown } | undefined;
 
+      if (anonymousPrefill.submissionId && createdTopic?._id) {
+        await apiService.markAnonymousContributionPublished(anonymousPrefill.submissionId, 'topic', String(createdTopic._id));
+      }
+
       trackEvent('create_topic', 'content', values.title);
       addToast('success', 'Topic created successfully!');
       setSubmitSuccess(true);
@@ -156,6 +162,15 @@ const TopicCreatePage: React.FC = () => {
     onSubmit: handleSubmit,
     validate,
   });
+
+  useEffect(() => {
+    if (anonymousPrefill.error) setSubmitError(anonymousPrefill.error);
+    if (!anonymousPrefill.submission) return;
+    setFieldValue('title', anonymousPrefill.submission.title);
+    setFieldValue('description', anonymousPrefill.submission.content || '');
+    setFieldValue('references', anonymousPrefill.submission.references || '');
+    if (anonymousPrefill.submission.parentId) setFieldValue('category', anonymousPrefill.submission.parentId);
+  }, [anonymousPrefill.error, anonymousPrefill.submission, setFieldValue]);
 
   useEffect(() => {
     const loadExistingTopic = async () => {
