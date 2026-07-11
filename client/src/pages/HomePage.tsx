@@ -14,6 +14,7 @@ import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
 import PageMeta from '../components/common/PageMeta';
 import { useNotification } from '../context/NotificationContext';
+import { toModernAppSectionUrl } from '../utils/paths';
 
 type HomeEntrySetColumn = {
   entries?: LegacyEntity[];
@@ -229,7 +230,7 @@ const HomePage: React.FC = () => {
               <p>{section.description}</p>
               {section.url && (
                 <p>
-                  <Link className="btn btn-default btn-block" to={section.url} role="button">
+                  <Link className="btn btn-default btn-block" to={toModernAppSectionUrl(section.url)} role="button">
                     Explore &raquo;
                   </Link>
                 </p>

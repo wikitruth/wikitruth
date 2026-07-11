@@ -6,9 +6,18 @@ import { useAuth } from '../../context/AuthContext';
 import authApi from '../../services/api/auth';
 import apiService from '../../services/api';
 import notificationsApi from '../../services/api/notifications';
+import { toModernAppSectionUrl } from '../../utils/paths';
 
 type HeaderUser = Pick<User, '_id' | 'username' | 'email' | 'roles'>;
-type HeaderApplication = Pick<Application, '_id'> & {
+interface HeaderSection {
+  title: string;
+  description?: string;
+  iconClass?: string;
+  url?: string;
+}
+
+type HeaderApplication = Partial<Pick<Application, '_id' | 'name' | 'sections'>> & {
+  id?: string;
   name?: string;
   title?: string;
   logoIcon?: string;
@@ -31,6 +40,24 @@ const ROLE_LABELS: Record<string, string> = {
   admin: 'Admin',
 };
 
+const DEFAULT_SECTIONS: HeaderSection[] = [
+  {
+    title: 'Debates',
+    iconClass: 'fa fa-commenting',
+    url: '/topics/entry/debates-discussions',
+  },
+  {
+    title: 'Dictionary',
+    iconClass: 'glyphicon glyphicon-font',
+    url: '/topics/entry/dictionary',
+  },
+  {
+    title: 'Manuscripts',
+    iconClass: 'fa fa-book',
+    url: '/topics/entry/sacred-texts',
+  },
+];
+
 const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false }) => {
   const location = useLocation();
   const { activeRole, setActiveRole, availableRoles } = useAuth();
@@ -40,6 +67,9 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const headerSections: HeaderSection[] = application?.sections?.length
+    ? application.sections
+    : DEFAULT_SECTIONS;
 
   useEffect(() => {
     let isMounted = true;
@@ -197,6 +227,22 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
                       <i className="fa fa-user-circle"></i> Members
                     </Link>
                   </li>
+                  <li className="divider" aria-hidden="true"></li>
+                  {headerSections.map((section) => (
+                    <li key={`${section.title}-${section.url || ''}`}>
+                      <Link
+                        to={toModernAppSectionUrl(section.url)}
+                        title={section.description}
+                        onClick={() => {
+                          setIsMoreOpen(false);
+                          setIsMobileNavOpen(false);
+                        }}
+                      >
+                        <i className={section.iconClass || 'fa fa-folder-open'} aria-hidden="true"></i>{' '}
+                        {section.title}
+                      </Link>
+                    </li>
+                  ))}
                   <li className="divider" aria-hidden="true"></li>
                   <li>
                     <Link to="/about" onClick={() => {

@@ -250,6 +250,7 @@ function mapLegacyPathToModern(req: Request): string {
     { pattern: /^\/question\/(.+)$/, targetPrefix: '/questions/entry/' },
     { pattern: /^\/issue\/(.+)$/, targetPrefix: '/issues/entry/' },
     { pattern: /^\/opinion\/(.+)$/, targetPrefix: '/opinions/entry/' },
+    { pattern: /^\/comment\/(.+)$/, targetPrefix: '/opinions/entry/' },
     { pattern: /^\/artifact\/(.+)$/, targetPrefix: '/artifacts/entry/' },
   ];
 

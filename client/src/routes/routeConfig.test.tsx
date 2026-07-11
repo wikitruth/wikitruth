@@ -32,6 +32,10 @@ describe('routeConfig', () => {
     expect(paths).toContain('/convert');
     expect(paths).toContain('/admin/verdicts');
     expect(paths).toContain('/admin/verdicts/:id');
+    expect(paths).toContain('/comments');
+    expect(paths).toContain('/comments/create');
+    expect(paths).toContain('/comments/entry/:friendlyUrl/:id');
+    expect(paths).toContain('/comment/:friendlyUrl/:id');
   });
 
   it('maps journal routes to the dedicated journal page', () => {

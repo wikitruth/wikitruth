@@ -13,4 +13,9 @@
   .row-offcanvas .sidebar-offcanvas {
     z-index: 1040;
   }
+
+  /* Keep the closed off-canvas panel from widening the mobile document. */
+  .row-offcanvas:not(.active) .sidebar-offcanvas {
+    display: none;
+  }
 }
