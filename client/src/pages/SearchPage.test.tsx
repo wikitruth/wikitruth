@@ -58,6 +58,8 @@ describe('SearchPage', () => {
 
     expect(screen.getByRole('tab', { name: /all/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /topics/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /^facts \(1\)$/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /^comments \(0\)$/i })).toBeInTheDocument();
     expect(screen.getByText(/topic one/i)).toBeInTheDocument();
     expect(screen.getByText(/argument one/i)).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: /view more/i }).length).toBeGreaterThanOrEqual(1);

@@ -45,6 +45,8 @@ interface HomeModel {
   application?: unknown;
   applications?: unknown;
   appCategories?: unknown;
+  diaryCategories?: unknown[];
+  myGroups?: unknown[];
   [key: string]: unknown;
 }
 
@@ -227,6 +229,13 @@ async function GET_home(req: WikitruthRequest, res: WikitruthResponse) {
     res.locals.appCategories ||
     (req.app.locals as { appCategories?: unknown } | undefined)?.appCategories ||
     [];
+
+  if (req.user) {
+    [model.diaryCategories, model.myGroups] = await Promise.all([
+      flowUtils.getDiaryCategories(req),
+      flowUtils.getUserGroups(req),
+    ]);
+  }
 
   res.json(model);
 }

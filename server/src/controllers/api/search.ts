@@ -18,6 +18,14 @@ type SearchModel = {
 
 type SearchTab = 'all' | 'topics' | 'arguments' | 'questions' | 'answers' | 'artifacts' | 'issues' | 'opinions';
 type SearchContent = 'all' | 'wiki' | 'journal';
+type SearchQueryChain = {
+  sort: (sort: Record<string, unknown>) => SearchQueryChain;
+  limit: (limit: number) => SearchQueryChain;
+  lean: () => Promise<Record<string, unknown>[]>;
+};
+type SearchableModel = {
+  find: (query: Record<string, unknown>, projection: Record<string, unknown>) => SearchQueryChain;
+};
 
 function parseLimit(req: WikitruthRequest, fallback: number): number {
   const raw = req.query.limit;
@@ -70,20 +78,6 @@ function normalizeContent(value: string): SearchContent {
   return content === 'wiki' || content === 'journal' ? (content as SearchContent) : 'all';
 }
 
-function buildRegexSearchFields(query: string, includeSource: boolean = false): Array<Record<string, unknown>> {
-  const pattern = { $regex: query, $options: 'i' };
-  const fields: Array<Record<string, unknown>> = [
-    { title: pattern },
-    { content: pattern },
-    { contentPreview: pattern },
-    { references: pattern },
-  ];
-  if (includeSource) {
-    fields.push({ source: pattern });
-  }
-  return fields;
-}
-
 function buildBaseQuery(screeningStatus: number | undefined, cursor: Date | null): Record<string, unknown> {
   const base: Record<string, unknown> = {};
 
@@ -116,15 +110,24 @@ function buildPrivacyFilter(content: SearchContent, req: WikitruthRequest): Arra
 
 function buildSectionQuery(
   baseQuery: Record<string, unknown>,
-  searchFields: Array<Record<string, unknown>>,
+  keyword: string,
   privacyFilter: Array<Record<string, unknown>>,
   extraQuery: Record<string, unknown> = {}
 ): Record<string, unknown> {
   return {
     ...baseQuery,
     ...extraQuery,
-    $and: [{ $or: searchFields }, { $or: privacyFilter }],
+    $text: { $search: keyword },
+    $or: privacyFilter,
   };
+}
+
+function findByRelevance(model: SearchableModel, query: Record<string, unknown>, limit: number) {
+  return model
+    .find(query, { score: { $meta: 'textScore' } })
+    .sort({ score: { $meta: 'textScore' }, editDate: -1, _id: 1 })
+    .limit(limit)
+    .lean();
 }
 
 export = function (router: Router) {
@@ -180,25 +183,25 @@ async function GET_search(req: WikitruthRequest, res: WikitruthResponse) {
     opinionResults,
   ] = await Promise.all([
     shouldLoad('topics')
-      ? db.Topic.find(buildSectionQuery(baseQuery, buildRegexSearchFields(keyword), privacyFilter)).sort({ editDate: -1 }).limit(limit).lean()
+      ? findByRelevance(db.Topic, buildSectionQuery(baseQuery, keyword, privacyFilter), limit)
       : [],
     shouldLoad('arguments')
-      ? db.Argument.find(buildSectionQuery(baseQuery, buildRegexSearchFields(keyword), privacyFilter)).sort({ editDate: -1 }).limit(limit).lean()
+      ? findByRelevance(db.Argument, buildSectionQuery(baseQuery, keyword, privacyFilter), limit)
       : [],
     shouldLoad('questions')
-      ? db.Question.find(buildSectionQuery(baseQuery, buildRegexSearchFields(keyword), privacyFilter)).sort({ editDate: -1 }).limit(limit).lean()
+      ? findByRelevance(db.Question, buildSectionQuery(baseQuery, keyword, privacyFilter), limit)
       : [],
     shouldLoad('answers')
-      ? db.Answer.find(buildSectionQuery(baseQuery, buildRegexSearchFields(keyword), privacyFilter)).sort({ editDate: -1 }).limit(limit).lean()
+      ? findByRelevance(db.Answer, buildSectionQuery(baseQuery, keyword, privacyFilter), limit)
       : [],
     shouldLoad('artifacts')
-      ? db.Artifact.find(buildSectionQuery(baseQuery, buildRegexSearchFields(keyword, true), privacyFilter)).sort({ editDate: -1 }).limit(limit).lean()
+      ? findByRelevance(db.Artifact, buildSectionQuery(baseQuery, keyword, privacyFilter), limit)
       : [],
     shouldLoad('issues')
-      ? db.Issue.find(buildSectionQuery(baseQuery, buildRegexSearchFields(keyword), privacyFilter)).sort({ editDate: -1 }).limit(limit).lean()
+      ? findByRelevance(db.Issue, buildSectionQuery(baseQuery, keyword, privacyFilter), limit)
       : [],
     shouldLoad('opinions')
-      ? db.Opinion.find(buildSectionQuery(baseQuery, buildRegexSearchFields(keyword), privacyFilter)).sort({ editDate: -1 }).limit(limit).lean()
+      ? findByRelevance(db.Opinion, buildSectionQuery(baseQuery, keyword, privacyFilter), limit)
       : [],
   ]);
 
@@ -214,6 +217,7 @@ async function GET_search(req: WikitruthRequest, res: WikitruthResponse) {
     flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.argument, req);
     flowUtils.setVerdictModel(result);
   });
+  flowUtils.sortArguments(argumentResults);
 
   await flowUtils.setEditorsUsername(questionResults);
   await flowUtils.setEntryParents(questionResults, constants.OBJECT_TYPES.question);

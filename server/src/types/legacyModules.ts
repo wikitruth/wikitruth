@@ -110,6 +110,8 @@ export interface FlowUtilsModule {
   getTopics: (query: unknown, options?: unknown) => Promise<LegacyEntry[]>;
   getArguments: (query: unknown, options?: unknown) => Promise<LegacyEntry[]>;
   getCategories: (...args: unknown[]) => Promise<LegacyEntry[]>;
+  getDiaryCategories: (req: unknown) => Promise<LegacyEntry[]>;
+  getUserGroups: (req?: unknown) => Promise<LegacyEntry[]>;
   getVerdictCount: LooseFn;
   getParent: LooseFn;
   getDbModelByObjectType: LooseFn;

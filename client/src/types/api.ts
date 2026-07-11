@@ -65,6 +65,8 @@ export interface HomeDataResponse extends ApiBaseResponse, EntityBuckets {
   application?: LegacyEntity;
   applications?: LegacyEntity[];
   appCategories?: LegacyEntity[];
+  diaryCategories?: LegacyEntity[];
+  myGroups?: LegacyEntity[];
   entrySet?: Array<{
     entries?: LegacyEntity[];
   }>;
@@ -102,8 +104,11 @@ export interface TopicEntryResponse extends ApiBaseResponse {
   topics?: LegacyEntity[];
   keyTopics?: LegacyEntity[];
   topicChildren?: LegacyEntity[];
+  topicChildrenMore?: boolean;
   topicSiblings?: LegacyEntity[];
   topicSiblingsMore?: boolean;
+  parentSiblings?: LegacyEntity[];
+  parentSiblingsMore?: boolean;
   topicLinks?: LegacyEntity[];
   parentTopic?: LegacyEntity;
   grandParentTopic?: LegacyEntity;

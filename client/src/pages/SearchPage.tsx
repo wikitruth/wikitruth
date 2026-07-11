@@ -33,12 +33,12 @@ type SectionConfig = {
 
 const sectionConfigs: SectionConfig[] = [
   { key: 'topics', title: 'Topics', iconClass: 'fa-folder-open', moreFlag: 'topicsMore' },
-  { key: 'arguments', title: 'Arguments', iconClass: 'fa-flash', moreFlag: 'argumentsMore' },
+  { key: 'arguments', title: 'Facts', iconClass: 'fa-flash', moreFlag: 'argumentsMore' },
   { key: 'questions', title: 'Questions', iconClass: 'fa-question-circle', moreFlag: 'questionsMore' },
   { key: 'answers', title: 'Answers', iconClass: 'fa-check-circle', moreFlag: 'answersMore' },
   { key: 'artifacts', title: 'Artifacts', iconClass: 'fa-puzzle-piece', moreFlag: 'artifactsMore' },
   { key: 'issues', title: 'Issues', iconClass: 'fa-exclamation-circle', moreFlag: 'issuesMore' },
-  { key: 'opinions', title: 'Opinions', iconClass: 'fa-comments-o', moreFlag: 'opinionsMore' },
+  { key: 'opinions', title: 'Comments', iconClass: 'fa-comments-o', moreFlag: 'opinionsMore' },
 ];
 
 const emptyResults: SearchResponse = {

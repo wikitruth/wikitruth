@@ -16,6 +16,7 @@ import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
 import ArtifactEntryRow from '../components/EntryRow/ArtifactEntryRow';
 import EntryActionsMenu from '../components/Entry/EntryActionsMenu';
 import EntryQuickActions from '../components/Entry/EntryQuickActions';
+import EntryOutline from '../components/Entry/EntryOutline';
 import PageMeta from '../components/common/PageMeta';
 import type { TopicEntryResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
@@ -399,36 +400,7 @@ const TopicEntryPage: React.FC = () => {
         )}
       </div>
 
-      {(keyTopics.length > 0 || keyArguments.length > 0) && (
-        <div style={{ marginTop: '18px' }}>
-          {keyTopics.length > 0 && (
-            <div style={{ marginBottom: '10px' }}>
-              <h3 style={{ marginTop: 0 }}>Key topics</h3>
-              <ul>
-                {keyTopics.map((item) => (
-                  <li key={`key-topic-${item._id}`}>
-                    <Link to={getTopicPath(item)}>{item.title}</Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          {keyArguments.length > 0 && (
-            <div>
-              <h3 style={{ marginTop: 0 }}>Key facts</h3>
-              <ul>
-                {keyArguments.map((item) => (
-                  <li key={`key-argument-${item._id}`}>
-                    <Link to={`/arguments/entry/${encodeURIComponent(String(item.friendlyUrl || item._id))}/${encodeURIComponent(String(item._id))}`}>
-                      {item.title}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      )}
+      <EntryOutline keyTopics={keyTopics} keyArguments={keyArguments} />
 
       <div className="wt-related" style={{ marginTop: '20px' }}>
         <span title="Related Topics">Topics</span>&nbsp;

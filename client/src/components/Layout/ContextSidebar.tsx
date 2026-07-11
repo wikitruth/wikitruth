@@ -48,6 +48,10 @@ interface SidebarNavItem {
 interface SidebarSection {
   title: string;
   titleTo?: string;
+  titleAction?: {
+    label: string;
+    to: string;
+  };
   items: SidebarNavItem[];
 }
 
@@ -83,6 +87,12 @@ function buildTopicLink(topic: Pick<SidebarCategory, '_id' | 'friendlyUrl'>): st
   const friendly = encodeURIComponent(String(topic.friendlyUrl || topic._id || ''));
   const id = encodeURIComponent(String(topic._id || ''));
   return `/topics/entry/${friendly}/${id}`;
+}
+
+function buildGroupLink(group: Pick<LegacyEntity, '_id' | 'friendlyUrl'>): string {
+  const friendly = encodeURIComponent(String(group.friendlyUrl || group._id || ''));
+  const id = encodeURIComponent(String(group._id || ''));
+  return `/groups/${friendly}/${id}`;
 }
 
 function buildSectionLink(section: SidebarSection): string | undefined {
@@ -405,9 +415,11 @@ const ContextSidebar: React.FC = () => {
     }
 
     const topic = topicContext.topic as SidebarCategory;
-    const parentTopic = (topic.parentTopic || null) as SidebarCategory | null;
+    const parentTopic = (topicContext.parentTopic || topic.parentTopic || null) as SidebarCategory | null;
+    const grandParentTopic = (topicContext.grandParentTopic || null) as SidebarCategory | null;
     const children = ((topicContext.topicChildren || topicContext.topics || []) as SidebarCategory[]).slice(0, 8);
     const siblings = ((topicContext.topicSiblings || []) as SidebarCategory[]).slice(0, 8);
+    const parentSiblings = ((topicContext.parentSiblings || []) as SidebarCategory[]).slice(0, 8);
     const items: SidebarNavItem[] = [];
 
     if (section === 'topics' && !parentTopic?._id) {
@@ -417,7 +429,7 @@ const ContextSidebar: React.FC = () => {
     if (parentTopic?._id) {
       items.push({
         key: `topic-parent-${String(parentTopic._id)}`,
-        label: String(parentTopic.title || parentTopic.contextTitle || '(Untitled)'),
+        label: String(parentTopic.contextTitle || parentTopic.title || '(Untitled)'),
         to: buildTopicLink(parentTopic),
         icon: String(parentTopic.icon || '').trim() || 'folder-open',
         badge: Number(parentTopic.childrenCount?.topics?.accepted || 0) || undefined,
@@ -427,7 +439,7 @@ const ContextSidebar: React.FC = () => {
     const currentLevel = parentTopic?._id ? 1 : 0;
     items.push({
       key: `topic-current-${String(topic._id)}`,
-      label: String(topic.title || topic.contextTitle || '(Untitled)'),
+      label: String(topic.contextTitle || topic.title || '(Untitled)'),
       to: buildTopicLink(topic),
       icon: String(topic.icon || '').trim() || 'folder-open',
       badge: Number(topic.childrenCount?.topics?.accepted || 0) || undefined,
@@ -438,7 +450,7 @@ const ContextSidebar: React.FC = () => {
     children.forEach((child, index) => {
       items.push({
         key: `topic-child-${index}-${String(child._id)}`,
-        label: String(child.title || child.contextTitle || '(Untitled)'),
+        label: String(child.contextTitle || child.title || '(Untitled)'),
         to: buildTopicLink(child),
         icon: String(child.icon || '').trim() || 'folder-open',
         badge: Number(child.childrenCount?.topics?.accepted || 0) || undefined,
@@ -446,10 +458,20 @@ const ContextSidebar: React.FC = () => {
       });
     });
 
+    if (topicContext.topicChildrenMore) {
+      items.push({
+        key: 'topic-children-more',
+        label: 'more...',
+        to: `/topics/${encodeURIComponent(String(topic.friendlyUrl || ''))}/${encodeURIComponent(String(topic._id || ''))}`,
+        icon: 'folder',
+        level: currentLevel + 1,
+      });
+    }
+
     siblings.forEach((sibling, index) => {
       items.push({
         key: `topic-sibling-${index}-${String(sibling._id)}`,
-        label: String(sibling.title || sibling.contextTitle || '(Untitled)'),
+        label: String(sibling.contextTitle || sibling.title || '(Untitled)'),
         to: buildTopicLink(sibling),
         icon: String(sibling.icon || '').trim() || 'folder-open',
         badge: Number(sibling.childrenCount?.topics?.accepted || 0) || undefined,
@@ -467,11 +489,69 @@ const ContextSidebar: React.FC = () => {
       });
     }
 
+    parentSiblings.forEach((parentSibling, index) => {
+      items.push({
+        key: `topic-parent-sibling-${index}-${String(parentSibling._id)}`,
+        label: String(parentSibling.contextTitle || parentSibling.title || '(Untitled)'),
+        to: buildTopicLink(parentSibling),
+        icon: String(parentSibling.icon || '').trim() || 'folder-open',
+        badge: Number(parentSibling.childrenCount?.topics?.accepted || 0) || undefined,
+      });
+    });
+
+    if (topicContext.parentSiblingsMore && grandParentTopic?._id) {
+      items.push({
+        key: 'topic-parent-siblings-more',
+        label: 'more...',
+        to: `/topics/${encodeURIComponent(String(grandParentTopic.friendlyUrl || ''))}/${encodeURIComponent(String(grandParentTopic._id || ''))}`,
+        icon: 'folder',
+      });
+    }
+
     return {
       title: 'In This Section',
       items,
     };
   }, [contextTopicId, section, sectionItemsByRoot, topicContext]);
+
+  const diarySection = useMemo<SidebarSection | null>(() => {
+    if (!user) {
+      return null;
+    }
+    const categories = (homeContext?.diaryCategories || []) as SidebarCategory[];
+    if (categories.length === 0) {
+      return null;
+    }
+    return {
+      title: 'My Journal',
+      titleTo: `/members/${encodeURIComponent(user.username)}/journal`,
+      items: categories.map((category, index) => ({
+        key: `diary-${index}-${String(category._id || '')}`,
+        label: String(category.contextTitle || category.title || '(Untitled)'),
+        to: buildTopicLink(category),
+        icon: String(category.icon || '').trim() || 'folder-open',
+        badge: Number(category.childrenCount?.topics?.accepted || 0) || undefined,
+      })),
+    };
+  }, [homeContext?.diaryCategories, user]);
+
+  const groupsSection = useMemo<SidebarSection | null>(() => {
+    if (!user) {
+      return null;
+    }
+    const groups = (homeContext?.myGroups || []) as LegacyEntity[];
+    return {
+      title: 'Groups',
+      titleTo: '/groups',
+      titleAction: { label: '+ Create', to: '/groups/create' },
+      items: groups.map((group, index) => ({
+        key: `group-${index}-${String(group._id || '')}`,
+        label: String(group.title || '(Untitled)'),
+        to: buildGroupLink(group),
+        icon: 'group',
+      })),
+    };
+  }, [homeContext?.myGroups, user]);
 
   const relatedItems = useMemo<SidebarNavItem[]>(() => {
     const entrySection = ['topics', 'arguments', 'questions', 'answers', 'artifacts', 'issues', 'opinions'].includes(section);
@@ -539,6 +619,12 @@ const ContextSidebar: React.FC = () => {
   if (relatedItems.length > 0) {
     sections.push({ title: 'Related', items: relatedItems });
   }
+  if (diarySection) {
+    sections.push(diarySection);
+  }
+  if (groupsSection) {
+    sections.push(groupsSection);
+  }
   if (exploreSection.items.length > 0) {
     sections.push(exploreSection);
   }
@@ -558,6 +644,11 @@ const ContextSidebar: React.FC = () => {
               ) : (
                 navSection.title
               )}
+              {navSection.titleAction ? (
+                <Link to={navSection.titleAction.to} className="pull-right">
+                  {navSection.titleAction.label}
+                </Link>
+              ) : null}
             </li>
             {navSection.items.map((item) => {
               const isActive = item.to ? location.pathname === item.to : false;

@@ -71,4 +71,19 @@ describe('Parity checklist guardrails', function () {
     expect(adminClient).toContain('linkAccountUser: async');
     expect(adminClient).toContain('updateAdministratorPermissions: async');
   });
+
+  it('keeps search ordering and sidebar context aligned with legacy behavior', function () {
+    const searchApi = read('server/src/controllers/api/search.ts');
+    const homeApi = read('server/src/controllers/api/home.ts');
+    const sidebar = read('client/src/components/Layout/ContextSidebar.tsx');
+
+    expect(searchApi).toContain("$text: { $search: keyword }");
+    expect(searchApi).toContain("score: { $meta: 'textScore' }");
+    expect(searchApi).toContain('flowUtils.sortArguments(argumentResults)');
+    expect(homeApi).toContain('flowUtils.getDiaryCategories(req)');
+    expect(homeApi).toContain('flowUtils.getUserGroups(req)');
+    expect(sidebar).toContain("title: 'My Journal'");
+    expect(sidebar).toContain("title: 'Groups'");
+    expect(sidebar).toContain('topicContext.parentSiblings');
+  });
 });

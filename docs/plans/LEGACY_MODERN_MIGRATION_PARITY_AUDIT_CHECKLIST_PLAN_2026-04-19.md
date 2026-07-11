@@ -78,7 +78,7 @@ Audit references used for this pass:
 - `[x]` Sidebar contains topic-context nested children/siblings for topic entry
 - `[x]` Sidebar contains `Related` section on topic pages
 - `[x]` Sidebar contains authenticated user shortcuts
-- `[ ]` Validate sidebar item ordering and visual hierarchy match legacy on all major screens
+- `[x]` Validate sidebar item ordering and visual hierarchy match legacy on all major screens
 - `[x]` Validate all legacy page links under `/legacy/*` stay prefix-scoped and do not leak to root modern URLs unless explicitly intended (intentional root escape kept only for explicit “New UX” navigation)
 
 ### 2) Home (`/legacy/` vs `/`)
@@ -109,7 +109,7 @@ Audit references used for this pass:
 - `[x]` “View more” pagination-style behavior in all-tab mode
 - `[x]` Empty-result UX exists
 - `[x]` Modern adds keyboard result navigation (up/down/enter, escape)
-- `[ ]` Validate result ordering and paging parity with identical fixture data
+- `[x]` Validate result ordering and paging parity with identical fixture data
 - `[x]` Artifact result rows now use dedicated modern `ArtifactEntryRow` with subtitle/labels/content-preview support aligned to legacy row depth
 
 ### 5) Topic Entry and Shared Entry Detail Behavior
@@ -123,7 +123,7 @@ Audit references used for this pass:
 - `[x]` Related topics chips
 - `[x]` Child entry lists for topics/facts/questions/artifacts/issues/comments
 - `[x]` Entry actions include edit/follow/share/reply/copy/link/history/report/signal/appeal/screening/convert/delete (role-gated)
-- `[ ]` Validate parity of legacy entry-outline behavior included from `dust/wiki/common/entry-outline`
+- `[x]` Validate parity of legacy entry-outline behavior included from `dust/wiki/common/entry-outline`
 - `[x]` Validate “link-entry” flows (topic/argument link entities) are fully reachable and editable in modern UX
 
 ### 6) Entity List + Create/Edit Flows (Topics, Arguments, Questions, Answers, Issues, Opinions, Artifacts)
@@ -278,3 +278,10 @@ Use this matrix to complete runtime parity sign-off after code-level review:
   - Create pages now prefill context ids from route query params when available.
   - Successful create actions now redirect to the newly created entry route for `topic`, `argument`, `question`, `answer`, `issue`, `opinion`, and `artifact` entities instead of only returning to list pages.
 - `[ ]` Group route runtime matrix pairs remain blocked by fixture availability (`Pair 06-08` require public group fixtures).
+
+## Revalidation Notes (2026-07-11)
+
+- `[x]` Search parity now uses MongoDB text relevance ordering with deterministic tie-breakers, preserves legacy argument sorting, and presents legacy `Facts` / `Comments` labels.
+- `[x]` Entry-outline parity is centralized in the shared modern `EntryOutline` component and renders linked `Key topics` and `Key facts` sections.
+- `[x]` Sidebar parity now restores legacy ordering and hierarchy: apps, contextual ancestry/siblings, related entries, journal categories, groups, explore categories, and personal shortcuts.
+- `[x]` Focused client tests, server parity guardrails, TypeScript checks, and no-new-`any` checks pass for this parity group.
