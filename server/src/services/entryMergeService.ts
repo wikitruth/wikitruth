@@ -474,7 +474,9 @@ export async function mergeEntries(options: {
 
 export async function findCompletedRedirect(objectType: number, sourceId: string): Promise<EntryRecord | null> {
   const redirectModel = db.EntryRedirect;
-  if (!redirectModel) {
+  // Friendly topic slugs share the /entry/:id route. Avoid casting them against
+  // the ObjectId-backed redirect collection before the entry controller resolves them.
+  if (!redirectModel || !/^[a-f0-9]{24}$/i.test(sourceId)) {
     return null;
   }
   return redirectModel.findOne({

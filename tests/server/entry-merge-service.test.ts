@@ -71,6 +71,7 @@ jest.mock('../../server/src/services/entryRevisionService', () => ({
 import {
   buildDuplicateScope,
   compareDuplicateEntries,
+  findCompletedRedirect,
   findDuplicateCandidates,
   mergeEntries,
   normalizeDuplicateText,
@@ -92,6 +93,11 @@ describe('entry merge service', () => {
       rule: 'exact_title',
       score: 1,
     }));
+  });
+
+  it('skips redirect lookup for friendly slugs before ObjectId casting', async () => {
+    await expect(findCompletedRedirect(1, 'philippine-popular-figures')).resolves.toBeNull();
+    expect(redirectFindOne).not.toHaveBeenCalled();
   });
 
   it('builds a parent-scoped query and returns deterministic candidates', async () => {
