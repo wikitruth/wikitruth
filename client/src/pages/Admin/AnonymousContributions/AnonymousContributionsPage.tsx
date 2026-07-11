@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Alert from '../../../components/common/Alert';
 import Button from '../../../components/common/Button';
@@ -18,7 +18,7 @@ const AnonymousContributionsPage: React.FC = () => {
   const [actingId, setActingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const load = async (nextStatus = status) => {
+  const load = useCallback(async (nextStatus: AnonymousContributionStatus | 'all') => {
     try {
       setLoading(true);
       setError(null);
@@ -29,9 +29,9 @@ const AnonymousContributionsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  useEffect(() => { void load(status); }, [status]);
+  useEffect(() => { void load(status); }, [load, status]);
 
   const review = async (submission: AnonymousContribution, nextStatus: Exclude<AnonymousContributionStatus, 'pending'>) => {
     const id = String(submission._id || submission.id || '');
