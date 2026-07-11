@@ -87,10 +87,10 @@ The following remain genuinely pending after current-code searches. Detailed req
 - [x] Change requests, stale-conflict handling, revision history, rollback, and suggestion mode (`CORE-014` through `CORE-017`).
 - [x] Policy-versioned contributor/reviewer onboarding gates (`CORE-010`).
 - [x] Independent truth-versus-ethics verdict channels (`CORE-022`).
-- [ ] Unresolved-content expiry policy and issue-first gates (`CORE-025`, `CORE-026`).
+- [x] Accepted-critical issue-first gates, reasoned resolution, and audited administrator override (`CORE-026`).
 - [x] Artifact subtype taxonomy, internal/external evidence modes, provenance, and source-quality review (`CORE-027` through `CORE-029`).
 - [x] Tamper-evident privileged audit events and verification tooling (`CORE-034`).
-- [ ] Strict debate modes, revision-linked comment obsolescence, reputation, and deterministic scorecards (`FLOW-007`, `FLOW-010`, `FLOW-021`, `FLOW-022`).
+- [x] Revision-linked comment context, supersession flags, and reasoned relevance decisions (`FLOW-010`).
 - [ ] Content policy packs, reviewer/screener playbooks, source-quality rubric, and seeded pilot evidence (`CONTENT-001` through `CONTENT-020`, as applicable).
 - [ ] Dedicated FixPH information architecture, government/accountability/location models, Vote Wisely workspace, and incident lifecycle (`FIXPH-001` through `FIXPH-008`).
 - [ ] React Native monorepo implementation and mobile release validation.
@@ -102,11 +102,13 @@ The following remain genuinely pending after current-code searches. Detailed req
 - `c8ac6673` added immutable numbered revision snapshots for all seven entry families, public revision metadata, partial change-request acceptance, stale-base detection, reviewer rollback, pre/post-merge revision links, hash-chained privileged events, chain verification UI/API, and backup coverage for integrity collections.
 - `a71847d3` added backward-compatible artifact taxonomy and provenance, five-dimension source-quality review, independently queryable factual and ethical verdict channels, atomic dual-channel updates, revision capture, privileged audit evidence, and modern review UI.
 - `4290c1dc` added policy-versioned contributor/reviewer onboarding, new-user and future-promotion gates, account completion UI, role-switch filtering, server-side entry-write enforcement, reviewer-decision enforcement, and role/onboarding audit evidence. Existing role holders remain grandfathered for compatibility.
+- `c80c7ac7` added direct issue targeting across entry families, accepted-critical issue gates for discussion and final factual verdicts, reasoned reviewer resolution, audited administrator override, revision-linked comment context, automatic supersession warnings, and reviewer relevance decisions without deleting history.
 - The content-policy item remains open only for seeded pilot execution and evidence; the policy pack and reviewer/screener playbook documents are implemented.
 
 ### Explicitly Deferred Product Decisions
 
 - Controlled anonymous contribution (`CORE-019`) is not part of this modernization release because abuse controls, moderation capacity, and reputation signals are not yet proven.
+- Automatic unresolved-content expiry (`CORE-025`) is disabled by policy; unresolved records remain visible until a human resolution because thresholds, notices, exceptions, and retention obligations are not mature enough for destructive automation.
 - Reputation, deterministic scorecards, and a broad strict-debate rollout remain deferred until a governed pilot produces enough usage evidence to define auditable, anti-gaming behavior.
 - Full FixPH productization and React Native delivery remain separate programs; they are not legacy-replacement blockers.
 
