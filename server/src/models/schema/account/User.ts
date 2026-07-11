@@ -13,6 +13,23 @@ const factory: SchemaFactory = function (app, mongoose) {
       screener: { type: Boolean, default: false },
       reviewer: { type: Boolean, default: false },
     },
+    onboarding: {
+      contributor: {
+        completed: { type: Boolean, default: true },
+        policyVersion: { type: String, default: '' },
+        acknowledgements: [{ type: String }],
+        completedDate: { type: Date, default: null },
+        completedUserId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+      },
+      reviewer: {
+        completed: { type: Boolean, default: true },
+        policyVersion: { type: String, default: '' },
+        acknowledgements: [{ type: String }],
+        completedDate: { type: Date, default: null },
+        completedUserId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+        assignedDate: { type: Date, default: null },
+      },
+    },
     isActive: String,
     timeCreated: { type: Date, default: Date.now },
     resetPasswordToken: String,

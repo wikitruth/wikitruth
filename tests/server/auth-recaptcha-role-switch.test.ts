@@ -132,7 +132,10 @@ describe('auth captcha and role-switch endpoints', () => {
 
     expect(response.status).toBe(201);
     expect(response.body.success).toBe(true);
-    expect(response.body.activeRole).toBe('contributor');
+    expect(response.body.activeRole).toBe('reader');
+    expect(mockDb.User.create).toHaveBeenCalledWith(expect.objectContaining({
+      onboarding: expect.objectContaining({ contributor: { completed: false } }),
+    }));
     expect(mockPostForm).toHaveBeenCalledWith(
       'https://www.google.com/recaptcha/api/siteverify',
       expect.objectContaining({

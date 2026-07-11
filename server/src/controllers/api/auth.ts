@@ -23,6 +23,7 @@ import {
   sanitizeUser,
   normalizeActiveRole,
   getSessionActiveRole,
+  getDefaultActiveRole,
   setSessionActiveRole,
   validateRecaptcha,
   isValidUsername,
@@ -45,10 +46,12 @@ import {
   rotateRefreshToken,
   revokeRefreshToken,
 } from './authTokenHelpers';
+import { registerAuthOnboardingRoutes } from './authOnboardingRoutes';
 
 const jwt = jwtMod as unknown as typeof import('jsonwebtoken');
 
 export = function (router: Router) {
+  registerAuthOnboardingRoutes(router);
   router.get('/me', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!req.user) {
       // Keep this endpoint non-failing for anonymous page loads in modern UI.
@@ -56,7 +59,7 @@ export = function (router: Router) {
       return;
     }
 
-    const activeRole = getSessionActiveRole(req) || 'contributor';
+    const activeRole = getSessionActiveRole(req) || getDefaultActiveRole(req.user as unknown as AuthUserDocument);
     setSessionActiveRole(req, activeRole);
     res.json({ success: true, user: sanitizeUser(req.user), activeRole: activeRole });
   });
@@ -121,6 +124,10 @@ export = function (router: Router) {
         email: email,
         password: passwordHash,
         search: [username, email],
+        onboarding: {
+          contributor: { completed: false },
+          reviewer: { completed: false },
+        },
       });
 
       const requireAccountVerification = Boolean(
@@ -147,8 +154,8 @@ export = function (router: Router) {
         if (err) {
           return next(err);
         }
-        setSessionActiveRole(req, 'contributor');
-        res.status(201).json({ success: true, user: sanitizeUser(user), activeRole: 'contributor' });
+        setSessionActiveRole(req, 'reader');
+        res.status(201).json({ success: true, user: sanitizeUser(user), activeRole: 'reader' });
       });
     } catch (error) {
       next(error);
@@ -196,7 +203,7 @@ export = function (router: Router) {
         if (err) {
           return next(err);
         }
-        const activeRole = getSessionActiveRole(req) || 'contributor';
+        const activeRole = getSessionActiveRole(req) || getDefaultActiveRole(user);
         setSessionActiveRole(req, activeRole);
         res.json({ success: true, user: sanitizeUser(user), activeRole: activeRole });
       });
@@ -272,7 +279,7 @@ export = function (router: Router) {
         if (err) {
           return next(err);
         }
-        const activeRole = getSessionActiveRole(req) || 'contributor';
+        const activeRole = getSessionActiveRole(req) || getDefaultActiveRole(user);
         setSessionActiveRole(req, activeRole);
         res.json({ success: true, user: sanitizeUser(user), activeRole: activeRole });
       });

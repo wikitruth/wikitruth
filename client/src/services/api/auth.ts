@@ -40,6 +40,17 @@ interface RoleSwitchResponse {
   activeRole?: string;
 }
 
+export interface OnboardingTrack {
+  key: 'contributor' | 'reviewer';
+  title: string;
+  policyVersion: string;
+  acknowledgements: string[];
+  eligible: boolean;
+  completed: boolean;
+  completedDate?: string | null;
+  completedPolicyVersion?: string;
+}
+
 interface AccountSettingsResponse {
   success?: boolean;
   account?: {
@@ -139,6 +150,16 @@ export const authApi = {
       method: 'POST',
       body: JSON.stringify({ role }),
     }),
+  onboarding: () =>
+    request<{ success: boolean; tracks: OnboardingTrack[] }>(`${API_BASE_URL}/auth/onboarding`),
+  completeOnboarding: (track: OnboardingTrack['key'], acknowledgements: string[]) =>
+    request<{ success: boolean; tracks: OnboardingTrack[]; user: User; activeRole: string }>(
+      `${API_BASE_URL}/auth/onboarding/${encodeURIComponent(track)}/complete`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ acknowledgements, confirmation: true }),
+      },
+    ),
   providers: () => request<AuthProvidersResponse>(`${API_BASE_URL}/auth/providers`),
   forgotPassword: (email: string) =>
     request<{ success: boolean; message: string; debug?: { email: string; token: string } }>(

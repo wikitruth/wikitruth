@@ -14,8 +14,10 @@ import {
 } from '../../types/controllerContracts';
 
 import appModForDb from '../../app';
+import constants from '../../models/constants';
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 import { registerAdminBackupRoutes } from './adminBackupRoutes';
+import { logEntryEvent } from '../../services/entryEventsService';
 
 function ensureAdmin(req: WikitruthRequest, res: WikitruthResponse): boolean {
   if (!req.user || !req.user.canPlayRoleOf || !req.user.canPlayRoleOf('admin')) {
@@ -187,6 +189,10 @@ export = function (router: Router) {
       roles: {
         screener: toBoolean(body.roles?.screener),
         reviewer: toBoolean(body.roles?.reviewer),
+      },
+      onboarding: {
+        contributor: { completed: false },
+        reviewer: { completed: false, assignedDate: toBoolean(body.roles?.reviewer) ? new Date() : null },
       },
       search: [username, email],
     });
@@ -397,8 +403,37 @@ export = function (router: Router) {
       user.roles = {};
     }
     user.roles.screener = toBoolean(body.screener ?? body.roles?.screener);
-    user.roles.reviewer = toBoolean(body.reviewer ?? body.roles?.reviewer);
+    const wasReviewer = Boolean(user.roles.reviewer);
+    const isReviewer = toBoolean(body.reviewer ?? body.roles?.reviewer);
+    user.roles.reviewer = isReviewer;
+    if (isReviewer && !wasReviewer) {
+      user.onboarding = user.onboarding || {};
+      user.onboarding.reviewer = {
+        completed: false,
+        policyVersion: '',
+        acknowledgements: [],
+        completedDate: null,
+        completedUserId: null,
+        assignedDate: new Date(),
+      };
+    }
     await user.save();
+
+    await logEntryEvent({
+      scope: 'privileged',
+      eventType: 'admin.user.roles.updated',
+      objectType: constants.OBJECT_TYPES.user,
+      objectName: 'user',
+      objectId: String(user._id),
+      actorUserId: String(req.user?.id || req.user?._id || ''),
+      actorUsername: String(req.user?.username || ''),
+      message: 'User screening/reviewer roles updated',
+      payload: {
+        screener: Boolean(user.roles.screener),
+        reviewer: isReviewer,
+        reviewerOnboardingReset: isReviewer && !wasReviewer,
+      },
+    });
 
     res.json({ success: true, user: await db.User.findById(user._id).lean() });
   });

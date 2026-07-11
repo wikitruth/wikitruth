@@ -9,6 +9,7 @@ import {
 
 import * as flowUtils from '../../utils/flowUtils';
 import constants from '../../models/constants';
+import { isOnboardingComplete } from './authHelpers';
 
 import appModForDb from '../../app';
 
@@ -65,8 +66,20 @@ function ensureAdmin(req: WikitruthRequest, res: WikitruthResponse): boolean {
 }
 
 function ensureReviewerOrAdmin(req: WikitruthRequest, res: WikitruthResponse): boolean {
-  if (canPlayRole(req, 'reviewer') || canPlayRole(req, 'admin')) {
+  if (canPlayRole(req, 'admin')) {
     return true;
+  }
+  if (canPlayRole(req, 'reviewer') && isOnboardingComplete(req.user, 'reviewer')) {
+    return true;
+  }
+  if (canPlayRole(req, 'reviewer')) {
+    res.status(403).json({
+      success: false,
+      code: 'ONBOARDING_REQUIRED',
+      message: 'Complete Reviewer Responsibilities before making reviewer decisions',
+      onboardingUrl: '/account/onboarding',
+    });
+    return false;
   }
   res.status(403).json({ success: false, message: 'Reviewer or admin privileges required' });
   return false;

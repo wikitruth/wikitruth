@@ -26,9 +26,13 @@ function isActiveRole(value: unknown): value is ActiveRole {
 }
 
 function getAvailableRolesForUser(user: User | null): ActiveRole[] {
-  const roles: ActiveRole[] = ['reader', 'contributor'];
+  const roles: ActiveRole[] = ['reader'];
+  const isAdmin = Boolean(user?.roles?.admin);
+  const contributorReady = isAdmin || user?.onboarding?.contributor?.completed !== false;
+  const reviewerReady = isAdmin || user?.onboarding?.reviewer?.completed !== false;
+  if (contributorReady) roles.push('contributor');
   if (user?.roles?.screener) roles.push('screener');
-  if (user?.roles?.reviewer) roles.push('reviewer');
+  if (user?.roles?.reviewer && reviewerReady) roles.push('reviewer');
   if (user?.roles?.admin) roles.push('admin');
   return roles;
 }

@@ -830,6 +830,60 @@
         }
       }
     },
+    "/auth/onboarding": {
+      "get": {
+        "summary": "Get contributor and reviewer onboarding tracks for the current user",
+        "responses": {
+          "200": {
+            "description": "Onboarding track status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/onboarding/{track}/complete": {
+      "post": {
+        "summary": "Record policy-versioned completion of an eligible onboarding track",
+        "parameters": [
+          {
+            "name": "track",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "enum": ["contributor", "reviewer"]
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericMutationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Onboarding completion recorded"
+          },
+          "400": {
+            "description": "Required acknowledgements are incomplete"
+          },
+          "403": {
+            "description": "Track is not assigned or eligible"
+          }
+        }
+      }
+    },
     "/auth/reset-password": {
       "post": {
         "summary": "Reset password",

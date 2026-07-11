@@ -8,6 +8,7 @@ const ForgotPasswordPage = lazy(() => import('../pages/Auth/ForgotPasswordPage')
 const ResetPasswordPage = lazy(() => import('../pages/Auth/ResetPasswordPage'));
 const LogoutPage = lazy(() => import('../pages/Auth/LogoutPage'));
 const AccountPage = lazy(() => import('../pages/Account/AccountPage'));
+const OnboardingPage = lazy(() => import('../pages/Account/OnboardingPage'));
 const SettingsPage = lazy(() => import('../pages/Account/SettingsPage'));
 const VerificationPage = lazy(() => import('../pages/Account/VerificationPage'));
 const AdminDashboard = lazy(() => import('../pages/Admin/AdminDashboard'));
@@ -107,6 +108,7 @@ export const appRoutes: AppRoute[] = [
   { path: '/reset-password', element: <ResetPasswordPage /> },
   { path: '/logout', element: <LogoutPage /> },
   { path: '/account', element: <AccountPage /> },
+  { path: '/account/onboarding', element: <OnboardingPage /> },
   { path: '/account/settings', element: <SettingsPage /> },
   { path: '/account/verification', element: <VerificationPage /> },
   { path: '/admin', element: <AdminDashboard /> },

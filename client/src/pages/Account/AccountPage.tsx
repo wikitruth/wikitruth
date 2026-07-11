@@ -56,14 +56,27 @@ const AccountPage: React.FC = () => {
             <strong>Verification:</strong>{' '}
             {verification?.required ? (verification.isVerified ? 'Verified' : 'Pending verification') : 'Not required'}
           </p>
+          <p>
+            <strong>Contributor onboarding:</strong>{' '}
+            {user?.onboarding?.contributor?.completed === false ? 'Required' : 'Complete'}
+          </p>
+          {user?.roles?.reviewer ? (
+            <p>
+              <strong>Reviewer onboarding:</strong>{' '}
+              {user.onboarding?.reviewer?.completed === false ? 'Required' : 'Complete'}
+            </p>
+          ) : null}
         </div>
       </div>
 
       <div className="btn-group">
+        <Link to="/account/onboarding" className="btn btn-primary">
+          <i className="fa fa-graduation-cap"></i> Role Onboarding
+        </Link>
         <Link to="/account/settings" className="btn btn-default">
           <i className="fa fa-cog"></i> Settings
         </Link>
-        <Link to="/account/verification" className="btn btn-primary">
+        <Link to="/account/verification" className="btn btn-default">
           <i className="fa fa-shield"></i> Verification
         </Link>
       </div>

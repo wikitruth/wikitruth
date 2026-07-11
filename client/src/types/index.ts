@@ -12,6 +12,21 @@ export interface User {
     screener?: boolean;
     reviewer?: boolean;
   };
+  onboarding?: {
+    contributor?: {
+      completed?: boolean;
+      policyVersion?: string;
+      acknowledgements?: string[];
+      completedDate?: Date | string;
+    };
+    reviewer?: {
+      completed?: boolean;
+      policyVersion?: string;
+      acknowledgements?: string[];
+      completedDate?: Date | string;
+      assignedDate?: Date | string;
+    };
+  };
   preferences?: {
     privateProfile?: boolean;
   };

@@ -32,6 +32,7 @@ import attachInstall from './install';
 import attachPages from './pages';
 import { registerEntryRedirectMiddleware } from './entryRedirectMiddleware';
 import constants from '../../models/constants';
+import { requireContributorOnboarding } from '../../middlewares/onboarding';
 
 export = function (router: Router) {
   router.use(apiError.apiEnvelopeMiddleware);
@@ -61,6 +62,9 @@ export = function (router: Router) {
   const timelineRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const installRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const pagesRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
+
+  [topicsRouter, argumentsRouter, questionsRouter, answersRouter, issuesRouter, opinionsRouter, artifactsRouter]
+    .forEach((entryRouter) => entryRouter.use(requireContributorOnboarding));
 
   attachHome(homeRouter);
   registerEntryRedirectMiddleware(topicsRouter, constants.OBJECT_TYPES.topic);

@@ -66,6 +66,21 @@ describe('Independent verdict channels', () => {
       .expect(403);
   });
 
+  it('requires assigned reviewers to complete reviewer onboarding', async () => {
+    const response = await request(createApp({
+      id: 'reviewer-1',
+      roles: { reviewer: true },
+      onboarding: { reviewer: { completed: false } },
+      canPlayRoleOf: (role) => role === 'reviewer',
+    }))
+      .put('/api/moderation/verdict-channel?topic=topic-1')
+      .send({ channel: 'factual', status: 'supported', reasoning: 'Evidence supports this claim.' })
+      .expect(403);
+
+    expect(response.body.code).toBe('ONBOARDING_REQUIRED');
+    expect(findEntryById).not.toHaveBeenCalled();
+  });
+
   it('requires substantive reasoning and an ethical framework', async () => {
     const user = { id: 'reviewer-1', canPlayRoleOf: (role) => role === 'reviewer' };
     await request(createApp(user))

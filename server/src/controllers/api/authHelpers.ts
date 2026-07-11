@@ -10,6 +10,7 @@ type AuthUserLike = {
   username: string;
   email?: string;
   roles?: unknown;
+  onboarding?: unknown;
 };
 
 type AuthUserDocument = {
@@ -18,6 +19,7 @@ type AuthUserDocument = {
   username: string;
   email?: string;
   roles?: Record<string, unknown>;
+  onboarding?: Record<string, unknown>;
   canPlayRoleOf?: (role: string) => boolean;
   defaultReturnUrl?: () => string;
   isAdmin?: () => boolean;
@@ -162,22 +164,45 @@ function sanitizeUser(user: AuthUserLike | null | undefined) {
     username: user.username,
     email: user.email,
     roles: user.roles,
+    onboarding: user.onboarding,
   };
 }
 
-function getAvailableRoles(user: AuthUserDocument | AuthUserLike | null | undefined): ActiveRole[] {
-  const roles: ActiveRole[] = ['reader', 'contributor'];
+function isOnboardingComplete(
+  user: AuthUserDocument | AuthUserLike | null | undefined,
+  track: 'contributor' | 'reviewer',
+): boolean {
   const roleSet = user?.roles as Record<string, unknown> | undefined;
+  if (roleSet?.admin) {
+    return true;
+  }
+  const onboarding = user?.onboarding as Record<string, { completed?: unknown }> | undefined;
+  const value = onboarding?.[track]?.completed;
+  // Existing accounts are grandfathered; new assignments explicitly persist false.
+  return typeof value === 'undefined' ? true : value === true;
+}
+
+function getAvailableRoles(user: AuthUserDocument | AuthUserLike | null | undefined): ActiveRole[] {
+  const roles: ActiveRole[] = ['reader'];
+  const roleSet = user?.roles as Record<string, unknown> | undefined;
+  if (isOnboardingComplete(user, 'contributor')) {
+    roles.push('contributor');
+  }
   if (roleSet?.screener) {
     roles.push('screener');
   }
-  if (roleSet?.reviewer) {
+  if (roleSet?.reviewer && isOnboardingComplete(user, 'reviewer')) {
     roles.push('reviewer');
   }
   if (roleSet?.admin) {
     roles.push('admin');
   }
   return roles;
+}
+
+function getDefaultActiveRole(user: AuthUserDocument | AuthUserLike | null | undefined): ActiveRole {
+  const available = getAvailableRoles(user);
+  return available.includes('contributor') ? 'contributor' : 'reader';
 }
 
 function normalizeActiveRole(
@@ -412,6 +437,9 @@ export {
   db,
   sanitizeUser,
   normalizeActiveRole,
+  getAvailableRoles,
+  getDefaultActiveRole,
+  isOnboardingComplete,
   getSessionActiveRole,
   setSessionActiveRole,
   validateRecaptcha,
