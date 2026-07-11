@@ -7,7 +7,7 @@ import PageMeta from './PageMeta';
 const renderPageMeta = (props: React.ComponentProps<typeof PageMeta>) => {
   return render(
     <HelmetProvider>
-      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <MemoryRouter>
         <PageMeta {...props} />
       </MemoryRouter>
     </HelmetProvider>
@@ -16,9 +16,6 @@ const renderPageMeta = (props: React.ComponentProps<typeof PageMeta>) => {
 
 describe('PageMeta', () => {
   afterEach(() => {
-    document.head.querySelectorAll('meta, link[rel="canonical"]').forEach((node) => {
-      node.parentNode?.removeChild(node);
-    });
     document.title = '';
   });
 

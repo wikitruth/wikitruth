@@ -67,7 +67,7 @@ describe('TopicsPage content view filter', () => {
 
     await waitFor(() => expect(mockedApi.getTopics).toHaveBeenCalledWith(undefined, 'all'));
 
-    await user.click(screen.getByRole('button', { name: /wiki/i }));
+    await user.click(await screen.findByRole('button', { name: /wiki/i }));
     await waitFor(() => expect(mockedApi.getTopics).toHaveBeenLastCalledWith(undefined, 'wiki'));
     expect(localStorage.getItem('wt_view_mode')).toBe('wiki');
 

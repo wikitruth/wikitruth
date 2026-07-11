@@ -108,7 +108,7 @@ describe('VerdictsPage', () => {
 
     await waitFor(() => expect(mockedModerationApi.listVerdicts).toHaveBeenCalledTimes(1));
 
-    await user.click(screen.getByLabelText(/select climate policy/i));
+    await user.click(await screen.findByLabelText(/select climate policy/i));
     await user.selectOptions(screen.getByLabelText(/bulk verdict status/i), '1');
     await user.click(screen.getByRole('button', { name: /apply to selected/i }));
 

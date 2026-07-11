@@ -11,10 +11,7 @@ interface TestProvidersProps {
 const TestProviders: React.FC<TestProvidersProps> = ({ children, route }) => {
   return (
     <HelmetProvider>
-      <MemoryRouter
-        initialEntries={[route]}
-        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
-      >
+      <MemoryRouter initialEntries={[route]}>
         {children}
       </MemoryRouter>
     </HelmetProvider>
