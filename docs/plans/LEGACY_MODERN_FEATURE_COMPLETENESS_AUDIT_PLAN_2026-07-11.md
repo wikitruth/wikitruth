@@ -7,6 +7,7 @@ Re-open legacy-to-modern parity at feature and workflow depth, rather than treat
 ## Method
 
 - Compared the same public artifact in legacy and modern at desktop and `390x844` mobile viewports.
+- Visually audited every distinct modern page surface in public and authenticated states, including administration, moderation, create/edit, member workspace, utility, and error pages.
 - Inspected legacy templates/controllers and modern routes/pages/API controllers for public, authenticated, moderation, administration, application-specific, and recovery workflows.
 - Rechecked the deferred target-state inventories against current `client/src`, `server/src`, and tests.
 - Reviewed parity automation for false-positive and live-data mutation risks.
@@ -20,7 +21,7 @@ Re-open legacy-to-modern parity at feature and workflow depth, rather than treat
 
 ### Modern target-state completeness
 
-**Core governance modernization is implemented and runtime-signed off; broader product programs remain separate.** The modern application includes deterministic duplicate/merge handling, immutable revisions, change requests and rollback, tamper-evident privileged audit events, evidence provenance and quality review, independent factual/ethical verdicts, policy-versioned onboarding, revision-linked discussion context, and issue-first controls. Anonymous contribution, reputation/scorecards, full FixPH productization, and React Native remain explicit deferred or separately scoped programs.
+**Core governance modernization is implemented and locally runtime-signed off; broader product programs remain separate.** The modern application includes deterministic duplicate/merge handling, immutable revisions, change requests and rollback, tamper-evident privileged audit events, evidence provenance and quality review, independent factual/ethical verdicts, policy-versioned onboarding, revision-linked discussion context, issue-first controls, controlled anonymous screening proposals, and deterministic reputation scorecards. Automatic content expiry remains explicitly deferred. Full FixPH productization and React Native remain separately scoped programs.
 
 ## Recommendation Review (2026-07-11)
 
@@ -37,9 +38,9 @@ The unchecked work is valid, but it should not be executed as one undifferentiat
 | 2 | Truth-versus-ethics verdict channels | Valid domain-model gap | Implement after the governing rubric and schema migration are approved. Keep truth and ethics outcomes independently queryable. |
 | 2 | Contributor/reviewer onboarding | Valid, but depends on policy content | Implement role-specific gates after the playbooks and source-quality rubric exist. |
 | 3 | Comment obsolescence | Valid, but technically blocked by revisions | Implement after revision identity and supersession semantics exist. |
-| 3 | Issue-first gates and unresolved-content expiry | Valid concepts, but unsafe without thresholds and overrides | Define policy, escalation, exceptions, and administrator override behavior before implementation. Do not silently expire or mutate content. |
-| Defer | Controlled anonymous contribution | Technically valid but materially expands abuse and moderation risk | Defer until abuse controls, reputation signals, moderation capacity, and operating policy are proven. It is not required for legacy replacement. |
-| Defer | Strict debate, reputation, and scorecards | Valid target-state ideas with anti-gaming and policy dependencies | Pilot strict debate only after explicit rules exist. Defer reputation and scorecards until sufficient usage data supports deterministic, auditable scoring. |
+| Complete / defer | Issue-first gates and unresolved-content expiry | Issue-first controls are implemented; automatic expiry remains unsafe without mature thresholds, notices, exceptions, and retention policy | Keep human resolution and administrator override behavior. Do not silently expire or mutate content. |
+| Complete | Controlled anonymous contribution | Implemented as a proposal-only screening queue with privacy-preserving network fingerprints, quotas, risk checks, duplicate detection, and no automatic publishing | Keep disabled by default in production unless moderation capacity is explicitly approved. |
+| Complete / defer | Reputation, scorecards, and strict debate | Deterministic reputation snapshots, badges, profile scorecards, and trusted ranking are implemented; broad strict-debate enforcement remains a policy program | Keep scoring formula-versioned and explainable. Pilot strict debate only after explicit rules exist. |
 | Separate program | FixPH productization | Valid extension roadmap; current implementation is tenant shell/configuration, not the full accountability product | Stabilize the core governance/data model and external tenant first, then execute FixPH information architecture and domain models as a separately scoped program. |
 | Separate program | React Native client | Valid roadmap; bearer-token APIs exist but no mobile workspace is implemented | Start shared contracts and transport only after the security wave and core API schemas stabilize. Defer full native UI until web workflows are stable. |
 | Verification | Credentialed role parity and external FixPH tenant | Valid release-signoff checks, not missing product implementation | Run with dedicated disposable/staging accounts; repair external DNS/proxy/firewall reachability before claiming FixPH tenant signoff. |
@@ -58,6 +59,8 @@ The unchecked work is valid, but it should not be executed as one undifferentiat
 | Admin CRUD and backup/restore | Present for authenticated admins | Audit timeline is modern-only | Normal admin restore is tested; empty-database bootstrap is not covered by this path. |
 | Fresh install / empty database recovery | Implemented and tested | Secure one-time bootstrap plus normal admin restore | `/api/install` now requires an empty core database, server-side token, CSRF, `RESTORE`, backup preflight, rate limit, and post-restore checks. Initialized systems direct admins to `/admin/db-backup`. |
 | Dynamic application About pages | Implemented and live-verified | About hierarchy is public without exposing profile pages | `/about/:id` uses `/api/pages/about/:id`, limits results to the About root/children, sanitizes HTML, and serves direct nested routes from the React shell. |
+| Controlled anonymous contribution | Not required for legacy replacement | Implemented as screened proposals, never direct publication | `/contribute` submits quota- and risk-controlled proposals; `/admin/anonymous-contributions` supports review and adoption into authenticated create flows. Raw IP addresses and user agents are not retained. |
+| Reputation and scorecards | Modern-only | Implemented with deterministic, explainable snapshots | Member profiles expose four scoring dimensions and earned badges; Explore offers a trusted ranking using reputation, screening state, and popularity inputs. |
 | QA proof | Public and privileged semantic coverage complete | Improved | `migration-parity-semantic.mjs` covers all seven families and mobile overflow; `run-disposable-authenticated-parity.mjs` provisions and removes isolated role fixtures while retaining only a redacted manifest. |
 | Mobile/native client | Not a legacy-web parity requirement | Planned, not implemented | `REACT_NATIVE_MONOREPO_CHECKLIST_PLAN_2026-04-19.md` remains active with its implementation backlog. |
 
@@ -70,6 +73,8 @@ The unchecked work is valid, but it should not be executed as one undifferentiat
 - [x] Add modern comment list/create/entry aliases backed by the Opinion implementation.
 - [x] Update the authenticated parity runner to locate the current modern `more` action menu.
 - [x] Require explicit `WT_PARITY_ALLOW_SIGNUP=true` before parity QA creates a generated account.
+- [x] Remove mobile document overflow from visualization topic controls, outline tree labels, Fast Switch PIN inputs, and database backup paths.
+- [x] Serve `/contribute` and modern `/comments/*` aliases through the React shell on direct navigation and refresh.
 
 ## Open Legacy-Replacement Work
 
@@ -92,6 +97,9 @@ The following remain genuinely pending after current-code searches. Detailed req
 - [x] Tamper-evident privileged audit events and verification tooling (`CORE-034`).
 - [x] Revision-linked comment context, supersession flags, and reasoned relevance decisions (`FLOW-010`).
 - [x] Content policy packs, reviewer/screener playbooks, source-quality rubric, and seeded live pilot evidence (`CONTENT-001` through `CONTENT-020`, as applicable).
+- [x] Controlled anonymous proposal intake, risk/duplicate screening, moderation queue, and authenticated adoption (`CORE-019`).
+- [x] Formula-versioned contributor/reviewer reputation signals and trusted ranking inputs (`FLOW-021`).
+- [x] Deterministic badges and contributor profile scorecards (`FLOW-022`).
 - Separate program: dedicated FixPH information architecture, government/accountability/location models, Vote Wisely workspace, and incident lifecycle (`FIXPH-001` through `FIXPH-008`).
 - Separate program: React Native monorepo implementation and mobile release validation.
 
@@ -106,13 +114,15 @@ The following remain genuinely pending after current-code searches. Detailed req
 - `9c545f2d` added and executed the read-only live content-policy pilot across all seven entry families, retaining a redacted manifest and an operational adoption queue without bulk-mutating legacy records.
 - `62aa1cd3` added the disposable authenticated parity runner, verified reader/contributor/screener/reviewer/admin behavior across all seven entry families, removed every temporary identity, and fixed active-role action visibility exposed by the run.
 - `7ed69015` prevented merge-redirect ObjectId casting from intercepting friendly topic slugs, preserving application section navigation and canonical topic redirects.
-- The FixPH production tenant now runs modernization code revision `d7cf056d` side by side on Node `22.17.0` under PM2 `wikitruth-modern`, with Nginx routing only `fixthephilippines.org` to port `8001` and serving the existing shared media store directly. The deployment also disables Kraken's duplicate cookie parser and MemoryStore defaults so the application-owned signed-cookie and Mongo session chain is authoritative.
+- `ee859b32` added controlled anonymous proposals, privacy-preserving anti-abuse controls, receipt lookup, reviewer adoption, and queue administration without automatic publication.
+- `04d75333` added deterministic reputation snapshots, dimension scorecards, earned badges, profile/member presentation, and trusted Explore ranking.
+- `94264826` fixed the mobile overflows found by the all-route visual audit; `55a37e2a` restored direct shell delivery for contribution and comment routes.
+- Operational correction: FixPH is not running a separate modern PM2 instance. `fixthephilippines.org` remains pointed at the existing shared production instance, and this modernization batch was not deployed to production or a VPS.
 
 ### Explicitly Deferred Product Decisions
 
-- Controlled anonymous contribution (`CORE-019`) is not part of this modernization release because abuse controls, moderation capacity, and reputation signals are not yet proven.
 - Automatic unresolved-content expiry (`CORE-025`) is disabled by policy; unresolved records remain visible until a human resolution because thresholds, notices, exceptions, and retention obligations are not mature enough for destructive automation.
-- Reputation, deterministic scorecards, and a broad strict-debate rollout remain deferred until a governed pilot produces enough usage evidence to define auditable, anti-gaming behavior.
+- A broad strict-debate rollout remains deferred until explicit operating rules and a governed pilot define enforceable behavior.
 - Full FixPH productization and React Native delivery remain separate programs; they are not legacy-replacement blockers.
 
 ## Verification Checklist
@@ -120,12 +130,16 @@ The following remain genuinely pending after current-code searches. Detailed req
 - [x] Focused client tests for header sections, route aliases, and closed mobile sidebar behavior.
 - [x] Focused server test for singular comment redirect behavior.
 - [x] Server TypeScript no-emit check after the first correction set.
-- [x] Full client and server test suites: 64 client suites / 153 tests and 45 server suites / 196 tests passed; the final slug-redirect correction also passed its focused 5-test suite and server typecheck.
+- [x] Full current client and server test suites: 67 client suites / 159 tests and 49 server suites / 215 tests passed on 2026-07-12; the route-shell correction also passed its focused 5-test suite and server typecheck.
 - [x] Production server and client builds.
 - [x] PM2 process `35` (`wikitruth`) restart plus post-restart `200` checks for modern artifact, legacy artifact, and `/api/home`.
 - [x] Live current-host verification of default header sections, comment redirect, and closed/open mobile overflow at `390x844`.
 - [x] Live dynamic About page and seven-family semantic parity verification, including `390x844` overflow checks.
 - [x] Live tenant-host verification of FixPH/application-specific header and Home section navigation, including external Home-to-People canonical navigation on the production tenant.
+- [x] Local visual audit of 87 public routes and 50 authenticated routes at both `1280x720` and `390x844` (274 rendered page checks), with populated admin/member/editor records where available.
+- [x] Direct HTTP shell-contract sweep of all 128 declared modern routes: 124 direct `200` HTML responses and four intentional canonical redirects.
+- [x] Responsive interaction checks for entry Reply/More menus, trusted Explore ranking, global navigation, and sidebar behavior with zero document overflow.
+- [x] Disposable visual-audit user, account, administrator, sessions, and reputation snapshot removed with zero residue.
 
 ## Completion Rule
 

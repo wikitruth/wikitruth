@@ -23,13 +23,13 @@
 | CORE-016 | Core Platform | todo | Implement version history with reversible revisions and reviewer-approved rollback. | Versioning & History, Change Request (CR), Development Phases. |
 | CORE-017 | Core Platform | todo | Implement edit suggestions for restricted entries and author/editor assignment controls. | Backlog, Mechanics & Architecture. |
 | CORE-018 | Core Platform | todo | Implement ownership and collaborator model for co-maintained topics. | Wikitruth Tasks. |
-| CORE-019 | Core Platform | todo | Implement controlled anonymous contribution with rate limits and anti-abuse checks. | Backlog, Mechanics & Architecture. |
+| CORE-019 | Core Platform | done | Implement controlled anonymous contribution with rate limits and anti-abuse checks. | Backlog, Mechanics & Architecture. |
 | CORE-020 | Core Platform | todo | Implement issue filing with typed issue categories and severity (Critical, Warning). | Issues, Backlog, Wikitruth Tasks. |
 | CORE-021 | Core Platform | todo | Implement verdict voting with configurable threshold (default >= 2/3 reviewer consensus). | Development Phases, Backlog, Wikitruth Tasks. |
 | CORE-022 | Core Platform | todo | Implement separation of epistemic verdicts vs moral/value judgements. | Wikitruth Notes, Backlog, Research Features. |
 | CORE-023 | Core Platform | todo | Implement reader feedback signals (controversial, incorrect verdict, needs reevaluation, wrong category/parent). | Reader voice, Development Phases, Backlog. |
 | CORE-024 | Core Platform | todo | Implement report/appeal process on verdict/issue actions. | Backlog, Wikitruth Tasks. |
-| CORE-025 | Core Platform | todo | Implement unresolved-content expiry/archive policy. | Mechanics & Architecture, Development Phases. |
+| CORE-025 | Core Platform | deferred | Implement unresolved-content expiry/archive policy. Explicitly deferred on 2026-07-12; human resolution remains authoritative. | Mechanics & Architecture, Development Phases. |
 | CORE-026 | Core Platform | todo | Implement issue-first moderation gate (major issues must be resolved before continued debate). | Issues, Backlog, Scenarios & Use Cases. |
 | CORE-027 | Core Platform | todo | Implement Artifact as first-class entry with media subtype metadata. | Wikitruth Tasks, Development Phases, Note to self. |
 | CORE-028 | Core Platform | todo | Implement artifact provenance fields (source_url, origin_type, capture_date, verifiability_notes). | Mechanics & Architecture, Acceptance & Verdict. |
@@ -60,8 +60,8 @@
 | FLOW-018 | Product Workflows | todo | Implement archived/outdated visibility modes and reader warnings. | Development Phases, Backlog. |
 | FLOW-019 | Product Workflows | done | Implement non-verdict popularity reactions (Upvote/Downvote, Expose/Bury, Good/Bad). | Development Phases, Backlog, Upvoting. |
 | FLOW-020 | Product Workflows | todo | Implement reviewer-priority queues based on votes, flags, and activity. | Mechanics & Architecture, Upvoting, Scenarios & Use Cases. |
-| FLOW-021 | Product Workflows | todo | Implement contributor/reviewer reputation signals and weighted ranking inputs. | Research Features, Wikitruth Notes, Backlog. |
-| FLOW-022 | Product Workflows | todo | Implement reviewer badges and contributor profile scorecards. | Reviewer Badges, Backlog, Wikitruth Notes. |
+| FLOW-021 | Product Workflows | done | Implement contributor/reviewer reputation signals and weighted ranking inputs. | Research Features, Wikitruth Notes, Backlog. |
+| FLOW-022 | Product Workflows | done | Implement reviewer badges and contributor profile scorecards. | Reviewer Badges, Backlog, Wikitruth Notes. |
 | FLOW-023 | Product Workflows | todo | Implement unified timeline view for each entry (edits, verdicts, issues, links, discussions). | Development Phases, Wikitruth Tasks, Backlog. |
 | FLOW-024 | Product Workflows | todo | Implement follow/subscribe system for entries and threads. | Development Phases, Backlog. |
 | FLOW-025 | Product Workflows | todo | Implement notification center with event types (screening, verdict, reply, mention, new post). | Development Phases, Backlog. |

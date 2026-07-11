@@ -11,7 +11,7 @@ Active and historical planning documents are organized under this folder.
   - `docs/plans/DEPENDENCY_UPGRADE_PLAN_2026-02-24.md` (all independent security, tooling, and framework-major waves complete; only legacy-renderer retirement remains)
   - `docs/plans/DEPRECATION_REPLACEMENT_PLAN.md` (runtime deprecations complete except the retained Jade/Kraken renderer)
 - Deferred checklist backlog:
-  - `docs/plans/deferred/**` open `[ ]`: **161** total
+  - `docs/plans/deferred/**` open `[ ]`: **158** total (automatic content expiry remains explicitly deferred)
 
 ## Active Plans
 

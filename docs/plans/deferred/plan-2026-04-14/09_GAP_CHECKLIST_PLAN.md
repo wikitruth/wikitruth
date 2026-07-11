@@ -4,6 +4,8 @@ This plan turns the validated status docs into an execution checklist focused on
 
 Status update (2026-04-18): migration-closure scope items are completed. Remaining unchecked items are post-migration roadmap work.
 
+Status update (2026-07-12): controlled anonymous contribution and deterministic reputation/scorecards are implemented. Automatic unresolved-content expiry is explicitly deferred and must not be inferred from archived-status support.
+
 ## Track 1: Core Reliability and Moderation Correctness
 
 - [ ] Implement duplicate detection service for topic/argument/question create+edit paths (`CORE-002`).
@@ -19,6 +21,7 @@ Status update (2026-04-18): migration-closure scope items are completed. Remaini
 
 ## Track 2: Verdict and Issue Governance
 
+- [x] Add controlled anonymous proposal intake with quotas, privacy-preserving risk checks, reviewer queue, and no automatic publication (`CORE-019`).
 - [x] Implement reviewer vote records for verdicts (`CORE-021`).
 - [x] Implement threshold consensus policy (default 2/3) with configurable settings (`CORE-021`).
 - [x] Add verdict provenance UI (who voted, when, rationale) (`CORE-021`).
@@ -27,7 +30,7 @@ Status update (2026-04-18): migration-closure scope items are completed. Remaini
 - [x] Route reader signals into moderation triage queue without auto-mutation (`CORE-023`).
 - [x] Build verdict/issue appeal workflow with responsible reviewer assignment (`CORE-024`).
 - [ ] Enforce issue-first discussion gate for unresolved critical issues (`CORE-026`).
-- [ ] Add unresolved-content expiry job + override mechanics (`CORE-025`).
+- [ ] Add unresolved-content expiry job + override mechanics (`CORE-025`) - explicitly deferred by product decision on 2026-07-12.
 
 ## Track 3: Security, Ops, and Deploy Stability
 
@@ -49,8 +52,8 @@ Status update (2026-04-18): migration-closure scope items are completed. Remaini
 - [x] Add Home ranking buckets (`Latest`, `Trending`, `Top`) with documented formulas (`FLOW-013`).
 - [x] Expand Explore filters (status/tag/relationship/screening) + sharable URL state (`FLOW-014`).
 - [x] Wire real reactions (`Upvote/Downvote`, `Expose/Bury`, etc.) decoupled from verdict (`FLOW-019`).
-- [ ] Add reputation model and ranking inputs (`FLOW-021`).
-- [ ] Add deterministic badge/scorecard system (`FLOW-022`).
+- [x] Add reputation model and ranking inputs (`FLOW-021`).
+- [x] Add deterministic badge/scorecard system (`FLOW-022`).
 - [x] Build unified entry timeline and timeline visualization mode (`FLOW-023`, `FLOW-028`).
 - [x] Implement backend follow/subscribe with delivery triggers (`FLOW-024`).
 - [x] Implement notification center + unread counts + deep links (`FLOW-025`).

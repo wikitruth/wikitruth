@@ -1,6 +1,6 @@
 # Validated Checklist: Core Platform (Code-Rechecked)
 
-Date validated: 2026-04-18  
+Date validated: 2026-04-18; CORE-019/CORE-025 revalidated 2026-07-12
 Validation basis: current repository code (`server/src`, `client/src`) only.
 
 Status legend:
@@ -40,7 +40,7 @@ Status legend:
 | CORE-016 | `partial` | Conversion workflow now preserves source/destination conversion metadata and history (`server/src/controllers/api/moderation.ts` `/convert-type`). | Full reversible revision graph with reviewer-approved rollback diff tooling is still not complete. |
 | CORE-017 | `not_implemented` | Edit APIs enforce owner/admin edit, not suggestion-based edits. | No restricted-entry suggestion queue, no suggestion acceptance pipeline. |
 | CORE-018 | `partial` | `Topic.sharing.users` exists in schema; moderation has take-ownership and ownership migration endpoints. | No full collaborator management UX/API (grant/revoke, audit by collaborator). |
-| CORE-019 | `not_implemented` | Create endpoints require authenticated users (`POST_*_create` controllers). | Controlled anonymous contribution flow with quotas/risk controls is absent. |
+| CORE-019 | `implemented` | `AnonymousContribution` schema/service/API plus `/contribute` and `/admin/anonymous-contributions` implement screened proposal intake, privacy-preserving rate/risk checks, receipt lookup, moderation, and authenticated adoption. | No direct anonymous publication is allowed; production enablement remains an explicit operating decision. |
 
 ## D. Review, Verdict, and Issue Engine
 
@@ -51,7 +51,7 @@ Status legend:
 | CORE-022 | `partial` | `ARGUMENT_TYPES` includes ethical/factual/prediction and `ethicalStatus` exists on schemas. | No distinct truth-vs-ethics verdict channels with dedicated UI and policy enforcement. |
 | CORE-023 | `implemented` | Reader signal model + triage queue implemented in moderation APIs and admin signal dashboard (`client/src/pages/Admin/ModerationSignals/SignalsAppealsPage.tsx`). | No critical reader-signal parity blocker remains in closure scope. |
 | CORE-024 | `implemented` | Appeal queue with review workflow and notification hooks is implemented in moderation services/UI. | No critical appeal-workflow parity blocker remains in closure scope. |
-| CORE-025 | `partial` | Archived screening status exists (`SCREENING_STATUS.status3`) and archived query support in flow utils. | No automatic unresolved-content expiry/archive scheduler with override policy. |
+| CORE-025 | `partial` | Archived screening status exists (`SCREENING_STATUS.status3`) and archived query support in flow utils. | Automatic unresolved-content expiry is explicitly deferred by product decision (2026-07-12); unresolved records remain visible for human resolution. |
 | CORE-026 | `not_implemented` | No rule enforcement found that blocks debate progression when major issues are unresolved. | Issue-first moderation gate is absent. |
 
 ## E. Artifact and Evidence Foundation
@@ -75,8 +75,8 @@ Status legend:
 
 ## Summary
 
-- `implemented`: 9
+- `implemented`: 10
 - `partial`: 17
-- `not_implemented`: 9
+- `not_implemented`: 8
 
-Primary remaining blockers outside closure scope: duplicate/merge system, full CR/revision graph, onboarding gating, and anonymous contribution workflow.
+Primary remaining blockers outside closure scope in this historical snapshot: duplicate/merge, CR/revision, and onboarding rows require broader status reconciliation; automatic expiry remains intentionally deferred.

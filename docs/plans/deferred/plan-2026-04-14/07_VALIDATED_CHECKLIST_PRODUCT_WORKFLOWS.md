@@ -1,6 +1,6 @@
 # Validated Checklist: Product Workflows (Code-Rechecked)
 
-Date validated: 2026-04-18  
+Date validated: 2026-04-18; FLOW-021/FLOW-022 revalidated 2026-07-12
 Validation basis: current repository code (`server/src`, `client/src`) only.
 
 Status legend:
@@ -47,8 +47,8 @@ Status legend:
 | --- | --- | --- | --- |
 | FLOW-019 | `implemented` | Persisted reactions now use `/api/reactions` (`server/src/controllers/api/reactions.ts`) + `Reaction` model (`server/src/models/schema/core/Reaction.ts`) and modern `EntryQuickActions` wires `Upvote/Downvote`, `Expose/Bury`, and `Good/Bad` with per-user state and counts (`client/src/components/Entry/EntryQuickActions.tsx`). | No remaining parity gap in reaction wiring; future tuning may focus on ranking/queue usage of reaction signals. |
 | FLOW-020 | `partial` | Admin verdict queue exists with filtering and batch updates. | No reviewer-priority queue scoring from votes/flags/activity signals. |
-| FLOW-021 | `not_implemented` | No reputation engine or weighted ranking model found. | Missing contributor/reviewer reputation metrics integrated into ranking. |
-| FLOW-022 | `partial` | Profile contribution counters and sections exist. | No deterministic reviewer badge system or robust contributor scorecards tied to explicit rules. |
+| FLOW-021 | `implemented` | `ReputationSnapshot` and `reputationService` calculate formula-versioned quality, participation, stewardship, and evidence signals; Explore trusted sorting combines reputation, accepted screening, and popularity. | Formula changes must remain versioned, explainable, and regression-tested. |
+| FLOW-022 | `implemented` | Deterministic badge thresholds and the `ReputationScorecard` are visible on member profiles and summarized in member lists. | Timeline badge-event presentation can be added later without blocking the scorecard feature. |
 
 ## E. Timeline, Notifications, and Follow System
 
@@ -80,8 +80,8 @@ Status legend:
 
 ## Summary
 
-- `implemented`: 15
-- `partial`: 16
-- `not_implemented`: 4
+- `implemented`: 17
+- `partial`: 15
+- `not_implemented`: 3
 
-Primary remaining workflow gaps outside closure scope: strict debate mode enforcement, reputation engine, and advanced high-scale performance controls.
+Primary remaining workflow gaps outside closure scope: strict debate mode enforcement and advanced high-scale performance controls.

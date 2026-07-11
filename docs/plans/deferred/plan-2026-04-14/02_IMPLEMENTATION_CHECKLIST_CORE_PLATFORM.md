@@ -80,8 +80,9 @@ Scope: domain model, contribution lifecycle, review/verdict mechanics, artifact 
   - Done when: owners can grant/revoke write collaboration and audit changes by collaborator.
   - Sources: `Wikitruth Tasks`.
 
-- [ ] `CORE-019` Implement controlled anonymous contribution with rate limits and anti-abuse checks.
+- [x] `CORE-019` Implement controlled anonymous contribution with rate limits and anti-abuse checks.
   - Done when: anonymous/IP contributors are constrained by quotas and risk rules.
+  - Implemented: proposal-only public intake, HMAC network identity, hourly/daily quotas, honeypot and form-age checks, duplicate fingerprints, reviewer queue, receipt status, and authenticated adoption (`ee859b32`).
   - Sources: `Backlog`, `Mechanics & Architecture`.
 
 ## D. Review, Verdict, and Issue Engine
@@ -108,6 +109,7 @@ Scope: domain model, contribution lifecycle, review/verdict mechanics, artifact 
 
 - [ ] `CORE-025` Implement unresolved-content expiry/archive policy.
   - Done when: unresolved stale items are auto-archived per policy with override capability.
+  - Deferred by explicit product decision (2026-07-12): unresolved records remain human-resolved; no automatic expiry or destructive mutation.
   - Sources: `Mechanics & Architecture`, `Development Phases`.
 
 - [ ] `CORE-026` Implement issue-first moderation gate (major issues must be resolved before continued debate).

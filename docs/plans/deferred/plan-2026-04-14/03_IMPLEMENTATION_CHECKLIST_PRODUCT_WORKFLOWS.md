@@ -90,12 +90,14 @@ Scope: reading/contribution UX, discussions, discovery/ranking, notifications, v
   - Done when: reviewer dashboards show priority-sorted review candidates.
   - Sources: `Mechanics & Architecture`, `Upvoting`, `Scenarios & Use Cases`.
 
-- [ ] `FLOW-021` Implement contributor/reviewer reputation signals and weighted ranking inputs.
+- [x] `FLOW-021` Implement contributor/reviewer reputation signals and weighted ranking inputs.
   - Done when: ranking considers reputation + content quality + screening state.
+  - Implemented: formula-versioned snapshots plus trusted Explore ranking from reputation, accepted screening, and popularity (`04d75333`).
   - Sources: `Research Features`, `Wikitruth Notes`, `Backlog`.
 
-- [ ] `FLOW-022` Implement reviewer badges and contributor profile scorecards.
+- [x] `FLOW-022` Implement reviewer badges and contributor profile scorecards.
   - Done when: badge rules are deterministic and visible in profile/timeline.
+  - Implemented: deterministic badge thresholds and four-dimension profile/member scorecards (`04d75333`).
   - Sources: `Reviewer Badges`, `Backlog`, `Wikitruth Notes`.
 
 ## E. Timeline, Notifications, and Follow System
