@@ -77,6 +77,7 @@ const fs = require('fs') as {
 };
 
 const registerAdminRoutes = require('../../server/src/controllers/api/admin');
+const { restoreDatabaseBackup } = require('../../server/src/controllers/api/adminBackupRoutes');
 
 function createApp() {
   const app = express();
@@ -160,5 +161,16 @@ describe('admin db backup restore route', () => {
     });
     expect(createTopic).toHaveBeenCalledTimes(2);
     expect(logEntryEvent).toHaveBeenCalledTimes(1);
+  });
+
+  it('parses backup JSON before deleting existing collection data', async () => {
+    fs.readFileSync.mockReturnValue('{invalid json');
+
+    await expect(restoreDatabaseBackup({
+      restorePublicData: true,
+      restorePrivateData: false,
+    })).rejects.toThrow();
+
+    expect(deleteManyTopic).not.toHaveBeenCalled();
   });
 });

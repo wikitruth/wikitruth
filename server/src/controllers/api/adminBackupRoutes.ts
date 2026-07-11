@@ -112,6 +112,12 @@ async function restoreCollectionFromDirectory(options: {
     .filter((name: string) => name.endsWith('.json'))
     .sort((a: string, b: string) => a.localeCompare(b));
 
+  // Parse the complete collection before deleting existing documents.
+  const documents = files.map((jsonFile: string) => {
+    const file = path.join(collectionDir, jsonFile);
+    return JSON.parse(fs.readFileSync(file, 'utf8')) as Record<string, unknown>;
+  });
+
   if (overwriteQuery) {
     await model.deleteMany(overwriteQuery);
   } else {
@@ -119,10 +125,7 @@ async function restoreCollectionFromDirectory(options: {
   }
 
   let restored = 0;
-  for (const jsonFile of files) {
-    const file = path.join(collectionDir, jsonFile);
-    const raw = fs.readFileSync(file, 'utf8');
-    const doc = JSON.parse(raw) as Record<string, unknown>;
+  for (const doc of documents) {
     await model.create(doc);
     restored += 1;
   }
@@ -131,10 +134,14 @@ async function restoreCollectionFromDirectory(options: {
 }
 
 function collectionHasJsonFiles(collectionDir: string): boolean {
-  if (!fs.existsSync(collectionDir)) {
+  try {
+    if (!fs.existsSync(collectionDir)) {
+      return false;
+    }
+    return fs.readdirSync(collectionDir).some((name: string) => name.endsWith('.json'));
+  } catch (_error) {
     return false;
   }
-  return fs.readdirSync(collectionDir).some((name: string) => name.endsWith('.json'));
 }
 
 export function getBootstrapBackupAvailability(): BackupAvailability {
