@@ -11,6 +11,7 @@ This plan tracks high-risk deprecated dependencies and defines a safe replacemen
 | Google auth | `passport-google-oauth20` | Replacement completed; production credentials still require live callback verification | Retain maintained OAuth 2 strategy | Keep callback routes and profile/session mapping covered by regression tests. |
 | Twitter auth | Application-owned strategy on `passport-oauth1` | Replacement completed; production credentials still require live callback verification | Retain JSON-only profile/error handling | Do not restore `passport-twitter`, `xtraverse`, or an XML parser for provider errors. |
 | Passport core | `passport@0.7.0` | Upgrade completed | Retain maintained session-regeneration behavior | Keep login/logout, social callback, CSRF, and legacy session regression tests. |
+| CSRF middleware | Application-owned HMAC double-submit protection | Replacement completed | Retain the signed-cookie and existing token transport contracts | Do not restore archived `csurf`; keep legacy forms, modern headers, monitoring exemptions, and cross-agent rejection covered. |
 | Generic OAuth adapter | No direct `passport-oauth` dependency | Removal completed | Keep provider-specific maintained strategies | Block accidental direct reintroduction. |
 | Database backup | Application-owned MongoDB-native JSON exporter | Replacement completed; archive compatibility remains operationally sensitive | Retain the service boundary and atomic collection writes | Preserve backup validation, restore preflight, progress reporting, and empty-database bootstrap behavior. |
 
@@ -65,4 +66,5 @@ This plan tracks high-risk deprecated dependencies and defines a safe replacemen
 - Backup completion and document counts are returned to the modern admin UI and included in the privileged event payload.
 - Commit `0f4ce298` removed Passport Twitter's vulnerable `xtraverse` / `xmldom` chain without removing Twitter OAuth 1 support.
 - Commit `7c51046e` upgraded Passport core to `0.7.0` and passed focused session, callback, CSRF, and legacy compatibility verification.
+- Commit `3d4ba87d` replaced archived `csurf` with an application-owned, timing-safe HMAC implementation while preserving signed cookies and all legacy/modern request token formats.
 - Remaining deprecation work is the Jade/Kraken-era template/localization chain. Keep this plan active until that compatibility migration is separately validated or legacy comparison mode is explicitly retired.
