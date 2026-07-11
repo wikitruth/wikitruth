@@ -2,14 +2,14 @@
 
 Active and historical planning documents are organized under this folder.
 
-## Pending Snapshot (2026-07-11)
+## Pending Snapshot (2026-07-12)
 
 - Active checklist backlog:
   - `docs/plans/LEGACY_MODERN_FEATURE_COMPLETENESS_AUDIT_PLAN_2026-07-11.md` open `[ ]`: **0** (verified; retained here because it records explicit deferred product decisions)
   - `docs/plans/REACT_NATIVE_MONOREPO_CHECKLIST_PLAN_2026-04-19.md` open `[ ]`: **83**
 - Active non-checklist plans (execution still pending by roadmap/wave):
-  - `docs/plans/DEPENDENCY_UPGRADE_PLAN_2026-02-24.md` (revalidated `2026-07-11`; still pending)
-  - `docs/plans/DEPRECATION_REPLACEMENT_PLAN.md` (revalidated `2026-07-11`; still pending)
+  - `docs/plans/DEPENDENCY_UPGRADE_PLAN_2026-02-24.md` (modern security/tooling waves complete; framework-major waves and legacy retirement remain)
+  - `docs/plans/DEPRECATION_REPLACEMENT_PLAN.md` (runtime deprecations complete except the retained Jade/Kraken renderer)
 - Deferred checklist backlog:
   - `docs/plans/deferred/**` open `[ ]`: **161** total
 
