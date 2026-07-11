@@ -27,6 +27,14 @@ This folder contains active engineering documentation, planning docs, and histor
 
 - Dependency docs index: `docs/dependencies/README.md`
 
+## Content Operations
+
+- Policy index: `docs/policies/README.md`
+- Duplicate and merge policy: `docs/policies/DUPLICATE_AND_MERGE_POLICY.md`
+- Source quality rubric: `docs/policies/SOURCE_QUALITY_RUBRIC.md`
+- Moderation playbook: `docs/policies/MODERATION_PLAYBOOK.md`
+- Truth and ethics verdict policy: `docs/policies/TRUTH_AND_ETHICS_VERDICT_POLICY.md`
+
 ## Frontend Docs
 
 - Frontend docs folder: `docs/frontend/`
