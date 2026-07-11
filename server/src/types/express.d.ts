@@ -8,6 +8,7 @@ declare global {
     interface Request {
       requestId?: string;
       user?: RequestContextUser;
+      csrfToken(): string;
       session: import('express-session').Session &
         Partial<WikitruthSessionData> & {
           preferences?: Record<string, unknown>;

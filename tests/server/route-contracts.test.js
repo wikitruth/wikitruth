@@ -61,7 +61,7 @@ describe('Server route contracts', function () {
 
     expect(appSource).toContain('const sessionConfig = config.session || {}');
     expect(appSource).toContain('const csrfConfig = config.csrf || {}');
-    expect(appSource).toContain('const csrfProtection = csrf({');
-    expect(appSource).toContain('return csrfProtection(req, res, next);');
+    expect(appSource).toContain('const csrfProtection = createCsrfProtection({');
+    expect(appSource).toContain('app.use(csrfProtection);');
   });
 });

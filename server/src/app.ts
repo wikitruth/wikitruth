@@ -8,6 +8,7 @@ import configureLocals from './middlewares/locals';
 import configurePassport from './middlewares/passport';
 import registerRoutes from './middlewares/routes';
 import { apiErrorHandler } from './middlewares/apiError';
+import { createCsrfProtection } from './middlewares/csrfProtection';
 
 import contents from './models/contents';
 import templates from './models/templates';
@@ -28,7 +29,6 @@ const config = require(path.join(process.cwd(), 'config/config')),
     bluebird = require('bluebird'),
     helmet = require('helmet'),
     cons = require('consolidate'),
-    csrf = require('csurf'),
     kraken = require('kraken-js');
 
 let options, app;
@@ -161,21 +161,19 @@ app.use(passport.initialize());
 app.use(passport.session());
 const csrfConfig = config.csrf || {};
 const csrfCookie = csrfConfig.cookie || {};
-const csrfProtection = csrf({
+const csrfProtection = createCsrfProtection({
     ignoreMethods: Array.isArray(csrfConfig.ignoreMethods) ? csrfConfig.ignoreMethods : ['GET', 'HEAD', 'OPTIONS'],
+    // Runtime error beacons may come from sendBeacon and cannot reliably attach CSRF headers.
+    skip: function (req) {
+        return /^\/api\/(?:v1\/)?monitoring\/(?:errors|csp)\/?$/.test(req.path);
+    },
     cookie: {
         signed: csrfCookie.signed !== false,
         secure: !!csrfCookie.secure,
         sameSite: csrfCookie.sameSite || 'lax'
     }
-}); // kraken-js:lusca is already using csrf module
-app.use(function (req: import('express').Request, res: import('express').Response, next: import('express').NextFunction) {
-    // Runtime error beacons may come from sendBeacon and cannot reliably attach CSRF headers.
-    if (/^\/api\/(?:v1\/)?monitoring\/(?:errors|csp)\/?$/.test(req.path)) {
-        return next();
-    }
-    return csrfProtection(req, res, next);
 });
+app.use(csrfProtection);
 
 // setup response locals
 configureLocals(app, passport);
