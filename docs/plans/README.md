@@ -5,7 +5,7 @@ Active and historical planning documents are organized under this folder.
 ## Pending Snapshot (2026-07-11)
 
 - Active checklist backlog:
-  - `docs/plans/LEGACY_MODERN_FEATURE_COMPLETENESS_AUDIT_PLAN_2026-07-11.md` open `[ ]`: **5**
+  - `docs/plans/LEGACY_MODERN_FEATURE_COMPLETENESS_AUDIT_PLAN_2026-07-11.md` open `[ ]`: **2**
   - `docs/plans/REACT_NATIVE_MONOREPO_CHECKLIST_PLAN_2026-04-19.md` open `[ ]`: **83**
 - Active non-checklist plans (execution still pending by roadmap/wave):
   - `docs/plans/DEPENDENCY_UPGRADE_PLAN_2026-02-24.md` (revalidated `2026-07-11`; still pending)

@@ -91,9 +91,9 @@ The following remain genuinely pending after current-code searches. Detailed req
 - [x] Artifact subtype taxonomy, internal/external evidence modes, provenance, and source-quality review (`CORE-027` through `CORE-029`).
 - [x] Tamper-evident privileged audit events and verification tooling (`CORE-034`).
 - [x] Revision-linked comment context, supersession flags, and reasoned relevance decisions (`FLOW-010`).
-- [ ] Content policy packs, reviewer/screener playbooks, source-quality rubric, and seeded pilot evidence (`CONTENT-001` through `CONTENT-020`, as applicable).
-- [ ] Dedicated FixPH information architecture, government/accountability/location models, Vote Wisely workspace, and incident lifecycle (`FIXPH-001` through `FIXPH-008`).
-- [ ] React Native monorepo implementation and mobile release validation.
+- [x] Content policy packs, reviewer/screener playbooks, source-quality rubric, and seeded live pilot evidence (`CONTENT-001` through `CONTENT-020`, as applicable).
+- Separate program: dedicated FixPH information architecture, government/accountability/location models, Vote Wisely workspace, and incident lifecycle (`FIXPH-001` through `FIXPH-008`).
+- Separate program: React Native monorepo implementation and mobile release validation.
 
 ### Implementation Progress (2026-07-11)
 
@@ -103,7 +103,7 @@ The following remain genuinely pending after current-code searches. Detailed req
 - `a71847d3` added backward-compatible artifact taxonomy and provenance, five-dimension source-quality review, independently queryable factual and ethical verdict channels, atomic dual-channel updates, revision capture, privileged audit evidence, and modern review UI.
 - `4290c1dc` added policy-versioned contributor/reviewer onboarding, new-user and future-promotion gates, account completion UI, role-switch filtering, server-side entry-write enforcement, reviewer-decision enforcement, and role/onboarding audit evidence. Existing role holders remain grandfathered for compatibility.
 - `c80c7ac7` added direct issue targeting across entry families, accepted-critical issue gates for discussion and final factual verdicts, reasoned reviewer resolution, audited administrator override, revision-linked comment context, automatic supersession warnings, and reviewer relevance decisions without deleting history.
-- The content-policy item remains open only for seeded pilot execution and evidence; the policy pack and reviewer/screener playbook documents are implemented.
+- `9c545f2d` added and executed the read-only live content-policy pilot across all seven entry families, retaining a redacted manifest and an operational adoption queue without bulk-mutating legacy records.
 
 ### Explicitly Deferred Product Decisions
 
