@@ -13,6 +13,7 @@ import * as opinionsService from '../../services/opinionsService';
 import { applyViewModeFilter } from './viewFilter';
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 import { logEntryEvent } from '../../services/entryEventsService';
+import { rejectBlockingDuplicate } from './duplicateWriteGuard';
 import { notifySubscribers } from '../../services/notificationsService';
 import { applyLegacyEntryContext, resolveLegacyEntryContext } from './entryContext';
 
@@ -157,14 +158,6 @@ function normalizeOpinionClassification(value: unknown): 'supplement' | 'objecti
   }
 }
 
-function normalizeTextForSimilarity(value: string): string {
-  return String(value || '')
-    .toLowerCase()
-    .replace(/<[^>]*>/g, ' ')
-    .replace(/[\s\W_]+/g, ' ')
-    .trim();
-}
-
 async function POST_opinion_create(req: WikitruthRequest, res: WikitruthResponse) {
   if (!req.user) {
     return res.status(401).json({ error: 'Authentication required' });
@@ -216,25 +209,12 @@ async function POST_opinion_create(req: WikitruthRequest, res: WikitruthResponse
 
   // Thread quality guardrails: prevent repetitive duplicate posts and posting spikes in the same thread.
   const recentWindowStart = new Date(Date.now() - 10 * 60 * 1000);
-  const lastDayWindowStart = new Date(Date.now() - 24 * 60 * 60 * 1000);
-  const [recentCount, recentEntries] = await Promise.all([
-    db.Opinion.countDocuments({
-      createUserId: req.user._id,
-      ownerId: ownerId,
-      parentId: parentId,
-      createDate: { $gte: recentWindowStart },
-    }),
-    db.Opinion.find({
-      createUserId: req.user._id,
-      ownerId: ownerId,
-      parentId: parentId,
-      createDate: { $gte: lastDayWindowStart },
-    })
-      .sort({ createDate: -1 })
-      .limit(50)
-      .select('title content')
-      .lean(),
-  ]);
+  const recentCount = await db.Opinion.countDocuments({
+    createUserId: req.user._id,
+    ownerId: ownerId,
+    parentId: parentId,
+    createDate: { $gte: recentWindowStart },
+  });
 
   if (recentCount >= 8) {
     return res.status(429).json({
@@ -242,16 +222,16 @@ async function POST_opinion_create(req: WikitruthRequest, res: WikitruthResponse
     });
   }
 
-  const incomingNormalized = normalizeTextForSimilarity(`${title} ${description}`);
-  const duplicateFound = recentEntries.some((entry: Record<string, unknown>) => {
-    const existingNormalized = normalizeTextForSimilarity(`${entry?.title || ''} ${entry?.content || ''}`);
-    return existingNormalized && existingNormalized === incomingNormalized;
-  });
-
-  if (duplicateFound) {
-    return res.status(409).json({
-      error: 'Duplicate comment detected in this thread. Please edit your existing comment instead.',
-    });
+  if (await rejectBlockingDuplicate(res, constants.OBJECT_TYPES.opinion, {
+    title,
+    content: description,
+    ownerType,
+    ownerId,
+    parentId,
+    private: isPrivate,
+    groupId: null,
+  })) {
+    return;
   }
 
   const now = new Date();

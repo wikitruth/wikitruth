@@ -2,6 +2,7 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import moderationApi, { type ModerationEntry, type ModerationStatusOption, type ModerationTarget } from '../../../services/api/moderation';
 import { useAuth } from '../../../context/AuthContext';
+import DuplicateReviewPanel from './DuplicateReviewPanel';
 
 const TARGET_KEYS = ['topic', 'topicLink', 'argument', 'argumentLink', 'artifact', 'question', 'answer', 'issue', 'opinion'] as const;
 
@@ -29,7 +30,8 @@ const ScreeningPage: React.FC = () => {
   const [error, setError] = React.useState<string | null>(null);
 
   const target = React.useMemo(() => getTargetFromSearch(location.search), [location.search]);
-  const canModerate = Boolean(user?.roles?.screener || user?.roles?.admin);
+  const canModerate = Boolean(user?.roles?.screener || user?.roles?.reviewer || user?.roles?.admin);
+  const canScreen = Boolean(user?.roles?.screener || user?.roles?.admin);
 
   React.useEffect(() => {
     const fetchData = async () => {
@@ -116,6 +118,7 @@ const ScreeningPage: React.FC = () => {
                 className="form-control"
                 value={String(selectedStatus)}
                 onChange={(event) => setSelectedStatus(Number(event.target.value))}
+                disabled={!canScreen}
               >
                 {statuses.map((status) => (
                   <option key={status.code} value={String(status.code)}>
@@ -125,7 +128,10 @@ const ScreeningPage: React.FC = () => {
               </select>
             </div>
             {message ? <div className="alert alert-success">{message}</div> : null}
-            <button className="btn btn-primary" type="submit" disabled={isSaving}>
+            {!canScreen ? (
+              <p className="text-muted">Reviewer access can evaluate duplicates; screening status requires screener or admin access.</p>
+            ) : null}
+            <button className="btn btn-primary" type="submit" disabled={isSaving || !canScreen}>
               {isSaving ? 'Saving...' : 'Save Screening Status'}
             </button>{' '}
             <button className="btn btn-default" type="button" onClick={() => navigate(-1)}>
@@ -134,6 +140,7 @@ const ScreeningPage: React.FC = () => {
           </div>
         </form>
       ) : null}
+      {!isLoading && !error && target && entry ? <DuplicateReviewPanel entry={entry} target={target} /> : null}
     </div>
   );
 };

@@ -67,6 +67,14 @@ function ensureReviewerOrAdmin(req: WikitruthRequest, res: WikitruthResponse): b
   return false;
 }
 
+function ensureModerator(req: WikitruthRequest, res: WikitruthResponse): boolean {
+  if (canPlayRole(req, 'screener') || canPlayRole(req, 'reviewer') || canPlayRole(req, 'admin')) {
+    return true;
+  }
+  res.status(403).json({ success: false, message: 'Screener, reviewer, or admin privileges required' });
+  return false;
+}
+
 function getDbModelByObjectType(objectType: number): Record<string, any> {
   return flowUtils.getDbModelByObjectType(objectType);
 }
@@ -357,6 +365,7 @@ export {
   ensureScreenerOrAdmin,
   ensureAdmin,
   ensureReviewerOrAdmin,
+  ensureModerator,
   parseModerationTarget,
   getDbModelByObjectType,
   getScreeningStatuses,

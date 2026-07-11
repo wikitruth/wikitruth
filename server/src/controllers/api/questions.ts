@@ -14,6 +14,7 @@ import constantsMod from '../../models/constants';
 const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
 const constants = constantsMod as unknown as WikitruthConstants;
 import * as utils from '../../utils/utils';
+import { rejectBlockingDuplicate } from './duplicateWriteGuard';
 import * as questionsService from '../../services/questionsService';
 import { applyLegacyEntryContext, resolveLegacyEntryContext } from './entryContext';
 
@@ -219,6 +220,17 @@ async function POST_question_create(req: WikitruthRequest, res: WikitruthRespons
 
   if (!description || description.length < 10) {
     return res.status(400).json({ error: 'Description must be at least 10 characters' });
+  }
+
+  if (await rejectBlockingDuplicate(res, constants.OBJECT_TYPES.question, {
+    title,
+    content: description,
+    ownerType,
+    ownerId,
+    groupId,
+    private: isPrivate || Boolean(groupId),
+  })) {
+    return;
   }
 
   const now = new Date();

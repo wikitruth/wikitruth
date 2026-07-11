@@ -30,6 +30,8 @@ import attachNotifications from './notifications';
 import attachTimeline from './timeline';
 import attachInstall from './install';
 import attachPages from './pages';
+import { registerEntryRedirectMiddleware } from './entryRedirectMiddleware';
+import constants from '../../models/constants';
 
 export = function (router: Router) {
   router.use(apiError.apiEnvelopeMiddleware);
@@ -61,6 +63,13 @@ export = function (router: Router) {
   const pagesRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
 
   attachHome(homeRouter);
+  registerEntryRedirectMiddleware(topicsRouter, constants.OBJECT_TYPES.topic);
+  registerEntryRedirectMiddleware(argumentsRouter, constants.OBJECT_TYPES.argument);
+  registerEntryRedirectMiddleware(questionsRouter, constants.OBJECT_TYPES.question);
+  registerEntryRedirectMiddleware(answersRouter, constants.OBJECT_TYPES.answer);
+  registerEntryRedirectMiddleware(issuesRouter, constants.OBJECT_TYPES.issue);
+  registerEntryRedirectMiddleware(opinionsRouter, constants.OBJECT_TYPES.opinion);
+  registerEntryRedirectMiddleware(artifactsRouter, constants.OBJECT_TYPES.artifact);
   attachTopics(topicsRouter);
   attachArguments(argumentsRouter);
   attachQuestions(questionsRouter);

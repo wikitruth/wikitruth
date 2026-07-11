@@ -33,6 +33,7 @@ export = function (app: Application, mongoose: Mongoose) {
   require('./core/Group')(app, mongoose);
   require('./core/Reaction')(app, mongoose);
   require('./core/EntryEvent')(app, mongoose);
+  require('./core/EntryRedirect')(app, mongoose);
   require('./core/VerdictVote')(app, mongoose);
   require('./core/ReaderSignal')(app, mongoose);
   require('./core/Appeal')(app, mongoose);

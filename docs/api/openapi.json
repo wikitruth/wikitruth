@@ -2521,6 +2521,53 @@
         }
       }
     },
+    "/moderation/duplicates": {
+      "get": {
+        "summary": "List deterministic duplicate candidates in the same entry scope",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/moderation/merge": {
+      "post": {
+        "summary": "Merge a duplicate source entry into an approved target",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericMutationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Merged",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Merge conflict or stale preview"
+          }
+        }
+      }
+    },
     "/moderation/screening": {
       "put": {
         "summary": "Update screening status for an entry target",

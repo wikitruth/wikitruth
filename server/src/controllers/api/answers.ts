@@ -10,6 +10,7 @@ import constantsMod from '../../models/constants';
 const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
 const constants = constantsMod as unknown as ConstantsModule;
 import * as utils from '../../utils/utils';
+import { rejectBlockingDuplicate } from './duplicateWriteGuard';
 import * as answersService from '../../services/answersService';
 import { applyViewModeFilter } from './viewFilter';
 import { applyLegacyEntryContext, resolveLegacyEntryContext } from './entryContext';
@@ -151,6 +152,16 @@ async function POST_answer_create(req: WikitruthRequest, res: WikitruthResponse)
 
   if (!questionId) {
     return res.status(400).json({ error: 'Question ID is required' });
+  }
+
+  if (await rejectBlockingDuplicate(res, constants.OBJECT_TYPES.answer, {
+    title,
+    content: description,
+    questionId,
+    private: isPrivate,
+    groupId: null,
+  })) {
+    return;
   }
 
   const now = new Date();

@@ -13,6 +13,7 @@ import * as issuesService from '../../services/issuesService';
 import { applyViewModeFilter } from './viewFilter';
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 import { logEntryEvent } from '../../services/entryEventsService';
+import { rejectBlockingDuplicate } from './duplicateWriteGuard';
 import { notifySubscribers } from '../../services/notificationsService';
 import { applyLegacyEntryContext, resolveLegacyEntryContext } from './entryContext';
 
@@ -150,6 +151,17 @@ async function POST_issue_create(req: WikitruthRequest, res: WikitruthResponse) 
 
   if (!description || description.length < 10) {
     return res.status(400).json({ error: 'Description must be at least 10 characters' });
+  }
+
+  if (await rejectBlockingDuplicate(res, constants.OBJECT_TYPES.issue, {
+    title,
+    content: description,
+    ownerType: constants.OBJECT_TYPES.topic,
+    ownerId,
+    private: isPrivate,
+    groupId: null,
+  })) {
+    return;
   }
 
   const now = new Date();

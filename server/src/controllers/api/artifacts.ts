@@ -17,6 +17,7 @@ import {
   type ArtifactFilePayload,
 } from '../../services/artifactFileService';
 import { parseBoolean, parseNumericTags } from './entryWriteHelpers';
+import { rejectBlockingDuplicate } from './duplicateWriteGuard';
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 export = function (router: Router) {
   // GET /api/artifacts - List artifacts
@@ -185,6 +186,18 @@ async function POST_artifact_create(req: WikitruthRequest, res: WikitruthRespons
 
   if (!description || description.length < 10) {
     return res.status(400).json({ error: 'Description must be at least 10 characters' });
+  }
+
+  if (await rejectBlockingDuplicate(res, constants.OBJECT_TYPES.artifact, {
+    title,
+    content: description,
+    ownerType,
+    ownerId,
+    parentId,
+    groupId,
+    private: isPrivate || Boolean(groupId),
+  })) {
+    return;
   }
 
   const now = new Date();

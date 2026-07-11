@@ -16,6 +16,7 @@ import constants from '../../models/constants';
 import {
   db,
   ensureScreenerOrAdmin,
+  ensureModerator,
   ensureAdmin,
   parseModerationTarget,
   getDbModelByObjectType,
@@ -34,10 +35,12 @@ import {
   buildVoteSummary,
 } from './moderationShared';
 import { registerModerationSignalsRoutes } from './moderationSignalsRoutes';
+import { registerModerationDuplicateRoutes } from './moderationDuplicateRoutes';
 
 export = function (router: Router) {
+  registerModerationDuplicateRoutes(router);
   router.get('/entry', async function (req: WikitruthRequest, res: WikitruthResponse) {
-    if (!ensureScreenerOrAdmin(req, res)) {
+    if (!ensureModerator(req, res)) {
       return;
     }
 

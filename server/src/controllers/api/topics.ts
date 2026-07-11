@@ -5,6 +5,7 @@ import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 import { applyViewModeFilter } from './viewFilter';
 import { parseNumericTags, parseOptionalDate } from './entryWriteHelpers';
+import { rejectBlockingDuplicate } from './duplicateWriteGuard';
 
 import * as flowUtilsNs from '../../utils/flowUtils';
 import appModForDb from '../../app';
@@ -193,6 +194,19 @@ async function POST_topic_create(req: WikitruthRequest, res: WikitruthResponse) 
 
   if (!description || description.length < 10) {
     return res.status(400).json({ error: 'Description must be at least 10 characters' });
+  }
+
+  if (await rejectBlockingDuplicate(res, constants.OBJECT_TYPES.topic, {
+    title,
+    content: description,
+    parentId,
+    categoryId,
+    ownerId,
+    ownerType,
+    groupId,
+    private: isPrivate || Boolean(groupId),
+  })) {
+    return;
   }
 
   const tags = parseNumericTags(tagsValue);

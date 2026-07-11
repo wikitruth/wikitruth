@@ -5,6 +5,7 @@ import appModForDb from '../../app';
 import constantsMod from '../../models/constants';
 import * as utils from '../../utils/utils';
 import { parseNumericTags, parseOptionalDate } from './entryWriteHelpers';
+import { rejectBlockingDuplicate } from './duplicateWriteGuard';
 
 const constants = constantsMod as unknown as WikitruthConstants;
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
@@ -58,6 +59,18 @@ export async function createArgument(req: WikitruthRequest, res: WikitruthRespon
 
   if (!description || description.length < 20) {
     return res.status(400).json({ error: 'Description must be at least 20 characters' });
+  }
+
+  if (await rejectBlockingDuplicate(res, constants.OBJECT_TYPES.argument, {
+    title,
+    content: description,
+    ownerType,
+    ownerId,
+    parentId,
+    groupId,
+    private: isPrivate || Boolean(groupId),
+  })) {
+    return;
   }
 
   const now = new Date();

@@ -144,6 +144,29 @@ interface VerdictVotesListResponse {
   };
 }
 
+export interface DuplicateCandidate {
+  id: string;
+  title: string;
+  editDate: string | null;
+  rule: 'exact_title' | 'exact_content' | 'near_title';
+  score: number;
+}
+
+interface DuplicateCandidatesResponse {
+  success: boolean;
+  candidates: DuplicateCandidate[];
+}
+
+interface MergeResponse {
+  success: boolean;
+  merge: {
+    source: { objectType: number; id: string };
+    target: { objectType: number; id: string; path: string };
+    movedRelationships: Record<string, number>;
+    redirectId: string;
+  };
+}
+
 const getCsrfToken = (): string | null => {
   if (typeof document === 'undefined') {
     return null;
@@ -185,6 +208,20 @@ export const moderationApi = {
     request<ModerationMutationResponse>(`/moderation/screening?${toQuery(target)}`, {
       method: 'PUT',
       body: JSON.stringify({ status }),
+    }),
+  listDuplicates: (target: ModerationTarget) =>
+    request<DuplicateCandidatesResponse>(`/moderation/duplicates?${toQuery(target)}`),
+  mergeDuplicate: (payload: {
+    objectType: number;
+    sourceId: string;
+    targetId: string;
+    sourceEditDate?: string;
+    targetEditDate?: string | null;
+    reason: string;
+  }) =>
+    request<MergeResponse>('/moderation/merge', {
+      method: 'POST',
+      body: JSON.stringify(payload),
     }),
   updateVerdict: (target: ModerationTarget, status: number) =>
     request<ModerationMutationResponse>(`/moderation/verdict?${toQuery(target)}`, {
