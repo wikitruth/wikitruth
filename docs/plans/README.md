@@ -2,10 +2,9 @@
 
 Active and historical planning documents are organized under this folder.
 
-## Pending Snapshot (2026-05-18)
+## Pending Snapshot (2026-07-11)
 
 - Active checklist backlog:
-  - `docs/plans/LEGACY_MODERN_MIGRATION_PARITY_AUDIT_CHECKLIST_PLAN_2026-04-19.md` open `[ ]`: **13**
   - `docs/plans/REACT_NATIVE_MONOREPO_CHECKLIST_PLAN_2026-04-19.md` open `[ ]`: **83**
 - Active non-checklist plans (execution still pending by roadmap/wave):
   - `docs/plans/DEPENDENCY_UPGRADE_PLAN_2026-02-24.md` (revalidated `2026-05-18`; still pending)
@@ -17,7 +16,6 @@ Active and historical planning documents are organized under this folder.
 
 - `docs/plans/DEPENDENCY_UPGRADE_PLAN_2026-02-24.md`
 - `docs/plans/DEPRECATION_REPLACEMENT_PLAN.md`
-- `docs/plans/LEGACY_MODERN_MIGRATION_PARITY_AUDIT_CHECKLIST_PLAN_2026-04-19.md`
 - `docs/plans/REACT_NATIVE_MONOREPO_CHECKLIST_PLAN_2026-04-19.md`
 
 ## Completed Plans
@@ -28,6 +26,7 @@ Active and historical planning documents are organized under this folder.
 - `docs/plans/completed/LEGACY_MODERN_URL_FORMAT_DRIFT_CHECKLIST_PLAN_2026-04-22.md`
 - `docs/plans/completed/LEGACY_COMPATIBILITY_ISOLATION_CHECKLIST_PLAN_2026-04-18.md`
 - `docs/plans/completed/LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md`
+- `docs/plans/completed/LEGACY_MODERN_MIGRATION_PARITY_AUDIT_CHECKLIST_PLAN_2026-04-19.md`
 - `docs/plans/completed/MIGRATION_COMPLETION_PLAN_2026-04-12.md`
 
 ## Deferred Plans

@@ -10,6 +10,7 @@ Historical planning and execution trackers that are fully completed.
 - `docs/plans/completed/LEGACY_MODERN_PARITY_IMPLEMENTATION_PLAN_2026-02-26.md`
 - `docs/plans/completed/LEGACY_COMPATIBILITY_ISOLATION_CHECKLIST_PLAN_2026-04-18.md`
 - `docs/plans/completed/LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md`
+- `docs/plans/completed/LEGACY_MODERN_MIGRATION_PARITY_AUDIT_CHECKLIST_PLAN_2026-04-19.md`
 - `docs/plans/completed/LEGACY_MODERN_URL_FORMAT_DRIFT_CHECKLIST_PLAN_2026-04-22.md`
 - `docs/plans/completed/MIGRATION_PLAN.md`
 - `docs/plans/completed/MIGRATION_CHECKLIST.md`

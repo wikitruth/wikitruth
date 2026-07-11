@@ -35,7 +35,7 @@ Audit references used for this pass:
 ### Status Legend
 
 - `[x]` Present in modern code and appears parity-aligned at code level
-- `[ ]` Missing, partial, or needs runtime parity validation
+- `open` Missing, partial, or needs runtime parity validation
 
 ## Route Ownership Snapshot
 
@@ -295,3 +295,16 @@ Use this matrix to complete runtime parity sign-off after code-level review:
 - `[x]` Group runtime parity uses `scripts/qa/parity-group-fixture.mjs` to create and clean a marked temporary public group; the screenshot runner now covers entry/posts/members and rejects HTTP error pages.
 - `[x]` Final screenshot matrix at `docs/qa/artifacts/parity-screenshots-2026-07-11-final/manifest.json` recorded `200/200` for all 11 modern/legacy pairs and left zero fixture records.
 - `[x]` Legacy group overview/posts compatibility was updated from obsolete callback calls to Promise-based utilities and current `groupId` ownership filters.
+
+## Formal Completion Verification (2026-07-11)
+
+- `[x]` Separate committed-tree verification pass completed after all implementation groups.
+- `[x]` Server suite: `32` suites, `153` tests passed.
+- `[x]` Client suite: `54` suites, `135` tests passed.
+- `[x]` `npm run build` passed for server and production client bundles.
+- `[x]` Modern and legacy TypeScript checks passed.
+- `[x]` File-size budget and documentation drift checks passed.
+- `[x]` Full lint completed with zero errors (`25` pre-existing hook/unused warnings remain).
+- `[x]` PM2 process `wikitruth` is online after restart; `/api/home` returns HTTP `200`.
+- `[x]` Deterministic group fixture browser matrix passed and cleanup verification found zero remaining fixtures.
+- `[x]` No pending or deferred checklist items remain in this plan.
