@@ -69,7 +69,7 @@ const ArgumentEntryPage: React.FC = () => {
     const entry = (data?.entry || null) as LegacyEntity | null;
     if (entry?.objectName === 'argumentLink') {
       setLinkTitleDraft(String(entry.title || ''));
-      setSupportsParent(!Boolean(entry.against));
+      setSupportsParent(!entry.against);
     } else {
       setLinkTitleDraft('');
       setSupportsParent(true);
@@ -91,7 +91,7 @@ const ArgumentEntryPage: React.FC = () => {
   const opinions = (data.opinions || []) as LegacyEntity[];
   const entryObjectName = String(entry.objectName || argument.objectName || 'argument').trim() || 'argument';
   const isArgumentLinkEntry = entryObjectName === 'argumentLink';
-  const quickActionObjectName: 'argument' = 'argument';
+  const quickActionObjectName = 'argument' as const;
   
   // Build breadcrumb items
   const breadcrumbItems = buildLegacyEntryBreadcrumb(argument, 'argument', {

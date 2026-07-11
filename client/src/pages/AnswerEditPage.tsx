@@ -62,14 +62,15 @@ const AnswerEditPage: React.FC = () => {
     try {
       setSaving(true);
       setError(null);
-      await apiService.updateAnswer(id, {
+      const response = await apiService.updateAnswer(id, {
         title,
         description,
         questionId,
         references,
         private: isPrivate,
       });
-      navigate('/answers');
+      const answer = response?.answer;
+      navigate(answer?._id ? `/answers/entry/${encodeURIComponent(String(answer._id))}` : '/answers');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update answer');
     } finally {
@@ -99,7 +100,8 @@ const AnswerEditPage: React.FC = () => {
             <div className="form-group" style={{ marginTop: '20px' }}>
               <Button type="submit" variant="primary" disabled={saving} icon={saving ? 'spinner fa-spin' : 'check'}>
                 {saving ? 'Saving...' : 'Save Changes'}
-              </Button>
+              </Button>{' '}
+              <Button type="button" variant="default" disabled={saving} icon="times" onClick={() => navigate(-1)}>Cancel</Button>
             </div>
           </form>
         </div>

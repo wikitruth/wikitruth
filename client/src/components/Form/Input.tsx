@@ -3,7 +3,7 @@ import React from 'react';
 interface InputProps {
   id?: string;
   name: string;
-  type?: 'text' | 'email' | 'password' | 'number' | 'url' | 'tel' | 'search';
+  type?: 'text' | 'email' | 'password' | 'number' | 'url' | 'tel' | 'search' | 'date' | 'datetime-local';
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;

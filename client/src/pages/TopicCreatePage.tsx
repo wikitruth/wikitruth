@@ -4,8 +4,9 @@ import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
 import Input from '../components/Form/Input';
 import RichTextEditor from '../components/Form/RichTextEditor';
-import Select from '../components/Form/Select';
+import TextArea from '../components/Form/TextArea';
 import Checkbox from '../components/Form/Checkbox';
+import NumericTagCheckboxes from '../components/Form/NumericTagCheckboxes';
 import Button from '../components/common/Button';
 import Alert from '../components/common/Alert';
 import PageMeta from '../components/common/PageMeta';
@@ -14,6 +15,8 @@ import apiService from '../services/api';
 import { trackEvent } from '../utils/analytics';
 import { useNotification } from '../context/NotificationContext';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { TOPIC_TAG_OPTIONS } from '../constants/entryFormOptions';
+import { toDateTimeLocal } from '../utils/formDates';
 
 interface TopicFormValues {
   title: string;
@@ -21,6 +24,11 @@ interface TopicFormValues {
   category: string;
   private: boolean;
   tags: string;
+  contextTitle: string;
+  references: string;
+  referenceDate: string;
+  hasEthicalValue: boolean;
+  icon: string;
 }
 
 const TopicCreatePage: React.FC = () => {
@@ -52,10 +60,6 @@ const TopicCreatePage: React.FC = () => {
       errors.description = 'Description must be at least 10 characters';
     }
 
-    if (!isEditMode && !values.category) {
-      errors.category = 'Category is required';
-    }
-
     return errors;
   };
 
@@ -68,8 +72,15 @@ const TopicCreatePage: React.FC = () => {
         const response = await apiService.updateTopic(editId, {
           title: values.title,
           description: values.description,
-          topicId: values.category || undefined,
+          topicId: values.category,
+          parentId: values.category,
           private: values.private,
+          contextTitle: values.contextTitle,
+          references: values.references,
+          referenceDate: values.referenceDate,
+          tags: values.tags,
+          hasEthicalValue: values.hasEthicalValue,
+          icon: values.icon,
         });
         const updatedTopic = response?.topic;
         trackEvent('update_topic', 'content', values.title);
@@ -92,6 +103,12 @@ const TopicCreatePage: React.FC = () => {
         private: values.private,
         tags: values.tags,
         groupId: groupId,
+        parentId: values.category || undefined,
+        contextTitle: values.contextTitle,
+        references: values.references,
+        referenceDate: values.referenceDate,
+        hasEthicalValue: values.hasEthicalValue,
+        icon: values.icon,
       });
       const createdTopic = response?.topic as { _id?: unknown; friendlyUrl?: unknown } | undefined;
 
@@ -130,6 +147,11 @@ const TopicCreatePage: React.FC = () => {
       category: parentTopicFromQuery,
       private: false,
       tags: '',
+      contextTitle: '',
+      references: '',
+      referenceDate: '',
+      hasEthicalValue: false,
+      icon: '',
     },
     onSubmit: handleSubmit,
     validate,
@@ -154,6 +176,11 @@ const TopicCreatePage: React.FC = () => {
         setFieldValue('category', String(topic.parentId || topic.ownerId || ''));
         setFieldValue('private', Boolean(topic.private));
         setFieldValue('tags', Array.isArray(topic.tags) ? topic.tags.join(', ') : '');
+        setFieldValue('contextTitle', String(topic.contextTitle || ''));
+        setFieldValue('references', String(topic.references || ''));
+        setFieldValue('referenceDate', toDateTimeLocal(topic.referenceDate));
+        setFieldValue('hasEthicalValue', Boolean((topic.ethicalStatus as { hasValue?: unknown } | undefined)?.hasValue));
+        setFieldValue('icon', String(topic.icon || ''));
       } catch (error) {
         const msg = error instanceof Error ? error.message : 'Failed to load topic';
         setSubmitError(msg);
@@ -177,7 +204,7 @@ const TopicCreatePage: React.FC = () => {
 
   return (
     <div>
-      <PageMeta title="Create Topic" description="Share a new topic for discussion and exploration" />
+      <PageMeta title={isEditMode ? 'Edit Topic' : 'Create Topic'} description="Share a new topic for discussion and exploration" />
       <Breadcrumb items={breadcrumbItems} />
       
       <PageHeader
@@ -189,7 +216,7 @@ const TopicCreatePage: React.FC = () => {
 
       {submitSuccess && (
         <Alert type="success">
-          {isEditMode ? 'Topic updated successfully! Redirecting...' : 'Topic created successfully! Redirecting to topics list...'}
+          {isEditMode ? 'Topic updated successfully! Redirecting...' : 'Topic created successfully! Redirecting...'}
         </Alert>
       )}
 
@@ -220,6 +247,15 @@ const TopicCreatePage: React.FC = () => {
               maxLength={200}
             />
 
+            <Input
+              name="contextTitle"
+              label="Contextual title (optional)"
+              value={values.contextTitle}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              placeholder="A shorter title when shown under its parent"
+            />
+
             <RichTextEditor
               name="description"
               label="Description"
@@ -231,32 +267,55 @@ const TopicCreatePage: React.FC = () => {
               error={touched.description ? errors.description : undefined}
             />
 
-            <Select
-              name="category"
-              label="Category"
-              value={values.category}
+            <TextArea
+              name="references"
+              label="Sources (optional)"
+              value={values.references}
               onChange={handleChange}
               onBlur={handleBlur}
-              placeholder="Select a category"
-              required
-              options={[
-                { value: 'truth-reality', label: 'Truth & Reality' },
-                { value: 'religion-worldviews', label: 'Religion & Worldviews' },
-                { value: 'morality-ethics', label: 'Morality & Ethics' },
-                { value: 'science-technology', label: 'Science & Technology' },
-                { value: 'politics-society', label: 'Politics & Society' },
-                { value: 'other', label: 'Other' },
-              ]}
-              error={touched.category ? errors.category : undefined}
+              placeholder="List source URLs or citations"
+              rows={3}
             />
 
             <Input
-              name="tags"
-              label="Tags"
-              value={values.tags}
+              name="category"
+              label="Parent topic ID (optional)"
+              value={values.category}
               onChange={handleChange}
               onBlur={handleBlur}
-              placeholder="Enter tags separated by commas (e.g., philosophy, ethics, morality)"
+              placeholder="Attach this topic below another topic"
+            />
+
+            <Input
+              name="referenceDate"
+              type="datetime-local"
+              label="Reference date (optional)"
+              value={values.referenceDate}
+              onChange={handleChange}
+              onBlur={handleBlur}
+            />
+
+            <NumericTagCheckboxes
+              name="topicTags"
+              value={values.tags}
+              options={TOPIC_TAG_OPTIONS}
+              onChange={(tags) => setFieldValue('tags', tags)}
+            />
+
+            <Checkbox
+              name="hasEthicalValue"
+              label="Contains moral, ethical, or aesthetic value"
+              checked={values.hasEthicalValue}
+              onChange={handleChange}
+            />
+
+            <Input
+              name="icon"
+              label="Icon (optional)"
+              value={values.icon}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              placeholder="Font Awesome icon name, for example globe"
             />
 
             <Checkbox
@@ -280,7 +339,7 @@ const TopicCreatePage: React.FC = () => {
               <Button
                 type="button"
                 variant="default"
-                onClick={() => navigate('/topics')}
+                onClick={() => isEditMode ? navigate(-1) : navigate('/topics')}
                 disabled={isSubmitting}
                 icon="times"
               >
@@ -301,8 +360,8 @@ const TopicCreatePage: React.FC = () => {
           <ul>
             <li>Choose a clear and descriptive title that summarizes the topic</li>
             <li>Provide enough context in the description for others to understand</li>
-            <li>Select the most appropriate category for your topic</li>
-            <li>Use relevant tags to help others discover your topic</li>
+            <li>Attach the topic to its parent unless you are creating an approved root category</li>
+            <li>Use the structured topic tags to describe its role</li>
             <li>Be respectful and follow community guidelines</li>
           </ul>
         </div>

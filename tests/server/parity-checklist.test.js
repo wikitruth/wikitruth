@@ -86,4 +86,29 @@ describe('Parity checklist guardrails', function () {
     expect(sidebar).toContain("title: 'Groups'");
     expect(sidebar).toContain('topicContext.parentSiblings');
   });
+
+  it('keeps legacy create and edit metadata wired through modern forms and APIs', function () {
+    const topicForm = read('client/src/pages/TopicCreatePage.tsx');
+    const argumentForm = read('client/src/pages/ArgumentCreatePage.tsx');
+    const artifactForm = read('client/src/pages/ArtifactCreatePage.tsx');
+    const topicsApi = read('server/src/controllers/api/topics.ts');
+    const argumentsApi = read('server/src/controllers/api/arguments.ts');
+    const argumentWrites = read('server/src/controllers/api/argumentWrites.ts');
+    const artifactsApi = read('server/src/controllers/api/artifacts.ts');
+    const opinionsApi = read('server/src/controllers/api/opinions.ts');
+
+    expect(topicForm).toContain('contextTitle');
+    expect(topicForm).toContain('referenceDate');
+    expect(topicForm).toContain('TOPIC_TAG_OPTIONS');
+    expect(argumentForm).toContain('supportsParent');
+    expect(argumentForm).toContain('FACT_TYPE_OPTIONS');
+    expect(argumentForm).toContain('updateArgument(editId');
+    expect(artifactForm).toContain('inlineFile');
+    expect(topicsApi).toContain('hasEthicalValue');
+    expect(argumentsApi).toContain('createArgument(req, res)');
+    expect(argumentWrites).toContain('parseNumericTags(body.tags)');
+    expect(artifactsApi).toContain('storeUploadedArtifactFile');
+    expect(opinionsApi).toContain("parentType === 'opinion'");
+    expect(opinionsApi).toContain('ownerTypes[parentType]');
+  });
 });

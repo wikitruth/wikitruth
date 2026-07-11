@@ -58,6 +58,7 @@ const OpinionCreatePage: React.FC = () => {
         description: values.description,
         topicId: values.topicId || undefined,
         parentId: parentIdFromQuery || undefined,
+        parentType: parentTypeFromQuery || undefined,
         private: values.private,
       });
       const createdOpinion = response?.opinion as { _id?: unknown; friendlyUrl?: unknown } | undefined;

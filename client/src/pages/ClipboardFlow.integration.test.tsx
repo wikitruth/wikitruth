@@ -30,6 +30,13 @@ jest.mock('../components/common/PageMeta', () => ({
   default: () => null,
 }));
 
+jest.mock('../services/api/notifications', () => ({
+  __esModule: true,
+  default: {
+    getSubscription: jest.fn().mockResolvedValue({ subscription: { followed: false } }),
+  },
+}));
+
 const mockedUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 const mockedUseNotification = useNotification as jest.MockedFunction<typeof useNotification>;
 
@@ -82,7 +89,7 @@ describe('Clipboard integration flow', () => {
       { route: '/topics/entry/climate-change/topic-1' },
     );
 
-    await user.click(screen.getByRole('button', { name: /actions/i }));
+    await user.click(await screen.findByRole('link', { name: /more/i }));
     await user.click(screen.getByRole('button', { name: /copy to clipboard/i }));
 
     render(<ClipboardPage />, { route: '/clipboard' });

@@ -60,9 +60,9 @@ describe('TopicCreatePage integration flow', () => {
     const user = userEvent.setup();
     render(<TopicCreatePage />, { route: '/topics/create' });
 
-    await user.type(screen.getByLabelText(/title/i), 'Climate Policy');
+    await user.type(screen.getByRole('textbox', { name: /^title/i }), 'Climate Policy');
     await user.type(screen.getByLabelText(/description/i), 'Detailed topic description for test.');
-    await user.selectOptions(screen.getByLabelText(/category/i), 'science-technology');
+    await user.type(screen.getByLabelText(/parent topic id/i), '507f1f77bcf86cd799439011');
     await user.click(screen.getByRole('button', { name: /create topic/i }));
 
     await waitFor(() =>
@@ -70,7 +70,8 @@ describe('TopicCreatePage integration flow', () => {
         expect.objectContaining({
           title: 'Climate Policy',
           description: 'Detailed topic description for test.',
-          category: 'science-technology',
+          category: '507f1f77bcf86cd799439011',
+          parentId: '507f1f77bcf86cd799439011',
         }),
       ),
     );

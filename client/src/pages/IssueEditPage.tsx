@@ -62,14 +62,17 @@ const IssueEditPage: React.FC = () => {
     try {
       setSaving(true);
       setError(null);
-      await apiService.updateIssue(id, {
+      const response = await apiService.updateIssue(id, {
         title,
         description,
-        topicId: topicId || undefined,
+        topicId,
         issueType: Number(issueType),
         private: isPrivate,
       });
-      navigate('/issues');
+      const issue = response?.issue;
+      navigate(issue?._id
+        ? `/issues/entry/${encodeURIComponent(String(issue.friendlyUrl || issue._id))}/${encodeURIComponent(String(issue._id))}`
+        : '/issues');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update issue');
     } finally {
@@ -115,7 +118,8 @@ const IssueEditPage: React.FC = () => {
             <div className="form-group" style={{ marginTop: '20px' }}>
               <Button type="submit" variant="warning" disabled={saving} icon={saving ? 'spinner fa-spin' : 'check'}>
                 {saving ? 'Saving...' : 'Save Changes'}
-              </Button>
+              </Button>{' '}
+              <Button type="button" variant="default" disabled={saving} icon="times" onClick={() => navigate(-1)}>Cancel</Button>
             </div>
           </form>
         </div>

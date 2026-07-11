@@ -172,8 +172,33 @@ async function POST_opinion_create(req: WikitruthRequest, res: WikitruthResponse
 
   const title = String(req.body?.title || '').trim();
   const description = String(req.body?.description || req.body?.content || '').trim();
-  const ownerId = req.body?.topicId || req.body?.ownerId || req.query?.topic || null;
-  const parentId = req.body?.parentId || null;
+  const requestedParentId = req.body?.parentId || null;
+  const parentType = String(req.body?.parentType || '').trim().toLowerCase();
+  const ownerTypes: Record<string, number> = {
+    topic: constants.OBJECT_TYPES.topic,
+    argument: constants.OBJECT_TYPES.argument,
+    question: constants.OBJECT_TYPES.question,
+    answer: constants.OBJECT_TYPES.answer,
+    artifact: constants.OBJECT_TYPES.artifact,
+    issue: constants.OBJECT_TYPES.issue,
+    opinion: constants.OBJECT_TYPES.opinion,
+  };
+  let ownerId = req.body?.topicId || req.body?.ownerId || req.query?.topic || null;
+  let ownerType = constants.OBJECT_TYPES.topic;
+  let parentId = null;
+
+  if (requestedParentId && parentType === 'opinion') {
+    const parentOpinion = await db.Opinion.findById(requestedParentId).lean();
+    if (!parentOpinion) {
+      return res.status(400).json({ error: 'Parent comment not found' });
+    }
+    parentId = requestedParentId;
+    ownerId = parentOpinion.ownerId;
+    ownerType = Number(parentOpinion.ownerType || constants.OBJECT_TYPES.topic);
+  } else if (requestedParentId && ownerTypes[parentType]) {
+    ownerId = requestedParentId;
+    ownerType = ownerTypes[parentType];
+  }
   const isPrivate = Boolean(req.body?.private);
   const classification = normalizeOpinionClassification(req.body?.classification);
 
@@ -235,7 +260,7 @@ async function POST_opinion_create(req: WikitruthRequest, res: WikitruthResponse
     content: description,
     contentPreview: description.slice(0, 240),
     friendlyUrl: utils.urlify(title),
-    ownerType: constants.OBJECT_TYPES.topic,
+    ownerType: ownerType,
     ownerId: ownerId,
     parentId: parentId,
     categoryId: ownerId,
@@ -252,8 +277,8 @@ async function POST_opinion_create(req: WikitruthRequest, res: WikitruthResponse
     },
   });
 
-  const timelineObjectType = ownerId ? constants.OBJECT_TYPES.topic : constants.OBJECT_TYPES.opinion;
-  const timelineObjectName = ownerId ? 'topic' : 'opinion';
+  const timelineObjectType = ownerId ? ownerType : constants.OBJECT_TYPES.opinion;
+  const timelineObjectName = ownerId ? (constants.OBJECT_ID_NAME_MAP[ownerType] || parentType || 'topic') : 'opinion';
   const timelineObjectId = String(ownerId || opinion._id);
 
   await logEntryEvent({
@@ -275,8 +300,8 @@ async function POST_opinion_create(req: WikitruthRequest, res: WikitruthResponse
   if (ownerId) {
     await notifySubscribers({
       target: {
-        objectType: constants.OBJECT_TYPES.topic,
-        objectName: 'topic',
+        objectType: ownerType,
+        objectName: String(constants.OBJECT_ID_NAME_MAP[ownerType] || parentType || 'topic'),
         objectId: String(ownerId),
       },
       type: 'reply',

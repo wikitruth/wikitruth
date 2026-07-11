@@ -11,6 +11,12 @@ const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
 const constants = constantsMod as unknown as ConstantsModule;
 import * as utils from '../../utils/utils';
 import * as artifactsService from '../../services/artifactsService';
+import {
+  storeArtifactFile,
+  storeUploadedArtifactFile,
+  type ArtifactFilePayload,
+} from '../../services/artifactFileService';
+import { parseBoolean, parseNumericTags } from './entryWriteHelpers';
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 export = function (router: Router) {
   // GET /api/artifacts - List artifacts
@@ -166,8 +172,12 @@ async function POST_artifact_create(req: WikitruthRequest, res: WikitruthRespons
   const title = String(req.body?.title || '').trim();
   const description = String(req.body?.description || req.body?.content || '').trim();
   const source = String(req.body?.source || '').trim();
-  const ownerId = req.body?.topicId || req.body?.ownerId || req.query?.topic || null;
-  const isPrivate = Boolean(req.body?.private);
+  const parentId = req.body?.parentId || null;
+  const groupId = req.body?.groupId || null;
+  const topicOwnerId = req.body?.topicId || req.body?.ownerId || req.query?.topic || null;
+  const ownerId = topicOwnerId || groupId || null;
+  const ownerType = topicOwnerId ? constants.OBJECT_TYPES.topic : groupId ? constants.OBJECT_TYPES.group : constants.OBJECT_TYPES.topic;
+  const isPrivate = parseBoolean(req.body?.private);
 
   if (!title || title.length < 3) {
     return res.status(400).json({ error: 'Title must be at least 3 characters' });
@@ -184,9 +194,13 @@ async function POST_artifact_create(req: WikitruthRequest, res: WikitruthRespons
     contentPreview: description.slice(0, 240),
     source: source,
     friendlyUrl: utils.urlify(title),
-    ownerType: constants.OBJECT_TYPES.topic,
+    ownerType: ownerType,
     ownerId: ownerId,
+    parentId: parentId,
+    groupId: groupId,
     categoryId: ownerId,
+    typeId: [0, 1, 2, 3, 4].includes(Number(req.body?.typeId)) ? Number(req.body.typeId) : constants.ARGUMENT_TYPES.factual,
+    tags: parseNumericTags(req.body?.tags),
     createDate: now,
     editDate: now,
     createUserId: req.user._id,
@@ -194,8 +208,21 @@ async function POST_artifact_create(req: WikitruthRequest, res: WikitruthRespons
     screening: {
       status: constants.SCREENING_STATUS.status0.code,
     },
-    private: isPrivate,
+    private: isPrivate || Boolean(groupId),
   });
+
+  const uploadedFile = req.files?.inlineFile;
+  if (uploadedFile || req.body?.file) {
+    try {
+      artifact.file = uploadedFile
+        ? await storeUploadedArtifactFile(artifact._id, uploadedFile)
+        : await storeArtifactFile(artifact._id, req.body.file as ArtifactFilePayload);
+      await artifact.save();
+    } catch (error) {
+      await db.Artifact.deleteOne({ _id: artifact._id });
+      return res.status(400).json({ error: errorMessage(error) });
+    }
+  }
 
   res.status(201).json({
     success: true,
@@ -249,12 +276,36 @@ async function PUT_artifact_update(req: WikitruthRequest, res: WikitruthResponse
   }
 
   if (typeof req.body?.private !== 'undefined') {
-    artifact.private = Boolean(req.body.private);
+    artifact.private = parseBoolean(req.body.private);
   }
 
   if (typeof req.body?.topicId !== 'undefined' || typeof req.body?.ownerId !== 'undefined') {
     artifact.ownerId = req.body.topicId || req.body.ownerId || null;
     artifact.categoryId = artifact.ownerId;
+  }
+
+  if (typeof req.body?.parentId !== 'undefined') {
+    artifact.parentId = req.body.parentId || null;
+  }
+  if (typeof req.body?.typeId !== 'undefined') {
+    const typeId = Number(req.body.typeId);
+    if (![0, 1, 2, 3, 4].includes(typeId)) {
+      return res.status(400).json({ error: 'Invalid artifact type' });
+    }
+    artifact.typeId = typeId;
+  }
+  if (typeof req.body?.tags !== 'undefined') {
+    artifact.tags = parseNumericTags(req.body.tags);
+  }
+  const uploadedFile = req.files?.inlineFile;
+  if (uploadedFile || req.body?.file) {
+    try {
+      artifact.file = uploadedFile
+        ? await storeUploadedArtifactFile(artifact._id, uploadedFile, artifact.file)
+        : await storeArtifactFile(artifact._id, req.body.file as ArtifactFilePayload, artifact.file);
+    } catch (error) {
+      return res.status(400).json({ error: errorMessage(error) });
+    }
   }
 
   artifact.editDate = new Date();

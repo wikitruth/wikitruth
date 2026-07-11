@@ -66,14 +66,17 @@ const QuestionEditPage: React.FC = () => {
     try {
       setSaving(true);
       setError(null);
-      await apiService.updateQuestion(id, {
+      const response = await apiService.updateQuestion(id, {
         title,
         description,
-        topicId: topicId || undefined,
+        topicId,
         references,
         private: isPrivate,
       });
-      navigate('/questions');
+      const question = response?.question;
+      navigate(question?._id
+        ? `/questions/entry/${encodeURIComponent(String(question.friendlyUrl || question._id))}/${encodeURIComponent(String(question._id))}`
+        : '/questions');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update question');
     } finally {
@@ -103,7 +106,8 @@ const QuestionEditPage: React.FC = () => {
             <div className="form-group" style={{ marginTop: '20px' }}>
               <Button type="submit" variant="success" disabled={saving} icon={saving ? 'spinner fa-spin' : 'check'}>
                 {saving ? 'Saving...' : 'Save Changes'}
-              </Button>
+              </Button>{' '}
+              <Button type="button" variant="default" disabled={saving} icon="times" onClick={() => navigate(-1)}>Cancel</Button>
             </div>
           </form>
         </div>

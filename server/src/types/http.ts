@@ -21,6 +21,17 @@ export interface WikitruthRequest extends Request {
     version: string | null;
     build: string | null;
   };
+  files?: Record<string, {
+    filepath?: string;
+    path?: string;
+    originalFilename?: string;
+    name?: string;
+    mimetype?: string;
+    type?: string;
+    size?: number;
+    mtime?: Date;
+    lastModifiedDate?: Date;
+  }>;
 }
 
 export type WikitruthResponse = Response;

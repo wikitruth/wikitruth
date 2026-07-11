@@ -140,4 +140,24 @@ describe('apiService', () => {
       })
     );
   });
+
+  it('sends artifact files as multipart form data without a JSON content type', async () => {
+    const file = new File(['artifact'], 'evidence.txt', { type: 'text/plain' });
+
+    await apiService.createArtifact({
+      title: 'Evidence artifact',
+      description: 'Detailed artifact description',
+      private: false,
+      tags: '20,30',
+      file,
+    });
+
+    const request = (globalThis.fetch as jest.Mock).mock.calls[0][1] as RequestInit;
+    expect(request.body).toBeInstanceOf(FormData);
+    const uploaded = (request.body as FormData).get('inlineFile') as File;
+    expect(uploaded.name).toBe('evidence.txt');
+    expect(uploaded.size).toBe(8);
+    expect((request.body as FormData).get('tags')).toBe('20,30');
+    expect(request.headers).not.toHaveProperty('Content-Type');
+  });
 });

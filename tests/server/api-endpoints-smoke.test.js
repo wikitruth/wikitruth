@@ -171,6 +171,7 @@ describe('API endpoint smoke coverage', function () {
   it('exposes content mutation handlers required by modern create/edit forms', function () {
     const topicsApi = read('server/src/controllers/api/topics.ts');
     const argumentsApi = read('server/src/controllers/api/arguments.ts');
+    const argumentWrites = read('server/src/controllers/api/argumentWrites.ts');
     const questionsApi = read('server/src/controllers/api/questions.ts');
     const answersApi = read('server/src/controllers/api/answers.ts');
     const issuesApi = read('server/src/controllers/api/issues.ts');
@@ -181,7 +182,9 @@ describe('API endpoint smoke coverage', function () {
     expect(topicsApi).toContain("router.post('/',");
     expect(topicsApi).toContain('POST_topic_create');
     expect(argumentsApi).toContain("router.post('/',");
-    expect(argumentsApi).toContain('POST_argument_create');
+    expect(argumentsApi).toContain('createArgument(req, res)');
+    expect(argumentWrites).toContain('export async function createArgument');
+    expect(argumentWrites).toContain('export async function updateArgument');
     expect(questionsApi).toContain("router.post('/',");
     expect(questionsApi).toContain("router.put('/entry/:id'");
     expect(answersApi).toContain("router.post('/',");

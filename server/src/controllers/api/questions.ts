@@ -207,8 +207,10 @@ async function POST_question_create(req: WikitruthRequest, res: WikitruthRespons
   const title = String(body.title || '').trim();
   const description = String(body.description || body.content || '').trim();
   const references = String(body.references || '').trim();
-  const ownerId = body.topicId || body.ownerId || req.query.topic || null;
   const groupId = body.groupId || null;
+  const topicOwnerId = body.topicId || body.ownerId || req.query.topic || null;
+  const ownerId = topicOwnerId || groupId || null;
+  const ownerType = topicOwnerId ? constants.OBJECT_TYPES.topic : groupId ? constants.OBJECT_TYPES.group : constants.OBJECT_TYPES.topic;
   const isPrivate = Boolean(body.private);
 
   if (!title || title.length < 3) {
@@ -226,7 +228,7 @@ async function POST_question_create(req: WikitruthRequest, res: WikitruthRespons
     contentPreview: description.slice(0, 240),
     references: references,
     friendlyUrl: utils.urlify(title),
-    ownerType: constants.OBJECT_TYPES.topic,
+    ownerType: ownerType,
     ownerId: ownerId,
     groupId: groupId,
     categoryId: ownerId,
@@ -237,7 +239,7 @@ async function POST_question_create(req: WikitruthRequest, res: WikitruthRespons
     screening: {
       status: constants.SCREENING_STATUS.status0.code,
     },
-    private: isPrivate,
+    private: isPrivate || Boolean(groupId),
   });
 
   res.status(201).json({

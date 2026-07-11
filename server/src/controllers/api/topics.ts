@@ -4,6 +4,7 @@ import type { FlowUtilsModule, ConstantsModule, UtilsModule } from '../../types/
 import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 import { applyViewModeFilter } from './viewFilter';
+import { parseNumericTags, parseOptionalDate } from './entryWriteHelpers';
 
 import * as flowUtilsNs from '../../utils/flowUtils';
 import appModForDb from '../../app';
@@ -172,13 +173,19 @@ async function POST_topic_create(req: WikitruthRequest, res: WikitruthResponse) 
   const parentId = req.body?.parentId || req.body?.topicId || null;
   const groupId = req.body?.groupId || null;
   const categoryId = req.body?.categoryId || req.body?.topicId || req.body?.category || parentId || null;
-  const ownerId = parentId || groupId || null;
+  const isPrivate = Boolean(req.body?.private);
+  const isAdmin = Boolean(req.user.canPlayRoleOf && req.user.canPlayRoleOf('admin'));
+  if (!parentId && !groupId && !isPrivate && !isAdmin) {
+    return res.status(403).json({ error: 'A parent topic is required for public topics' });
+  }
+  const ownerId = parentId || groupId || (isPrivate ? req.user._id : null);
   const ownerType = parentId
     ? constants.OBJECT_TYPES.topic
     : groupId
       ? constants.OBJECT_TYPES.group
-      : -1;
-  const isPrivate = Boolean(req.body?.private);
+      : isPrivate
+        ? constants.OBJECT_TYPES.user
+        : -1;
 
   if (!title || title.length < 3) {
     return res.status(400).json({ error: 'Title must be at least 3 characters' });
@@ -188,16 +195,16 @@ async function POST_topic_create(req: WikitruthRequest, res: WikitruthResponse) 
     return res.status(400).json({ error: 'Description must be at least 10 characters' });
   }
 
-  const tags = tagsValue
-    .split(',')
-    .map((tag: string) => tag.trim())
-    .filter(Boolean);
+  const tags = parseNumericTags(tagsValue);
 
   const now = new Date();
   const topic = await db.Topic.create({
     title: title,
+    contextTitle: String(req.body?.contextTitle || '').trim(),
     content: description,
     contentPreview: description.slice(0, 240),
+    references: String(req.body?.references || '').trim(),
+    referenceDate: parseOptionalDate(req.body?.referenceDate),
     friendlyUrl: utils.urlify(title),
     parentId: parentId,
     groupId: groupId,
@@ -211,9 +218,11 @@ async function POST_topic_create(req: WikitruthRequest, res: WikitruthResponse) 
     screening: {
       status: constants.SCREENING_STATUS.status0.code,
     },
-    private: isPrivate,
-    extras: {
-      tags: tags,
+    private: isPrivate || Boolean(groupId),
+    tags: tags,
+    icon: String(req.body?.icon || '').trim(),
+    ethicalStatus: {
+      hasValue: Boolean(req.body?.hasEthicalValue),
     },
   });
 
@@ -270,6 +279,28 @@ async function PUT_topic_update(req: WikitruthRequest, res: WikitruthResponse) {
 
   if (typeof req.body?.private !== 'undefined') {
     topic.private = Boolean(req.body.private);
+  }
+
+  if (typeof req.body?.contextTitle !== 'undefined') {
+    topic.contextTitle = String(req.body.contextTitle || '').trim();
+  }
+  if (typeof req.body?.references !== 'undefined') {
+    topic.references = String(req.body.references || '').trim();
+  }
+  if (typeof req.body?.referenceDate !== 'undefined') {
+    topic.referenceDate = parseOptionalDate(req.body.referenceDate);
+  }
+  if (typeof req.body?.tags !== 'undefined') {
+    topic.tags = parseNumericTags(req.body.tags);
+  }
+  if (typeof req.body?.icon !== 'undefined') {
+    topic.icon = String(req.body.icon || '').trim();
+  }
+  if (typeof req.body?.hasEthicalValue !== 'undefined') {
+    topic.ethicalStatus = {
+      ...(topic.ethicalStatus || {}),
+      hasValue: Boolean(req.body.hasEthicalValue),
+    };
   }
 
   if (typeof req.body?.topicId !== 'undefined' || typeof req.body?.parentId !== 'undefined') {

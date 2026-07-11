@@ -39,6 +39,23 @@ export class ApiRequestError extends Error {
   }
 }
 
+export type ArtifactFileUpload = File;
+
+function buildArtifactFormData(payload: object): FormData {
+  const formData = new FormData();
+  Object.entries(payload).forEach(([key, value]) => {
+    if (typeof value === 'undefined' || value === null) {
+      return;
+    }
+    if (key === 'file' && value instanceof File) {
+      formData.append('inlineFile', value, value.name);
+      return;
+    }
+    formData.append(key, String(value));
+  });
+  return formData;
+}
+
 class ApiService {
   private baseUrl: string;
   private cache: Map<string, { expiresAt: number; value: unknown }>;
@@ -72,8 +89,9 @@ class ApiService {
       }
     }
 
+    const isFormData = typeof FormData !== 'undefined' && options?.body instanceof FormData;
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
+      ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
       ...(options?.headers as Record<string, string> | undefined),
     };
 
@@ -183,6 +201,12 @@ class ApiService {
     tags?: string;
     topicId?: string;
     groupId?: string;
+    contextTitle?: string;
+    references?: string;
+    referenceDate?: string;
+    parentId?: string;
+    hasEthicalValue?: boolean;
+    icon?: string;
   }): Promise<LegacyApiResponse> {
     return this.request<LegacyApiResponse>('/topics', {
       method: 'POST',
@@ -197,6 +221,13 @@ class ApiService {
       description?: string;
       topicId?: string;
       private?: boolean;
+      contextTitle?: string;
+      references?: string;
+      referenceDate?: string;
+      tags?: string;
+      parentId?: string;
+      hasEthicalValue?: boolean;
+      icon?: string;
     }
   ): Promise<LegacyApiResponse> {
     return this.request<LegacyApiResponse>(`/topics/entry/${id}`, {
@@ -263,6 +294,12 @@ class ApiService {
     private?: boolean;
     sources?: string;
     groupId?: string;
+    parentId?: string;
+    supportsParent?: boolean;
+    referenceDate?: string;
+    typeId?: number;
+    tags?: string;
+    hasEthicalValue?: boolean;
   }): Promise<LegacyApiResponse> {
     return this.request<LegacyApiResponse>('/arguments', {
       method: 'POST',
@@ -280,6 +317,12 @@ class ApiService {
       topicId?: string;
       private?: boolean;
       sources?: string;
+      parentId?: string;
+      supportsParent?: boolean;
+      referenceDate?: string;
+      typeId?: number;
+      tags?: string;
+      hasEthicalValue?: boolean;
     }
   ): Promise<LegacyApiResponse> {
     return this.request<LegacyApiResponse>(`/arguments/entry/${id}`, {
@@ -413,6 +456,7 @@ class ApiService {
     description: string;
     topicId?: string;
     parentId?: string;
+    parentType?: string;
     private?: boolean;
   }): Promise<LegacyApiResponse> {
     return this.request<LegacyApiResponse>('/opinions', {
@@ -495,10 +539,15 @@ class ApiService {
     topicId?: string;
     private?: boolean;
     source?: string;
+    parentId?: string;
+    groupId?: string;
+    typeId?: number;
+    tags?: string;
+    file?: ArtifactFileUpload;
   }): Promise<LegacyApiResponse> {
     return this.request<LegacyApiResponse>('/artifacts', {
       method: 'POST',
-      body: JSON.stringify(payload),
+      body: buildArtifactFormData(payload),
     });
   }
 
@@ -510,11 +559,15 @@ class ApiService {
       topicId?: string;
       private?: boolean;
       source?: string;
+      parentId?: string;
+      typeId?: number;
+      tags?: string;
+      file?: ArtifactFileUpload;
     }
   ): Promise<LegacyApiResponse> {
     return this.request<LegacyApiResponse>(`/artifacts/entry/${id}`, {
       method: 'PUT',
-      body: JSON.stringify(payload),
+      body: buildArtifactFormData(payload),
     });
   }
 

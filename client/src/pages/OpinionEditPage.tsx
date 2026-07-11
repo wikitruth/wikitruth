@@ -59,13 +59,16 @@ const OpinionEditPage: React.FC = () => {
     try {
       setSaving(true);
       setError(null);
-      await apiService.updateOpinion(id, {
+      const response = await apiService.updateOpinion(id, {
         title,
         description,
-        topicId: topicId || undefined,
+        topicId,
         private: isPrivate,
       });
-      navigate('/opinions');
+      const opinion = response?.opinion;
+      navigate(opinion?._id
+        ? `/opinions/entry/${encodeURIComponent(String(opinion.friendlyUrl || opinion._id))}/${encodeURIComponent(String(opinion._id))}`
+        : '/opinions');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update opinion');
     } finally {
@@ -94,7 +97,8 @@ const OpinionEditPage: React.FC = () => {
             <div className="form-group" style={{ marginTop: '20px' }}>
               <Button type="submit" variant="info" disabled={saving} icon={saving ? 'spinner fa-spin' : 'check'}>
                 {saving ? 'Saving...' : 'Save Changes'}
-              </Button>
+              </Button>{' '}
+              <Button type="button" variant="default" disabled={saving} icon="times" onClick={() => navigate(-1)}>Cancel</Button>
             </div>
           </form>
         </div>

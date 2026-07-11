@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import Breadcrumb from '../components/common/Breadcrumb';
 import PageHeader from '../components/common/PageHeader';
@@ -7,6 +7,7 @@ import RichTextEditor from '../components/Form/RichTextEditor';
 import TextArea from '../components/Form/TextArea';
 import Select from '../components/Form/Select';
 import Checkbox from '../components/Form/Checkbox';
+import NumericTagCheckboxes from '../components/Form/NumericTagCheckboxes';
 import Button from '../components/common/Button';
 import Alert from '../components/common/Alert';
 import PageMeta from '../components/common/PageMeta';
@@ -14,14 +15,22 @@ import useForm from '../hooks/useForm';
 import apiService from '../services/api';
 import { trackEvent } from '../utils/analytics';
 import { useNotification } from '../context/NotificationContext';
+import LoadingSpinner from '../components/LoadingSpinner';
+import { FACT_TAG_OPTIONS, FACT_TYPE_OPTIONS } from '../constants/entryFormOptions';
+import { toDateTimeLocal } from '../utils/formDates';
 
 interface ArgumentFormValues {
   title: string;
   description: string;
-  verdict: string;
   topicId: string;
   private: boolean;
   sources: string;
+  parentId: string;
+  relationship: string;
+  referenceDate: string;
+  typeId: string;
+  tags: string;
+  hasEthicalValue: boolean;
 }
 
 const ArgumentCreatePage: React.FC = () => {
@@ -29,8 +38,12 @@ const ArgumentCreatePage: React.FC = () => {
   const [searchParams] = useSearchParams();
   const groupId = searchParams.get('group') || undefined;
   const topicIdFromQuery = String(searchParams.get('topic') || searchParams.get('topicId') || '').trim();
+  const parentIdFromQuery = String(searchParams.get('parent') || searchParams.get('parentId') || '').trim();
+  const editId = String(searchParams.get('id') || '').trim();
+  const isEditMode = Boolean(editId);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [loadingExisting, setLoadingExisting] = useState(false);
   const { addToast } = useNotification();
 
   const validate = (values: ArgumentFormValues) => {
@@ -50,10 +63,6 @@ const ArgumentCreatePage: React.FC = () => {
       errors.description = 'Description must be at least 20 characters';
     }
 
-    if (!values.verdict) {
-      errors.verdict = 'Verdict is required';
-    }
-
     return errors;
   };
 
@@ -62,19 +71,27 @@ const ArgumentCreatePage: React.FC = () => {
     setSubmitSuccess(false);
 
     try {
-      const response = await apiService.createArgument({
+      const payload = {
         title: values.title,
         description: values.description,
-        verdict: values.verdict,
-        topicId: values.topicId || undefined,
+        topicId: values.topicId,
         private: values.private,
         sources: values.sources,
         groupId: groupId,
-      });
+        parentId: values.parentId,
+        supportsParent: values.relationship !== 'oppose',
+        referenceDate: values.referenceDate,
+        typeId: Number(values.typeId),
+        tags: values.tags,
+        hasEthicalValue: values.hasEthicalValue,
+      };
+      const response = isEditMode
+        ? await apiService.updateArgument(editId, payload)
+        : await apiService.createArgument(payload);
       const createdArgument = response?.argument as { _id?: unknown; friendlyUrl?: unknown } | undefined;
       
-      trackEvent('create_argument', 'content', values.title);
-      addToast('success', 'Argument created successfully!');
+      trackEvent(isEditMode ? 'update_argument' : 'create_argument', 'content', values.title);
+      addToast('success', `Argument ${isEditMode ? 'updated' : 'created'} successfully!`);
       setSubmitSuccess(true);
       
       // Redirect after a short delay
@@ -84,9 +101,9 @@ const ArgumentCreatePage: React.FC = () => {
           return;
         }
         navigate('/arguments');
-      }, 1500);
+      }, isEditMode ? 1000 : 1500);
     } catch (error) {
-      const msg = error instanceof Error ? error.message : 'Failed to create argument';
+      const msg = error instanceof Error ? error.message : `Failed to ${isEditMode ? 'update' : 'create'} argument`;
       setSubmitError(msg);
       addToast('danger', msg);
     }
@@ -105,28 +122,68 @@ const ArgumentCreatePage: React.FC = () => {
     initialValues: {
       title: '',
       description: '',
-      verdict: '',
       topicId: topicIdFromQuery,
       private: false,
       sources: '',
+      parentId: parentIdFromQuery,
+      relationship: 'support',
+      referenceDate: '',
+      typeId: '1',
+      tags: '',
+      hasEthicalValue: false,
     },
     onSubmit: handleSubmit,
     validate,
   });
 
+  useEffect(() => {
+    const loadExistingArgument = async () => {
+      if (!isEditMode) return;
+      try {
+        setLoadingExisting(true);
+        const response = await apiService.getArgumentEntry(editId);
+        const argument = response?.argument;
+        if (!argument?._id) {
+          setSubmitError('Argument not found');
+          return;
+        }
+        setFieldValue('title', String(argument.title || ''));
+        setFieldValue('description', String(argument.content || argument.description || ''));
+        setFieldValue('topicId', String(argument.ownerId || ''));
+        setFieldValue('private', Boolean(argument.private));
+        setFieldValue('sources', String(argument.references || ''));
+        setFieldValue('parentId', String(argument.parentId || ''));
+        setFieldValue('relationship', argument.against ? 'oppose' : 'support');
+        setFieldValue('referenceDate', toDateTimeLocal(argument.referenceDate));
+        setFieldValue('typeId', String(argument.typeId ?? 1));
+        setFieldValue('tags', Array.isArray(argument.tags) ? argument.tags.join(',') : '');
+        setFieldValue('hasEthicalValue', Boolean((argument.ethicalStatus as { hasValue?: unknown } | undefined)?.hasValue));
+      } catch (error) {
+        setSubmitError(error instanceof Error ? error.message : 'Failed to load argument');
+      } finally {
+        setLoadingExisting(false);
+      }
+    };
+    void loadExistingArgument();
+  }, [editId, isEditMode, setFieldValue]);
+
+  if (loadingExisting) {
+    return <LoadingSpinner message="Loading argument..." />;
+  }
+
   const breadcrumbItems = [
     { title: 'Home', url: '/' },
     { title: 'Arguments', url: '/arguments' },
-    { title: 'Create Argument', active: true },
+    { title: isEditMode ? 'Edit Argument' : 'Create Argument', active: true },
   ];
 
   return (
     <div>
-      <PageMeta title="Create Argument" description="Present a fact or claim with supporting evidence" />
+      <PageMeta title={isEditMode ? 'Edit Argument' : 'Create Argument'} description="Present a fact or claim with supporting evidence" />
       <Breadcrumb items={breadcrumbItems} />
       
       <PageHeader
-        title="Create New Argument"
+        title={isEditMode ? 'Edit Argument' : 'Create New Argument'}
         subtitle="Present a fact or claim with supporting evidence"
         icon="flash"
         iconColor="text-primary"
@@ -134,7 +191,7 @@ const ArgumentCreatePage: React.FC = () => {
 
       {submitSuccess && (
         <Alert type="success">
-          Argument created successfully! Redirecting to arguments list...
+          Argument {isEditMode ? 'updated' : 'created'} successfully! Redirecting...
         </Alert>
       )}
 
@@ -177,22 +234,13 @@ const ArgumentCreatePage: React.FC = () => {
             />
 
             <Select
-              name="verdict"
-              label="Verdict"
-              value={values.verdict}
+              name="typeId"
+              label="Fact type"
+              value={values.typeId}
               onChange={handleChange}
               onBlur={handleBlur}
-              placeholder="Select the verdict for this argument"
               required
-              options={[
-                { value: 'true', label: 'True - Claim is accurate' },
-                { value: 'mostly-true', label: 'Mostly True - Claim is largely accurate with minor inaccuracies' },
-                { value: 'half-true', label: 'Half True - Claim has both accurate and inaccurate elements' },
-                { value: 'mostly-false', label: 'Mostly False - Claim is largely inaccurate' },
-                { value: 'false', label: 'False - Claim is inaccurate' },
-                { value: 'unknown', label: 'Unknown - Cannot be verified' },
-              ]}
-              error={touched.verdict ? errors.verdict : undefined}
+              options={FACT_TYPE_OPTIONS}
             />
 
             <Input
@@ -214,6 +262,51 @@ const ArgumentCreatePage: React.FC = () => {
               rows={4}
             />
 
+            <Input
+              name="parentId"
+              label="Parent fact ID (optional)"
+              value={values.parentId}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              placeholder="Create this as a child fact"
+            />
+
+            {values.parentId ? (
+              <Select
+                name="relationship"
+                label="Relationship to parent"
+                value={values.relationship}
+                onChange={handleChange}
+                options={[
+                  { value: 'support', label: 'Supporting fact (for)' },
+                  { value: 'oppose', label: 'Opposing fact (against)' },
+                ]}
+              />
+            ) : null}
+
+            <Input
+              name="referenceDate"
+              type="datetime-local"
+              label="Reference date (optional)"
+              value={values.referenceDate}
+              onChange={handleChange}
+              onBlur={handleBlur}
+            />
+
+            <NumericTagCheckboxes
+              name="argumentTags"
+              value={values.tags}
+              options={FACT_TAG_OPTIONS}
+              onChange={(tags) => setFieldValue('tags', tags)}
+            />
+
+            <Checkbox
+              name="hasEthicalValue"
+              label="Contains moral, ethical, or aesthetic value"
+              checked={values.hasEthicalValue}
+              onChange={handleChange}
+            />
+
             <Checkbox
               name="private"
               label="Make this argument private (only visible to you)"
@@ -229,13 +322,13 @@ const ArgumentCreatePage: React.FC = () => {
                 disabled={isSubmitting}
                 icon={isSubmitting ? 'spinner fa-spin' : 'check'}
               >
-                {isSubmitting ? 'Creating...' : 'Create Argument'}
+                {isSubmitting ? (isEditMode ? 'Updating...' : 'Creating...') : isEditMode ? 'Update Argument' : 'Create Argument'}
               </Button>
               {' '}
               <Button
                 type="button"
                 variant="default"
-                onClick={() => navigate('/arguments')}
+                onClick={() => isEditMode ? navigate(-1) : navigate('/arguments')}
                 disabled={isSubmitting}
                 icon="times"
               >
@@ -256,7 +349,7 @@ const ArgumentCreatePage: React.FC = () => {
           <ul>
             <li>State your claim clearly and concisely</li>
             <li>Provide credible evidence to support your claim</li>
-            <li>Choose the appropriate verdict based on the evidence</li>
+            <li>Choose the fact type that best describes the claim</li>
             <li>Cite reliable sources and references</li>
             <li>Be objective and factual in your presentation</li>
             <li>Avoid personal opinions or biases</li>

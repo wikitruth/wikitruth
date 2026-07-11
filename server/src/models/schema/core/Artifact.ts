@@ -18,6 +18,7 @@ const factory: SchemaFactory = function (app, mongoose) {
     },
     contentPreview: { type: String }, // A preview lines of text to display in list view
     friendlyUrl: { type: String },
+    typeId: { type: Number, default: constants.ARGUMENT_TYPES.factual },
     screening: {
       status: { type: Number, default: constants.SCREENING_STATUS.status0.code }, // SCREENING_STATUS
       history: [

@@ -17,25 +17,22 @@ import ArtifactEntryRow from '../components/EntryRow/ArtifactEntryRow';
 import EntryActionsMenu from '../components/Entry/EntryActionsMenu';
 import EntryQuickActions from '../components/Entry/EntryQuickActions';
 import EntryOutline from '../components/Entry/EntryOutline';
+import TopicBranchContext from '../components/Entry/TopicBranchContext';
+import TopicDetailsContent from '../components/Entry/TopicDetailsContent';
 import PageMeta from '../components/common/PageMeta';
 import type { TopicEntryResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
 import type { Argument, Artifact, Issue, Opinion, Question, Topic } from '../types';
-import { sanitizeHtml } from '../utils/sanitizeHtml';
 import { EntryMetaBlock, buildLegacyEntryBreadcrumb } from '../components/Entry/EntryLegacyParity';
-
 const CONTENT_COLLAPSE_THRESHOLD = 1200;
-
 function getCount(value: unknown): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : 0;
 }
-
 function getTopicPath(topic: Partial<LegacyEntity>): string {
   const id = encodeURIComponent(String(topic._id || ''));
   const friendly = encodeURIComponent(String(topic.friendlyUrl || topic._id || ''));
   return `/topics/entry/${friendly}/${id}`;
 }
-
 const TopicEntryPage: React.FC = () => {
   const { id, friendlyUrl } = useParams<{ id: string; friendlyUrl?: string }>();
   const navigate = useNavigate();
@@ -142,7 +139,7 @@ const TopicEntryPage: React.FC = () => {
   const tagLabels = Array.isArray(data?.tagLabels) ? (data?.tagLabels as LegacyEntity[]) : [];
   const entryObjectName = String(entry.objectName || topic.objectName || 'topic').trim() || 'topic';
   const isTopicLinkEntry = entryObjectName === 'topicLink';
-  const quickActionObjectName: 'topic' = 'topic';
+  const quickActionObjectName = 'topic' as const;
 
   const breadcrumbItems = buildLegacyEntryBreadcrumb(topic, 'topic', {
     sectionTopic: (data?.parentTopic || null) as LegacyEntity | null,
@@ -377,28 +374,13 @@ const TopicEntryPage: React.FC = () => {
 
       <PageTabs tabs={tabs} activeTab="details" />
 
-      <div className="text-body collapsible" style={{ marginTop: '20px', ...contentStyle }}>
-        {topic.content ? (
-          <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(topic.content) }} />
-        ) : topic.description ? (
-          <p className="lead">{topic.description}</p>
-        ) : (
-          <p className="text-muted">No content available for this topic yet.</p>
-        )}
-        {showSeeMore && !showFullContent && (
-          <a
-            href="#"
-            onClick={(event) => {
-              event.preventDefault();
-              setShowFullContent(true);
-            }}
-            className="content-see-more"
-          >
-            <div className="content-see-more-gradient"></div>
-            <div className="content-see-more-text">See more</div>
-          </a>
-        )}
-      </div>
+      <TopicDetailsContent
+        topic={topic}
+        style={contentStyle}
+        showSeeMore={showSeeMore}
+        expanded={showFullContent}
+        onExpand={() => setShowFullContent(true)}
+      />
 
       <EntryOutline keyTopics={keyTopics} keyArguments={keyArguments} />
 
@@ -417,88 +399,12 @@ const TopicEntryPage: React.FC = () => {
         {!relatedParentTopic && topicLinks.length === 0 && <span className="text-muted">No linked topics</span>}
       </div>
 
-      {isMainTopic && categories.length > 0 && (
-        <div className="row" style={{ marginTop: '25px' }}>
-          {categories.map((category) => {
-            const subtopics = Array.isArray(category.subtopics) ? (category.subtopics as LegacyEntity[]).slice(0, 3) : [];
-            const subarguments = Array.isArray(category.subarguments) ? (category.subarguments as LegacyEntity[]).slice(0, 3) : [];
-            return (
-              <div key={`category-tile-${category._id}`} className="col-lg-4 col-md-6 col-sm-6">
-                <div className="media wt-category">
-                  <div className="media-left media-top">
-                    <Link to={getTopicPath(category)}>
-                      <GeoPatternBackground
-                        seed={String(category.title || category._id)}
-                        className="wt-category-icon wt-geopattern-title"
-                        height={90}
-                      />
-                    </Link>
-                  </div>
-                  <div className="media-body">
-                    <h4 className="media-heading">
-                      <Link to={getTopicPath(category)}>{category.title}</Link>
-                    </h4>
-                    {subtopics.map((subtopic) => (
-                      <div key={`cat-subtopic-${subtopic._id}`}>
-                        <i className="fa fa-folder-open text-muted" aria-hidden="true"></i>{' '}
-                        <Link to={getTopicPath(subtopic)}>{String(subtopic.shortTitle || subtopic.title || '(Untitled)')}</Link>
-                      </div>
-                    ))}
-                    {subarguments.map((subargument) => (
-                      <div key={`cat-subarg-${subargument._id}`}>
-                        <i className="fa fa-flash text-muted" aria-hidden="true"></i>{' '}
-                        <Link to={`/arguments/entry/${encodeURIComponent(String(subargument.friendlyUrl || subargument._id))}/${encodeURIComponent(String(subargument._id))}`}>
-                          {String(subargument.shortTitle || subargument.title || '(Untitled)')}
-                        </Link>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {!isMainTopic && (topics.length > 0 || siblingTopics.length > 0 || categories.length > 0) && (
-        <div className="panel panel-default" style={{ marginTop: '20px' }}>
-          <div className="panel-heading">
-            <h3 className="panel-title">Branch Context</h3>
-          </div>
-          <div className="panel-body">
-            {categories.length > 0 && (
-              <div style={{ marginBottom: '10px' }}>
-                <strong>Peer Categories:</strong>{' '}
-                {categories.map((item) => (
-                  <Link key={item._id} to={getTopicPath(item)} className="wt-label label label-default" style={{ marginRight: '4px' }}>
-                    {item.title}
-                  </Link>
-                ))}
-              </div>
-            )}
-            {topics.length > 0 && (
-              <div style={{ marginBottom: '10px' }}>
-                <strong>Subtopics:</strong>{' '}
-                {topics.map((item) => (
-                  <Link key={item._id} to={getTopicPath(item)} className="wt-label label label-default" style={{ marginRight: '4px' }}>
-                    {item.title}
-                  </Link>
-                ))}
-              </div>
-            )}
-            {siblingTopics.length > 0 && (
-              <div>
-                <strong>Sibling topics:</strong>{' '}
-                {siblingTopics.map((item) => (
-                  <Link key={item._id} to={getTopicPath(item)} className="wt-label label label-default" style={{ marginRight: '4px' }}>
-                    {item.title}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      <TopicBranchContext
+        isMainTopic={isMainTopic}
+        categories={categories}
+        topics={topics}
+        siblingTopics={siblingTopics}
+      />
 
       {topics.length > 0 && (
         <EntryList

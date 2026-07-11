@@ -133,8 +133,8 @@ Audit references used for this pass:
 - `[x]` Edit routes exist where expected
 - `[x]` Entry routes exist (friendly + id variants where needed)
 - `[x]` Discussion subroutes exist on modern entry pages
-- `[ ]` Validate per-entity create form field parity against legacy forms
-- `[ ]` Validate per-entity moderation controls and post-create redirects parity
+- `[x]` Validate per-entity create form field parity against legacy forms
+- `[x]` Validate per-entity moderation controls and post-create redirects parity
 
 ### 7) Visualize (`/legacy/visualize` vs `/visualize`)
 
@@ -218,7 +218,7 @@ Audit references used for this pass:
 
 - `[x]` PARITY-P1-001: Validate and tune visualize drag/bounce physics parity against legacy behavior
 - `[x]` PARITY-P1-002: Validate explore “Latest/Popular” semantics and align behavior or document intentional divergence
-- `[ ]` PARITY-P1-003: Verify per-entity create/edit forms against legacy fields/actions
+- `[x]` PARITY-P1-003: Verify per-entity create/edit forms against legacy fields/actions
 
 ### P2 (Audit infra and long-tail)
 
@@ -285,3 +285,10 @@ Use this matrix to complete runtime parity sign-off after code-level review:
 - `[x]` Entry-outline parity is centralized in the shared modern `EntryOutline` component and renders linked `Key topics` and `Key facts` sections.
 - `[x]` Sidebar parity now restores legacy ordering and hierarchy: apps, contextual ancestry/siblings, related entries, journal categories, groups, explore categories, and personal shortcuts.
 - `[x]` Focused client tests, server parity guardrails, TypeScript checks, and no-new-`any` checks pass for this parity group.
+- `[x]` Topic create/edit restores contextual title, sources, parent, reference date, numeric tags, ethical-value flag, and icon persistence.
+- `[x]` Fact create/edit restores type, parent support/opposition, reference date, numeric tags, ethical-value flag, and edit-mode loading; verdict selection remains in the dedicated moderation flow rather than being incorrectly required at creation.
+- `[x]` Artifact create/edit restores inline file upload, type, parent, and numeric tags with bounded safe media storage and replacement behavior.
+- `[x]` Question, answer, issue, opinion, and artifact edits now return to the updated entry; cancel actions return to the prior entry context.
+- `[x]` Cross-entity comments preserve owner type, while comment replies preserve nested parent-comment context.
+- `[x]` Group-scoped topic/fact/question/artifact creation is private and group-owned instead of leaking into public topic feeds.
+- `[x]` Full server (`152` tests) and client (`135` tests) suites pass after form/action parity implementation.

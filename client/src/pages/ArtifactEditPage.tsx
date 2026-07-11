@@ -5,11 +5,15 @@ import PageHeader from '../components/common/PageHeader';
 import Input from '../components/Form/Input';
 import RichTextEditor from '../components/Form/RichTextEditor';
 import Checkbox from '../components/Form/Checkbox';
+import Select from '../components/Form/Select';
+import NumericTagCheckboxes from '../components/Form/NumericTagCheckboxes';
 import Button from '../components/common/Button';
 import Alert from '../components/common/Alert';
 import LoadingSpinner from '../components/LoadingSpinner';
 import PageMeta from '../components/common/PageMeta';
 import apiService from '../services/api';
+import { FACT_TAG_OPTIONS, FACT_TYPE_OPTIONS } from '../constants/entryFormOptions';
+import { readArtifactFile } from '../utils/artifactUpload';
 
 const ArtifactEditPage: React.FC = () => {
   const navigate = useNavigate();
@@ -22,6 +26,11 @@ const ArtifactEditPage: React.FC = () => {
   const [topicId, setTopicId] = useState('');
   const [source, setSource] = useState('');
   const [isPrivate, setIsPrivate] = useState(false);
+  const [parentId, setParentId] = useState('');
+  const [typeId, setTypeId] = useState('1');
+  const [tags, setTags] = useState('');
+  const [inlineFile, setInlineFile] = useState<File | null>(null);
+  const [existingFileName, setExistingFileName] = useState('');
 
   useEffect(() => {
     const load = async () => {
@@ -39,6 +48,10 @@ const ArtifactEditPage: React.FC = () => {
         setTopicId(String(artifact?.ownerId || ''));
         setSource(artifact?.source || '');
         setIsPrivate(Boolean(artifact?.private));
+        setParentId(String(artifact?.parentId || ''));
+        setTypeId(String(artifact?.typeId ?? 1));
+        setTags(Array.isArray(artifact?.tags) ? artifact.tags.join(',') : '');
+        setExistingFileName(String(artifact?.file?.name || ''));
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load artifact');
       } finally {
@@ -61,14 +74,24 @@ const ArtifactEditPage: React.FC = () => {
     try {
       setSaving(true);
       setError(null);
-      await apiService.updateArtifact(id, {
+      const file = inlineFile ? await readArtifactFile(inlineFile) : undefined;
+      const response = await apiService.updateArtifact(id, {
         title,
         description,
-        topicId: topicId || undefined,
+        topicId,
         source,
         private: isPrivate,
+        parentId,
+        typeId: Number(typeId),
+        tags,
+        file,
       });
-      navigate('/artifacts');
+      const artifact = response?.artifact;
+      if (artifact?._id) {
+        navigate(`/artifacts/entry/${encodeURIComponent(String(artifact.friendlyUrl || artifact._id))}/${encodeURIComponent(String(artifact._id))}`);
+      } else {
+        navigate('/artifacts');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update artifact');
     } finally {
@@ -94,11 +117,27 @@ const ArtifactEditPage: React.FC = () => {
             <RichTextEditor name="description" label="Description" value={description} onChange={(_, html) => setDescription(html)} />
             <Input name="source" label="Source URL (optional)" value={source} onChange={(e) => setSource(e.target.value)} />
             <Input name="topicId" label="Topic ID (optional)" value={topicId} onChange={(e) => setTopicId(e.target.value)} />
+            <div className="form-group">
+              <label htmlFor="inlineFile">Replace inline file (optional)</label>
+              {existingFileName ? <p className="help-block">Current file: {existingFileName}</p> : null}
+              <input
+                id="inlineFile"
+                name="inlineFile"
+                type="file"
+                className="form-control"
+                onChange={(event) => setInlineFile(event.target.files?.[0] || null)}
+              />
+              <p className="help-block">Maximum file size: 10 MB.</p>
+            </div>
+            <Select name="typeId" label="Artifact type" value={typeId} onChange={(e) => setTypeId(e.target.value)} options={FACT_TYPE_OPTIONS} />
+            <Input name="parentId" label="Parent artifact ID (optional)" value={parentId} onChange={(e) => setParentId(e.target.value)} />
+            <NumericTagCheckboxes name="artifactTags" value={tags} options={FACT_TAG_OPTIONS} onChange={setTags} />
             <Checkbox name="private" label="Private" checked={isPrivate} onChange={(e) => setIsPrivate(e.target.checked)} />
             <div className="form-group" style={{ marginTop: '20px' }}>
               <Button type="submit" variant="primary" disabled={saving} icon={saving ? 'spinner fa-spin' : 'check'}>
                 {saving ? 'Saving...' : 'Save Changes'}
-              </Button>
+              </Button>{' '}
+              <Button type="button" variant="default" disabled={saving} icon="times" onClick={() => navigate(-1)}>Cancel</Button>
             </div>
           </form>
         </div>
