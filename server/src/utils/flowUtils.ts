@@ -1817,7 +1817,7 @@ async function syncChildren(parent: SyncParent, options: SyncOptions) {
         update: async function() {
           categoryChanged = oldCategoryId !== child.categoryId;
           if (categoryChanged || !parentIsTopic) {
-            await db.Artifact.update({ _id: child._id }, child, { upsert: true });
+            await db.Artifact.updateOne({ _id: child._id }, child, { upsert: true });
           }
         },
         syncChildren: async function() {
@@ -1846,7 +1846,7 @@ async function syncChildren(parent: SyncParent, options: SyncOptions) {
         update: async function() {
           categoryChanged = oldCategoryId !== child.categoryId;
           if (categoryChanged) {
-            await db.ArgumentLink.update({ _id: child._id }, child, { upsert: true });
+            await db.ArgumentLink.updateOne({ _id: child._id }, child, { upsert: true });
           }
         },
         syncChildren: async function() {
@@ -1870,7 +1870,7 @@ async function syncChildren(parent: SyncParent, options: SyncOptions) {
         update: async function() {
           categoryChanged = oldCategoryId !== child.categoryId;
           if (categoryChanged) {
-            return await db.Answer.update({ _id: child._id }, child, { upsert: true });
+            return await db.Answer.updateOne({ _id: child._id }, child, { upsert: true });
           }
         },
         syncChildren: async function() {

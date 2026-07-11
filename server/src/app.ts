@@ -23,10 +23,9 @@ const config = require(path.join(process.cwd(), 'config/config')),
     express = require('express'),
     cookieParser = require('cookie-parser'),
     session = require('express-session'),
-    mongoStore = require('connect-mongo'),
+    MongoStore = require('connect-mongo').MongoStore,
     passport = require('passport'),
     mongoose = require('mongoose'),
-    bluebird = require('bluebird'),
     helmet = require('helmet'),
     cons = require('consolidate'),
     kraken = require('kraken-js');
@@ -63,7 +62,6 @@ app.config = config;
 //app.server = http.createServer(app);
 
 //setup mongoose
-mongoose.Promise = bluebird;
 app.db = mongoose.createConnection(config.mongodb.uri, {
     // useNewUrlParser: true,
     // useCreateIndex: true,
@@ -134,7 +132,7 @@ if (helmetConfig.enabled) {
     }));
 }
 
-let sessionStore = mongoStore.create({mongoUrl: config.mongodb.uri});
+let sessionStore = MongoStore.create({mongoUrl: config.mongodb.uri});
 sessionStore.on('error', function (error: unknown) {
     console.error('Mongo session store error:', error);
     // You can implement fallback logic here, like switching to a MemoryStore

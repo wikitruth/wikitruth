@@ -60,6 +60,8 @@ describe('Server route contracts', function () {
     const appSource = readProjectFile('app.js');
 
     expect(appSource).toContain('const sessionConfig = config.session || {}');
+    expect(appSource).toContain("MongoStore = require('connect-mongo').MongoStore");
+    expect(appSource).toContain('MongoStore.create({mongoUrl: config.mongodb.uri})');
     expect(appSource).toContain('const csrfConfig = config.csrf || {}');
     expect(appSource).toContain('const csrfProtection = createCsrfProtection({');
     expect(appSource).toContain('app.use(csrfProtection);');
