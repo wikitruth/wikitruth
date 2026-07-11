@@ -142,7 +142,20 @@ async function POST_issue_create(req: WikitruthRequest, res: WikitruthResponse) 
 
   const title = String(req.body?.title || '').trim();
   const description = String(req.body?.description || req.body?.content || '').trim();
-  const ownerId = req.body?.topicId || req.body?.ownerId || req.query?.topic || null;
+  const ownerTypes: Record<string, number> = {
+    topic: constants.OBJECT_TYPES.topic,
+    argument: constants.OBJECT_TYPES.argument,
+    question: constants.OBJECT_TYPES.question,
+    answer: constants.OBJECT_TYPES.answer,
+    artifact: constants.OBJECT_TYPES.artifact,
+    issue: constants.OBJECT_TYPES.issue,
+    opinion: constants.OBJECT_TYPES.opinion,
+  };
+  const requestedOwnerType = String(req.body?.ownerType || '').trim().toLowerCase();
+  const queryOwner = Object.keys(ownerTypes).find((key) => req.query?.[key]);
+  const ownerName = ownerTypes[requestedOwnerType] ? requestedOwnerType : queryOwner || 'topic';
+  const ownerType = ownerTypes[ownerName] || constants.OBJECT_TYPES.topic;
+  const ownerId = req.body?.ownerId || req.body?.topicId || (queryOwner ? req.query?.[queryOwner] : req.query?.topic) || null;
   const issueType = Number(req.body?.issueType || constants.ISSUE_TYPES.type100.code);
   const isPrivate = Boolean(req.body?.private);
 
@@ -157,7 +170,7 @@ async function POST_issue_create(req: WikitruthRequest, res: WikitruthResponse) 
   if (await rejectBlockingDuplicate(res, constants.OBJECT_TYPES.issue, {
     title,
     content: description,
-    ownerType: constants.OBJECT_TYPES.topic,
+    ownerType,
     ownerId,
     private: isPrivate,
     groupId: null,
@@ -172,9 +185,9 @@ async function POST_issue_create(req: WikitruthRequest, res: WikitruthResponse) 
     contentPreview: description.slice(0, 240),
     friendlyUrl: utils.urlify(title),
     issueType: issueType,
-    ownerType: constants.OBJECT_TYPES.topic,
+    ownerType,
     ownerId: ownerId,
-    categoryId: ownerId,
+    categoryId: req.body?.categoryId || (ownerType === constants.OBJECT_TYPES.topic ? ownerId : null),
     createDate: now,
     editDate: now,
     createUserId: req.user._id,
@@ -195,8 +208,8 @@ async function POST_issue_create(req: WikitruthRequest, res: WikitruthResponse) 
 
   await logEntryEvent({
     eventType: 'issue.created',
-    objectType: constants.OBJECT_TYPES.topic,
-    objectName: 'topic',
+    objectType: ownerId ? ownerType : constants.OBJECT_TYPES.issue,
+    objectName: ownerId ? ownerName : 'issue',
     objectId: String(ownerId || issue._id),
     actorUserId: String(req.user._id),
     actorUsername: String(req.user.username || ''),
@@ -211,8 +224,8 @@ async function POST_issue_create(req: WikitruthRequest, res: WikitruthResponse) 
   if (ownerId) {
     await notifySubscribers({
       target: {
-        objectType: constants.OBJECT_TYPES.topic,
-        objectName: 'topic',
+        objectType: ownerType,
+        objectName: ownerName,
         objectId: String(ownerId),
       },
       type: 'issue',
@@ -286,6 +299,18 @@ async function PUT_issue_update(req: WikitruthRequest, res: WikitruthResponse) {
   if (typeof req.body?.topicId !== 'undefined' || typeof req.body?.ownerId !== 'undefined') {
     issue.ownerId = req.body.topicId || req.body.ownerId || null;
     issue.categoryId = issue.ownerId;
+  }
+  if (typeof req.body?.ownerType !== 'undefined') {
+    const ownerTypes: Record<string, number> = {
+      topic: constants.OBJECT_TYPES.topic,
+      argument: constants.OBJECT_TYPES.argument,
+      question: constants.OBJECT_TYPES.question,
+      answer: constants.OBJECT_TYPES.answer,
+      artifact: constants.OBJECT_TYPES.artifact,
+      issue: constants.OBJECT_TYPES.issue,
+      opinion: constants.OBJECT_TYPES.opinion,
+    };
+    issue.ownerType = ownerTypes[String(req.body.ownerType || '').trim().toLowerCase()] || issue.ownerType;
   }
 
   issue.editDate = new Date();

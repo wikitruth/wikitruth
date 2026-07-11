@@ -3,6 +3,7 @@
 import { sha256IntegrityHash } from '../utils/integrityHash';
 import { logEntryEvent } from './entryEventsService';
 import * as utils from '../utils/utils';
+import { markCommentsPotentiallyObsolete } from './discussionRevisionService';
 import {
   EDITABLE_FIELDS,
   changeRequestModel,
@@ -45,7 +46,7 @@ export async function captureEntryRevision(options: {
 
   const revisionNumber = await nextRevisionNumber(options.objectType, options.objectId);
   try {
-    return await revisionModel().create({
+    const revision = await revisionModel().create({
       objectType: options.objectType,
       objectId: options.objectId,
       revisionNumber,
@@ -58,6 +59,16 @@ export async function captureEntryRevision(options: {
       createUserId: options.actorId || null,
       createUsername: options.actorUsername || '',
     });
+    if (!['bootstrap', 'create'].includes(options.source)) {
+      await markCommentsPotentiallyObsolete({
+        objectType: options.objectType,
+        objectId: options.objectId,
+        revisionId: String(revision._id || ''),
+        revisionNumber,
+        reason: `Entry changed in revision ${revisionNumber}`,
+      });
+    }
+    return revision;
   } catch (error) {
     const isDuplicate = Boolean(error && typeof error === 'object' && Number((error as { code?: unknown }).code) === 11000);
     if (!isDuplicate) {

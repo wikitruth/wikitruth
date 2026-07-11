@@ -16,6 +16,7 @@ import apiService from '../services/api';
 import type { OpinionEntryResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
 import type { Issue, Opinion } from '../types';
+import { CommentRevisionNotice } from '../components/Entry/DiscussionIntegrityPanels';
 import { sanitizeHtml } from '../utils/sanitizeHtml';
 import {
   EntryContextLine,
@@ -60,6 +61,7 @@ const OpinionEntryPage: React.FC = () => {
   }
 
   const opinion = data.opinion as LegacyEntity;
+  const typedOpinion = opinion as unknown as Opinion;
   const issues = (data.issues || []) as LegacyEntity[];
   const opinions = (data.opinions || []) as LegacyEntity[];
   
@@ -103,6 +105,7 @@ const OpinionEntryPage: React.FC = () => {
       />
       
       <PageTabs tabs={tabs} activeTab="details" />
+      <CommentRevisionNotice opinion={typedOpinion} />
 
       {/* Opinion content */}
       <div className="text-body collapsible" style={{ marginTop: '20px' }}>

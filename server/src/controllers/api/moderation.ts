@@ -41,13 +41,16 @@ import { registerModerationDuplicateRoutes } from './moderationDuplicateRoutes';
 import { registerModerationRevisionRoutes } from './moderationRevisionRoutes';
 import { registerModerationArtifactRoutes } from './moderationArtifactRoutes';
 import { registerModerationVerdictChannelRoutes } from './moderationVerdictChannelRoutes';
+import { registerModerationIssueRoutes } from './moderationIssueRoutes';
 import { recordEntryRevision } from './revisionWriteRecorder';
+import { countBlockingIssues, enforceIssueFirstGate } from '../../services/issueGateService';
 
 export = function (router: Router) {
   registerModerationDuplicateRoutes(router);
   registerModerationRevisionRoutes(router);
   registerModerationArtifactRoutes(router);
   registerModerationVerdictChannelRoutes(router);
+  registerModerationIssueRoutes(router);
   router.get('/entry', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureModerator(req, res)) {
       return;
@@ -167,7 +170,7 @@ export = function (router: Router) {
     }
 
     if (![constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.argument].includes(target.objectType)) {
-      res.status(400).json({ success: false, message: 'Convert is only supported for topics and arguments' });
+      res.status(400).json({ success: false, message: 'Verdicts are only supported for topics and arguments' });
       return;
     }
 
@@ -176,6 +179,17 @@ export = function (router: Router) {
     const reasoning = String(body.reasoning || body.verdictReasoning || '').trim();
     if (status === null || !isSupportedVerdictStatus(status)) {
       res.status(400).json({ success: false, message: 'A valid verdict status is required' });
+      return;
+    }
+    const factualStatus = mapLegacyVerdictToFactual(status);
+    if (!['pending', 'insufficient_evidence'].includes(factualStatus) && !await enforceIssueFirstGate({
+      req,
+      res,
+      objectType: target.objectType,
+      objectName: target.objectName,
+      objectId: target.id,
+      action: 'factual_verdict',
+    })) {
       return;
     }
 
@@ -201,7 +215,7 @@ export = function (router: Router) {
     entry.verdicts = entry.verdicts || {};
     entry.verdicts.factual = {
       ...(entry.verdicts.factual || {}),
-      status: mapLegacyVerdictToFactual(status),
+      status: factualStatus,
       reasoning,
       editDate: new Date(),
       editUserId: req.user?.id || req.user?._id || entry.editUserId,
@@ -590,6 +604,28 @@ export = function (router: Router) {
         results.push({ id, success: false, message: 'Unsupported object type' });
         continue;
       }
+      const factualStatus = mapLegacyVerdictToFactual(status);
+      const blockingCount = ['pending', 'insufficient_evidence'].includes(factualStatus)
+        ? 0
+        : await countBlockingIssues(objectType, id);
+      if (blockingCount) {
+        const overrideReason = String(update.issueGateOverrideReason || '').trim();
+        if (overrideReason.length < 10) {
+          results.push({ id, success: false, message: `${blockingCount} accepted critical issue(s) must be resolved first` });
+          continue;
+        }
+        await logEntryEvent({
+          scope: 'privileged',
+          eventType: 'moderation.issue-gate.overridden',
+          objectType,
+          objectName: String(constants.OBJECT_ID_NAME_MAP?.[objectType] || 'entry'),
+          objectId: id,
+          actorUserId: String(userId || ''),
+          actorUsername: String(req.user?.username || ''),
+          message: overrideReason,
+          payload: { action: 'factual_verdict', blockingCount, bulk: true },
+        });
+      }
 
       const entry = await dbModel.findById(id);
       if (!entry) {
@@ -607,7 +643,7 @@ export = function (router: Router) {
       entry.verdicts = entry.verdicts || {};
       entry.verdicts.factual = {
         ...(entry.verdicts.factual || {}),
-        status: mapLegacyVerdictToFactual(status),
+        status: factualStatus,
         reasoning,
         editDate: new Date(),
         editUserId: userId || entry.editUserId,

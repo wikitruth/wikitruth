@@ -16,6 +16,22 @@ const factory: SchemaFactory = function (app, mongoose) {
     categoryId: { type: mongoose.Schema.ObjectId, ref: 'Topic' }, // the root topic where this entry belong
     ownerId: { type: mongoose.Schema.ObjectId },
     ownerType: { type: Number }, // OBJECT_TYPES
+    discussionContext: {
+      revisionId: { type: mongoose.Schema.ObjectId, ref: 'EntryRevision', default: null },
+      revisionNumber: { type: Number, default: null },
+      status: {
+        type: String,
+        enum: ['current', 'potentially_obsolete', 'relevant', 'obsolete'],
+        default: 'current',
+        index: true,
+      },
+      supersededByRevisionId: { type: mongoose.Schema.ObjectId, ref: 'EntryRevision', default: null },
+      supersededByRevisionNumber: { type: Number, default: null },
+      flaggedDate: { type: Date, default: null },
+      reviewedDate: { type: Date, default: null },
+      reviewedUserId: { type: mongoose.Schema.ObjectId, ref: 'User', default: null },
+      reason: { type: String, default: '' },
+    },
     screening: {
       status: { type: Number, default: constants.SCREENING_STATUS.status0.code }, // SCREENING_STATUS
       history: [

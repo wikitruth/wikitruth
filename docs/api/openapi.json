@@ -2907,6 +2907,40 @@
         }
       }
     },
+    "/moderation/issue-resolution": {
+      "put": {
+        "summary": "Resolve or dismiss an issue with reviewer evidence",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/GenericMutationRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Issue resolution recorded" },
+          "400": { "description": "Invalid status or missing decision reason" }
+        }
+      }
+    },
+    "/moderation/comment-relevance": {
+      "put": {
+        "summary": "Classify a revision-linked comment as still relevant or obsolete",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/GenericMutationRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Comment relevance recorded" },
+          "400": { "description": "Invalid status or missing review reason" }
+        }
+      }
+    },
     "/moderation/take-ownership": {
       "post": {
         "summary": "Take ownership of an entry as admin",

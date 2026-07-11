@@ -8,6 +8,7 @@ const mockCurrentEntry: Record<string, unknown> = {
 };
 let mockSequence = 0;
 const mockLogEntryEvent = jest.fn();
+const mockOpinionUpdateMany = jest.fn();
 
 function matches(record: Record<string, unknown>, query: Record<string, unknown>): boolean {
   return Object.entries(query).every(([key, value]) => String(record[key] ?? '') === String(value ?? ''));
@@ -82,6 +83,9 @@ jest.mock('../../server/src/app', () => ({
         })),
       },
       ChangeRequest: mockChangeRequestModel,
+      Opinion: {
+        updateMany: (...args: unknown[]) => mockOpinionUpdateMany(...args),
+      },
     },
   },
 }));
@@ -111,6 +115,7 @@ describe('entry revision and change-request service', () => {
       editDate: '2026-07-11T10:00:00.000Z',
     });
     jest.clearAllMocks();
+    mockOpinionUpdateMany.mockResolvedValue({ modifiedCount: 2 });
   });
 
   it('creates immutable numbered revisions and returns metadata without snapshots', async () => {
@@ -140,6 +145,15 @@ describe('entry revision and change-request service', () => {
       changedFields: expect.arrayContaining(['title']),
       snapshotHash: expect.stringMatching(/^[a-f0-9]{64}$/),
     }));
+    expect(mockOpinionUpdateMany).toHaveBeenCalledWith(
+      expect.objectContaining({ ownerType: 1, ownerId: 'topic-1' }),
+      expect.objectContaining({
+        $set: expect.objectContaining({
+          'discussionContext.status': 'potentially_obsolete',
+          'discussionContext.supersededByRevisionNumber': 2,
+        }),
+      }),
+    );
     const history = await listEntryRevisions({ objectType: 1, objectId: 'topic-1' });
     expect(history.revisions[0]).not.toHaveProperty('snapshot');
   });

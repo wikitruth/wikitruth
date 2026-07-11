@@ -215,11 +215,7 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
       return;
     }
     setIsOpen(false);
-    if (objectName === 'topic') {
-      void navigate(`/issues/create?topicId=${encodeURIComponent(entry._id)}`);
-      return;
-    }
-    void navigate('/issues/create');
+    void navigate(`/issues/create?${encodeURIComponent(objectName)}=${encodeURIComponent(entry._id)}`);
   };
 
   const handleViewDetails = () => {

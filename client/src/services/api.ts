@@ -446,6 +446,9 @@ class ApiService {
     title: string;
     description: string;
     topicId?: string;
+    ownerId?: string;
+    ownerType?: string;
+    categoryId?: string;
     private?: boolean;
     issueType?: number;
   }): Promise<LegacyApiResponse> {
@@ -461,6 +464,8 @@ class ApiService {
       title?: string;
       description?: string;
       topicId?: string;
+      ownerId?: string;
+      ownerType?: string;
       private?: boolean;
       issueType?: number;
     }

@@ -12,6 +12,18 @@ const factory: SchemaFactory = function (app, mongoose) {
     contentPreview: { type: String }, // A preview lines of text to display in list view
     friendlyUrl: { type: String },
     issueType: { type: Number, default: constants.ISSUE_TYPES.type100.code },
+    resolution: {
+      status: {
+        type: String,
+        enum: ['open', 'resolved', 'dismissed'],
+        default: 'open',
+        index: true,
+      },
+      reason: { type: String, default: '' },
+      decisionDate: { type: Date, default: null },
+      decisionUserId: { type: mongoose.Schema.ObjectId, ref: 'User', default: null },
+      decisionUsername: { type: String, default: '' },
+    },
     groupId: { type: mongoose.Schema.ObjectId, ref: 'Group', default: null },
     categoryId: { type: mongoose.Schema.ObjectId, ref: 'Topic' }, // the root topic where this entry belong
     ownerId: { type: mongoose.Schema.ObjectId },

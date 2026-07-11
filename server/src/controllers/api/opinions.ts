@@ -17,6 +17,8 @@ import { rejectBlockingDuplicate } from './duplicateWriteGuard';
 import { recordEntryRevision } from './revisionWriteRecorder';
 import { notifySubscribers } from '../../services/notificationsService';
 import { applyLegacyEntryContext, resolveLegacyEntryContext } from './entryContext';
+import { ensureCurrentRevision } from '../../services/entryRevisionService';
+import { enforceIssueFirstGate } from '../../services/issueGateService';
 
 export = function (router: Router) {
   // Get opinions list
@@ -208,6 +210,17 @@ async function POST_opinion_create(req: WikitruthRequest, res: WikitruthResponse
     return res.status(400).json({ error: 'Description is too long. Limit is 5000 characters.' });
   }
 
+  if (ownerId && !await enforceIssueFirstGate({
+    req,
+    res,
+    objectType: ownerType,
+    objectName: String(constants.OBJECT_ID_NAME_MAP[ownerType] || parentType || 'entry'),
+    objectId: String(ownerId),
+    action: 'discussion',
+  })) {
+    return;
+  }
+
   // Thread quality guardrails: prevent repetitive duplicate posts and posting spikes in the same thread.
   const recentWindowStart = new Date(Date.now() - 10 * 60 * 1000);
   const recentCount = await db.Opinion.countDocuments({
@@ -236,6 +249,9 @@ async function POST_opinion_create(req: WikitruthRequest, res: WikitruthResponse
   }
 
   const now = new Date();
+  const contextRevision = ownerId
+    ? await ensureCurrentRevision({ objectType: ownerType, objectId: String(ownerId) })
+    : null;
   const opinion = await db.Opinion.create({
     title: title,
     content: description,
@@ -244,6 +260,11 @@ async function POST_opinion_create(req: WikitruthRequest, res: WikitruthResponse
     ownerType: ownerType,
     ownerId: ownerId,
     parentId: parentId,
+    discussionContext: {
+      revisionId: contextRevision?._id || null,
+      revisionNumber: contextRevision ? Number(contextRevision.revisionNumber || 0) : null,
+      status: 'current',
+    },
     categoryId: ownerId,
     createDate: now,
     editDate: now,

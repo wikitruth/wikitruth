@@ -14,6 +14,7 @@ import {
   toModerationEntry,
 } from './moderationShared';
 import { recordEntryRevision } from './revisionWriteRecorder';
+import { enforceIssueFirstGate } from '../../services/issueGateService';
 
 type VerdictChannel = 'factual' | 'ethical';
 type ParsedChannel = {
@@ -100,6 +101,17 @@ async function saveChannels(
 ): Promise<void> {
   const target = getSupportedTarget(req, res);
   if (!target) {
+    return;
+  }
+  const factual = parsedChannels.find((parsed) => parsed.channel === 'factual');
+  if (factual && !['pending', 'insufficient_evidence'].includes(factual.status) && !await enforceIssueFirstGate({
+    req,
+    res,
+    objectType: target.objectType,
+    objectName: target.objectName,
+    objectId: target.id,
+    action: 'factual_verdict',
+  })) {
     return;
   }
   const dbModel = getDbModelByObjectType(target.objectType);

@@ -29,6 +29,12 @@ const OpinionEntryRow: React.FC<OpinionEntryRowProps> = ({
         <Link to={getOpinionLink()}>
           {opinion.title}
         </Link>
+        {opinion.discussionContext?.status === 'potentially_obsolete' ? (
+          <span className="label label-warning" style={{ marginLeft: 6 }}>older revision</span>
+        ) : null}
+        {opinion.discussionContext?.status === 'obsolete' ? (
+          <span className="label label-default" style={{ marginLeft: 6 }}>obsolete</span>
+        ) : null}
         {labels && (
           <>
             {opinion.private && (

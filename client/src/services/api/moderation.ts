@@ -314,6 +314,16 @@ export const moderationApi = {
       method: 'PUT',
       body: JSON.stringify(payload),
     }),
+  resolveIssue: (issueId: string, payload: { status: 'resolved' | 'dismissed'; reason: string }) =>
+    request<{ success: boolean; resolution: Record<string, unknown> }>(
+      `/moderation/issue-resolution?${toQuery({ key: 'issue', id: issueId })}`,
+      { method: 'PUT', body: JSON.stringify(payload) },
+    ),
+  reviewCommentRelevance: (opinionId: string, payload: { status: 'relevant' | 'obsolete'; reason: string }) =>
+    request<{ success: boolean; discussionContext: Record<string, unknown> }>(
+      `/moderation/comment-relevance?${toQuery({ key: 'opinion', id: opinionId })}`,
+      { method: 'PUT', body: JSON.stringify(payload) },
+    ),
   updateVerdictChannel: (
     target: ModerationTarget,
     payload: {

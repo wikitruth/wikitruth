@@ -172,7 +172,7 @@ describe('EntryActionsMenu moderation actions', () => {
 
     openMenu();
     fireEvent.click(screen.getByRole('button', { name: /report/i }));
-    expect(mockNavigate).toHaveBeenCalledWith('/issues/create?topicId=topic-1');
+    expect(mockNavigate).toHaveBeenCalledWith('/issues/create?topic=topic-1');
 
     openMenu();
     fireEvent.click(screen.getByRole('button', { name: /details/i }));

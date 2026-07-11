@@ -17,7 +17,7 @@ import { useNotification } from '../context/NotificationContext';
 interface IssueFormValues {
   title: string;
   description: string;
-  topicId: string;
+  ownerId: string;
   issueType: string;
   private: boolean;
 }
@@ -25,7 +25,11 @@ interface IssueFormValues {
 const IssueCreatePage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const topicIdFromQuery = String(searchParams.get('topicId') || searchParams.get('topic') || '').trim();
+  const ownerContext = ['topic', 'argument', 'question', 'answer', 'artifact', 'issue', 'opinion']
+    .map((key) => ({ key, id: String(searchParams.get(key) || '').trim() }))
+    .find((candidate) => candidate.id);
+  const ownerType = String(searchParams.get('ownerType') || ownerContext?.key || 'topic');
+  const ownerIdFromQuery = String(searchParams.get('ownerId') || searchParams.get('topicId') || ownerContext?.id || '').trim();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const { addToast } = useNotification();
@@ -52,7 +56,8 @@ const IssueCreatePage: React.FC = () => {
       const response = await apiService.createIssue({
         title: values.title,
         description: values.description,
-        topicId: values.topicId || undefined,
+        ownerId: values.ownerId || undefined,
+        ownerType,
         issueType: Number(values.issueType || '100'),
         private: values.private,
       });
@@ -79,7 +84,7 @@ const IssueCreatePage: React.FC = () => {
     initialValues: {
       title: '',
       description: '',
-      topicId: topicIdFromQuery,
+      ownerId: ownerIdFromQuery,
       issueType: '100',
       private: false,
     },
@@ -152,12 +157,12 @@ const IssueCreatePage: React.FC = () => {
             />
 
             <Input
-              name="topicId"
-              label="Topic ID (optional)"
-              value={values.topicId}
+              name="ownerId"
+              label={`${ownerType.charAt(0).toUpperCase()}${ownerType.slice(1)} ID (optional)`}
+              value={values.ownerId}
               onChange={handleChange}
               onBlur={handleBlur}
-              placeholder="Attach this issue to a topic"
+              placeholder={`Attach this issue to a ${ownerType}`}
             />
 
             <Checkbox

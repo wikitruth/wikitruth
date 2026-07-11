@@ -161,6 +161,12 @@ export interface Issue {
   createDate?: Date;
   editorId?: string;
   editorUsername?: string;
+  resolution?: {
+    status?: 'open' | 'resolved' | 'dismissed';
+    reason?: string;
+    decisionDate?: Date | string;
+    decisionUsername?: string;
+  };
 }
 
 export interface Opinion {
@@ -177,6 +183,16 @@ export interface Opinion {
   createDate?: Date;
   editorId?: string;
   editorUsername?: string;
+  discussionContext?: {
+    revisionId?: string;
+    revisionNumber?: number;
+    status?: 'current' | 'potentially_obsolete' | 'relevant' | 'obsolete';
+    supersededByRevisionId?: string;
+    supersededByRevisionNumber?: number;
+    reason?: string;
+    flaggedDate?: Date | string;
+    reviewedDate?: Date | string;
+  };
 }
 
 export interface Artifact {

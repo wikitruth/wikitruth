@@ -14,7 +14,8 @@ import PageMeta from '../components/common/PageMeta';
 import apiService from '../services/api';
 import type { IssueEntryResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
-import type { Opinion } from '../types';
+import type { Issue, Opinion } from '../types';
+import { IssueResolutionPanel } from '../components/Entry/DiscussionIntegrityPanels';
 import { sanitizeHtml } from '../utils/sanitizeHtml';
 import {
   EntryContextLine,
@@ -59,6 +60,7 @@ const IssueEntryPage: React.FC = () => {
   }
 
   const issue = data.issue as LegacyEntity;
+  const typedIssue = issue as unknown as Issue;
   const opinions = (data.opinions || []) as LegacyEntity[];
   
   // Build breadcrumb items
@@ -99,6 +101,7 @@ const IssueEntryPage: React.FC = () => {
         moreActions={<EntryActionsMenu entry={issue} editPath={`/issues/edit/${encodeURIComponent(issue._id)}`} />}
       />
       
+      <IssueResolutionPanel issue={typedIssue} />
       <PageTabs tabs={tabs} activeTab="details" />
 
       {/* Issue content */}
