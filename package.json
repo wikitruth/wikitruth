@@ -35,6 +35,7 @@
     "test:parity:screenshots": "node scripts/qa/migration-parity-screenshots.mjs",
     "test:parity:semantic": "node scripts/qa/migration-parity-semantic.mjs",
     "test:parity:authenticated": "node scripts/qa/migration-authenticated-parity.mjs",
+    "test:policy:pilot": "node --env-file-if-exists=.env scripts/qa/content-policy-pilot.mjs",
     "test:parity": "npm-run-all test:parity:server test:parity:client",
     "test:upgrade:regression": "bash scripts/qa/upgrade-regression-batch.sh all",
     "test:upgrade:regression:tooling": "bash scripts/qa/upgrade-regression-batch.sh tooling",
