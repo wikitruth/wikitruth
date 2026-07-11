@@ -16,7 +16,7 @@ Re-open legacy-to-modern parity at feature and workflow depth, rather than treat
 
 ### Legacy replacement readiness
 
-**Not yet complete.** Core public reading, entry CRUD, discussion, search, visualization, member/group, moderation, and admin surfaces are substantially represented in modern code. Replacement remains blocked by the fresh-install recovery gap and requires additional validation for authenticated/privileged workflows.
+**Functionally complete for public and recovery workflows; final signoff pending.** Core public reading, entry CRUD, discussion, search, visualization, member/group, moderation, admin, empty-database recovery, and dynamic About content are represented in modern code. Final replacement signoff still requires credentialed privileged-role validation and an externally reachable FixPH tenant check.
 
 ### Modern target-state completeness
 
@@ -34,9 +34,9 @@ Re-open legacy-to-modern parity at feature and workflow depth, rather than treat
 | Members, profiles, journals, groups | Present in code and focused tests | Modern follow/subscription support exceeds legacy | Full role/session runtime journey remains an audit item. |
 | Screening, verdicts, conversion, ownership | Present in modern API/UI | Signals, appeals, and bulk verdict operations exceed legacy | Requires credentialed screener/reviewer/admin runtime verification. |
 | Admin CRUD and backup/restore | Present for authenticated admins | Audit timeline is modern-only | Normal admin restore is tested; empty-database bootstrap is not covered by this path. |
-| Fresh install / empty database recovery | **Missing** | Incomplete operationally | `/api/home` redirects an empty database to `/install`, but modern `/install` only shows contributor setup instructions. Legacy `/install` performs guarded restore/bootstrap. |
-| Dynamic application About pages | **Missing** | Incomplete multi-tenant content support | Legacy `/about/:id` loads a `Page` by stable `id`; modern has only a static `/about` route. |
-| QA proof | Partial | Incomplete | Screenshot runner captures files but does not compare them. Auth runner was corrected to find the modern `more` menu and now requires explicit opt-in before generated signup. |
+| Fresh install / empty database recovery | Implemented and tested | Secure one-time bootstrap plus normal admin restore | `/api/install` now requires an empty core database, server-side token, CSRF, `RESTORE`, backup preflight, rate limit, and post-restore checks. Initialized systems direct admins to `/admin/db-backup`. |
+| Dynamic application About pages | Implemented and live-verified | About hierarchy is public without exposing profile pages | `/about/:id` uses `/api/pages/about/:id`, limits results to the About root/children, sanitizes HTML, and serves direct nested routes from the React shell. |
+| QA proof | Public semantic coverage complete; privileged coverage pending | Improved | `migration-parity-semantic.mjs` validates all seven entry families, required semantics, HTTP state, error markers, and mobile overflow. Auth runner requires explicit opt-in before generated signup. |
 | Mobile/native client | Not a legacy-web parity requirement | Planned, not implemented | `REACT_NATIVE_MONOREPO_CHECKLIST_PLAN_2026-04-19.md` remains active with its implementation backlog. |
 
 ## Verified Defects Corrected in This Pass
@@ -51,11 +51,11 @@ Re-open legacy-to-modern parity at feature and workflow depth, rather than treat
 
 ## Open Legacy-Replacement Work
 
-- [ ] Design and implement a secure one-time empty-database bootstrap/restore flow reached from `/install`.
-- [ ] Add a modern public dynamic application page contract and `/about/:id` route, including not-found and visibility rules.
-- [ ] Add semantic DOM/action inventory comparisons to parity QA; do not treat screenshots plus HTTP `200` as a parity assertion.
+- [x] Design and implement a secure one-time empty-database bootstrap/restore flow reached from `/install`.
+- [x] Add a modern public dynamic application page contract and `/about/:id` route, including not-found and visibility rules.
+- [x] Add semantic DOM/action inventory comparisons to parity QA; do not treat screenshots plus HTTP `200` as a parity assertion.
 - [ ] Run credentialed reader/contributor/screener/reviewer/admin parity without creating persistent test users, and retain a redacted manifest.
-- [ ] Expand live representative entry checks from the artifact sample to all seven entity families on desktop and mobile.
+- [x] Expand live representative entry checks from the artifact sample to all seven entity families on desktop and mobile.
 
 ## Open Modern Target-State Work
 
@@ -76,10 +76,11 @@ The following remain genuinely pending after current-code searches. Detailed req
 - [x] Focused client tests for header sections, route aliases, and closed mobile sidebar behavior.
 - [x] Focused server test for singular comment redirect behavior.
 - [x] Server TypeScript no-emit check after the first correction set.
-- [x] Full client and server test suites: 56 client suites / 139 tests and 33 server suites / 154 tests passed.
+- [x] Full client and server test suites: 58 client suites / 142 tests and 35 server suites / 160 tests passed.
 - [x] Production server and client builds.
 - [x] PM2 process `35` (`wikitruth`) restart plus post-restart `200` checks for modern artifact, legacy artifact, and `/api/home`.
 - [x] Live current-host verification of default header sections, comment redirect, and closed/open mobile overflow at `390x844`.
+- [x] Live dynamic About page and seven-family semantic parity verification, including `390x844` overflow checks.
 - [ ] Live tenant-host verification of FixPH/application-specific header and Home section navigation.
 
 ## Completion Rule

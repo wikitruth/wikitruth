@@ -69,10 +69,10 @@
 | Notifications | N/A | N/A | `/notifications` | `client/src/pages/NotificationsPage.tsx` | `Modern Only (Intentional)` | Explicit modern enhancement. |
 | Timeline | N/A | N/A | `/timeline` | `client/src/pages/EntryTimelinePage.tsx` | `Modern Only (Intentional)` | Explicit modern enhancement. |
 | Create wizard | N/A | N/A | `/create` | `client/src/pages/CreateWizardPage.tsx` | `Modern Only (Intentional)` | Explicit modern enhancement. |
-| About | `/legacy/about` | `legacy/templates/dust/about/page.dust`, `legacy/templates/jade/about/index.jade` | `/about` | `client/src/pages/AboutPage.tsx` | `Aligned (Code Evidence)` | Static page parity present. |
+| About | `/legacy/about`, `/legacy/about/:id` | `legacy/templates/dust/about/page.dust`, `legacy/templates/jade/about/index.jade` | `/about`, `/about/:id` | `client/src/pages/AboutPage.tsx`, `client/src/pages/AboutContentPage.tsx` | `Aligned (Runtime Evidence)` | Dynamic About hierarchy API/UI is constrained to the About root and direct children; direct nested shell route and mobile rendering verified 2026-07-11. |
 | Contact | `/legacy/contact` | `legacy/templates/jade/contact/index.jade` | `/contact` | `client/src/pages/ContactPage.tsx` | `Aligned (Code Evidence)` | Contact form parity implemented with API integration. |
 | Help us | `/legacy/help-us` | `legacy/templates/dust/help-us.dust` | `/help-us` | `client/src/pages/HelpUsPage.tsx` | `Aligned (Code Evidence)` | Static parity present. |
-| Install | `/legacy/install` | `legacy/templates/dust/install/index.dust` | `/install` | `client/src/pages/InstallPage.tsx` | `Aligned (Code Evidence)` | Static parity present. |
+| Install | `/legacy/install` | `legacy/templates/dust/install/index.dust` | `/install` | `client/src/pages/Install/InstallPage.tsx` | `Aligned (Code + Runtime Evidence)` | Modern one-time restore requires empty core DB, server token, CSRF, confirmation, backup preflight, rate limit, and post-restore verification; initialized live status routes admins to `/admin/db-backup`. |
 | Errors | `/legacy/http/500`, `/legacy/http/404`, `/legacy/errors/503` | `legacy/templates/jade/http/500.jade`, `legacy/templates/jade/http/404.jade`, `legacy/templates/dust/errors/*.dust` | `/500`, `/503`, `*` | `client/src/pages/errors/*.tsx` | `Aligned (Code Evidence)` | Modern error pages are explicitly routed. |
 
 ## Common UI Elements Side-by-Side Matrix
