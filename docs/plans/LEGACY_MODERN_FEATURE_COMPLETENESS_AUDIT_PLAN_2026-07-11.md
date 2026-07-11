@@ -83,7 +83,7 @@ The unchecked work is valid, but it should not be executed as one undifferentiat
 
 The following remain genuinely pending after current-code searches. Detailed requirement IDs remain in `docs/plans/deferred/plan-2026-04-14/`.
 
-- [ ] Duplicate detection, deterministic merge, redirects, and moderator logs (`CORE-002`, `CONTENT-004`).
+- [x] Duplicate detection, deterministic merge, redirects, and moderator logs (`CORE-002`, `CONTENT-004`).
 - [ ] Change requests, stale-conflict handling, revision history, rollback, and suggestion mode (`CORE-014` through `CORE-017`).
 - [ ] Contributor/reviewer onboarding gates and controlled anonymous contribution (`CORE-010`, `CORE-019`).
 - [ ] Truth-versus-ethics verdict channels, unresolved-content expiry, and issue-first gates (`CORE-022`, `CORE-025`, `CORE-026`).
@@ -93,6 +93,12 @@ The following remain genuinely pending after current-code searches. Detailed req
 - [ ] Content policy packs, reviewer/screener playbooks, source-quality rubric, and seeded pilot evidence (`CONTENT-001` through `CONTENT-020`, as applicable).
 - [ ] Dedicated FixPH information architecture, government/accountability/location models, Vote Wisely workspace, and incident lifecycle (`FIXPH-001` through `FIXPH-008`).
 - [ ] React Native monorepo implementation and mobile release validation.
+
+### Implementation Progress (2026-07-11)
+
+- `54bf2cc8` added the operating policy baseline for duplicate/merge decisions, source quality, moderation roles, and independent truth/ethics review.
+- `38fa284b` added scoped deterministic candidate detection, exact duplicate prevention for all seven entry families, stale-preview validation, moderator-approved merges, relationship migration summaries, durable API redirects, source tombstones, privileged merge events, and the modern duplicate-review UI.
+- The content-policy item remains open only for seeded pilot execution and evidence; the policy pack and reviewer/screener playbook documents are implemented.
 
 ## Verification Checklist
 
