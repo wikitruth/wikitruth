@@ -1,0 +1,520 @@
+{
+  "baseUrl": "https://127.0.0.1:9443",
+  "generatedAt": "2026-07-11T15:37:43.674Z",
+  "outDir": "[transient-screenshots-not-retained]",
+  "auth": {
+    "mode": "provided-login",
+    "usedProvidedCredentials": true,
+    "generatedSignupAllowed": false,
+    "username": "[redacted-disposable-user]",
+    "success": true,
+    "availableRoles": [
+      "reader",
+      "contributor",
+      "screener",
+      "reviewer",
+      "admin"
+    ],
+    "activeRole": "contributor",
+    "cleanup": {
+      "disposableRecordsRemoved": true,
+      "verifiedAfterRun": true
+    }
+  },
+  "accountMenus": {
+    "modern": {
+      "screenshot": "[not-retained]",
+      "menuItems": [
+        "Account",
+        "My Profile",
+        "My Journal",
+        "Admin Area",
+        "Switch Role",
+        "Reader",
+        "Contributor",
+        "Screener",
+        "Reviewer",
+        "Admin",
+        "Sign Out"
+      ]
+    },
+    "legacy": {
+      "screenshot": "[not-retained]",
+      "menuItems": [
+        "Account",
+        "My Profile",
+        "My Journal",
+        "Admin Area",
+        "My Role",
+        "Contributor",
+        "Reader",
+        "Sign Out"
+      ]
+    }
+  },
+  "entries": [
+    {
+      "family": "topic",
+      "id": "5923af159c799b16ae951962",
+      "friendly": "republic-of-the-philippines",
+      "title": "Republic of the Philippines",
+      "modernUrl": "https://127.0.0.1:9443/topics/entry/republic-of-the-philippines/5923af159c799b16ae951962",
+      "legacyUrl": "https://127.0.0.1:9443/legacy/topic/republic-of-the-philippines/5923af159c799b16ae951962",
+      "modernFile": "[not-retained]",
+      "legacyFile": "[not-retained]",
+      "modernActionsFile": "[not-retained]",
+      "legacyActionsFile": "[not-retained]",
+      "modernBreadcrumb": "ExploreScience Republic of the Philippines",
+      "legacyBreadcrumb": "ExploreScienceRepublic of the Philippines",
+      "modernActions": [
+        "MORE OPTIONS",
+        "Follow",
+        "Share",
+        "Reply",
+        "Copy to Clipboard",
+        "Link to...",
+        "Report",
+        "Details",
+        "Signal for Review",
+        "Submit Appeal"
+      ],
+      "legacyActions": [
+        "MORE OPTIONS",
+        "Take Ownership",
+        "Move / Link...",
+        "Convert...",
+        "Swap Link",
+        "Delete",
+        "Follow",
+        "Share",
+        "Report",
+        "Details",
+        "Screener",
+        "Screening Status"
+      ],
+      "errors": []
+    },
+    {
+      "family": "argument",
+      "id": "5a4df5791271ae80f6009554",
+      "friendly": "the-fda-has-received-many-anecdotal-reports-of-adverse-reactions-to-foods-containing-msg",
+      "title": "The FDA has received many anecdotal reports of adverse reactions to foods containing MSG",
+      "modernUrl": "https://127.0.0.1:9443/arguments/entry/the-fda-has-received-many-anecdotal-reports-of-adverse-reactions-to-foods-containing-msg/5a4df5791271ae80f6009554",
+      "legacyUrl": "https://127.0.0.1:9443/legacy/argument/the-fda-has-received-many-anecdotal-reports-of-adverse-reactions-to-foods-containing-msg/5a4df5791271ae80f6009554",
+      "modernFile": "[not-retained]",
+      "legacyFile": "[not-retained]",
+      "modernActionsFile": "[not-retained]",
+      "legacyActionsFile": "[not-retained]",
+      "modernBreadcrumb": "ExploreHealthMonosodium glutamate (MSG) The FDA has received many anecdotal reports of adverse reactions to foods containing MSG",
+      "legacyBreadcrumb": "ExploreHealthMonosodium glutamate (MSG) The FDA has received many anecdotal reports of...",
+      "modernActions": [
+        "MORE OPTIONS",
+        "Follow",
+        "Share",
+        "Reply",
+        "Copy to Clipboard",
+        "Link to...",
+        "Report",
+        "Details",
+        "Signal for Review",
+        "Submit Appeal"
+      ],
+      "legacyActions": [
+        "MORE OPTIONS",
+        "Take Ownership",
+        "Move / Link...",
+        "Convert...",
+        "Swap Link",
+        "Delete",
+        "Follow",
+        "Share",
+        "Report",
+        "Details",
+        "Screener",
+        "Screening Status"
+      ],
+      "errors": []
+    },
+    {
+      "family": "question",
+      "id": "5896a1f7ad8ebac0293812ca",
+      "friendly": "accepted-question",
+      "title": "accepted question",
+      "modernUrl": "https://127.0.0.1:9443/questions/entry/accepted-question/5896a1f7ad8ebac0293812ca",
+      "legacyUrl": "https://127.0.0.1:9443/legacy/question/accepted-question/5896a1f7ad8ebac0293812ca",
+      "modernFile": "[not-retained]",
+      "legacyFile": "[not-retained]",
+      "modernActionsFile": "[not-retained]",
+      "legacyActionsFile": "[not-retained]",
+      "modernBreadcrumb": "ExploreGenetically modified organism (GMO) accepted question",
+      "legacyBreadcrumb": "ExploreGenetically modified organism (GMO) accepted question",
+      "modernActions": [
+        "MORE OPTIONS",
+        "Follow",
+        "Share",
+        "Reply",
+        "Copy to Clipboard",
+        "Link to...",
+        "Report",
+        "Details",
+        "Signal for Review",
+        "Submit Appeal"
+      ],
+      "legacyActions": [
+        "MORE OPTIONS",
+        "Take Ownership",
+        "Move / Link...",
+        "Convert...",
+        "Swap Link",
+        "Delete",
+        "Follow",
+        "Share",
+        "Report",
+        "Details",
+        "Screener",
+        "Screening Status"
+      ],
+      "errors": []
+    },
+    {
+      "family": "answer",
+      "id": "586b34baa49cb7770f8d2977",
+      "friendly": "answer-on-gmo-5",
+      "title": "answer on gmo 5",
+      "modernUrl": "https://127.0.0.1:9443/answers/entry/586b34baa49cb7770f8d2977",
+      "legacyUrl": "https://127.0.0.1:9443/legacy/answer/answer-on-gmo-5/586b34baa49cb7770f8d2977",
+      "modernFile": "[not-retained]",
+      "legacyFile": "[not-retained]",
+      "modernActionsFile": "[not-retained]",
+      "legacyActionsFile": "[not-retained]",
+      "modernBreadcrumb": "ExploreGenetically modified organism (GMO) question on gmo answer on gmo 5",
+      "legacyBreadcrumb": "ExploreGenetically modified organism (GMO) question on gmo answer on gmo 5",
+      "modernActions": [
+        "MORE OPTIONS",
+        "Follow",
+        "Share",
+        "Reply",
+        "Copy to Clipboard",
+        "Link to...",
+        "Report",
+        "Details",
+        "Signal for Review",
+        "Submit Appeal"
+      ],
+      "legacyActions": [
+        "MORE OPTIONS",
+        "Take Ownership",
+        "Move / Link...",
+        "Convert...",
+        "Swap Link",
+        "Delete",
+        "Follow",
+        "Share",
+        "Report",
+        "Details",
+        "Screener",
+        "Screening Status"
+      ],
+      "errors": []
+    },
+    {
+      "family": "issue",
+      "id": "595e4fcc37c6cc10212e1689",
+      "friendly": "abc",
+      "title": "abc",
+      "modernUrl": "https://127.0.0.1:9443/issues/entry/abc/595e4fcc37c6cc10212e1689",
+      "legacyUrl": "https://127.0.0.1:9443/legacy/issue/abc/595e4fcc37c6cc10212e1689",
+      "modernFile": "[not-retained]",
+      "legacyFile": "[not-retained]",
+      "modernActionsFile": "[not-retained]",
+      "legacyActionsFile": "[not-retained]",
+      "modernBreadcrumb": "ExploreScienceRepublic of the Philippines abc",
+      "legacyBreadcrumb": "ExploreScienceRepublic of the Philippines abc",
+      "modernActions": [
+        "MORE OPTIONS",
+        "Follow",
+        "Share",
+        "Reply",
+        "Copy to Clipboard",
+        "Link to...",
+        "Report",
+        "Details",
+        "Signal for Review",
+        "Submit Appeal"
+      ],
+      "legacyActions": [
+        "MORE OPTIONS",
+        "Take Ownership",
+        "Move / Link...",
+        "Convert...",
+        "Swap Link",
+        "Delete",
+        "Follow",
+        "Share",
+        "Report",
+        "Details",
+        "Screener",
+        "Screening Status"
+      ],
+      "errors": []
+    },
+    {
+      "family": "opinion",
+      "id": "595e4fd637c6cc10212e168a",
+      "friendly": "abc",
+      "title": "abc",
+      "modernUrl": "https://127.0.0.1:9443/opinions/entry/abc/595e4fd637c6cc10212e168a",
+      "legacyUrl": "https://127.0.0.1:9443/legacy/opinion/abc/595e4fd637c6cc10212e168a",
+      "modernFile": "[not-retained]",
+      "legacyFile": "[not-retained]",
+      "modernActionsFile": "[not-retained]",
+      "legacyActionsFile": "[not-retained]",
+      "modernBreadcrumb": "ExploreScienceRepublic of the Philippines abc",
+      "legacyBreadcrumb": "ExploreScienceRepublic of the Philippines abc",
+      "modernActions": [
+        "MORE OPTIONS",
+        "Follow",
+        "Share",
+        "Reply",
+        "Copy to Clipboard",
+        "Link to...",
+        "Report",
+        "Details",
+        "Signal for Review",
+        "Submit Appeal"
+      ],
+      "legacyActions": [
+        "MORE OPTIONS",
+        "Take Ownership",
+        "Move / Link...",
+        "Convert...",
+        "Swap Link",
+        "Delete",
+        "Follow",
+        "Share",
+        "Report",
+        "Details",
+        "Screener",
+        "Screening Status"
+      ],
+      "errors": []
+    },
+    {
+      "family": "artifact",
+      "id": "59e467f7ea72bc2893f3f83e",
+      "friendly": "sample-artifact",
+      "title": "Sample artifact",
+      "modernUrl": "https://127.0.0.1:9443/artifacts/entry/sample-artifact/59e467f7ea72bc2893f3f83e",
+      "legacyUrl": "https://127.0.0.1:9443/legacy/artifact/sample-artifact/59e467f7ea72bc2893f3f83e",
+      "modernFile": "[not-retained]",
+      "legacyFile": "[not-retained]",
+      "modernActionsFile": "[not-retained]",
+      "legacyActionsFile": "[not-retained]",
+      "modernBreadcrumb": "ExploreScienceRepublic of the Philippines Sample artifact",
+      "legacyBreadcrumb": "ExploreScienceRepublic of the Philippines Sample artifact",
+      "modernActions": [
+        "MORE OPTIONS",
+        "Follow",
+        "Share",
+        "Copy to Clipboard",
+        "Link to...",
+        "Report",
+        "Details",
+        "Signal for Review",
+        "Submit Appeal"
+      ],
+      "legacyActions": [
+        "MORE OPTIONS",
+        "Take Ownership",
+        "Move / Link...",
+        "Convert...",
+        "Swap Link",
+        "Delete",
+        "Follow",
+        "Share",
+        "Report",
+        "Details",
+        "Screener",
+        "Screening Status"
+      ],
+      "errors": []
+    }
+  ],
+  "roleChecks": [
+    {
+      "role": "reader",
+      "switch": {
+        "role": "reader",
+        "status": 200,
+        "success": true,
+        "payload": {
+          "success": true,
+          "activeRole": "reader"
+        }
+      },
+      "screenshot": "[not-retained]",
+      "menuItems": [
+        "MORE OPTIONS",
+        "Follow",
+        "Share",
+        "Report",
+        "Details",
+        "Signal for Review",
+        "Submit Appeal"
+      ],
+      "signals": {
+        "screeningStatus": false,
+        "takeOwnership": false,
+        "deleteEntry": false,
+        "convert": false,
+        "signal": true,
+        "appeal": true
+      }
+    },
+    {
+      "role": "contributor",
+      "switch": {
+        "role": "contributor",
+        "status": 200,
+        "success": true,
+        "payload": {
+          "success": true,
+          "activeRole": "contributor"
+        }
+      },
+      "screenshot": "[not-retained]",
+      "menuItems": [
+        "MORE OPTIONS",
+        "Follow",
+        "Share",
+        "Reply",
+        "Copy to Clipboard",
+        "Link to...",
+        "Report",
+        "Details",
+        "Signal for Review",
+        "Submit Appeal"
+      ],
+      "signals": {
+        "screeningStatus": false,
+        "takeOwnership": false,
+        "deleteEntry": false,
+        "convert": false,
+        "signal": true,
+        "appeal": true
+      }
+    },
+    {
+      "role": "screener",
+      "switch": {
+        "role": "screener",
+        "status": 200,
+        "success": true,
+        "payload": {
+          "success": true,
+          "activeRole": "screener"
+        }
+      },
+      "screenshot": "[not-retained]",
+      "menuItems": [
+        "MORE OPTIONS",
+        "Follow",
+        "Share",
+        "Reply",
+        "Copy to Clipboard",
+        "Link to...",
+        "Report",
+        "Details",
+        "Signal for Review",
+        "Submit Appeal",
+        "Screening Status"
+      ],
+      "signals": {
+        "screeningStatus": true,
+        "takeOwnership": false,
+        "deleteEntry": false,
+        "convert": false,
+        "signal": true,
+        "appeal": true
+      }
+    },
+    {
+      "role": "reviewer",
+      "switch": {
+        "role": "reviewer",
+        "status": 200,
+        "success": true,
+        "payload": {
+          "success": true,
+          "activeRole": "reviewer"
+        }
+      },
+      "screenshot": "[not-retained]",
+      "menuItems": [
+        "MORE OPTIONS",
+        "Follow",
+        "Share",
+        "Reply",
+        "Copy to Clipboard",
+        "Link to...",
+        "Report",
+        "Details",
+        "Signal for Review",
+        "Submit Appeal"
+      ],
+      "signals": {
+        "screeningStatus": false,
+        "takeOwnership": false,
+        "deleteEntry": false,
+        "convert": false,
+        "signal": true,
+        "appeal": true
+      }
+    },
+    {
+      "role": "admin",
+      "switch": {
+        "role": "admin",
+        "status": 200,
+        "success": true,
+        "payload": {
+          "success": true,
+          "activeRole": "admin"
+        }
+      },
+      "screenshot": "[not-retained]",
+      "menuItems": [
+        "MORE OPTIONS",
+        "Edit",
+        "Follow",
+        "Share",
+        "Reply",
+        "Copy to Clipboard",
+        "Link to...",
+        "Report",
+        "Details",
+        "Signal for Review",
+        "Submit Appeal",
+        "Screening Status",
+        "Take Ownership",
+        "Convert",
+        "Delete"
+      ],
+      "signals": {
+        "screeningStatus": true,
+        "takeOwnership": true,
+        "deleteEntry": true,
+        "convert": true,
+        "signal": true,
+        "appeal": true
+      }
+    }
+  ],
+  "styleStates": {
+    "modernHoverFile": "docs/qa/artifacts/parity-authenticated-disposable-2026-07-11/style-state-modern-hover.png",
+    "modernFocusFile": "docs/qa/artifacts/parity-authenticated-disposable-2026-07-11/style-state-modern-focus.png",
+    "legacyHoverFile": "docs/qa/artifacts/parity-authenticated-disposable-2026-07-11/style-state-legacy-hover.png",
+    "legacyFocusFile": "docs/qa/artifacts/parity-authenticated-disposable-2026-07-11/style-state-legacy-focus.png",
+    "errors": []
+  }
+}

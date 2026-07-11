@@ -114,12 +114,14 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
     return () => window.clearTimeout(timeout);
   }, [statusMessage]);
 
-  const isAdmin = Boolean(user?.roles?.admin);
-  const isScreener = Boolean(user?.roles?.screener);
+  const hasAdminRole = Boolean(user?.roles?.admin);
+  const hasScreenerRole = Boolean(user?.roles?.screener);
+  const isAdminMode = activeRole === 'admin' && hasAdminRole;
+  const isScreenerMode = activeRole === 'screener' && hasScreenerRole;
   const isAuthenticated = Boolean(user?._id);
   const isReaderMode = activeRole === 'reader';
   const isOwner = Boolean(user?._id && entry.createUserId && String(user._id) === String(entry.createUserId));
-  const canEdit = !isReaderMode && Boolean(editPath) && (isOwner || isAdmin);
+  const canEdit = !isReaderMode && Boolean(editPath) && (isOwner || isAdminMode);
   const objectType = typeof entry.objectType === 'number' ? entry.objectType : null;
   const canConvert = objectName === 'topic' || objectName === 'argument';
   const canReply = !isReaderMode && ['topic', 'argument', 'question', 'answer', 'issue', 'opinion'].includes(objectName);
@@ -130,7 +132,7 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
   const canViewDetails = Boolean(entry._id);
   const canSignal = isAuthenticated && Boolean(entry._id) && Boolean(objectName);
   const canAppeal = isAuthenticated && Boolean(entry._id) && Boolean(objectName);
-  const canManageEntry = !isReaderMode && (isScreener || isAdmin);
+  const canManageEntry = isScreenerMode || isAdminMode;
 
   const handleEdit = () => {
     if (!editPath) {
@@ -435,14 +437,14 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
               </li>
             )}
             {canManageEntry && <li role="separator" className="divider"></li>}
-            {!isReaderMode && isScreener && objectName && (
+            {canManageEntry && objectName && (
               <li>
                 <button type="button" className="btn btn-link" onClick={handleScreening}>
                   <i className="fa fa-pencil-square-o" aria-hidden="true"></i> Screening Status
                 </button>
               </li>
             )}
-            {!isReaderMode && isAdmin && (
+            {isAdminMode && (
               <>
                 {objectType !== null && !isOwner && (
                   <li>

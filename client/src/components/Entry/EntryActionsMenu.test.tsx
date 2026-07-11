@@ -226,4 +226,31 @@ describe('EntryActionsMenu moderation actions', () => {
     expect(screen.getByRole('button', { name: /share/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /details/i })).toBeInTheDocument();
   });
+
+  it('does not leak assigned admin capabilities into contributor mode', async () => {
+    mockUseAuth.mockReturnValue({
+      user: {
+        _id: 'admin-user',
+        username: 'admin',
+        roles: { admin: 'admin-role-id', screener: true },
+      },
+      isAuthenticated: true,
+      isLoading: false,
+      activeRole: 'contributor' as const,
+      setActiveRole: jest.fn(),
+      availableRoles: ['reader' as const, 'contributor' as const, 'screener' as const, 'admin' as const],
+      login: jest.fn(),
+      signup: jest.fn(),
+      logout: jest.fn(),
+      updateUser: jest.fn(),
+    });
+
+    await renderMenu({ objectName: 'topic', objectType: 1, createUserId: 'other-user', _id: 'topic-1' });
+    openMenu();
+
+    expect(screen.queryByRole('button', { name: /screening status/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /take ownership/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /convert/i })).not.toBeInTheDocument();
+  });
 });
