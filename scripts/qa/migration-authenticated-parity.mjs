@@ -17,6 +17,9 @@ const providedPassword = String(
 const providedEmail = String(
   process.env.WT_PARITY_EMAIL || process.env.WT_PARITY_PRIVILEGED_EMAIL || '',
 ).trim();
+const allowGeneratedSignup = ['1', 'true', 'yes'].includes(
+  String(process.env.WT_PARITY_ALLOW_SIGNUP || '').trim().toLowerCase(),
+);
 
 const generatedToken = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
 const generatedCredentials = {
@@ -283,6 +286,8 @@ async function openLegacyAccountMenu(page) {
 
 async function openModernEntryActionsMenu(page) {
   return clickFirstVisible(page, [
+    '.entry-options a[title="See more options"]',
+    '.entry-options a.dropdown-toggle:has-text("more")',
     'button:has-text("Actions")',
     '.entry-actions button.dropdown-toggle',
     '.dropdown button.dropdown-toggle:has-text("Actions")',
@@ -357,6 +362,10 @@ async function ensureSignedIn(page, context) {
   if (providedUsername && providedPassword) {
     const loggedIn = await tryLoginViaModern(page);
     return { mode: 'provided-login', success: loggedIn };
+  }
+
+  if (!allowGeneratedSignup) {
+    return { mode: 'credentials-required', success: false };
   }
 
   const created = await trySignupViaModern(page);
@@ -511,6 +520,7 @@ async function main() {
     auth: {
       mode: '',
       usedProvidedCredentials: Boolean(providedUsername && providedPassword),
+      generatedSignupAllowed: allowGeneratedSignup,
       username: credentials.username,
       success: false,
       availableRoles: [],
@@ -538,7 +548,7 @@ async function main() {
   if (!authOutcome.success) {
     await browser.close();
     throw new Error(
-      'Unable to authenticate for signed-in parity. Provide WT_PARITY_USERNAME/WT_PARITY_PASSWORD or ensure signup is available.'
+      'Unable to authenticate for signed-in parity. Provide WT_PARITY_USERNAME/WT_PARITY_PASSWORD, reuse an authenticated session, or explicitly set WT_PARITY_ALLOW_SIGNUP=true.'
     );
   }
 
