@@ -2,7 +2,6 @@
 
 import type { LegacyControllerFactory } from '../../../server/src/types/legacyControllers';
 
-import * as url from 'url';
 import mongoose from 'mongoose';
 import async from 'async';
 
@@ -129,7 +128,7 @@ async function GET_posts(req, res) {
     const LIMIT = req.query.tab ? 25 : 15;
     const allTabs = !req.query.tab;
     const tab = req.query.tab ? req.query.tab : 'all';
-    const baseUrl = url.parse(req.originalUrl);
+    const baseUrl = new URL(req.originalUrl, 'http://legacy.local');
     const model = {
         tab: tab,
         url: baseUrl.pathname,
