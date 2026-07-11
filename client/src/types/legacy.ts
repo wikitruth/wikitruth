@@ -26,6 +26,9 @@ export interface LegacyEntity {
   username: string;
   email: string;
   points?: number;
+  reputation?: import('./index').ReputationSnapshot | null;
+  authorReputationScore?: number;
+  authorReputationLevel?: string;
   screening?: {
     status?: number;
     history?: unknown[];

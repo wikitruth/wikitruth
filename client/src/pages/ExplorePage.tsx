@@ -17,6 +17,7 @@ import GeoPatternBackground from '../components/common/GeoPatternBackground';
 import ContentViewFilter, { type ViewMode } from '../components/common/ContentViewFilter';
 import { useNotification } from '../context/NotificationContext';
 import { useAuth } from '../context/AuthContext';
+import { getTrustedRankingScore } from '../utils/trustedRanking';
 
 type ExploreTab = 'all' | 'topics' | 'arguments' | 'questions' | 'answers' | 'artifacts' | 'issues' | 'opinions';
 
@@ -70,7 +71,8 @@ const ExplorePage: React.FC = () => {
   const verdictFilter = String(searchParams.get('status') || 'all').trim();
   const relationshipFilter = String(searchParams.get('relationship') || 'all').trim();
   const tagFilter = String(searchParams.get('tag') || '').trim();
-  const sortMode: 'latest' | 'popular' = String(searchParams.get('sort') || 'latest').toLowerCase() === 'popular' ? 'popular' : 'latest';
+  const sortValue = String(searchParams.get('sort') || 'latest').toLowerCase();
+  const sortMode: 'latest' | 'popular' | 'trusted' = sortValue === 'popular' || sortValue === 'trusted' ? sortValue : 'latest';
   const { addToast } = useNotification();
 
   useEffect(() => {
@@ -266,6 +268,11 @@ const ExplorePage: React.FC = () => {
             return scoreDelta;
           }
         }
+        if (sortMode === 'trusted') {
+          const trustedDelta = getTrustedRankingScore(right, getPopularityScore(right))
+            - getTrustedRankingScore(left, getPopularityScore(left));
+          if (trustedDelta !== 0) return trustedDelta;
+        }
 
         const leftDate = new Date(left.editDate || left.createDate || 0).getTime();
         const rightDate = new Date(right.editDate || right.createDate || 0).getTime();
@@ -372,6 +379,18 @@ const ExplorePage: React.FC = () => {
             }}
           >
             Popular
+          </a>
+          <a
+            href="#browse"
+            className={`btn btn-${sortMode === 'trusted' ? 'info' : 'default'} btn-sm`}
+            role="button"
+            title="Rank accepted content using the contributor scorecard as one transparent input"
+            onClick={(event) => {
+              event.preventDefault();
+              updateFilter('sort', 'trusted');
+            }}
+          >
+            Trusted
           </a>
         </div>
         &nbsp;&nbsp;

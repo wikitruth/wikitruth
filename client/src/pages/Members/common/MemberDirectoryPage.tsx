@@ -99,6 +99,14 @@ const MemberDirectoryPage: React.FC<MemberDirectoryPageProps> = ({ title, subtit
                           {member.username}
                         </span>
                       </div>
+                      {member.reputation ? (
+                        <div style={{ marginTop: 4 }}>
+                          <span className="label label-info" title={member.reputation.level}>
+                            Score {member.reputation.score}
+                          </span>{' '}
+                          <span className="text-muted small">{member.reputation.level}</span>
+                        </div>
+                      ) : null}
                     </h4>
                     <div>
                       <i className="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>&nbsp;

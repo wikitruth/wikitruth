@@ -32,6 +32,32 @@ export interface User {
   };
   createdDate?: Date;
   isActive?: string;
+  reputation?: ReputationSnapshot | null;
+}
+
+export interface ReputationSnapshot {
+  score: number;
+  level: string;
+  dimensions: {
+    quality: number;
+    participation: number;
+    stewardship: number;
+    evidence: number;
+  };
+  counts: {
+    contributions: number;
+    acceptedContributions: number;
+    rejectedContributions: number;
+    acceptedArtifacts: number;
+    artifactReviews: number;
+    verdictVotes: number;
+    privilegedActions: number;
+    acceptedChangeRequests: number;
+    rejectedChangeRequests: number;
+  };
+  badges: Array<{ key: string; label: string; description: string }>;
+  formulaVersion: string;
+  calculatedAt: string;
 }
 
 export interface Application {

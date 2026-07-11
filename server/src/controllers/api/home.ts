@@ -12,6 +12,7 @@ const async = asyncMod as unknown as {
 };
 import * as flowUtilsNs from '../../utils/flowUtils';
 import constantsMod from '../../models/constants';
+import { attachAuthorReputation } from '../../services/reputationService';
 const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
 const constants = constantsMod as unknown as ConstantsModule;
 const applications = applicationsMod as unknown as {
@@ -214,6 +215,8 @@ async function GET_home(req: WikitruthRequest, res: WikitruthResponse) {
       }
     },
   });
+
+  await attachAuthorReputation(db, model);
 
   // Keep parity with legacy homepage mixed "Latest Posts" columns.
   flowUtils.createEntrySet(model);

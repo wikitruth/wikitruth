@@ -9,6 +9,7 @@ import * as utils from '../../utils/utils';
 import constantsMod from '../../models/constants';
 const constants = constantsMod as unknown as ConstantsModule;
 import jwtMod from 'jsonwebtoken';
+import { attachReputationSnapshots, getOrRefreshReputation } from '../../services/reputationService';
 const jwt = jwtMod as unknown as { sign(payload: object, secret: string, options?: object): string; verify(token: string, secret: string): unknown };
 
 export = function (router: Router) {
@@ -21,7 +22,7 @@ export = function (router: Router) {
         .sort({ name: 1 })
         .lean();
 
-      res.json({ contributors });
+      res.json({ contributors: await attachReputationSnapshots(db, contributors) });
     } catch (err) {
       console.error('Error fetching members:', err);
       res.status(500).json({ error: 'Failed to fetch members' });
@@ -40,7 +41,7 @@ export = function (router: Router) {
         .sort({ name: 1 })
         .lean();
 
-      res.json({ screeners });
+      res.json({ screeners: await attachReputationSnapshots(db, screeners) });
     } catch (err) {
       console.error('Error fetching screeners:', err);
       res.status(500).json({ error: 'Failed to fetch screeners' });
@@ -59,7 +60,7 @@ export = function (router: Router) {
         .sort({ name: 1 })
         .lean();
 
-      res.json({ reviewers });
+      res.json({ reviewers: await attachReputationSnapshots(db, reviewers) });
     } catch (err) {
       console.error('Error fetching reviewers:', err);
       res.status(500).json({ error: 'Failed to fetch reviewers' });
@@ -78,7 +79,7 @@ export = function (router: Router) {
         .sort({ name: 1 })
         .lean();
 
-      res.json({ administrators });
+      res.json({ administrators: await attachReputationSnapshots(db, administrators) });
     } catch (err) {
       console.error('Error fetching administrators:', err);
       res.status(500).json({ error: 'Failed to fetch administrators' });
@@ -824,6 +825,24 @@ export = function (router: Router) {
     }
   });
 
+  router.get('/:username/reputation', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    const member = await db.User.findOne({ username: req.params.username }).select('_id username preferences').lean();
+    if (!member) return res.status(404).json({ error: 'Member not found' });
+    if (!canViewProfile(member, req.user)) return res.status(403).json({ error: 'Profile is private' });
+    const reputation = await getOrRefreshReputation(db, member);
+    return res.json({ success: true, reputation });
+  });
+
+  router.post('/:username/reputation/refresh', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    const member = await db.User.findOne({ username: req.params.username }).select('_id username preferences').lean();
+    if (!member) return res.status(404).json({ error: 'Member not found' });
+    const isSelf = String(req.user?.username || '') === String(member.username || '');
+    const canReview = Boolean(req.user?.roles?.reviewer || req.user?.roles?.admin);
+    if (!req.user || (!isSelf && !canReview)) return res.status(403).json({ error: 'Not allowed to refresh this scorecard' });
+    const reputation = await getOrRefreshReputation(db, member, { force: true });
+    return res.json({ success: true, reputation });
+  });
+
   // Get single member profile
   router.get('/:username', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
@@ -840,7 +859,8 @@ export = function (router: Router) {
         return res.status(403).json({ error: 'Profile is private' });
       }
 
-      res.json(member);
+      const reputation = await getOrRefreshReputation(db, member);
+      res.json({ ...member, reputation });
     } catch (err) {
       console.error('Error fetching member:', err);
       res.status(500).json({ error: 'Failed to fetch member' });

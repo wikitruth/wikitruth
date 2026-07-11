@@ -160,3 +160,42 @@ button:focus-visible,
   background-color: #1a2a3a;
   outline-color: #5ba3d9;
 }
+
+.wt-reputation-card {
+  border-top: 3px solid #2f7d68;
+}
+
+.wt-reputation-score {
+  width: 92px;
+  height: 92px;
+  margin: 0 auto 8px;
+  border: 8px solid #d9eee8;
+  border-radius: 50%;
+  color: #1f6655;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 76px;
+}
+
+.wt-reputation-dimension .progress {
+  height: 8px;
+  margin: 3px 0 10px;
+  background: #edf2f0;
+}
+
+.wt-reputation-dimension .progress-bar {
+  background: linear-gradient(90deg, #2f7d68, #56a37f);
+}
+
+.wt-reputation-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.wt-reputation-badges .label {
+  display: inline-block;
+  padding: 6px 9px;
+}

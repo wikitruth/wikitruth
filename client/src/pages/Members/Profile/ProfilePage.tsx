@@ -9,6 +9,7 @@ import type { LegacyEntity } from '../../../types/legacy';
 import PageMeta from '../../../components/common/PageMeta';
 import GeoPatternBackground from '../../../components/common/GeoPatternBackground';
 import notificationsApi from '../../../services/api/notifications';
+import ReputationScorecard from '../../../components/Members/ReputationScorecard';
 
 const USER_OBJECT_TYPE = 21;
 
@@ -144,6 +145,7 @@ const ProfilePage: React.FC = () => {
           reviewer: profile.roles?.reviewer,
         }}
       >
+        {profile.reputation ? <ReputationScorecard reputation={profile.reputation} /> : null}
         <div className="row" style={{ marginTop: '15px' }}>
           <Link to={`${isOwnProfile ? '/members/profile' : `/members/${profile.username}`}/contributions`} className="no-underline">
             <div className="col-sm-12">
