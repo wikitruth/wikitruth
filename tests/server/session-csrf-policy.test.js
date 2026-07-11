@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const request = require('supertest');
 const config = require('../../config/config');
+const krakenConfig = require('../../config/config.json');
 const { createCsrfProtection } = require('../../server/src/middlewares/csrfProtection');
 
 /** @typedef {import('../../server/src/types/http').WikitruthRequest} WikitruthRequest */
@@ -70,6 +71,11 @@ function createSecurityTestApp(options = {}) {
 }
 
 describe('Session and CSRF policy', function () {
+  it('disables Kraken defaults in favor of the application-owned cookie and session chain', function () {
+    expect(krakenConfig.middleware.cookieParser.enabled).toBe(false);
+    expect(krakenConfig.middleware.session.enabled).toBe(false);
+  });
+
   it('rejects legacy form writes without a CSRF token', async function () {
     const app = createSecurityTestApp();
 
