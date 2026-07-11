@@ -9,6 +9,8 @@ This plan tracks high-risk deprecated dependencies and defines a safe replacemen
 | HTTP client | No direct `request` dependency in `package.json` / `package-lock.json` | Historical deprecation target; risk is regression if legacy `request` calls are reintroduced | Keep Native `fetch` (Node 22) + adapter approach | Keep response/error mapping backward compatible and block reintroduction of `request`. |
 | Template engine alias | `jade` | Deprecated name; modern ecosystem is `pug` | `pug` package and `cons.pug` renderer only | Remove `cons.jade` and jade-specific view references after parity checks. |
 | Google auth | `passport-google-oauth20` | Replacement completed; production credentials still require live callback verification | Retain maintained OAuth 2 strategy | Keep callback routes and profile/session mapping covered by regression tests. |
+| Twitter auth | Application-owned strategy on `passport-oauth1` | Replacement completed; production credentials still require live callback verification | Retain JSON-only profile/error handling | Do not restore `passport-twitter`, `xtraverse`, or an XML parser for provider errors. |
+| Passport core | `passport@0.7.0` | Upgrade completed | Retain maintained session-regeneration behavior | Keep login/logout, social callback, CSRF, and legacy session regression tests. |
 | Generic OAuth adapter | No direct `passport-oauth` dependency | Removal completed | Keep provider-specific maintained strategies | Block accidental direct reintroduction. |
 | Database backup | Application-owned MongoDB-native JSON exporter | Replacement completed; archive compatibility remains operationally sensitive | Retain the service boundary and atomic collection writes | Preserve backup validation, restore preflight, progress reporting, and empty-database bootstrap behavior. |
 
@@ -61,4 +63,6 @@ This plan tracks high-risk deprecated dependencies and defines a safe replacemen
 - Commit `b9f4bb28` completed the database-backup replacement, Google OAuth 2 migration, and direct generic OAuth dependency removal.
 - Modern and legacy backup controllers now share one awaited service that writes the existing per-document JSON format atomically and partitions private records by user.
 - Backup completion and document counts are returned to the modern admin UI and included in the privileged event payload.
-- Remaining deprecation work is the Jade/Kraken-era template chain and Passport Twitter's vulnerable transitive XML parser. Keep this plan active until those compatibility migrations are separately validated.
+- Commit `0f4ce298` removed Passport Twitter's vulnerable `xtraverse` / `xmldom` chain without removing Twitter OAuth 1 support.
+- Commit `7c51046e` upgraded Passport core to `0.7.0` and passed focused session, callback, CSRF, and legacy compatibility verification.
+- Remaining deprecation work is the Jade/Kraken-era template/localization chain. Keep this plan active until that compatibility migration is separately validated or legacy comparison mode is explicitly retired.

@@ -96,3 +96,10 @@ Do not upgrade blindly while Dust/Jade comparison mode remains active.
 - Full validation passed: modern and legacy type checks, `36` server suites / `165` tests, `58` client suites / `142` tests, production server/client builds, lint checks, and source guardrails.
 - `npm audit` improved from `71` findings (`13` critical) to `51` findings (`7` critical). The remaining critical findings are constrained to the retained Jade/Kraken-era template stack and Passport Twitter's obsolete XML dependency; those require isolated compatibility migrations rather than forced audit fixes.
 - Wave A and Wave A2 are complete for the approved safe-security scope. Waves B through D remain active.
+
+## Implementation Progress (2026-07-12)
+
+- Commit `0f4ce298` replaced `passport-twitter` with an application-owned OAuth 1 strategy on `passport-oauth1@1.3.0`, preserving Twitter profile/callback behavior while removing `xtraverse` and the vulnerable `xmldom` error parser.
+- Commit `7c51046e` upgraded Passport core from `0.4.1` to `0.7.0`, enabling the maintained login/logout session-regeneration behavior.
+- Auth, session, CSRF, legacy-compatibility, modern/legacy type, full server/client, and production build checks passed across the two isolated migrations.
+- `npm audit` is now `47` findings (`6` critical, `20` high, `18` moderate, `3` low). The remaining critical findings are confined to the retained Jade/Kraken-era template/localization chain.
