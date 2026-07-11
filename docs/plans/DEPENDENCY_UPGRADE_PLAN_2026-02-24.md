@@ -37,7 +37,6 @@ Upgrade after Tier 1 is green and pinned in CI.
 
 Require dedicated migration PRs and feature toggles.
 
-- `express` (`4` -> `5`)
 - `mongoose` (`8` -> `9`)
 - `react`/`react-dom` (`18` -> `19`)
 - `react-router-dom` (`6` -> `7`)
@@ -56,6 +55,7 @@ Do not upgrade blindly while Dust/Jade comparison mode remains active.
 - `jade`
 - `localizr`
 - Grunt-era plugins tied to legacy view/build flow
+- `express` (`4` -> `5`), because active `kraken-js@2.6.0` requires Express 4 and the legacy wildcard route table uses Express 4 path syntax
 
 ## Execution Waves
 
@@ -119,3 +119,6 @@ Do not upgrade blindly while Dust/Jade comparison mode remains active.
 - Commit `b9622de5` completed the remaining Webpack tooling majors with `webpack-cli@7.2.1`, `css-loader@7.1.4`, and `style-loader@4.0.0`. Development, production, analyzed, and Storybook builds all passed, completing the planned CLI/loader items in Wave B.
 - Commit `8af4e0e9` upgraded Helmet from 7 to `8.2.0` without changing the explicit security policy. CSP/header contract tests, server build, and the full smoke/type guardrails passed; live header verification remains part of the deployment checkpoint.
 - Commit `17a4a540` upgraded Mongoose to `9.7.4` and connect-mongo to `6.0.0`, removed the obsolete Bluebird Promise override, migrated the final removed `Model.update()` calls, and adopted connect-mongo's namespaced v6 export. MongoDB `8.2.7` ping and temporary session set/get/destroy checks passed alongside all `47` server suites / `205` tests and smoke/type guardrails.
+- Commit `d16ed4fd` upgraded React/React DOM to `19.2.7` and React Router DOM to `7.18.1`, aligned React type packages, added the Router 7 Jest encoder contract, removed obsolete future flags, and corrected React-owned test teardown/synchronization. All `65` client suites / `156` tests, production build, Storybook build, and smoke/type guardrails passed.
+- Express 5 was revalidated and moved to Tier 4: `kraken-js@2.6.0` declares an Express 4 peer, and the active legacy compatibility route table depends on Express 4 wildcard syntax. It is not a valid independent upgrade while legacy comparison mode remains enabled.
+- Waves A through C are complete for every dependency that can be upgraded independently. This plan remains active only for the explicit Tier 4 legacy-renderer retirement boundary.
