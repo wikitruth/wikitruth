@@ -147,7 +147,7 @@ export async function getOrRefreshReputation(
   return db.ReputationSnapshot.findOneAndUpdate(
     { userId: user._id },
     { $set: calculated },
-    { upsert: true, new: true, setDefaultsOnInsert: true },
+    { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true },
   ).lean();
 }
 
