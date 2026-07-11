@@ -103,3 +103,6 @@ Do not upgrade blindly while Dust/Jade comparison mode remains active.
 - Commit `7c51046e` upgraded Passport core from `0.4.1` to `0.7.0`, enabling the maintained login/logout session-regeneration behavior.
 - Auth, session, CSRF, legacy-compatibility, modern/legacy type, full server/client, and production build checks passed across the two isolated migrations.
 - `npm audit` is now `47` findings (`6` critical, `20` high, `18` moderate, `3` low). The remaining critical findings are confined to the retained Jade/Kraken-era template/localization chain.
+- Commit `c51851e0` completed the first Wave B tooling group: TypeScript ESLint `8.63.0`, final-compatible ESLint `8.57.1`, React lint `7.37.5`, Prettier `3.9.5`, Nodemon `3.1.14`, and an explicit `sanitize-html@2.17.5` compatibility pin.
+- `sanitize-html@2.17.6` was rejected after the full suite proved its ESM parser chain incompatible with the CommonJS Jest/legacy runtime path; the prior compatible release remains pinned rather than accepting an untested runtime split.
+- Lint, `ci:smoke`, `46` server suites / `199` tests, `64` client suites / `154` tests, and production builds passed. Audit is now `41` findings (`6` critical, `15` high, `17` moderate, `3` low).
