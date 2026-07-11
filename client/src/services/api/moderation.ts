@@ -21,6 +21,17 @@ export interface ModerationStatusOption {
   text: string;
 }
 
+export type VerdictChannel = 'factual' | 'ethical';
+
+export interface VerdictChannelValue {
+  status: string;
+  reasoning?: string;
+  framework?: string;
+  evidenceRefs?: string[];
+  editDate?: string | null;
+  editUserId?: string | null;
+}
+
 export interface ModerationEntry {
   _id?: string;
   title?: string;
@@ -37,6 +48,10 @@ export interface ModerationEntry {
     reasoning?: string | null;
   };
   verdictReasoning?: string | null;
+  verdictChannels?: {
+    factual: VerdictChannelValue;
+    ethical: VerdictChannelValue;
+  };
   ownerId?: string | null;
   ownerType?: number | null;
   parentId?: string | null;
@@ -50,7 +65,7 @@ export interface ModerationEntry {
   };
 }
 
-interface ModerationEntryResponse {
+export interface ModerationEntryResponse {
   success: boolean;
   target: {
     objectType: number;
@@ -60,6 +75,10 @@ interface ModerationEntryResponse {
   entry: ModerationEntry;
   screeningStatuses: ModerationStatusOption[];
   verdictStatuses: ModerationStatusOption[];
+  verdictChannelStatuses: {
+    factual: string[];
+    ethical: string[];
+  };
 }
 
 interface ModerationMutationResponse {
@@ -182,6 +201,18 @@ export interface ChangeRequest {
   createUsername?: string;
 }
 
+export interface ArtifactSourceQuality {
+  identity: number;
+  proximity: number;
+  integrity: number;
+  recency: number;
+  reproducibility: number;
+  total: number;
+  notes?: string;
+  reviewDate?: string | Date;
+  reviewUsername?: string;
+}
+
 const getCsrfToken = (): string | null => {
   if (typeof document === 'undefined') {
     return null;
@@ -270,6 +301,42 @@ export const moderationApi = {
   }) =>
     request<{ success: boolean; revision: Record<string, unknown> }>('/moderation/rollback', {
       method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+  reviewArtifactQuality: (
+    target: ModerationTarget,
+    payload: {
+      scores: Pick<ArtifactSourceQuality, 'identity' | 'proximity' | 'integrity' | 'recency' | 'reproducibility'>;
+      notes?: string;
+    },
+  ) =>
+    request<{ success: boolean; sourceQuality: ArtifactSourceQuality }>(`/moderation/artifact-quality?${toQuery(target)}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+  updateVerdictChannel: (
+    target: ModerationTarget,
+    payload: {
+      channel: VerdictChannel;
+      status: string;
+      reasoning?: string;
+      framework?: string;
+      evidenceRefs?: string[];
+    },
+  ) =>
+    request<ModerationMutationResponse>(`/moderation/verdict-channel?${toQuery(target)}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+  updateVerdictChannels: (
+    target: ModerationTarget,
+    payload: {
+      factual: Omit<VerdictChannelValue, 'editDate' | 'editUserId'>;
+      ethical: Omit<VerdictChannelValue, 'editDate' | 'editUserId'>;
+    },
+  ) =>
+    request<ModerationMutationResponse>(`/moderation/verdict-channels?${toQuery(target)}`, {
+      method: 'PUT',
       body: JSON.stringify(payload),
     }),
   updateVerdict: (target: ModerationTarget, status: number) =>

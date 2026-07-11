@@ -8,14 +8,26 @@ import Button from '../../../components/common/Button';
 import Alert from '../../../components/common/Alert';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import PageMeta from '../../../components/common/PageMeta';
-import moderationApi, { type ModerationStatusOption } from '../../../services/api/moderation';
+import moderationApi from '../../../services/api/moderation';
 
-const TOPIC_OBJECT_TYPE = 1;
-const ARGUMENT_OBJECT_TYPE = 2;
-
-function normalizeType(value: string | null): 'topic' | 'argument' {
-  return value === 'topic' ? 'topic' : 'argument';
+function normalizeType(value: string | null): 'topic' | 'argument' | 'answer' {
+  if (value === 'topic' || value === 'answer') {
+    return value;
+  }
+  return 'argument';
 }
+
+const LABELS: Record<string, string> = {
+  pending: 'Pending review',
+  supported: 'Supported by evidence',
+  refuted: 'Refuted by evidence',
+  mixed: 'Mixed or qualified',
+  insufficient_evidence: 'Insufficient evidence',
+  permissible: 'Permissible',
+  impermissible: 'Impermissible',
+  contested: 'Contested',
+  not_applicable: 'Not applicable',
+};
 
 const VerdictUpdatePage: React.FC = () => {
   const navigate = useNavigate();
@@ -26,12 +38,13 @@ const VerdictUpdatePage: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [title, setTitle] = useState('');
-  const [verdict, setVerdict] = useState<number>(0);
-  const [reasoning, setReasoning] = useState('');
-  const [statuses, setStatuses] = useState<ModerationStatusOption[]>([]);
-  const [resolvedObjectType, setResolvedObjectType] = useState<number>(
-    entryType === 'topic' ? TOPIC_OBJECT_TYPE : ARGUMENT_OBJECT_TYPE,
-  );
+  const [factualStatus, setFactualStatus] = useState('pending');
+  const [factualReasoning, setFactualReasoning] = useState('');
+  const [ethicalStatus, setEthicalStatus] = useState('pending');
+  const [ethicalReasoning, setEthicalReasoning] = useState('');
+  const [ethicalFramework, setEthicalFramework] = useState('');
+  const [factualStatuses, setFactualStatuses] = useState<string[]>([]);
+  const [ethicalStatuses, setEthicalStatuses] = useState<string[]>([]);
 
   useEffect(() => {
     const load = async () => {
@@ -43,20 +56,15 @@ const VerdictUpdatePage: React.FC = () => {
       try {
         const result = await moderationApi.entry({ key: entryType, id });
         const entry = result.entry;
-        const nextStatuses = result.verdictStatuses || [];
+        const channelStatuses = result.verdictChannelStatuses;
         setTitle(entry?.title || '');
-        setStatuses(nextStatuses);
-        setVerdict(
-          typeof entry?.verdict?.status === 'number' ? entry.verdict.status : nextStatuses[0]?.code || 0,
-        );
-        setReasoning(String(entry?.verdict?.reasoning || entry?.verdictReasoning || ''));
-        setResolvedObjectType(
-          typeof entry?.objectType === 'number'
-            ? entry.objectType
-            : entryType === 'topic'
-              ? TOPIC_OBJECT_TYPE
-              : ARGUMENT_OBJECT_TYPE,
-        );
+        setFactualStatuses(channelStatuses?.factual || []);
+        setEthicalStatuses(channelStatuses?.ethical || []);
+        setFactualStatus(entry?.verdictChannels?.factual?.status || 'pending');
+        setFactualReasoning(String(entry?.verdictChannels?.factual?.reasoning || ''));
+        setEthicalStatus(entry?.verdictChannels?.ethical?.status || 'pending');
+        setEthicalReasoning(String(entry?.verdictChannels?.ethical?.reasoning || ''));
+        setEthicalFramework(String(entry?.verdictChannels?.ethical?.framework || ''));
       } catch (loadError) {
         setError(loadError instanceof Error ? loadError.message : 'Failed to load entry');
       } finally {
@@ -66,12 +74,14 @@ const VerdictUpdatePage: React.FC = () => {
     void load();
   }, [entryType, id]);
 
-  const verdictOptions = useMemo(() => {
-    return statuses.map((status) => ({
-      value: String(status.code),
-      label: status.text,
-    }));
-  }, [statuses]);
+  const factualOptions = useMemo(() => factualStatuses.map((status) => ({
+    value: status,
+    label: LABELS[status] || status,
+  })), [factualStatuses]);
+  const ethicalOptions = useMemo(() => ethicalStatuses.map((status) => ({
+    value: status,
+    label: LABELS[status] || status,
+  })), [ethicalStatuses]);
 
   const handleSave = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -83,19 +93,20 @@ const VerdictUpdatePage: React.FC = () => {
     try {
       setSaving(true);
       setError(null);
-      const result = await moderationApi.bulkUpdateVerdicts([
+      await moderationApi.updateVerdictChannels(
+        { key: entryType, id },
         {
-          id,
-          type: resolvedObjectType,
-          status: verdict,
-          reasoning: reasoning.trim() || undefined,
+          factual: {
+            status: factualStatus,
+            reasoning: factualReasoning.trim() || undefined,
+          },
+          ethical: {
+            status: ethicalStatus,
+            reasoning: ethicalReasoning.trim() || undefined,
+            framework: ethicalFramework.trim() || undefined,
+          },
         },
-      ]);
-      const row = result.results[0];
-      if (!row?.success) {
-        setError(row?.message || 'Failed to update verdict');
-        return;
-      }
+      );
       navigate('/admin/verdicts');
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : 'Failed to update verdict');
@@ -130,27 +141,61 @@ const VerdictUpdatePage: React.FC = () => {
       <div className="panel panel-default">
         <div className="panel-body">
           <form onSubmit={handleSave}>
-            <Select
-              name="verdict"
-              label="Verdict"
-              value={String(verdict)}
-              onChange={(event: React.ChangeEvent<HTMLSelectElement>) => setVerdict(Number(event.target.value))}
-              options={verdictOptions}
-              required
-            />
+            <fieldset>
+              <legend>Factual verdict</legend>
+              <p className="text-muted">Evaluate whether the claim is supported by evidence, separately from moral judgement.</p>
+              <Select
+                name="factualStatus"
+                label="Evidence status"
+                value={factualStatus}
+                onChange={(event: React.ChangeEvent<HTMLSelectElement>) => setFactualStatus(event.target.value)}
+                options={factualOptions}
+                required
+              />
+              <RichTextEditor
+                name="factualReasoning"
+                label="Evidence reasoning"
+                value={factualReasoning}
+                onChange={(_name: string, html: string) => setFactualReasoning(html)}
+                placeholder="Explain the evidence supporting this status"
+                compact
+              />
+            </fieldset>
 
-            <RichTextEditor
-              name="reasoning"
-              label="Reasoning (optional)"
-              value={reasoning}
-              onChange={(_name: string, html: string) => setReasoning(html)}
-              placeholder="Explain the reasoning behind this verdict"
-              compact
-            />
+            <fieldset style={{ marginTop: 24 }}>
+              <legend>Ethical verdict</legend>
+              <p className="text-muted">Evaluate moral or value implications independently and name the framework used.</p>
+              <Select
+                name="ethicalStatus"
+                label="Ethical status"
+                value={ethicalStatus}
+                onChange={(event: React.ChangeEvent<HTMLSelectElement>) => setEthicalStatus(event.target.value)}
+                options={ethicalOptions}
+                required
+              />
+              <div className="form-group">
+                <label htmlFor="ethical-framework">Ethical framework or principle</label>
+                <input
+                  id="ethical-framework"
+                  className="form-control"
+                  value={ethicalFramework}
+                  onChange={(event) => setEthicalFramework(event.target.value)}
+                  placeholder="For example: human rights, consequentialism, professional ethics"
+                />
+              </div>
+              <RichTextEditor
+                name="ethicalReasoning"
+                label="Ethical reasoning"
+                value={ethicalReasoning}
+                onChange={(_name: string, html: string) => setEthicalReasoning(html)}
+                placeholder="Explain the value judgement without presenting it as a factual finding"
+                compact
+              />
+            </fieldset>
 
             <div className="form-group" style={{ marginTop: 24 }}>
               <Button type="submit" variant="warning" disabled={saving} icon={saving ? 'spinner fa-spin' : 'check'}>
-                {saving ? 'Saving...' : 'Update Verdict'}
+                {saving ? 'Saving...' : 'Update Verdicts'}
               </Button>{' '}
               <Button type="button" variant="default" onClick={() => navigate('/admin/verdicts')} icon="times">
                 Cancel

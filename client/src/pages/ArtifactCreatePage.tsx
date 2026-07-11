@@ -16,6 +16,11 @@ import { trackEvent } from '../utils/analytics';
 import { useNotification } from '../context/NotificationContext';
 import { FACT_TAG_OPTIONS, FACT_TYPE_OPTIONS } from '../constants/entryFormOptions';
 import { readArtifactFile } from '../utils/artifactUpload';
+import ArtifactProvenanceFields from '../components/Artifacts/ArtifactProvenanceFields';
+import {
+  EMPTY_ARTIFACT_PROVENANCE,
+  type ArtifactProvenanceInput,
+} from '../constants/artifactOptions';
 
 interface ArtifactFormValues {
   title: string;
@@ -37,6 +42,7 @@ const ArtifactCreatePage: React.FC = () => {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [inlineFile, setInlineFile] = useState<File | null>(null);
+  const [provenance, setProvenance] = useState<ArtifactProvenanceInput>({ ...EMPTY_ARTIFACT_PROVENANCE });
   const { addToast } = useNotification();
 
   const validate = (values: ArtifactFormValues) => {
@@ -70,6 +76,7 @@ const ArtifactCreatePage: React.FC = () => {
         typeId: Number(values.typeId),
         tags: values.tags,
         file,
+        ...provenance,
       });
       const createdArtifact = response?.artifact as { _id?: unknown; friendlyUrl?: unknown } | undefined;
 
@@ -159,6 +166,8 @@ const ArtifactCreatePage: React.FC = () => {
               placeholder="https://example.com/source"
             />
 
+            <ArtifactProvenanceFields value={provenance} onChange={setProvenance} disabled={isSubmitting} />
+
             <Input
               name="topicId"
               label="Topic ID (optional)"
@@ -182,7 +191,7 @@ const ArtifactCreatePage: React.FC = () => {
 
             <Select
               name="typeId"
-              label="Artifact type"
+              label="Legacy evidence classification"
               value={values.typeId}
               onChange={handleChange}
               options={FACT_TYPE_OPTIONS}

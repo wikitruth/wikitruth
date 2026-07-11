@@ -14,6 +14,11 @@ import PageMeta from '../components/common/PageMeta';
 import apiService from '../services/api';
 import { FACT_TAG_OPTIONS, FACT_TYPE_OPTIONS } from '../constants/entryFormOptions';
 import { readArtifactFile } from '../utils/artifactUpload';
+import ArtifactProvenanceFields from '../components/Artifacts/ArtifactProvenanceFields';
+import {
+  EMPTY_ARTIFACT_PROVENANCE,
+  type ArtifactProvenanceInput,
+} from '../constants/artifactOptions';
 
 const ArtifactEditPage: React.FC = () => {
   const navigate = useNavigate();
@@ -31,6 +36,7 @@ const ArtifactEditPage: React.FC = () => {
   const [tags, setTags] = useState('');
   const [inlineFile, setInlineFile] = useState<File | null>(null);
   const [existingFileName, setExistingFileName] = useState('');
+  const [provenance, setProvenance] = useState<ArtifactProvenanceInput>({ ...EMPTY_ARTIFACT_PROVENANCE });
 
   useEffect(() => {
     const load = async () => {
@@ -52,6 +58,18 @@ const ArtifactEditPage: React.FC = () => {
         setTypeId(String(artifact?.typeId ?? 1));
         setTags(Array.isArray(artifact?.tags) ? artifact.tags.join(',') : '');
         setExistingFileName(String(artifact?.file?.name || ''));
+        setProvenance({
+          artifactType: String(artifact?.artifactType || 'other'),
+          originType: String(artifact?.provenance?.originType || 'unknown'),
+          sourceCreator: String(artifact?.provenance?.creator || ''),
+          publisher: String(artifact?.provenance?.publisher || ''),
+          publicationDate: artifact?.provenance?.publicationDate ? new Date(artifact.provenance.publicationDate).toISOString().slice(0, 10) : '',
+          captureDate: artifact?.provenance?.captureDate ? new Date(artifact.provenance.captureDate).toISOString().slice(0, 16) : '',
+          archiveUrl: String(artifact?.provenance?.archiveUrl || ''),
+          checksum: String(artifact?.provenance?.checksum || ''),
+          accessLimitations: String(artifact?.provenance?.accessLimitations || ''),
+          verifiabilityNotes: String(artifact?.provenance?.verifiabilityNotes || ''),
+        });
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load artifact');
       } finally {
@@ -85,6 +103,7 @@ const ArtifactEditPage: React.FC = () => {
         typeId: Number(typeId),
         tags,
         file,
+        ...provenance,
       });
       const artifact = response?.artifact;
       if (artifact?._id) {
@@ -116,6 +135,7 @@ const ArtifactEditPage: React.FC = () => {
             <Input name="title" label="Artifact title" value={title} onChange={(e) => setTitle(e.target.value)} required />
             <RichTextEditor name="description" label="Description" value={description} onChange={(_, html) => setDescription(html)} />
             <Input name="source" label="Source URL (optional)" value={source} onChange={(e) => setSource(e.target.value)} />
+            <ArtifactProvenanceFields value={provenance} onChange={setProvenance} disabled={saving} />
             <Input name="topicId" label="Topic ID (optional)" value={topicId} onChange={(e) => setTopicId(e.target.value)} />
             <div className="form-group">
               <label htmlFor="inlineFile">Replace inline file (optional)</label>
@@ -129,7 +149,7 @@ const ArtifactEditPage: React.FC = () => {
               />
               <p className="help-block">Maximum file size: 10 MB.</p>
             </div>
-            <Select name="typeId" label="Artifact type" value={typeId} onChange={(e) => setTypeId(e.target.value)} options={FACT_TYPE_OPTIONS} />
+            <Select name="typeId" label="Legacy evidence classification" value={typeId} onChange={(e) => setTypeId(e.target.value)} options={FACT_TYPE_OPTIONS} />
             <Input name="parentId" label="Parent artifact ID (optional)" value={parentId} onChange={(e) => setParentId(e.target.value)} />
             <NumericTagCheckboxes name="artifactTags" value={tags} options={FACT_TAG_OPTIONS} onChange={setTags} />
             <Checkbox name="private" label="Private" checked={isPrivate} onChange={(e) => setIsPrivate(e.target.checked)} />

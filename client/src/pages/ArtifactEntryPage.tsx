@@ -25,6 +25,8 @@ import {
   EntryRelatedTopics,
   buildLegacyEntryBreadcrumb,
 } from '../components/Entry/EntryLegacyParity';
+import ArtifactQualityPanel from '../components/Artifacts/ArtifactQualityPanel';
+import { ARTIFACT_TYPE_OPTIONS, ORIGIN_TYPE_OPTIONS } from '../constants/artifactOptions';
 
 function formatFileSize(bytes?: number): string {
   const size = Number(bytes || 0);
@@ -135,6 +137,8 @@ const ArtifactEntryPage: React.FC = () => {
   }
 
   const artifact = data.artifact as LegacyEntity;
+  const typedArtifact = artifact as unknown as Artifact;
+  const provenance = typedArtifact.provenance || {};
   const artifacts = (data.artifacts || []) as LegacyEntity[];
   const args = (data.arguments || []) as LegacyEntity[];
   const questions = (data.questions || []) as LegacyEntity[];
@@ -260,6 +264,27 @@ const ArtifactEntryPage: React.FC = () => {
           </p>
         </div>
       ) : null}
+
+      <section className="panel panel-default" style={{ marginTop: 16 }} aria-labelledby="artifact-provenance-heading">
+        <div className="panel-heading"><strong id="artifact-provenance-heading">Evidence Provenance</strong></div>
+        <div className="panel-body">
+          <dl className="dl-horizontal" style={{ marginBottom: 0 }}>
+            <dt>Artifact kind</dt>
+            <dd>{ARTIFACT_TYPE_OPTIONS.find((option) => option.value === typedArtifact.artifactType)?.label || 'Other'}</dd>
+            <dt>Origin</dt>
+            <dd>{ORIGIN_TYPE_OPTIONS.find((option) => option.value === provenance.originType)?.label || 'Unknown origin'}</dd>
+            <dt>Creator</dt><dd>{provenance.creator || 'Unknown'}</dd>
+            <dt>Publisher</dt><dd>{provenance.publisher || 'Unknown'}</dd>
+            <dt>Published</dt><dd>{formatFriendlyDate(provenance.publicationDate) || 'Unknown'}</dd>
+            <dt>Captured</dt><dd>{formatFriendlyDate(provenance.captureDate) || 'Unknown'}</dd>
+            {provenance.archiveUrl ? <><dt>Archive</dt><dd><a href={provenance.archiveUrl} target="_blank" rel="noreferrer">{provenance.archiveUrl}</a></dd></> : null}
+            {provenance.checksum ? <><dt>Checksum</dt><dd><code>{provenance.checksum}</code></dd></> : null}
+            {provenance.accessLimitations ? <><dt>Access limits</dt><dd>{provenance.accessLimitations}</dd></> : null}
+            {provenance.verifiabilityNotes ? <><dt>Verification</dt><dd>{provenance.verifiabilityNotes}</dd></> : null}
+          </dl>
+        </div>
+      </section>
+      <ArtifactQualityPanel artifactId={artifact._id} initialQuality={provenance.sourceQuality} />
       <EntryRelatedTopics entry={artifact} topicLinks={topicLinks} />
 
       {artifacts.length > 0 && (

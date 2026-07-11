@@ -48,6 +48,23 @@ const factory: SchemaFactory = function (app, mongoose) {
       editDate: { type: Date },
       editUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },
     },
+    verdicts: {
+      factual: {
+        status: { type: String, enum: ['pending', 'supported', 'refuted', 'mixed', 'insufficient_evidence'], default: 'pending' },
+        reasoning: { type: String, default: '' },
+        evidenceRefs: [{ type: mongoose.Schema.ObjectId, ref: 'Artifact' }],
+        editDate: { type: Date, default: null },
+        editUserId: { type: mongoose.Schema.ObjectId, ref: 'User', default: null },
+      },
+      ethical: {
+        status: { type: String, enum: ['pending', 'permissible', 'impermissible', 'contested', 'not_applicable'], default: 'pending' },
+        reasoning: { type: String, default: '' },
+        framework: { type: String, default: '' },
+        evidenceRefs: [{ type: mongoose.Schema.ObjectId, ref: 'Artifact' }],
+        editDate: { type: Date, default: null },
+        editUserId: { type: mongoose.Schema.ObjectId, ref: 'User', default: null },
+      },
+    },
     childrenCount: {
       arguments: {
         total: { type: Number, default: 0 },

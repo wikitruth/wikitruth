@@ -19,6 +19,39 @@ const factory: SchemaFactory = function (app, mongoose) {
     contentPreview: { type: String }, // A preview lines of text to display in list view
     friendlyUrl: { type: String },
     typeId: { type: Number, default: constants.ARGUMENT_TYPES.factual },
+    artifactType: {
+      type: String,
+      enum: ['document', 'image', 'audio', 'video', 'dataset', 'web_capture', 'physical_record', 'testimony', 'other'],
+      default: 'other',
+      index: true,
+    },
+    provenance: {
+      originType: {
+        type: String,
+        enum: ['primary', 'secondary', 'derived', 'unknown'],
+        default: 'unknown',
+      },
+      creator: { type: String, default: '' },
+      publisher: { type: String, default: '' },
+      publicationDate: { type: Date, default: null },
+      captureDate: { type: Date, default: null },
+      archiveUrl: { type: String, default: '' },
+      checksum: { type: String, default: '' },
+      accessLimitations: { type: String, default: '' },
+      verifiabilityNotes: { type: String, default: '' },
+      sourceQuality: {
+        identity: { type: Number, min: 0, max: 4, default: null },
+        proximity: { type: Number, min: 0, max: 4, default: null },
+        integrity: { type: Number, min: 0, max: 4, default: null },
+        recency: { type: Number, min: 0, max: 4, default: null },
+        reproducibility: { type: Number, min: 0, max: 4, default: null },
+        total: { type: Number, min: 0, max: 20, default: null },
+        notes: { type: String, default: '' },
+        reviewDate: { type: Date, default: null },
+        reviewUserId: { type: mongoose.Schema.ObjectId, ref: 'User', default: null },
+        reviewUsername: { type: String, default: '' },
+      },
+    },
     screening: {
       status: { type: Number, default: constants.SCREENING_STATUS.status0.code }, // SCREENING_STATUS
       history: [

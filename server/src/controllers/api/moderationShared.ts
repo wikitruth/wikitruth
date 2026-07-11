@@ -38,6 +38,11 @@ const VERDICT_STATUS_ORDER: number[] = [
   constants.VERDICT_STATUS.misleading_invalid,
 ];
 
+const VERDICT_CHANNEL_STATUSES = {
+  factual: ['pending', 'supported', 'refuted', 'mixed', 'insufficient_evidence'],
+  ethical: ['pending', 'permissible', 'impermissible', 'contested', 'not_applicable'],
+} as const;
+
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 function canPlayRole(req: WikitruthRequest, role: string): boolean {
   return Boolean(req.user && req.user.canPlayRoleOf && req.user.canPlayRoleOf(role));
@@ -134,6 +139,37 @@ function getVerdictStatuses(): Array<{ code: number; text: string }> {
   }));
 }
 
+function getVerdictChannelStatuses(): typeof VERDICT_CHANNEL_STATUSES {
+  return VERDICT_CHANNEL_STATUSES;
+}
+
+function mapLegacyVerdictToFactual(status: number): (typeof VERDICT_CHANNEL_STATUSES.factual)[number] {
+  const category = constants.VERDICT_STATUS.getCategory(status);
+  if (category === constants.VERDICT_STATUS.categories.true) {
+    return 'supported';
+  }
+  if (category === constants.VERDICT_STATUS.categories.false) {
+    return 'refuted';
+  }
+  if (status === constants.VERDICT_STATUS.claim) {
+    return 'insufficient_evidence';
+  }
+  return 'pending';
+}
+
+function mapFactualVerdictToLegacy(status: string): number {
+  if (status === 'supported') {
+    return constants.VERDICT_STATUS.status_true;
+  }
+  if (status === 'refuted') {
+    return constants.VERDICT_STATUS.status_false;
+  }
+  if (status === 'mixed' || status === 'insufficient_evidence') {
+    return constants.VERDICT_STATUS.claim;
+  }
+  return constants.VERDICT_STATUS.pending;
+}
+
 function toNumber(value: unknown): number | null {
   if (typeof value === 'number' && Number.isFinite(value)) {
     return value;
@@ -162,7 +198,11 @@ function escapeRegex(raw: string): string {
 function toModerationEntry(entry: Record<string, unknown> | null | undefined, target: ModerationTarget): Record<string, unknown> {
   const e = (entry || {}) as Record<string, unknown> & {
     screening?: { status?: unknown };
-    verdict?: { status?: unknown; reasoning?: unknown };
+    verdict?: { status?: unknown; reasoning?: unknown; editDate?: unknown; editUserId?: unknown };
+    verdicts?: {
+      factual?: Record<string, unknown>;
+      ethical?: Record<string, unknown>;
+    };
   };
   return {
     _id: e._id,
@@ -180,6 +220,23 @@ function toModerationEntry(entry: Record<string, unknown> | null | undefined, ta
       reasoning: e.verdict?.reasoning || e.verdictReasoning || null,
     },
     verdictReasoning: e.verdict?.reasoning || e.verdictReasoning || null,
+    verdictChannels: {
+      factual: {
+        status: e.verdicts?.factual?.status || mapLegacyVerdictToFactual(Number(e.verdict?.status || 0)),
+        reasoning: e.verdicts?.factual?.reasoning || e.verdict?.reasoning || e.verdictReasoning || '',
+        evidenceRefs: e.verdicts?.factual?.evidenceRefs || [],
+        editDate: e.verdicts?.factual?.editDate || e.verdict?.editDate || null,
+        editUserId: e.verdicts?.factual?.editUserId || e.verdict?.editUserId || null,
+      },
+      ethical: {
+        status: e.verdicts?.ethical?.status || 'pending',
+        reasoning: e.verdicts?.ethical?.reasoning || '',
+        framework: e.verdicts?.ethical?.framework || '',
+        evidenceRefs: e.verdicts?.ethical?.evidenceRefs || [],
+        editDate: e.verdicts?.ethical?.editDate || null,
+        editUserId: e.verdicts?.ethical?.editUserId || null,
+      },
+    },
     ownerId: e.ownerId || null,
     ownerType: toNumber(e.ownerType),
     parentId: e.parentId || null,
@@ -370,6 +427,9 @@ export {
   getDbModelByObjectType,
   getScreeningStatuses,
   getVerdictStatuses,
+  getVerdictChannelStatuses,
+  mapLegacyVerdictToFactual,
+  mapFactualVerdictToLegacy,
   toNumber,
   toPositiveInt,
   escapeRegex,

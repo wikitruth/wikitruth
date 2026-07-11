@@ -179,6 +179,29 @@ export interface Artifact {
   createDate?: Date;
   editorId?: string;
   editorUsername?: string;
+  artifactType?: 'document' | 'image' | 'audio' | 'video' | 'dataset' | 'web_capture' | 'physical_record' | 'testimony' | 'other';
+  provenance?: {
+    originType?: 'primary' | 'secondary' | 'derived' | 'unknown';
+    creator?: string;
+    publisher?: string;
+    publicationDate?: Date | string;
+    captureDate?: Date | string;
+    archiveUrl?: string;
+    checksum?: string;
+    accessLimitations?: string;
+    verifiabilityNotes?: string;
+    sourceQuality?: {
+      identity?: number;
+      proximity?: number;
+      integrity?: number;
+      recency?: number;
+      reproducibility?: number;
+      total?: number;
+      notes?: string;
+      reviewDate?: Date | string;
+      reviewUsername?: string;
+    };
+  };
 }
 
 export interface Group {

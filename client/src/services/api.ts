@@ -44,6 +44,19 @@ export class ApiRequestError extends Error {
 
 export type ArtifactFileUpload = File;
 
+export type ArtifactProvenancePayload = {
+  artifactType?: string;
+  originType?: string;
+  sourceCreator?: string;
+  publisher?: string;
+  publicationDate?: string;
+  captureDate?: string;
+  archiveUrl?: string;
+  checksum?: string;
+  accessLimitations?: string;
+  verifiabilityNotes?: string;
+};
+
 function buildArtifactFormData(payload: object): FormData {
   const formData = new FormData();
   Object.entries(payload).forEach(([key, value]) => {
@@ -565,7 +578,7 @@ class ApiService {
     typeId?: number;
     tags?: string;
     file?: ArtifactFileUpload;
-  }): Promise<LegacyApiResponse> {
+  } & ArtifactProvenancePayload): Promise<LegacyApiResponse> {
     return this.request<LegacyApiResponse>('/artifacts', {
       method: 'POST',
       body: buildArtifactFormData(payload),
@@ -584,7 +597,7 @@ class ApiService {
       typeId?: number;
       tags?: string;
       file?: ArtifactFileUpload;
-    }
+    } & ArtifactProvenancePayload
   ): Promise<LegacyApiResponse> {
     return this.request<LegacyApiResponse>(`/artifacts/entry/${id}`, {
       method: 'PUT',

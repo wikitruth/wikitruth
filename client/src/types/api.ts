@@ -1,4 +1,5 @@
 import type { LegacyEntity, LegacyResponse } from './legacy';
+import type { Artifact } from './index';
 
 export interface ApiBaseResponse {
   success?: boolean;
@@ -180,7 +181,7 @@ export interface AnswerEntryResponse extends ApiBaseResponse {
 }
 
 export interface ArtifactEntryResponse extends ApiBaseResponse {
-  artifact?: LegacyEntity;
+  artifact?: LegacyEntity & Partial<Artifact>;
   hasValue?: boolean;
   topic?: LegacyEntity;
   topicLinks?: LegacyEntity[];

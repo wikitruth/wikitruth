@@ -24,9 +24,9 @@ function authValue(roles: Record<string, string> = {}) {
     user: { _id: 'user-1', username: 'alice', roles },
     isAuthenticated: true,
     isLoading: false,
-    activeRole: 'user',
+    activeRole: 'reader' as const,
     setActiveRole: jest.fn(),
-    availableRoles: ['user'],
+    availableRoles: ['reader' as const],
     login: jest.fn(),
     signup: jest.fn(),
     logout: jest.fn(),
@@ -116,4 +116,3 @@ describe('ChangeRequestPanel', () => {
     }));
   });
 });
-

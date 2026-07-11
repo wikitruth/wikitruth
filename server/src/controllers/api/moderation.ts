@@ -22,6 +22,8 @@ import {
   getDbModelByObjectType,
   getScreeningStatuses,
   getVerdictStatuses,
+  getVerdictChannelStatuses,
+  mapLegacyVerdictToFactual,
   toNumber,
   toPositiveInt,
   escapeRegex,
@@ -37,10 +39,15 @@ import {
 import { registerModerationSignalsRoutes } from './moderationSignalsRoutes';
 import { registerModerationDuplicateRoutes } from './moderationDuplicateRoutes';
 import { registerModerationRevisionRoutes } from './moderationRevisionRoutes';
+import { registerModerationArtifactRoutes } from './moderationArtifactRoutes';
+import { registerModerationVerdictChannelRoutes } from './moderationVerdictChannelRoutes';
+import { recordEntryRevision } from './revisionWriteRecorder';
 
 export = function (router: Router) {
   registerModerationDuplicateRoutes(router);
   registerModerationRevisionRoutes(router);
+  registerModerationArtifactRoutes(router);
+  registerModerationVerdictChannelRoutes(router);
   router.get('/entry', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureModerator(req, res)) {
       return;
@@ -70,6 +77,7 @@ export = function (router: Router) {
       entry: toModerationEntry(entry, target),
       screeningStatuses: getScreeningStatuses(),
       verdictStatuses: getVerdictStatuses(),
+      verdictChannelStatuses: getVerdictChannelStatuses(),
     });
   });
 
@@ -190,12 +198,27 @@ export = function (router: Router) {
       editUserId: req.user?.id || req.user?._id || entry.editUserId,
       ...(reasoning ? { reasoning } : {}),
     };
+    entry.verdicts = entry.verdicts || {};
+    entry.verdicts.factual = {
+      ...(entry.verdicts.factual || {}),
+      status: mapLegacyVerdictToFactual(status),
+      reasoning,
+      editDate: new Date(),
+      editUserId: req.user?.id || req.user?._id || entry.editUserId,
+    };
     if (reasoning && typeof entry.verdictReasoning !== 'undefined') {
       entry.verdictReasoning = reasoning;
     }
     entry.editDate = new Date();
     entry.editUserId = req.user?.id || req.user?._id || entry.editUserId;
     await entry.save();
+    await recordEntryRevision({
+      req,
+      objectType: target.objectType,
+      entry,
+      source: 'update',
+      summary: 'Factual verdict updated',
+    });
 
     await logEntryEvent({
       scope: 'privileged',
@@ -581,12 +604,27 @@ export = function (router: Router) {
         editUserId: userId || entry.editUserId,
         ...(reasoning ? { reasoning } : {}),
       };
+      entry.verdicts = entry.verdicts || {};
+      entry.verdicts.factual = {
+        ...(entry.verdicts.factual || {}),
+        status: mapLegacyVerdictToFactual(status),
+        reasoning,
+        editDate: new Date(),
+        editUserId: userId || entry.editUserId,
+      };
       if (reasoning && typeof entry.verdictReasoning !== 'undefined') {
         entry.verdictReasoning = reasoning;
       }
       entry.editDate = new Date();
       entry.editUserId = userId || entry.editUserId;
       await entry.save();
+      await recordEntryRevision({
+        req,
+        objectType,
+        entry,
+        source: 'update',
+        summary: 'Factual verdict updated in bulk',
+      });
 
       await logEntryEvent({
         scope: 'privileged',

@@ -45,6 +45,58 @@ describe('moderationApi', () => {
     );
   });
 
+  it('updates independent verdict channels', async () => {
+    document.cookie = '_csrfToken=test-csrf-token';
+    const fetchMock = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true }),
+    });
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+    await moderationApi.updateVerdictChannel(
+      { key: 'argument', id: 'a1' },
+      {
+        channel: 'ethical',
+        status: 'contested',
+        reasoning: 'Reasonable people applying the principle may disagree.',
+        framework: 'human rights',
+      },
+    );
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/moderation/verdict-channel?argument=a1',
+      expect.objectContaining({
+        method: 'PUT',
+        headers: expect.objectContaining({ 'x-csrf-token': 'test-csrf-token' }),
+        body: JSON.stringify({
+          channel: 'ethical',
+          status: 'contested',
+          reasoning: 'Reasonable people applying the principle may disagree.',
+          framework: 'human rights',
+        }),
+      }),
+    );
+  });
+
+  it('updates both verdict channels through the atomic endpoint', async () => {
+    const fetchMock = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true }),
+    });
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+    const payload = {
+      factual: { status: 'supported', reasoning: 'Primary evidence supports the claim.' },
+      ethical: { status: 'contested', reasoning: 'Competing rights produce different conclusions.', framework: 'human rights' },
+    };
+
+    await moderationApi.updateVerdictChannels({ key: 'topic', id: 't1' }, payload);
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/moderation/verdict-channels?topic=t1',
+      expect.objectContaining({ method: 'PUT', body: JSON.stringify(payload) }),
+    );
+  });
+
   it('posts ownership migration payload for admin migration flow', async () => {
     document.cookie = '_csrfToken=test-csrf-token';
     const fetchMock = jest.fn().mockResolvedValue({

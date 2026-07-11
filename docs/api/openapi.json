@@ -2763,6 +2763,96 @@
         }
       }
     },
+    "/moderation/verdict-channel": {
+      "put": {
+        "summary": "Update an independent factual or ethical verdict channel",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericMutationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verdict channel updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid channel, status, reasoning, or ethical framework"
+          }
+        }
+      }
+    },
+    "/moderation/verdict-channels": {
+      "put": {
+        "summary": "Atomically update factual and ethical verdict channels",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericMutationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Both verdict channels updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Neither channel is updated when either payload is invalid"
+          }
+        }
+      }
+    },
+    "/moderation/artifact-quality": {
+      "put": {
+        "summary": "Review artifact source quality across the five-dimension rubric",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenericMutationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Source-quality review saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StandardApiResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid artifact target or source-quality scores"
+          }
+        }
+      }
+    },
     "/moderation/take-ownership": {
       "post": {
         "summary": "Take ownership of an entry as admin",

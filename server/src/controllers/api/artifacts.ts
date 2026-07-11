@@ -16,7 +16,7 @@ import {
   storeUploadedArtifactFile,
   type ArtifactFilePayload,
 } from '../../services/artifactFileService';
-import { parseBoolean, parseNumericTags } from './entryWriteHelpers';
+import { parseBoolean, parseNumericTags, parseOptionalDate } from './entryWriteHelpers';
 import { rejectBlockingDuplicate } from './duplicateWriteGuard';
 import { recordEntryRevision } from './revisionWriteRecorder';
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
@@ -166,6 +166,33 @@ function canEditEntry(entry: Record<string, unknown> | null | undefined, user: R
   return String(entry.createUserId || '') === String(user._id || user.id || '');
 }
 
+const ARTIFACT_TYPES = new Set(['document', 'image', 'audio', 'video', 'dataset', 'web_capture', 'physical_record', 'testimony', 'other']);
+const ORIGIN_TYPES = new Set(['primary', 'secondary', 'derived', 'unknown']);
+
+function parseArtifactType(value: unknown): string {
+  const normalized = String(value || '').trim().toLowerCase();
+  return ARTIFACT_TYPES.has(normalized) ? normalized : 'other';
+}
+
+function parseOriginType(value: unknown): string {
+  const normalized = String(value || '').trim().toLowerCase();
+  return ORIGIN_TYPES.has(normalized) ? normalized : 'unknown';
+}
+
+function parseProvenance(body: Record<string, unknown>): Record<string, unknown> {
+  return {
+    originType: parseOriginType(body.originType),
+    creator: String(body.sourceCreator || body.creator || '').trim(),
+    publisher: String(body.publisher || '').trim(),
+    publicationDate: parseOptionalDate(body.publicationDate),
+    captureDate: parseOptionalDate(body.captureDate),
+    archiveUrl: String(body.archiveUrl || '').trim(),
+    checksum: String(body.checksum || '').trim().toLowerCase(),
+    accessLimitations: String(body.accessLimitations || '').trim(),
+    verifiabilityNotes: String(body.verifiabilityNotes || '').trim(),
+  };
+}
+
 async function POST_artifact_create(req: WikitruthRequest, res: WikitruthResponse) {
   if (!req.user) {
     return res.status(401).json({ error: 'Authentication required' });
@@ -214,6 +241,8 @@ async function POST_artifact_create(req: WikitruthRequest, res: WikitruthRespons
     groupId: groupId,
     categoryId: ownerId,
     typeId: [0, 1, 2, 3, 4].includes(Number(req.body?.typeId)) ? Number(req.body.typeId) : constants.ARGUMENT_TYPES.factual,
+    artifactType: parseArtifactType(req.body?.artifactType),
+    provenance: parseProvenance((req.body || {}) as Record<string, unknown>),
     tags: parseNumericTags(req.body?.tags),
     createDate: now,
     editDate: now,
@@ -315,6 +344,31 @@ async function PUT_artifact_update(req: WikitruthRequest, res: WikitruthResponse
       return res.status(400).json({ error: 'Invalid artifact type' });
     }
     artifact.typeId = typeId;
+  }
+  if (typeof req.body?.artifactType !== 'undefined') {
+    artifact.artifactType = parseArtifactType(req.body.artifactType);
+  }
+  const provenanceFields = [
+    'originType',
+    'sourceCreator',
+    'creator',
+    'publisher',
+    'publicationDate',
+    'captureDate',
+    'archiveUrl',
+    'checksum',
+    'accessLimitations',
+    'verifiabilityNotes',
+  ];
+  if (provenanceFields.some((field) => typeof req.body?.[field] !== 'undefined')) {
+    const current = typeof artifact.provenance?.toObject === 'function'
+      ? artifact.provenance.toObject()
+      : { ...(artifact.provenance || {}) };
+    artifact.provenance = {
+      ...current,
+      ...parseProvenance({ ...current, ...(req.body || {}) }),
+      sourceQuality: current.sourceQuality || artifact.provenance?.sourceQuality,
+    };
   }
   if (typeof req.body?.tags !== 'undefined') {
     artifact.tags = parseNumericTags(req.body.tags);
