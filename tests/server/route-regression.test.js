@@ -26,6 +26,24 @@ describe('Route regression coverage for legacy + React shell', function () {
     expect(appController).toContain("router.get('/*', function (req: WikitruthRequest, res: WikitruthResponse)"); // /app/*
   });
 
+  it('serves modern contribution and comment aliases through the React shell', function () {
+    const routesSource = source('server/src/middlewares/routes.ts');
+    const shellPatterns = routesSource.slice(
+      routesSource.indexOf('const modernShellPatterns'),
+      routesSource.indexOf('const legacyRoutePatterns'),
+    );
+    const legacyPatterns = routesSource.slice(
+      routesSource.indexOf('const legacyRoutePatterns'),
+      routesSource.indexOf('legacyRoutePatterns.forEach'),
+    );
+
+    expect(shellPatterns).toContain("'/contribute'");
+    expect(shellPatterns).toContain("'/comments'");
+    expect(shellPatterns).toContain("'/comments/*'");
+    expect(legacyPatterns).not.toContain("'/comments'");
+    expect(legacyPatterns).not.toContain("'/comments/*'");
+  });
+
   it('keeps required API endpoint mounted', function () {
     const apiIndex = source('server/src/controllers/api/index.ts');
 
