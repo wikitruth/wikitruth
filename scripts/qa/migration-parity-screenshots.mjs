@@ -2,6 +2,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { chromium } from 'playwright';
+import { cleanupParityGroupFixture, ensureParityGroupFixture } from './parity-group-fixture.mjs';
 
 const baseUrl = process.argv[2] || 'https://127.0.0.1:9443';
 const explicitOutDir = process.argv[3] || '';
@@ -19,9 +20,13 @@ const baseRoutePairs = [
 ];
 
 async function capturePage(page, url, outputPath) {
-  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+  const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+  if (!response || response.status() >= 400) {
+    throw new Error(`${url} returned HTTP ${response?.status() || 'no response'}`);
+  }
   await page.waitForTimeout(1200);
   await page.screenshot({ path: outputPath, fullPage: true });
+  return response.status();
 }
 
 function resolveTopicCandidateFromHome(payload) {
@@ -71,51 +76,87 @@ async function resolveTopicEntryPair(context) {
   }
 }
 
+function isLocalFixtureTarget() {
+  const hostname = new URL(baseUrl).hostname;
+  return ['127.0.0.1', 'localhost', '::1'].includes(hostname)
+    || ['1', 'true', 'yes'].includes(String(process.env.WT_PARITY_ALLOW_DB_FIXTURE || '').toLowerCase());
+}
+
+function buildGroupPairs(group) {
+  const id = encodeURIComponent(String(group.id));
+  const friendly = encodeURIComponent(String(group.friendlyUrl));
+  const modernBase = `/groups/${friendly}/${id}`;
+  const legacyBase = `/legacy/groups/${friendly}/${id}`;
+  return [
+    { name: 'group-entry', modern: modernBase, legacy: legacyBase, group },
+    { name: 'group-posts', modern: `${modernBase}/posts`, legacy: `${legacyBase}/posts`, group },
+    { name: 'group-members', modern: `${modernBase}/members`, legacy: `${legacyBase}/members`, group },
+  ];
+}
+
 async function main() {
   await fs.mkdir(outDir, { recursive: true });
-  const browser = await chromium.launch({ headless: true });
-  const context = await browser.newContext({
-    ignoreHTTPSErrors: true,
-    viewport: { width: 1366, height: 960 },
-  });
-  const page = await context.newPage();
-  const resolvedTopicPair = await resolveTopicEntryPair(context);
-  const routePairs = resolvedTopicPair
-    ? [...baseRoutePairs, resolvedTopicPair]
-    : baseRoutePairs;
+  let browser;
+  let fixture = null;
+  try {
+    if (isLocalFixtureTarget()) {
+      fixture = await ensureParityGroupFixture();
+      console.log(`Prepared group fixture ${fixture.id}`);
+    }
 
-  const manifest = [];
-
-  for (const pair of routePairs) {
-    const modernPath = `${pair.name}-modern.png`;
-    const legacyPath = `${pair.name}-legacy.png`;
-    const modernUrl = `${baseUrl}${pair.modern}`;
-    const legacyUrl = `${baseUrl}${pair.legacy}`;
-    const modernFile = path.join(outDir, modernPath);
-    const legacyFile = path.join(outDir, legacyPath);
-
-    await capturePage(page, modernUrl, modernFile);
-    await capturePage(page, legacyUrl, legacyFile);
-
-    manifest.push({
-      name: pair.name,
-      modernUrl,
-      legacyUrl,
-      modernFile,
-      legacyFile,
-      topicSource: pair.source,
-      topicId: pair.topicId,
-      topicFriendly: pair.topicFriendly,
+    browser = await chromium.launch({ headless: true });
+    const context = await browser.newContext({
+      ignoreHTTPSErrors: true,
+      viewport: { width: 1366, height: 960 },
     });
-    console.log(`Captured ${pair.name}`);
+    const page = await context.newPage();
+    const resolvedTopicPair = await resolveTopicEntryPair(context);
+    const routePairs = [
+      ...baseRoutePairs,
+      ...(resolvedTopicPair ? [resolvedTopicPair] : []),
+      ...(fixture ? buildGroupPairs(fixture) : []),
+    ];
+    const manifest = [];
+
+    for (const pair of routePairs) {
+      const modernPath = `${pair.name}-modern.png`;
+      const legacyPath = `${pair.name}-legacy.png`;
+      const modernUrl = `${baseUrl}${pair.modern}`;
+      const legacyUrl = `${baseUrl}${pair.legacy}`;
+      const modernFile = path.join(outDir, modernPath);
+      const legacyFile = path.join(outDir, legacyPath);
+      const modernStatus = await capturePage(page, modernUrl, modernFile);
+      const legacyStatus = await capturePage(page, legacyUrl, legacyFile);
+
+      manifest.push({
+        name: pair.name,
+        modernUrl,
+        legacyUrl,
+        modernStatus,
+        legacyStatus,
+        modernFile,
+        legacyFile,
+        topicSource: pair.source,
+        topicId: pair.topicId,
+        topicFriendly: pair.topicFriendly,
+        groupFixture: pair.group || null,
+      });
+      console.log(`Captured ${pair.name}`);
+    }
+
+    const manifestPath = path.join(outDir, 'manifest.json');
+    await fs.writeFile(manifestPath, `${JSON.stringify({ baseUrl, generatedAt: new Date().toISOString(), pairs: manifest }, null, 2)}\n`, 'utf8');
+    console.log(`Saved parity screenshots to ${outDir}`);
+    console.log(`Manifest: ${manifestPath}`);
+  } finally {
+    if (browser) {
+      await browser.close();
+    }
+    if (fixture) {
+      await cleanupParityGroupFixture();
+      console.log(`Cleaned group fixture ${fixture.id}`);
+    }
   }
-
-  const manifestPath = path.join(outDir, 'manifest.json');
-  await fs.writeFile(manifestPath, `${JSON.stringify({ baseUrl, generatedAt: new Date().toISOString(), pairs: manifest }, null, 2)}\n`, 'utf8');
-  await browser.close();
-
-  console.log(`Saved parity screenshots to ${outDir}`);
-  console.log(`Manifest: ${manifestPath}`);
 }
 
 main().catch((error) => {

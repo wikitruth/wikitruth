@@ -235,16 +235,16 @@ Use this matrix to complete runtime parity sign-off after code-level review:
 - `[x]` Pair 03: `/legacy/search?q=<term>` vs `/search?q=<term>` (screenshot run PASS with `q=gmo`)
 - `[x]` Pair 04: `/legacy/topic/<friendly>/<id>` vs `/topics/entry/<friendly>/<id>` (screenshot run PASS)
 - `[x]` Pair 05: `/legacy/visualize/topic/<friendly>/<id>` vs `/visualize/topic/<friendly>/<id>` (route-level PASS; 200 on both sides)
-- `[ ]` Pair 06: `/legacy/groups/<friendly>/<id>` vs `/groups/<friendly>/<id>` (blocked in local fixture: no public groups)
-- `[ ]` Pair 07: `/legacy/groups/<friendly>/<id>/posts` vs `/groups/<friendly>/<id>/posts` (blocked in local fixture: no public groups)
-- `[ ]` Pair 08: `/legacy/groups/<friendly>/<id>/members` vs `/groups/<friendly>/<id>/members` (blocked in local fixture: no public groups)
+- `[x]` Pair 06: `/legacy/groups/<friendly>/<id>` vs `/groups/<friendly>/<id>` (deterministic fixture screenshot run PASS; HTTP `200/200`)
+- `[x]` Pair 07: `/legacy/groups/<friendly>/<id>/posts` vs `/groups/<friendly>/<id>/posts` (deterministic fixture screenshot run PASS; HTTP `200/200`)
+- `[x]` Pair 08: `/legacy/groups/<friendly>/<id>/members` vs `/groups/<friendly>/<id>/members` (deterministic fixture screenshot run PASS; HTTP `200/200`)
 - `[x]` Pair 09: `/legacy/members/<username>` vs `/members/<username>` (route-level PASS with `dsalunga`)
 - `[x]` Pair 10: `/legacy/admin` legacy alias verified (intentional divergence): redirects to `/legacy/admin/db-backup` while modern admin remains `/admin`
 
 ## Exit Criteria for “Parity Complete”
 
-- `[ ]` All P0/P1 items above are completed or formally accepted as intentional divergences
-- `[ ]` Runtime verification matrix passes with evidence screenshots/notes
+- `[x]` All P0/P1 items above are completed or formally accepted as intentional divergences
+- `[x]` Runtime verification matrix passes with evidence screenshots/notes
 - `[x]` No unresolved legacy-only route without explicit product decision
 - `[x]` QA scripts and active parity docs now reflect current root-modern (`/`) routing model (`/app/*` documented as alias only)
 
@@ -277,7 +277,7 @@ Use this matrix to complete runtime parity sign-off after code-level review:
 - `[x]` Modern create flows now preserve more legacy-style context and redirect behavior:
   - Create pages now prefill context ids from route query params when available.
   - Successful create actions now redirect to the newly created entry route for `topic`, `argument`, `question`, `answer`, `issue`, `opinion`, and `artifact` entities instead of only returning to list pages.
-- `[ ]` Group route runtime matrix pairs remain blocked by fixture availability (`Pair 06-08` require public group fixtures).
+- `[x]` Group route runtime matrix pairs pass through the deterministic temporary public fixture (`Pair 06-08`, HTTP `200/200` for each pair).
 
 ## Revalidation Notes (2026-07-11)
 
@@ -292,3 +292,6 @@ Use this matrix to complete runtime parity sign-off after code-level review:
 - `[x]` Cross-entity comments preserve owner type, while comment replies preserve nested parent-comment context.
 - `[x]` Group-scoped topic/fact/question/artifact creation is private and group-owned instead of leaking into public topic feeds.
 - `[x]` Full server (`152` tests) and client (`135` tests) suites pass after form/action parity implementation.
+- `[x]` Group runtime parity uses `scripts/qa/parity-group-fixture.mjs` to create and clean a marked temporary public group; the screenshot runner now covers entry/posts/members and rejects HTTP error pages.
+- `[x]` Final screenshot matrix at `docs/qa/artifacts/parity-screenshots-2026-07-11-final/manifest.json` recorded `200/200` for all 11 modern/legacy pairs and left zero fixture records.
+- `[x]` Legacy group overview/posts compatibility was updated from obsolete callback calls to Promise-based utilities and current `groupId` ownership filters.

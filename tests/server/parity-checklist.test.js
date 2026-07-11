@@ -111,4 +111,21 @@ describe('Parity checklist guardrails', function () {
     expect(opinionsApi).toContain("parentType === 'opinion'");
     expect(opinionsApi).toContain('ownerTypes[parentType]');
   });
+
+  it('keeps deterministic group parity fixtures and promise-based legacy routes wired', function () {
+    const compatibility = read('legacy/compatibility/server/bootstrap.ts');
+    const legacyGroups = read('legacy/server/controllers/groups.ts');
+    const screenshotRunner = read('scripts/qa/migration-parity-screenshots.mjs');
+    const fixture = read('scripts/qa/parity-group-fixture.mjs');
+
+    expect(compatibility).toContain('locals.group = model.group');
+    expect(legacyGroups).toContain('await flowUtils.countEntries(model, groupFilter)');
+    expect(legacyGroups).toContain("loadEntries('topics'");
+    expect(screenshotRunner).toContain("name: 'group-entry'");
+    expect(screenshotRunner).toContain("name: 'group-posts'");
+    expect(screenshotRunner).toContain("name: 'group-members'");
+    expect(screenshotRunner).toContain('response.status() >= 400');
+    expect(fixture).toContain('cleanupParityGroupFixture');
+    expect(fixture).toContain('migration-parity-group-v1');
+  });
 });

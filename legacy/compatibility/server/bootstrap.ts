@@ -191,11 +191,11 @@ function registerLegacyCompatibility(app: Express, options: LegacyCompatibilityO
       let routeWikiBaseUrl = mountPath;
       if (segments.length >= 2 && segments[0] === 'members' && segments[1]) {
         routeWikiBaseUrl = legacyFlowUtilsModule.getDiaryBaseUrl(segments[1]);
-      } else if (segments.length >= 2 && segments[0] === 'groups' && segments[1]) {
-        routeWikiBaseUrl =
-          legacyFlowUtilsModule.buildGroupUrl({
-            _id: segments[1],
-          }) + (legacyPaths as unknown as { groups: { group: { posts: string } } }).groups.group.posts;
+      } else if (segments.length >= 3 && segments[0] === 'groups' && segments[1] && segments[2]) {
+        const groupId = segments[2];
+        req.query.group = req.query.group || groupId;
+        routeWikiBaseUrl = `${mountPath}/groups/${segments[1]}/${groupId}`
+          + (legacyPaths as unknown as { groups: { group: { posts: string } } }).groups.group.posts;
       }
       locals.wikiBaseUrl = routeWikiBaseUrl;
 
@@ -209,6 +209,9 @@ function registerLegacyCompatibility(app: Express, options: LegacyCompatibilityO
       } as Record<string, unknown>;
       await legacyFlowUtilsModule.setGroupModel(req, model);
       locals.model = model;
+      if (model.group) {
+        locals.group = model.group;
+      }
 
       next();
     } catch (error) {
