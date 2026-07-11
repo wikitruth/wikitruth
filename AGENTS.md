@@ -6,6 +6,15 @@ This file is the repository-level instruction source for coding agents in this r
 
 - Never commit secrets, credentials, or private keys.
 
+## Production Deployment Safety
+
+- Never deploy to production or a VPS unless the user explicitly instructs the agent to perform that production deployment in the current request.
+- Do not treat requests to implement end-to-end, commit, push, build, verify, or restart a local process as authorization to change production.
+- Production changes include pulling code on a server, installing dependencies, building on a server, restarting or creating PM2/services/containers, changing listeners, and editing or reloading Nginx/proxy/DNS routing.
+- A deployment runbook, an existing production checkout, or a prior deployment does not imply authorization for another deployment.
+- Read-only production inspection is allowed when needed to answer a status or topology question, but ask for explicit confirmation before making any production change.
+- Distinguish local runtime restarts from remote production restarts in both execution and reporting.
+
 ## Planning and Delivery
 
 - Any formal plan/proposal must include a concrete checklist of implementation steps.
