@@ -711,7 +711,7 @@ const VisualizePage: React.FC = () => {
             <p className="text-muted" style={{ marginBottom: 0 }}>No topics are currently available.</p>
           ) : (
             <div
-              className="btn-group"
+              className="btn-group wt-topic-selector"
               role="group"
               aria-label="Select topic for graph details"
               style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}
@@ -723,7 +723,7 @@ const VisualizePage: React.FC = () => {
                   <button
                     key={topicId}
                     type="button"
-                    className={`btn ${isSelected ? 'btn-primary' : 'btn-default'}`}
+                    className={`btn wt-topic-selector-button ${isSelected ? 'btn-primary' : 'btn-default'}`}
                     style={{ marginBottom: '8px' }}
                     onClick={() => setSelectedTopicId(topicId)}
                   >

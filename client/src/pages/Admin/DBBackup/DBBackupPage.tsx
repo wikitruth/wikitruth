@@ -92,10 +92,12 @@ const DBBackupPage: React.FC = () => {
         <div className="panel panel-default">
           <div className="panel-body">
             <p>
-              <strong>Public backup directory:</strong> <code>{status.backupDir}</code>
+              <strong>Public backup directory:</strong>{' '}
+              <code className="wt-code-wrap">{status.backupDir}</code>
             </p>
             <p>
-              <strong>Private backup directory:</strong> <code>{status.privateBackupDir}</code>
+              <strong>Private backup directory:</strong>{' '}
+              <code className="wt-code-wrap">{status.privateBackupDir}</code>
             </p>
             <p>
               <strong>Git backup configured:</strong> {status.hasGitBackup ? 'Yes' : 'No'}

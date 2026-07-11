@@ -188,6 +188,60 @@ button:focus-visible,
   background: linear-gradient(90deg, #2f7d68, #56a37f);
 }
 
+.wt-pin-inputs {
+  display: flex;
+  gap: 10px;
+}
+
+.wt-pin-inputs .pincode-input-text {
+  width: 55px;
+  text-align: center;
+}
+
+.wt-code-wrap {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+@media (max-width: 767px) {
+  .wt-topic-selector {
+    width: 100%;
+  }
+
+  .wt-topic-selector .wt-topic-selector-button {
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: left;
+  }
+
+  .wt-outline-tree-button {
+    display: inline-flex;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: left;
+  }
+
+  .wt-outline-tree-button .fa {
+    flex: 0 0 auto;
+    margin-top: 2px;
+  }
+
+  .wt-pin-inputs {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .wt-pin-inputs .pincode-input-text {
+    width: 100%;
+    min-width: 0;
+    padding-right: 4px;
+    padding-left: 4px;
+  }
+}
+
 .wt-reputation-badges {
   display: flex;
   flex-wrap: wrap;

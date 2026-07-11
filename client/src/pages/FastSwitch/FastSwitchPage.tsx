@@ -87,7 +87,7 @@ const FastSwitchPage: React.FC = () => {
 
       <form onSubmit={handleSubmit}>
         <div className="form-group form-group-lg">
-          <div style={{ display: 'flex', gap: '10px', flexWrap: 'nowrap' }}>
+          <div className="wt-pin-inputs">
             {pinDigits.map((digit, index) => (
               <input
                 key={index}

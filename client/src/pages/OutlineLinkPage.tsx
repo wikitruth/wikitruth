@@ -134,12 +134,12 @@ const OutlineLinkPage: React.FC = () => {
       return null;
     }
     return (
-      <ul className="list-unstyled" style={{ marginLeft: level === 0 ? 0 : 16 }}>
+      <ul className="list-unstyled wt-outline-tree" style={{ marginLeft: level === 0 ? 0 : 16 }}>
         {nodes.map((node) => (
           <li key={node._id} style={{ marginBottom: 8 }}>
             <button
               type="button"
-              className="btn btn-link btn-xs"
+              className="btn btn-link btn-xs wt-outline-tree-button"
               style={{ padding: 0, textAlign: 'left' }}
               onClick={() => {
                 const asTarget: OutlineSearchItem = {
