@@ -2,7 +2,7 @@
 
 ## Objectives
 
-- Reduce vulnerability exposure from `npm audit` baseline (`80` findings: `11 critical`, `52 high` at plan creation) and current revalidation baseline (`49` findings: `12 critical`, `21 high` on `2026-05-15`).
+- Reduce vulnerability exposure from `npm audit` baseline (`80` findings: `11 critical`, `52 high` at plan creation) and current revalidation baseline (`71` findings: `13 critical`, `23 high`, `31 moderate`, `4 low` on `2026-07-11`).
 - Keep legacy comparison mode functional (Dust/Jade + Grunt fallback retained).
 - Upgrade by risk tier to avoid broad regressions.
 
@@ -59,10 +59,11 @@ Do not upgrade blindly while Dust/Jade comparison mode remains active.
 
 ## Execution Waves
 
-1. Wave A: Tier 1 (stability + vulnerability reduction)
-2. Wave B: Tier 2 (tooling modernization)
-3. Wave C: Tier 3 (runtime/platform migrations)
-4. Wave D: Tier 4 only when legacy comparison mode is explicitly retired
+1. Wave A: remaining Tier 1 and same-major security fixes (stability + vulnerability reduction)
+2. Wave A2: replace `mongodb-backup-fixed` and remove its vulnerable `bson` / `tar` dependency chain
+3. Wave B: Tier 2 (tooling modernization)
+4. Wave C: Tier 3 (runtime/platform migrations)
+5. Wave D: Tier 4 only when legacy comparison mode is explicitly retired
 
 ## Acceptance Checks Per Wave
 
@@ -78,3 +79,11 @@ Do not upgrade blindly while Dust/Jade comparison mode remains active.
 - `package.json` still contains legacy-constrained packages (`adaro`, `consolidate`, `dustjs-helpers`, `engine-munger`, `jade`, `localizr`) and auth legacy stack (`passport@0.4.1`, `passport-google`, `passport-google-oauth`, `passport-oauth`).
 - `npm audit --json` current metadata reports `49` total vulnerabilities (`12 critical`, `21 high`, `13 moderate`, `3 low`), so this plan remains active.
 - Tier progression is still pending; no wave is fully completed yet in this plan.
+
+## Revalidation Notes (2026-07-11)
+
+- `npm audit --json` now reports `71` total vulnerabilities (`13 critical`, `23 high`, `31 moderate`, `4 low`). This is worse than the May snapshot, so security remediation should precede optional target-state product work.
+- Several original Tier 1 upgrades are already present: `typescript@5.9.3`, `ts-loader@9.5.7`, `express-session@1.19.0`, and `rimraf@6.1.3`. The plan remains active because the wave has not passed its full acceptance suite.
+- Immediate same-major candidates include `dompurify@3.4.12`, `express@4.22.2`, `mongoose@8.24.1`, `jsonwebtoken@9.0.3`, Tiptap `3.27.x`, and `@playwright/test@1.61.1`. Storybook should first move to a patched `8.6.x` release rather than combining its security fix with a major migration.
+- `mongodb-backup-fixed` introduces a critical/high transitive `bson` / `tar` chain that is not adequately resolved by a normal direct-package patch. Replacing the backup implementation is now a separate Wave A2 deliverable.
+- Broad framework majors remain intentionally separated. Do not combine Express 5, Mongoose 9, React 19, React Router 7, or Storybook 10 in the security patch wave.

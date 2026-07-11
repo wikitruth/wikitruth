@@ -10,14 +10,16 @@ This plan tracks high-risk deprecated dependencies and defines a safe replacemen
 | Template engine alias | `jade` | Deprecated name; modern ecosystem is `pug` | `pug` package and `cons.pug` renderer only | Remove `cons.jade` and jade-specific view references after parity checks. |
 | Google auth | `passport-google`, `passport-google-oauth` | Legacy strategy packages, stale maintenance | `passport-google-oauth20` | Keep callback route/claims mapping compatible with current session payload. |
 | Generic OAuth adapter | `passport-oauth` | Likely orphaned legacy dependency and maintenance risk | Remove if unused, otherwise use provider-specific maintained strategies (`oauth2`) | Verify runtime imports/usages before removal; avoid broad auth rewrite in one step. |
+| Database backup | `mongodb-backup-fixed` | Pulls vulnerable, obsolete `bson` and `tar` dependency chains; no adequate direct patch path | Maintained MongoDB-native backup/restore adapter or an isolated `mongodump` / `mongorestore` process wrapper | Preserve backup archive validation, restore preflight, progress reporting, and empty-database bootstrap behavior. |
 
 ## Delivery Sequence
 
-1. Introduce compatibility adapters behind feature flags.
-2. Confirm `request` is absent from direct dependencies and code paths, then enforce this via docs/checks.
-3. Switch template engine usage to `pug` only, then remove `jade` runtime references.
+1. Replace `mongodb-backup-fixed` behind the existing backup/restore service boundary and verify archive compatibility and recovery paths.
+2. Introduce remaining compatibility adapters behind feature flags.
+3. Confirm `request` is absent from direct dependencies and code paths, then enforce this via docs/checks.
 4. Replace Google auth strategy with `passport-google-oauth20` while preserving callback contracts.
 5. Remove orphaned auth adapter packages after production verification windows.
+6. Switch template engine usage to `pug` only, then remove `jade` runtime references when legacy comparison mode is explicitly retired.
 
 ## Risk Notes
 
@@ -46,3 +48,10 @@ This plan tracks high-risk deprecated dependencies and defines a safe replacemen
 - Runtime still registers both template engines (`server/src/app.ts`: `app.engine('jade', cons.jade)` and `app.engine('pug', cons.pug)`), so the template migration item is still pending.
 - Runtime auth still imports `passport-google` (`server/src/middlewares/passport.ts`) and carries `passport-google-oauth` / `passport-oauth` dependencies in `package.json`.
 - This plan remains active and should focus on template + auth strategy deprecation replacement, with `request` treated as a guardrail item.
+
+## Revalidation Notes (2026-07-11)
+
+- The current audit identifies `mongodb-backup-fixed` as the most urgent replacement because its transitive `bson` / `tar` vulnerabilities include critical and high findings without a safe direct patch path.
+- The backup replacement must retain the modern admin backup/restore contract and secure empty-database restore flow; it should be delivered before auth and template migrations.
+- Google auth replacement remains valid and should follow the backup migration in a separate, reversible change.
+- The Jade-to-Pug cleanup remains valid but should stay coupled to an explicit legacy-comparison retirement decision rather than being pulled into the security wave.
