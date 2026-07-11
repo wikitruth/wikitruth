@@ -85,7 +85,7 @@ The following remain genuinely pending after current-code searches. Detailed req
 
 - [x] Duplicate detection, deterministic merge, redirects, and moderator logs (`CORE-002`, `CONTENT-004`).
 - [x] Change requests, stale-conflict handling, revision history, rollback, and suggestion mode (`CORE-014` through `CORE-017`).
-- [ ] Contributor/reviewer onboarding gates and controlled anonymous contribution (`CORE-010`, `CORE-019`).
+- [x] Policy-versioned contributor/reviewer onboarding gates (`CORE-010`).
 - [x] Independent truth-versus-ethics verdict channels (`CORE-022`).
 - [ ] Unresolved-content expiry policy and issue-first gates (`CORE-025`, `CORE-026`).
 - [x] Artifact subtype taxonomy, internal/external evidence modes, provenance, and source-quality review (`CORE-027` through `CORE-029`).
@@ -101,7 +101,14 @@ The following remain genuinely pending after current-code searches. Detailed req
 - `38fa284b` added scoped deterministic candidate detection, exact duplicate prevention for all seven entry families, stale-preview validation, moderator-approved merges, relationship migration summaries, durable API redirects, source tombstones, privileged merge events, and the modern duplicate-review UI.
 - `c8ac6673` added immutable numbered revision snapshots for all seven entry families, public revision metadata, partial change-request acceptance, stale-base detection, reviewer rollback, pre/post-merge revision links, hash-chained privileged events, chain verification UI/API, and backup coverage for integrity collections.
 - `a71847d3` added backward-compatible artifact taxonomy and provenance, five-dimension source-quality review, independently queryable factual and ethical verdict channels, atomic dual-channel updates, revision capture, privileged audit evidence, and modern review UI.
+- `4290c1dc` added policy-versioned contributor/reviewer onboarding, new-user and future-promotion gates, account completion UI, role-switch filtering, server-side entry-write enforcement, reviewer-decision enforcement, and role/onboarding audit evidence. Existing role holders remain grandfathered for compatibility.
 - The content-policy item remains open only for seeded pilot execution and evidence; the policy pack and reviewer/screener playbook documents are implemented.
+
+### Explicitly Deferred Product Decisions
+
+- Controlled anonymous contribution (`CORE-019`) is not part of this modernization release because abuse controls, moderation capacity, and reputation signals are not yet proven.
+- Reputation, deterministic scorecards, and a broad strict-debate rollout remain deferred until a governed pilot produces enough usage evidence to define auditable, anti-gaming behavior.
+- Full FixPH productization and React Native delivery remain separate programs; they are not legacy-replacement blockers.
 
 ## Verification Checklist
 
