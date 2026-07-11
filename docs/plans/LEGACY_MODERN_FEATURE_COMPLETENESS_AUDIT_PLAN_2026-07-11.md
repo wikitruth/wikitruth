@@ -106,7 +106,7 @@ The following remain genuinely pending after current-code searches. Detailed req
 - `9c545f2d` added and executed the read-only live content-policy pilot across all seven entry families, retaining a redacted manifest and an operational adoption queue without bulk-mutating legacy records.
 - `62aa1cd3` added the disposable authenticated parity runner, verified reader/contributor/screener/reviewer/admin behavior across all seven entry families, removed every temporary identity, and fixed active-role action visibility exposed by the run.
 - `7ed69015` prevented merge-redirect ObjectId casting from intercepting friendly topic slugs, preserving application section navigation and canonical topic redirects.
-- The FixPH production tenant now runs revision `7ed69015` side by side on Node `22.17.0` under PM2 `wikitruth-modern`, with Nginx routing only `fixthephilippines.org` to port `8001` and serving the existing shared media store directly.
+- The FixPH production tenant now runs modernization code revision `d7cf056d` side by side on Node `22.17.0` under PM2 `wikitruth-modern`, with Nginx routing only `fixthephilippines.org` to port `8001` and serving the existing shared media store directly. The deployment also disables Kraken's duplicate cookie parser and MemoryStore defaults so the application-owned signed-cookie and Mongo session chain is authoritative.
 
 ### Explicitly Deferred Product Decisions
 
