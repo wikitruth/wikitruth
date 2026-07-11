@@ -1,5 +1,7 @@
 # Legacy vs Modern Migration Parity Audit Checklist Plan (2026-04-19)
 
+> Historical closure note (2026-07-11): this route/code-level audit is superseded by the deeper workflow audit in `docs/plans/LEGACY_MODERN_FEATURE_COMPLETENESS_AUDIT_PLAN_2026-07-11.md`. Fresh live validation found mobile overflow, omitted application navigation, comment alias, empty-install recovery, and dynamic application-page gaps that were not detected by the original `200`/render-oriented checks.
+
 ## Goal
 
 Audit legacy (`/legacy/*`) versus modern (`/*`) behavior in a single checklist that tracks parity by:
