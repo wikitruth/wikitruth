@@ -319,6 +319,7 @@ export default function registerLegacyPathRedirects(app: AppRouteRegistrar, _pas
   const modernShellPatterns = [
     '/',
     '/about',
+    '/about/*',
     '/contact',
     '/explore',
     '/search',

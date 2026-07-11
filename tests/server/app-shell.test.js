@@ -44,6 +44,14 @@ describe('React shell routes', function () {
     expect(res.text).toContain('Wikitruth - React App');
   });
 
+  it('serves the React shell for dynamic About pages', async function () {
+    const app = createRootApp();
+    const res = await request(app).get('/about/what-is-wikitruth').expect(200);
+
+    expect(res.text).toContain('<!DOCTYPE html>');
+    expect(res.text).toContain('Wikitruth - React App');
+  });
+
   it('redirects /app alias routes to root-based modern routes', async function () {
     const app = createRootApp();
     const res = await request(app).get('/app/topics').expect(302);
