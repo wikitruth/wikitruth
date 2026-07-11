@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import GeoPattern from 'geopattern';
+import { createGeoPatternDataUrl } from '../../utils/geoPattern';
 
 interface GeoPatternBackgroundProps {
   seed: string;
@@ -17,8 +17,7 @@ const GeoPatternBackground: React.FC<GeoPatternBackgroundProps> = ({
   const style = useMemo(() => {
     let dataUrl = '';
     try {
-      const pattern = GeoPattern.generate(seed);
-      dataUrl = pattern.toDataUrl();
+      dataUrl = createGeoPatternDataUrl(seed);
     } catch (_error) {
       dataUrl = '';
     }

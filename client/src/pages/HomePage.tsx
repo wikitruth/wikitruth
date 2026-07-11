@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import GeoPattern from 'geopattern';
 import apiService from '../services/api';
 import type { Answer, Application, Argument, Artifact, Issue, Opinion, Question, Topic } from '../types';
 import type { LegacyEntity } from '../types/legacy';
@@ -15,6 +14,7 @@ import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
 import PageMeta from '../components/common/PageMeta';
 import { useNotification } from '../context/NotificationContext';
 import { toModernAppSectionUrl } from '../utils/paths';
+import { createGeoPatternDataUrl } from '../utils/geoPattern';
 
 type HomeEntrySetColumn = {
   entries?: LegacyEntity[];
@@ -48,9 +48,8 @@ const FALLBACK_FEATURE_SECTION_TITLES = [
 const buildFeatureHeaderStyle = (title: string): React.CSSProperties => {
   const seed = String(title || 'feature');
   try {
-    const pattern = GeoPattern.generate(seed);
     return {
-      backgroundImage: pattern.toDataUrl(),
+      backgroundImage: createGeoPatternDataUrl(seed),
       backgroundSize: 'cover',
       backgroundPosition: 'center',
     };

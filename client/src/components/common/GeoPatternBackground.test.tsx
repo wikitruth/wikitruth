@@ -1,15 +1,13 @@
 import React from 'react';
 import { render, screen } from '../../test-utils/render';
 import GeoPatternBackground from './GeoPatternBackground';
-import GeoPattern from 'geopattern';
+import { createGeoPatternDataUrl } from '../../utils/geoPattern';
 
-jest.mock('geopattern', () => ({
-  generate: jest.fn(() => ({
-    toDataUrl: () => 'url("data:image/svg+xml;base64,abc")',
-  })),
+jest.mock('../../utils/geoPattern', () => ({
+  createGeoPatternDataUrl: jest.fn(() => 'url("data:image/svg+xml;base64,abc")'),
 }));
 
-const generateMock = (GeoPattern as unknown as { generate: jest.Mock }).generate;
+const generateMock = createGeoPatternDataUrl as jest.Mock;
 
 describe('GeoPatternBackground', () => {
   it('renders with default height', () => {
