@@ -45,6 +45,17 @@ type DbContract = Record<string, GenericModel> & {
 
 const db = (appModForDb as unknown as { db: { models: DbContract } }).db.models;
 
+export interface RestoreSummary {
+  public: Record<string, { restored: number; skipped: boolean }>;
+  private: Record<string, { restored: number; skipped: boolean }>;
+}
+
+export interface BackupAvailability {
+  ready: boolean;
+  requiredCollections: string[];
+  missingCollections: string[];
+}
+
 function ensureDir(dirPath: string): void {
   if (fs.existsSync(dirPath)) {
     return;
@@ -117,6 +128,85 @@ async function restoreCollectionFromDirectory(options: {
   }
 
   return { restored, skipped: false };
+}
+
+function collectionHasJsonFiles(collectionDir: string): boolean {
+  if (!fs.existsSync(collectionDir)) {
+    return false;
+  }
+  return fs.readdirSync(collectionDir).some((name: string) => name.endsWith('.json'));
+}
+
+export function getBootstrapBackupAvailability(): BackupAvailability {
+  const requiredCollections = ['admins', 'users', 'topics'];
+  const publicRoot = path.join(flowUtils.getBackupDir(), String(config.mongodb?.dbname || '').trim());
+  const missingCollections = requiredCollections.filter(
+    (collectionName) => !collectionHasJsonFiles(path.join(publicRoot, collectionName))
+  );
+
+  return {
+    ready: missingCollections.length === 0,
+    requiredCollections,
+    missingCollections,
+  };
+}
+
+export async function restoreDatabaseBackup(options: {
+  restorePublicData: boolean;
+  restorePrivateData: boolean;
+}): Promise<RestoreSummary> {
+  const { restorePublicData, restorePrivateData } = options;
+  const backupDir = flowUtils.getBackupDir();
+  const privateBackupDir = path.join(flowUtils.getBackupDir(true), 'users');
+  const collections = config.mongodb?.collections || {};
+  const dbName = String(config.mongodb?.dbname || '').trim();
+  const modelMapping = (collections.modelMapping || {}) as Record<string, string>;
+  const summary: RestoreSummary = {
+    public: {},
+    private: {},
+  };
+
+  if (restorePublicData) {
+    const publicRoot = path.join(backupDir, dbName);
+    const publicCollections = Array.from(
+      new Set([...(collections.backupList || []), ...(collections.privateBackupList || [])])
+    ) as string[];
+
+    for (const collectionName of publicCollections) {
+      const collectionDir = path.join(publicRoot, collectionName);
+      summary.public[collectionName] = await restoreCollectionFromDirectory({
+        collectionName,
+        collectionDir,
+        modelMapping,
+      });
+    }
+  }
+
+  if (restorePrivateData) {
+    const users = await db.User.find({}).sort({ username: 1 }).select('_id username').lean();
+    for (const user of users) {
+      const usernameKey = String(user.username || '').trim();
+      if (!usernameKey) {
+        continue;
+      }
+      const userRoot = path.join(privateBackupDir, usernameKey, dbName);
+      for (const collectionName of (collections.privateBackupList || []) as string[]) {
+        const collectionDir = path.join(userRoot, collectionName);
+        const key = `${usernameKey}:${collectionName}`;
+        summary.private[key] = await restoreCollectionFromDirectory({
+          collectionName,
+          collectionDir,
+          modelMapping,
+          overwriteQuery: {
+            private: true,
+            createUserId: user._id,
+          },
+        });
+      }
+    }
+  }
+
+  return summary;
 }
 
 export function registerAdminBackupRoutes(router: Router, ensureAdmin: EnsureAdmin): void {
@@ -226,52 +316,10 @@ export function registerAdminBackupRoutes(router: Router, ensureAdmin: EnsureAdm
         return;
       }
 
-      const dbName = String(config.mongodb?.dbname || '').trim();
-      const modelMapping = (collections.modelMapping || {}) as Record<string, string>;
-      const summary = {
-        public: {} as Record<string, { restored: number; skipped: boolean }>,
-        private: {} as Record<string, { restored: number; skipped: boolean }>,
-      };
-
-      if (restorePublicData) {
-        const publicRoot = path.join(backupDir, dbName);
-        const publicCollections = Array.from(
-          new Set([...(collections.backupList || []), ...(collections.privateBackupList || [])])
-        ) as string[];
-
-        for (const collectionName of publicCollections) {
-          const collectionDir = path.join(publicRoot, collectionName);
-          summary.public[collectionName] = await restoreCollectionFromDirectory({
-            collectionName,
-            collectionDir,
-            modelMapping,
-          });
-        }
-      }
-
-      if (restorePrivateData) {
-        const users = await db.User.find({}).sort({ username: 1 }).select('_id username').lean();
-        for (const user of users) {
-          const usernameKey = String(user.username || '').trim();
-          if (!usernameKey) {
-            continue;
-          }
-          const userRoot = path.join(privateBackupDir, usernameKey, dbName);
-          for (const collectionName of (collections.privateBackupList || []) as string[]) {
-            const collectionDir = path.join(userRoot, collectionName);
-            const key = `${usernameKey}:${collectionName}`;
-            summary.private[key] = await restoreCollectionFromDirectory({
-              collectionName,
-              collectionDir,
-              modelMapping,
-              overwriteQuery: {
-                private: true,
-                createUserId: user._id,
-              },
-            });
-          }
-        }
-      }
+      const summary = await restoreDatabaseBackup({
+        restorePublicData,
+        restorePrivateData,
+      });
 
       await logEntryEvent({
         scope: 'privileged',

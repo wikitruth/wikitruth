@@ -16,7 +16,7 @@ interface HeaderSection {
   url?: string;
 }
 
-type HeaderApplication = Partial<Pick<Application, '_id' | 'name' | 'sections'>> & {
+type HeaderApplication = Partial<Pick<Application, '_id' | 'name' | 'sections' | 'aboutUrl'>> & {
   id?: string;
   name?: string;
   title?: string;
@@ -245,7 +245,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
                   ))}
                   <li className="divider" aria-hidden="true"></li>
                   <li>
-                    <Link to="/about" onClick={() => {
+                    <Link to={toModernAppSectionUrl(application?.aboutUrl || '/about')} onClick={() => {
                       setIsMoreOpen(false);
                       setIsMobileNavOpen(false);
                     }}>

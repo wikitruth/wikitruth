@@ -28,6 +28,8 @@ import attachRealtime from './realtime';
 import attachReactions from './reactions';
 import attachNotifications from './notifications';
 import attachTimeline from './timeline';
+import attachInstall from './install';
+import attachPages from './pages';
 
 export = function (router: Router) {
   router.use(apiError.apiEnvelopeMiddleware);
@@ -55,6 +57,8 @@ export = function (router: Router) {
   const reactionsRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const notificationsRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const timelineRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
+  const installRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
+  const pagesRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
 
   attachHome(homeRouter);
   attachTopics(topicsRouter);
@@ -77,6 +81,8 @@ export = function (router: Router) {
   attachReactions(reactionsRouter);
   attachNotifications(notificationsRouter);
   attachTimeline(timelineRouter);
+  attachInstall(installRouter);
+  attachPages(pagesRouter);
 
   router.use('/home', homeRouter);
   router.use('/topics', topicsRouter);
@@ -99,4 +105,6 @@ export = function (router: Router) {
   router.use('/reactions', reactionsRouter);
   router.use('/notifications', notificationsRouter);
   router.use('/timeline', timelineRouter);
+  router.use('/install', installRouter);
+  router.use('/pages', pagesRouter);
 };

@@ -288,3 +288,30 @@ export interface MemberFastSwitchState {
 export interface MemberFastSwitchResponse extends ApiBaseResponse {
   fastSwitch?: MemberFastSwitchState;
 }
+
+export interface InstallStatusResponse extends ApiBaseResponse {
+  install?: {
+    databaseEmpty: boolean;
+    initialized: boolean;
+    hasAdmin: boolean;
+    tokenConfigured: boolean;
+    tokenRequired: boolean;
+    backupReady: boolean;
+    requiredCollections: string[];
+    missingCollections: string[];
+    eligible: boolean;
+    adminRestorePath: string | null;
+  };
+}
+
+export interface InstallRestoreResponse extends ApiBaseResponse {
+  restore?: {
+    completedAt?: string;
+    summary?: unknown;
+  };
+}
+
+export interface PublicPageResponse extends ApiBaseResponse {
+  page?: LegacyEntity;
+  parent?: LegacyEntity | null;
+}

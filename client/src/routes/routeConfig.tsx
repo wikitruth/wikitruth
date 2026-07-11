@@ -77,6 +77,7 @@ const ConvertPage = lazy(() => import('../pages/Wiki/Convert/ConvertPage'));
 const SearchPage = lazy(() => import('../pages/SearchPage'));
 const VisualizePage = lazy(() => import('../pages/VisualizePage'));
 const AboutPage = lazy(() => import('../pages/AboutPage'));
+const AboutContentPage = lazy(() => import('../pages/AboutContentPage'));
 const ContactPage = lazy(() => import('../pages/Contact/ContactPage'));
 const HelpUsPage = lazy(() => import('../pages/HelpUs/HelpUsPage'));
 const InstallPage = lazy(() => import('../pages/Install/InstallPage'));
@@ -209,6 +210,7 @@ export const appRoutes: AppRoute[] = [
   { path: '/visualize/topic/:id', element: <VisualizePage /> },
   { path: '/visualize/topic/:friendlyUrl/:id', element: <VisualizePage /> },
   { path: '/about', element: <AboutPage /> },
+  { path: '/about/:id', element: <AboutContentPage /> },
   { path: '/contact', element: <ContactPage /> },
   { path: '/help-us', element: <HelpUsPage /> },
   { path: '/install', element: <InstallPage /> },

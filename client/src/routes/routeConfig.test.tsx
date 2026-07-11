@@ -36,6 +36,7 @@ describe('routeConfig', () => {
     expect(paths).toContain('/comments/create');
     expect(paths).toContain('/comments/entry/:friendlyUrl/:id');
     expect(paths).toContain('/comment/:friendlyUrl/:id');
+    expect(paths).toContain('/about/:id');
   });
 
   it('maps journal routes to the dedicated journal page', () => {

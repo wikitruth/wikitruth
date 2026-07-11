@@ -64,6 +64,7 @@ describe('Header parity navigation', () => {
       application: {
         id: 'fixtheph',
         title: 'Fix The Philippines',
+        aboutUrl: '/topic/fixthephilippines-org',
         sections: [
           {
             title: 'Incidents',
@@ -83,6 +84,10 @@ describe('Header parity navigation', () => {
     expect(await screen.findByRole('link', { name: /incidents/i })).toHaveAttribute(
       'href',
       '/topics/entry/incidents-in-the-philippines'
+    );
+    expect(screen.getByRole('link', { name: /^about$/i })).toHaveAttribute(
+      'href',
+      '/topics/entry/fixthephilippines-org'
     );
     expect(screen.queryByRole('link', { name: /debates/i })).not.toBeInTheDocument();
   });

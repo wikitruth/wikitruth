@@ -4,6 +4,7 @@ import type { SchemaFactory } from '../factory';
 
 const factory: SchemaFactory = function (app, mongoose) {
   const schema = new mongoose.Schema({
+    id: { type: String },
     title: { type: String, default: '' },
     content: { type: String, default: '' },
     friendlyUrl: { type: String },

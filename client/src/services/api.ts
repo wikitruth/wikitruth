@@ -25,6 +25,9 @@ import type {
   EntryReactionsResponse,
   ReactionChannel,
   ReactionValue,
+  InstallStatusResponse,
+  InstallRestoreResponse,
+  PublicPageResponse,
 } from '../types/api';
 
 export class ApiRequestError extends Error {
@@ -159,6 +162,24 @@ class ApiService {
   // Home
   async getHomeData(): Promise<HomeDataResponse> {
     return this.request<HomeDataResponse>('/home');
+  }
+
+  async getInstallStatus(): Promise<InstallStatusResponse> {
+    return this.request<InstallStatusResponse>('/install');
+  }
+
+  async restoreEmptyDatabase(payload: {
+    bootstrapToken: string;
+    confirmText: string;
+  }): Promise<InstallRestoreResponse> {
+    return this.request<InstallRestoreResponse>('/install/restore', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  async getAboutPage(id: string): Promise<PublicPageResponse> {
+    return this.request<PublicPageResponse>(`/pages/about/${encodeURIComponent(id)}`);
   }
 
   // Topics

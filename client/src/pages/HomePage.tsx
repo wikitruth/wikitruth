@@ -209,7 +209,11 @@ const HomePage: React.FC = () => {
           >
             <i className="fa fa-snowflake-o"></i> Visualize
           </Link>
-          <Link className="btn btn-lg btn-warning" to="/about" role="button">
+          <Link
+            className="btn btn-lg btn-warning"
+            to={toModernAppSectionUrl(application?.aboutUrl || '/about')}
+            role="button"
+          >
             Learn more
           </Link>
         </p>
