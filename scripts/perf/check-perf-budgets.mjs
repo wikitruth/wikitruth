@@ -3,7 +3,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
-import autocannon from 'autocannon';
+import { performance } from 'node:perf_hooks';
 
 const rootDir = process.cwd();
 const baseUrl = process.env.PERF_BASE_URL || 'http://127.0.0.1:8000';
@@ -11,17 +11,42 @@ const configPath =
   process.env.PERF_BUDGET_CONFIG ||
   path.join(rootDir, 'docs/qa/perf-budgets-2026-04-24.json');
 
-function runAutocannon(options) {
-  return new Promise((resolve, reject) => {
-    const instance = autocannon(options, (err, result) => {
-      if (err) {
-        reject(err);
-        return;
+function percentile(values, percentileValue) {
+  if (!values.length) return 0;
+  const sorted = [...values].sort((left, right) => left - right);
+  const index = Math.max(0, Math.ceil((percentileValue / 100) * sorted.length) - 1);
+  return sorted[index] || 0;
+}
+
+async function runLoad({ url, connections, durationSeconds }) {
+  const durationMs = Math.max(1, durationSeconds * 1000);
+  const startedAt = performance.now();
+  const deadline = startedAt + durationMs;
+  const latencies = [];
+  let completed = 0;
+
+  async function worker() {
+    while (performance.now() < deadline) {
+      const requestStartedAt = performance.now();
+      const response = await fetch(url, {
+        redirect: 'manual',
+        signal: AbortSignal.timeout(Math.max(5_000, durationMs)),
+      });
+      await response.arrayBuffer();
+      if (response.status >= 500) {
+        throw new Error(`Load request failed with HTTP ${response.status}: ${url}`);
       }
-      resolve(result);
-    });
-    instance.on('error', reject);
-  });
+      latencies.push(performance.now() - requestStartedAt);
+      completed += 1;
+    }
+  }
+
+  await Promise.all(Array.from({ length: Math.max(1, connections) }, () => worker()));
+  const elapsedSeconds = Math.max((performance.now() - startedAt) / 1000, 0.001);
+  return {
+    p95: percentile(latencies, 95),
+    averageRequestsPerSecond: completed / elapsedSeconds,
+  };
 }
 
 function toNumber(value, fallback = 0) {
@@ -55,14 +80,14 @@ async function main() {
     const p95MsMax = toNumber(endpoint.p95MsMax, 0);
     const avgReqPerSecMin = toNumber(endpoint.avgReqPerSecMin, 0);
 
-    const result = await runAutocannon({
+    const result = await runLoad({
       url,
       connections,
-      duration,
+      durationSeconds: duration,
     });
 
-    const p95 = toNumber(result?.latency?.p95, 0);
-    const avgReqPerSec = toNumber(result?.requests?.average, 0);
+    const p95 = toNumber(result.p95, 0);
+    const avgReqPerSec = toNumber(result.averageRequestsPerSecond, 0);
 
     const p95Pass = p95MsMax <= 0 ? true : p95 <= p95MsMax;
     const rpsPass = avgReqPerSecMin <= 0 ? true : avgReqPerSec >= avgReqPerSecMin;
