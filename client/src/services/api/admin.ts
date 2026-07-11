@@ -76,7 +76,12 @@ export const adminApi = {
     request<{
       success: boolean;
       message: string;
-      backup: { backupDir: string; privateBackupDir: string; startedAt: string };
+      backup: {
+        backupDir: string;
+        privateBackupDir: string;
+        completedAt: string;
+        summary: { public: Record<string, number>; private: Record<string, number> };
+      };
     }>(`${API_BASE_URL}/admin/db-backup`, {
       method: 'POST',
       body: JSON.stringify({ action: 'backup' }),

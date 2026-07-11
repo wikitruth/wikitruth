@@ -5,7 +5,7 @@ import type { LegacyControllerFactory } from '../../../server/src/types/legacyCo
 import fs from 'fs';
 import path from 'path';
 import async from 'async';
-import backup from 'mongodb-backup-fixed';
+import { createDatabaseBackup } from '../../../server/src/services/databaseBackupService';
 
 import templates from '../models/templates';
 import config from '../config/config';
@@ -15,30 +15,6 @@ import app from '../app';
 let collectionsConfig = config.mongodb.collections,
   privateDirName = 'users';
 const db = app.db.models;
-
-/**
- * make dir
- *
- * @function makeDir
- * @param {String} path - path of dir
- */
-function makeDir(path) {
-  try {
-    const stats = fs.statSync(path);
-    if (stats && stats.isDirectory() === false) {
-      //logger('unlink file at ' + path);
-      fs.unlinkSync(path);
-      //logger('make dir at ' + path);
-      return fs.mkdirSync(path);
-    }
-  } catch (err) {
-    if (err && err.code === 'ENOENT') {
-      //logger('make dir at ' + path);
-      return fs.mkdirSync(path);
-    }
-  }
-  return path;
-}
 
 function performGitBackup(backupDir, pathspec, gitConfig) {
   let pathToRepo = path.resolve(backupDir);
@@ -181,46 +157,15 @@ const mountAdminController: LegacyControllerFactory = function(router) {
     }
 
     if (action === 'backup') {
-      await async.series({
-        createPublicDir: function() {
-          makeDir(backupDir);
-        },
-        createPrivateDir: function() {
-          makeDir(privateBackupDir);
-        },
-        backupSystemData: function() {
-          backup({
-            uri: config.mongodb.uri, // mongodb://<dbuser>:<dbpassword>@<dbdomain>.mongolab.com:<dbport>/<dbdatabase>
-            root: backupDir, // write files into this dir
-            collections: collectionsConfig.backupList, // save this collection only
-            parser: 'json',
-          });
-        },
-        backupPublicData: function() {
-          backup({
-            uri: config.mongodb.uri,
-            root: backupDir,
-            collections: collectionsConfig.privateBackupList,
-            parser: 'json',
-            query: { private: false },
-          });
-        },
-        backupPrivateData: async function() {
-          let users = await db.User
-            .find({})
-            .sort({ username: 1 })
-            .lean();
-          await async.eachSeries(users, function(user) {
-            console.log('backing up for user ' + user.username);
-            backup({
-              uri: config.mongodb.uri,
-              root: privateBackupDir + '/' + user.username,
-              collections: collectionsConfig.privateBackupList,
-              parser: 'json',
-              query: { private: true, createUserId: user._id },
-            });
-          });
-        },
+      const users = await db.User.find({}).sort({ username: 1 }).lean();
+      model.backupSummary = await createDatabaseBackup({
+        connection: req.app.db,
+        databaseName: config.mongodb.dbname,
+        publicRoot: backupDir,
+        privateUsersRoot: privateBackupDir,
+        publicCollections: collectionsConfig.backupList,
+        privateCollections: collectionsConfig.privateBackupList,
+        users,
       });
       res.render(templates.admin.mongoBackup, model);
 

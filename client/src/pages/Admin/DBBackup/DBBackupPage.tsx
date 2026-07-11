@@ -37,7 +37,11 @@ const DBBackupPage: React.FC = () => {
       setError(null);
       setMessage(null);
       const result = await adminApi.runDbBackup();
-      setMessage(`${result.message}. Started at ${new Date(result.backup.startedAt).toLocaleString()}`);
+      const documentCount = [...Object.values(result.backup.summary.public), ...Object.values(result.backup.summary.private)]
+        .reduce((total, count) => total + count, 0);
+      setMessage(
+        `${result.message}: ${documentCount.toLocaleString()} documents at ${new Date(result.backup.completedAt).toLocaleString()}`
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to start backup');
     } finally {
@@ -99,7 +103,7 @@ const DBBackupPage: React.FC = () => {
 
             <div className="form-group" style={{ marginTop: '20px' }}>
               <Button type="button" variant="primary" onClick={handleRunBackup} disabled={running} icon={running ? 'spinner fa-spin' : 'database'}>
-                {running ? 'Starting Backup...' : 'Run Backup'}
+                {running ? 'Running Backup...' : 'Run Backup'}
               </Button>{' '}
               <Button type="button" variant="default" onClick={loadStatus} disabled={running} icon="refresh">
                 Refresh Status

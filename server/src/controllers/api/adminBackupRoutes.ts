@@ -11,10 +11,13 @@ import {
 } from '../../types/controllerContracts';
 
 import appModForDb from '../../app';
-import backup from 'mongodb-backup-fixed';
 import config from '../../config/config';
 import * as flowUtils from '../../utils/flowUtils';
 import { listPrivilegedEvents, logEntryEvent } from '../../services/entryEventsService';
+import {
+  createDatabaseBackup,
+  type BackupDatabaseConnection,
+} from '../../services/databaseBackupService';
 import fs from 'fs';
 import path from 'path';
 
@@ -43,7 +46,10 @@ type DbContract = Record<string, GenericModel> & {
   };
 };
 
-const db = (appModForDb as unknown as { db: { models: DbContract } }).db.models;
+const databaseConnection = (appModForDb as unknown as {
+  db: BackupDatabaseConnection & { models: DbContract };
+}).db;
+const db = databaseConnection.models;
 
 export interface RestoreSummary {
   public: Record<string, { restored: number; skipped: boolean }>;
@@ -253,51 +259,42 @@ export function registerAdminBackupRoutes(router: Router, ensureAdmin: EnsureAdm
     const username = String(req.user?.username || '');
 
     if (action === 'backup') {
-      backup({
-        uri: config.mongodb.uri,
-        root: backupDir,
-        collections: collections.backupList || [],
-        parser: 'json',
+      const users = await db.User.find({}).sort({ username: 1 }).select('_id username').lean();
+      const summary = await createDatabaseBackup({
+        connection: databaseConnection,
+        databaseName: String(config.mongodb?.dbname || '').trim(),
+        publicRoot: backupDir,
+        privateUsersRoot: privateBackupDir,
+        publicCollections: (collections.backupList || []) as string[],
+        privateCollections: (collections.privateBackupList || []) as string[],
+        users,
       });
-
-      backup({
-        uri: config.mongodb.uri,
-        root: backupDir,
-        collections: collections.privateBackupList || [],
-        parser: 'json',
-        query: { private: false },
-      });
-
-      backup({
-        uri: config.mongodb.uri,
-        root: privateBackupDir,
-        collections: collections.privateBackupList || [],
-        parser: 'json',
-        query: { private: true },
-      });
+      const completedAt = new Date().toISOString();
 
       await logEntryEvent({
         scope: 'privileged',
-        eventType: 'admin.backup.started',
+        eventType: 'admin.backup.completed',
         objectType: 1,
         objectName: 'topic',
         objectId: String(req.user?._id || req.user?.id || req.user?.username || 'admin'),
         actorUserId: userId,
         actorUsername: username,
-        message: 'Started database backup',
+        message: 'Completed database backup',
         payload: {
           backupDir,
           privateBackupDir,
+          summary,
         },
       });
 
-      res.status(202).json({
+      res.json({
         success: true,
-        message: 'Backup tasks started',
+        message: 'Backup completed',
         backup: {
           backupDir: backupDir,
           privateBackupDir: privateBackupDir,
-          startedAt: new Date().toISOString(),
+          completedAt,
+          summary,
         },
       });
       return;

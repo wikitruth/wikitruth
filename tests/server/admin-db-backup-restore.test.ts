@@ -7,6 +7,7 @@ const createTopic = jest.fn();
 const countDocuments = jest.fn();
 const getBackupDir = jest.fn();
 const logEntryEvent = jest.fn();
+const createDatabaseBackup = jest.fn();
 
 jest.mock('../../server/src/app', () => ({
   db: {
@@ -60,7 +61,9 @@ jest.mock('../../server/src/services/entryEventsService', () => ({
   }),
 }));
 
-jest.mock('mongodb-backup-fixed', () => jest.fn());
+jest.mock('../../server/src/services/databaseBackupService', () => ({
+  createDatabaseBackup: (...args: unknown[]) => createDatabaseBackup(...args),
+}));
 
 jest.mock('fs', () => ({
   existsSync: jest.fn(),
@@ -119,6 +122,31 @@ describe('admin db backup restore route', () => {
     createTopic.mockResolvedValue({ _id: 'topic-1' });
     countDocuments.mockResolvedValue(0);
     logEntryEvent.mockResolvedValue(undefined);
+    createDatabaseBackup.mockResolvedValue({
+      public: { topics: 1 },
+      private: { 'alice:topics': 1 },
+    });
+  });
+
+  it('waits for a complete backup and records its summary', async () => {
+    const app = createApp();
+    const response = await request(app)
+      .post('/api/admin/db-backup')
+      .send({ action: 'backup' })
+      .expect(200);
+
+    expect(createDatabaseBackup).toHaveBeenCalledTimes(1);
+    expect(response.body.message).toBe('Backup completed');
+    expect(response.body.backup.summary).toEqual({
+      public: { topics: 1 },
+      private: { 'alice:topics': 1 },
+    });
+    expect(logEntryEvent).toHaveBeenCalledWith(expect.objectContaining({
+      eventType: 'admin.backup.completed',
+      payload: expect.objectContaining({
+        summary: expect.any(Object),
+      }),
+    }));
   });
 
   it('rejects restore requests without RESTORE confirmation text', async () => {

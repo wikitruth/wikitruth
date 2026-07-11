@@ -7,7 +7,7 @@ import { Strategy as LocalStrategyTyped } from 'passport-local';
 import { Strategy as TwitterStrategyTyped } from 'passport-twitter';
 import { Strategy as GitHubStrategyTyped } from 'passport-github';
 import { Strategy as FacebookStrategyTyped } from 'passport-facebook';
-import passportGoogle from 'passport-google';
+import { Strategy as GoogleStrategyTyped } from 'passport-google-oauth20';
 import AppleStrategyDefault from 'passport-apple';
 import passportMicrosoft from 'passport-microsoft';
 
@@ -16,7 +16,7 @@ const LocalStrategy = LocalStrategyTyped as unknown as StrategyCtor;
 const TwitterStrategy = TwitterStrategyTyped as unknown as StrategyCtor;
 const GitHubStrategy = GitHubStrategyTyped as unknown as StrategyCtor;
 const FacebookStrategy = FacebookStrategyTyped as unknown as StrategyCtor;
-const GoogleStrategy = (passportGoogle as { Strategy: unknown }).Strategy as StrategyCtor;
+const GoogleStrategy = GoogleStrategyTyped as unknown as StrategyCtor;
 const AppleStrategy = AppleStrategyDefault as unknown as StrategyCtor;
 const MicrosoftStrategy = (passportMicrosoft as { Strategy: unknown }).Strategy as StrategyCtor;
 
@@ -161,6 +161,7 @@ export default function configurePassport(app: AppWithConfig, passport: Passport
         {
           clientID: app.config.oauth.google.key,
           clientSecret: app.config.oauth.google.secret,
+          scope: ['profile', 'email'],
         },
         function (
           accessToken: string,
