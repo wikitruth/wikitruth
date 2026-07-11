@@ -1,9 +1,12 @@
-const path = require('path');
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const configDirectory = path.dirname(fileURLToPath(import.meta.url));
 
 /** @type {import('@storybook/react-webpack5').StorybookConfig} */
 const config = {
   stories: ['../client/src/**/*.mdx', '../client/src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
-  addons: ['@storybook/addon-essentials', '@storybook/addon-interactions'],
+  addons: ['@storybook/addon-docs'],
   framework: {
     name: '@storybook/react-webpack5',
     options: {},
@@ -23,11 +26,11 @@ const config = {
 
     webpackConfig.module.rules.push({
       test: /\.(ts|tsx)$/,
-      include: path.resolve(__dirname, '../client'),
+      include: path.resolve(configDirectory, '../client'),
       exclude: /node_modules/,
       use: [
         {
-          loader: require.resolve('ts-loader'),
+          loader: fileURLToPath(import.meta.resolve('ts-loader')),
           options: {
             transpileOnly: true,
           },
