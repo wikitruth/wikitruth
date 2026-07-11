@@ -8,9 +8,9 @@ This plan tracks high-risk deprecated dependencies and defines a safe replacemen
 |---|---|---|---|---|
 | HTTP client | No direct `request` dependency in `package.json` / `package-lock.json` | Historical deprecation target; risk is regression if legacy `request` calls are reintroduced | Keep Native `fetch` (Node 22) + adapter approach | Keep response/error mapping backward compatible and block reintroduction of `request`. |
 | Template engine alias | `jade` | Deprecated name; modern ecosystem is `pug` | `pug` package and `cons.pug` renderer only | Remove `cons.jade` and jade-specific view references after parity checks. |
-| Google auth | `passport-google`, `passport-google-oauth` | Legacy strategy packages, stale maintenance | `passport-google-oauth20` | Keep callback route/claims mapping compatible with current session payload. |
-| Generic OAuth adapter | `passport-oauth` | Likely orphaned legacy dependency and maintenance risk | Remove if unused, otherwise use provider-specific maintained strategies (`oauth2`) | Verify runtime imports/usages before removal; avoid broad auth rewrite in one step. |
-| Database backup | `mongodb-backup-fixed` | Pulls vulnerable, obsolete `bson` and `tar` dependency chains; no adequate direct patch path | Maintained MongoDB-native backup/restore adapter or an isolated `mongodump` / `mongorestore` process wrapper | Preserve backup archive validation, restore preflight, progress reporting, and empty-database bootstrap behavior. |
+| Google auth | `passport-google-oauth20` | Replacement completed; production credentials still require live callback verification | Retain maintained OAuth 2 strategy | Keep callback routes and profile/session mapping covered by regression tests. |
+| Generic OAuth adapter | No direct `passport-oauth` dependency | Removal completed | Keep provider-specific maintained strategies | Block accidental direct reintroduction. |
+| Database backup | Application-owned MongoDB-native JSON exporter | Replacement completed; archive compatibility remains operationally sensitive | Retain the service boundary and atomic collection writes | Preserve backup validation, restore preflight, progress reporting, and empty-database bootstrap behavior. |
 
 ## Delivery Sequence
 
@@ -55,3 +55,10 @@ This plan tracks high-risk deprecated dependencies and defines a safe replacemen
 - The backup replacement must retain the modern admin backup/restore contract and secure empty-database restore flow; it should be delivered before auth and template migrations.
 - Google auth replacement remains valid and should follow the backup migration in a separate, reversible change.
 - The Jade-to-Pug cleanup remains valid but should stay coupled to an explicit legacy-comparison retirement decision rather than being pulled into the security wave.
+
+## Implementation Progress (2026-07-11)
+
+- Commit `b9f4bb28` completed the database-backup replacement, Google OAuth 2 migration, and direct generic OAuth dependency removal.
+- Modern and legacy backup controllers now share one awaited service that writes the existing per-document JSON format atomically and partitions private records by user.
+- Backup completion and document counts are returned to the modern admin UI and included in the privileged event payload.
+- Remaining deprecation work is the Jade/Kraken-era template chain and Passport Twitter's vulnerable transitive XML parser. Keep this plan active until those compatibility migrations are separately validated.

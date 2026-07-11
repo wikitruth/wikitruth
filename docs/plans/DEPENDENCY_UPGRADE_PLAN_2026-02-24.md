@@ -87,3 +87,12 @@ Do not upgrade blindly while Dust/Jade comparison mode remains active.
 - Immediate same-major candidates include `dompurify@3.4.12`, `express@4.22.2`, `mongoose@8.24.1`, `jsonwebtoken@9.0.3`, Tiptap `3.27.x`, and `@playwright/test@1.61.1`. Storybook should first move to a patched `8.6.x` release rather than combining its security fix with a major migration.
 - `mongodb-backup-fixed` introduces a critical/high transitive `bson` / `tar` chain that is not adequately resolved by a normal direct-package patch. Replacing the backup implementation is now a separate Wave A2 deliverable.
 - Broad framework majors remain intentionally separated. Do not combine Express 5, Mongoose 9, React 19, React Router 7, or Storybook 10 in the security patch wave.
+
+## Implementation Progress (2026-07-11)
+
+- Commit `b9f4bb28` completed the safe same-major runtime/editor/tooling wave and replaced `mongodb-backup-fixed` with an application-owned, atomic JSON backup service.
+- Google authentication now uses `passport-google-oauth20`; `passport-google`, `passport-google-oauth`, the unused direct `passport-oauth`, and their obsolete declarations were removed.
+- Tiptap packages are aligned at `3.27.3`; DOMPurify, Express 4, Mongoose 8, JSON Web Token, Babel 7, Storybook 8, Playwright, Webpack 5, and related safe-minor packages were updated without taking framework majors.
+- Full validation passed: modern and legacy type checks, `36` server suites / `165` tests, `58` client suites / `142` tests, production server/client builds, lint checks, and source guardrails.
+- `npm audit` improved from `71` findings (`13` critical) to `51` findings (`7` critical). The remaining critical findings are constrained to the retained Jade/Kraken-era template stack and Passport Twitter's obsolete XML dependency; those require isolated compatibility migrations rather than forced audit fixes.
+- Wave A and Wave A2 are complete for the approved safe-security scope. Waves B through D remain active.
