@@ -20,7 +20,7 @@ Re-open legacy-to-modern parity at feature and workflow depth, rather than treat
 
 ### Modern target-state completeness
 
-**Not complete.** The modern application exceeds legacy in notifications, timeline, reaction persistence, reader signals/appeals, audit viewing, and the unified create flow. It still lacks several approved/deferred product capabilities, including duplicate/merge handling, change requests and revision rollback, strict debate modes, reputation, content-operations policy/playbooks, and most dedicated FixPH workflows.
+**Core governance modernization is substantially implemented; broader product programs remain separate.** The modern application now includes deterministic duplicate/merge handling, immutable revisions, change requests and rollback, tamper-evident privileged audit events, evidence provenance and quality review, and independent factual/ethical verdicts. Remaining core work is onboarding, revision-linked comment obsolescence, issue-first controls, and runtime signoff; anonymous contribution, reputation/scorecards, FixPH productization, and React Native remain explicit deferred or separate programs.
 
 ## Recommendation Review (2026-07-11)
 
@@ -86,8 +86,9 @@ The following remain genuinely pending after current-code searches. Detailed req
 - [x] Duplicate detection, deterministic merge, redirects, and moderator logs (`CORE-002`, `CONTENT-004`).
 - [x] Change requests, stale-conflict handling, revision history, rollback, and suggestion mode (`CORE-014` through `CORE-017`).
 - [ ] Contributor/reviewer onboarding gates and controlled anonymous contribution (`CORE-010`, `CORE-019`).
-- [ ] Truth-versus-ethics verdict channels, unresolved-content expiry, and issue-first gates (`CORE-022`, `CORE-025`, `CORE-026`).
-- [ ] Artifact subtype taxonomy and richer provenance (`CORE-027` through `CORE-029`).
+- [x] Independent truth-versus-ethics verdict channels (`CORE-022`).
+- [ ] Unresolved-content expiry policy and issue-first gates (`CORE-025`, `CORE-026`).
+- [x] Artifact subtype taxonomy, internal/external evidence modes, provenance, and source-quality review (`CORE-027` through `CORE-029`).
 - [x] Tamper-evident privileged audit events and verification tooling (`CORE-034`).
 - [ ] Strict debate modes, revision-linked comment obsolescence, reputation, and deterministic scorecards (`FLOW-007`, `FLOW-010`, `FLOW-021`, `FLOW-022`).
 - [ ] Content policy packs, reviewer/screener playbooks, source-quality rubric, and seeded pilot evidence (`CONTENT-001` through `CONTENT-020`, as applicable).
@@ -99,6 +100,7 @@ The following remain genuinely pending after current-code searches. Detailed req
 - `54bf2cc8` added the operating policy baseline for duplicate/merge decisions, source quality, moderation roles, and independent truth/ethics review.
 - `38fa284b` added scoped deterministic candidate detection, exact duplicate prevention for all seven entry families, stale-preview validation, moderator-approved merges, relationship migration summaries, durable API redirects, source tombstones, privileged merge events, and the modern duplicate-review UI.
 - `c8ac6673` added immutable numbered revision snapshots for all seven entry families, public revision metadata, partial change-request acceptance, stale-base detection, reviewer rollback, pre/post-merge revision links, hash-chained privileged events, chain verification UI/API, and backup coverage for integrity collections.
+- `a71847d3` added backward-compatible artifact taxonomy and provenance, five-dimension source-quality review, independently queryable factual and ethical verdict channels, atomic dual-channel updates, revision capture, privileged audit evidence, and modern review UI.
 - The content-policy item remains open only for seeded pilot execution and evidence; the policy pack and reviewer/screener playbook documents are implemented.
 
 ## Verification Checklist
