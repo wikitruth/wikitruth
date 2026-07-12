@@ -77,6 +77,9 @@ const CreateWizardPage: React.FC = () => {
           Want to contribute without an account? <Link to="/contribute">Submit an anonymous proposal for screening</Link>.
         </Alert>
       ) : null}
+      <Alert type="info">
+        Before publishing, review the <Link to="/policies">contribution, evidence, and moderation policies</Link>.
+      </Alert>
 
       <div className="row">
         {targets.map((target) => (

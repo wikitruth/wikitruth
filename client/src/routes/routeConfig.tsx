@@ -97,6 +97,7 @@ const AnonymousContributionPage = lazy(() => import('../pages/AnonymousContribut
 const AnonymousContributionsPage = lazy(() => import('../pages/Admin/AnonymousContributions/AnonymousContributionsPage'));
 const CivicWorkspacePage = lazy(() => import('../pages/Civic/CivicWorkspacePage'));
 const CivicRecordPage = lazy(() => import('../pages/Civic/CivicRecordPage'));
+const PolicyCenterPage = lazy(() => import('../pages/PolicyCenterPage'));
 
 export interface AppRoute {
   path: string;
@@ -135,6 +136,7 @@ export const appRoutes: AppRoute[] = [
   { path: '/civic', element: <CivicWorkspacePage /> },
   { path: '/civic/:section', element: <CivicWorkspacePage /> },
   { path: '/civic/records/:id', element: <CivicRecordPage /> },
+  { path: '/policies', element: <PolicyCenterPage /> },
   { path: '/topics', element: <TopicsPage /> },
   { path: '/topics/create', element: <TopicCreatePage /> },
   { path: '/topics/entry/:friendlyUrl/:id', element: <TopicEntryPage /> },

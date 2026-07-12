@@ -88,7 +88,7 @@ const OnboardingPage: React.FC = () => {
                 <p>This track is complete{track.completedDate ? ` as of ${new Date(track.completedDate).toLocaleString()}` : ''}.</p>
               ) : (
                 <>
-                  <p>Review the <Link to="/about">operating guidance</Link>, then confirm every responsibility:</p>
+                  <p>Review the <Link to="/policies">operating policies</Link>, then confirm every responsibility:</p>
                   {track.acknowledgements.map((item) => (
                     <div className="checkbox" key={item}>
                       <label>
