@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import apiService from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -37,22 +37,22 @@ const IssuesPage: React.FC = () => {
     localStorage.setItem('wt_view_mode', mode);
   };
 
-  useEffect(() => {
-    fetchIssues();
-  }, [viewMode]);
-
-  const fetchIssues = async () => {
+  const fetchIssues = useCallback(async () => {
     try {
       setLoading(true);
       const data = await apiService.getIssues(undefined, viewMode);
       setIssues(data.issues || []);
-    } catch (err) {
+    } catch {
       setError('Failed to load issues');
       addToast('danger', 'Failed to load issues');
     } finally {
       setLoading(false);
     }
-  };
+  }, [addToast, viewMode]);
+
+  useEffect(() => {
+    void fetchIssues();
+  }, [fetchIssues]);
 
   // Filter and sort issues
   const filteredAndSortedIssues = React.useMemo(() => {

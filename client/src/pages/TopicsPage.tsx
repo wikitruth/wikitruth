@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import apiService from '../services/api';
 import type { Topic } from '../types';
@@ -46,21 +46,21 @@ const TopicsPage: React.FC = () => {
 
   const toTimestamp = (value?: Date) => (value ? new Date(value).getTime() : 0);
 
-  useEffect(() => {
-    fetchTopics();
-  }, [topicId, viewMode]);
-
-  const fetchTopics = async () => {
+  const fetchTopics = useCallback(async () => {
     try {
       const result = (await apiService.getTopics(topicId, viewMode)) as TopicsApiResponse;
       setTopics(result.topics || []);
       setTopic(result.topic || null);
       setLoading(false);
-    } catch (error) {
+    } catch {
       addToast('danger', 'Failed to load topics');
       setLoading(false);
     }
-  };
+  }, [addToast, topicId, viewMode]);
+
+  useEffect(() => {
+    void fetchTopics();
+  }, [fetchTopics]);
 
   // Filter and sort topics
   const filteredAndSortedTopics = React.useMemo(() => {

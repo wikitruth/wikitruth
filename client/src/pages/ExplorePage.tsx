@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import apiService from '../services/api';
 import type { HomeDataResponse } from '../types/api';
@@ -182,7 +182,7 @@ const ExplorePage: React.FC = () => {
     ];
   }, [data]);
 
-  const filterEntry = (entry: LegacyEntity): boolean => {
+  const filterEntry = useCallback((entry: LegacyEntity): boolean => {
     if (keyword) {
       const text = `${String(entry.title || '')} ${String(entry.content || '')} ${String(entry.contentPreview || '')}`.toLowerCase();
       if (!text.includes(keyword.toLowerCase())) {
@@ -238,7 +238,7 @@ const ExplorePage: React.FC = () => {
     }
 
     return true;
-  };
+  }, [keyword, relationshipFilter, screeningFilter, tagFilter, verdictFilter]);
 
   const filteredSections = useMemo(() => {
     const getPopularityScore = (entry: LegacyEntity): number => {
@@ -284,7 +284,7 @@ const ExplorePage: React.FC = () => {
       ...section,
       items: sortEntries((section.items || []).filter((entry) => filterEntry(entry as LegacyEntity))),
     }));
-  }, [sections, keyword, screeningFilter, verdictFilter, relationshipFilter, tagFilter, sortMode]);
+  }, [filterEntry, sections, sortMode]);
 
   const categories: ExploreCategory[] = (data?.appCategories || []) as ExploreCategory[];
 

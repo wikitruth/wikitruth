@@ -101,7 +101,7 @@ const SearchPage: React.FC = () => {
       setSearchParams(params);
     }, 333);
     return () => clearTimeout(timer);
-  }, [searchQuery]);
+  }, [content, query, searchQuery, setSearchParams, tab]);
 
   // Reset focused index when results change
   useEffect(() => {
@@ -122,7 +122,7 @@ const SearchPage: React.FC = () => {
         const response = await apiService.search(query, { tab: tab, content: content });
         trackEvent('search', 'engagement', query);
         setResults(response);
-      } catch (error) {
+      } catch {
         addToast('danger', 'Search failed. Please try again.');
         setResults(emptyResults);
       } finally {
@@ -131,7 +131,7 @@ const SearchPage: React.FC = () => {
     };
 
     void run();
-  }, [query, tab, content]);
+  }, [addToast, query, tab, content]);
 
   const buildSearchLink = (next: { q?: string; tab?: SearchTab; content?: SearchContent }) => {
     const params = new URLSearchParams();

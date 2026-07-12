@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link, useSearchParams, useNavigate } from 'react-router-dom';
 import apiService from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -42,11 +42,7 @@ const ArgumentEntryPage: React.FC = () => {
   const isArgumentLinkMode = Boolean(argumentLinkId);
   const isArgumentLinkEditMode = isArgumentLinkMode && mode === 'edit-link';
 
-  useEffect(() => {
-    fetchArgumentEntry();
-  }, [id, argumentLinkId, mode]);
-
-  const fetchArgumentEntry = async () => {
+  const fetchArgumentEntry = useCallback(async () => {
     if (!id) return;
     
     try {
@@ -63,7 +59,11 @@ const ArgumentEntryPage: React.FC = () => {
       setError('Failed to load argument');
       setLoading(false);
     }
-  };
+  }, [argumentLinkId, id, mode]);
+
+  useEffect(() => {
+    void fetchArgumentEntry();
+  }, [fetchArgumentEntry]);
 
   useEffect(() => {
     const entry = (data?.entry || null) as LegacyEntity | null;

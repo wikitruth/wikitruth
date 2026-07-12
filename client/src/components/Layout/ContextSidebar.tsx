@@ -342,7 +342,7 @@ const ContextSidebar: React.FC = () => {
     };
   }, [homeContext?.appCategories]);
 
-  const sectionItemsByRoot: Record<string, SidebarSection> = {
+  const sectionItemsByRoot = useMemo<Record<string, SidebarSection>>(() => ({
     topics: {
       title: 'In This Section',
       items: [
@@ -406,7 +406,7 @@ const ContextSidebar: React.FC = () => {
           : []),
       ],
     },
-  };
+  }), [profileBasePath, profileUsername, user?.username]);
 
   const topicInSection = useMemo<SidebarSection | null>(() => {
     const fallback = sectionItemsByRoot[section] || null;

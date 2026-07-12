@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 interface UseFetchOptions {
   skip?: boolean;
@@ -14,7 +14,7 @@ export function useFetch<T = unknown>(
   const [loading, setLoading] = useState(!skip);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (skip) return;
 
     setLoading(true);
@@ -36,16 +36,16 @@ export function useFetch<T = unknown>(
     } finally {
       setLoading(false);
     }
-  };
+  }, [skip, url]);
 
   useEffect(() => {
     if (refetchOnMount) {
-      fetchData();
+      void fetchData();
     }
-  }, [url, skip, refetchOnMount]);
+  }, [fetchData, refetchOnMount]);
 
   const refetch = () => {
-    fetchData();
+    void fetchData();
   };
 
   return { data, loading, error, refetch };

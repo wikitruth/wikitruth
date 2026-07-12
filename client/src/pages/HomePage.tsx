@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import apiService from '../services/api';
 import type { Answer, Application, Argument, Artifact, Issue, Opinion, Question, Topic } from '../types';
@@ -88,20 +88,20 @@ const HomePage: React.FC = () => {
     return featureHeaderStyles.get(normalizedTitle) || buildFeatureHeaderStyle(normalizedTitle);
   };
 
-  useEffect(() => {
-    fetchHomeData();
-  }, []);
-
-  const fetchHomeData = async () => {
+  const fetchHomeData = useCallback(async () => {
     try {
       const result = (await apiService.getHomeData()) as HomeData;
       setData(result);
       setLoading(false);
-    } catch (error) {
+    } catch {
       addToast('danger', 'Failed to load homepage data');
       setLoading(false);
     }
-  };
+  }, [addToast]);
+
+  useEffect(() => {
+    void fetchHomeData();
+  }, [fetchHomeData]);
 
   if (loading) {
     return <LoadingSpinner message="Loading homepage..." />;

@@ -40,7 +40,7 @@ describe('API error envelope', function () {
     });
 
     app.use(apiErrorHandler);
-    app.use(function (err, req, res, next) {
+    app.use(function (err, _req, res, _next) {
       res.status(500).json({ legacy: true, message: err.message });
     });
 

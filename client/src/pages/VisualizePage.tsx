@@ -288,13 +288,15 @@ const VisualizePage: React.FC = () => {
     }
   }, [isFullscreen]);
 
-  const topics = (data?.topics || []) as LegacyEntity[];
-  const argumentsList = (data?.arguments || []) as LegacyEntity[];
-  const questions = (data?.questions || []) as LegacyEntity[];
-  const issues = (data?.issues || []) as LegacyEntity[];
-  const opinions = (data?.opinions || []) as LegacyEntity[];
-  const artifacts = (data?.artifacts || []) as LegacyEntity[];
-  const answers = (data?.answers || []) as LegacyEntity[];
+  const { topics, argumentsList, questions, issues, opinions, artifacts, answers } = useMemo(() => ({
+    topics: (data?.topics || []) as LegacyEntity[],
+    argumentsList: (data?.arguments || []) as LegacyEntity[],
+    questions: (data?.questions || []) as LegacyEntity[],
+    issues: (data?.issues || []) as LegacyEntity[],
+    opinions: (data?.opinions || []) as LegacyEntity[],
+    artifacts: (data?.artifacts || []) as LegacyEntity[],
+    answers: (data?.answers || []) as LegacyEntity[],
+  }), [data]);
 
   const selectedTopic = useMemo(
     () => topics.find((topic) => String(topic._id) === selectedTopicId) || null,

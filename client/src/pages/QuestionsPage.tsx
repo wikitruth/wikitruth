@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import apiService from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -39,20 +39,20 @@ const QuestionsPage: React.FC = () => {
     localStorage.setItem('wt_view_mode', mode);
   };
 
-  useEffect(() => {
-    fetchQuestions();
-  }, [topicId, viewMode]);
-
-  const fetchQuestions = async () => {
+  const fetchQuestions = useCallback(async () => {
     try {
       const result = await apiService.getQuestions(topicId, viewMode);
       setQuestions(result.questions || []);
       setLoading(false);
-    } catch (error) {
+    } catch {
       addToast('danger', 'Failed to load questions');
       setLoading(false);
     }
-  };
+  }, [addToast, topicId, viewMode]);
+
+  useEffect(() => {
+    void fetchQuestions();
+  }, [fetchQuestions]);
 
   // Filter and sort questions
   const filteredAndSortedQuestions = React.useMemo(() => {

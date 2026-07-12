@@ -70,11 +70,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [user]);
 
-  useEffect(() => {
-    // Check if user is already logged in on mount
-    void checkAuthStatus();
-  }, []);
-
   const checkAuthStatus = useCallback(async () => {
     try {
       const response = await authApi.me();
@@ -99,6 +94,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    void checkAuthStatus();
+  }, [checkAuthStatus]);
 
   const login = useCallback(async (username: string, password: string) => {
     try {
@@ -157,7 +156,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     logout,
     updateUser,
-  }), [user, isLoading, activeRole, setActiveRole, availableRoles]);
+  }), [user, isLoading, activeRole, setActiveRole, availableRoles, signup, login, logout, updateUser]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

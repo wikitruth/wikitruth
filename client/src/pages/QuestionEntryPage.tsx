@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import apiService from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -30,11 +30,7 @@ const QuestionEntryPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchQuestionEntry();
-  }, [id]);
-
-  const fetchQuestionEntry = async () => {
+  const fetchQuestionEntry = useCallback(async () => {
     if (!id) return;
     
     try {
@@ -47,7 +43,11 @@ const QuestionEntryPage: React.FC = () => {
       setError('Failed to load question');
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    void fetchQuestionEntry();
+  }, [fetchQuestionEntry]);
 
   if (loading) {
     return <LoadingSpinner message="Loading question..." />;

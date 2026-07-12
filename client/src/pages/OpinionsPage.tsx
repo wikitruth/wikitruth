@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import apiService from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -37,22 +37,22 @@ const OpinionsPage: React.FC = () => {
     localStorage.setItem('wt_view_mode', mode);
   };
 
-  useEffect(() => {
-    fetchOpinions();
-  }, [viewMode]);
-
-  const fetchOpinions = async () => {
+  const fetchOpinions = useCallback(async () => {
     try {
       setLoading(true);
       const data = await apiService.getOpinions(undefined, viewMode);
       setOpinions(data.opinions || []);
-    } catch (err) {
+    } catch {
       setError('Failed to load opinions');
       addToast('danger', 'Failed to load opinions');
     } finally {
       setLoading(false);
     }
-  };
+  }, [addToast, viewMode]);
+
+  useEffect(() => {
+    void fetchOpinions();
+  }, [fetchOpinions]);
 
   // Filter and sort opinions
   const filteredAndSortedOpinions = React.useMemo(() => {

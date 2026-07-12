@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import apiService from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -40,20 +40,20 @@ const ArgumentsPage: React.FC = () => {
     localStorage.setItem('wt_view_mode', mode);
   };
 
-  useEffect(() => {
-    fetchArguments();
-  }, [topicId, viewMode]);
-
-  const fetchArguments = async () => {
+  const fetchArguments = useCallback(async () => {
     try {
       const result = await apiService.getArguments(topicId, viewMode);
       setArgumentsList(result.arguments || []);
       setLoading(false);
-    } catch (error) {
+    } catch {
       addToast('danger', 'Failed to load arguments');
       setLoading(false);
     }
-  };
+  }, [addToast, topicId, viewMode]);
+
+  useEffect(() => {
+    void fetchArguments();
+  }, [fetchArguments]);
 
   // Filter and sort arguments
   const filteredAndSortedArguments = React.useMemo(() => {

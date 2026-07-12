@@ -53,7 +53,7 @@ const AnswersPage: React.FC = () => {
     };
 
     fetchData();
-  }, [viewMode]);
+  }, [addToast, viewMode]);
 
   // Filter and sort answers
   const filteredAndSortedAnswers = React.useMemo(() => {
