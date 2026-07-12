@@ -95,6 +95,8 @@ const ServiceUnavailable503 = lazy(() => import('../pages/Errors/ServiceUnavaila
 const NotFoundPage = lazy(() => import('../pages/NotFoundPage'));
 const AnonymousContributionPage = lazy(() => import('../pages/AnonymousContributionPage'));
 const AnonymousContributionsPage = lazy(() => import('../pages/Admin/AnonymousContributions/AnonymousContributionsPage'));
+const CivicWorkspacePage = lazy(() => import('../pages/Civic/CivicWorkspacePage'));
+const CivicRecordPage = lazy(() => import('../pages/Civic/CivicRecordPage'));
 
 export interface AppRoute {
   path: string;
@@ -130,6 +132,9 @@ export const appRoutes: AppRoute[] = [
   { path: '/admin/audit', element: <AuditTimelinePage /> },
   { path: '/admin/moderation/signals', element: <SignalsAppealsPage /> },
   { path: '/admin/anonymous-contributions', element: <AnonymousContributionsPage /> },
+  { path: '/civic', element: <CivicWorkspacePage /> },
+  { path: '/civic/:section', element: <CivicWorkspacePage /> },
+  { path: '/civic/records/:id', element: <CivicRecordPage /> },
   { path: '/topics', element: <TopicsPage /> },
   { path: '/topics/create', element: <TopicCreatePage /> },
   { path: '/topics/entry/:friendlyUrl/:id', element: <TopicEntryPage /> },

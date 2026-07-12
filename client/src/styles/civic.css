@@ -1,0 +1,477 @@
+.wt-civic-page {
+  --civic-ink: #172336;
+  --civic-navy: #15395f;
+  --civic-red: #ba2d2d;
+  --civic-gold: #e5a229;
+  --civic-paper: #f5f1e8;
+  color: var(--civic-ink);
+}
+
+.wt-civic-hero {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  min-height: 270px;
+  margin-bottom: 0;
+  padding: 46px 52px;
+  overflow: hidden;
+  background: linear-gradient(120deg, #102b48 0%, #1c4c76 64%, #97302e 100%);
+  color: #fff;
+}
+
+.wt-civic-hero::after {
+  content: '';
+  position: absolute;
+  right: -90px;
+  bottom: -145px;
+  width: 390px;
+  height: 390px;
+  border: 52px solid rgba(255, 255, 255, 0.06);
+  border-radius: 50%;
+}
+
+.wt-civic-hero-grid {
+  position: absolute;
+  inset: 0;
+  opacity: 0.12;
+  background-image: linear-gradient(rgba(255, 255, 255, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.3) 1px, transparent 1px);
+  background-size: 34px 34px;
+}
+
+.wt-civic-hero-copy,
+.wt-civic-pulse {
+  position: relative;
+  z-index: 1;
+}
+
+.wt-civic-hero-copy {
+  max-width: 720px;
+}
+
+.wt-civic-kicker {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--civic-gold);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.wt-civic-hero h1 {
+  margin: 0 0 15px;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 52px;
+  line-height: 1.05;
+}
+
+.wt-civic-hero p {
+  max-width: 680px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 18px;
+}
+
+.wt-civic-pulse {
+  width: 150px;
+  text-align: right;
+}
+
+.wt-civic-pulse strong {
+  display: block;
+  color: #fff;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 46px;
+  line-height: 1;
+}
+
+.wt-civic-pulse span {
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.wt-civic-sections {
+  display: flex;
+  gap: 0;
+  margin-bottom: 38px;
+  overflow-x: auto;
+  border-bottom: 1px solid #d6d0c5;
+  background: var(--civic-paper);
+}
+
+.wt-civic-sections a {
+  flex: 0 0 auto;
+  padding: 15px 17px;
+  border-bottom: 3px solid transparent;
+  color: #4b5360;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.wt-civic-sections a.active,
+.wt-civic-sections a:hover {
+  border-bottom-color: var(--civic-red);
+  color: var(--civic-red);
+}
+
+.wt-civic-section-heading,
+.wt-civic-form-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 20px;
+}
+
+.wt-civic-section-heading h2,
+.wt-civic-form-heading h3,
+.wt-civic-detail-panel h2 {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+.wt-civic-directory,
+.wt-civic-urgent,
+.wt-civic-compare,
+.wt-civic-form,
+.wt-civic-signin {
+  margin-bottom: 38px;
+}
+
+.wt-civic-filters {
+  display: grid;
+  grid-template-columns: minmax(220px, 2fr) minmax(150px, 1fr) minmax(150px, 1fr);
+  gap: 12px;
+  margin-bottom: 22px;
+  padding: 16px;
+  border: 1px solid #ddd6ca;
+  background: #faf8f3;
+}
+
+.wt-civic-filters label span {
+  display: block;
+  margin-bottom: 5px;
+  color: #667080;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.wt-civic-record-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.wt-civic-record {
+  position: relative;
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid #d7dce2;
+  border-top: 4px solid var(--civic-navy);
+  background: #fff;
+  box-shadow: 0 8px 22px rgba(17, 38, 62, 0.05);
+}
+
+.wt-civic-record.is-critical {
+  border-top-color: var(--civic-red);
+}
+
+.wt-civic-record-topline,
+.wt-civic-record-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.wt-civic-kind {
+  color: #657080;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.wt-civic-status {
+  padding: 3px 7px;
+  border-radius: 2px;
+  background: #e8edf2;
+  color: #415268;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.wt-civic-status.status-verified,
+.wt-civic-status.status-resolved {
+  background: #dcefe5;
+  color: #216441;
+}
+
+.wt-civic-record h3 {
+  margin: 15px 0 9px;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 22px;
+}
+
+.wt-civic-record h3 a {
+  color: var(--civic-ink);
+}
+
+.wt-civic-record p {
+  color: #5b6470;
+}
+
+.wt-civic-record-meta {
+  justify-content: flex-start;
+  margin: 16px 0;
+  color: #78818d;
+  font-size: 11px;
+}
+
+.wt-civic-record-meta .severity-high,
+.wt-civic-record-meta .severity-critical {
+  color: var(--civic-red);
+  font-weight: 800;
+}
+
+.wt-civic-progress {
+  height: 6px;
+  margin: 16px 0;
+  overflow: hidden;
+  background: #e7ebee;
+}
+
+.wt-civic-progress span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--civic-gold), #5b9b6c);
+}
+
+.wt-civic-empty {
+  padding: 54px 20px;
+  border: 1px dashed #c8c3b9;
+  background: #faf8f3;
+  text-align: center;
+}
+
+.wt-civic-empty .fa {
+  color: #9aa1a8;
+  font-size: 40px;
+}
+
+.wt-civic-form,
+.wt-civic-signin,
+.wt-civic-compare {
+  padding: 26px;
+  border: 1px solid #d8d1c4;
+  background: var(--civic-paper);
+}
+
+.wt-civic-comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1px;
+  margin-top: 22px;
+  background: #cfd5da;
+}
+
+.wt-civic-comparison-grid > div {
+  padding: 22px;
+  background: #fff;
+}
+
+.wt-civic-detail-breadcrumb {
+  display: flex;
+  gap: 8px;
+  margin: 22px 0;
+}
+
+.wt-civic-detail-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 30px;
+  margin-bottom: 28px;
+  padding: 38px;
+  background: linear-gradient(115deg, #f4f0e7, #fff);
+  border-left: 7px solid var(--civic-red);
+}
+
+.wt-civic-detail-header h1 {
+  margin: 0 0 10px;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 42px;
+}
+
+.wt-civic-detail-state {
+  min-width: 150px;
+  text-align: right;
+  text-transform: uppercase;
+}
+
+.wt-civic-detail-state span,
+.wt-civic-detail-state strong {
+  display: block;
+}
+
+.wt-civic-detail-state span {
+  color: var(--civic-red);
+  font-weight: 800;
+}
+
+.wt-civic-detail-panel {
+  margin-bottom: 20px;
+  padding: 24px;
+  border: 1px solid #d9dde2;
+  background: #fff;
+}
+
+.wt-civic-detail-panel h2 {
+  margin-bottom: 18px;
+}
+
+.wt-civic-description {
+  white-space: pre-wrap;
+}
+
+.wt-civic-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.wt-civic-facts.stacked {
+  grid-template-columns: 1fr;
+}
+
+.wt-civic-facts div {
+  padding-bottom: 10px;
+  border-bottom: 1px solid #edf0f2;
+}
+
+.wt-civic-facts dt {
+  color: #77818e;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.wt-civic-facts dd {
+  margin-top: 4px;
+}
+
+.wt-civic-outcome {
+  border-color: #d4b56d;
+  background: #fffaf0;
+}
+
+.wt-civic-history {
+  position: relative;
+  margin: 0;
+  padding: 0 0 0 22px;
+  list-style: none;
+}
+
+.wt-civic-history::before {
+  content: '';
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  left: 4px;
+  width: 2px;
+  background: #d8dee4;
+}
+
+.wt-civic-history li {
+  position: relative;
+  margin-bottom: 22px;
+}
+
+.wt-civic-history li::before {
+  content: '';
+  position: absolute;
+  top: 5px;
+  left: -23px;
+  width: 12px;
+  height: 12px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  background: var(--civic-red);
+  box-shadow: 0 0 0 1px var(--civic-red);
+}
+
+.wt-civic-history time,
+.wt-civic-history strong,
+.wt-civic-detail-panel li small {
+  display: block;
+}
+
+.wt-civic-history time,
+.wt-civic-history small,
+.wt-civic-detail-panel li small {
+  color: #7c8590;
+  font-size: 11px;
+}
+
+.wt-civic-detail-panel li {
+  margin-bottom: 10px;
+}
+
+@media (max-width: 991px) {
+  .wt-civic-record-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .wt-civic-hero {
+    padding: 38px 30px;
+  }
+
+  .wt-civic-hero h1 {
+    font-size: 42px;
+  }
+}
+
+@media (max-width: 767px) {
+  .wt-civic-hero,
+  .wt-civic-detail-header,
+  .wt-civic-section-heading,
+  .wt-civic-form-heading {
+    display: block;
+  }
+
+  .wt-civic-hero {
+    min-height: 0;
+    padding: 34px 22px;
+  }
+
+  .wt-civic-hero h1,
+  .wt-civic-detail-header h1 {
+    font-size: 34px;
+    overflow-wrap: anywhere;
+  }
+
+  .wt-civic-pulse,
+  .wt-civic-detail-state {
+    margin-top: 26px;
+    text-align: left;
+  }
+
+  .wt-civic-filters,
+  .wt-civic-record-grid,
+  .wt-civic-facts {
+    grid-template-columns: 1fr;
+  }
+
+  .wt-civic-record,
+  .wt-civic-form,
+  .wt-civic-detail-panel,
+  .wt-civic-detail-header {
+    padding: 20px;
+  }
+}

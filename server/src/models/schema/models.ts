@@ -44,6 +44,7 @@ export = function (app: Application, mongoose: Mongoose) {
   require('./core/Notification')(app, mongoose);
   require('./core/AnonymousContribution')(app, mongoose);
   require('./core/ReputationSnapshot')(app, mongoose);
+  require('./core/CivicRecord')(app, mongoose);
 
   require('./core/TrustedClient')(app, mongoose);
   //require('./schema/core/Word')(app, mongoose);

@@ -39,37 +39,51 @@ const APPLICATIONS: ApplicationDefinition[] = [
       {
         title: 'People',
         iconClass: 'fa fa-user',
-        url: '/topic/philippine-popular-figures',
+        url: '/civic/people',
         description:
           'Government officials, politicians, media personnel, businessmen, influential leaders and every key people that shape the society.',
       },
       {
         title: 'Incidents',
         iconClass: 'fa fa-bolt',
-        url: '/topic/incidents-in-the-philippines',
+        url: '/civic/incidents',
         description:
           'Natural calamities, disasters, accidents, rallies, good cause, immoral and malicious acts that impact the society and people.',
       },
       {
         title: 'Projects',
         iconClass: 'fa fa-truck',
-        url: '/topic/projects-in-the-philippines',
+        url: '/civic/projects',
         description:
           'Major projects done by the government or private organizations as long as it impacts the people negatively or positively.',
       },
       {
         title: 'Organizations',
         iconClass: 'fa fa-bank',
-        url: '/topic/organizations-in-the-philippines',
+        url: '/civic/organizations',
         description:
           'The Government of the Philippines, public or private businesses, charities, nonprofit, religions, or any movement or group that impact us.',
       },
       {
-        title: 'Election',
+        title: 'Actions',
+        iconClass: 'fa fa-hand-paper-o',
+        url: '/civic/actions',
+        description:
+          'Track commitments, public responses, citizen initiatives, and concrete actions connected to unresolved civic issues.',
+      },
+      {
+        title: 'Vote Wisely',
         iconClass: 'fa fa-check-square-o',
-        url: '/topic/philippine-election',
+        url: '/civic/elections',
         description:
           'Get factual information about the running candidates, their public service history, and any information that would help you vote wisely.',
+      },
+      {
+        title: 'History',
+        iconClass: 'fa fa-history',
+        url: '/civic/history',
+        description:
+          'Preserve what happened, who was responsible, what followed, and whether promised outcomes were delivered.',
       },
     ],
   },

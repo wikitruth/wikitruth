@@ -293,6 +293,7 @@ function mapLegacyPathToModern(req: Request): string {
     '/groups',
     '/members',
     '/outline',
+    '/civic',
   ];
 
   for (const prefix of modernPathPrefixes) {
@@ -378,6 +379,8 @@ export default function registerLegacyPathRedirects(app: AppRouteRegistrar, _pas
     '/contribute/*',
     '/comments',
     '/comments/*',
+    '/civic',
+    '/civic/*',
     '/500',
     '/503',
   ];

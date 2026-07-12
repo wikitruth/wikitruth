@@ -128,6 +128,7 @@ exports.mongodb = {
       'topics',
       'topiclinks',
       'anonymouscontributions',
+      'civicrecords',
     ],
     modelMapping: {
       answers: 'Answer',
@@ -147,6 +148,7 @@ exports.mongodb = {
       changerequests: 'ChangeRequest',
       reputationsnapshots: 'ReputationSnapshot',
       anonymouscontributions: 'AnonymousContribution',
+      civicrecords: 'CivicRecord',
       opinions: 'Opinion',
       artifacts: 'Artifact',
       pages: 'Page',

@@ -77,6 +77,11 @@ describe('OpenAPI contract', function () {
       '/monitoring/errors',
       '/reactions',
       '/realtime/events',
+      '/civic/overview',
+      '/civic/records',
+      '/civic/records/{id}',
+      '/civic/records/{id}/transition',
+      '/civic/candidates/compare',
     ].forEach((contractPath) => expect(paths[contractPath]).toBeDefined());
   });
 
@@ -110,6 +115,12 @@ describe('OpenAPI contract', function () {
       'MobileTokenRequest',
       'MobileRefreshTokenRequest',
       'MobileTokenResponse',
+      'CivicRecord',
+      'CivicRecordMutationRequest',
+      'CivicTransitionRequest',
+      'CivicRecordResponse',
+      'CivicRecordsResponse',
+      'CivicOverviewResponse',
     ].forEach((schemaName) => expect(schemas[schemaName]).toBeDefined());
   });
 
