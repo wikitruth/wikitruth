@@ -1,6 +1,6 @@
 import React from 'react';
 
-type ViewMode = 'all' | 'wiki' | 'original';
+type ViewMode = 'all' | 'wiki' | 'original' | 'archived';
 
 interface ContentViewFilterProps {
   value: ViewMode;
@@ -8,9 +8,10 @@ interface ContentViewFilterProps {
 }
 
 const options: { value: ViewMode; label: string; icon: string }[] = [
-  { value: 'all', label: 'All', icon: 'list' },
-  { value: 'wiki', label: 'Wiki', icon: 'wikipedia-w' },
-  { value: 'original', label: 'Original', icon: 'pencil' },
+  { value: 'wiki', label: 'Accepted', icon: 'check-circle' },
+  { value: 'original', label: 'Pending', icon: 'clock-o' },
+  { value: 'archived', label: 'Archived', icon: 'archive' },
+  { value: 'all', label: 'All states', icon: 'list' },
 ];
 
 const ContentViewFilter: React.FC<ContentViewFilterProps> = ({ value, onChange }) => {

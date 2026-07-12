@@ -18,6 +18,7 @@ export interface LegacyEntity {
   issueType: number;
   editDate: string | Date;
   createDate: string | Date;
+  referenceDate?: string | Date;
   editorUsername: string;
   editUsername?: string;
   createUsername?: string;

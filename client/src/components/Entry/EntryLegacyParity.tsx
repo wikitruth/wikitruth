@@ -340,9 +340,27 @@ export const EntryMetaBlock: React.FC<{ entry: LegacyEntity }> = ({ entry }) => 
   const postedLabel = posted || 'unknown time';
   const editedLabel = edited || postedLabel;
   const avatarInitial = createUsername ? createUsername.slice(0, 1).toUpperCase() : '?';
+  const referenceDate = entry.referenceDate ? new Date(entry.referenceDate) : null;
+  const hasReferenceDate = Boolean(referenceDate && !Number.isNaN(referenceDate.getTime()));
+  const isArchived = Number(entry.screening?.status) === 3;
 
   return (
     <div style={{ marginTop: '26px', paddingTop: '14px', borderTop: '1px solid #eee' }}>
+      {isArchived && (
+        <div className="alert alert-warning wt-entry-lifecycle-notice" role="status">
+          <i className="fa fa-archive" aria-hidden="true"></i>{' '}
+          <strong>Archived record.</strong> This entry remains available for historical context and is not presented as current accepted content.
+        </div>
+      )}
+      {hasReferenceDate && referenceDate && (
+        <div className="alert alert-info wt-entry-lifecycle-notice" role="note">
+          <i className="fa fa-calendar" aria-hidden="true"></i>{' '}
+          <strong>Time-sensitive information.</strong> This entry is tied to{' '}
+          <time dateTime={referenceDate.toISOString()} title={referenceDate.toString()}>
+            {referenceDate.toLocaleDateString()}
+          </time>. Verify newer evidence before treating it as current.
+        </div>
+      )}
       <div className="media wt-category-x">
         <div className="media-left media-top">
           {createUsername ? (

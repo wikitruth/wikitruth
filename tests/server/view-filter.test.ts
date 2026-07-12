@@ -28,4 +28,11 @@ describe('applyViewModeFilter', () => {
     expect(mode).toBe('all');
     expect(query).not.toHaveProperty('screening.status');
   });
+
+  it('sets archived mode to retained historical content', () => {
+    const query: Record<string, unknown> = {};
+    const mode = applyViewModeFilter({ query: { view: 'archived' } }, query, 1);
+    expect(mode).toBe('archived');
+    expect(query['screening.status']).toBe(3);
+  });
 });

@@ -10,35 +10,42 @@ describe('ContentViewFilter', () => {
     mockOnChange.mockClear();
   });
 
-  it('renders all three filter options', () => {
+  it('renders explicit review-state filter options', () => {
     render(<ContentViewFilter value="all" onChange={mockOnChange} />);
-    expect(screen.getByText('All')).toBeInTheDocument();
-    expect(screen.getByText('Wiki')).toBeInTheDocument();
-    expect(screen.getByText('Original')).toBeInTheDocument();
+    expect(screen.getByText('All states')).toBeInTheDocument();
+    expect(screen.getByText('Accepted')).toBeInTheDocument();
+    expect(screen.getByText('Pending')).toBeInTheDocument();
+    expect(screen.getByText('Archived')).toBeInTheDocument();
   });
 
   it('marks the active option with aria-pressed', () => {
     render(<ContentViewFilter value="wiki" onChange={mockOnChange} />);
-    expect(screen.getByText('Wiki').closest('button')).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByText('All').closest('button')).toHaveAttribute('aria-pressed', 'false');
-    expect(screen.getByText('Original').closest('button')).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByText('Accepted').closest('button')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByText('All states').closest('button')).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByText('Pending').closest('button')).toHaveAttribute('aria-pressed', 'false');
   });
 
   it('calls onChange with the selected mode', () => {
     render(<ContentViewFilter value="all" onChange={mockOnChange} />);
-    fireEvent.click(screen.getByText('Wiki'));
+    fireEvent.click(screen.getByText('Accepted'));
     expect(mockOnChange).toHaveBeenCalledWith('wiki');
   });
 
   it('calls onChange with "original" when Original is clicked', () => {
     render(<ContentViewFilter value="all" onChange={mockOnChange} />);
-    fireEvent.click(screen.getByText('Original'));
+    fireEvent.click(screen.getByText('Pending'));
     expect(mockOnChange).toHaveBeenCalledWith('original');
   });
 
-  it('calls onChange with "all" when All is clicked', () => {
+  it('calls onChange with "archived" when Archived is clicked', () => {
     render(<ContentViewFilter value="wiki" onChange={mockOnChange} />);
-    fireEvent.click(screen.getByText('All'));
+    fireEvent.click(screen.getByText('Archived'));
+    expect(mockOnChange).toHaveBeenCalledWith('archived');
+  });
+
+  it('calls onChange with "all" when All states is clicked', () => {
+    render(<ContentViewFilter value="wiki" onChange={mockOnChange} />);
+    fireEvent.click(screen.getByText('All states'));
     expect(mockOnChange).toHaveBeenCalledWith('all');
   });
 });

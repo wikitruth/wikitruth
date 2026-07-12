@@ -7,6 +7,7 @@ const constants = constantsMod as unknown as {
   SCREENING_STATUS: {
     status0: { code: number };
     status1: { code: number };
+    status3: { code: number };
   };
 };
 
@@ -14,7 +15,7 @@ type QueryWithScreening = Record<string, unknown> & {
   'screening.status'?: unknown;
 };
 
-export type ApiViewMode = 'default' | 'all' | 'wiki' | 'original';
+export type ApiViewMode = 'default' | 'all' | 'wiki' | 'original' | 'archived';
 
 export function applyViewModeFilter(
   req: WikitruthRequest | any,
@@ -36,6 +37,11 @@ export function applyViewModeFilter(
   if (viewMode === 'wiki') {
     query['screening.status'] = constants.SCREENING_STATUS.status1.code;
     return 'wiki';
+  }
+
+  if (viewMode === 'archived') {
+    query['screening.status'] = constants.SCREENING_STATUS.status3.code;
+    return 'archived';
   }
 
   if (typeof defaultStatus !== 'undefined') {

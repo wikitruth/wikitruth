@@ -27,7 +27,7 @@ const QuestionsPage: React.FC = () => {
   const [sortBy, setSortBy] = useState('editDate');
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     const saved = localStorage.getItem('wt_view_mode');
-    return (saved === 'wiki' || saved === 'original') ? saved : 'all';
+    return (saved === 'wiki' || saved === 'original' || saved === 'archived') ? saved : 'all';
   });
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;

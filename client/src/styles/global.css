@@ -253,3 +253,8 @@ button:focus-visible,
   display: inline-block;
   padding: 6px 9px;
 }
+
+.wt-entry-lifecycle-notice {
+  margin-bottom: 14px;
+  border-left-width: 4px;
+}

@@ -53,7 +53,7 @@ const ExplorePage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const storedViewMode = (() => {
     const saved = localStorage.getItem('wt_view_mode');
-    return saved === 'wiki' || saved === 'original' ? saved : 'all';
+    return saved === 'wiki' || saved === 'original' || saved === 'archived' ? saved : 'all';
   })();
   const activeTab = ((): ExploreTab => {
     const raw = String(searchParams.get('tab') || 'all').toLowerCase();
