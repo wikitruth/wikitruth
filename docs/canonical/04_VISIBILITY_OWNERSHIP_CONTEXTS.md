@@ -15,7 +15,10 @@ Define how access scope and context are resolved for content.
 - `view=all`: include all screening states.
 - `view=wiki`: accepted-only view.
 - `view=original`: pending-only view.
+- `view=archived`: retained historical content only.
 - default: uses route-specific default screening status.
+
+The modern client presents these modes as `All states`, `Accepted`, `Pending`, and `Archived` without changing the compatibility API values.
 
 ## Ownership Resolution
 

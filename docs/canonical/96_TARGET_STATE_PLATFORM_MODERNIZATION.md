@@ -25,5 +25,7 @@ Capture cross-cutting platform targets beyond feature workflows.
 
 ## Target State Status
 
-- Mixed: many foundations are `implemented` or `partial`, while delivery expansion remains `planned`.
+- Web modernization and legacy/modern replacement parity: `implemented` for the verified scope.
+- Independent dependency upgrade waves: `implemented`; legacy-renderer and constrained-dependency retirement is explicitly `deferred`.
+- React Native phases are explicitly `deferred`; API token contracts remain available without implying a native client exists.
 - Source baseline: `docs/plans/completed/MIGRATION_COMPLETION_PLAN_2026-04-12.md`, `docs/plans/DEPENDENCY_UPGRADE_PLAN_2026-02-24.md`, `docs/strategy/MOBILE_APP_STRATEGY_2026-02-24.md`.

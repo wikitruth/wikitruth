@@ -13,21 +13,30 @@ Capture the canonical lifecycle of submitted content and moderation flow.
 - `Archived` (3)
 - New API content creation defaults to pending screening for moderated entities.
 - Screening updates are performed through moderation APIs and are role-gated (screener/admin).
+- Reader-facing filters label states as `Accepted`, `Pending`, `Archived`, and `All states` while retaining legacy API values (`wiki`, `original`, `archived`, `all`).
+- Archived entries remain available for historical context and are not presented as current accepted content.
+- A valid reference date identifies time-sensitive information and prompts readers to check newer evidence; it does not trigger automatic expiry.
 
 ## Verdict Lifecycle
 
-- Verdicts are applied to `Topic` and `Argument`.
-- Verdict updates are admin-gated.
+- Factual and ethical verdict channels apply to `Topic`, `Argument`, and `Answer`.
+- Verdict-channel updates and reviewer votes require reviewer/admin privileges and completed reviewer onboarding where applicable.
+- Final factual verdicts are blocked by accepted critical issues unless the issue is resolved or an audited administrator override is supplied.
 - Verdict queue supports:
 - filtered listing
 - single update
 - bulk update
+- reviewer votes and deterministic consensus summaries
 
 ## Moderation Operations
 
 - Retrieve moderation target and status metadata.
 - Update screening.
 - Update verdict (with optional reasoning).
+- Review reader signals and accepted-critical issues.
+- Create and resolve field-level change requests with stale-base detection.
+- Inspect immutable revision history and perform reviewer-approved rollback.
+- Review duplicate candidates and perform audited merges with durable redirects.
 - Take ownership.
 - Delete entry.
 - Ownership migration for root topics between public and journal scope with guardrails.
@@ -37,6 +46,7 @@ Capture the canonical lifecycle of submitted content and moderation flow.
 - Parent/owner child counters are recomputed on moderation state changes and deletions.
 - Batch counter updates support transactional mode.
 - Guardrails assert `childrenCount` consistency (`total == accepted + pending + rejected` per bucket).
+- Privileged moderation, verdict, role, merge, and revision actions append tamper-evident hash-chained events.
 
 ## Lifecycle Invariant
 

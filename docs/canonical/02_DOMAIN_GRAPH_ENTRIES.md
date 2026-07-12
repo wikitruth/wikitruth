@@ -19,10 +19,13 @@ Define the core knowledge graph objects and how they relate.
 - `TopicLink` and `ArgumentLink` (explicit graph linking objects)
 - `ObjectLink` (generic linking support)
 - `Group`, `Page`, dictionary models (`Word`, `Meaning`, `Definition`)
+- Integrity and governance models: `EntryRevision`, `ChangeRequest`, `EntryRedirect`, `EntryEvent`, `ReaderSignal`, and `VerdictVote`.
+- Extension models: `AnonymousContribution`, `ReputationSnapshot`, and `CivicRecord`.
 
 ## Shared Entry Shape (Cross-Entity Pattern)
 
 - Editorial fields: `title`, `content`, `references`, `friendlyUrl`.
+- Time-sensitive entries may include `referenceDate`; artifacts additionally carry subtype, provenance, and source-quality metadata.
 - Ownership and placement: `ownerType`, `ownerId`, optional `parentId`, optional `groupId`.
 - Moderation fields: `screening.status`, `screening.history`.
 - Privacy flag: `private`.
@@ -30,8 +33,9 @@ Define the core knowledge graph objects and how they relate.
 
 ## Verdict Scope
 
-- Verdict metadata exists on `Topic` and `Argument` (status plus editor/date metadata).
-- Verdict statuses include binary and nuanced likelihood states (for example `status_true`, `status_false`, `likely`, `very_unlikely`, `misleading_invalid`).
+- `Topic`, `Argument`, and `Answer` support independently queryable factual and ethical verdict channels with reasoning, evidence references, editor, and date metadata.
+- Factual channel updates preserve the legacy verdict projection for compatibility.
+- Reviewer votes and deterministic consensus summaries are separate from the persisted final channel state.
 
 ## Graph Invariant
 

@@ -9,7 +9,8 @@ Define the core runtime shape of Wikitruth.
 - Server runtime is Node.js + Express + Kraken with Mongoose/MongoDB.
 - The app runs in hybrid mode:
 - Legacy server-rendered routes (jade/dust-era flow) still exist.
-- Modern React SPA is served under `/app` and uses `/api` endpoints.
+- Modern React SPA is the primary product surface on canonical root routes (`/*`) and uses `/api` endpoints.
+- `/app/*` remains a compatibility alias for modern routes.
 - API surface is available under both `/api/*` and `/api/v1/*` (same router tree for migration compatibility).
 
 ## Request Pipeline Expectations

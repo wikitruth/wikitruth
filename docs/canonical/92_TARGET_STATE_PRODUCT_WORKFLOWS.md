@@ -28,5 +28,8 @@ Define the intended future workflow UX and engagement model.
 
 ## Target State Status
 
-- Overall: `planned`, with many pieces currently `partial`.
-- Source baseline: `docs/plans/plan-2026-04-14/09_GAP_CHECKLIST_PLAN.md` and `07_VALIDATED_CHECKLIST_PRODUCT_WORKFLOWS.md`.
+- Overall: `mixed`.
+- Implemented: unified create wizard, history-preserving conversion, expanded Explore controls, role-aware lifecycle views, timeline workflows, persisted reactions, reputation/scorecards, follow/subscription delivery, and notification center.
+- Remaining planned: inline entry-page authoring, comment-classification routing, and fully explicit Home ranking buckets.
+- Broad strict-debate enforcement is explicitly `deferred` pending governed rules and pilot evidence.
+- Source baseline: `docs/plans/deferred/plan-2026-04-14/09_GAP_CHECKLIST_PLAN.md` and `docs/plans/deferred/plan-2026-04-14/07_VALIDATED_CHECKLIST_PRODUCT_WORKFLOWS.md`.

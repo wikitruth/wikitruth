@@ -25,5 +25,8 @@ Provide a quick-reference execution map for major planned tracks.
 
 ## Target State Status
 
-- Current execution state: `planned` (tracks not yet closed in gap checklist).
-- Source baseline: `docs/plans/plan-2026-04-14/09_GAP_CHECKLIST_PLAN.md`.
+- Tracks 1 through 4: scoped software baseline `implemented`.
+- Track 5: policy and tooling `implemented`; live seeding, calibration, and sustained curation remain operational.
+- Track 6: FixPH civic software baseline `implemented`; real-world adoption remains operational.
+- The custom-debate pilot is explicitly `deferred`; the remaining pilot exit targets are content-operations work.
+- Source baseline: `docs/plans/deferred/plan-2026-04-14/09_GAP_CHECKLIST_PLAN.md`.

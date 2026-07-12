@@ -19,7 +19,7 @@ Implemented now:
 8. [08_REALTIME_MONITORING.md](./08_REALTIME_MONITORING.md)
 9. [09_URL_CONTRACT_AND_DRIFT_POLICY.md](./09_URL_CONTRACT_AND_DRIFT_POLICY.md)
 
-Target state (planned and/or partial):
+Target-state contracts (implemented, mixed, and explicitly deferred):
 1. [90_TARGET_STATE_OVERVIEW.md](./90_TARGET_STATE_OVERVIEW.md)
 2. [91_TARGET_STATE_CORE_PLATFORM.md](./91_TARGET_STATE_CORE_PLATFORM.md)
 3. [92_TARGET_STATE_PRODUCT_WORKFLOWS.md](./92_TARGET_STATE_PRODUCT_WORKFLOWS.md)
@@ -30,6 +30,6 @@ Target state (planned and/or partial):
 
 ## Update Rule
 
-When core behavior changes, update the relevant card in the same work so this folder remains a reliable quick-reference.
+When core behavior changes, update the relevant card with explicit owner approval so this folder remains a reliable quick-reference.
 
-For target-state cards, update statuses (`planned`, `partial`, `implemented`) whenever roadmap progress changes.
+For target-state cards, update statuses (`planned`, `partial`, `implemented`, `deferred`) whenever roadmap progress or an explicit product decision changes.

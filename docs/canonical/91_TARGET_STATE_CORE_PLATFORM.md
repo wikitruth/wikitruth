@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Define high-priority core platform capabilities planned beyond current implementation.
+Define the high-priority governance and integrity contract for the core platform.
 
 ## Core Platform Targets
 
@@ -13,7 +13,7 @@ Define high-priority core platform capabilities planned beyond current implement
 - Consensus verdict model with reviewer votes, thresholds, and provenance.
 - Reader signal intake queue (for example incorrect verdict, re-evaluate, wrong category).
 - Issue-first governance gates for unresolved critical issues.
-- Immutable signed audit timeline for privileged actions (moderation/verdict/role changes).
+- Tamper-evident hash-chained audit timeline for privileged actions (moderation/verdict/role changes). Public-key signing requires a separate approved threat model.
 
 ## Reliability and Operations Targets
 
@@ -23,5 +23,6 @@ Define high-priority core platform capabilities planned beyond current implement
 
 ## Target State Status
 
-- Overall: `planned`, with several foundations currently `partial`.
-- Source baseline: `docs/plans/plan-2026-04-14/09_GAP_CHECKLIST_PLAN.md` and `06_VALIDATED_CHECKLIST_CORE_PLATFORM.md`.
+- Overall: scoped core-platform baseline `implemented`.
+- Automatic unresolved-content expiry remains explicitly `deferred`; human resolution and audited administrator override remain canonical.
+- Source baseline: `docs/plans/deferred/plan-2026-04-14/09_GAP_CHECKLIST_PLAN.md` and `docs/plans/deferred/plan-2026-04-14/06_VALIDATED_CHECKLIST_CORE_PLATFORM.md`.
