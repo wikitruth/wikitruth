@@ -21,7 +21,7 @@ Re-open legacy-to-modern parity at feature and workflow depth, rather than treat
 
 ### Modern target-state completeness
 
-**Core governance modernization is implemented and locally runtime-signed off; broader product programs remain separate.** The modern application includes deterministic duplicate/merge handling, immutable revisions, change requests and rollback, tamper-evident privileged audit events, evidence provenance and quality review, independent factual/ethical verdicts, policy-versioned onboarding, revision-linked discussion context, issue-first controls, controlled anonymous screening proposals, and deterministic reputation scorecards. Automatic content expiry remains explicitly deferred. Full FixPH productization and React Native remain separately scoped programs.
+**Core governance modernization is implemented and locally runtime-signed off; broader product programs remain separate.** The modern application includes deterministic duplicate/merge handling, immutable revisions, change requests and rollback, tamper-evident privileged audit events, evidence provenance and quality review, independent factual/ethical verdicts, policy-versioned onboarding, revision-linked discussion context, issue-first controls, controlled anonymous screening proposals, and deterministic reputation scorecards. Automatic content expiry and React Native delivery are explicitly deferred. Full FixPH productization remains a separately scoped program.
 
 ## Recommendation Review (2026-07-11)
 
@@ -42,7 +42,7 @@ The unchecked work is valid, but it should not be executed as one undifferentiat
 | Complete | Controlled anonymous contribution | Implemented as a proposal-only screening queue with privacy-preserving network fingerprints, quotas, risk checks, duplicate detection, and no automatic publishing | Keep disabled by default in production unless moderation capacity is explicitly approved. |
 | Complete / defer | Reputation, scorecards, and strict debate | Deterministic reputation snapshots, badges, profile scorecards, and trusted ranking are implemented; broad strict-debate enforcement remains a policy program | Keep scoring formula-versioned and explainable. Pilot strict debate only after explicit rules exist. |
 | Separate program | FixPH productization | Valid extension roadmap; current implementation is tenant shell/configuration, not the full accountability product | Stabilize the core governance/data model and external tenant first, then execute FixPH information architecture and domain models as a separately scoped program. |
-| Separate program | React Native client | Valid roadmap; bearer-token APIs exist but no mobile workspace is implemented | Start shared contracts and transport only after the security wave and core API schemas stabilize. Defer full native UI until web workflows are stable. |
+| Deferred program | React Native client | Valid roadmap; bearer-token APIs exist but no mobile workspace is implemented | No implementation is scheduled following the explicit 2026-07-13 deferral decision. |
 | Verification | Credentialed role parity and external FixPH tenant | Valid release-signoff checks, not missing product implementation | Run with dedicated disposable/staging accounts; repair external DNS/proxy/firewall reachability before claiming FixPH tenant signoff. |
 
 ## Feature Matrix
@@ -62,7 +62,7 @@ The unchecked work is valid, but it should not be executed as one undifferentiat
 | Controlled anonymous contribution | Not required for legacy replacement | Implemented as screened proposals, never direct publication | `/contribute` submits quota- and risk-controlled proposals; `/admin/anonymous-contributions` supports review and adoption into authenticated create flows. Raw IP addresses and user agents are not retained. |
 | Reputation and scorecards | Modern-only | Implemented with deterministic, explainable snapshots | Member profiles expose four scoring dimensions and earned badges; Explore offers a trusted ranking using reputation, screening state, and popularity inputs. |
 | QA proof | Public and privileged semantic coverage complete | Improved | `migration-parity-semantic.mjs` covers all seven families and mobile overflow; `run-disposable-authenticated-parity.mjs` provisions and removes isolated role fixtures while retaining only a redacted manifest. |
-| Mobile/native client | Not a legacy-web parity requirement | Planned, not implemented | `REACT_NATIVE_MONOREPO_CHECKLIST_PLAN_2026-04-19.md` remains active with its implementation backlog. |
+| Mobile/native client | Not a legacy-web parity requirement | Deferred, not implemented | `docs/plans/deferred/REACT_NATIVE_MONOREPO_CHECKLIST_PLAN_2026-04-19.md` was explicitly deferred on 2026-07-13. |
 
 ## Verified Defects Corrected in This Pass
 
@@ -101,7 +101,7 @@ The following remain genuinely pending after current-code searches. Detailed req
 - [x] Formula-versioned contributor/reviewer reputation signals and trusted ranking inputs (`FLOW-021`).
 - [x] Deterministic badges and contributor profile scorecards (`FLOW-022`).
 - Separate program: dedicated FixPH information architecture, government/accountability/location models, Vote Wisely workspace, and incident lifecycle (`FIXPH-001` through `FIXPH-008`).
-- Separate program: React Native monorepo implementation and mobile release validation.
+- Deferred program: React Native monorepo implementation and mobile release validation.
 
 ### Implementation Progress (2026-07-11)
 
@@ -123,7 +123,8 @@ The following remain genuinely pending after current-code searches. Detailed req
 
 - Automatic unresolved-content expiry (`CORE-025`) is disabled by policy; unresolved records remain visible until a human resolution because thresholds, notices, exceptions, and retention obligations are not mature enough for destructive automation.
 - A broad strict-debate rollout remains deferred until explicit operating rules and a governed pilot define enforceable behavior.
-- Full FixPH productization and React Native delivery remain separate programs; they are not legacy-replacement blockers.
+- Full FixPH productization remains a separate program; it is not a legacy-replacement blocker.
+- Legacy-renderer retirement and React Native delivery were explicitly deferred on 2026-07-13 and are not part of the active execution queue.
 
 ## Verification Checklist
 

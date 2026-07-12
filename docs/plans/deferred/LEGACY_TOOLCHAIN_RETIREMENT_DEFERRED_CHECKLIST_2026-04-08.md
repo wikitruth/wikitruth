@@ -2,7 +2,7 @@
 
 ## Plan Status
 
-Deferred
+Deferred. The decision to retain legacy rendering and keep its retirement outside the active execution queue was reaffirmed on 2026-07-13.
 
 ## Goal
 

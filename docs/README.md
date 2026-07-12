@@ -9,8 +9,9 @@ This folder contains active engineering documentation, planning docs, and histor
 - Active plans index: `docs/plans/README.md`
 - Completed plans index: `docs/plans/completed/README.md`
 - Deferred plans index: `docs/plans/deferred/README.md`
-- Dependency upgrade plan (active): `docs/plans/DEPENDENCY_UPGRADE_PLAN_2026-02-24.md`
-- Deprecation replacement plan (active): `docs/plans/DEPRECATION_REPLACEMENT_PLAN.md`
+- Dependency upgrade history (legacy-renderer retirement deferred): `docs/plans/DEPENDENCY_UPGRADE_PLAN_2026-02-24.md`
+- Deferred deprecation replacement plan: `docs/plans/deferred/DEPRECATION_REPLACEMENT_PLAN.md`
+- Deferred React Native plan: `docs/plans/deferred/REACT_NATIVE_MONOREPO_CHECKLIST_PLAN_2026-04-19.md`
 - Mobile app strategy: `docs/strategy/MOBILE_APP_STRATEGY_2026-02-24.md`
 - Rollback runbook: `docs/runbooks/ROLLBACK_PLAN.md`
 - Dependency upgrade classification: `docs/dependencies/dep-upgrade-classification-2026-04-22.md`

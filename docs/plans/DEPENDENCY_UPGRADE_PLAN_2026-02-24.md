@@ -1,5 +1,9 @@
 # Dependency Upgrade Plan (2026-02-24)
 
+## Status
+
+Independent dependency upgrades in Waves A through C are complete. Wave D, which retires the retained Jade/Dust/Kraken legacy renderer and its constrained dependencies, was explicitly deferred on 2026-07-13. This document remains at its canonical reference path as the historical upgrade record; deferred retirement execution is tracked by `docs/plans/deferred/LEGACY_TOOLCHAIN_RETIREMENT_DEFERRED_CHECKLIST_2026-04-08.md`.
+
 ## Objectives
 
 - Reduce vulnerability exposure from `npm audit` baseline (`80` findings: `11 critical`, `52 high` at plan creation) and current revalidation baseline (`71` findings: `13 critical`, `23 high`, `31 moderate`, `4 low` on `2026-07-11`).
@@ -121,7 +125,7 @@ Do not upgrade blindly while Dust/Jade comparison mode remains active.
 - Commit `17a4a540` upgraded Mongoose to `9.7.4` and connect-mongo to `6.0.0`, removed the obsolete Bluebird Promise override, migrated the final removed `Model.update()` calls, and adopted connect-mongo's namespaced v6 export. MongoDB `8.2.7` ping and temporary session set/get/destroy checks passed alongside all `47` server suites / `205` tests and smoke/type guardrails.
 - Commit `d16ed4fd` upgraded React/React DOM to `19.2.7` and React Router DOM to `7.18.1`, aligned React type packages, added the Router 7 Jest encoder contract, removed obsolete future flags, and corrected React-owned test teardown/synchronization. All `65` client suites / `156` tests, production build, Storybook build, and smoke/type guardrails passed.
 - Express 5 was revalidated and moved to Tier 4: `kraken-js@2.6.0` declares an Express 4 peer, and the active legacy compatibility route table depends on Express 4 wildcard syntax. It is not a valid independent upgrade while legacy comparison mode remains enabled.
-- Waves A through C are complete for every dependency that can be upgraded independently. This plan remains active only for the explicit Tier 4 legacy-renderer retirement boundary.
+- Waves A through C are complete for every dependency that can be upgraded independently. The explicit Tier 4 legacy-renderer retirement boundary was subsequently deferred on 2026-07-13.
 - Commit `6a612ef9` upgraded Jest to `30.4.2` with aligned Jest 30 types while retaining ts-jest compatibility. All `47` server suites / `205` tests, `65` client suites / `156` tests, and both production builds passed.
 - Commit `dc6a0d55` upgraded ESLint to `9.39.5` and migrated `.eslintrc` / `.eslintignore` into a native flat configuration with current hooks and Prettier integrations. The prior rule contract and `66`-warning baseline were preserved exactly; smoke/type guardrails and both full test suites passed. ESLint 10 remains unavailable until `eslint-plugin-react` publishes a compatible peer range.
 - Production verification exposed Kraken's implicit MemoryStore and cookie-parser defaults running ahead of the application-owned middleware. Commit `d7cf056d` disables both duplicate defaults in the two runtime config copies; `47` server suites / `206` tests, smoke/type guardrails, local Node 24 startup, and FixPH Node 22 startup passed without a new MemoryStore warning.

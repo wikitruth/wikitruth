@@ -2,23 +2,20 @@
 
 Active and historical planning documents are organized under this folder.
 
-## Pending Snapshot (2026-07-12)
+## Pending Snapshot (2026-07-13)
 
 - Active checklist backlog:
   - `docs/plans/LEGACY_MODERN_FEATURE_COMPLETENESS_AUDIT_PLAN_2026-07-11.md` open `[ ]`: **0** (verified; retained here because it records explicit deferred product decisions)
-  - `docs/plans/REACT_NATIVE_MONOREPO_CHECKLIST_PLAN_2026-04-19.md` open `[ ]`: **83**
-- Active non-checklist plans (execution still pending by roadmap/wave):
-  - `docs/plans/DEPENDENCY_UPGRADE_PLAN_2026-02-24.md` (all independent security, tooling, and framework-major waves complete; only legacy-renderer retirement remains)
-  - `docs/plans/DEPRECATION_REPLACEMENT_PLAN.md` (runtime deprecations complete except the retained Jade/Kraken renderer)
 - Deferred checklist backlog:
-  - `docs/plans/deferred/**` open `[ ]`: **158** total (automatic content expiry remains explicitly deferred)
+  - `docs/plans/deferred/**` open `[ ]`: **239** total
+  - Legacy-renderer retirement, React Native delivery, and automatic content expiry are explicitly deferred.
+- Deferred non-checklist history:
+  - `docs/plans/DEPENDENCY_UPGRADE_PLAN_2026-02-24.md` remains at its canonical reference path; only its legacy-renderer retirement wave is deferred.
+  - `docs/plans/deferred/DEPRECATION_REPLACEMENT_PLAN.md` has no active work outside the deferred legacy renderer.
 
 ## Active Plans
 
 - `docs/plans/LEGACY_MODERN_FEATURE_COMPLETENESS_AUDIT_PLAN_2026-07-11.md`
-- `docs/plans/DEPENDENCY_UPGRADE_PLAN_2026-02-24.md`
-- `docs/plans/DEPRECATION_REPLACEMENT_PLAN.md`
-- `docs/plans/REACT_NATIVE_MONOREPO_CHECKLIST_PLAN_2026-04-19.md`
 
 ## Completed Plans
 

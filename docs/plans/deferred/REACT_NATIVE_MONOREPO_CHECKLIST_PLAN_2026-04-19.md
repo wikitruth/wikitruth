@@ -1,5 +1,9 @@
 # React Native Monorepo Checklist Plan (2026-04-19)
 
+## Status
+
+Deferred by explicit product decision on 2026-07-13. No React Native workspace implementation or rollout work is part of the active execution queue.
+
 ## Objective
 
 Deliver a React Native client using Expo with low risk to current web/server flows, while maximizing code reuse through shared packages in this repository.
@@ -163,3 +167,4 @@ This plan is not eligible for `docs/plans/completed/` until all items below pass
 
 - 2026-04-19: Plan created.
 - 2026-05-15: Revalidation pass confirmed no monorepo bootstrap artifacts yet (`apps/mobile` absent, `packages/*` absent, root `package.json` has no workspaces or `mobile:*` scripts). Checklist remains not started.
+- 2026-07-13: React Native implementation and rollout were explicitly deferred; the checklist remains outside the active execution queue.

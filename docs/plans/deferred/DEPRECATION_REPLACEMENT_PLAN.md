@@ -1,5 +1,9 @@
 # Deprecation Replacement Plan
 
+## Status
+
+All independent replacement work is complete. The remaining Jade/Dust/Kraken template and localization retirement was explicitly deferred on 2026-07-13 and is not part of the active execution queue.
+
 This plan tracks high-risk deprecated dependencies and defines a safe replacement sequence for runtime stability.
 
 ## Upgrade Matrix
