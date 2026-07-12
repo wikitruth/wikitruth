@@ -67,11 +67,11 @@ describe('TopicsPage content view filter', () => {
 
     await waitFor(() => expect(mockedApi.getTopics).toHaveBeenCalledWith(undefined, 'all'));
 
-    await user.click(await screen.findByRole('button', { name: /wiki/i }));
+    await user.click(await screen.findByRole('button', { name: /accepted/i }));
     await waitFor(() => expect(mockedApi.getTopics).toHaveBeenLastCalledWith(undefined, 'wiki'));
     expect(localStorage.getItem('wt_view_mode')).toBe('wiki');
 
-    await user.click(screen.getByRole('button', { name: /original/i }));
+    await user.click(screen.getByRole('button', { name: /pending/i }));
     await waitFor(() => expect(mockedApi.getTopics).toHaveBeenLastCalledWith(undefined, 'original'));
     expect(localStorage.getItem('wt_view_mode')).toBe('original');
   });
