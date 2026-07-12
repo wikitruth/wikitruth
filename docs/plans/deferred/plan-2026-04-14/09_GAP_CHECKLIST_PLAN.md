@@ -6,18 +6,20 @@ Status update (2026-04-18): migration-closure scope items are completed. Remaini
 
 Status update (2026-07-12): controlled anonymous contribution and deterministic reputation/scorecards are implemented. Automatic unresolved-content expiry is explicitly deferred and must not be inferred from archived-status support.
 
+Status update (2026-07-13): core governance reconciliation, content-policy assets, explicit archived/freshness UX, and the FixPH civic accountability workspace are implemented. Remaining pilot/seed items require real content operations and are not software implementation tasks.
+
 ## Track 1: Core Reliability and Moderation Correctness
 
-- [ ] Implement duplicate detection service for topic/argument/question create+edit paths (`CORE-002`).
-- [ ] Add duplicate resolution workflow (merge + redirect metadata + moderator action logs) (`CORE-002`, `CONTENT-004`).
-- [ ] Implement true CR domain model (`ChangeRequest`, states, target fragments) (`CORE-014`).
-- [ ] Add CR reviewer actions: accept/reject/partial accept with diff preview (`CORE-014`).
-- [ ] Add stale-CR conflict detection and explicit rebase/resolve flow (`CORE-015`).
-- [ ] Add revision history model (entry-level + block-level snapshots) (`CORE-016`).
-- [ ] Add reviewer-approved rollback endpoint + UI (`CORE-016`).
-- [ ] Add suggestion-only mode for restricted entries (`CORE-017`).
+- [x] Implement duplicate detection service for topic/argument/question create+edit paths (`CORE-002`).
+- [x] Add duplicate resolution workflow (merge + redirect metadata + moderator action logs) (`CORE-002`, `CONTENT-004`).
+- [x] Implement true CR domain model (`ChangeRequest`, states, target fragments) (`CORE-014`).
+- [x] Add CR reviewer actions: accept/reject/partial accept with diff preview (`CORE-014`).
+- [x] Add stale-CR conflict detection and explicit rebase/resolve flow (`CORE-015`).
+- [x] Add revision history model (entry-level + block-level snapshots) (`CORE-016`).
+- [x] Add reviewer-approved rollback endpoint + UI (`CORE-016`).
+- [x] Add suggestion-only mode for restricted entries (`CORE-017`).
 - [x] Add immutable privileged action audit event store (`CORE-034`).
-- [ ] Emit signed audit events for moderation/verdict/role changes (`CORE-034`).
+- [x] Emit hash-chained audit events for moderation/verdict/role changes (`CORE-034`).
 
 ## Track 2: Verdict and Issue Governance
 
@@ -25,11 +27,11 @@ Status update (2026-07-12): controlled anonymous contribution and deterministic 
 - [x] Implement reviewer vote records for verdicts (`CORE-021`).
 - [x] Implement threshold consensus policy (default 2/3) with configurable settings (`CORE-021`).
 - [x] Add verdict provenance UI (who voted, when, rationale) (`CORE-021`).
-- [ ] Add explicit truth-channel vs ethics-channel verdict structures (`CORE-022`, `CONTENT-005`).
+- [x] Add explicit truth-channel vs ethics-channel verdict structures (`CORE-022`, `CONTENT-005`).
 - [x] Add reader signal model (`controversial`, `incorrect verdict`, `needs reevaluation`, `wrong category`) (`CORE-023`).
 - [x] Route reader signals into moderation triage queue without auto-mutation (`CORE-023`).
 - [x] Build verdict/issue appeal workflow with responsible reviewer assignment (`CORE-024`).
-- [ ] Enforce issue-first discussion gate for unresolved critical issues (`CORE-026`).
+- [x] Enforce issue-first discussion gate for unresolved critical issues (`CORE-026`).
 - [ ] Add unresolved-content expiry job + override mechanics (`CORE-025`) - explicitly deferred by product decision on 2026-07-12.
 
 ## Track 3: Security, Ops, and Deploy Stability
@@ -60,27 +62,27 @@ Status update (2026-07-12): controlled anonymous contribution and deterministic 
 
 ## Track 5: Content Ops and Policy Assets
 
-- [ ] Publish contributor/reviewer policy docs and versioning process (`CONTENT-001`).
-- [ ] Publish issue taxonomy handbook with moderation examples (`CONTENT-002`).
-- [ ] Publish verdict policy handbook aligned with UI labels (`CONTENT-003`).
-- [ ] Publish duplicate/merge policy (`CONTENT-004`).
-- [ ] Publish source quality rubric and reviewer checklist (`CONTENT-006`).
-- [ ] Publish screening playbook with SLA targets (`CONTENT-013`).
-- [ ] Publish reviewer playbook with escalation/appeal paths (`CONTENT-014`).
-- [ ] Publish stale-discussion cleanup SOP (`CONTENT-015`).
-- [ ] Publish concise-writing standard and enforcement checklist (`CONTENT-016`).
-- [ ] Define incentives model and quality-linked attribution metrics (`CONTENT-017`).
+- [x] Publish contributor/reviewer policy docs and versioning process (`CONTENT-001`).
+- [x] Publish issue taxonomy handbook with moderation examples (`CONTENT-002`).
+- [x] Publish verdict policy handbook aligned with UI labels (`CONTENT-003`).
+- [x] Publish duplicate/merge policy (`CONTENT-004`).
+- [x] Publish source quality rubric and reviewer checklist (`CONTENT-006`).
+- [x] Publish screening playbook with SLA targets (`CONTENT-013`).
+- [x] Publish reviewer playbook with escalation/appeal paths (`CONTENT-014`).
+- [x] Publish stale-discussion cleanup SOP (`CONTENT-015`).
+- [x] Publish concise-writing standard and enforcement checklist (`CONTENT-016`).
+- [x] Define incentives model and quality-linked attribution metrics (`CONTENT-017`).
 
 ## Track 6: FixPH Productization
 
-- [ ] Extend FixPH IA with explicit `Actions`, `Vote Wisely`, and `History` sections (`FIXPH-001`).
-- [ ] Implement government hierarchy entity model and responsibility graph (`FIXPH-002`).
-- [ ] Add project accountability schema + project detail dashboards (`FIXPH-003`).
-- [ ] Implement citizen observation submission + escalation lifecycle (`FIXPH-004`).
-- [ ] Add location model and geo-surfacing endpoints/UI (`FIXPH-005`).
-- [ ] Build Vote Wisely candidate comparison workspace (`FIXPH-006`).
-- [ ] Add incident stage model and severity progression (`FIXPH-007`).
-- [ ] Add long-term historical memory linking incidents to follow-up actions (`FIXPH-008`).
+- [x] Extend FixPH IA with explicit `Actions`, `Vote Wisely`, and `History` sections (`FIXPH-001`).
+- [x] Implement government hierarchy entity model and responsibility graph (`FIXPH-002`).
+- [x] Add project accountability schema + project detail dashboards (`FIXPH-003`).
+- [x] Implement citizen observation submission + escalation lifecycle (`FIXPH-004`).
+- [x] Add location model and geo-surfacing endpoints/UI (`FIXPH-005`).
+- [x] Build Vote Wisely candidate comparison workspace (`FIXPH-006`).
+- [x] Add incident stage model and severity progression (`FIXPH-007`).
+- [x] Add long-term historical memory linking incidents to follow-up actions (`FIXPH-008`).
 
 ## Track 7: Migration Closure Gate (Admin + UX)
 
@@ -91,7 +93,7 @@ Status update (2026-07-12): controlled anonymous contribution and deterministic 
 
 ## Pilot and Validation Exit Criteria
 
-- [ ] Run controlled 2-person custom debate pilot and publish findings (`CONTENT-018`).
+- [ ] Run controlled 2-person custom debate pilot and publish findings (`CONTENT-018`) - deferred with broad strict-debate rollout.
 - [ ] Run controversial-topic reviewer calibration stress test (`CONTENT-019`).
 - [ ] Ship one flagship Wikitruth topic + one flagship FixPH issue cluster under full end-to-end flow (`CONTENT-020`).
 - [x] Update validated checklist docs with new statuses after each completed track.

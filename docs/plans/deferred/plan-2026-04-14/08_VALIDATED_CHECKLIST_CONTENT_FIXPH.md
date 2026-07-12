@@ -70,3 +70,11 @@ Status legend:
 Primary gaps are policy-document rollout, operational playbooks, seeded content execution artifacts, and most FixPH-specific product mechanics.
 
 Revalidation note (2026-04-18): migration-closure execution focused on core platform and product workflow parity. Content/FixPH status distribution remains unchanged in this pass.
+
+## Revalidation Override (2026-07-13)
+
+This historical table is superseded for implemented policy and FixPH rows by current evidence:
+
+- `CONTENT-001` through `CONTENT-006`, `CONTENT-011`, and `CONTENT-013` through `CONTENT-017` are implemented through versioned policy handbooks, the modern Policy Center, onboarding links, moderation playbooks, explicit archived/freshness UX, and explainable reputation attribution.
+- `FIXPH-001` through `FIXPH-008` are implemented in the `CivicRecord` domain, `/api/civic` contracts, `/civic` workspace, project accountability detail, citizen observation lifecycle, region/city filtering, candidate comparison, severity/stage progression, and retained outcome history.
+- `CONTENT-007` through `CONTENT-010`, `CONTENT-012`, and `CONTENT-018` through `CONTENT-020` remain real-world seed/curation/pilot operations. They are not represented as completed software work and remain deferred from this implementation run.

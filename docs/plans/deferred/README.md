@@ -5,7 +5,7 @@ These plans are intentionally deferred and are not part of the active execution 
 ## Pending Snapshot (2026-07-13)
 
 - Deferred checklist docs with open `[ ]`: **7**
-- Total deferred open `[ ]` items: **239**
+- Total deferred open `[ ]` items: **190**
 
 ## Deferred Checklist Plans
 

@@ -21,7 +21,7 @@ Re-open legacy-to-modern parity at feature and workflow depth, rather than treat
 
 ### Modern target-state completeness
 
-**Core governance modernization is implemented and locally runtime-signed off; broader product programs remain separate.** The modern application includes deterministic duplicate/merge handling, immutable revisions, change requests and rollback, tamper-evident privileged audit events, evidence provenance and quality review, independent factual/ethical verdicts, policy-versioned onboarding, revision-linked discussion context, issue-first controls, controlled anonymous screening proposals, and deterministic reputation scorecards. Automatic content expiry and React Native delivery are explicitly deferred. Full FixPH productization remains a separately scoped program.
+**Core governance modernization and the FixPH civic product baseline are implemented and locally signed off.** The modern application includes deterministic duplicate/merge handling, immutable revisions, change requests and rollback, tamper-evident privileged audit events, evidence provenance and quality review, independent factual/ethical verdicts, policy-versioned onboarding, revision-linked discussion context, issue-first controls, controlled anonymous screening proposals, deterministic reputation scorecards, explicit archived/freshness UX, and dedicated civic accountability workflows. Automatic content expiry and React Native delivery are explicitly deferred.
 
 ## Recommendation Review (2026-07-11)
 
@@ -41,7 +41,7 @@ The unchecked work is valid, but it should not be executed as one undifferentiat
 | Complete / defer | Issue-first gates and unresolved-content expiry | Issue-first controls are implemented; automatic expiry remains unsafe without mature thresholds, notices, exceptions, and retention policy | Keep human resolution and administrator override behavior. Do not silently expire or mutate content. |
 | Complete | Controlled anonymous contribution | Implemented as a proposal-only screening queue with privacy-preserving network fingerprints, quotas, risk checks, duplicate detection, and no automatic publishing | Keep disabled by default in production unless moderation capacity is explicitly approved. |
 | Complete / defer | Reputation, scorecards, and strict debate | Deterministic reputation snapshots, badges, profile scorecards, and trusted ranking are implemented; broad strict-debate enforcement remains a policy program | Keep scoring formula-versioned and explainable. Pilot strict debate only after explicit rules exist. |
-| Separate program | FixPH productization | Valid extension roadmap; current implementation is tenant shell/configuration, not the full accountability product | Stabilize the core governance/data model and external tenant first, then execute FixPH information architecture and domain models as a separately scoped program. |
+| Complete | FixPH civic productization baseline | Dedicated civic domain, public workspace, responsibility hierarchy, projects, observations, locations, incidents, elections, actions, and history are implemented | Real-world seed content and operating adoption remain content operations, not missing software implementation. |
 | Deferred program | React Native client | Valid roadmap; bearer-token APIs exist but no mobile workspace is implemented | No implementation is scheduled following the explicit 2026-07-13 deferral decision. |
 | Verification | Credentialed role parity and external FixPH tenant | Valid release-signoff checks, not missing product implementation | Run with dedicated disposable/staging accounts; repair external DNS/proxy/firewall reachability before claiming FixPH tenant signoff. |
 
@@ -61,6 +61,8 @@ The unchecked work is valid, but it should not be executed as one undifferentiat
 | Dynamic application About pages | Implemented and live-verified | About hierarchy is public without exposing profile pages | `/about/:id` uses `/api/pages/about/:id`, limits results to the About root/children, sanitizes HTML, and serves direct nested routes from the React shell. |
 | Controlled anonymous contribution | Not required for legacy replacement | Implemented as screened proposals, never direct publication | `/contribute` submits quota- and risk-controlled proposals; `/admin/anonymous-contributions` supports review and adoption into authenticated create flows. Raw IP addresses and user agents are not retained. |
 | Reputation and scorecards | Modern-only | Implemented with deterministic, explainable snapshots | Member profiles expose four scoring dimensions and earned badges; Explore offers a trusted ranking using reputation, screening state, and popularity inputs. |
+| FixPH civic accountability | Modern-only | Implemented as a dedicated product workspace | `/civic` and `/api/civic` cover responsibility hierarchy, projects, citizen observations, locations, incidents, actions, candidate comparison, and historical outcomes. |
+| Lifecycle reading modes | Improved over legacy | Implemented | Accepted, Pending, Archived, and All states are explicit; archived entries and reference-dated information show non-destructive reader notices. |
 | QA proof | Public and privileged semantic coverage complete | Improved | `migration-parity-semantic.mjs` covers all seven families and mobile overflow; `run-disposable-authenticated-parity.mjs` provisions and removes isolated role fixtures while retaining only a redacted manifest. |
 | Mobile/native client | Not a legacy-web parity requirement | Deferred, not implemented | `docs/plans/deferred/REACT_NATIVE_MONOREPO_CHECKLIST_PLAN_2026-04-19.md` was explicitly deferred on 2026-07-13. |
 
@@ -100,7 +102,7 @@ The following remain genuinely pending after current-code searches. Detailed req
 - [x] Controlled anonymous proposal intake, risk/duplicate screening, moderation queue, and authenticated adoption (`CORE-019`).
 - [x] Formula-versioned contributor/reviewer reputation signals and trusted ranking inputs (`FLOW-021`).
 - [x] Deterministic badges and contributor profile scorecards (`FLOW-022`).
-- Separate program: dedicated FixPH information architecture, government/accountability/location models, Vote Wisely workspace, and incident lifecycle (`FIXPH-001` through `FIXPH-008`).
+- [x] Dedicated FixPH information architecture, government/accountability/location models, Vote Wisely workspace, and incident lifecycle (`FIXPH-001` through `FIXPH-008`).
 - Deferred program: React Native monorepo implementation and mobile release validation.
 
 ### Implementation Progress (2026-07-11)
@@ -117,13 +119,16 @@ The following remain genuinely pending after current-code searches. Detailed req
 - `ee859b32` added controlled anonymous proposals, privacy-preserving anti-abuse controls, receipt lookup, reviewer adoption, and queue administration without automatic publication.
 - `04d75333` added deterministic reputation snapshots, dimension scorecards, earned badges, profile/member presentation, and trusted Explore ranking.
 - `94264826` fixed the mobile overflows found by the all-route visual audit; `55a37e2a` restored direct shell delivery for contribution and comment routes.
+- `8ea071ee` eliminated the 66-warning client lint baseline by stabilizing hooks and intentional-unused conventions.
+- `4c2dfb33` added the dedicated FixPH civic model, public and governed APIs, accountability workspace, project detail, observation lifecycle, geo filters, candidate comparison, and durable history.
+- `21955ce0` added explicit Accepted/Pending/Archived/All reading modes plus reference-date and archived-record notices without automatic expiry.
+- `c33a8555` published the complete content-operations handbook set; `42ed723b` added repeatable form-field and search-ordering parity evidence.
 - Operational correction: FixPH is not running a separate modern PM2 instance. `fixthephilippines.org` remains pointed at the existing shared production instance, and this modernization batch was not deployed to production or a VPS.
 
 ### Explicitly Deferred Product Decisions
 
 - Automatic unresolved-content expiry (`CORE-025`) is disabled by policy; unresolved records remain visible until a human resolution because thresholds, notices, exceptions, and retention obligations are not mature enough for destructive automation.
 - A broad strict-debate rollout remains deferred until explicit operating rules and a governed pilot define enforceable behavior.
-- Full FixPH productization remains a separate program; it is not a legacy-replacement blocker.
 - Legacy-renderer retirement and React Native delivery were explicitly deferred on 2026-07-13 and are not part of the active execution queue.
 
 ## Verification Checklist
@@ -141,6 +146,9 @@ The following remain genuinely pending after current-code searches. Detailed req
 - [x] Direct HTTP shell-contract sweep of all 128 declared modern routes: 124 direct `200` HTML responses and four intentional canonical redirects.
 - [x] Responsive interaction checks for entry Reply/More menus, trusted Explore ranking, global navigation, and sidebar behavior with zero document overflow.
 - [x] Disposable visual-audit user, account, administrator, sessions, and reputation snapshot removed with zero residue.
+- [x] FixPH focused API/client/route/OpenAPI tests plus full 50-suite server and 68-suite client regression runs.
+- [x] Legacy/modern semantic form-field contracts for all seven entry families and deterministic search ordering/cursor/privacy fixtures.
+- [x] Zero-warning lint, modern/legacy type checks, production builds, and source guardrails after lifecycle and FixPH implementation.
 
 ## Completion Rule
 
