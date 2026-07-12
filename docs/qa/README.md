@@ -2,9 +2,11 @@
 
 ## Active QA and Parity Artifacts
 
+- Final local modernization signoff: `docs/qa/MODERNIZATION_LOCAL_SIGNOFF_2026-07-13.md`
 - Migration sign-off checklist: `docs/qa/MIGRATION_SIGNOFF_CHECKLIST_2026-04-18.md`
 - Admin parity checklist: `docs/qa/ADMIN_PARITY_QA_CHECKLIST_2026-04-18.md`
 - Legacy/modern parity audit summary: `docs/qa/LEGACY_MODERN_PARITY_AUDIT_2026-04-20.md`
+- Superseded temporary FixPH deployment evidence: `docs/qa/FIXPH_MODERN_TENANT_SIGNOFF_2026-07-12.md`
 
 ## Page-by-Page Legacy vs Modern Comparison Pack
 

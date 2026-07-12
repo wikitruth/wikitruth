@@ -1,10 +1,12 @@
-# FixPH Modern Tenant Signoff (2026-07-12)
+# FixPH Modern Tenant Signoff (2026-07-12, Superseded)
 
 ## Result
 
-`https://fixthephilippines.org` is externally serving the modern Wikitruth application against the existing VPS production database. The tenant-specific Home page and application section navigation passed runtime verification.
+This document preserves evidence from a temporary separate-modern deployment performed on 2026-07-12. That topology was subsequently rolled back at the owner's direction and is not the current production design.
 
-## Deployed Revision
+`https://fixthephilippines.org` must point to the same existing shared application instance as `wikitruth.net`. Agents must not recreate, restart, upgrade, or deploy a separate modern FixPH instance unless the user explicitly authorizes that production change in the current request.
+
+## Historical Deployment
 
 - Runtime code revision: `d7cf056d638b4ac16892aee94c0a80ed9b0d1541`
 - PM2 process: `wikitruth-modern`
@@ -36,7 +38,7 @@ The first dependency-upgrade deployment exposed Kraken's default `express-sessio
 
 ## Operational Notes
 
-- The legacy `wikitruth` PM2 process remains on port `8000` for other historical domains.
-- The modern checkout is separate at `/opt/wikitruth-modern` and is clean/updatable.
-- The environment file is root-only and excluded from Git.
-- Nginx rollback copies are stored outside `sites-enabled` under `/root/nginx-backups/` so they cannot be loaded as duplicate server blocks.
+- The separate `wikitruth-modern` process was stopped after this signoff.
+- FixPH routing was restored to the existing shared Wikitruth instance.
+- The historical deployment details above are evidence only, not a deployment runbook or authorization to restore that topology.
+- Current production topology must be verified read-only before reporting it; any production mutation requires explicit authorization in the current request.

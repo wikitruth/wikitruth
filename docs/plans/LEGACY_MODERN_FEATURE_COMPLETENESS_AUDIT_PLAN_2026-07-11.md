@@ -43,20 +43,20 @@ The unchecked work is valid, but it should not be executed as one undifferentiat
 | Complete / defer | Reputation, scorecards, and strict debate | Deterministic reputation snapshots, badges, profile scorecards, and trusted ranking are implemented; broad strict-debate enforcement remains a policy program | Keep scoring formula-versioned and explainable. Pilot strict debate only after explicit rules exist. |
 | Complete | FixPH civic productization baseline | Dedicated civic domain, public workspace, responsibility hierarchy, projects, observations, locations, incidents, elections, actions, and history are implemented | Real-world seed content and operating adoption remain content operations, not missing software implementation. |
 | Deferred program | React Native client | Valid roadmap; bearer-token APIs exist but no mobile workspace is implemented | No implementation is scheduled following the explicit 2026-07-13 deferral decision. |
-| Verification | Credentialed role parity and external FixPH tenant | Valid release-signoff checks, not missing product implementation | Run with dedicated disposable/staging accounts; repair external DNS/proxy/firewall reachability before claiming FixPH tenant signoff. |
+| Complete | Credentialed role parity and FixPH civic verification | Disposable role fixtures and local civic runtime checks passed | External production topology remains an operational concern and must not be changed without explicit deployment authorization. |
 
 ## Feature Matrix
 
 | Area | Legacy parity | Modern completeness | Evidence / decision |
 | --- | --- | --- | --- |
 | Global header and application sections | Corrected in this pass | Modern adds Create and account notification affordances | Modern previously omitted legacy Debates/Dictionary/Manuscripts and tenant sections even though `/api/home` returned them. |
-| Responsive shell and context sidebar | Corrected in this pass; deployment verification pending | Modern retains a usable slide-out sidebar | Closed modern sidebar widened a 390 px document to 680 px; legacy removed the closed panel from layout. |
+| Responsive shell and context sidebar | Corrected and runtime-verified | Modern retains a usable slide-out sidebar | Closed modern sidebar previously widened a 390 px document to 680 px; current mobile checks show no document overflow. |
 | Home / Explore / Search | Substantially present | Advanced Explore filters and keyboard navigation exceed legacy | FixPH/application feature-card URLs were normalized in this pass so client-side navigation does not 404. |
 | Topic / argument / question / answer / issue / opinion / artifact entries | Verified | Modern adds signals, appeals, persisted reactions, and timeline | Public semantic comparison and disposable reader/contributor/screener/reviewer/admin journeys cover all seven families without retained test identities. |
 | Comment terminology and URLs | Corrected in this pass | Opinion remains the canonical model | Added `/comment/*` and `/comments/*` compatibility paths to the modern opinion pages. |
-| Members, profiles, journals, groups | Present in code and focused tests | Modern follow/subscription support exceeds legacy | Full role/session runtime journey remains an audit item. |
-| Screening, verdicts, conversion, ownership | Present in modern API/UI | Signals, appeals, and bulk verdict operations exceed legacy | Requires credentialed screener/reviewer/admin runtime verification. |
-| Admin CRUD and backup/restore | Present for authenticated admins | Audit timeline is modern-only | Normal admin restore is tested; empty-database bootstrap is not covered by this path. |
+| Members, profiles, journals, groups | Verified in code, tests, and disposable role journeys | Modern follow/subscription support exceeds legacy | Disposable account/session fixtures are removed after verification. |
+| Screening, verdicts, conversion, ownership | Verified in modern API/UI and disposable role journeys | Signals, appeals, and bulk verdict operations exceed legacy | Contributor, screener, reviewer, and administrator behavior is covered without retained test identities. |
+| Admin CRUD and backup/restore | Present for authenticated admins | Audit timeline is modern-only | Normal admin restore and secure empty-database bootstrap contracts are tested separately. |
 | Fresh install / empty database recovery | Implemented and tested | Secure one-time bootstrap plus normal admin restore | `/api/install` now requires an empty core database, server-side token, CSRF, `RESTORE`, backup preflight, rate limit, and post-restore checks. Initialized systems direct admins to `/admin/db-backup`. |
 | Dynamic application About pages | Implemented and live-verified | About hierarchy is public without exposing profile pages | `/about/:id` uses `/api/pages/about/:id`, limits results to the About root/children, sanitizes HTML, and serves direct nested routes from the React shell. |
 | Controlled anonymous contribution | Not required for legacy replacement | Implemented as screened proposals, never direct publication | `/contribute` submits quota- and risk-controlled proposals; `/admin/anonymous-contributions` supports review and adoption into authenticated create flows. Raw IP addresses and user agents are not retained. |
@@ -136,20 +136,22 @@ The following remain genuinely pending after current-code searches. Detailed req
 - [x] Focused client tests for header sections, route aliases, and closed mobile sidebar behavior.
 - [x] Focused server test for singular comment redirect behavior.
 - [x] Server TypeScript no-emit check after the first correction set.
-- [x] Full current client and server test suites: 67 client suites / 159 tests and 49 server suites / 215 tests passed on 2026-07-12; the route-shell correction also passed its focused 5-test suite and server typecheck.
+- [x] Full current client and server test suites: 69 client suites / 165 tests and 52 server suites / 232 tests passed on 2026-07-13.
 - [x] Production server and client builds.
 - [x] PM2 process `35` (`wikitruth`) restart plus post-restart `200` checks for modern artifact, legacy artifact, and `/api/home`.
 - [x] Live current-host verification of default header sections, comment redirect, and closed/open mobile overflow at `390x844`.
 - [x] Live dynamic About page and seven-family semantic parity verification, including `390x844` overflow checks.
-- [x] Live tenant-host verification of FixPH/application-specific header and Home section navigation, including external Home-to-People canonical navigation on the production tenant.
+- [x] Historical tenant-host verification of FixPH/application-specific navigation is retained; the temporary separate-modern production topology was subsequently rolled back and is not part of this local modernization signoff.
 - [x] Local visual audit of 87 public routes and 50 authenticated routes at both `1280x720` and `390x844` (274 rendered page checks), with populated admin/member/editor records where available.
 - [x] Direct HTTP shell-contract sweep of all 128 declared modern routes: 124 direct `200` HTML responses and four intentional canonical redirects.
 - [x] Responsive interaction checks for entry Reply/More menus, trusted Explore ranking, global navigation, and sidebar behavior with zero document overflow.
 - [x] Disposable visual-audit user, account, administrator, sessions, and reputation snapshot removed with zero residue.
-- [x] FixPH focused API/client/route/OpenAPI tests plus full 50-suite server and 68-suite client regression runs.
+- [x] FixPH focused API/client/route/OpenAPI tests plus the current full 52-suite server and 69-suite client regression runs.
 - [x] Legacy/modern semantic form-field contracts for all seven entry families and deterministic search ordering/cursor/privacy fixtures.
 - [x] Zero-warning lint, modern/legacy type checks, production builds, and source guardrails after lifecycle and FixPH implementation.
 
 ## Completion Rule
 
 Keep this plan active until every item under **Open Legacy-Replacement Work** and **Verification Checklist** is complete. Modern target-state items may remain deferred only with an explicit product decision; they must not be represented as feature-complete.
+
+All non-deferred implementation and verification items are complete as of 2026-07-13. This plan remains outside `docs/plans/completed/` because it records explicit deferred product decisions, in accordance with the repository planning rules.

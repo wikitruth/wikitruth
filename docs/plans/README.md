@@ -5,7 +5,7 @@ Active and historical planning documents are organized under this folder.
 ## Pending Snapshot (2026-07-13)
 
 - Active checklist backlog:
-  - `docs/plans/LEGACY_MODERN_FEATURE_COMPLETENESS_AUDIT_PLAN_2026-07-11.md` open `[ ]`: **0** (verified; retained here because it records explicit deferred product decisions)
+  - `docs/plans/LEGACY_MODERN_FEATURE_COMPLETENESS_AUDIT_PLAN_2026-07-11.md` open `[ ]`: **0** (all non-deferred implementation and verification work is complete; retained here because it records explicit deferred product decisions)
 - Deferred checklist backlog:
   - `docs/plans/deferred/**` open `[ ]`: **190** total
   - Legacy-renderer retirement, React Native delivery, automatic content expiry, strict-debate pilots, real-world seed operations, and non-canonical imported ideas remain explicitly deferred.
