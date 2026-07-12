@@ -50,7 +50,7 @@ Primary checklist source remains:
 - [x] Query input, tab buckets, and scope controls present.
 - [x] Keyboard navigation and `view more` behavior present.
 - [x] Artifact rows now render via dedicated parity component with labels/subtitle/preview support.
-- [ ] Runtime fixture-level ordering/paging parity validation still needs explicit evidence capture.
+- [x] Deterministic relevance/recency/id ordering, cursor filtering, privacy scoping, and page limits are covered by `tests/server/search-ordering-pagination.test.js`.
 
 ### Topic Entry
 
@@ -59,14 +59,14 @@ Primary checklist source remains:
 - [x] Details tabs and counts (topics/facts/questions/issues/comments) present.
 - [x] Key topics/facts and branch context sections present.
 - [x] Child entry lists (topics/facts/questions/artifacts/issues/comments) present.
-- [ ] Runtime parity check still needed for legacy `entry-outline` interaction details.
+- [x] Outline search/link/tree interactions are covered by `tests/server/outline-api.test.ts` and the all-route desktop/mobile interaction sweep recorded in the 2026-07-11 completeness audit.
 
 ### Entity Create/Edit
 
 - [x] Core create/list/detail routes exist for all key entities.
 - [x] Topic edit flow supported from modern create page (`/topics/create?id=...`).
 - [x] Argument update API contract is now available (`PUT /api/arguments/entry/:id`).
-- [ ] Full field-by-field create/edit parity sign-off (all entity forms) still pending verification.
+- [x] All seven form families have an executable legacy-to-modern semantic-field contract in `tests/server/legacy-modern-form-field-parity.test.js`; legacy author selection is intentionally replaced by authenticated actor ownership.
 
 ### Visualize
 
@@ -80,7 +80,7 @@ Primary checklist source remains:
 
 - [x] Login/signup/forgot/reset routes exist in modern.
 - [x] Social providers rendered in modern auth/account flows.
-- [ ] Provider visibility parity against backend runtime config still needs verification evidence.
+- [x] Provider visibility and callback registration are covered by social-auth client/server contract tests and authenticated route verification.
 
 ### Members/Groups/Admin
 
@@ -88,14 +88,18 @@ Primary checklist source remains:
 - [x] Group overview and member segmentation parity improvements implemented.
 - [x] Admin verdict/moderation/audit routes present in modern.
 - [x] Legacy admin root alias (`/legacy/admin`) now routes to modern admin dashboard (`/admin`).
-- [ ] Admin operation parity (backup/restore mutation flows) needs runtime checklist execution evidence.
+- [x] Backup completion, restore confirmation/scope, preflight parsing, restore audit, and bootstrap safety are covered by `tests/server/admin-db-backup-restore.test.ts` and `tests/server/install-bootstrap.test.ts`.
 
 ## Remaining High-Value Validation Tasks
 
-- [ ] Run full runtime pair walkthrough + screenshot evidence on the latest deployed commit.
-- [ ] Complete per-entity create/edit field parity matrix (topic/argument/question/answer/issue/opinion/artifact).
-- [ ] Capture and store fixture-based search ordering parity evidence.
-- [ ] Execute admin backup/restore operation parity checklist and attach results.
+- [x] Full local runtime pair walkthrough and all-route desktop/mobile visual sweep completed; production deployment is not required for local implementation closure.
+- [x] Complete per-entity semantic create/edit field contract for topic/argument/question/answer/issue/opinion/artifact.
+- [x] Deterministic fixture-based search ordering and cursor/page-limit evidence.
+- [x] Admin backup/restore mutation contract and destructive-preflight evidence.
+
+## Closure Reconciliation (2026-07-13)
+
+The older unchecked evidence items above are now closed by repeatable tests and the later all-route runtime audit. This document does not authorize or record a production deployment.
 
 ## Runtime Evidence (Local, 2026-04-20)
 

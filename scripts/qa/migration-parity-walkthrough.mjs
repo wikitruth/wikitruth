@@ -13,6 +13,7 @@ const basePageChecks = [
   { label: 'modern-admin-route', path: '/admin', pattern: /Sign In|Admin/i },
   { label: 'modern-moderation-route', path: '/admin/verdicts', pattern: /Sign In|Verdict|Moderation/i },
   { label: 'modern-app-alias', path: '/app/explore', pattern: /Explore|Topics|Facts/i },
+  { label: 'modern-fixph-civic', path: '/civic', pattern: /Fix The Philippines|Accountability|public record/i },
 ];
 
 function resolveTopicCandidateFromHome(payload) {
@@ -115,6 +116,23 @@ async function run() {
   } catch (error) {
     failed = true;
     console.log(`FAIL auth-me: request error -> ${String(error)}`);
+  }
+
+  try {
+    const civicResponse = await context.request.get(`${baseUrl}/api/civic/overview`, {
+      failOnStatusCode: false,
+      timeout: 30000,
+    });
+    const civicBody = await civicResponse.text();
+    if (civicResponse.ok() && /"counts"|"recent"/i.test(civicBody)) {
+      console.log(`PASS civic-overview: /api/civic/overview exposes the public accountability contract`);
+    } else {
+      failed = true;
+      console.log(`FAIL civic-overview: unexpected response (status=${civicResponse.status()})`);
+    }
+  } catch (error) {
+    failed = true;
+    console.log(`FAIL civic-overview: request error -> ${String(error)}`);
   }
 
   await browser.close();
