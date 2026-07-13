@@ -8,6 +8,7 @@ const find = jest.fn();
 const findById = jest.fn();
 const findOne = jest.fn();
 const create = jest.fn();
+const findMembership = jest.fn();
 const logEntryEvent = jest.fn();
 const recordEntryRevision = jest.fn();
 const notifySubscribers = jest.fn();
@@ -21,6 +22,9 @@ jest.mock('../../server/src/app', () => ({
         findById: (...args) => findById(...args),
         findOne: (...args) => findOne(...args),
         create: (...args) => create(...args),
+      },
+      TenantMembership: {
+        findOne: (...args) => findMembership(...args),
       },
     },
   },
@@ -75,6 +79,7 @@ describe('FixPH civic API', () => {
     countDocuments.mockResolvedValue(0);
     find.mockReturnValue(queryResult([]));
     findOne.mockReturnValue(queryResult(null));
+    findMembership.mockReturnValue(queryResult(null));
     logEntryEvent.mockResolvedValue(undefined);
     recordEntryRevision.mockResolvedValue(undefined);
     notifySubscribers.mockResolvedValue(0);
@@ -91,6 +96,24 @@ describe('FixPH civic API', () => {
     expect(response.body.recent).toHaveLength(1);
     expect(response.body.urgent).toHaveLength(1);
     expect(countDocuments).toHaveBeenCalledTimes(10);
+    expect(countDocuments).toHaveBeenCalledWith(expect.objectContaining({ tenantId: 'fixtheph' }));
+  });
+
+  it('lets tenant administrators view the complete tenant record set', async () => {
+    findMembership.mockReturnValue(queryResult({ roles: ['admin'] }));
+    const tenantAdmin = {
+      _id: '66f000000000000000000012',
+      canPlayRoleOf: () => false,
+    };
+
+    await request(createApp(tenantAdmin)).get('/api/civic/overview').expect(200);
+
+    expect(findMembership).toHaveBeenCalledWith(expect.objectContaining({
+      tenantId: 'fixtheph',
+      userId: tenantAdmin._id,
+      active: true,
+    }));
+    expect(countDocuments).toHaveBeenCalledWith(expect.not.objectContaining({ private: false }));
   });
 
   it('requires an authenticated contributor for submissions', async () => {

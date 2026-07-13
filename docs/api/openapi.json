@@ -857,7 +857,10 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": ["contributor", "reviewer"]
+              "enum": [
+                "contributor",
+                "reviewer"
+              ]
             }
           }
         ],
@@ -1870,7 +1873,15 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": ["topic", "argument", "question", "answer", "issue", "opinion", "artifact"]
+              "enum": [
+                "topic",
+                "argument",
+                "question",
+                "answer",
+                "issue",
+                "opinion",
+                "artifact"
+              ]
             }
           }
         ],
@@ -1895,22 +1906,46 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["id", "objectName", "channel", "value"],
+                "required": [
+                  "id",
+                  "objectName",
+                  "channel",
+                  "value"
+                ],
                 "properties": {
                   "id": {
                     "type": "string"
                   },
                   "objectName": {
                     "type": "string",
-                    "enum": ["topic", "argument", "question", "answer", "issue", "opinion", "artifact"]
+                    "enum": [
+                      "topic",
+                      "argument",
+                      "question",
+                      "answer",
+                      "issue",
+                      "opinion",
+                      "artifact"
+                    ]
                   },
                   "channel": {
                     "type": "string",
-                    "enum": ["exposure", "vote", "value"]
+                    "enum": [
+                      "exposure",
+                      "vote",
+                      "value"
+                    ]
                   },
                   "value": {
                     "type": "string",
-                    "enum": ["expose", "bury", "upvote", "downvote", "good", "bad"]
+                    "enum": [
+                      "expose",
+                      "bury",
+                      "upvote",
+                      "downvote",
+                      "good",
+                      "bad"
+                    ]
                   }
                 }
               }
@@ -1947,7 +1982,15 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": ["topic", "argument", "question", "answer", "issue", "opinion", "artifact"]
+              "enum": [
+                "topic",
+                "argument",
+                "question",
+                "answer",
+                "issue",
+                "opinion",
+                "artifact"
+              ]
             }
           },
           {
@@ -1956,7 +1999,11 @@
             "required": true,
             "schema": {
               "type": "string",
-              "enum": ["exposure", "vote", "value"]
+              "enum": [
+                "exposure",
+                "vote",
+                "value"
+              ]
             }
           }
         ],
@@ -2914,13 +2961,19 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/GenericMutationRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/GenericMutationRequest"
+              }
             }
           }
         },
         "responses": {
-          "200": { "description": "Issue resolution recorded" },
-          "400": { "description": "Invalid status or missing decision reason" }
+          "200": {
+            "description": "Issue resolution recorded"
+          },
+          "400": {
+            "description": "Invalid status or missing decision reason"
+          }
         }
       }
     },
@@ -2931,13 +2984,19 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/GenericMutationRequest" }
+              "schema": {
+                "$ref": "#/components/schemas/GenericMutationRequest"
+              }
             }
           }
         },
         "responses": {
-          "200": { "description": "Comment relevance recorded" },
-          "400": { "description": "Invalid status or missing review reason" }
+          "200": {
+            "description": "Comment relevance recorded"
+          },
+          "400": {
+            "description": "Invalid status or missing review reason"
+          }
         }
       }
     },
@@ -3720,7 +3779,7 @@
     },
     "/civic/overview": {
       "get": {
-        "summary": "Get FixPH civic accountability overview",
+        "summary": "Get civic accountability overview for the resolved tenant",
         "responses": {
           "200": {
             "description": "Success",
@@ -4001,6 +4060,1198 @@
           },
           "404": {
             "description": "Candidate not found"
+          }
+        }
+      }
+    },
+    "/civic/tenant": {
+      "get": {
+        "summary": "Get the resolved civic tenant configuration",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "tenant"
+                  ],
+                  "properties": {
+                    "tenant": {
+                      "$ref": "#/components/schemas/CivicTenant"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant not found"
+          },
+          "409": {
+            "description": "Tenant context conflict"
+          }
+        }
+      }
+    },
+    "/civic/jurisdictions": {
+      "get": {
+        "summary": "List active jurisdictions for the resolved tenant",
+        "parameters": [
+          {
+            "name": "parentId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "levelKey",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "jurisdictions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CivicJurisdiction"
+                      }
+                    },
+                    "count": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/civic/records/{id}/links": {
+      "get": {
+        "summary": "List linked Wikitruth knowledge and compatibility evidence",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "links": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CivicEntryLink"
+                      }
+                    },
+                    "count": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Link an existing Wikitruth entry to a civic record",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "relationship",
+                  "objectId"
+                ],
+                "properties": {
+                  "relationship": {
+                    "$ref": "#/components/schemas/CivicEntryRelationship"
+                  },
+                  "objectId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Linked"
+          },
+          "400": {
+            "description": "Invalid or inaccessible target"
+          },
+          "403": {
+            "description": "Tenant role required"
+          }
+        }
+      }
+    },
+    "/civic/records/{recordId}/links/{linkId}": {
+      "delete": {
+        "summary": "Remove a Wikitruth entry link from a civic record",
+        "parameters": [
+          {
+            "name": "recordId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "linkId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Removed"
+          },
+          "403": {
+            "description": "Tenant role required"
+          },
+          "404": {
+            "description": "Link not found"
+          }
+        }
+      }
+    },
+    "/civic/platform/tenants": {
+      "get": {
+        "summary": "List civic tenants (platform administrator)",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tenants": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CivicTenant"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Platform administrator required"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a civic tenant (platform administrator)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CivicTenant"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Invalid tenant configuration"
+          },
+          "403": {
+            "description": "Platform administrator required"
+          }
+        }
+      }
+    },
+    "/civic/platform/tenants/{managedTenantId}": {
+      "put": {
+        "summary": "Update a civic tenant (platform administrator)",
+        "parameters": [
+          {
+            "name": "managedTenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CivicTenant"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated"
+          },
+          "404": {
+            "description": "Tenant not found"
+          }
+        }
+      }
+    },
+    "/civic/platform/tenants/bootstrap": {
+      "post": {
+        "summary": "Persist built-in civic tenant definitions",
+        "responses": {
+          "200": {
+            "description": "Bootstrapped"
+          },
+          "403": {
+            "description": "Platform administrator required"
+          }
+        }
+      }
+    },
+    "/civic/admin/jurisdictions": {
+      "post": {
+        "summary": "Create a tenant jurisdiction",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CivicJurisdictionMutation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Invalid jurisdiction"
+          },
+          "403": {
+            "description": "Tenant administrator required"
+          }
+        }
+      }
+    },
+    "/civic/admin/memberships": {
+      "get": {
+        "summary": "List tenant memberships",
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "403": {
+            "description": "Tenant administrator required"
+          }
+        }
+      }
+    },
+    "/civic/admin/memberships/{userId}": {
+      "put": {
+        "summary": "Create or update tenant membership",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Updated"
+          },
+          "403": {
+            "description": "Tenant administrator required"
+          }
+        }
+      }
+    },
+    "/tenants/{tenantId}/civic/overview": {
+      "get": {
+        "summary": "Get FixPH civic accountability overview",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CivicOverviewResponse"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+            }
+          }
+        ]
+      }
+    },
+    "/tenants/{tenantId}/civic/records": {
+      "get": {
+        "summary": "List and filter civic records",
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+            }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "stage",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "severity",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "region",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "city",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CivicRecordsResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Submit a civic record for screening",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CivicRecordMutationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CivicRecordResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid record"
+          },
+          "401": {
+            "description": "Authentication required"
+          },
+          "403": {
+            "description": "Contributor privileges required"
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+            }
+          }
+        ]
+      }
+    },
+    "/tenants/{tenantId}/civic/records/{id}": {
+      "get": {
+        "summary": "Get a civic record with connected context",
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CivicRecordResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a contributor-owned civic record",
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CivicRecordMutationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CivicRecordResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid record"
+          },
+          "403": {
+            "description": "Not permitted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/tenants/{tenantId}/civic/records/{id}/transition": {
+      "post": {
+        "summary": "Record a reviewed civic lifecycle decision",
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CivicTransitionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CivicRecordResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid decision"
+          },
+          "403": {
+            "description": "Reviewer privileges required"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/tenants/{tenantId}/civic/candidates/compare": {
+      "get": {
+        "summary": "Compare two to six candidate evidence records",
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+            }
+          },
+          {
+            "name": "ids",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "candidates": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CivicRecord"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid selection"
+          },
+          "404": {
+            "description": "Candidate not found"
+          }
+        }
+      }
+    },
+    "/tenants/{tenantId}/civic/tenant": {
+      "get": {
+        "summary": "Get the resolved civic tenant configuration",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "tenant"
+                  ],
+                  "properties": {
+                    "tenant": {
+                      "$ref": "#/components/schemas/CivicTenant"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tenant not found"
+          },
+          "409": {
+            "description": "Tenant context conflict"
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+            }
+          }
+        ]
+      }
+    },
+    "/tenants/{tenantId}/civic/jurisdictions": {
+      "get": {
+        "summary": "List active jurisdictions for the resolved tenant",
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+            }
+          },
+          {
+            "name": "parentId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "levelKey",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "jurisdictions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CivicJurisdiction"
+                      }
+                    },
+                    "count": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tenants/{tenantId}/civic/records/{id}/links": {
+      "get": {
+        "summary": "List linked Wikitruth knowledge and compatibility evidence",
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "links": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CivicEntryLink"
+                      }
+                    },
+                    "count": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Link an existing Wikitruth entry to a civic record",
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "relationship",
+                  "objectId"
+                ],
+                "properties": {
+                  "relationship": {
+                    "$ref": "#/components/schemas/CivicEntryRelationship"
+                  },
+                  "objectId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Linked"
+          },
+          "400": {
+            "description": "Invalid or inaccessible target"
+          },
+          "403": {
+            "description": "Tenant role required"
+          }
+        }
+      }
+    },
+    "/tenants/{tenantId}/civic/records/{recordId}/links/{linkId}": {
+      "delete": {
+        "summary": "Remove a Wikitruth entry link from a civic record",
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+            }
+          },
+          {
+            "name": "recordId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "linkId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Removed"
+          },
+          "403": {
+            "description": "Tenant role required"
+          },
+          "404": {
+            "description": "Link not found"
+          }
+        }
+      }
+    },
+    "/tenants/{tenantId}/civic/admin/jurisdictions": {
+      "post": {
+        "summary": "Create a tenant jurisdiction",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CivicJurisdictionMutation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          },
+          "400": {
+            "description": "Invalid jurisdiction"
+          },
+          "403": {
+            "description": "Tenant administrator required"
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+            }
+          }
+        ]
+      }
+    },
+    "/tenants/{tenantId}/civic/admin/memberships": {
+      "get": {
+        "summary": "List tenant memberships",
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "403": {
+            "description": "Tenant administrator required"
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+            }
+          }
+        ]
+      }
+    },
+    "/tenants/{tenantId}/civic/admin/memberships/{userId}": {
+      "put": {
+        "summary": "Create or update tenant membership",
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Updated"
+          },
+          "403": {
+            "description": "Tenant administrator required"
+          }
+        }
+      }
+    },
+    "/civic/admin/jurisdictions/{id}": {
+      "put": {
+        "summary": "Update a tenant jurisdiction",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CivicJurisdictionMutation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated"
+          },
+          "400": {
+            "description": "Invalid jurisdiction"
+          },
+          "403": {
+            "description": "Tenant administrator required"
+          },
+          "404": {
+            "description": "Jurisdiction not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Deactivate a tenant jurisdiction",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deactivated"
+          },
+          "403": {
+            "description": "Tenant administrator required"
+          },
+          "404": {
+            "description": "Jurisdiction not found"
+          },
+          "409": {
+            "description": "Active child jurisdictions must be deactivated first"
+          }
+        }
+      }
+    },
+    "/tenants/{tenantId}/civic/admin/jurisdictions/{id}": {
+      "put": {
+        "summary": "Update a tenant jurisdiction",
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CivicJurisdictionMutation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated"
+          },
+          "400": {
+            "description": "Invalid jurisdiction"
+          },
+          "403": {
+            "description": "Tenant administrator required"
+          },
+          "404": {
+            "description": "Jurisdiction not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Deactivate a tenant jurisdiction",
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deactivated"
+          },
+          "403": {
+            "description": "Tenant administrator required"
+          },
+          "404": {
+            "description": "Jurisdiction not found"
+          },
+          "409": {
+            "description": "Active child jurisdictions must be deactivated first"
           }
         }
       }
@@ -4649,6 +5900,8 @@
       "CivicRecord": {
         "type": "object",
         "required": [
+          "tenantId",
+          "countryCode",
           "_id",
           "kind",
           "title",
@@ -4656,6 +5909,16 @@
           "stage"
         ],
         "properties": {
+          "tenantId": {
+            "type": "string"
+          },
+          "countryCode": {
+            "type": "string"
+          },
+          "jurisdictionId": {
+            "type": "string",
+            "nullable": true
+          },
           "_id": {
             "type": "string"
           },
@@ -4758,6 +6021,10 @@
           "title"
         ],
         "properties": {
+          "jurisdictionId": {
+            "type": "string",
+            "nullable": true
+          },
           "kind": {
             "type": "string",
             "enum": [
@@ -4888,6 +6155,12 @@
             "items": {
               "$ref": "#/components/schemas/CivicRecord"
             }
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CivicEntryLink"
+            }
           }
         }
       },
@@ -4931,6 +6204,223 @@
             "items": {
               "$ref": "#/components/schemas/CivicRecord"
             }
+          }
+        }
+      },
+      "CivicEntryRelationship": {
+        "type": "string",
+        "enum": [
+          "subject",
+          "claim",
+          "question",
+          "answer",
+          "evidence",
+          "discussion",
+          "review_issue"
+        ]
+      },
+      "CivicTenant": {
+        "type": "object",
+        "required": [
+          "tenantId",
+          "status",
+          "countryCode",
+          "title",
+          "domains",
+          "branding",
+          "localization",
+          "geography",
+          "sections"
+        ],
+        "properties": {
+          "tenantId": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "inactive"
+            ]
+          },
+          "countryCode": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2
+          },
+          "title": {
+            "type": "string"
+          },
+          "navTitle": {
+            "type": "string"
+          },
+          "slogan": {
+            "type": "string"
+          },
+          "domains": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "branding": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "localization": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "geography": {
+            "type": "object",
+            "additionalProperties": true
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": true
+            }
+          },
+          "featureFlags": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "boolean"
+            }
+          },
+          "moderationPolicyVersion": {
+            "type": "string"
+          },
+          "electionSystem": {
+            "type": "string"
+          },
+          "deploymentMode": {
+            "type": "string",
+            "enum": [
+              "shared",
+              "dedicated",
+              "headless"
+            ]
+          }
+        }
+      },
+      "CivicJurisdiction": {
+        "type": "object",
+        "required": [
+          "_id",
+          "tenantId",
+          "code",
+          "countryCode",
+          "levelKey",
+          "name"
+        ],
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "tenantId": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "countryCode": {
+            "type": "string"
+          },
+          "levelKey": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "friendlyUrl": {
+            "type": "string"
+          },
+          "parentId": {
+            "type": "string",
+            "nullable": true
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
+      "CivicJurisdictionMutation": {
+        "type": "object",
+        "required": [
+          "code",
+          "levelKey",
+          "name"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "levelKey": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "parentId": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        }
+      },
+      "CivicEntryLink": {
+        "type": "object",
+        "required": [
+          "relationship",
+          "objectType",
+          "objectName",
+          "objectId",
+          "title",
+          "url"
+        ],
+        "properties": {
+          "linkId": {
+            "type": "string"
+          },
+          "relationship": {
+            "$ref": "#/components/schemas/CivicEntryRelationship"
+          },
+          "objectType": {
+            "type": "integer"
+          },
+          "objectName": {
+            "type": "string",
+            "enum": [
+              "topic",
+              "argument",
+              "question",
+              "answer",
+              "artifact",
+              "opinion",
+              "issue"
+            ]
+          },
+          "objectId": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "friendlyUrl": {
+            "type": "string"
+          },
+          "contentPreview": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "legacy": {
+            "type": "boolean"
           }
         }
       }

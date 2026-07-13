@@ -63,13 +63,13 @@ async function getApplicationAsync(req: {
   app?: { db?: { models?: Record<string, any> } };
 }): Promise<ApplicationDefinition | null> {
   const hostname = (String(req.get?.('x-forwarded-host') || req.hostname || '').split(':')[0] || '').toLowerCase();
-  const builtIn = builtInCivicTenantForHost(hostname);
-  if (builtIn) return applicationFromCivicTenant(builtIn);
   const CivicTenant = req.app?.db?.models?.CivicTenant;
   const tenant = CivicTenant?.findOne
     ? await CivicTenant.findOne({ status: 'active', domains: hostname }).lean()
     : null;
-  return tenant ? applicationFromCivicTenant(tenant as CivicTenantDefinition) : null;
+  if (tenant) return applicationFromCivicTenant(tenant as CivicTenantDefinition);
+  const builtIn = builtInCivicTenantForHost(hostname);
+  return builtIn ? applicationFromCivicTenant(builtIn) : null;
 }
 
 export = {

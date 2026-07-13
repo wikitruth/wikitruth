@@ -1,0 +1,49 @@
+{
+  "tenantId": "fix-example",
+  "status": "active",
+  "countryCode": "XZ",
+  "title": "Fix Example",
+  "navTitle": "FixXZ",
+  "slogan": "A fictional tenant used to prove country-neutral civic behavior.",
+  "domains": ["fix.example.test"],
+  "branding": {
+    "logoIcon": "/img/logo-64x64.png",
+    "favicon": "/favicon.ico",
+    "primaryColor": "#145f68",
+    "accentColor": "#c45b32",
+    "surfaceColor": "#eef4ed",
+    "fontFamily": "Georgia"
+  },
+  "localization": {
+    "defaultLocale": "en-XZ",
+    "supportedLocales": ["en-XZ"],
+    "timezone": "UTC",
+    "currency": "XZD"
+  },
+  "geography": {
+    "levels": [
+      { "key": "country", "label": "Country" },
+      { "key": "district", "label": "District" },
+      { "key": "ward", "label": "Ward" }
+    ],
+    "addressFields": ["district", "ward", "address"]
+  },
+  "sections": [
+    {
+      "slug": "public-works",
+      "title": "Public Works",
+      "description": "Track fictional public infrastructure.",
+      "icon": "building",
+      "kinds": ["project"],
+      "createKinds": ["project"],
+      "enabled": true
+    }
+  ],
+  "featureFlags": {
+    "projects": true,
+    "knowledgeLinks": true
+  },
+  "moderationPolicyVersion": "1",
+  "electionSystem": "fictional",
+  "deploymentMode": "shared"
+}

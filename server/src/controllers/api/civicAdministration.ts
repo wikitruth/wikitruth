@@ -75,6 +75,7 @@ const jurisdictionSchema = z.object({
   parentId: z.string().trim().refine((value) => !value || mongoose.isValidObjectId(value), 'Invalid parent id').optional(),
   metadata: z.record(z.string(), z.unknown()).optional().default({}),
 });
+const jurisdictionUpdateSchema = jurisdictionSchema.partial();
 const membershipSchema = z.object({
   userId: z.string().trim().refine((value) => mongoose.isValidObjectId(value), 'Invalid user id'),
   roles: z.array(z.enum(CIVIC_TENANT_ROLES)).min(1),
@@ -243,5 +244,63 @@ export function registerCivicAdministrationRoutes(router: Router): void {
       message: 'Civic jurisdiction created', payload: { tenantId: req.civicTenant!.tenantId, code: parsed.data.code },
     });
     res.status(201).json({ jurisdiction });
+  });
+
+  router.put('/admin/jurisdictions/:id', async (req: WikitruthRequest, res: WikitruthResponse) => {
+    if (!await ensureCivicTenantRole(req, res, ['admin'])) return;
+    const parsed = jurisdictionUpdateSchema.safeParse(req.body || {});
+    if (!parsed.success) {
+      res.status(400).json({ success: false, message: 'Invalid jurisdiction', details: parsed.error.issues });
+      return;
+    }
+    if (parsed.data.parentId) {
+      const parent = await db.Jurisdiction.findOne({ _id: parsed.data.parentId, tenantId: req.civicTenant!.tenantId, active: true }).lean();
+      if (!parent || String(parent._id) === req.params.id) {
+        res.status(400).json({ success: false, message: 'Invalid parent jurisdiction for this tenant' });
+        return;
+      }
+    }
+    if (parsed.data.levelKey) {
+      const allowed = req.civicTenant!.geography.levels.some((level) => level.key === parsed.data.levelKey);
+      if (!allowed) {
+        res.status(400).json({ success: false, message: 'Jurisdiction level is not configured for this tenant' });
+        return;
+      }
+    }
+    const update = {
+      ...parsed.data,
+      ...(parsed.data.name ? { friendlyUrl: utils.urlify(parsed.data.name) } : {}),
+      editUserId: actorId(req),
+      editDate: new Date(),
+    };
+    const jurisdiction = await db.Jurisdiction.findOneAndUpdate(
+      { _id: req.params.id, tenantId: req.civicTenant!.tenantId },
+      { $set: update },
+      { new: true },
+    );
+    if (!jurisdiction) {
+      res.status(404).json({ success: false, message: 'Jurisdiction not found' });
+      return;
+    }
+    res.json({ jurisdiction });
+  });
+
+  router.delete('/admin/jurisdictions/:id', async (req: WikitruthRequest, res: WikitruthResponse) => {
+    if (!await ensureCivicTenantRole(req, res, ['admin'])) return;
+    const hasChildren = await db.Jurisdiction.countDocuments({ tenantId: req.civicTenant!.tenantId, parentId: req.params.id, active: true });
+    if (hasChildren) {
+      res.status(409).json({ success: false, message: 'Deactivate child jurisdictions first' });
+      return;
+    }
+    const jurisdiction = await db.Jurisdiction.findOneAndUpdate(
+      { _id: req.params.id, tenantId: req.civicTenant!.tenantId },
+      { $set: { active: false, editUserId: actorId(req), editDate: new Date() } },
+      { new: true },
+    );
+    if (!jurisdiction) {
+      res.status(404).json({ success: false, message: 'Jurisdiction not found' });
+      return;
+    }
+    res.json({ success: true, jurisdiction });
   });
 }

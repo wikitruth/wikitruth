@@ -6,7 +6,7 @@ import { z } from 'zod';
 
 import appModForDb from '../../app';
 import { logEntryEvent } from '../../services/entryEventsService';
-import { ensureCivicTenantRole } from '../../services/civicAuthorizationService';
+import { civicTenantRoles, ensureCivicTenantRole } from '../../services/civicAuthorizationService';
 import { publicCivicTenant } from '../../services/civicTenantService';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 import {
@@ -25,7 +25,6 @@ import constants from '../../models/constants';
 import { recordEntryRevision } from './revisionWriteRecorder';
 import { notifySubscribers } from '../../services/notificationsService';
 import { listCivicEntryLinks } from '../../services/civicEntryLinkService';
-import { civicTenantRoles } from '../../services/civicAuthorizationService';
 import { registerCivicEntryLinkRoutes } from './civicEntryLinks';
 import { registerCivicAdministrationRoutes } from './civicAdministration';
 
@@ -152,12 +151,17 @@ function canPlayRole(req: WikitruthRequest, role: string): boolean {
   return Boolean(req.user?.canPlayRoleOf?.(role));
 }
 
-function canViewPrivate(req: WikitruthRequest, record: Record<string, unknown>): boolean {
-  return !record.private || canPlayRole(req, 'admin') || String(record.createUserId || '') === actorId(req);
+async function canViewPrivate(req: WikitruthRequest, record: Record<string, unknown>): Promise<boolean> {
+  if (!record.private || canPlayRole(req, 'admin') || String(record.createUserId || '') === actorId(req)) return true;
+  const roles = await civicTenantRoles(req, tenantId(req));
+  return roles.has('admin');
 }
 
-function canEdit(req: WikitruthRequest, record: Record<string, unknown>): boolean {
-  return Boolean(req.user) && (canPlayRole(req, 'admin') || String(record.createUserId || '') === actorId(req));
+async function canEdit(req: WikitruthRequest, record: Record<string, unknown>): Promise<boolean> {
+  if (!req.user) return false;
+  if (canPlayRole(req, 'admin') || String(record.createUserId || '') === actorId(req)) return true;
+  const roles = await civicTenantRoles(req, tenantId(req));
+  return roles.has('admin');
 }
 
 function validationError(res: WikitruthResponse, error: z.ZodError): void {
@@ -194,9 +198,10 @@ async function validateParent(req: WikitruthRequest, kind: CivicRecordKind, pare
   return { ok: true };
 }
 
-function publicQuery(req: WikitruthRequest): Record<string, unknown> {
+async function publicQuery(req: WikitruthRequest): Promise<Record<string, unknown>> {
   const scope = { tenantId: tenantId(req) };
-  if (canPlayRole(req, 'admin')) {
+  const roles = await civicTenantRoles(req, tenantId(req));
+  if (roles.has('admin')) {
     return scope;
   }
   if (req.user) {
@@ -206,7 +211,7 @@ function publicQuery(req: WikitruthRequest): Record<string, unknown> {
 }
 
 async function getOverview(req: WikitruthRequest, res: WikitruthResponse): Promise<void> {
-  const visibility = publicQuery(req);
+  const visibility = await publicQuery(req);
   const counts = Object.fromEntries(await Promise.all(CIVIC_RECORD_KINDS.map(async (kind) => [
     kind,
     await db.CivicRecord.countDocuments({ ...visibility, kind }),
@@ -239,7 +244,7 @@ async function listJurisdictions(req: WikitruthRequest, res: WikitruthResponse):
 }
 
 async function listRecords(req: WikitruthRequest, res: WikitruthResponse): Promise<void> {
-  const query: Record<string, unknown> = publicQuery(req);
+  const query: Record<string, unknown> = await publicQuery(req);
   const kinds = String(req.query.kind || '').split(',').map((value) => value.trim()).filter(
     (value): value is CivicRecordKind => CIVIC_RECORD_KINDS.includes(value as CivicRecordKind),
   );
@@ -270,11 +275,11 @@ async function getRecord(req: WikitruthRequest, res: WikitruthResponse): Promise
     return;
   }
   const record = await db.CivicRecord.findOne({ _id: req.params.id, tenantId: tenantId(req) }).lean();
-  if (!record || !canViewPrivate(req, record)) {
+  if (!record || !await canViewPrivate(req, record)) {
     res.status(404).json({ message: 'Civic record not found' });
     return;
   }
-  const visibility = publicQuery(req);
+  const visibility = await publicQuery(req);
   const roles = await civicTenantRoles(req, tenantId(req));
   const [parent, children, related, links] = await Promise.all([
     record.parentId ? db.CivicRecord.findOne({ ...visibility, _id: record.parentId }).lean() : null,
@@ -360,11 +365,11 @@ async function createRecord(req: WikitruthRequest, res: WikitruthResponse): Prom
 async function updateRecord(req: WikitruthRequest, res: WikitruthResponse): Promise<void> {
   if (!await ensureCivicTenantRole(req, res, ['contributor', 'admin'])) return;
   const record = await db.CivicRecord.findOne({ _id: req.params.id, tenantId: tenantId(req) });
-  if (!record || !canViewPrivate(req, record.toObject())) {
+  if (!record || !await canViewPrivate(req, record.toObject())) {
     res.status(404).json({ message: 'Civic record not found' });
     return;
   }
-  if (!canEdit(req, record)) {
+  if (!await canEdit(req, record)) {
     res.status(403).json({ message: 'Only the contributor or an administrator may edit this record' });
     return;
   }
@@ -495,7 +500,8 @@ async function compareCandidates(req: WikitruthRequest, res: WikitruthResponse):
     res.status(400).json({ message: 'Select between two and six valid candidate records' });
     return;
   }
-  const candidates = await db.CivicRecord.find({ ...publicQuery(req), _id: { $in: ids }, kind: 'candidate' })
+  const visibility = await publicQuery(req);
+  const candidates = await db.CivicRecord.find({ ...visibility, _id: { $in: ids }, kind: 'candidate' })
     .sort({ title: 1 })
     .lean();
   if (candidates.length !== ids.length) {
