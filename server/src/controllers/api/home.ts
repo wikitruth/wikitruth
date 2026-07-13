@@ -227,7 +227,8 @@ async function GET_home(req: WikitruthRequest, res: WikitruthResponse) {
   }
 
   // Expose sidebar context so modern client can mirror legacy navigation.
-  model.applications = applications.getApplications();
+  // Tenant hosts advertise their resolved civic app instead of the built-in discovery list.
+  model.applications = res.locals.application ? [res.locals.application] : applications.getApplications();
   model.appCategories =
     res.locals.appCategories ||
     (req.app.locals as { appCategories?: unknown } | undefined)?.appCategories ||
