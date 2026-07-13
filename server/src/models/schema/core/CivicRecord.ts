@@ -9,6 +9,8 @@ import {
 } from '../../../types/civic';
 
 const factory: SchemaFactory = function (app, mongoose) {
+  const defaultTenantId = String(process.env.CIVIC_DEFAULT_TENANT_ID || 'fixtheph').trim().toLowerCase();
+  const defaultCountryCode = String(process.env.CIVIC_DEFAULT_COUNTRY_CODE || 'PH').trim().toUpperCase();
   const historySchema = new mongoose.Schema({
     action: { type: String, required: true },
     summary: { type: String, required: true },
@@ -24,6 +26,9 @@ const factory: SchemaFactory = function (app, mongoose) {
   }, { _id: true });
 
   const schema = new mongoose.Schema({
+    tenantId: { type: String, required: true, default: defaultTenantId, lowercase: true, trim: true, index: true },
+    countryCode: { type: String, required: true, default: defaultCountryCode, uppercase: true, trim: true, index: true },
+    jurisdictionId: { type: mongoose.Schema.ObjectId, ref: 'Jurisdiction', default: null, index: true },
     kind: { type: String, enum: CIVIC_RECORD_KINDS, required: true, index: true },
     title: { type: String, required: true, trim: true },
     friendlyUrl: { type: String, required: true, trim: true, index: true },
@@ -37,7 +42,7 @@ const factory: SchemaFactory = function (app, mongoose) {
     artifactIds: [{ type: mongoose.Schema.ObjectId, ref: 'Artifact' }],
     issueIds: [{ type: mongoose.Schema.ObjectId, ref: 'Issue' }],
     location: {
-      countryCode: { type: String, default: 'PH', uppercase: true },
+      countryCode: { type: String, default: defaultCountryCode, uppercase: true },
       region: { type: String, default: '' },
       province: { type: String, default: '' },
       city: { type: String, default: '' },
@@ -58,7 +63,7 @@ const factory: SchemaFactory = function (app, mongoose) {
     },
     project: {
       budget: { type: Number, min: 0, default: null },
-      currency: { type: String, default: 'PHP', uppercase: true },
+      currency: { type: String, default: null, uppercase: true },
       contractor: { type: String, default: '' },
       contractReference: { type: String, default: '' },
       progressPercent: { type: Number, min: 0, max: 100, default: null },
@@ -93,9 +98,10 @@ const factory: SchemaFactory = function (app, mongoose) {
     editDate: { type: Date, default: Date.now, index: true },
   });
 
-  schema.index({ kind: 1, parentId: 1, title: 1 });
-  schema.index({ kind: 1, status: 1, stage: 1, editDate: -1 });
-  schema.index({ 'location.region': 1, 'location.city': 1, kind: 1 });
+  schema.index({ tenantId: 1, kind: 1, parentId: 1, title: 1 });
+  schema.index({ tenantId: 1, kind: 1, status: 1, stage: 1, editDate: -1 });
+  schema.index({ tenantId: 1, jurisdictionId: 1, kind: 1, editDate: -1 });
+  schema.index({ tenantId: 1, 'location.region': 1, 'location.city': 1, kind: 1 });
   schema.index({ title: 'text', summary: 'text', description: 'text' });
 
   app.db.model('CivicRecord', schema);

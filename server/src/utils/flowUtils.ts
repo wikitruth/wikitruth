@@ -2435,6 +2435,8 @@ function getDbModelByObjectType(type?: number) {
       return db.Issue;
     case constants.OBJECT_TYPES.opinion:
       return db.Opinion;
+    case constants.OBJECT_TYPES.civicRecord:
+      return db.CivicRecord;
   }
   return null;
 }

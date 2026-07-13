@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from 'express';
 import type { Session, SessionData } from 'express-session';
 import type { AuthUser } from './auth';
 import type { ApiErrorCode } from './errors';
+import type { CivicTenantDefinition } from './civicTenancy';
 
 export interface WikitruthSessionData extends SessionData {
   returnUrl?: string;
@@ -16,6 +17,7 @@ export interface WikitruthRequest extends Request {
   user?: AuthUser;
   session: WikitruthSession;
   requestId?: string;
+  civicTenant?: CivicTenantDefinition;
   clientTelemetry?: {
     platform: string | null;
     version: string | null;

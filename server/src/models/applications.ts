@@ -1,6 +1,8 @@
 'use strict';
 
 import type { ApplicationDefinition } from '../types/domain';
+import { FIXPH_TENANT, builtInCivicTenantForHost } from '../config/civicTenants';
+import type { CivicTenantDefinition } from '../types/civicTenancy';
 
 /*var wikitruthDomains = [
     'wikitruth.co',
@@ -12,82 +14,30 @@ import type { ApplicationDefinition } from '../types/domain';
     'www.wikitruthproject.org'
 ];*/
 
-const APPLICATIONS: ApplicationDefinition[] = [
-  {
-    id: 'fixtheph',
-    title: 'Fix The Philippines',
-    navTitle: 'fixtheph',
-    slogan:
-      'Fix the Philippines, help citizens identify, raise and fix issues in their society and the government',
-    logoIcon: '/img/fixtheph/logo-64x64.png',
-    homeUrl: 'https://fixthephilippines.org',
-    aboutUrl: '/topic/fixthephilippines-org',
-    exploreUrl: '/topic/republic-of-the-philippines',
-    exploreTopicId: '57aa74e0b663fb1072c7766d',
-    domains: [
-      'fixthephilippines.org',
-      /*'localhost',*/
-      'www.fixthephilippines.org',
-    ],
-    googleAnalyticsTrackingId: 'UA-66543450-2',
-    jumbotron: {
-      title: "Let's Fix The Philippines",
-      description:
-        'A system to promote transparency and accountability, help citizens identify, raise and fix issues in the Philippine society and government.',
-    },
-    sections: [
-      {
-        title: 'People',
-        iconClass: 'fa fa-user',
-        url: '/civic/people',
-        description:
-          'Government officials, politicians, media personnel, businessmen, influential leaders and every key people that shape the society.',
-      },
-      {
-        title: 'Incidents',
-        iconClass: 'fa fa-bolt',
-        url: '/civic/incidents',
-        description:
-          'Natural calamities, disasters, accidents, rallies, good cause, immoral and malicious acts that impact the society and people.',
-      },
-      {
-        title: 'Projects',
-        iconClass: 'fa fa-truck',
-        url: '/civic/projects',
-        description:
-          'Major projects done by the government or private organizations as long as it impacts the people negatively or positively.',
-      },
-      {
-        title: 'Organizations',
-        iconClass: 'fa fa-bank',
-        url: '/civic/organizations',
-        description:
-          'The Government of the Philippines, public or private businesses, charities, nonprofit, religions, or any movement or group that impact us.',
-      },
-      {
-        title: 'Actions',
-        iconClass: 'fa fa-hand-paper-o',
-        url: '/civic/actions',
-        description:
-          'Track commitments, public responses, citizen initiatives, and concrete actions connected to unresolved civic issues.',
-      },
-      {
-        title: 'Vote Wisely',
-        iconClass: 'fa fa-check-square-o',
-        url: '/civic/elections',
-        description:
-          'Get factual information about the running candidates, their public service history, and any information that would help you vote wisely.',
-      },
-      {
-        title: 'History',
-        iconClass: 'fa fa-history',
-        url: '/civic/history',
-        description:
-          'Preserve what happened, who was responsible, what followed, and whether promised outcomes were delivered.',
-      },
-    ],
-  },
-];
+function applicationFromCivicTenant(tenant: CivicTenantDefinition): ApplicationDefinition {
+  return {
+    id: tenant.tenantId,
+    title: tenant.title,
+    name: tenant.title,
+    navTitle: tenant.navTitle,
+    slogan: tenant.slogan,
+    logoIcon: tenant.branding.logoIcon,
+    homeUrl: tenant.domains[0] ? `https://${tenant.domains[0]}` : '/civic',
+    aboutUrl: '/civic',
+    exploreUrl: '/civic',
+    domains: tenant.domains,
+    civicTenant: tenant,
+    jumbotron: { title: tenant.title, description: tenant.slogan },
+    sections: tenant.sections.filter((section) => section.enabled).map((section) => ({
+      title: section.title,
+      iconClass: `fa fa-${section.icon}`,
+      url: `/civic/${section.slug}`,
+      description: section.description,
+    })),
+  };
+}
+
+const APPLICATIONS: ApplicationDefinition[] = [applicationFromCivicTenant(FIXPH_TENANT)];
 
 function getApplications() {
   return APPLICATIONS;
@@ -107,7 +57,24 @@ function getApplication(req: { hostname?: string }): ApplicationDefinition | nul
   return application;
 }
 
+async function getApplicationAsync(req: {
+  hostname?: string;
+  get?: (name: string) => string | undefined;
+  app?: { db?: { models?: Record<string, any> } };
+}): Promise<ApplicationDefinition | null> {
+  const hostname = (String(req.get?.('x-forwarded-host') || req.hostname || '').split(':')[0] || '').toLowerCase();
+  const builtIn = builtInCivicTenantForHost(hostname);
+  if (builtIn) return applicationFromCivicTenant(builtIn);
+  const CivicTenant = req.app?.db?.models?.CivicTenant;
+  const tenant = CivicTenant?.findOne
+    ? await CivicTenant.findOne({ status: 'active', domains: hostname }).lean()
+    : null;
+  return tenant ? applicationFromCivicTenant(tenant as CivicTenantDefinition) : null;
+}
+
 export = {
   getApplications,
   getApplication,
+  getApplicationAsync,
+  applicationFromCivicTenant,
 };

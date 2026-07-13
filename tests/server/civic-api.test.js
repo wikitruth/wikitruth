@@ -9,6 +9,8 @@ const findById = jest.fn();
 const findOne = jest.fn();
 const create = jest.fn();
 const logEntryEvent = jest.fn();
+const recordEntryRevision = jest.fn();
+const notifySubscribers = jest.fn();
 
 jest.mock('../../server/src/app', () => ({
   db: {
@@ -28,6 +30,14 @@ jest.mock('../../server/src/services/entryEventsService', () => ({
   logEntryEvent: (...args) => logEntryEvent(...args),
 }));
 
+jest.mock('../../server/src/controllers/api/revisionWriteRecorder', () => ({
+  recordEntryRevision: (...args) => recordEntryRevision(...args),
+}));
+
+jest.mock('../../server/src/services/notificationsService', () => ({
+  notifySubscribers: (...args) => notifySubscribers(...args),
+}));
+
 function queryResult(value) {
   const chain = {
     sort: jest.fn(() => chain),
@@ -44,6 +54,13 @@ function createApp(user) {
   app.use((req, _res, next) => {
     req.user = user;
     req.session = { preferences: {} };
+    req.civicTenant = {
+      tenantId: 'fixtheph',
+      countryCode: 'PH',
+      title: 'Fix The Philippines',
+      localization: { currency: 'PHP' },
+      geography: { levels: [] },
+    };
     next();
   });
   const router = express.Router();
@@ -59,6 +76,8 @@ describe('FixPH civic API', () => {
     find.mockReturnValue(queryResult([]));
     findOne.mockReturnValue(queryResult(null));
     logEntryEvent.mockResolvedValue(undefined);
+    recordEntryRevision.mockResolvedValue(undefined);
+    notifySubscribers.mockResolvedValue(0);
   });
 
   it('provides public civic overview counts and queues', async () => {
@@ -90,6 +109,7 @@ describe('FixPH civic API', () => {
       title: 'Barangay health center upgrade',
       status: 'pending',
       stage: 'reported',
+      tenantId: 'fixtheph',
     };
     create.mockResolvedValue(record);
     const user = {
@@ -112,12 +132,18 @@ describe('FixPH civic API', () => {
     expect(response.body.record).toEqual(record);
     expect(create).toHaveBeenCalledWith(expect.objectContaining({
       kind: 'project',
+      tenantId: 'fixtheph',
+      countryCode: 'PH',
       status: 'pending',
       stage: 'reported',
       friendlyUrl: 'barangay-health-center-upgrade',
       history: [expect.objectContaining({ action: 'created', toStatus: 'pending' })],
     }));
     expect(logEntryEvent).toHaveBeenCalledWith(expect.objectContaining({ eventType: 'civic.record.created' }));
+    expect(recordEntryRevision).toHaveBeenCalledWith(expect.objectContaining({
+      objectType: 40,
+      source: 'create',
+    }));
   });
 
   it('records reviewer lifecycle decisions with privileged audit evidence', async () => {
@@ -130,7 +156,7 @@ describe('FixPH civic API', () => {
       history,
       save: jest.fn().mockResolvedValue(undefined),
     };
-    findById.mockResolvedValue(record);
+    findOne.mockResolvedValue(record);
     const reviewer = {
       _id: '66f000000000000000000011',
       username: 'reviewer',
@@ -153,6 +179,9 @@ describe('FixPH civic API', () => {
       scope: 'privileged',
       eventType: 'civic.record.transitioned',
     }));
+    expect(notifySubscribers).toHaveBeenCalledWith(expect.objectContaining({
+      target: expect.objectContaining({ objectType: 40 }),
+    }));
   });
 
   it('rejects lifecycle changes without a reasoned decision', async () => {
@@ -161,6 +190,6 @@ describe('FixPH civic API', () => {
       .post('/api/civic/records/66f000000000000000000001/transition')
       .send({ status: 'verified', reason: 'too short' })
       .expect(400);
-    expect(findById).not.toHaveBeenCalled();
+    expect(findOne).not.toHaveBeenCalled();
   });
 });

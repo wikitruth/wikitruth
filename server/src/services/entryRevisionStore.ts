@@ -70,6 +70,7 @@ const MODEL_NAMES: Record<number, string> = {
   [constants.OBJECT_TYPES.issue]: 'Issue',
   [constants.OBJECT_TYPES.opinion]: 'Opinion',
   [constants.OBJECT_TYPES.artifact]: 'Artifact',
+  [constants.OBJECT_TYPES.civicRecord]: 'CivicRecord',
 };
 
 export const EDITABLE_FIELDS = new Set([
@@ -85,6 +86,17 @@ export const EDITABLE_FIELDS = new Set([
   'ethicalStatus',
   'artifactType',
   'provenance',
+  'summary',
+  'description',
+  'severity',
+  'jurisdictionId',
+  'location',
+  'responsibility',
+  'project',
+  'observation',
+  'election',
+  'outcome',
+  'relatedRecordIds',
 ]);
 
 export function modelFor(objectType: number): ModelContract {

@@ -6,6 +6,8 @@ import { z } from 'zod';
 
 import appModForDb from '../../app';
 import { logEntryEvent } from '../../services/entryEventsService';
+import { ensureCivicTenantRole } from '../../services/civicAuthorizationService';
+import { publicCivicTenant } from '../../services/civicTenantService';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 import {
   CIVIC_RECORD_KINDS,
@@ -19,9 +21,19 @@ import {
   type CivicSeverity,
 } from '../../types/civic';
 import * as utils from '../../utils/utils';
+import constants from '../../models/constants';
+import { recordEntryRevision } from './revisionWriteRecorder';
+import { notifySubscribers } from '../../services/notificationsService';
+import { listCivicEntryLinks } from '../../services/civicEntryLinkService';
+import { civicTenantRoles } from '../../services/civicAuthorizationService';
+import { registerCivicEntryLinkRoutes } from './civicEntryLinks';
+import { registerCivicAdministrationRoutes } from './civicAdministration';
 
 interface CivicRecordShape {
   _id: mongoose.Types.ObjectId;
+  tenantId: string;
+  countryCode: string;
+  jurisdictionId?: mongoose.Types.ObjectId | null;
   kind: CivicRecordKind;
   title: string;
   friendlyUrl: string;
@@ -40,7 +52,7 @@ interface CivicRecordShape {
 }
 
 const db = (appModForDb as unknown as {
-  db: { models: { CivicRecord: mongoose.Model<CivicRecordShape> } };
+  db: { models: Record<string, any> & { CivicRecord: mongoose.Model<CivicRecordShape> } };
 }).db.models;
 
 const optionalDate = z.union([z.string().trim().min(1), z.date(), z.null()]).optional();
@@ -56,6 +68,7 @@ const civicRecordInput = z.object({
   summary: z.string().trim().max(500).optional().default(''),
   description: z.string().trim().max(30000).optional().default(''),
   severity: z.enum(CIVIC_SEVERITIES).optional().default('info'),
+  jurisdictionId: optionalId,
   parentId: optionalId,
   relatedRecordIds: optionalIdArray,
   artifactIds: optionalIdArray,
@@ -147,22 +160,6 @@ function canEdit(req: WikitruthRequest, record: Record<string, unknown>): boolea
   return Boolean(req.user) && (canPlayRole(req, 'admin') || String(record.createUserId || '') === actorId(req));
 }
 
-function ensureContributor(req: WikitruthRequest, res: WikitruthResponse): boolean {
-  if (req.user && (canPlayRole(req, 'contributor') || canPlayRole(req, 'admin'))) {
-    return true;
-  }
-  res.status(req.user ? 403 : 401).json({ message: req.user ? 'Contributor privileges required' : 'Authentication required' });
-  return false;
-}
-
-function ensureReviewer(req: WikitruthRequest, res: WikitruthResponse): boolean {
-  if (req.user && (canPlayRole(req, 'reviewer') || canPlayRole(req, 'admin'))) {
-    return true;
-  }
-  res.status(req.user ? 403 : 401).json({ message: req.user ? 'Reviewer or admin privileges required' : 'Authentication required' });
-  return false;
-}
-
 function validationError(res: WikitruthResponse, error: z.ZodError): void {
   res.status(400).json({
     message: 'Invalid civic record data',
@@ -170,11 +167,23 @@ function validationError(res: WikitruthResponse, error: z.ZodError): void {
   });
 }
 
-async function validateParent(kind: CivicRecordKind, parentId?: string): Promise<{ ok: true } | { ok: false; message: string }> {
+function tenantId(req: WikitruthRequest): string {
+  const resolved = String(req.civicTenant?.tenantId || '').trim().toLowerCase();
+  if (!resolved) throw new Error('Civic tenant context is unavailable');
+  return resolved;
+}
+
+async function validateJurisdiction(req: WikitruthRequest, jurisdictionId?: string): Promise<{ ok: true } | { ok: false; message: string }> {
+  if (!jurisdictionId) return { ok: true };
+  const jurisdiction = await db.Jurisdiction.findOne({ _id: jurisdictionId, tenantId: tenantId(req), active: true }).lean();
+  return jurisdiction ? { ok: true } : { ok: false, message: 'Jurisdiction was not found in this tenant' };
+}
+
+async function validateParent(req: WikitruthRequest, kind: CivicRecordKind, parentId?: string): Promise<{ ok: true } | { ok: false; message: string }> {
   if (!parentId) {
     return { ok: true };
   }
-  const parent = await db.CivicRecord.findById(parentId).select('kind').lean();
+  const parent = await db.CivicRecord.findOne({ _id: parentId, tenantId: tenantId(req) }).select('kind').lean();
   if (!parent) {
     return { ok: false, message: 'Parent civic record was not found' };
   }
@@ -186,13 +195,14 @@ async function validateParent(kind: CivicRecordKind, parentId?: string): Promise
 }
 
 function publicQuery(req: WikitruthRequest): Record<string, unknown> {
+  const scope = { tenantId: tenantId(req) };
   if (canPlayRole(req, 'admin')) {
-    return {};
+    return scope;
   }
   if (req.user) {
-    return { $or: [{ private: false }, { createUserId: req.user._id }] };
+    return { ...scope, $or: [{ private: false }, { createUserId: req.user._id }] };
   }
-  return { private: false };
+  return { ...scope, private: false };
 }
 
 async function getOverview(req: WikitruthRequest, res: WikitruthResponse): Promise<void> {
@@ -216,6 +226,18 @@ async function getOverview(req: WikitruthRequest, res: WikitruthResponse): Promi
   res.json({ counts, recent, urgent, kinds: CIVIC_RECORD_KINDS, statuses: CIVIC_RECORD_STATUSES, stages: CIVIC_RECORD_STAGES });
 }
 
+async function getTenantMetadata(req: WikitruthRequest, res: WikitruthResponse): Promise<void> {
+  res.json({ tenant: publicCivicTenant(req.civicTenant!) });
+}
+
+async function listJurisdictions(req: WikitruthRequest, res: WikitruthResponse): Promise<void> {
+  const query: Record<string, unknown> = { tenantId: tenantId(req), active: true };
+  if (mongoose.isValidObjectId(String(req.query.parentId || ''))) query.parentId = req.query.parentId;
+  if (req.query.levelKey) query.levelKey = String(req.query.levelKey).trim();
+  const jurisdictions = await db.Jurisdiction.find(query).sort({ levelKey: 1, name: 1 }).limit(500).lean();
+  res.json({ jurisdictions, count: jurisdictions.length });
+}
+
 async function listRecords(req: WikitruthRequest, res: WikitruthResponse): Promise<void> {
   const query: Record<string, unknown> = publicQuery(req);
   const kinds = String(req.query.kind || '').split(',').map((value) => value.trim()).filter(
@@ -227,6 +249,7 @@ async function listRecords(req: WikitruthRequest, res: WikitruthResponse): Promi
   if (CIVIC_RECORD_STAGES.includes(req.query.stage as never)) query.stage = req.query.stage;
   if (CIVIC_SEVERITIES.includes(req.query.severity as never)) query.severity = req.query.severity;
   if (mongoose.isValidObjectId(String(req.query.parentId || ''))) query.parentId = req.query.parentId;
+  if (mongoose.isValidObjectId(String(req.query.jurisdictionId || ''))) query.jurisdictionId = req.query.jurisdictionId;
   if (req.query.region) query['location.region'] = String(req.query.region).trim();
   if (req.query.city) query['location.city'] = String(req.query.city).trim();
   const search = String(req.query.q || '').trim();
@@ -246,37 +269,56 @@ async function getRecord(req: WikitruthRequest, res: WikitruthResponse): Promise
     res.status(400).json({ message: 'Invalid civic record id' });
     return;
   }
-  const record = await db.CivicRecord.findById(req.params.id).lean();
+  const record = await db.CivicRecord.findOne({ _id: req.params.id, tenantId: tenantId(req) }).lean();
   if (!record || !canViewPrivate(req, record)) {
     res.status(404).json({ message: 'Civic record not found' });
     return;
   }
   const visibility = publicQuery(req);
-  const [parent, children, related] = await Promise.all([
+  const roles = await civicTenantRoles(req, tenantId(req));
+  const [parent, children, related, links] = await Promise.all([
     record.parentId ? db.CivicRecord.findOne({ ...visibility, _id: record.parentId }).lean() : null,
     db.CivicRecord.find({ ...visibility, parentId: record._id }).sort({ kind: 1, title: 1 }).limit(100).lean(),
     record.relatedRecordIds?.length
       ? db.CivicRecord.find({ ...visibility, _id: { $in: record.relatedRecordIds } }).sort({ title: 1 }).lean()
       : [],
+    listCivicEntryLinks({ tenantId: tenantId(req), record, userId: actorId(req), isAdmin: roles.has('admin') }),
   ]);
-  res.json({ record, parent, children, related });
+  res.json({ record, parent, children, related, links });
 }
 
 async function createRecord(req: WikitruthRequest, res: WikitruthResponse): Promise<void> {
-  if (!ensureContributor(req, res)) return;
+  if (!await ensureCivicTenantRole(req, res, ['contributor', 'admin'])) return;
   const parsed = civicRecordInput.safeParse(req.body || {});
   if (!parsed.success) {
     validationError(res, parsed.error);
     return;
   }
-  const parentValidation = await validateParent(parsed.data.kind, parsed.data.parentId);
+  const parentValidation = await validateParent(req, parsed.data.kind, parsed.data.parentId);
   if (!parentValidation.ok) {
     res.status(400).json({ message: parentValidation.message });
     return;
   }
+  const jurisdictionValidation = await validateJurisdiction(req, parsed.data.jurisdictionId);
+  if (!jurisdictionValidation.ok) {
+    res.status(400).json({ message: jurisdictionValidation.message });
+    return;
+  }
   const now = new Date();
+  const tenant = req.civicTenant!;
+  const project = parsed.data.project
+    ? { ...parsed.data.project, currency: parsed.data.project.currency || tenant.localization.currency }
+    : undefined;
+  const location = parsed.data.location
+    ? { ...parsed.data.location, countryCode: parsed.data.location.countryCode || tenant.countryCode }
+    : { countryCode: tenant.countryCode };
   const record = await db.CivicRecord.create({
     ...parsed.data,
+    tenantId: tenant.tenantId,
+    countryCode: tenant.countryCode,
+    jurisdictionId: parsed.data.jurisdictionId || null,
+    project,
+    location,
     parentId: parsed.data.parentId || null,
     friendlyUrl: utils.urlify(parsed.data.title),
     status: 'pending',
@@ -295,22 +337,29 @@ async function createRecord(req: WikitruthRequest, res: WikitruthResponse): Prom
       toStage: 'reported',
     }],
   });
+  await recordEntryRevision({
+    req,
+    objectType: constants.OBJECT_TYPES.civicRecord,
+    entry: record,
+    source: 'create',
+    summary: `${parsed.data.kind} civic record created`,
+  });
   await logEntryEvent({
     eventType: 'civic.record.created',
-    objectType: 0,
+    objectType: constants.OBJECT_TYPES.civicRecord,
     objectName: 'civicRecord',
     objectId: String(record._id),
     actorUserId: actorId(req),
     actorUsername: String(req.user?.username || ''),
     message: `${parsed.data.kind} civic record submitted`,
-    payload: { kind: parsed.data.kind, title: parsed.data.title, parentId: parsed.data.parentId || null },
+    payload: { tenantId: tenant.tenantId, kind: parsed.data.kind, title: parsed.data.title, parentId: parsed.data.parentId || null },
   });
   res.status(201).json({ record });
 }
 
 async function updateRecord(req: WikitruthRequest, res: WikitruthResponse): Promise<void> {
-  if (!ensureContributor(req, res)) return;
-  const record = await db.CivicRecord.findById(req.params.id);
+  if (!await ensureCivicTenantRole(req, res, ['contributor', 'admin'])) return;
+  const record = await db.CivicRecord.findOne({ _id: req.params.id, tenantId: tenantId(req) });
   if (!record || !canViewPrivate(req, record.toObject())) {
     res.status(404).json({ message: 'Civic record not found' });
     return;
@@ -325,13 +374,24 @@ async function updateRecord(req: WikitruthRequest, res: WikitruthResponse): Prom
     return;
   }
   const parentId = parsed.data.parentId ?? (record.parentId ? String(record.parentId) : undefined);
-  const parentValidation = await validateParent(record.kind, parentId);
+  const parentValidation = await validateParent(req, record.kind, parentId);
   if (!parentValidation.ok) {
     res.status(400).json({ message: parentValidation.message });
     return;
   }
+  const jurisdictionId = parsed.data.jurisdictionId ?? (record.jurisdictionId ? String(record.jurisdictionId) : undefined);
+  const jurisdictionValidation = await validateJurisdiction(req, jurisdictionId);
+  if (!jurisdictionValidation.ok) {
+    res.status(400).json({ message: jurisdictionValidation.message });
+    return;
+  }
+  const project = parsed.data.project
+    ? { ...parsed.data.project, currency: parsed.data.project.currency || req.civicTenant!.localization.currency }
+    : undefined;
   Object.assign(record, parsed.data, {
     parentId: parentId || null,
+    jurisdictionId: jurisdictionId || null,
+    ...(project ? { project } : {}),
     friendlyUrl: parsed.data.title ? utils.urlify(parsed.data.title) : record.friendlyUrl,
     editUserId: req.user?._id,
     editDate: new Date(),
@@ -344,17 +404,24 @@ async function updateRecord(req: WikitruthRequest, res: WikitruthResponse): Prom
     actorUsername: req.user?.username || '',
   });
   await record.save();
+  await recordEntryRevision({
+    req,
+    objectType: constants.OBJECT_TYPES.civicRecord,
+    entry: record,
+    source: 'update',
+    summary: 'Civic record details updated',
+  });
   res.json({ record });
 }
 
 async function transitionRecord(req: WikitruthRequest, res: WikitruthResponse): Promise<void> {
-  if (!ensureReviewer(req, res)) return;
+  if (!await ensureCivicTenantRole(req, res, ['reviewer', 'admin'])) return;
   const parsed = civicTransitionInput.safeParse(req.body || {});
   if (!parsed.success) {
     validationError(res, parsed.error);
     return;
   }
-  const record = await db.CivicRecord.findById(req.params.id);
+  const record = await db.CivicRecord.findOne({ _id: req.params.id, tenantId: tenantId(req) });
   if (!record) {
     res.status(404).json({ message: 'Civic record not found' });
     return;
@@ -379,16 +446,24 @@ async function transitionRecord(req: WikitruthRequest, res: WikitruthResponse): 
     toStage: record.stage,
   });
   await record.save();
+  await recordEntryRevision({
+    req,
+    objectType: constants.OBJECT_TYPES.civicRecord,
+    entry: record,
+    source: 'update',
+    summary: 'Civic lifecycle decision recorded',
+  });
   await logEntryEvent({
     scope: 'privileged',
     eventType: 'civic.record.transitioned',
-    objectType: 0,
+    objectType: constants.OBJECT_TYPES.civicRecord,
     objectName: 'civicRecord',
     objectId: String(record._id),
     actorUserId: actorId(req),
     actorUsername: String(req.user?.username || ''),
     message: 'Civic lifecycle decision recorded',
     payload: {
+      tenantId: tenantId(req),
       kind: record.kind,
       fromStatus: previousStatus,
       toStatus: record.status,
@@ -396,6 +471,20 @@ async function transitionRecord(req: WikitruthRequest, res: WikitruthResponse): 
       toStage: record.stage,
       reason: parsed.data.reason,
     },
+  });
+  await notifySubscribers({
+    target: {
+      objectType: constants.OBJECT_TYPES.civicRecord,
+      objectName: 'civicRecord',
+      objectId: String(record._id),
+    },
+    type: 'civic_transition',
+    title: 'Civic record updated',
+    body: `${record.title} is now ${record.status} / ${record.stage}.`,
+    link: `/civic/records/${record._id}`,
+    trigger: 'screening',
+    excludeUserIds: [actorId(req)],
+    payload: { tenantId: tenantId(req), status: record.status, stage: record.stage },
   });
   res.json({ record });
 }
@@ -417,6 +506,8 @@ async function compareCandidates(req: WikitruthRequest, res: WikitruthResponse):
 }
 
 export = function attachCivic(router: Router) {
+  router.get('/tenant', getTenantMetadata);
+  router.get('/jurisdictions', listJurisdictions);
   router.get('/overview', getOverview);
   router.get('/records', listRecords);
   router.get('/records/:id', getRecord);
@@ -424,4 +515,6 @@ export = function attachCivic(router: Router) {
   router.put('/records/:id', updateRecord);
   router.post('/records/:id/transition', transitionRecord);
   router.get('/candidates/compare', compareCandidates);
+  registerCivicEntryLinkRoutes(router);
+  registerCivicAdministrationRoutes(router);
 };

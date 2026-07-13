@@ -35,6 +35,7 @@ import attachCivic from './civic';
 import { registerEntryRedirectMiddleware } from './entryRedirectMiddleware';
 import constants from '../../models/constants';
 import { requireContributorOnboarding } from '../../middlewares/onboarding';
+import { civicTenantContext } from '../../middlewares/civicTenantContext';
 
 export = function (router: Router) {
   router.use(apiError.apiEnvelopeMiddleware);
@@ -66,6 +67,7 @@ export = function (router: Router) {
   const pagesRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const anonymousContributionsRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const civicRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
+  const explicitCivicRouter = apiError.wrapAsyncRouter(express.Router({ mergeParams: true })) as Router;
 
   [topicsRouter, argumentsRouter, questionsRouter, answersRouter, issuesRouter, opinionsRouter, artifactsRouter]
     .forEach((entryRouter) => entryRouter.use(requireContributorOnboarding));
@@ -101,8 +103,11 @@ export = function (router: Router) {
   attachInstall(installRouter);
   attachPages(pagesRouter);
   attachAnonymousContributions(anonymousContributionsRouter);
-  civicRouter.use(requireContributorOnboarding);
-  attachCivic(civicRouter);
+  [civicRouter, explicitCivicRouter].forEach((tenantRouter) => {
+    tenantRouter.use(civicTenantContext);
+    tenantRouter.use(requireContributorOnboarding);
+    attachCivic(tenantRouter);
+  });
 
   router.use('/home', homeRouter);
   router.use('/topics', topicsRouter);
@@ -129,4 +134,5 @@ export = function (router: Router) {
   router.use('/pages', pagesRouter);
   router.use('/anonymous-contributions', anonymousContributionsRouter);
   router.use('/civic', civicRouter);
+  router.use('/tenants/:tenantId/civic', explicitCivicRouter);
 };

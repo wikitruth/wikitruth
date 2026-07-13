@@ -30,6 +30,7 @@ export interface CoreModelsRegistry {
   Issue: ModelLike<EntryBase>;
   Opinion: ModelLike<EntryBase>;
   Artifact: ModelLike<EntryBase>;
+  CivicRecord?: ModelLike<EntryBase>;
   Group?: ModelLike<EntryBase>;
   User?: ModelLike<EntryBase>;
   [key: string]: ModelLike<EntryBase> | undefined;
@@ -52,4 +53,5 @@ export interface AppContext {
 export interface ApplicationsModule {
   getApplications(): ApplicationDefinition[];
   getApplication(req: { hostname?: string }): ApplicationDefinition | null;
+  getApplicationAsync?(req: { hostname?: string; get?: (name: string) => string | undefined }): Promise<ApplicationDefinition | null>;
 }

@@ -10,6 +10,7 @@ export interface CoreModelRegistry {
   Issue: Model<IBaseDocument>;
   Opinion: Model<IBaseDocument>;
   Artifact: Model<IBaseDocument>;
+  CivicRecord: Model<IBaseDocument>;
 }
 
 export function getCoreModels(app: AppContext): CoreModelRegistry {

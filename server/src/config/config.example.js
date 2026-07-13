@@ -28,6 +28,11 @@ exports.mongodb = {
       'questions',
       'status',
       'topics',
+      'civictenants',
+      'jurisdictions',
+      'tenantmemberships',
+      'civicrecords',
+      'civicentrylinks',
       'words'
     ],
     modelMapping: {
@@ -45,6 +50,11 @@ exports.mongodb = {
       sessions: 'Session',
       status: 'Status',
       topics: 'Topic',
+      civictenants: 'CivicTenant',
+      jurisdictions: 'Jurisdiction',
+      tenantmemberships: 'TenantMembership',
+      civicrecords: 'CivicRecord',
+      civicentrylinks: 'CivicEntryLink',
       users: 'User',
       words: 'Word'
     }

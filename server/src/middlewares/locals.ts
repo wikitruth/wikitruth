@@ -48,7 +48,9 @@ export default function configureLocals(app: AppContext & { use: (...args: unkno
       setApplication: async function () {
         // set the application
         const model: { categories?: unknown[] } = {};
-        let application = applications.getApplication(req);
+        let application = applications.getApplicationAsync
+          ? await applications.getApplicationAsync(req)
+          : applications.getApplication(req);
         res.locals.application = application;
         if (application) {
           // a sub-application. set cache to req-level
