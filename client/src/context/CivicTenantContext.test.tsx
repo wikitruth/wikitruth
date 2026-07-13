@@ -17,7 +17,7 @@ const tenant: CivicTenant = {
   localization: { defaultLocale: 'en-XZ', supportedLocales: ['en-XZ'], timezone: 'UTC', currency: 'XZD' },
   geography: { levels: [{ key: 'district', label: 'District' }], addressFields: ['district'] },
   sections: [{ slug: 'projects', title: 'Public Works', description: 'Track public works.', icon: 'building', kinds: ['project'], createKinds: ['project'], enabled: true }],
-  featureFlags: { knowledgeLinks: true }, moderationPolicyVersion: '1', electionSystem: '', deploymentMode: 'shared',
+  featureFlags: { knowledgeLinks: true }, extensionSchemas: {}, moderationPolicyVersion: '1', electionSystem: '', deploymentMode: 'shared',
 };
 
 const Consumer = () => {

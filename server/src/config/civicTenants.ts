@@ -47,6 +47,7 @@ export const FIXPH_TENANT: CivicTenantDefinition = {
     elections: true,
     knowledgeLinks: true,
   },
+  extensionSchemas: {},
   moderationPolicyVersion: '1',
   electionSystem: 'plurality-and-country-defined',
   deploymentMode: 'shared',

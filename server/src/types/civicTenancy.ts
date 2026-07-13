@@ -67,6 +67,7 @@ export interface CivicTenantDefinition {
   };
   sections: CivicTenantSection[];
   featureFlags: Record<string, boolean>;
+  extensionSchemas: Record<string, unknown>;
   moderationPolicyVersion: string;
   electionSystem: string;
   deploymentMode: CivicDeploymentMode;

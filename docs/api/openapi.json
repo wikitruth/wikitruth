@@ -6230,7 +6230,8 @@
           "branding",
           "localization",
           "geography",
-          "sections"
+          "sections",
+          "extensionSchemas"
         ],
         "properties": {
           "tenantId": {
@@ -6301,6 +6302,10 @@
               "dedicated",
               "headless"
             ]
+          },
+          "extensionSchemas": {
+            "type": "object",
+            "additionalProperties": true
           }
         }
       },

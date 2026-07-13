@@ -17,7 +17,7 @@ const tenant = {
   branding: { logoIcon: '', favicon: '', primaryColor: '#123456', accentColor: '#abcdef', surfaceColor: '#f0eadc', fontFamily: '' },
   localization: { defaultLocale: 'en-XZ', supportedLocales: ['en-XZ'], timezone: 'UTC', currency: 'XZD' },
   geography: { levels: [{ key: 'district', label: 'District' }], addressFields: ['district'] }, sections: [], featureFlags: {},
-  moderationPolicyVersion: '1', electionSystem: '', deploymentMode: 'shared',
+  extensionSchemas: {}, moderationPolicyVersion: '1', electionSystem: '', deploymentMode: 'shared',
 } as CivicTenant;
 
 describe('CivicTenantsPage', () => {

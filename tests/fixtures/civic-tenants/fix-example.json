@@ -43,6 +43,7 @@
     "projects": true,
     "knowledgeLinks": true
   },
+  "extensionSchemas": {},
   "moderationPolicyVersion": "1",
   "electionSystem": "fictional",
   "deploymentMode": "shared"
