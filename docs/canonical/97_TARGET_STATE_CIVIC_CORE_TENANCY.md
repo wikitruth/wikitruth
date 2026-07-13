@@ -38,6 +38,9 @@ Define the reusable civic-accountability platform contract that powers FixPH and
 
 ## Target State Status
 
-- Approved for implementation on 2026-07-13.
+- `implemented` and locally verified on 2026-07-13.
+- FixPH is the first persisted compatibility tenant; shared, dedicated, and headless profiles use the same models and APIs.
+- A fictional second tenant verified country, currency, geography, branding, navigation, isolation, and responsive rendering.
 - Detailed architecture: `docs/architecture/CIVIC_CORE_MULTI_TENANCY_ARCHITECTURE.md`.
-- Execution checklist: `docs/plans/CIVIC_CORE_MULTI_TENANCY_CHECKLIST_PLAN_2026-07-13.md`.
+- Completed checklist: `docs/plans/completed/CIVIC_CORE_MULTI_TENANCY_CHECKLIST_PLAN_2026-07-13.md`.
+- QA evidence: `docs/qa/CIVIC_CORE_MULTI_TENANCY_SIGNOFF_2026-07-13.md`.

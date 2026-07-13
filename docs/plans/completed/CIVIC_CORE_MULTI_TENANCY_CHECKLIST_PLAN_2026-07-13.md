@@ -63,10 +63,10 @@ Convert FixPH into the first tenant of a reusable, isolated Civic Core that reus
 
 ## 7. Verification and Closure
 
-- [ ] Add model, resolver, authorization, isolation, API, link-validation, migration, and OpenAPI tests.
-- [ ] Add client tenant-config, branding, navigation, jurisdiction, link, and compatibility tests.
-- [ ] Run full server and client suites, production builds, lint, modern/legacy type checks, and source guardrails.
-- [ ] Restart and verify only the local PM2 Wikitruth process.
-- [ ] Browser-test the FixPH tenant and fictional second tenant at desktop and mobile widths with no relevant console errors.
-- [ ] Record final QA evidence and reconcile canonical status.
-- [ ] Move this plan to `docs/plans/completed/` only after a separate verification pass succeeds with no pending or deferred plan items.
+- [x] Add model, resolver, authorization, isolation, API, link-validation, migration, and OpenAPI tests.
+- [x] Add client tenant-config, branding, navigation, jurisdiction, link, and compatibility tests.
+- [x] Run full server and client suites, production builds, lint, modern/legacy type checks, and source guardrails.
+- [x] Restart and verify only the local PM2 Wikitruth process.
+- [x] Browser-test the FixPH tenant and fictional second tenant at desktop and mobile widths with no relevant console errors.
+- [x] Record final QA evidence and reconcile canonical status.
+- [x] Move this plan to `docs/plans/completed/` only after a separate verification pass succeeds with no pending or deferred plan items.

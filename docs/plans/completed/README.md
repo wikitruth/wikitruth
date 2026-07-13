@@ -6,6 +6,7 @@ Historical planning and execution trackers that are fully completed.
 
 - `docs/plans/completed/CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-22.md`
 - `docs/plans/completed/CODE_HEALTH_SOURCE_FILE_CHECKLIST_PLAN_2026-04-22.md`
+- `docs/plans/completed/CIVIC_CORE_MULTI_TENANCY_CHECKLIST_PLAN_2026-07-13.md`
 - `docs/plans/completed/CORE_GAP_REMEDIATION_PLAN_2026-03-27.md`
 - `docs/plans/completed/LEGACY_MODERN_PARITY_IMPLEMENTATION_PLAN_2026-02-26.md`
 - `docs/plans/completed/LEGACY_COMPATIBILITY_ISOLATION_CHECKLIST_PLAN_2026-04-18.md`
