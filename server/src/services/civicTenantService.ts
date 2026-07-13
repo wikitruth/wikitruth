@@ -105,5 +105,26 @@ export async function bootstrapBuiltInCivicTenants(userId?: string): Promise<num
 }
 
 export function publicCivicTenant(tenant: CivicTenantDefinition): CivicTenantDefinition {
-  return JSON.parse(JSON.stringify(tenant)) as CivicTenantDefinition;
+  if (!tenant) {
+    throw new CivicTenantResolutionError('Civic tenant context is unavailable', 500);
+  }
+  const normalized = normalizeTenant(tenant as unknown as Record<string, any>);
+  return {
+    tenantId: normalized.tenantId,
+    status: normalized.status,
+    countryCode: normalized.countryCode,
+    title: normalized.title,
+    navTitle: normalized.navTitle,
+    slogan: normalized.slogan,
+    domains: normalized.domains,
+    branding: normalized.branding,
+    localization: normalized.localization,
+    geography: normalized.geography,
+    sections: normalized.sections,
+    featureFlags: normalized.featureFlags,
+    extensionSchemas: normalized.extensionSchemas,
+    moderationPolicyVersion: normalized.moderationPolicyVersion,
+    electionSystem: normalized.electionSystem,
+    deploymentMode: normalized.deploymentMode,
+  };
 }

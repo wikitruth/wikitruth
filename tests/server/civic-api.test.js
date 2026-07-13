@@ -58,13 +58,6 @@ function createApp(user) {
   app.use((req, _res, next) => {
     req.user = user;
     req.session = { preferences: {} };
-    req.civicTenant = {
-      tenantId: 'fixtheph',
-      countryCode: 'PH',
-      title: 'Fix The Philippines',
-      localization: { currency: 'PHP' },
-      geography: { levels: [] },
-    };
     next();
   });
   const router = express.Router();
@@ -97,6 +90,18 @@ describe('FixPH civic API', () => {
     expect(response.body.urgent).toHaveLength(1);
     expect(countDocuments).toHaveBeenCalledTimes(10);
     expect(countDocuments).toHaveBeenCalledWith(expect.objectContaining({ tenantId: 'fixtheph' }));
+  });
+
+  it('resolves and exposes the public tenant when mounted directly by Kraken', async () => {
+    const response = await request(createApp()).get('/api/civic/tenant').expect(200);
+
+    expect(response.body.tenant).toEqual(expect.objectContaining({
+      tenantId: 'fixtheph',
+      countryCode: 'PH',
+      title: 'Fix The Philippines',
+    }));
+    expect(response.body.tenant).not.toHaveProperty('createUserId');
+    expect(response.body.tenant).not.toHaveProperty('editUserId');
   });
 
   it('lets tenant administrators view the complete tenant record set', async () => {

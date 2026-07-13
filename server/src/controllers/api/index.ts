@@ -35,7 +35,6 @@ import attachCivic from './civic';
 import { registerEntryRedirectMiddleware } from './entryRedirectMiddleware';
 import constants from '../../models/constants';
 import { requireContributorOnboarding } from '../../middlewares/onboarding';
-import { civicTenantContext } from '../../middlewares/civicTenantContext';
 
 export = function (router: Router) {
   router.use(apiError.apiEnvelopeMiddleware);
@@ -103,11 +102,7 @@ export = function (router: Router) {
   attachInstall(installRouter);
   attachPages(pagesRouter);
   attachAnonymousContributions(anonymousContributionsRouter);
-  [civicRouter, explicitCivicRouter].forEach((tenantRouter) => {
-    tenantRouter.use(civicTenantContext);
-    tenantRouter.use(requireContributorOnboarding);
-    attachCivic(tenantRouter);
-  });
+  [civicRouter, explicitCivicRouter].forEach(attachCivic);
 
   router.use('/home', homeRouter);
   router.use('/topics', topicsRouter);

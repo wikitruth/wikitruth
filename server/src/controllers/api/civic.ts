@@ -5,6 +5,8 @@ import mongoose from 'mongoose';
 import type { ZodError } from 'zod';
 
 import appModForDb from '../../app';
+import { civicTenantContext } from '../../middlewares/civicTenantContext';
+import { requireContributorOnboarding } from '../../middlewares/onboarding';
 import { logEntryEvent } from '../../services/entryEventsService';
 import { civicTenantRoles, ensureCivicTenantRole } from '../../services/civicAuthorizationService';
 import { publicCivicTenant } from '../../services/civicTenantService';
@@ -434,6 +436,9 @@ async function compareCandidates(req: WikitruthRequest, res: WikitruthResponse):
 }
 
 export = function attachCivic(router: Router) {
+  // Kraken mounts controller files directly as well as through the aggregate API router.
+  router.use(civicTenantContext);
+  router.use(requireContributorOnboarding);
   router.get('/tenant', getTenantMetadata);
   router.get('/jurisdictions', listJurisdictions);
   router.get('/overview', getOverview);
