@@ -32,6 +32,7 @@ describe('CivicTenantsPage', () => {
     render(<CivicTenantsPage />, { route: '/admin/civic-tenants' });
     await user.click(await screen.findByRole('button', { name: /fix example/i }));
     expect(screen.getByLabelText(/tenant id/i)).toHaveValue('fix-example');
+    expect(screen.getByLabelText(/tenant id/i)).toHaveAttribute('pattern', '[a-z0-9][a-z0-9\\-]{1,62}');
     expect(screen.getByLabelText(/public title/i)).toHaveValue('Fix Example');
     expect(screen.getByRole('button', { name: /update tenant/i })).toBeInTheDocument();
   });

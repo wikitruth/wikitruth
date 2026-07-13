@@ -142,7 +142,8 @@ const AdminDashboard: React.FC = () => {
               <div className="panel-heading">Civic Tenants</div>
               <div className="panel-body">
                 <p className="text-muted" style={{ marginBottom: 10 }}>Configure branded country and jurisdiction instances.</p>
-                <Link to="/admin/civic-tenants" className="btn btn-success btn-xs">Manage Tenants</Link>
+                <Link to="/admin/civic-tenants" className="btn btn-success btn-xs">Manage Tenants</Link>{' '}
+                <Link to="/admin/civic-operations" className="btn btn-default btn-xs">Current Tenant</Link>
               </div>
             </div>
           </div>

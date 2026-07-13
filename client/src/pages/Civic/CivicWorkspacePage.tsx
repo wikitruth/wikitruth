@@ -60,7 +60,7 @@ function CivicRecordCard({ record, selectable, selected, onSelect, addressFields
 
 const CivicWorkspacePage: React.FC = () => {
   const { section: sectionSlug } = useParams<{ section?: string }>();
-  const { tenant, jurisdictions } = useCivicTenant();
+  const { tenant, jurisdictions, hasRole } = useCivicTenant();
   const sections = useMemo(() => civicSectionsForTenant(tenant), [tenant]);
   const section = getCivicSection(tenant, sectionSlug);
   const { isAuthenticated } = useAuth();
@@ -144,6 +144,7 @@ const CivicWorkspacePage: React.FC = () => {
             <i className={`fa fa-${item.icon}`} aria-hidden="true"></i> {item.title}
           </Link>
         ))}
+        {hasRole('admin') && <Link to="/admin/civic-operations"><i className="fa fa-cog" aria-hidden="true"></i> Manage tenant</Link>}
       </nav>
 
       {!section && overview?.urgent?.length ? (
@@ -181,7 +182,8 @@ const CivicWorkspacePage: React.FC = () => {
         </section>
       )}
 
-      {isAuthenticated && section && <CivicRecordForm tenant={tenant} jurisdictions={jurisdictions} kinds={section.createKinds} onCreated={(record) => setRecords((current) => [record, ...current])} />}
+      {section && hasRole('contributor', 'admin') && <CivicRecordForm tenant={tenant} jurisdictions={jurisdictions} kinds={section.createKinds} onCreated={(record) => setRecords((current) => [record, ...current])} />}
+      {isAuthenticated && section && !hasRole('contributor', 'admin') && <div className="wt-civic-signin"><strong>Read-only tenant access.</strong> Ask a tenant administrator for contributor access to submit records.</div>}
       {!isAuthenticated && section && <div className="wt-civic-signin"><strong>Have verifiable information?</strong> <Link to={`/login?returnUrl=${encodeURIComponent(`/civic/${section.slug}`)}`}>Sign in to submit it for screening.</Link></div>}
     </div>
   );

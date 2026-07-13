@@ -7,7 +7,7 @@ import { civicSectionsForTenant } from '../pages/Civic/civicSections';
 
 jest.mock('../services/api/civic', () => ({
   __esModule: true,
-  default: { tenant: jest.fn(), jurisdictions: jest.fn() },
+  default: { tenant: jest.fn(), jurisdictions: jest.fn(), actor: jest.fn() },
 }));
 
 const mockedApi = civicApi as jest.Mocked<typeof civicApi>;
@@ -22,7 +22,7 @@ const tenant: CivicTenant = {
 
 const Consumer = () => {
   const value = useCivicTenant();
-  return <div data-testid="tenant">{value.tenant.title}:{value.jurisdictions[0]?.name}</div>;
+  return <div data-testid="tenant">{value.tenant.title}:{value.jurisdictions[0]?.name}:{value.hasRole('contributor') ? 'contributor' : 'reader'}</div>;
 };
 
 describe('CivicTenantProvider', () => {
@@ -30,13 +30,15 @@ describe('CivicTenantProvider', () => {
     jest.clearAllMocks();
     mockedApi.tenant.mockResolvedValue({ tenant });
     mockedApi.jurisdictions.mockResolvedValue({ jurisdictions: [{ _id: 'j1', tenantId: 'fix-example', code: 'D1', countryCode: 'XZ', levelKey: 'district', name: 'North District', friendlyUrl: 'north-district' }], count: 1 });
+    mockedApi.actor.mockResolvedValue({ authenticated: true, tenantId: 'fix-example', userId: 'user-1', roles: ['contributor'] });
   });
 
   it('loads tenant and jurisdiction configuration in parallel and applies scoped branding', async () => {
     const { container } = render(<CivicTenantProvider><Consumer /></CivicTenantProvider>);
-    await waitFor(() => expect(screen.getByTestId('tenant')).toHaveTextContent('Fix Example:North District'));
+    await waitFor(() => expect(screen.getByTestId('tenant')).toHaveTextContent('Fix Example:North District:contributor'));
     expect(mockedApi.tenant).toHaveBeenCalledTimes(1);
     expect(mockedApi.jurisdictions).toHaveBeenCalledTimes(1);
+    expect(mockedApi.actor).toHaveBeenCalledTimes(1);
     expect(container.querySelector('.wt-civic-tenant')).toHaveStyle({ '--civic-primary': '#123456', '--civic-accent': '#abcdef' });
   });
 

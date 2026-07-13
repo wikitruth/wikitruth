@@ -61,6 +61,25 @@ describe('civicApi', () => {
     expect(fetchMock).toHaveBeenLastCalledWith('/api/civic/jurisdictions?levelKey=district', expect.objectContaining({ credentials: 'include' }));
   });
 
+  it('loads tenant-scoped actor roles instead of inferring global roles', async () => {
+    fetchMock.mockResolvedValue({ ok: true, json: async () => ({ authenticated: true, tenantId: 'fix-example', userId: 'user-1', roles: ['reviewer'] }) } as Response);
+    await civicApi.actor();
+    expect(fetchMock).toHaveBeenLastCalledWith('/api/civic/me', expect.objectContaining({ credentials: 'include' }));
+  });
+
+  it('manages tenant memberships and jurisdictions with CSRF protection', async () => {
+    document.cookie = '_csrfToken=admin-token; path=/';
+    fetchMock.mockResolvedValue({ ok: true, json: async () => ({ membership: { userId: 'user-1' } }) } as Response);
+    await civicApi.updateMembership('user-1', { roles: ['contributor'], active: true });
+    expect(fetchMock).toHaveBeenLastCalledWith('/api/civic/admin/memberships/user-1', expect.objectContaining({
+      method: 'PUT', headers: expect.objectContaining({ 'x-csrf-token': 'admin-token' }),
+    }));
+
+    fetchMock.mockResolvedValue({ ok: true, json: async () => ({ jurisdiction: { _id: 'j1' } }) } as Response);
+    await civicApi.createJurisdiction({ code: 'NCR', levelKey: 'region', name: 'National Capital Region' });
+    expect(fetchMock).toHaveBeenLastCalledWith('/api/civic/admin/jurisdictions', expect.objectContaining({ method: 'POST' }));
+  });
+
   it('creates a typed Wikitruth knowledge link with CSRF protection', async () => {
     document.cookie = '_csrfToken=link-token; path=/';
     fetchMock.mockResolvedValue({ ok: true, json: async () => ({ link: { _id: 'link-1' } }) } as Response);

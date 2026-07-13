@@ -14,6 +14,7 @@ export type CivicRecordStatus = 'draft' | 'pending' | 'active' | 'verified' | 'r
 export type CivicRecordStage = 'reported' | 'screening' | 'investigating' | 'action_planned' | 'in_progress' | 'resolved' | 'closed';
 export type CivicSeverity = 'info' | 'low' | 'medium' | 'high' | 'critical';
 export type CivicEntryRelationship = 'subject' | 'claim' | 'question' | 'answer' | 'evidence' | 'discussion' | 'review_issue';
+export type CivicTenantRole = 'reader' | 'contributor' | 'screener' | 'reviewer' | 'admin';
 
 export interface CivicTenantSection {
   slug: string;
@@ -68,6 +69,32 @@ export interface CivicJurisdiction {
   name: string;
   friendlyUrl: string;
   parentId?: string | null;
+  metadata?: Record<string, unknown>;
+  active?: boolean;
+}
+
+export interface CivicActorContext {
+  authenticated: boolean;
+  tenantId: string;
+  userId: string | null;
+  roles: CivicTenantRole[];
+}
+
+export interface CivicMembershipUser {
+  _id: string;
+  username: string;
+  email?: string;
+}
+
+export interface CivicTenantMembership {
+  _id: string;
+  tenantId: string;
+  userId: string;
+  roles: CivicTenantRole[];
+  active: boolean;
+  user?: CivicMembershipUser | null;
+  createDate?: string;
+  editDate?: string;
 }
 
 export interface CivicEntryLink {

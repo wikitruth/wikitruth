@@ -7,8 +7,12 @@ import type {
   CivicRecordStatus,
   CivicEntryLink,
   CivicEntryRelationship,
+  CivicActorContext,
   CivicJurisdiction,
+  CivicMembershipUser,
   CivicTenant,
+  CivicTenantMembership,
+  CivicTenantRole,
 } from '../../types/civic';
 
 const request = createApiClient();
@@ -25,6 +29,7 @@ type RecordResponse = {
 
 export const civicApi = {
   tenant: () => request<{ tenant: CivicTenant }>('/civic/tenant'),
+  actor: () => request<CivicActorContext>('/civic/me'),
   jurisdictions: (params: { parentId?: string; levelKey?: string } = {}) => {
     const search = new URLSearchParams();
     if (params.parentId) search.set('parentId', params.parentId);
@@ -77,6 +82,20 @@ export const civicApi = {
   }),
   updateTenant: (tenantId: string, payload: Partial<CivicTenant>) => request<{ tenant: CivicTenant }>(`/civic/platform/tenants/${encodeURIComponent(tenantId)}`, {
     method: 'PUT', body: JSON.stringify(payload),
+  }),
+  adminMemberships: () => request<{ memberships: CivicTenantMembership[] }>('/civic/admin/memberships'),
+  searchMembershipCandidates: (query: string) => request<{ users: CivicMembershipUser[] }>(`/civic/admin/membership-candidates?q=${encodeURIComponent(query)}`),
+  updateMembership: (userId: string, payload: { roles: CivicTenantRole[]; active: boolean }) => request<{ membership: CivicTenantMembership }>(`/civic/admin/memberships/${encodeURIComponent(userId)}`, {
+    method: 'PUT', body: JSON.stringify(payload),
+  }),
+  createJurisdiction: (payload: { code: string; levelKey: string; name: string; parentId?: string; metadata?: Record<string, unknown> }) => request<{ jurisdiction: CivicJurisdiction }>('/civic/admin/jurisdictions', {
+    method: 'POST', body: JSON.stringify(payload),
+  }),
+  updateJurisdiction: (id: string, payload: { code?: string; levelKey?: string; name?: string; parentId?: string; metadata?: Record<string, unknown> }) => request<{ jurisdiction: CivicJurisdiction }>(`/civic/admin/jurisdictions/${encodeURIComponent(id)}`, {
+    method: 'PUT', body: JSON.stringify(payload),
+  }),
+  deactivateJurisdiction: (id: string) => request<{ success: boolean; jurisdiction: CivicJurisdiction }>(`/civic/admin/jurisdictions/${encodeURIComponent(id)}`, {
+    method: 'DELETE',
   }),
 };
 

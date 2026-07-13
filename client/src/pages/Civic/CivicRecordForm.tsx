@@ -7,7 +7,10 @@ interface CivicRecordFormProps {
   parentId?: string;
   tenant: CivicTenant;
   jurisdictions: CivicJurisdiction[];
-  onCreated: (record: CivicRecord) => void;
+  record?: CivicRecord;
+  onCreated?: (record: CivicRecord) => void;
+  onUpdated?: (record: CivicRecord) => void;
+  onCancel?: () => void;
 }
 
 const KIND_LABELS: Record<CivicRecordKind, string> = {
@@ -23,20 +26,21 @@ const KIND_LABELS: Record<CivicRecordKind, string> = {
   history: 'Historical outcome',
 };
 
-const CivicRecordForm: React.FC<CivicRecordFormProps> = ({ kinds, parentId, tenant, jurisdictions, onCreated }) => {
-  const [kind, setKind] = useState<CivicRecordKind>(kinds[0]);
-  const [title, setTitle] = useState('');
-  const [summary, setSummary] = useState('');
-  const [description, setDescription] = useState('');
-  const [severity, setSeverity] = useState<CivicSeverity>('info');
-  const [region, setRegion] = useState('');
-  const [city, setCity] = useState('');
-  const [budget, setBudget] = useState('');
-  const [progress, setProgress] = useState('');
-  const [position, setPosition] = useState('');
-  const [electionDate, setElectionDate] = useState('');
-  const [sourceUrl, setSourceUrl] = useState('');
-  const [jurisdictionId, setJurisdictionId] = useState('');
+const CivicRecordForm: React.FC<CivicRecordFormProps> = ({ kinds, parentId, tenant, jurisdictions, record, onCreated, onUpdated, onCancel }) => {
+  const editing = Boolean(record);
+  const [kind, setKind] = useState<CivicRecordKind>(record?.kind || kinds[0]);
+  const [title, setTitle] = useState(record?.title || '');
+  const [summary, setSummary] = useState(record?.summary || '');
+  const [description, setDescription] = useState(record?.description || '');
+  const [severity, setSeverity] = useState<CivicSeverity>(record?.severity || 'info');
+  const [region, setRegion] = useState(record?.location?.region || '');
+  const [city, setCity] = useState(record?.location?.city || '');
+  const [budget, setBudget] = useState(record?.project?.budget == null ? '' : String(record.project.budget));
+  const [progress, setProgress] = useState(record?.project?.progressPercent == null ? '' : String(record.project.progressPercent));
+  const [position, setPosition] = useState(record?.election?.position || '');
+  const [electionDate, setElectionDate] = useState(record?.election?.electionDate ? String(record.election.electionDate).slice(0, 10) : '');
+  const [sourceUrl, setSourceUrl] = useState(record?.observation?.sourceUrl || '');
+  const [jurisdictionId, setJurisdictionId] = useState(record?.jurisdictionId || '');
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -50,9 +54,11 @@ const CivicRecordForm: React.FC<CivicRecordFormProps> = ({ kinds, parentId, tena
       summary,
       description,
       severity,
-      parentId,
-      jurisdictionId: jurisdictionId || undefined,
-      location: region || city ? { countryCode: tenant.countryCode, region, city } : { countryCode: tenant.countryCode },
+      parentId: record?.parentId || parentId,
+      jurisdictionId: editing ? jurisdictionId : jurisdictionId || undefined,
+      location: editing
+        ? { countryCode: tenant.countryCode, region, city }
+        : region || city ? { countryCode: tenant.countryCode, region, city } : { countryCode: tenant.countryCode },
       project: kind === 'project' ? {
         budget: budget ? Number(budget) : null,
         currency: tenant.localization.currency,
@@ -65,12 +71,20 @@ const CivicRecordForm: React.FC<CivicRecordFormProps> = ({ kinds, parentId, tena
       observation: kind === 'observation' ? { sourceUrl, escalationStatus: 'submitted' } : undefined,
     };
     try {
-      const response = await civicApi.create(payload);
-      onCreated(response.record);
-      setTitle('');
-      setSummary('');
-      setDescription('');
-      setMessage('Submitted for screening.');
+      if (record) {
+        const updatePayload: Partial<CivicRecordInput> = { ...payload };
+        delete updatePayload.kind;
+        const response = await civicApi.update(record._id, updatePayload);
+        onUpdated?.(response.record);
+        setMessage('Civic record details updated.');
+      } else {
+        const response = await civicApi.create(payload);
+        onCreated?.(response.record);
+        setTitle('');
+        setSummary('');
+        setDescription('');
+        setMessage('Submitted for screening.');
+      }
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Unable to submit this civic record.');
     } finally {
@@ -85,15 +99,15 @@ const CivicRecordForm: React.FC<CivicRecordFormProps> = ({ kinds, parentId, tena
     <form className="wt-civic-form" onSubmit={submit}>
       <div className="wt-civic-form-heading">
         <div>
-          <span className="wt-civic-kicker">Contribute a record</span>
-          <h3>Put a civic fact on the record</h3>
+          <span className="wt-civic-kicker">{editing ? 'Maintain the record' : 'Contribute a record'}</span>
+          <h3>{editing ? 'Edit civic record details' : 'Put a civic fact on the record'}</h3>
         </div>
         <span className="label label-warning">Screened before publication</span>
       </div>
       <div className="row">
         <div className="col-sm-4 form-group">
           <label htmlFor="civic-kind">Record type</label>
-          <select id="civic-kind" className="form-control" value={kind} onChange={(event) => setKind(event.target.value as CivicRecordKind)}>
+          <select id="civic-kind" className="form-control" disabled={editing} value={kind} onChange={(event) => setKind(event.target.value as CivicRecordKind)}>
             {kinds.map((value) => <option value={value} key={value}>{KIND_LABELS[value]}</option>)}
           </select>
         </div>
@@ -139,7 +153,8 @@ const CivicRecordForm: React.FC<CivicRecordFormProps> = ({ kinds, parentId, tena
         </div>
       )}
       {message && <p className="help-block" role="status">{message}</p>}
-      <button className="btn btn-primary" type="submit" disabled={submitting}>{submitting ? 'Submitting...' : 'Submit civic record'}</button>
+      <button className="btn btn-primary" type="submit" disabled={submitting}>{submitting ? 'Saving...' : editing ? 'Save record details' : 'Submit civic record'}</button>
+      {editing && onCancel && <button className="btn btn-link" type="button" onClick={onCancel}>Cancel</button>}
     </form>
   );
 };
