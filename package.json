@@ -37,6 +37,7 @@
     "test:parity:authenticated": "node scripts/qa/migration-authenticated-parity.mjs",
     "test:parity:authenticated:disposable": "node --env-file-if-exists=.env scripts/qa/run-disposable-authenticated-parity.mjs",
     "test:policy:pilot": "node --env-file-if-exists=.env scripts/qa/content-policy-pilot.mjs",
+    "test:civic:authenticated:disposable": "node --env-file-if-exists=.env scripts/qa/run-disposable-civic-browser.mjs",
     "test:parity": "npm-run-all test:parity:server test:parity:client",
     "test:upgrade:regression": "bash scripts/qa/upgrade-regression-batch.sh all",
     "test:upgrade:regression:tooling": "bash scripts/qa/upgrade-regression-batch.sh tooling",

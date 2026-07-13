@@ -21,7 +21,7 @@ Re-open legacy-to-modern parity at feature and workflow depth, rather than treat
 
 ### Modern target-state completeness
 
-**Core governance modernization and the FixPH civic product baseline are implemented and locally signed off.** The modern application includes deterministic duplicate/merge handling, immutable revisions, change requests and rollback, tamper-evident privileged audit events, evidence provenance and quality review, independent factual/ethical verdicts, policy-versioned onboarding, revision-linked discussion context, issue-first controls, controlled anonymous screening proposals, deterministic reputation scorecards, explicit archived/freshness UX, and dedicated civic accountability workflows. Automatic content expiry and React Native delivery are explicitly deferred.
+**Core governance modernization and the FixPH civic product baseline are implemented and locally signed off.** The modern application includes deterministic duplicate/merge handling, immutable revisions, change requests and rollback, tamper-evident privileged audit events, evidence provenance and quality review, independent factual/ethical verdicts, policy-versioned onboarding, revision-linked discussion context, issue-first controls, controlled anonymous screening proposals, deterministic reputation scorecards, explicit archived/freshness UX, dedicated civic accountability workflows, tenant-scoped operations, and governed record maintenance. Automatic content expiry and React Native delivery are explicitly deferred.
 
 ## Recommendation Review (2026-07-11)
 
@@ -61,9 +61,9 @@ The unchecked work is valid, but it should not be executed as one undifferentiat
 | Dynamic application About pages | Implemented and live-verified | About hierarchy is public without exposing profile pages | `/about/:id` uses `/api/pages/about/:id`, limits results to the About root/children, sanitizes HTML, and serves direct nested routes from the React shell. |
 | Controlled anonymous contribution | Not required for legacy replacement | Implemented as screened proposals, never direct publication | `/contribute` submits quota- and risk-controlled proposals; `/admin/anonymous-contributions` supports review and adoption into authenticated create flows. Raw IP addresses and user agents are not retained. |
 | Reputation and scorecards | Modern-only | Implemented with deterministic, explainable snapshots | Member profiles expose four scoring dimensions and earned badges; Explore offers a trusted ranking using reputation, screening state, and popularity inputs. |
-| FixPH civic accountability | Modern-only | Implemented as a dedicated product workspace | `/civic` and `/api/civic` cover responsibility hierarchy, projects, citizen observations, locations, incidents, actions, candidate comparison, and historical outcomes. |
+| FixPH civic accountability | Modern-only | Implemented as a dedicated product workspace | `/civic` and `/api/civic` cover responsibility hierarchy, projects, citizen observations, locations, incidents, actions, candidate comparison, historical outcomes, tenant memberships, jurisdiction administration, and governed record editing. |
 | Lifecycle reading modes | Improved over legacy | Implemented | Accepted, Pending, Archived, and All states are explicit; archived entries and reference-dated information show non-destructive reader notices. |
-| QA proof | Public and privileged semantic coverage complete | Improved | `migration-parity-semantic.mjs` covers all seven families and mobile overflow; `run-disposable-authenticated-parity.mjs` provisions and removes isolated role fixtures while retaining only a redacted manifest. |
+| QA proof | Public and privileged semantic coverage complete | Improved | `migration-parity-semantic.mjs` covers all seven families and mobile overflow; the disposable parity and civic Chrome runners provision and remove isolated role, tenant, jurisdiction, and record fixtures while retaining only redacted manifests and immutable audit evidence. |
 | Mobile/native client | Not a legacy-web parity requirement | Deferred, not implemented | `docs/plans/deferred/REACT_NATIVE_MONOREPO_CHECKLIST_PLAN_2026-04-19.md` was explicitly deferred on 2026-07-13. |
 
 ## Verified Defects Corrected in This Pass
@@ -88,7 +88,7 @@ The unchecked work is valid, but it should not be executed as one undifferentiat
 
 ## Open Modern Target-State Work
 
-The following remain genuinely pending after current-code searches. Detailed requirement IDs remain in `docs/plans/deferred/plan-2026-04-14/`.
+The target-state inventory was revalidated against current code. All non-deferred items below are complete; the detailed historical requirement IDs remain in `docs/plans/deferred/plan-2026-04-14/`.
 
 - [x] Duplicate detection, deterministic merge, redirects, and moderator logs (`CORE-002`, `CONTENT-004`).
 - [x] Change requests, stale-conflict handling, revision history, rollback, and suggestion mode (`CORE-014` through `CORE-017`).
@@ -121,6 +121,8 @@ The following remain genuinely pending after current-code searches. Detailed req
 - `94264826` fixed the mobile overflows found by the all-route visual audit; `55a37e2a` restored direct shell delivery for contribution and comment routes.
 - `8ea071ee` eliminated the 66-warning client lint baseline by stabilizing hooks and intentional-unused conventions.
 - `4c2dfb33` added the dedicated FixPH civic model, public and governed APIs, accountability workspace, project detail, observation lifecycle, geo filters, candidate comparison, and durable history.
+- `dd91bb9d` added tenant actor, membership candidate, membership administration, and audited jurisdiction contracts; safe nested record updates; cycle prevention; OpenAPI coverage; and defensive tenant normalization.
+- `d55f4c4a` added the modern tenant operations page, tenant-role-aware contribution/review controls, contributor-owned record editing, and client regression coverage.
 - `21955ce0` added explicit Accepted/Pending/Archived/All reading modes plus reference-date and archived-record notices without automatic expiry.
 - `c33a8555` published the complete content-operations handbook set; `42ed723b` added repeatable form-field and search-ordering parity evidence.
 - Operational correction: FixPH is not running a separate modern PM2 instance. `fixthephilippines.org` remains pointed at the existing shared production instance, and this modernization batch was not deployed to production or a VPS.
@@ -136,7 +138,7 @@ The following remain genuinely pending after current-code searches. Detailed req
 - [x] Focused client tests for header sections, route aliases, and closed mobile sidebar behavior.
 - [x] Focused server test for singular comment redirect behavior.
 - [x] Server TypeScript no-emit check after the first correction set.
-- [x] Full current client and server test suites: 69 client suites / 165 tests and 52 server suites / 232 tests passed on 2026-07-13.
+- [x] Full current client and server test suites: 74 client suites / 178 tests and 56 server suites / 251 tests passed on 2026-07-13.
 - [x] Production server and client builds.
 - [x] PM2 process `35` (`wikitruth`) restart plus post-restart `200` checks for modern artifact, legacy artifact, and `/api/home`.
 - [x] Live current-host verification of default header sections, comment redirect, and closed/open mobile overflow at `390x844`.
@@ -146,9 +148,10 @@ The following remain genuinely pending after current-code searches. Detailed req
 - [x] Direct HTTP shell-contract sweep of all 128 declared modern routes: 124 direct `200` HTML responses and four intentional canonical redirects.
 - [x] Responsive interaction checks for entry Reply/More menus, trusted Explore ranking, global navigation, and sidebar behavior with zero document overflow.
 - [x] Disposable visual-audit user, account, administrator, sessions, and reputation snapshot removed with zero residue.
-- [x] FixPH focused API/client/route/OpenAPI tests plus the current full 52-suite server and 69-suite client regression runs.
+- [x] FixPH focused API/client/route/OpenAPI tests plus the current full 56-suite server and 74-suite client regression runs.
 - [x] Legacy/modern semantic form-field contracts for all seven entry families and deterministic search ordering/cursor/privacy fixtures.
 - [x] Zero-warning lint, modern/legacy type checks, production builds, and source guardrails after lifecycle and FixPH implementation.
+- [x] Disposable authenticated Google Chrome verification of platform tenant configuration, tenant membership and jurisdiction operations, contributor record create/edit, knowledge-link add/remove, lifecycle review, and mobile overflow with zero mutable fixture residue.
 
 ## Completion Rule
 

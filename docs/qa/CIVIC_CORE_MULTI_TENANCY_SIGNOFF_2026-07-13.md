@@ -6,8 +6,8 @@
 
 ## Automated Verification
 
-- Server: 55 suites, 245 tests passed.
-- Client: 71 suites, 171 tests passed.
+- Server: 56 suites, 251 tests passed.
+- Client: 74 suites, 178 tests passed.
 - Legacy/modern parity: server checklist, URL contracts, and 31 client checks passed.
 - Performance budgets: auth, topic listing, and search passed.
 - TypeScript: modern and legacy checks passed.
@@ -39,6 +39,13 @@ The final runs emitted only the existing `ts-jest` deprecation notice and pre-ex
 - Public tenant metadata omitted `_id`, `createUserId`, and `editUserId`.
 - Unconfigured cross-origin access remained fail-closed; exact-origin headless CORS and preflight behavior passed automated tests.
 - No new PM2 error-log entry was recorded after the corrected runtime restart and probes.
+
+## Authenticated Tenant Operations
+
+- Platform tenant create/update/inactivate, tenant membership assignment/deactivation, jurisdiction create/update/deactivation, contributor record create/update, Wikitruth link add/remove, and reviewer lifecycle transition passed in Google Chrome `150.0.7871.115`.
+- The authenticated mobile civic workspace had no horizontal overflow at `390x844`.
+- Disposable users, memberships, jurisdictions, records, sessions, and tenant configuration were removed with zero mutable fixture residue and no retained credentials.
+- Full evidence and the repeatable command are recorded in `docs/qa/CIVIC_AUTHENTICATED_BROWSER_SIGNOFF_2026-07-13.md`.
 
 ## Browser Matrix
 
