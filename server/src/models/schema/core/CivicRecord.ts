@@ -6,7 +6,7 @@ import {
   CIVIC_RECORD_STAGES,
   CIVIC_RECORD_STATUSES,
   CIVIC_SEVERITIES,
-} from '../../../types/civic';
+} from '../civicEnums';
 
 const factory: SchemaFactory = function (app, mongoose) {
   const defaultTenantId = String(process.env.CIVIC_DEFAULT_TENANT_ID || 'fixtheph').trim().toLowerCase();

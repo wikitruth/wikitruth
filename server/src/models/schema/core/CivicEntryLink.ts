@@ -4,7 +4,7 @@ import type { SchemaFactory } from '../factory';
 import {
   CIVIC_ENTRY_RELATIONSHIPS,
   CIVIC_LINKED_OBJECT_NAMES,
-} from '../../../types/civicTenancy';
+} from '../civicEnums';
 
 const factory: SchemaFactory = function (app, mongoose) {
   const schema = new mongoose.Schema({

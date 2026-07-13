@@ -4,7 +4,7 @@ import type { SchemaFactory } from '../factory';
 import {
   CIVIC_DEPLOYMENT_MODES,
   CIVIC_TENANT_STATUSES,
-} from '../../../types/civicTenancy';
+} from '../civicEnums';
 
 const factory: SchemaFactory = function (app, mongoose) {
   const sectionSchema = new mongoose.Schema({

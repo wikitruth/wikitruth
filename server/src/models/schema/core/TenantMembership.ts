@@ -1,7 +1,7 @@
 'use strict';
 
 import type { SchemaFactory } from '../factory';
-import { CIVIC_TENANT_ROLES } from '../../../types/civicTenancy';
+import { CIVIC_TENANT_ROLES } from '../civicEnums';
 
 const factory: SchemaFactory = function (app, mongoose) {
   const schema = new mongoose.Schema({
