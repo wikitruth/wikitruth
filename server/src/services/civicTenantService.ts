@@ -40,6 +40,10 @@ function normalizeTenant(raw: Record<string, any>): CivicTenantDefinition {
     geography: { ...(fallback?.geography || {}), ...(raw.geography || {}) },
     sections: Array.isArray(raw.sections) && raw.sections.length ? raw.sections : (fallback?.sections || []),
     featureFlags: { ...(fallback?.featureFlags || {}), ...(raw.featureFlags || {}) },
+    extensionSchemas: { ...(fallback?.extensionSchemas || {}), ...(raw.extensionSchemas || {}) },
+    moderationPolicyVersion: String(raw.moderationPolicyVersion || fallback?.moderationPolicyVersion || '1'),
+    electionSystem: String(raw.electionSystem || fallback?.electionSystem || ''),
+    deploymentMode: raw.deploymentMode || fallback?.deploymentMode || 'shared',
   } as CivicTenantDefinition;
 }
 

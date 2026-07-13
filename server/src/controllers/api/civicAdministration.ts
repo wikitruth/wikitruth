@@ -81,6 +81,7 @@ const membershipSchema = z.object({
   roles: z.array(z.enum(CIVIC_TENANT_ROLES)).min(1),
   active: z.boolean().default(true),
 });
+const membershipCandidateQuerySchema = z.string().trim().min(2).max(120);
 
 function actorId(req: WikitruthRequest): string {
   return String(req.user?._id || req.user?.id || '');
@@ -109,6 +110,30 @@ async function auditTenantChange(req: WikitruthRequest, tenant: Record<string, a
     message,
     payload: { tenantId: tenant.tenantId },
   });
+}
+
+function membershipUser(user: Record<string, unknown>): Record<string, string> {
+  return {
+    _id: String(user._id),
+    username: String(user.username || ''),
+    email: String(user.email || ''),
+  };
+}
+
+function escapedSearchExpression(value: string): RegExp {
+  return new RegExp(value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+}
+
+async function createsJurisdictionCycle(tenantId: string, jurisdictionId: string, parentId: string): Promise<boolean> {
+  let currentId = parentId;
+  const visited = new Set<string>();
+  while (currentId) {
+    if (currentId === jurisdictionId || visited.has(currentId)) return true;
+    visited.add(currentId);
+    const current = await db.Jurisdiction.findOne({ _id: currentId, tenantId, active: true }).select('parentId').lean();
+    currentId = current?.parentId ? String(current.parentId) : '';
+  }
+  return false;
 }
 
 export function registerCivicAdministrationRoutes(router: Router): void {
@@ -170,7 +195,32 @@ export function registerCivicAdministrationRoutes(router: Router): void {
   router.get('/admin/memberships', async (req: WikitruthRequest, res: WikitruthResponse) => {
     if (!await ensureCivicTenantRole(req, res, ['admin'])) return;
     const memberships = await db.TenantMembership.find({ tenantId: req.civicTenant!.tenantId }).sort({ createDate: 1 }).lean();
-    res.json({ memberships });
+    const userIds = memberships.map((membership: Record<string, unknown>) => membership.userId).filter(Boolean);
+    const users = userIds.length
+      ? await db.User.find({ _id: { $in: userIds } }).select('_id username email').lean()
+      : [];
+    const usersById = new Map(users.map((user: Record<string, unknown>) => [String(user._id), membershipUser(user)]));
+    res.json({
+      memberships: memberships.map((membership: Record<string, unknown>) => ({
+        ...membership,
+        user: usersById.get(String(membership.userId)) || null,
+      })),
+    });
+  });
+
+  router.get('/admin/membership-candidates', async (req: WikitruthRequest, res: WikitruthResponse) => {
+    if (!await ensureCivicTenantRole(req, res, ['admin'])) return;
+    const parsed = membershipCandidateQuerySchema.safeParse(req.query.q);
+    if (!parsed.success) {
+      res.status(400).json({ success: false, message: 'Enter at least two characters to search users' });
+      return;
+    }
+    const search = escapedSearchExpression(parsed.data);
+    const users = await db.User.find({
+      isActive: 'yes',
+      $or: [{ username: search }, { email: search }],
+    }).select('_id username email').sort({ username: 1 }).limit(20).lean();
+    res.json({ users: users.map(membershipUser) });
   });
 
   router.put('/admin/memberships/:userId', async (req: WikitruthRequest, res: WikitruthResponse) => {
@@ -255,7 +305,7 @@ export function registerCivicAdministrationRoutes(router: Router): void {
     }
     if (parsed.data.parentId) {
       const parent = await db.Jurisdiction.findOne({ _id: parsed.data.parentId, tenantId: req.civicTenant!.tenantId, active: true }).lean();
-      if (!parent || String(parent._id) === req.params.id) {
+      if (!parent || await createsJurisdictionCycle(req.civicTenant!.tenantId, String(req.params.id || ''), parsed.data.parentId)) {
         res.status(400).json({ success: false, message: 'Invalid parent jurisdiction for this tenant' });
         return;
       }
@@ -282,6 +332,11 @@ export function registerCivicAdministrationRoutes(router: Router): void {
       res.status(404).json({ success: false, message: 'Jurisdiction not found' });
       return;
     }
+    await logEntryEvent({
+      scope: 'privileged', eventType: 'civic.jurisdiction.updated', objectType: constants.OBJECT_TYPES.jurisdiction,
+      objectName: 'jurisdiction', objectId: String(jurisdiction._id), actorUserId: actorId(req), actorUsername: String(req.user?.username || ''),
+      message: 'Civic jurisdiction updated', payload: { tenantId: req.civicTenant!.tenantId, code: jurisdiction.code },
+    });
     res.json({ jurisdiction });
   });
 
@@ -301,6 +356,11 @@ export function registerCivicAdministrationRoutes(router: Router): void {
       res.status(404).json({ success: false, message: 'Jurisdiction not found' });
       return;
     }
+    await logEntryEvent({
+      scope: 'privileged', eventType: 'civic.jurisdiction.deactivated', objectType: constants.OBJECT_TYPES.jurisdiction,
+      objectName: 'jurisdiction', objectId: String(jurisdiction._id), actorUserId: actorId(req), actorUsername: String(req.user?.username || ''),
+      message: 'Civic jurisdiction deactivated', payload: { tenantId: req.civicTenant!.tenantId, code: jurisdiction.code },
+    });
     res.json({ success: true, jurisdiction });
   });
 }

@@ -30,6 +30,7 @@ import { listCivicEntryLinks } from '../../services/civicEntryLinkService';
 import { registerCivicEntryLinkRoutes } from './civicEntryLinks';
 import { registerCivicAdministrationRoutes } from './civicAdministration';
 import { civicRecordInput, civicRecordUpdate, civicTransitionInput } from './civicRecordValidation';
+import { CIVIC_TENANT_ROLES } from '../../types/civicTenancy';
 
 interface CivicRecordShape {
   _id: mongoose.Types.ObjectId;
@@ -46,6 +47,10 @@ interface CivicRecordShape {
   relatedRecordIds?: mongoose.Types.ObjectId[];
   history: CivicHistoryItem[];
   outcome?: { summary?: string; happenedAt?: Date | string | null };
+  project?: Record<string, unknown> & { currency?: string };
+  location?: Record<string, unknown>;
+  observation?: Record<string, unknown>;
+  election?: Record<string, unknown>;
   private: boolean;
   createUserId?: mongoose.Types.ObjectId | string;
   editUserId?: mongoose.Types.ObjectId | string;
@@ -153,6 +158,16 @@ async function getOverview(req: WikitruthRequest, res: WikitruthResponse): Promi
   }).sort({ editDate: -1 }).limit(8).lean();
 
   res.json({ counts, recent, urgent, kinds: CIVIC_RECORD_KINDS, statuses: CIVIC_RECORD_STATUSES, stages: CIVIC_RECORD_STAGES });
+}
+
+async function getActorContext(req: WikitruthRequest, res: WikitruthResponse): Promise<void> {
+  const roles = await civicTenantRoles(req, tenantId(req));
+  res.json({
+    authenticated: Boolean(req.user),
+    tenantId: tenantId(req),
+    userId: req.user ? actorId(req) : null,
+    roles: CIVIC_TENANT_ROLES.filter((role) => roles.has(role)),
+  });
 }
 
 async function getTenantMetadata(req: WikitruthRequest, res: WikitruthResponse): Promise<void> {
@@ -314,13 +329,30 @@ async function updateRecord(req: WikitruthRequest, res: WikitruthResponse): Prom
     res.status(400).json({ message: jurisdictionValidation.message });
     return;
   }
+  const currentRecord = record.toObject();
   const project = parsed.data.project
-    ? { ...parsed.data.project, currency: parsed.data.project.currency || req.civicTenant!.localization.currency }
+    ? {
+      ...(currentRecord.project || {}),
+      ...parsed.data.project,
+      currency: parsed.data.project.currency || currentRecord.project?.currency || req.civicTenant!.localization.currency,
+    }
+    : undefined;
+  const location = parsed.data.location
+    ? { ...(currentRecord.location || {}), ...parsed.data.location }
+    : undefined;
+  const observation = parsed.data.observation
+    ? { ...(currentRecord.observation || {}), ...parsed.data.observation }
+    : undefined;
+  const election = parsed.data.election
+    ? { ...(currentRecord.election || {}), ...parsed.data.election }
     : undefined;
   Object.assign(record, parsed.data, {
     parentId: parentId || null,
     jurisdictionId: jurisdictionId || null,
     ...(project ? { project } : {}),
+    ...(location ? { location } : {}),
+    ...(observation ? { observation } : {}),
+    ...(election ? { election } : {}),
     friendlyUrl: parsed.data.title ? utils.urlify(parsed.data.title) : record.friendlyUrl,
     editUserId: req.user?._id,
     editDate: new Date(),
@@ -440,6 +472,7 @@ export = function attachCivic(router: Router) {
   router.use(civicTenantContext);
   router.use(requireContributorOnboarding);
   router.get('/tenant', getTenantMetadata);
+  router.get('/me', getActorContext);
   router.get('/jurisdictions', listJurisdictions);
   router.get('/overview', getOverview);
   router.get('/records', listRecords);

@@ -4388,7 +4388,22 @@
         "summary": "List tenant memberships",
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "memberships": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CivicTenantMembership"
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           "403": {
             "description": "Tenant administrator required"
@@ -5057,7 +5072,22 @@
         "summary": "List tenant memberships",
         "responses": {
           "200": {
-            "description": "Success"
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "memberships": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CivicTenantMembership"
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           "403": {
             "description": "Tenant administrator required"
@@ -5252,6 +5282,152 @@
           },
           "409": {
             "description": "Active child jurisdictions must be deactivated first"
+          }
+        }
+      }
+    },
+    "/civic/me": {
+      "get": {
+        "summary": "Get tenant-scoped roles for the current actor",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CivicActorContext"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Tenant context conflict"
+          }
+        }
+      }
+    },
+    "/civic/admin/membership-candidates": {
+      "get": {
+        "summary": "Search active users for tenant membership assignment",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 120
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "users": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CivicMembershipUser"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Search query is too short"
+          },
+          "403": {
+            "description": "Tenant administrator required"
+          }
+        }
+      }
+    },
+    "/tenants/{tenantId}/civic/me": {
+      "get": {
+        "summary": "Get tenant-scoped roles for the current actor",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CivicActorContext"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Tenant context conflict"
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+            }
+          }
+        ]
+      }
+    },
+    "/tenants/{tenantId}/civic/admin/membership-candidates": {
+      "get": {
+        "summary": "Search active users for tenant membership assignment",
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]{1,62}$"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 120
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "users": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CivicMembershipUser"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Search query is too short"
+          },
+          "403": {
+            "description": "Tenant administrator required"
           }
         }
       }
@@ -6426,6 +6602,104 @@
           },
           "legacy": {
             "type": "boolean"
+          }
+        }
+      },
+      "CivicActorContext": {
+        "type": "object",
+        "required": [
+          "authenticated",
+          "tenantId",
+          "userId",
+          "roles"
+        ],
+        "properties": {
+          "authenticated": {
+            "type": "boolean"
+          },
+          "tenantId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string",
+            "nullable": true
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "reader",
+                "contributor",
+                "screener",
+                "reviewer",
+                "admin"
+              ]
+            }
+          }
+        }
+      },
+      "CivicMembershipUser": {
+        "type": "object",
+        "required": [
+          "_id",
+          "username"
+        ],
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          }
+        }
+      },
+      "CivicTenantMembership": {
+        "type": "object",
+        "required": [
+          "_id",
+          "tenantId",
+          "userId",
+          "roles",
+          "active"
+        ],
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "tenantId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "reader",
+                "contributor",
+                "screener",
+                "reviewer",
+                "admin"
+              ]
+            }
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "user": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CivicMembershipUser"
+              }
+            ],
+            "nullable": true
           }
         }
       }

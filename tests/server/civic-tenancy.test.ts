@@ -88,6 +88,9 @@ describe('civic tenant resolution and knowledge reuse', () => {
       }));
     const tenant = await resolveCivicTenant(request({ params: { tenantId: 'fix-example' } }));
     expect(tenant).toEqual(expect.objectContaining({ tenantId: 'fix-example', countryCode: 'XZ' }));
+    expect(tenant.extensionSchemas).toEqual({});
+    expect(tenant.moderationPolicyVersion).toBe('1');
+    expect(tenant.deploymentMode).toBe('shared');
   });
 
   it('preserves existing FixPH global roles until memberships are backfilled', async () => {

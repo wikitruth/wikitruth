@@ -79,6 +79,7 @@ describe('OpenAPI contract', function () {
       '/realtime/events',
       '/civic/overview',
       '/civic/tenant',
+      '/civic/me',
       '/civic/jurisdictions',
       '/civic/records',
       '/civic/records/{id}',
@@ -89,9 +90,12 @@ describe('OpenAPI contract', function () {
       '/civic/platform/tenants',
       '/civic/admin/jurisdictions',
       '/civic/admin/jurisdictions/{id}',
+      '/civic/admin/membership-candidates',
       '/tenants/{tenantId}/civic/records',
       '/tenants/{tenantId}/civic/records/{id}',
       '/tenants/{tenantId}/civic/admin/jurisdictions/{id}',
+      '/tenants/{tenantId}/civic/me',
+      '/tenants/{tenantId}/civic/admin/membership-candidates',
     ].forEach((contractPath) => expect(paths[contractPath]).toBeDefined());
   });
 
@@ -135,6 +139,9 @@ describe('OpenAPI contract', function () {
       'CivicJurisdiction',
       'CivicEntryLink',
       'CivicEntryRelationship',
+      'CivicActorContext',
+      'CivicMembershipUser',
+      'CivicTenantMembership',
     ].forEach((schemaName) => expect(schemas[schemaName]).toBeDefined());
   });
 

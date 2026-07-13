@@ -104,6 +104,23 @@ describe('FixPH civic API', () => {
     expect(response.body.tenant).not.toHaveProperty('editUserId');
   });
 
+  it('exposes tenant-scoped roles for the current actor', async () => {
+    findMembership.mockReturnValue(queryResult({ roles: ['contributor', 'reviewer'], active: true }));
+    const user = {
+      _id: '66f000000000000000000012',
+      canPlayRoleOf: () => false,
+    };
+
+    const response = await request(createApp(user)).get('/api/civic/me').expect(200);
+
+    expect(response.body).toEqual({
+      authenticated: true,
+      tenantId: 'fixtheph',
+      userId: user._id,
+      roles: ['contributor', 'reviewer'],
+    });
+  });
+
   it('lets tenant administrators view the complete tenant record set', async () => {
     findMembership.mockReturnValue(queryResult({ roles: ['admin'] }));
     const tenantAdmin = {
@@ -210,6 +227,39 @@ describe('FixPH civic API', () => {
     expect(notifySubscribers).toHaveBeenCalledWith(expect.objectContaining({
       target: expect.objectContaining({ objectType: 40 }),
     }));
+  });
+
+  it('preserves unedited nested civic details during partial updates', async () => {
+    const user = {
+      _id: '66f000000000000000000010',
+      username: 'citizen',
+      canPlayRoleOf: (role) => role === 'contributor',
+    };
+    const record = {
+      _id: '66f000000000000000000001',
+      kind: 'project',
+      title: 'Health center upgrade',
+      friendlyUrl: 'health-center-upgrade',
+      private: false,
+      createUserId: user._id,
+      parentId: null,
+      jurisdictionId: null,
+      project: { budget: 1000, currency: 'PHP', contractor: 'Builder One', contractReference: 'CTR-1' },
+      location: { countryCode: 'PH', province: 'Metro Manila', city: 'Old City' },
+      history: [],
+      toObject() { return { ...this }; },
+      save: jest.fn().mockResolvedValue(undefined),
+    };
+    findOne.mockResolvedValue(record);
+
+    await request(createApp(user))
+      .put('/api/civic/records/66f000000000000000000001')
+      .send({ project: { budget: 2000 }, location: { city: 'New City' } })
+      .expect(200);
+
+    expect(record.project).toEqual(expect.objectContaining({ budget: 2000, contractor: 'Builder One', contractReference: 'CTR-1' }));
+    expect(record.location).toEqual(expect.objectContaining({ province: 'Metro Manila', city: 'New City' }));
+    expect(record.save).toHaveBeenCalledTimes(1);
   });
 
   it('rejects lifecycle changes without a reasoned decision', async () => {
