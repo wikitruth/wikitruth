@@ -40,6 +40,7 @@ describe('routeConfig', () => {
     expect(paths).toContain('/civic');
     expect(paths).toContain('/civic/:section');
     expect(paths).toContain('/civic/records/:id');
+    expect(paths).toContain('/admin/civic-tenants');
     expect(paths).toContain('/policies');
   });
 

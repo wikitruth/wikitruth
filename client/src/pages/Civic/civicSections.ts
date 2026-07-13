@@ -1,4 +1,4 @@
-import type { CivicRecordKind } from '../../types/civic';
+import type { CivicRecordKind, CivicTenant } from '../../types/civic';
 
 export interface CivicSection {
   slug: string;
@@ -10,72 +10,18 @@ export interface CivicSection {
   createKinds: CivicRecordKind[];
 }
 
-export const CIVIC_SECTIONS: CivicSection[] = [
-  {
-    slug: 'organizations',
-    title: 'Organizations & Offices',
-    eyebrow: 'Who is responsible',
-    description: 'Map institutions, offices, and their public responsibilities.',
-    icon: 'university',
-    kinds: ['institution', 'office'],
-    createKinds: ['institution', 'office'],
-  },
-  {
-    slug: 'people',
-    title: 'People',
-    eyebrow: 'Public responsibility',
-    description: 'Connect officials and civic actors to offices, projects, incidents, and outcomes.',
-    icon: 'users',
-    kinds: ['person'],
-    createKinds: ['person'],
-  },
-  {
-    slug: 'projects',
-    title: 'Projects',
-    eyebrow: 'Follow the work and money',
-    description: 'Track budgets, contracts, officials, evidence, timelines, and delivery progress.',
-    icon: 'building',
-    kinds: ['project'],
-    createKinds: ['project'],
-  },
-  {
-    slug: 'incidents',
-    title: 'Incidents & Observations',
-    eyebrow: 'Report, verify, resolve',
-    description: 'Surface citizen observations and follow incidents through escalation and resolution.',
-    icon: 'bolt',
-    kinds: ['incident', 'observation'],
-    createKinds: ['incident', 'observation'],
-  },
-  {
-    slug: 'actions',
-    title: 'Actions',
-    eyebrow: 'What happens next',
-    description: 'Track commitments, public responses, citizen initiatives, and measurable follow-through.',
-    icon: 'hand-paper-o',
-    kinds: ['action'],
-    createKinds: ['action'],
-  },
-  {
-    slug: 'elections',
-    title: 'Vote Wisely',
-    eyebrow: 'Evidence for decisions',
-    description: 'Compare candidates using public-service history, issue links, platforms, and evidence.',
-    icon: 'check-square-o',
-    kinds: ['election', 'candidate'],
-    createKinds: ['election', 'candidate'],
-  },
-  {
-    slug: 'history',
-    title: 'Public Memory',
-    eyebrow: 'The system does not forget',
-    description: 'Connect incidents and promises to later actions, evidence, and documented outcomes.',
-    icon: 'history',
-    kinds: ['history'],
-    createKinds: ['history'],
-  },
-];
+const EYEBROWS: Record<string, string> = {
+  organizations: 'Who is responsible', people: 'Public responsibility', projects: 'Follow the work and money',
+  incidents: 'Report, verify, resolve', actions: 'What happens next', elections: 'Evidence for decisions', history: 'Public memory',
+};
 
-export function getCivicSection(slug?: string): CivicSection | undefined {
-  return CIVIC_SECTIONS.find((section) => section.slug === slug);
+export function civicSectionsForTenant(tenant: CivicTenant): CivicSection[] {
+  return tenant.sections.filter((section) => section.enabled).map((section) => ({
+    ...section,
+    eyebrow: EYEBROWS[section.slug] || 'Public accountability',
+  }));
+}
+
+export function getCivicSection(tenant: CivicTenant, slug?: string): CivicSection | undefined {
+  return civicSectionsForTenant(tenant).find((section) => section.slug === slug);
 }

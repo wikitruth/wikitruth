@@ -50,4 +50,23 @@ describe('civicApi', () => {
     await expect(civicApi.create({ kind: 'office', title: 'Regional office', parentId: 'missing' }))
       .rejects.toThrow('Parent civic record was not found');
   });
+
+  it('loads tenant configuration and jurisdiction filters', async () => {
+    fetchMock.mockResolvedValue({ ok: true, json: async () => ({ tenant: { tenantId: 'fix-example' } }) } as Response);
+    await civicApi.tenant();
+    expect(fetchMock).toHaveBeenLastCalledWith('/api/civic/tenant', expect.objectContaining({ credentials: 'include' }));
+
+    fetchMock.mockResolvedValue({ ok: true, json: async () => ({ jurisdictions: [], count: 0 }) } as Response);
+    await civicApi.jurisdictions({ levelKey: 'district' });
+    expect(fetchMock).toHaveBeenLastCalledWith('/api/civic/jurisdictions?levelKey=district', expect.objectContaining({ credentials: 'include' }));
+  });
+
+  it('creates a typed Wikitruth knowledge link with CSRF protection', async () => {
+    document.cookie = '_csrfToken=link-token; path=/';
+    fetchMock.mockResolvedValue({ ok: true, json: async () => ({ link: { _id: 'link-1' } }) } as Response);
+    await civicApi.addLink('record-1', { relationship: 'evidence', objectId: '66f000000000000000000001' });
+    expect(fetchMock).toHaveBeenCalledWith('/api/civic/records/record-1/links', expect.objectContaining({
+      method: 'POST', headers: expect.objectContaining({ 'x-csrf-token': 'link-token' }),
+    }));
+  });
 });

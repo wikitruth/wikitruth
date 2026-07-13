@@ -1,10 +1,11 @@
 .wt-civic-page {
   --civic-ink: #172336;
-  --civic-navy: #15395f;
-  --civic-red: #ba2d2d;
+  --civic-navy: var(--civic-primary, #15395f);
+  --civic-red: var(--civic-accent, #ba2d2d);
   --civic-gold: #e5a229;
-  --civic-paper: #f5f1e8;
+  --civic-paper: var(--civic-surface, #f5f1e8);
   color: var(--civic-ink);
+  font-family: var(--civic-font, inherit);
 }
 
 .wt-civic-hero {
@@ -16,7 +17,7 @@
   margin-bottom: 0;
   padding: 46px 52px;
   overflow: hidden;
-  background: linear-gradient(120deg, #102b48 0%, #1c4c76 64%, #97302e 100%);
+  background: linear-gradient(120deg, var(--civic-navy) 0%, #1c4c76 64%, var(--civic-red) 100%);
   color: #fff;
 }
 
@@ -421,6 +422,45 @@
 
 .wt-civic-detail-panel li {
   margin-bottom: 10px;
+}
+
+.wt-civic-knowledge-links {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wt-civic-knowledge-links li {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid #edf0f2;
+}
+
+.wt-civic-knowledge-links li:last-child {
+  border-bottom: 0;
+}
+
+.wt-civic-knowledge-links a,
+.wt-civic-link-type {
+  display: block;
+}
+
+.wt-civic-link-type {
+  margin-bottom: 3px;
+  color: var(--civic-red);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.wt-civic-knowledge-links p {
+  margin: 5px 0 0;
+  color: #667080;
+  font-size: 12px;
 }
 
 @media (max-width: 991px) {

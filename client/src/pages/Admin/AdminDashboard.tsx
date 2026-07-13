@@ -138,6 +138,15 @@ const AdminDashboard: React.FC = () => {
             </div>
           </div>
           <div className="col-sm-3">
+            <div className="panel panel-success">
+              <div className="panel-heading">Civic Tenants</div>
+              <div className="panel-body">
+                <p className="text-muted" style={{ marginBottom: 10 }}>Configure branded country and jurisdiction instances.</p>
+                <Link to="/admin/civic-tenants" className="btn btn-success btn-xs">Manage Tenants</Link>
+              </div>
+            </div>
+          </div>
+          <div className="col-sm-3">
             <div className="panel panel-info">
               <div className="panel-heading">Anonymous Contributions</div>
               <div className="panel-body">

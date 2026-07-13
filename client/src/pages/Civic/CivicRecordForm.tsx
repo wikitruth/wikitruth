@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import civicApi from '../../services/api/civic';
-import type { CivicRecord, CivicRecordInput, CivicRecordKind, CivicSeverity } from '../../types/civic';
+import type { CivicJurisdiction, CivicRecord, CivicRecordInput, CivicRecordKind, CivicSeverity, CivicTenant } from '../../types/civic';
 
 interface CivicRecordFormProps {
   kinds: CivicRecordKind[];
   parentId?: string;
+  tenant: CivicTenant;
+  jurisdictions: CivicJurisdiction[];
   onCreated: (record: CivicRecord) => void;
 }
 
@@ -21,7 +23,7 @@ const KIND_LABELS: Record<CivicRecordKind, string> = {
   history: 'Historical outcome',
 };
 
-const CivicRecordForm: React.FC<CivicRecordFormProps> = ({ kinds, parentId, onCreated }) => {
+const CivicRecordForm: React.FC<CivicRecordFormProps> = ({ kinds, parentId, tenant, jurisdictions, onCreated }) => {
   const [kind, setKind] = useState<CivicRecordKind>(kinds[0]);
   const [title, setTitle] = useState('');
   const [summary, setSummary] = useState('');
@@ -34,6 +36,7 @@ const CivicRecordForm: React.FC<CivicRecordFormProps> = ({ kinds, parentId, onCr
   const [position, setPosition] = useState('');
   const [electionDate, setElectionDate] = useState('');
   const [sourceUrl, setSourceUrl] = useState('');
+  const [jurisdictionId, setJurisdictionId] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
@@ -48,10 +51,11 @@ const CivicRecordForm: React.FC<CivicRecordFormProps> = ({ kinds, parentId, onCr
       description,
       severity,
       parentId,
-      location: region || city ? { countryCode: 'PH', region, city } : undefined,
+      jurisdictionId: jurisdictionId || undefined,
+      location: region || city ? { countryCode: tenant.countryCode, region, city } : { countryCode: tenant.countryCode },
       project: kind === 'project' ? {
         budget: budget ? Number(budget) : null,
-        currency: 'PHP',
+        currency: tenant.localization.currency,
         progressPercent: progress ? Number(progress) : null,
       } : undefined,
       election: kind === 'election' || kind === 'candidate' ? {
@@ -73,6 +77,9 @@ const CivicRecordForm: React.FC<CivicRecordFormProps> = ({ kinds, parentId, onCr
       setSubmitting(false);
     }
   };
+
+  const regionLabel = tenant.geography.levels.find((level) => level.key === 'region')?.label || tenant.geography.levels[1]?.label || 'Region';
+  const cityLabel = tenant.geography.levels.find((level) => ['city', 'municipality'].includes(level.key))?.label || 'City / municipality';
 
   return (
     <form className="wt-civic-form" onSubmit={submit}>
@@ -115,12 +122,13 @@ const CivicRecordForm: React.FC<CivicRecordFormProps> = ({ kinds, parentId, onCr
         </div>
       )}
       <div className="row">
-        <div className="col-sm-6 form-group"><label htmlFor="civic-region">Region</label><input id="civic-region" className="form-control" value={region} onChange={(event) => setRegion(event.target.value)} /></div>
-        <div className="col-sm-6 form-group"><label htmlFor="civic-city">City / municipality</label><input id="civic-city" className="form-control" value={city} onChange={(event) => setCity(event.target.value)} /></div>
+        <div className="col-sm-6 form-group"><label htmlFor="civic-region">{regionLabel}</label><input id="civic-region" className="form-control" value={region} onChange={(event) => setRegion(event.target.value)} /></div>
+        <div className="col-sm-6 form-group"><label htmlFor="civic-city">{cityLabel}</label><input id="civic-city" className="form-control" value={city} onChange={(event) => setCity(event.target.value)} /></div>
       </div>
+      {jurisdictions.length > 0 && <div className="form-group"><label htmlFor="civic-jurisdiction">Official jurisdiction</label><select id="civic-jurisdiction" className="form-control" value={jurisdictionId} onChange={(event) => setJurisdictionId(event.target.value)}><option value="">Not specified</option>{jurisdictions.map((jurisdiction) => <option key={jurisdiction._id} value={jurisdiction._id}>{jurisdiction.name}</option>)}</select></div>}
       {kind === 'project' && (
         <div className="row">
-          <div className="col-sm-6 form-group"><label htmlFor="civic-budget">Budget (PHP)</label><input id="civic-budget" type="number" min="0" className="form-control" value={budget} onChange={(event) => setBudget(event.target.value)} /></div>
+          <div className="col-sm-6 form-group"><label htmlFor="civic-budget">Budget ({tenant.localization.currency})</label><input id="civic-budget" type="number" min="0" className="form-control" value={budget} onChange={(event) => setBudget(event.target.value)} /></div>
           <div className="col-sm-6 form-group"><label htmlFor="civic-progress">Progress (%)</label><input id="civic-progress" type="number" min="0" max="100" className="form-control" value={progress} onChange={(event) => setProgress(event.target.value)} /></div>
         </div>
       )}

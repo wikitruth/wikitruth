@@ -1,4 +1,5 @@
 import React, { lazy } from 'react';
+import { CivicTenantProvider } from '../context/CivicTenantContext';
 
 const HomePage = lazy(() => import('../pages/HomePage'));
 const ExplorePage = lazy(() => import('../pages/ExplorePage'));
@@ -97,6 +98,7 @@ const AnonymousContributionPage = lazy(() => import('../pages/AnonymousContribut
 const AnonymousContributionsPage = lazy(() => import('../pages/Admin/AnonymousContributions/AnonymousContributionsPage'));
 const CivicWorkspacePage = lazy(() => import('../pages/Civic/CivicWorkspacePage'));
 const CivicRecordPage = lazy(() => import('../pages/Civic/CivicRecordPage'));
+const CivicTenantsPage = lazy(() => import('../pages/Admin/CivicTenants/CivicTenantsPage'));
 const PolicyCenterPage = lazy(() => import('../pages/PolicyCenterPage'));
 
 export interface AppRoute {
@@ -133,9 +135,10 @@ export const appRoutes: AppRoute[] = [
   { path: '/admin/audit', element: <AuditTimelinePage /> },
   { path: '/admin/moderation/signals', element: <SignalsAppealsPage /> },
   { path: '/admin/anonymous-contributions', element: <AnonymousContributionsPage /> },
-  { path: '/civic', element: <CivicWorkspacePage /> },
-  { path: '/civic/:section', element: <CivicWorkspacePage /> },
-  { path: '/civic/records/:id', element: <CivicRecordPage /> },
+  { path: '/admin/civic-tenants', element: <CivicTenantsPage /> },
+  { path: '/civic', element: <CivicTenantProvider><CivicWorkspacePage /></CivicTenantProvider> },
+  { path: '/civic/:section', element: <CivicTenantProvider><CivicWorkspacePage /></CivicTenantProvider> },
+  { path: '/civic/records/:id', element: <CivicTenantProvider><CivicRecordPage /></CivicTenantProvider> },
   { path: '/policies', element: <PolicyCenterPage /> },
   { path: '/topics', element: <TopicsPage /> },
   { path: '/topics/create', element: <TopicCreatePage /> },

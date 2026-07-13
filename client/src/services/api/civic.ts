@@ -5,6 +5,10 @@ import type {
   CivicRecordInput,
   CivicRecordStage,
   CivicRecordStatus,
+  CivicEntryLink,
+  CivicEntryRelationship,
+  CivicJurisdiction,
+  CivicTenant,
 } from '../../types/civic';
 
 const request = createApiClient();
@@ -16,9 +20,18 @@ type RecordResponse = {
   parent?: CivicRecord | null;
   children?: CivicRecord[];
   related?: CivicRecord[];
+  links?: CivicEntryLink[];
 };
 
 export const civicApi = {
+  tenant: () => request<{ tenant: CivicTenant }>('/civic/tenant'),
+  jurisdictions: (params: { parentId?: string; levelKey?: string } = {}) => {
+    const search = new URLSearchParams();
+    if (params.parentId) search.set('parentId', params.parentId);
+    if (params.levelKey) search.set('levelKey', params.levelKey);
+    const suffix = search.toString();
+    return request<{ jurisdictions: CivicJurisdiction[]; count: number }>(`/civic/jurisdictions${suffix ? `?${suffix}` : ''}`);
+  },
   overview: () => request<CivicOverview>('/civic/overview'),
   list: (params: Record<string, string | undefined> = {}) => {
     const search = new URLSearchParams();
@@ -49,6 +62,22 @@ export const civicApi = {
   compareCandidates: (ids: string[]) => request<{ success?: boolean; candidates: CivicRecord[] }>(
     `/civic/candidates/compare?ids=${encodeURIComponent(ids.join(','))}`,
   ),
+  links: (id: string) => request<{ links: CivicEntryLink[]; count: number }>(`/civic/records/${encodeURIComponent(id)}/links`),
+  addLink: (id: string, payload: { relationship: CivicEntryRelationship; objectId: string }) => request<{ link: unknown }>(`/civic/records/${encodeURIComponent(id)}/links`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  }),
+  removeLink: (recordId: string, linkId: string) => request<{ success: boolean }>(`/civic/records/${encodeURIComponent(recordId)}/links/${encodeURIComponent(linkId)}`, {
+    method: 'DELETE',
+  }),
+  platformTenants: () => request<{ tenants: CivicTenant[] }>('/civic/platform/tenants'),
+  bootstrapTenants: () => request<{ success: boolean; count: number }>('/civic/platform/tenants/bootstrap', { method: 'POST' }),
+  createTenant: (payload: CivicTenant) => request<{ tenant: CivicTenant }>('/civic/platform/tenants', {
+    method: 'POST', body: JSON.stringify(payload),
+  }),
+  updateTenant: (tenantId: string, payload: Partial<CivicTenant>) => request<{ tenant: CivicTenant }>(`/civic/platform/tenants/${encodeURIComponent(tenantId)}`, {
+    method: 'PUT', body: JSON.stringify(payload),
+  }),
 };
 
 export default civicApi;

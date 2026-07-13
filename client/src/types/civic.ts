@@ -13,9 +13,80 @@ export type CivicRecordKind =
 export type CivicRecordStatus = 'draft' | 'pending' | 'active' | 'verified' | 'resolved' | 'archived';
 export type CivicRecordStage = 'reported' | 'screening' | 'investigating' | 'action_planned' | 'in_progress' | 'resolved' | 'closed';
 export type CivicSeverity = 'info' | 'low' | 'medium' | 'high' | 'critical';
+export type CivicEntryRelationship = 'subject' | 'claim' | 'question' | 'answer' | 'evidence' | 'discussion' | 'review_issue';
+
+export interface CivicTenantSection {
+  slug: string;
+  title: string;
+  description: string;
+  icon: string;
+  kinds: CivicRecordKind[];
+  createKinds: CivicRecordKind[];
+  enabled: boolean;
+}
+
+export interface CivicTenant {
+  tenantId: string;
+  status: 'active' | 'inactive';
+  countryCode: string;
+  title: string;
+  navTitle: string;
+  slogan: string;
+  domains: string[];
+  branding: {
+    logoIcon: string;
+    favicon: string;
+    primaryColor: string;
+    accentColor: string;
+    surfaceColor: string;
+    fontFamily: string;
+  };
+  localization: {
+    defaultLocale: string;
+    supportedLocales: string[];
+    timezone: string;
+    currency: string;
+  };
+  geography: {
+    levels: Array<{ key: string; label: string }>;
+    addressFields: string[];
+  };
+  sections: CivicTenantSection[];
+  featureFlags: Record<string, boolean>;
+  moderationPolicyVersion: string;
+  electionSystem: string;
+  deploymentMode: 'shared' | 'dedicated' | 'headless';
+}
+
+export interface CivicJurisdiction {
+  _id: string;
+  tenantId: string;
+  code: string;
+  countryCode: string;
+  levelKey: string;
+  name: string;
+  friendlyUrl: string;
+  parentId?: string | null;
+}
+
+export interface CivicEntryLink {
+  linkId?: string;
+  relationship: CivicEntryRelationship;
+  objectType: number;
+  objectName: 'topic' | 'argument' | 'question' | 'answer' | 'artifact' | 'opinion' | 'issue';
+  objectId: string;
+  title: string;
+  friendlyUrl: string;
+  contentPreview?: string;
+  url: string;
+  legacy: boolean;
+}
 
 export interface CivicRecord {
   _id: string;
+  tenantId: string;
+  countryCode: string;
+  jurisdictionId?: string | null;
   kind: CivicRecordKind;
   title: string;
   friendlyUrl: string;
@@ -91,6 +162,7 @@ export interface CivicRecordInput {
   summary?: string;
   description?: string;
   severity?: CivicSeverity;
+  jurisdictionId?: string;
   parentId?: string;
   location?: CivicRecord['location'];
   project?: CivicRecord['project'];

@@ -3,10 +3,11 @@ import { Link, useParams } from 'react-router-dom';
 import PageMeta from '../../components/common/PageMeta';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import { useAuth } from '../../context/AuthContext';
+import { useCivicTenant } from '../../context/CivicTenantContext';
 import civicApi from '../../services/api/civic';
 import type { CivicOverview, CivicRecord, CivicRecordStatus } from '../../types/civic';
 import CivicRecordForm from './CivicRecordForm';
-import { CIVIC_SECTIONS, getCivicSection } from './civicSections';
+import { civicSectionsForTenant, getCivicSection } from './civicSections';
 
 const STATUS_LABELS: Record<CivicRecordStatus, string> = {
   draft: 'Draft',
@@ -17,19 +18,19 @@ const STATUS_LABELS: Record<CivicRecordStatus, string> = {
   archived: 'Archived',
 };
 
-function recordLocation(record: CivicRecord): string {
-  return [record.location?.barangay, record.location?.city, record.location?.province, record.location?.region]
-    .filter(Boolean)
-    .join(', ');
+function recordLocation(record: CivicRecord, addressFields: string[]): string {
+  const location = (record.location || {}) as Record<string, unknown>;
+  return addressFields.map((field) => String(location[field] || '')).filter(Boolean).join(', ');
 }
 
-function CivicRecordCard({ record, selectable, selected, onSelect }: {
+function CivicRecordCard({ record, selectable, selected, onSelect, addressFields }: {
   record: CivicRecord;
   selectable?: boolean;
   selected?: boolean;
   onSelect?: (record: CivicRecord) => void;
+  addressFields: string[];
 }) {
-  const location = recordLocation(record);
+  const location = recordLocation(record, addressFields);
   return (
     <article className={`wt-civic-record ${record.severity === 'critical' ? 'is-critical' : ''}`}>
       <div className="wt-civic-record-topline">
@@ -59,7 +60,9 @@ function CivicRecordCard({ record, selectable, selected, onSelect }: {
 
 const CivicWorkspacePage: React.FC = () => {
   const { section: sectionSlug } = useParams<{ section?: string }>();
-  const section = getCivicSection(sectionSlug);
+  const { tenant, jurisdictions } = useCivicTenant();
+  const sections = useMemo(() => civicSectionsForTenant(tenant), [tenant]);
+  const section = getCivicSection(tenant, sectionSlug);
   const { isAuthenticated } = useAuth();
   const [overview, setOverview] = useState<CivicOverview | null>(null);
   const [records, setRecords] = useState<CivicRecord[]>([]);
@@ -68,6 +71,7 @@ const CivicWorkspacePage: React.FC = () => {
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('');
   const [region, setRegion] = useState('');
+  const [jurisdictionId, setJurisdictionId] = useState('');
   const [selectedCandidates, setSelectedCandidates] = useState<CivicRecord[]>([]);
   const [comparedCandidates, setComparedCandidates] = useState<CivicRecord[]>([]);
 
@@ -78,7 +82,7 @@ const CivicWorkspacePage: React.FC = () => {
     try {
       const [overviewResult, recordsResult] = await Promise.all([
         civicApi.overview(),
-        civicApi.list({ kind: kinds, q: query || undefined, status: status || undefined, region: region || undefined }),
+        civicApi.list({ kind: kinds, q: query || undefined, status: status || undefined, region: region || undefined, jurisdictionId: jurisdictionId || undefined }),
       ]);
       setOverview(overviewResult);
       setRecords(recordsResult.records || []);
@@ -87,7 +91,7 @@ const CivicWorkspacePage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [kinds, query, region, status]);
+  }, [jurisdictionId, kinds, query, region, status]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => void load(), query ? 250 : 0);
@@ -111,8 +115,9 @@ const CivicWorkspacePage: React.FC = () => {
     setComparedCandidates(result.candidates || []);
   };
 
-  const title = section?.title || 'Fix The Philippines';
-  const description = section?.description || 'A public accountability workspace connecting people, institutions, evidence, actions, and outcomes.';
+  const title = section?.title || tenant.title;
+  const description = section?.description || tenant.slogan || 'A public accountability workspace connecting people, institutions, evidence, actions, and outcomes.';
+  const regionLabel = tenant.geography.levels.find((level) => level.key === 'region')?.label || tenant.geography.levels[1]?.label || 'Region';
 
   return (
     <div className="wt-civic-page">
@@ -132,9 +137,9 @@ const CivicWorkspacePage: React.FC = () => {
         )}
       </header>
 
-      <nav className="wt-civic-sections" aria-label="FixPH civic sections">
+      <nav className="wt-civic-sections" aria-label={`${tenant.title} civic sections`}>
         <Link className={!section ? 'active' : ''} to="/civic"><i className="fa fa-dashboard" aria-hidden="true"></i> Overview</Link>
-        {CIVIC_SECTIONS.map((item) => (
+        {sections.map((item) => (
           <Link className={section?.slug === item.slug ? 'active' : ''} key={item.slug} to={`/civic/${item.slug}`}>
             <i className={`fa fa-${item.icon}`} aria-hidden="true"></i> {item.title}
           </Link>
@@ -144,7 +149,7 @@ const CivicWorkspacePage: React.FC = () => {
       {!section && overview?.urgent?.length ? (
         <section className="wt-civic-urgent">
           <div className="wt-civic-section-heading"><div><span className="wt-civic-kicker">Needs attention</span><h2>Unresolved high-impact incidents</h2></div><Link to="/civic/incidents">View incident tracker</Link></div>
-          <div className="wt-civic-record-grid">{overview.urgent.map((record) => <CivicRecordCard record={record} key={record._id} />)}</div>
+          <div className="wt-civic-record-grid">{overview.urgent.map((record) => <CivicRecordCard record={record} addressFields={tenant.geography.addressFields} key={record._id} />)}</div>
         </section>
       ) : null}
 
@@ -156,11 +161,15 @@ const CivicWorkspacePage: React.FC = () => {
         <div className="wt-civic-filters">
           <label><span>Search</span><input className="form-control" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Name, office, project, incident..." /></label>
           <label><span>Status</span><select className="form-control" value={status} onChange={(event) => setStatus(event.target.value)}><option value="">All statuses</option>{overview?.statuses?.map((value) => <option value={value} key={value}>{STATUS_LABELS[value]}</option>)}</select></label>
-          <label><span>Region</span><input className="form-control" value={region} onChange={(event) => setRegion(event.target.value)} placeholder="e.g. NCR" /></label>
+          {jurisdictions.length > 0 ? (
+            <label><span>Jurisdiction</span><select className="form-control" value={jurisdictionId} onChange={(event) => setJurisdictionId(event.target.value)}><option value="">All jurisdictions</option>{jurisdictions.map((jurisdiction) => <option value={jurisdiction._id} key={jurisdiction._id}>{jurisdiction.name}</option>)}</select></label>
+          ) : (
+            <label><span>{regionLabel}</span><input className="form-control" value={region} onChange={(event) => setRegion(event.target.value)} placeholder={`Filter by ${regionLabel.toLowerCase()}`} /></label>
+          )}
         </div>
         {loading ? <LoadingSpinner message="Loading civic records..." /> : error ? <div className="alert alert-danger">{error}</div> : records.length ? (
           <div className="wt-civic-record-grid">
-            {records.map((record) => <CivicRecordCard key={record._id} record={record} selectable={section?.slug === 'elections' && record.kind === 'candidate'} selected={selectedCandidates.some((item) => item._id === record._id)} onSelect={toggleCandidate} />)}
+            {records.map((record) => <CivicRecordCard key={record._id} record={record} addressFields={tenant.geography.addressFields} selectable={section?.slug === 'elections' && record.kind === 'candidate'} selected={selectedCandidates.some((item) => item._id === record._id)} onSelect={toggleCandidate} />)}
           </div>
         ) : <div className="wt-civic-empty"><i className="fa fa-map-o" aria-hidden="true"></i><h3>No records match this view yet</h3><p>Use the contribution form to place the first verifiable civic record here.</p></div>}
       </section>
@@ -172,7 +181,7 @@ const CivicWorkspacePage: React.FC = () => {
         </section>
       )}
 
-      {isAuthenticated && section && <CivicRecordForm kinds={section.createKinds} onCreated={(record) => setRecords((current) => [record, ...current])} />}
+      {isAuthenticated && section && <CivicRecordForm tenant={tenant} jurisdictions={jurisdictions} kinds={section.createKinds} onCreated={(record) => setRecords((current) => [record, ...current])} />}
       {!isAuthenticated && section && <div className="wt-civic-signin"><strong>Have verifiable information?</strong> <Link to={`/login?returnUrl=${encodeURIComponent(`/civic/${section.slug}`)}`}>Sign in to submit it for screening.</Link></div>}
     </div>
   );
