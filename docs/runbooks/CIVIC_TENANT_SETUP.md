@@ -36,6 +36,7 @@ CIVIC_FIXED_TENANT_ID=fix-example
 MONGODB_URI=mongodb://127.0.0.1:27017/fix-example
 MONGODB_DBNAME=fix-example
 MONGODB_BACKUP_ROOT=/path/to/fix-example-backups
+CIVIC_CORS_ORIGINS=https://civic.fix-example.org
 ```
 
 Use separate secrets and media storage. `CIVIC_FIXED_TENANT_ID` causes conflicting explicit tenant routes to fail closed.
@@ -43,7 +44,7 @@ Use separate secrets and media storage. `CIVIC_FIXED_TENANT_ID` causes conflicti
 ## Headless Frontend
 
 - Consume `/api/v1/tenants/:tenantId/civic/*`.
-- Use tenant-scoped session or bearer identity and an explicit CORS allowlist.
+- Use tenant-scoped session or bearer identity and configure exact frontend origins in the comma-separated `CIVIC_CORS_ORIGINS` allowlist.
 - Read public branding/localization from the tenant endpoint.
 - Do not fork Civic Core or redefine Wikitruth entry semantics in the frontend.
 

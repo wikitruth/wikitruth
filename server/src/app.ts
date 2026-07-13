@@ -9,6 +9,7 @@ import configurePassport from './middlewares/passport';
 import registerRoutes from './middlewares/routes';
 import { apiErrorHandler } from './middlewares/apiError';
 import { createCsrfProtection } from './middlewares/csrfProtection';
+import { civicCors } from './middlewares/civicCors';
 
 import contents from './models/contents';
 import templates from './models/templates';
@@ -139,6 +140,7 @@ sessionStore.on('error', function (error: unknown) {
 });
 const sessionConfig = config.session || {};
 const sessionCookie = sessionConfig.cookie || {};
+app.use(civicCors);
 app.use(session({
     name: sessionConfig.name || 'sid',
     resave: !!sessionConfig.resave,
