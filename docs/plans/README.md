@@ -6,6 +6,7 @@ Active and historical planning documents are organized under this folder.
 
 - Active checklist backlog:
   - `docs/plans/LEGACY_MODERN_FEATURE_COMPLETENESS_AUDIT_PLAN_2026-07-11.md` open `[ ]`: **0** (all non-deferred implementation and verification work is complete; retained here because it records explicit deferred product decisions)
+  - `docs/plans/CIVIC_CORE_MULTI_TENANCY_CHECKLIST_PLAN_2026-07-13.md`: approved Civic Core reuse, country/jurisdiction tenancy, isolation, API, frontend, migration, and verification work.
 - Deferred checklist backlog:
   - `docs/plans/deferred/**` open `[ ]`: **190** total
   - Legacy-renderer retirement, React Native delivery, automatic content expiry, strict-debate pilots, real-world seed operations, and non-canonical imported ideas remain explicitly deferred.
@@ -15,6 +16,7 @@ Active and historical planning documents are organized under this folder.
 
 ## Active Plans
 
+- `docs/plans/CIVIC_CORE_MULTI_TENANCY_CHECKLIST_PLAN_2026-07-13.md`
 - `docs/plans/LEGACY_MODERN_FEATURE_COMPLETENESS_AUDIT_PLAN_2026-07-11.md`
 
 ## Completed Plans
