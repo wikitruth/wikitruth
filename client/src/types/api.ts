@@ -128,6 +128,20 @@ export interface HomeDataResponse extends ApiBaseResponse, EntityBuckets {
   artifactsMore?: boolean;
 }
 
+export interface OutlineTreeNode {
+  _id: string;
+  title: string;
+  objectName: 'topic';
+  friendlyUrl?: string;
+  children: OutlineTreeNode[];
+}
+
+export interface OutlineTreeResponse extends ApiBaseResponse {
+  tree?: OutlineTreeNode;
+  trees?: OutlineTreeNode[];
+  truncated?: boolean;
+}
+
 export interface SearchResponse extends ApiBaseResponse, EntityBuckets {
   tab?: string;
   content?: string;

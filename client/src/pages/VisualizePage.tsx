@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import apiService from '../services/api';
 import Alert from '../components/common/Alert';
 import LoadingSpinner from '../components/LoadingSpinner';
-import type { HomeDataResponse } from '../types/api';
+import type { HomeDataResponse, OutlineTreeNode } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
 
 interface VisDataSet {
@@ -76,6 +76,31 @@ type GraphPayload = {
   nodes: GraphNode[];
   edges: GraphEdge[];
 };
+
+type FlattenedOutline = {
+  topics: LegacyEntity[];
+  parentById: Map<string, string>;
+};
+
+function flattenOutlineTrees(roots: OutlineTreeNode[]): FlattenedOutline {
+  const topics: LegacyEntity[] = [];
+  const parentById = new Map<string, string>();
+
+  const visit = (node: OutlineTreeNode, parentId?: string) => {
+    const id = String(node._id || '');
+    if (!id) {
+      return;
+    }
+    topics.push(node as unknown as LegacyEntity);
+    if (parentId) {
+      parentById.set(id, parentId);
+    }
+    (node.children || []).forEach((child) => visit(child, id));
+  };
+
+  roots.forEach((root) => visit(root));
+  return { topics, parentById };
+}
 
 const ROOT_NODE_ID = 'root';
 const FULLSCREEN_PREF_KEY = 'wt.visualize.fullscreen';
@@ -198,6 +223,8 @@ const VisualizePage: React.FC = () => {
   const navigate = useNavigate();
   const params = useParams<{ id?: string }>();
   const [data, setData] = useState<HomeDataResponse | null>(null);
+  const [outlineTrees, setOutlineTrees] = useState<OutlineTreeNode[]>([]);
+  const [outlineTruncated, setOutlineTruncated] = useState(false);
   const [selectedTopicId, setSelectedTopicId] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -231,8 +258,13 @@ const VisualizePage: React.FC = () => {
     const fetchVisualizationData = async () => {
       try {
         setLoading(true);
-        const result = await apiService.getHomeData();
+        const [result, outline] = await Promise.all([
+          apiService.getHomeData(),
+          apiService.getOutlineTree(undefined, 4).catch(() => null),
+        ]);
         setData(result);
+        setOutlineTrees(outline?.tree ? [outline.tree] : outline?.trees || []);
+        setOutlineTruncated(Boolean(outline?.truncated));
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load visualization data');
       } finally {
@@ -288,8 +320,8 @@ const VisualizePage: React.FC = () => {
     }
   }, [isFullscreen]);
 
-  const { topics, argumentsList, questions, issues, opinions, artifacts, answers } = useMemo(() => ({
-    topics: (data?.topics || []) as LegacyEntity[],
+  const { homeTopics, argumentsList, questions, issues, opinions, artifacts, answers } = useMemo(() => ({
+    homeTopics: (data?.topics || []) as LegacyEntity[],
     argumentsList: (data?.arguments || []) as LegacyEntity[],
     questions: (data?.questions || []) as LegacyEntity[],
     issues: (data?.issues || []) as LegacyEntity[],
@@ -298,9 +330,12 @@ const VisualizePage: React.FC = () => {
     answers: (data?.answers || []) as LegacyEntity[],
   }), [data]);
 
+  const flattenedOutline = useMemo(() => flattenOutlineTrees(outlineTrees), [outlineTrees]);
+  const graphTopics = flattenedOutline.topics.length > 0 ? flattenedOutline.topics : homeTopics;
+
   const selectedTopic = useMemo(
-    () => topics.find((topic) => String(topic._id) === selectedTopicId) || null,
-    [selectedTopicId, topics]
+    () => graphTopics.find((topic) => String(topic._id) === selectedTopicId) || null,
+    [graphTopics, selectedTopicId]
   );
 
   const topicRelatedEntries = useMemo(() => {
@@ -362,8 +397,7 @@ const VisualizePage: React.FC = () => {
       visualizeUrl: '/visualize',
     });
 
-    const topicNodes = topics.slice(0, 14);
-    topicNodes.forEach((topic) => {
+    graphTopics.forEach((topic) => {
       const id = String(topic._id);
       const topicFriendly = encodeURIComponent(String(topic.friendlyUrl || topic._id || ''));
       const topicId = encodeURIComponent(id);
@@ -380,7 +414,11 @@ const VisualizePage: React.FC = () => {
         exploreUrl: topicEntryUrl,
         visualizeUrl: topicVisualizeUrl,
       });
-      edges.push({ from: ROOT_NODE_ID, to: id, width: 3 });
+      edges.push({
+        from: flattenedOutline.parentById.get(id) || ROOT_NODE_ID,
+        to: id,
+        width: flattenedOutline.parentById.has(id) ? 2 : 3,
+      });
     });
 
     if (selectedTopicId) {
@@ -402,7 +440,7 @@ const VisualizePage: React.FC = () => {
     }
 
     return { nodes, edges };
-  }, [selectedTopicId, topicRelatedEntries, topics]);
+  }, [flattenedOutline.parentById, graphTopics, selectedTopicId, topicRelatedEntries]);
 
   useEffect(() => {
     if (selectedTopic) {
@@ -669,7 +707,7 @@ const VisualizePage: React.FC = () => {
   }
 
   const metrics = [
-    { key: 'topics', title: 'Topics', count: topics.length, icon: 'folder-open', color: 'text-success-x' },
+    { key: 'topics', title: 'Topics', count: graphTopics.length, icon: 'folder-open', color: 'text-success-x' },
     { key: 'arguments', title: 'Arguments', count: argumentsList.length, icon: 'flash', color: 'text-primary' },
     { key: 'questions', title: 'Questions', count: questions.length, icon: 'question-circle', color: 'text-info' },
     { key: 'issues', title: 'Issues', count: issues.length, icon: 'exclamation-triangle', color: 'text-warning' },
@@ -709,41 +747,48 @@ const VisualizePage: React.FC = () => {
           <h3 className="panel-title">Topics in Graph</h3>
         </div>
         <div className="panel-body">
-          {topics.length === 0 ? (
+          {graphTopics.length === 0 ? (
             <p className="text-muted" style={{ marginBottom: 0 }}>No topics are currently available.</p>
           ) : (
-            <div
-              className="btn-group wt-topic-selector"
-              role="group"
-              aria-label="Select topic for graph details"
-              style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}
-            >
-              {topics.slice(0, 14).map((topic) => {
-                const topicId = String(topic._id || '');
-                const isSelected = selectedTopicId === topicId;
-                return (
+            <>
+              <div
+                className="btn-group wt-topic-selector"
+                role="group"
+                aria-label="Select topic for graph details"
+                style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}
+              >
+                {graphTopics.slice(0, 40).map((topic) => {
+                  const topicId = String(topic._id || '');
+                  const isSelected = selectedTopicId === topicId;
+                  return (
+                    <button
+                      key={topicId}
+                      type="button"
+                      className={`btn wt-topic-selector-button ${isSelected ? 'btn-primary' : 'btn-default'}`}
+                      style={{ marginBottom: '8px' }}
+                      onClick={() => setSelectedTopicId(topicId)}
+                    >
+                      {String(topic.title || 'Untitled topic')}
+                    </button>
+                  );
+                })}
+                {selectedTopicId && (
                   <button
-                    key={topicId}
                     type="button"
-                    className={`btn wt-topic-selector-button ${isSelected ? 'btn-primary' : 'btn-default'}`}
+                    className="btn btn-link"
+                    onClick={() => setSelectedTopicId('')}
                     style={{ marginBottom: '8px' }}
-                    onClick={() => setSelectedTopicId(topicId)}
                   >
-                    {String(topic.title || 'Untitled topic')}
+                    Clear selection
                   </button>
-                );
-              })}
-              {selectedTopicId && (
-                <button
-                  type="button"
-                  className="btn btn-link"
-                  onClick={() => setSelectedTopicId('')}
-                  style={{ marginBottom: '8px' }}
-                >
-                  Clear selection
-                </button>
-              )}
-            </div>
+                )}
+              </div>
+              {outlineTruncated ? (
+                <p className="help-block" role="status">
+                  Showing the first 500 topics to keep the interactive graph responsive.
+                </p>
+              ) : null}
+            </>
           )}
         </div>
       </div>

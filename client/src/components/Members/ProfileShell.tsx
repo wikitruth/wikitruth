@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import DeterministicAvatar from '../common/DeterministicAvatar';
 
 type ProfileTab = 'overview' | 'contributions' | 'topics' | 'journal' | 'following' | 'pages' | 'settings';
 
@@ -22,7 +23,7 @@ const ProfileShell: React.FC<ProfileShellProps> = ({ username, activeTab, isOwnP
   return (
     <div>
       <h1 className="page-header wt-header wt-profile-header" title={username}>
-        <i className="fa fa-user-circle fa-2x"></i>
+        <DeterministicAvatar seed={username} label={username} size={72} className="wt-profile-avatar" />
         <br />
         {username}
         <div>

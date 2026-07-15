@@ -59,5 +59,6 @@ describe('routeConfig', () => {
     expect(paths).toContain('/questions/entry/:friendlyUrl/:id/discussion');
     expect(paths).toContain('/issues/entry/:friendlyUrl/:id/discussion');
     expect(paths).toContain('/opinions/entry/:friendlyUrl/:id/discussion');
+    expect(paths).toContain('/answers/entry/:id/discussion');
   });
 });

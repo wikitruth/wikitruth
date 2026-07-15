@@ -29,6 +29,13 @@ type OutlineTreeNode = {
   children: OutlineTreeNode[];
 };
 
+type TreeBudget = {
+  remaining: number;
+  truncated: boolean;
+};
+
+const MAX_TREE_NODES = 500;
+
 function escapeRegex(raw: string): string {
   return raw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -41,11 +48,18 @@ function sanitizeLimit(raw: unknown, fallback = 20, max = 100): number {
   return Math.min(Math.floor(parsed), max);
 }
 
-async function buildTopicTree(topicId: string, depth: number): Promise<OutlineTreeNode | null> {
+async function buildTopicTree(topicId: string, depth: number, budget: TreeBudget): Promise<OutlineTreeNode | null> {
+  if (budget.remaining <= 0) {
+    budget.truncated = true;
+    return null;
+  }
+
   const topic = await db.Topic.findById(topicId).lean();
   if (!topic) {
     return null;
   }
+
+  budget.remaining -= 1;
 
   const node: OutlineTreeNode = {
     _id: String(topic._id),
@@ -69,9 +83,13 @@ async function buildTopicTree(topicId: string, depth: number): Promise<OutlineTr
     .lean();
 
   for (const child of children) {
-    const childNode = await buildTopicTree(String(child._id), depth - 1);
+    const childNode = await buildTopicTree(String(child._id), depth - 1, budget);
     if (childNode) {
       node.children.push(childNode);
+    }
+    if (budget.remaining <= 0) {
+      budget.truncated = true;
+      break;
     }
   }
 
@@ -119,14 +137,15 @@ export = function (router: Router) {
   router.get('/tree', async function (req: WikitruthRequest, res: WikitruthResponse) {
     const rootId = String(req.query.rootId || '').trim();
     const depth = sanitizeLimit(req.query.depth, 2, 4);
+    const budget: TreeBudget = { remaining: MAX_TREE_NODES, truncated: false };
 
     if (rootId) {
-      const tree = await buildTopicTree(rootId, depth);
+      const tree = await buildTopicTree(rootId, depth, budget);
       if (!tree) {
         res.status(404).json({ success: false, message: 'Root topic not found' });
         return;
       }
-      res.json({ success: true, tree });
+      res.json({ success: true, tree, truncated: budget.truncated });
       return;
     }
 
@@ -141,13 +160,17 @@ export = function (router: Router) {
 
     const trees: OutlineTreeNode[] = [];
     for (const root of roots) {
-      const tree = await buildTopicTree(String(root._id), depth);
+      const tree = await buildTopicTree(String(root._id), depth, budget);
       if (tree) {
         trees.push(tree);
       }
+      if (budget.remaining <= 0) {
+        budget.truncated = true;
+        break;
+      }
     }
 
-    res.json({ success: true, trees });
+    res.json({ success: true, trees, truncated: budget.truncated });
   });
 
   router.get('/search', async function (req: WikitruthRequest, res: WikitruthResponse) {

@@ -7,6 +7,8 @@ import LoadingSpinner from '../../../components/LoadingSpinner';
 import apiService from '../../../services/api';
 import type { LegacyEntity } from '../../../types/legacy';
 import { useAuth } from '../../../context/AuthContext';
+import GroupNavigation from '../../../components/Groups/GroupNavigation';
+import DeterministicAvatar from '../../../components/common/DeterministicAvatar';
 
 const GroupMembers: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -69,9 +71,18 @@ const GroupMembers: React.FC = () => {
 
       return (
         <li key={memberId || index} className="list-group-item">
-          <strong>
-            <Link to={`/members/${encodeURIComponent(username)}`}>{username}</Link>
-          </strong>
+          <div className="media">
+            <div className="media-left media-middle">
+              <Link to={`/members/${encodeURIComponent(username)}`}>
+                <DeterministicAvatar seed={memberId || username} label={username} size={36} />
+              </Link>
+            </div>
+            <div className="media-body media-middle">
+              <strong>
+                <Link to={`/members/${encodeURIComponent(username)}`}>{username}</Link>
+              </strong>
+            </div>
+          </div>
         </li>
       );
     });
@@ -102,7 +113,9 @@ const GroupMembers: React.FC = () => {
         }
       />
 
-      <div className="panel panel-default">
+      <GroupNavigation group={group} activeTab="members" />
+
+      <div className="panel panel-default" style={{ marginTop: 20 }}>
         <div className="panel-heading">
           <h3 className="panel-title">Administrators</h3>
         </div>
@@ -117,10 +130,6 @@ const GroupMembers: React.FC = () => {
           {renderMembers(members, 'No members found.')}
         </ul>
       </div>
-
-      <Link to={`/groups/${group.friendlyUrl || group._id}/${group._id}`} className="btn btn-default">
-        <i className="fa fa-arrow-left"></i> Back to Group
-      </Link>
     </div>
   );
 };

@@ -184,6 +184,7 @@ export const appRoutes: AppRoute[] = [
   { path: '/answers/create', element: <AnswerCreatePage /> },
   { path: '/answers/edit/:id', element: <AnswerEditPage /> },
   { path: '/answers/entry/:id', element: <AnswerEntryPage /> },
+  { path: '/answers/entry/:id/discussion', element: <AnswerEntryPage /> },
   { path: '/artifacts', element: <ArtifactsPage /> },
   { path: '/artifacts/create', element: <ArtifactCreatePage /> },
   { path: '/artifacts/edit/:id', element: <ArtifactEditPage /> },

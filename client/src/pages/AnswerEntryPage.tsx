@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Alert from '../components/common/Alert';
 import Breadcrumb from '../components/common/Breadcrumb';
@@ -25,6 +25,7 @@ import {
 
 const AnswerEntryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
   const [data, setData] = useState<AnswerEntryResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -58,6 +59,7 @@ const AnswerEntryPage: React.FC = () => {
   }
 
   const answer = data.answer as LegacyEntity;
+  const isDiscussion = location.pathname.endsWith('/discussion');
   const issues = (data.issues || []) as LegacyEntity[];
   const opinions = (data.opinions || []) as LegacyEntity[];
   const detailsTab = [
@@ -78,10 +80,10 @@ const AnswerEntryPage: React.FC = () => {
       id: 'comments',
       title: 'Comments',
       icon: 'comments-o',
-      url: `/opinions?answer=${encodeURIComponent(String(answer._id || ''))}`,
+      url: `/answers/entry/${encodeURIComponent(String(answer._id || ''))}/discussion`,
       count: Number(answer.childrenCount?.opinions?.accepted || 0),
     },
-  ].filter((tab) => tab.id === 'details' || Number(tab.count || 0) > 0);
+  ].filter((tab) => tab.id === 'details' || tab.id === 'comments' || Number(tab.count || 0) > 0);
   const breadcrumbItems = buildLegacyEntryBreadcrumb(answer, 'answer', {
     sectionTopic: (data.topic || answer.parentTopic || null) as LegacyEntity | null,
     grandParentTopic: (data.parentTopic || data.grandParentTopic || null) as LegacyEntity | null,
@@ -107,12 +109,14 @@ const AnswerEntryPage: React.FC = () => {
         hasValue={Boolean(data?.hasValue)}
         moreActions={<EntryActionsMenu entry={answer} editPath={`/answers/edit/${encodeURIComponent(answer._id)}`} />}
       />
-      <PageTabs tabs={detailsTab} activeTab="details" />
+      <PageTabs tabs={detailsTab} activeTab={isDiscussion ? 'comments' : 'details'} />
 
-      <div className="text-body" style={{ marginTop: '20px' }}>
-        <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(answer.content || answer.description || '') }} />
-      </div>
-      {issues.length > 0 && (
+      {!isDiscussion ? (
+        <div className="text-body" style={{ marginTop: '20px' }}>
+          <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(answer.content || answer.description || '') }} />
+        </div>
+      ) : null}
+      {!isDiscussion && issues.length > 0 && (
         <EntryList
           title="Issues"
           icon="exclamation-triangle"
@@ -137,6 +141,16 @@ const AnswerEntryPage: React.FC = () => {
           ))}
         </EntryList>
       )}
+
+      {isDiscussion && opinions.length === 0 ? (
+        <Alert type="info">
+          No comments yet.{' '}
+          <Link to={`/opinions/create?parentId=${encodeURIComponent(answer._id)}&parentType=answer`}>
+            Start the discussion
+          </Link>
+          .
+        </Alert>
+      ) : null}
 
       <EntryMetaBlock entry={answer} />
 

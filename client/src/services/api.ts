@@ -32,6 +32,7 @@ import type {
   AnonymousContributionResponse,
   AnonymousContributionStatus,
   AnonymousEntryType,
+  OutlineTreeResponse,
 } from '../types/api';
 
 export class ApiRequestError extends Error {
@@ -889,29 +890,7 @@ class ApiService {
     });
   }
 
-  async getOutlineTree(rootId?: string, depth: number = 2): Promise<{
-    success?: boolean;
-    tree?: {
-      _id: string;
-      title: string;
-      objectName: 'topic';
-      friendlyUrl?: string;
-      children: Array<{
-        _id: string;
-        title: string;
-        objectName: 'topic';
-        friendlyUrl?: string;
-        children: unknown[];
-      }>;
-    };
-    trees?: Array<{
-      _id: string;
-      title: string;
-      objectName: 'topic';
-      friendlyUrl?: string;
-      children: unknown[];
-    }>;
-  }> {
+  async getOutlineTree(rootId?: string, depth: number = 2): Promise<OutlineTreeResponse> {
     const params = new URLSearchParams();
     if (rootId) {
       params.set('rootId', rootId);

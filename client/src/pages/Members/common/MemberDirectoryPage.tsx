@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import Alert from '../../../components/common/Alert';
 import { User } from '../../../types';
+import DeterministicAvatar from '../../../components/common/DeterministicAvatar';
 
 interface MemberDirectoryPageProps {
   title: string;
@@ -88,7 +89,7 @@ const MemberDirectoryPage: React.FC<MemberDirectoryPageProps> = ({ title, subtit
                 <div className="media wt-category">
                   <div className="media-left media-top">
                     <Link to={`/members/${member.username}`}>
-                      <div className="photo-placeholder" title={member.username}></div>
+                      <DeterministicAvatar seed={member._id || member.username} label={member.username} size={64} />
                     </Link>
                   </div>
                   <div className="media-body">

@@ -12,6 +12,7 @@ import apiService from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
 import type { LegacyEntity } from '../../../types/legacy';
 import GeoPatternBackground from '../../../components/common/GeoPatternBackground';
+import GroupNavigation from '../../../components/Groups/GroupNavigation';
 
 const EMPTY_TOTALS = {
   topics: 0,
@@ -179,6 +180,8 @@ const GroupPage: React.FC = () => {
           </Link>
         }
       />
+
+      <GroupNavigation group={group} activeTab="about" />
 
       {error && <Alert type="danger">{error}</Alert>}
 

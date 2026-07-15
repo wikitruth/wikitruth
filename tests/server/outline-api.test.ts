@@ -88,6 +88,7 @@ describe('outline api endpoints', () => {
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);
     expect(response.body.tree.title).toBe('Root Topic');
+    expect(response.body.truncated).toBe(false);
   });
 
   it('searches topics and arguments by query', async () => {

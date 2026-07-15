@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import type { LegacyEntity } from '../../types/legacy';
 import { formatRelativeTime } from '../../utils/dateFormat';
+import DeterministicAvatar from '../common/DeterministicAvatar';
 
 export type EntryObjectName = 'topic' | 'argument' | 'question' | 'answer' | 'artifact' | 'issue' | 'opinion';
 export interface EntryBreadcrumbItem {
@@ -339,7 +340,6 @@ export const EntryMetaBlock: React.FC<{ entry: LegacyEntity }> = ({ entry }) => 
   const edited = formatRelativeTime(entry.editDate || entry.createDate);
   const postedLabel = posted || 'unknown time';
   const editedLabel = edited || postedLabel;
-  const avatarInitial = createUsername ? createUsername.slice(0, 1).toUpperCase() : '?';
   const referenceDate = entry.referenceDate ? new Date(entry.referenceDate) : null;
   const hasReferenceDate = Boolean(referenceDate && !Number.isNaN(referenceDate.getTime()));
   const isArchived = Number(entry.screening?.status) === 3;
@@ -365,32 +365,10 @@ export const EntryMetaBlock: React.FC<{ entry: LegacyEntity }> = ({ entry }) => 
         <div className="media-left media-top">
           {createUsername ? (
             <Link to={`/members/${encodeURIComponent(createUsername)}`}>
-              <div
-                title={createUsername}
-                style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: '50%',
-                  backgroundColor: '#2d7f5e',
-                  color: '#fff',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontWeight: 700,
-                }}
-              >
-                {avatarInitial}
-              </div>
+              <DeterministicAvatar seed={createUsername} label={createUsername} size={36} />
             </Link>
           ) : (
-            <div
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: '50%',
-                backgroundColor: '#2d7f5e',
-              }}
-            />
+            <DeterministicAvatar seed="unknown-author" size={36} />
           )}
         </div>
         <div className="media-body">
