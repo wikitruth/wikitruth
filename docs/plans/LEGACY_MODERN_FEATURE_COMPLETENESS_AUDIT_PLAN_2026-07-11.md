@@ -142,6 +142,12 @@ The target-state inventory was revalidated against current code. All non-deferre
 
 ### Implementation Progress (2026-07-11)
 
+- `9bf26051` closed a content-level topic discrepancy found during direct
+  screenshot inspection after the aggregate sweep: hydrated topic creator and
+  editor names now survive JSON serialization, the topic header identifies its
+  actual parent, and existing verdict, tag, and link-count metadata renders with
+  legacy-compatible semantics. Focused client/server tests, both TypeScript
+  checks, and production server/client builds passed.
 - `110afa37` corrected the final two modern console defects found by the
   independent public sweep: answer discussion context now resolves the answer
   identifier instead of the `discussion` suffix, and unauthorized journal
