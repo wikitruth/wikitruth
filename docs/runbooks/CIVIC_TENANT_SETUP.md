@@ -64,6 +64,28 @@ npm run migrate:civic-core:apply
 
 The migration bootstraps `fixtheph`, backfills legacy civic records, converts legacy Artifact/Issue arrays into typed links, and creates tenant-scoped indexes. It does not delete compatibility fields.
 
+## Local FixPH QA Tenant
+
+Keep the production FixPH domains in tenant configuration, but make the app switcher stay on the local shared instance by adding this to the ignored local `.env`:
+
+```bash
+CIVIC_TENANT_HOME_URL_OVERRIDES=fixtheph=/civic
+```
+
+Bootstrap the local tenant and upsert deterministic public QA records covering every civic record kind:
+
+```bash
+npm run setup:local-fixph
+```
+
+The setup refuses non-loopback MongoDB hosts before making any changes. It is idempotent and labels all generated records with `local-fixph-qa-v1`. Remove only those fixtures with:
+
+```bash
+npm run setup:local-fixph:clean
+```
+
+Open `/civic` on the local Wikitruth host to test the overview, all tenant sections, filtering, jurisdictions, and record detail pages. Do not add local hostnames to the production tenant domain list.
+
 ## Isolation Verification
 
 - Requests for one tenant never return another tenant's civic records.

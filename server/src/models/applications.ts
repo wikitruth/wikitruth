@@ -14,6 +14,26 @@ import type { CivicTenantDefinition } from '../types/civicTenancy';
     'www.wikitruthproject.org'
 ];*/
 
+function configuredTenantHomeUrl(tenant: CivicTenantDefinition): string {
+  const configured = String(process.env.CIVIC_TENANT_HOME_URL_OVERRIDES || '')
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+    .map((entry) => {
+      const separator = entry.indexOf('=');
+      return separator > 0
+        ? [entry.slice(0, separator).trim().toLowerCase(), entry.slice(separator + 1).trim()]
+        : ['', ''];
+    })
+    .find(([tenantId]) => tenantId === tenant.tenantId.toLowerCase())?.[1];
+
+  // Allow same-origin paths or explicit web URLs, but never protocol-relative or script URLs.
+  if (configured && (/^\/(?!\/)/.test(configured) || /^https?:\/\//i.test(configured))) {
+    return configured;
+  }
+  return tenant.domains[0] ? `https://${tenant.domains[0]}` : '/civic';
+}
+
 function applicationFromCivicTenant(tenant: CivicTenantDefinition): ApplicationDefinition {
   return {
     id: tenant.tenantId,
@@ -22,7 +42,7 @@ function applicationFromCivicTenant(tenant: CivicTenantDefinition): ApplicationD
     navTitle: tenant.navTitle,
     slogan: tenant.slogan,
     logoIcon: tenant.branding.logoIcon,
-    homeUrl: tenant.domains[0] ? `https://${tenant.domains[0]}` : '/civic',
+    homeUrl: configuredTenantHomeUrl(tenant),
     aboutUrl: '/civic',
     exploreUrl: '/civic',
     domains: tenant.domains,
@@ -44,8 +64,8 @@ function getApplications() {
 }
 
 function getApplication(req: { hostname?: string }): ApplicationDefinition | null {
-  let domainName = req.hostname || '',
-    application: ApplicationDefinition | null = null;
+  const domainName = req.hostname || '';
+  let application: ApplicationDefinition | null = null;
   APPLICATIONS.some(function (app) {
     if ((app.domains || []).indexOf(domainName) > -1) {
       application = app;
@@ -60,10 +80,12 @@ function getApplication(req: { hostname?: string }): ApplicationDefinition | nul
 async function getApplicationAsync(req: {
   hostname?: string;
   get?: (name: string) => string | undefined;
-  app?: { db?: { models?: Record<string, any> } };
+  app?: { db?: { models?: Record<string, unknown> } };
 }): Promise<ApplicationDefinition | null> {
   const hostname = (String(req.get?.('x-forwarded-host') || req.hostname || '').split(':')[0] || '').toLowerCase();
-  const CivicTenant = req.app?.db?.models?.CivicTenant;
+  const CivicTenant = req.app?.db?.models?.CivicTenant as {
+    findOne?: (query: Record<string, unknown>) => { lean: () => Promise<unknown> };
+  } | undefined;
   const tenant = CivicTenant?.findOne
     ? await CivicTenant.findOne({ status: 'active', domains: hostname }).lean()
     : null;
