@@ -142,6 +142,10 @@ The target-state inventory was revalidated against current code. All non-deferre
 
 ### Implementation Progress (2026-07-11)
 
+- `aa7ced4f` closed an additional missing-group crash exposed by the independent
+  306-render rerun and wrapped all mounted legacy controller GET/POST promises
+  so rejected handlers are forwarded to Express instead of terminating the
+  shared process. Missing legacy group overview/member routes now return `404`.
 - `ef6792ff` hardened anonymous legacy topic creation, restored the named
   contributors-directory route ahead of the username route, intercepted
   unknown member profiles, and fixed exact legacy-mount redirects. Modern and
