@@ -12,7 +12,8 @@ const applications = applicationsMod as unknown as {
 
 function requestsLocalCivicApplication(req: WikitruthRequest): boolean {
   const value = String(req.query?.civic || '').trim().toLowerCase();
-  return value === '1' || value === 'true';
+  const path = String(req.path || '');
+  return value === '1' || value === 'true' || path === '/civic' || path.startsWith('/civic/');
 }
 
 export async function resolveActiveApplication(

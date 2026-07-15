@@ -22,8 +22,9 @@ describe('Route regression coverage for legacy + React shell', function () {
   it('keeps required React shell endpoints wired', function () {
     const appController = source('server/src/controllers/app.ts');
 
-    expect(appController).toContain("router.get('/', function (req: WikitruthRequest, res: WikitruthResponse)"); // /app
-    expect(appController).toContain("router.get('/*', function (req: WikitruthRequest, res: WikitruthResponse)"); // /app/*
+    expect(appController).toContain("router.get('/', sendShell)"); // /app
+    expect(appController).toContain("router.get('/*', sendShell)"); // /app/*
+    expect(appController).toContain('renderReactShell(req');
   });
 
   it('serves modern contribution and comment aliases through the React shell', function () {

@@ -2,9 +2,16 @@ import { promises as fs } from 'fs';
 import path from 'path';
 import type { Request } from 'express';
 import type { ApplicationDefinition } from '../types/domain';
+import type { CivicTenantDefinition } from '../types/civicTenancy';
+import applicationsMod from '../models/applications';
+import { builtInCivicTenant } from '../config/civicTenants';
 
 const shellPath = path.join(process.cwd(), 'public/react-app.html');
 let shellTemplate: Promise<string> | null = null;
+
+const applications = applicationsMod as unknown as {
+  applicationFromCivicTenant: (tenant: CivicTenantDefinition) => ApplicationDefinition;
+};
 
 function loadShellTemplate(): Promise<string> {
   shellTemplate ||= fs.readFile(shellPath, 'utf8');
@@ -26,6 +33,38 @@ function safeApplicationId(application: ApplicationDefinition | null): string {
     .toLowerCase()
     .replace(/[^a-z0-9_-]+/g, '-')
     .replace(/^-+|-+$/g, '');
+}
+
+function requestsLocalCivicShell(req: Request): boolean {
+  const value = String(req.query?.civic || '').trim().toLowerCase();
+  return value === '1' || value === 'true' || req.path === '/civic' || req.path.startsWith('/civic/');
+}
+
+export async function resolveReactShellApplication(
+  req: Request,
+  hostApplication: ApplicationDefinition | null,
+): Promise<ApplicationDefinition | null> {
+  if (!requestsLocalCivicShell(req)) return hostApplication;
+
+  const tenantId = String(
+    process.env.CIVIC_FIXED_TENANT_ID || process.env.CIVIC_DEFAULT_TENANT_ID || 'fixtheph',
+  ).trim().toLowerCase();
+  const CivicTenant = (req.app as unknown as {
+    db?: { models?: { CivicTenant?: { findOne?: (query: Record<string, unknown>) => { lean: () => Promise<unknown> } } } };
+  }).db?.models?.CivicTenant;
+  const persisted = CivicTenant?.findOne
+    ? await CivicTenant.findOne({ status: 'active', tenantId }).lean()
+    : null;
+  const tenant = (persisted as CivicTenantDefinition | null) || builtInCivicTenant(tenantId);
+  if (!tenant) return hostApplication;
+
+  const localApplication = applications.applicationFromCivicTenant(tenant);
+  if (hostApplication && hostApplication.id !== localApplication.id) {
+    const error = new Error('Requested civic application does not match the current host') as Error & { statusCode?: number };
+    error.statusCode = 409;
+    throw error;
+  }
+  return hostApplication || localApplication;
 }
 
 function requestOrigin(req: Request): string {

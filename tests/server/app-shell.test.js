@@ -77,6 +77,16 @@ describe('React shell routes', function () {
     expect(res.text).not.toContain('__WT_');
   });
 
+  it('renders the local Civic mount with FixPH identity before React loads', async function () {
+    const app = createRootApp();
+    const res = await request(app).get('/civic').expect(200);
+
+    expect(res.text).toContain('class="wt-tenant-app app-fixtheph"');
+    expect(res.text).toContain('content="FixPH"');
+    expect(res.text).toContain('/img/fixtheph/favicons/favicon.ico');
+    expect(res.text).not.toContain('__WT_');
+  });
+
   it('serves the React shell for dynamic About pages', async function () {
     const app = createRootApp();
     const res = await request(app).get('/about/what-is-wikitruth').expect(200);

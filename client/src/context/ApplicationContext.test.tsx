@@ -107,6 +107,6 @@ describe('ApplicationProvider', () => {
     expect(screen.getByTestId('app-name')).toHaveTextContent('Wikitruth');
     expect(screen.getByTestId('app-path')).toHaveTextContent('/search?tab=topics#browse');
     expect(document.body).not.toHaveClass('wt-tenant-app');
-    expect(document.title).toBe('Wikitruth');
+    await waitFor(() => expect(document.title).toBe('Wikitruth'));
   });
 });

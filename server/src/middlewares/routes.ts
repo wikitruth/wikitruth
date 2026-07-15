@@ -2,8 +2,7 @@
 
 import type { NextFunction, Request, Response } from 'express';
 import type { AppContext } from '../types/models';
-import type { ApplicationDefinition } from '../types/domain';
-import { renderReactShell } from '../services/reactShellService';
+import { renderReactShell, resolveReactShellApplication } from '../services/reactShellService';
 
 type AppRouteRegistrar = AppContext & {
   get: (...args: unknown[]) => unknown;
@@ -315,7 +314,8 @@ function redirectToModernApp(req: Request, res: Response): void {
 }
 
 function serveModernShell(req: Request, res: Response, next: NextFunction): void {
-  void renderReactShell(req, (res.locals.application || null) as ApplicationDefinition | null)
+  void resolveReactShellApplication(req, res.locals.application || null)
+    .then((application) => renderReactShell(req, application))
     .then((html) => res.type('html').send(html))
     .catch(next);
 }
@@ -330,7 +330,8 @@ function serveModernNotFoundShell(req: Request, res: Response, next: NextFunctio
     return;
   }
 
-  void renderReactShell(req, (res.locals.application || null) as ApplicationDefinition | null)
+  void resolveReactShellApplication(req, res.locals.application || null)
+    .then((application) => renderReactShell(req, application))
     .then((html) => res.status(404).type('html').send(html))
     .catch(next);
 }

@@ -164,7 +164,7 @@ export const ApplicationProvider: React.FC<{ children: React.ReactNode }> = ({ c
 
   return (
     <ApplicationContext.Provider value={value}>
-      <ApplicationDocumentIdentity application={application} />
+      {!loading ? <ApplicationDocumentIdentity application={application} /> : null}
       {children}
     </ApplicationContext.Provider>
   );
