@@ -83,9 +83,9 @@ Current detailed evidence and page-family results are in
 - [x] Restore useful parent context, excerpts, authorship, status, dates,
   interactions, and artifact media across Home, Explore, Search, lists, and
   related-entry sections.
-- [ ] Build visualization from the existing outline-tree API instead of only
+- [x] Build visualization from the existing outline-tree API instead of only
   the five-item Home payload.
-- [ ] Add persistent About/Posts/Members navigation to every group subroute.
+- [x] Add persistent About/Posts/Members navigation to every group subroute.
 - [x] Repair creator/editor hydration and empty artifact-editor grammar.
 - [ ] Fix the mobile fixed-header collision that visually covers breadcrumbs.
 - [ ] Serve the branded React 404 for arbitrary direct browser URLs.
@@ -94,7 +94,7 @@ Current detailed evidence and page-family results are in
 - [ ] Keep the active FixPH section visible in its horizontal navigation and
   add an overflow affordance.
 - [ ] Implement a real `Remember me` session choice or remove the no-op field.
-- [ ] Decide whether answers need a dedicated discussion route and align route
+- [x] Decide whether answers need a dedicated discussion route and align route
   inventory/tests with that decision.
 - [ ] Harden or isolate `/legacy/topics/create` and
   `/legacy/members/contributors`; both currently crash the shared PM2 process.
@@ -142,6 +142,10 @@ The target-state inventory was revalidated against current code. All non-deferre
 
 ### Implementation Progress (2026-07-11)
 
+- `83506978` switched visualization to the depth-four outline hierarchy with a
+  bounded 500-node traversal, added persistent group About/Posts/Members tabs
+  and rich group activity rows, introduced a focused answer discussion route,
+  and differentiated member/profile avatars with deterministic patterns.
 - `e963ed49` centralized rich entry-row presentation across all seven families,
   replaced numeric screening codes with semantic labels, restored parent,
   excerpt, author, date, interaction, and artifact-media context, and fixed
