@@ -60,10 +60,12 @@ function getEntryIdFromPath(pathname: string): string | null {
   if (parts.length < 3 || parts[1] !== 'entry') {
     return null;
   }
-  if (parts.length >= 4) {
-    return decodeURIComponent(parts[3]);
-  }
-  return decodeURIComponent(parts[2]);
+
+  const entryParts = parts.slice(2);
+  const subrouteIndex = entryParts.findIndex((part) => ['answers', 'discussion', 'timeline'].includes(part));
+  const entryPath = subrouteIndex >= 0 ? entryParts.slice(0, subrouteIndex) : entryParts;
+  const entryId = entryPath.at(-1);
+  return entryId ? decodeURIComponent(entryId) : null;
 }
 
 function getSectionFromPath(pathname: string): string {

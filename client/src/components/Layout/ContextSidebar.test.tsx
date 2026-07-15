@@ -18,6 +18,7 @@ jest.mock('../../services/api', () => ({
   default: {
     getHomeData: jest.fn(),
     getTopicEntry: jest.fn(),
+    getAnswerEntry: jest.fn(),
   },
 }));
 
@@ -28,6 +29,7 @@ describe('ContextSidebar', () => {
   beforeEach(() => {
     mockedApi.getHomeData.mockReset();
     mockedApi.getTopicEntry.mockReset();
+    mockedApi.getAnswerEntry.mockReset();
     mockedUseAuth.mockReturnValue({
       user: { _id: 'user-1', username: 'demo', roles: {} },
       isAuthenticated: true,
@@ -81,5 +83,18 @@ describe('ContextSidebar', () => {
       'Explore',
       'My Shortcuts',
     ]);
+  });
+
+  it('uses the answer id rather than a discussion subroute as sidebar context', async () => {
+    mockedApi.getHomeData.mockResolvedValue({ applications: [], appCategories: [] });
+    mockedApi.getAnswerEntry.mockResolvedValue({
+      answer: makeEntity({ _id: 'answer-1', title: 'Answer' }),
+      topicLinks: [],
+    });
+
+    render(<ContextSidebar />, { route: '/answers/entry/answer-1/discussion' });
+
+    await waitFor(() => expect(mockedApi.getAnswerEntry).toHaveBeenCalledWith('answer-1'));
+    expect(mockedApi.getAnswerEntry).not.toHaveBeenCalledWith('discussion');
   });
 });

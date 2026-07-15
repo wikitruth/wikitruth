@@ -114,8 +114,11 @@ describe('CivicWorkspacePage navigation', () => {
         candidate: 0,
         history: 0,
       },
+      recent: [],
       urgent: [],
+      kinds: [],
       statuses: [],
+      stages: [],
     });
     mockedCivicApi.list.mockResolvedValue({ records: [], count: 0 });
   });

@@ -17,7 +17,7 @@ import type { Answer, Argument, Issue, Opinion, Question, Topic } from '../../..
 
 const ProfileJournal: React.FC = () => {
   const { username: routeUsername } = useParams<{ username?: string }>();
-  const { user } = useAuth();
+  const { user, isLoading: isAuthLoading } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const username = routeUsername || user?.username || '';
   const tab = (searchParams.get('tab') || 'all').toLowerCase();
@@ -25,17 +25,31 @@ const ProfileJournal: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const isOwnProfile = useMemo(() => Boolean(user?.username && username && user.username === username), [user?.username, username]);
+  const canViewJournal = isOwnProfile || Boolean(user?.roles?.admin);
 
   useEffect(() => {
     const loadJournal = async () => {
+      if (isAuthLoading) {
+        setLoading(true);
+        return;
+      }
+
       if (!username) {
         setError('Username is required');
         setLoading(false);
         return;
       }
 
+      if (!canViewJournal) {
+        setData({});
+        setError(null);
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
+        setError(null);
         const result = await apiService.getMemberJournal(username, tab);
         setData(result || {});
       } catch (err) {
@@ -46,7 +60,7 @@ const ProfileJournal: React.FC = () => {
     };
 
     void loadJournal();
-  }, [tab, username]);
+  }, [canViewJournal, isAuthLoading, tab, username]);
 
   const sections = useMemo(
     () => [
@@ -63,12 +77,30 @@ const ProfileJournal: React.FC = () => {
 
   const categories = (data.categories || []) as LegacyEntity[];
 
-  if (loading) {
+  if (isAuthLoading || loading) {
     return <LoadingSpinner message="Loading journal..." />;
   }
 
   if (error) {
     return <Alert type="danger">{error}</Alert>;
+  }
+
+  if (!canViewJournal) {
+    const returnUrl = `/members/${encodeURIComponent(username)}/journal`;
+    return (
+      <ProfileShell username={username} activeTab="journal" isOwnProfile={false}>
+        <div style={{ marginTop: '15px' }}>
+          <Alert type="info">
+            This journal is private. Only the profile owner or an administrator can view it.
+          </Alert>
+          {!user && (
+            <Link to={`/login?returnUrl=${encodeURIComponent(returnUrl)}`} className="btn btn-primary">
+              <i className="fa fa-sign-in" aria-hidden="true"></i> Sign in
+            </Link>
+          )}
+        </div>
+      </ProfileShell>
+    );
   }
 
   return (
