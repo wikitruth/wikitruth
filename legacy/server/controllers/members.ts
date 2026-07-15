@@ -19,10 +19,29 @@ const db = app.db.models;
 const mountMembersController: LegacyControllerFactory = function(router) {
   let prefix = '/:username/diary';
 
-  router.get('/', async function(req, res) {
+  async function renderContributors(req, res) {
     let model = {};
     model.contributors = await findMembers({ 'preferences.privateProfile': { $ne: true } });
     res.render(templates.members.contributors, model);
+  }
+
+  router.get('/', renderContributors);
+  // Keep the historical named tab URL from falling through to /:username.
+  router.get('/contributors', renderContributors);
+
+  router.param('username', function(req, res, next, username) {
+    if (req.user && req.user.username === username) {
+      req.legacyMember = req.user;
+      return next();
+    }
+
+    Promise.resolve(db.User.findOne({ username: username })).then(function(member) {
+      if (!member) {
+        return res.redirect(paths.members.index);
+      }
+      req.legacyMember = member;
+      next();
+    }, next);
   });
 
   router.get('/screeners', async function(req, res) {
@@ -750,7 +769,12 @@ async function findMembers(memberFilter) {
 
 async function setMemberModel(model, req) {
   if (req.params.username) {
-    if (req.user && req.user.username === req.params.username) {
+    if (req.legacyMember) {
+      model.member = req.legacyMember;
+      if (req.user && req.user.username === req.params.username) {
+        model.loggedIn = true;
+      }
+    } else if (req.user && req.user.username === req.params.username) {
       model.member = req.user;
       model.loggedIn = true;
     } else {

@@ -55,6 +55,15 @@ describe('Legacy auth/account/admin request smoke', function () {
     app = express();
     app.use(express.urlencoded({ extended: true }));
     app.use(express.json());
+    app.use(function stubLegacyRenderer(_req, res, next) {
+      res.render = function renderLegacyTestResponse(view, model) {
+        return res.status(200).json({
+          view,
+          modelKeys: Object.keys(model || {}),
+        });
+      };
+      next();
+    });
     registerLegacyCompatibility(app, { enabled: true });
   });
 
@@ -90,5 +99,16 @@ describe('Legacy auth/account/admin request smoke', function () {
 
     const adminResponse = await request(app).get('/legacy/admin?section=backup').expect(302);
     expect(adminResponse.headers.location).toBe('/legacy/admin/db-backup?section=backup');
+  });
+
+  it('redirects anonymous root topic creation without dereferencing a missing user', async function () {
+    const response = await request(app).get('/legacy/topics/create').expect(302);
+    expect(response.headers.location).toBe('/legacy');
+  });
+
+  it('serves the named contributors directory instead of treating it as a profile', async function () {
+    const response = await request(app).get('/legacy/members/contributors').expect(200);
+    expect(response.body.view).toBe('dust/members/contributors');
+    expect(response.body.modelKeys).toContain('contributors');
   });
 });

@@ -172,7 +172,7 @@ function registerLegacyCompatibility(app: Express, options: LegacyCompatibilityO
         if (redirectUrl.startsWith('/')) {
           if (redirectUrl === '/') {
             redirectUrl = mountPath + '/';
-          } else if (!redirectUrl.startsWith(mountPath + '/')) {
+          } else if (redirectUrl !== mountPath && !redirectUrl.startsWith(mountPath + '/')) {
             redirectUrl = mountPath + redirectUrl;
           }
         }

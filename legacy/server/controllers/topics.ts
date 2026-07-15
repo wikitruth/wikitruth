@@ -14,6 +14,10 @@ import app from '../app';
 
 const db = app.db.models;
 
+function isAdministrator(req) {
+  return !!req.user && typeof req.user.isAdmin === 'function' && req.user.isAdmin();
+}
+
 const mountTopicsController: LegacyControllerFactory = function(router) {
 
   router.get('/', async function(req, res) {
@@ -275,7 +279,7 @@ async function GET_create(req, res) {
     return res.redirect('/');
   }
   flowUtils.setModelContext(req, res, model);
-  if (!model.topic && !model.parentTopic && !req.params.username && !req.user.isAdmin()) {
+  if (!model.topic && !model.parentTopic && !req.params.username && !isAdministrator(req)) {
     // A public create on root topics but not an admin
     return res.redirect(model.wikiBaseUrl);
   }
@@ -328,7 +332,7 @@ async function POST_create(req, res) {
     entity.ownerType = constants.OBJECT_TYPES.group;
     entity.ownerId = res.locals.group._id;
     entity.groupId = res.locals.group._id;
-  } else if (!entity.parentId && !req.user.isAdmin()) {
+  } else if (!entity.parentId && !isAdministrator(req)) {
     // root topic & not admin & not private - non-admins are not allowed to create categories
     return res.redirect('/');
   }
@@ -537,7 +541,7 @@ async function GET_link_edit(req, res) {
 async function POST_link_edit(req, res) {
   const action = req.body.action;
   if (action === 'delete') {
-    if (!req.user.isAdmin()) {
+    if (!isAdministrator(req)) {
       // VALIDATION: only admin can delete a link
       return res.redirect(flowUtils.buildReturnUrl(req));
     }
