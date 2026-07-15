@@ -17,18 +17,17 @@ Re-open legacy-to-modern parity at feature and workflow depth, rather than treat
 
 ### Legacy replacement readiness
 
-**Broad functional coverage is verified, but replacement readiness is reopened.**
+**Non-deferred local legacy-replacement readiness is verified.**
 Core public reading, entry CRUD, discussion, search, member/group, moderation,
 admin, empty-database recovery, dynamic About content, disposable privileged-role
 journeys, and FixPH are represented in modern code. The 2026-07-15 visual and
-feature-depth revalidation found open information-density, navigation,
-visualization, authorization-UX, identity-hydration, and mobile breadcrumb gaps.
-The modern app must not be described as fully legacy-parity-complete until the
-open remediation checklist below passes a separate verification run.
+feature-depth revalidation found information-density, navigation,
+visualization, authorization-UX, identity-hydration, and mobile breadcrumb gaps;
+those gaps were implemented and passed a separate final verification run.
 
 ### Modern target-state completeness
 
-**Core governance modernization and the FixPH civic product baseline are implemented and locally signed off, while frontend completion remains open.** The modern application includes deterministic duplicate/merge handling, immutable revisions, change requests and rollback, tamper-evident privileged audit events, evidence provenance and quality review, independent factual/ethical verdicts, policy-versioned onboarding, revision-linked discussion context, issue-first controls, controlled anonymous screening proposals, deterministic reputation scorecards, explicit archived/freshness UX, dedicated civic accountability workflows, tenant-scoped operations, and governed record maintenance. Automatic content expiry and React Native delivery are explicitly deferred. The frontend gaps recorded by the 2026-07-15 revalidation are active implementation work, not deferred product decisions.
+**Core governance modernization, the FixPH civic product baseline, and non-deferred frontend completion are locally signed off.** The modern application includes deterministic duplicate/merge handling, immutable revisions, change requests and rollback, tamper-evident privileged audit events, evidence provenance and quality review, independent factual/ethical verdicts, policy-versioned onboarding, revision-linked discussion context, issue-first controls, controlled anonymous screening proposals, deterministic reputation scorecards, explicit archived/freshness UX, dedicated civic accountability workflows, tenant-scoped operations, governed record maintenance, rich entry presentation, and verified responsive navigation. Automatic content expiry and React Native delivery are explicitly deferred.
 
 ## Recommendation Review (2026-07-11)
 
@@ -70,7 +69,7 @@ The unchecked work is valid, but it should not be executed as one undifferentiat
 | Reputation and scorecards | Modern-only | Implemented with deterministic, explainable snapshots | Member profiles expose four scoring dimensions and earned badges; Explore offers a trusted ranking using reputation, screening state, and popularity inputs. |
 | FixPH civic accountability | Modern-only | Implemented as a dedicated local product workspace | The deterministic local tenant covers all record kinds and sections; active mobile navigation is automatically centered with explicit overflow affordances. |
 | Lifecycle reading modes | Improved over legacy | Implemented | Accepted, Pending, Archived, and All states are explicit; archived entries and reference-dated information show non-destructive reader notices. |
-| QA proof | Broad route and privileged semantic coverage; visual parity open | Improved | The fresh 306-render audit proves that route/overflow checks alone can miss information and navigation gaps. Disposable role and civic fixtures still clean up successfully. |
+| QA proof | Broad route, semantic, privileged, and visual coverage verified | Improved | The final 306-render audit has zero regressions, navigation failures, `5xx`, request failures, or modern overflow. Disposable role and civic fixtures clean up successfully. |
 | Mobile/native client | Not a legacy-web parity requirement | Deferred, not implemented | `docs/plans/deferred/REACT_NATIVE_MONOREPO_CHECKLIST_PLAN_2026-04-19.md` was explicitly deferred on 2026-07-13. |
 
 ## Revalidation Findings (2026-07-15)
@@ -89,8 +88,9 @@ Current detailed evidence and page-family results are in
 - [x] Repair creator/editor hydration and empty artifact-editor grammar.
 - [x] Fix the mobile fixed-header collision that visually covers breadcrumbs.
 - [x] Serve the branded React 404 for arbitrary direct browser URLs.
-- [x] Add consistent route-level authentication/role guards for Notifications
-  and Admin pages before protected forms and data requests mount.
+- [x] Add consistent route-level authentication/role guards for account,
+  authoring/editing, owner workspace, screening/conversion, outline mutation,
+  Notifications, and Admin pages before protected forms and data requests mount.
 - [x] Keep the active FixPH section visible in its horizontal navigation and
   add an overflow affordance.
 - [x] Implement a real `Remember me` session choice or remove the no-op field.
@@ -98,7 +98,7 @@ Current detailed evidence and page-family results are in
   inventory/tests with that decision.
 - [x] Harden or isolate `/legacy/topics/create` and
   `/legacy/members/contributors`; both currently crash the shared PM2 process.
-- [ ] Re-run the 306-render public sweep, seven-family semantic suite, and
+- [x] Re-run the 306-render public sweep, seven-family semantic suite, and
   disposable five-role audit after remediation.
 
 ## Verified Defects Corrected in This Pass
@@ -142,6 +142,18 @@ The target-state inventory was revalidated against current code. All non-deferre
 
 ### Implementation Progress (2026-07-11)
 
+- `4af9b33d` aligned modern route access with API authorization: account,
+  authoring/editing, current-member workspace, outline mutation, screening,
+  conversion, Notifications, and Admin surfaces now guard before protected
+  components or requests mount. The public Create chooser and controlled
+  anonymous proposal flow remain available. Focused route/auth/login tests,
+  lint, type checking, and the production client build passed.
+- Final independent verification on 2026-07-15 completed 306 renders with zero
+  regressions, navigation failures, `5xx`, request failures, or modern overflow;
+  passed all seven semantic entry families and all five disposable roles with
+  cleanup; passed 61 server suites / 266 tests and 83 client suites / 203 tests;
+  and passed smoke guardrails plus production server/client builds. Local PM2
+  process `35` remained online and did not restart during the final sweep.
 - `9bf26051` closed a content-level topic discrepancy found during direct
   screenshot inspection after the aggregate sweep: hydrated topic creator and
   editor names now survive JSON serialization, the topic header identifies its
@@ -207,7 +219,7 @@ The target-state inventory was revalidated against current code. All non-deferre
 - [x] Focused client tests for header sections, route aliases, and closed mobile sidebar behavior.
 - [x] Focused server test for singular comment redirect behavior.
 - [x] Server TypeScript no-emit check after the first correction set.
-- [x] Full current client and server test suites: 74 client suites / 178 tests and 56 server suites / 251 tests passed on 2026-07-13.
+- [x] Full current client and server test suites: 83 client suites / 203 tests and 61 server suites / 266 tests passed on 2026-07-15.
 - [x] Production server and client builds.
 - [x] PM2 process `35` (`wikitruth`) restart plus post-restart `200` checks for modern artifact, legacy artifact, and `/api/home`.
 - [x] Live current-host verification of default header sections, comment redirect, and closed/open mobile overflow at `390x844`.
@@ -221,13 +233,18 @@ The target-state inventory was revalidated against current code. All non-deferre
 - [x] Legacy/modern semantic form-field contracts for all seven entry families and deterministic search ordering/cursor/privacy fixtures.
 - [x] Zero-warning lint, modern/legacy type checks, production builds, and source guardrails after lifecycle and FixPH implementation.
 - [x] Disposable authenticated Google Chrome verification of platform tenant configuration, tenant membership and jurisdiction operations, contributor record create/edit, knowledge-link add/remove, lifecycle review, and mobile overflow with zero mutable fixture residue.
+- [x] Final public 306-render sweep after all remediation: zero regressions,
+  navigation failures, `5xx`, request failures, modern overflow, or fully hidden
+  breadcrumbs; only the intentional branded modern `404` logged a modern
+  resource error.
+- [x] Final seven-family semantic and disposable reader/contributor/screener/
+  reviewer/admin parity reruns, with zero action errors and verified cleanup.
 
 ## Completion Rule
 
 Keep this plan active until every item under **Open Legacy-Replacement Work** and **Verification Checklist** is complete. Modern target-state items may remain deferred only with an explicit product decision; they must not be represented as feature-complete.
 
-The 2026-07-13 functional implementation remains valuable, but the 2026-07-15
-revalidation reopened non-deferred frontend and shared-runtime work. This plan
-must remain active until the revalidation checklist is implemented and passes a
-separate verification stage. The explicit legacy-retirement, automatic-expiry,
-and React Native deferrals remain unchanged.
+The 2026-07-15 revalidation checklist is implemented and has passed its separate
+verification stage. This plan remains active rather than moving to `completed/`
+because the explicit legacy-retirement, automatic-expiry, strict-debate, and
+React Native product decisions remain deferred.
