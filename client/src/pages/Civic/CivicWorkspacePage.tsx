@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import PageMeta from '../../components/common/PageMeta';
 import LoadingSpinner from '../../components/LoadingSpinner';
@@ -74,6 +74,7 @@ const CivicWorkspacePage: React.FC = () => {
   const [jurisdictionId, setJurisdictionId] = useState('');
   const [selectedCandidates, setSelectedCandidates] = useState<CivicRecord[]>([]);
   const [comparedCandidates, setComparedCandidates] = useState<CivicRecord[]>([]);
+  const sectionsNavRef = useRef<HTMLElement | null>(null);
 
   const kinds = useMemo(() => section?.kinds.join(','), [section]);
   const load = useCallback(async () => {
@@ -102,6 +103,13 @@ const CivicWorkspacePage: React.FC = () => {
     setSelectedCandidates([]);
     setComparedCandidates([]);
   }, [sectionSlug]);
+
+  useEffect(() => {
+    const activeItem = sectionsNavRef.current?.querySelector<HTMLElement>('a[aria-current="page"]');
+    if (activeItem?.scrollIntoView) {
+      activeItem.scrollIntoView({ behavior: 'auto', block: 'nearest', inline: 'center' });
+    }
+  }, [section?.slug]);
 
   const toggleCandidate = (candidate: CivicRecord) => {
     setSelectedCandidates((current) => current.some((item) => item._id === candidate._id)
@@ -137,15 +145,27 @@ const CivicWorkspacePage: React.FC = () => {
         )}
       </header>
 
-      <nav className="wt-civic-sections" aria-label={`${tenant.title} civic sections`}>
-        <Link className={!section ? 'active' : ''} to="/civic"><i className="fa fa-dashboard" aria-hidden="true"></i> Overview</Link>
-        {sections.map((item) => (
-          <Link className={section?.slug === item.slug ? 'active' : ''} key={item.slug} to={`/civic/${item.slug}`}>
-            <i className={`fa fa-${item.icon}`} aria-hidden="true"></i> {item.title}
-          </Link>
-        ))}
-        {hasRole('admin') && <Link to="/admin/civic-operations"><i className="fa fa-cog" aria-hidden="true"></i> Manage tenant</Link>}
-      </nav>
+      <div className="wt-civic-sections-shell">
+        <span className="sr-only" id="civic-sections-help">Scroll horizontally to view more sections.</span>
+        <nav
+          ref={sectionsNavRef}
+          className="wt-civic-sections"
+          aria-label={`${tenant.title} civic sections`}
+          aria-describedby="civic-sections-help"
+          tabIndex={0}
+        >
+          <Link className={!section ? 'active' : ''} aria-current={!section ? 'page' : undefined} to="/civic"><i className="fa fa-dashboard" aria-hidden="true"></i> Overview</Link>
+          {sections.map((item) => {
+            const isActive = section?.slug === item.slug;
+            return (
+              <Link className={isActive ? 'active' : ''} aria-current={isActive ? 'page' : undefined} key={item.slug} to={`/civic/${item.slug}`}>
+                <i className={`fa fa-${item.icon}`} aria-hidden="true"></i> {item.title}
+              </Link>
+            );
+          })}
+          {hasRole('admin') && <Link to="/admin/civic-operations"><i className="fa fa-cog" aria-hidden="true"></i> Manage tenant</Link>}
+        </nav>
+      </div>
 
       {!section && overview?.urgent?.length ? (
         <section className="wt-civic-urgent">

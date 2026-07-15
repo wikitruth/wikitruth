@@ -52,6 +52,26 @@ describe('React shell routes', function () {
     expect(res.text).toContain('Wikitruth - React App');
   });
 
+  it('serves the branded React not-found page for an arbitrary browser URL', async function () {
+    const app = createRootApp();
+    const res = await request(app)
+      .get('/this-page-does-not-exist')
+      .set('Accept', 'text/html')
+      .expect(404);
+
+    expect(res.text).toContain('<!DOCTYPE html>');
+    expect(res.text).toContain('Wikitruth - React App');
+  });
+
+  it('does not turn missing API or asset requests into HTML', async function () {
+    const app = createRootApp();
+    const apiResponse = await request(app).get('/api/not-real').set('Accept', 'text/html').expect(404);
+    const assetResponse = await request(app).get('/js/not-real.js').set('Accept', 'text/html').expect(404);
+
+    expect(apiResponse.text).not.toContain('Wikitruth - React App');
+    expect(assetResponse.text).not.toContain('Wikitruth - React App');
+  });
+
   it('redirects /app alias routes to root-based modern routes', async function () {
     const app = createRootApp();
     const res = await request(app).get('/app/topics').expect(302);

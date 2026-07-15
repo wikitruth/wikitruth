@@ -1,6 +1,6 @@
 'use strict';
 
-import type { Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import type { AppContext } from '../types/models';
 import path from 'path';
 
@@ -319,6 +319,19 @@ function serveModernShell(_req: Request, res: Response): void {
   res.sendFile(reactShellPath);
 }
 
+function serveModernNotFoundShell(req: Request, res: Response, next: NextFunction): void {
+  const excludedPrefix = /^\/(?:api|legacy|vendor|media|img|css|js|fonts|socket\.io)(?:\/|$)/i;
+  const fileLikePath = /\/[^/]+\.[a-z0-9]{1,10}$/i;
+  const acceptsHtml = req.accepts('html');
+
+  if (!acceptsHtml || excludedPrefix.test(req.path) || fileLikePath.test(req.path)) {
+    next();
+    return;
+  }
+
+  res.status(404).sendFile(reactShellPath);
+}
+
 export default function registerLegacyPathRedirects(app: AppRouteRegistrar, _passport: unknown): void {
   const modernShellPatterns = [
     '/',
@@ -447,4 +460,6 @@ export default function registerLegacyPathRedirects(app: AppRouteRegistrar, _pas
   modernShellPatterns.forEach((pattern) => {
     app.get(pattern, serveModernShell);
   });
+
+  app.get('*', serveModernNotFoundShell);
 };

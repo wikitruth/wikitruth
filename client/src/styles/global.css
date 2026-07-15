@@ -213,6 +213,15 @@ button:focus-visible,
 }
 
 @media (max-width: 767px) {
+  body {
+    padding-top: 80px;
+  }
+
+  .breadcrumb.wt-bc {
+    position: relative;
+    z-index: 1;
+  }
+
   .navbar-brand-label .hidden-xxs {
     display: inline !important;
   }

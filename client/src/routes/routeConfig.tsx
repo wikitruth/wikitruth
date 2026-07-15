@@ -1,5 +1,6 @@
 import React, { lazy } from 'react';
 import { CivicTenantProvider } from '../context/CivicTenantContext';
+import ProtectedRoute, { type ProtectedRole } from '../components/Auth/ProtectedRoute';
 
 const HomePage = lazy(() => import('../pages/HomePage'));
 const ExplorePage = lazy(() => import('../pages/ExplorePage'));
@@ -107,6 +108,10 @@ export interface AppRoute {
   element: React.ReactElement;
 }
 
+function protectedRoute(element: React.ReactElement, allowedRoles?: ProtectedRole[]): React.ReactElement {
+  return <ProtectedRoute allowedRoles={allowedRoles}>{element}</ProtectedRoute>;
+}
+
 export const appRoutes: AppRoute[] = [
   { path: '/', element: <HomePage /> },
   { path: '/explore', element: <ExplorePage /> },
@@ -119,25 +124,25 @@ export const appRoutes: AppRoute[] = [
   { path: '/account/onboarding', element: <OnboardingPage /> },
   { path: '/account/settings', element: <SettingsPage /> },
   { path: '/account/verification', element: <VerificationPage /> },
-  { path: '/admin', element: <AdminDashboard /> },
-  { path: '/admin/users', element: <UsersList /> },
-  { path: '/admin/users/:id', element: <UserDetails /> },
-  { path: '/admin/accounts', element: <AccountsList /> },
-  { path: '/admin/accounts/:id', element: <AccountDetails /> },
-  { path: '/admin/administrators', element: <AdminsList /> },
-  { path: '/admin/administrators/:id', element: <AdminDetails /> },
-  { path: '/admin/groups', element: <GroupsList /> },
-  { path: '/admin/groups/:id', element: <GroupDetails /> },
-  { path: '/admin/categories', element: <CategoriesList /> },
-  { path: '/admin/categories/:id', element: <CategoryDetails /> },
-  { path: '/admin/statuses', element: <StatusesList /> },
-  { path: '/admin/statuses/:id', element: <StatusDetails /> },
-  { path: '/admin/db-backup', element: <DBBackupPage /> },
-  { path: '/admin/audit', element: <AuditTimelinePage /> },
-  { path: '/admin/moderation/signals', element: <SignalsAppealsPage /> },
-  { path: '/admin/anonymous-contributions', element: <AnonymousContributionsPage /> },
-  { path: '/admin/civic-tenants', element: <CivicTenantsPage /> },
-  { path: '/admin/civic-operations', element: <CivicTenantProvider><CivicOperationsPage /></CivicTenantProvider> },
+  { path: '/admin', element: protectedRoute(<AdminDashboard />, ['admin']) },
+  { path: '/admin/users', element: protectedRoute(<UsersList />, ['admin']) },
+  { path: '/admin/users/:id', element: protectedRoute(<UserDetails />, ['admin']) },
+  { path: '/admin/accounts', element: protectedRoute(<AccountsList />, ['admin']) },
+  { path: '/admin/accounts/:id', element: protectedRoute(<AccountDetails />, ['admin']) },
+  { path: '/admin/administrators', element: protectedRoute(<AdminsList />, ['admin']) },
+  { path: '/admin/administrators/:id', element: protectedRoute(<AdminDetails />, ['admin']) },
+  { path: '/admin/groups', element: protectedRoute(<GroupsList />, ['admin']) },
+  { path: '/admin/groups/:id', element: protectedRoute(<GroupDetails />, ['admin']) },
+  { path: '/admin/categories', element: protectedRoute(<CategoriesList />, ['admin']) },
+  { path: '/admin/categories/:id', element: protectedRoute(<CategoryDetails />, ['admin']) },
+  { path: '/admin/statuses', element: protectedRoute(<StatusesList />, ['admin']) },
+  { path: '/admin/statuses/:id', element: protectedRoute(<StatusDetails />, ['admin']) },
+  { path: '/admin/db-backup', element: protectedRoute(<DBBackupPage />, ['admin']) },
+  { path: '/admin/audit', element: protectedRoute(<AuditTimelinePage />, ['admin']) },
+  { path: '/admin/moderation/signals', element: protectedRoute(<SignalsAppealsPage />, ['reviewer', 'admin']) },
+  { path: '/admin/anonymous-contributions', element: protectedRoute(<AnonymousContributionsPage />, ['screener', 'reviewer', 'admin']) },
+  { path: '/admin/civic-tenants', element: protectedRoute(<CivicTenantsPage />, ['admin']) },
+  { path: '/admin/civic-operations', element: protectedRoute(<CivicTenantProvider><CivicOperationsPage /></CivicTenantProvider>) },
   { path: '/civic', element: <CivicTenantProvider><CivicWorkspacePage /></CivicTenantProvider> },
   { path: '/civic/:section', element: <CivicTenantProvider><CivicWorkspacePage /></CivicTenantProvider> },
   { path: '/civic/records/:id', element: <CivicTenantProvider><CivicRecordPage /></CivicTenantProvider> },
@@ -236,11 +241,11 @@ export const appRoutes: AppRoute[] = [
   { path: '/create', element: <CreateWizardPage /> },
   { path: '/contribute', element: <AnonymousContributionPage /> },
   { path: '/clipboard', element: <ClipboardPage /> },
-  { path: '/notifications', element: <NotificationsPage /> },
+  { path: '/notifications', element: protectedRoute(<NotificationsPage />) },
   { path: '/timeline', element: <EntryTimelinePage /> },
   { path: '/outline/link', element: <OutlineLinkPage /> },
-  { path: '/admin/verdicts', element: <VerdictsPage /> },
-  { path: '/admin/verdicts/:id', element: <VerdictUpdatePage /> },
+  { path: '/admin/verdicts', element: protectedRoute(<VerdictsPage />, ['admin']) },
+  { path: '/admin/verdicts/:id', element: protectedRoute(<VerdictUpdatePage />, ['reviewer', 'admin']) },
   { path: '/500', element: <ServerError500 /> },
   { path: '/503', element: <ServiceUnavailable503 /> },
   { path: '*', element: <NotFoundPage /> },

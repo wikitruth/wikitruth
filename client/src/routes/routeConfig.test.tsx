@@ -1,6 +1,7 @@
 import { appRoutes } from './routeConfig';
 import * as fs from 'fs';
 import * as path from 'path';
+import ProtectedRoute from '../components/Auth/ProtectedRoute';
 
 describe('routeConfig', () => {
   it('contains key routes', () => {
@@ -60,5 +61,23 @@ describe('routeConfig', () => {
     expect(paths).toContain('/issues/entry/:friendlyUrl/:id/discussion');
     expect(paths).toContain('/opinions/entry/:friendlyUrl/:id/discussion');
     expect(paths).toContain('/answers/entry/:id/discussion');
+  });
+
+  it('guards notification and administration pages before they mount', () => {
+    const protectedPaths = [
+      '/notifications',
+      '/admin',
+      '/admin/users',
+      '/admin/db-backup',
+      '/admin/moderation/signals',
+      '/admin/anonymous-contributions',
+      '/admin/civic-operations',
+      '/admin/verdicts',
+    ];
+
+    protectedPaths.forEach((routePath) => {
+      const route = appRoutes.find((candidate) => candidate.path === routePath);
+      expect(route?.element.type).toBe(ProtectedRoute);
+    });
   });
 });

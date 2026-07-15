@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import Input from '../components/Form/Input';
-import Checkbox from '../components/Form/Checkbox';
 import Button from '../components/common/Button';
 import Alert from '../components/common/Alert';
 import SocialLoginButtons from '../components/Auth/SocialLoginButtons';
@@ -14,11 +13,17 @@ import { trackEvent } from '../utils/analytics';
 interface LoginFormValues {
   username: string;
   password: string;
-  rememberMe: boolean;
+}
+
+function safeReturnUrl(value: string | null): string {
+  const candidate = String(value || '').trim();
+  return candidate.startsWith('/') && !candidate.startsWith('//') ? candidate : '/';
 }
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const returnUrl = safeReturnUrl(searchParams.get('returnUrl'));
   const { login, isAuthenticated } = useAuth();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [providersReady, setProvidersReady] = useState(false);
@@ -26,9 +31,9 @@ const LoginPage: React.FC = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/');
+      navigate(returnUrl, { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, returnUrl]);
 
   useEffect(() => {
     let active = true;
@@ -77,7 +82,7 @@ const LoginPage: React.FC = () => {
     try {
       await login(values.username, values.password);
       trackEvent('login', 'auth', 'credentials');
-      navigate('/');
+      navigate(returnUrl, { replace: true });
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Login failed. Please check your credentials.');
     }
@@ -95,7 +100,6 @@ const LoginPage: React.FC = () => {
     initialValues: {
       username: '',
       password: '',
-      rememberMe: false,
     },
     onSubmit: handleSubmit,
     validate,
@@ -153,13 +157,6 @@ const LoginPage: React.FC = () => {
               required
               error={touched.password ? errors.password : undefined}
               autoComplete="current-password"
-            />
-
-            <Checkbox
-              name="rememberMe"
-              label="Remember me"
-              checked={values.rememberMe}
-              onChange={handleChange}
             />
 
             <div className="form-actions" style={{ marginTop: '20px' }}>
