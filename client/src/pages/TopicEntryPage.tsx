@@ -24,6 +24,7 @@ import type { TopicEntryResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
 import type { Argument, Artifact, Issue, Opinion, Question, Topic } from '../types';
 import { EntryMetaBlock, buildLegacyEntryBreadcrumb } from '../components/Entry/EntryLegacyParity';
+import TopicEntrySummary from '../components/Entry/TopicEntrySummary';
 const CONTENT_COLLAPSE_THRESHOLD = 1200;
 function getCount(value: unknown): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : 0;
@@ -273,47 +274,14 @@ const TopicEntryPage: React.FC = () => {
         iconColor="text-success-x"
       />
 
-      <div className="text-muted" style={{ marginTop: '-6px', marginBottom: '8px' }}>
-        <small>
-          <i className="fa fa-folder-open-o" aria-hidden="true"></i> A topic category{' '}
-          {topic.editDate ? (
-            <>
-              <i className="fa fa-clock-o" aria-hidden="true"></i> {new Date(topic.editDate).toLocaleString()}
-            </>
-          ) : null}
-        </small>
-      </div>
-
-      <div style={{ marginBottom: '8px' }}>
-        {topic.screening?.status === 0 ? (
-          <span className="label label-warning" style={{ marginRight: '6px' }}>
-            unverified
-          </span>
-        ) : null}
-        {typeof data?.linkCount === 'number' && data.linkCount > 1 ? (
-          <span className="label label-warning" style={{ marginRight: '6px' }}>
-            {data.linkCount}
-          </span>
-        ) : null}
-        {isMainTopic ? (
-          <span className="label label-info" style={{ marginRight: '6px' }}>
-            Main
-          </span>
-        ) : null}
-        {tagLabels.map((tag, index) => {
-          const theme = String(tag.theme || 'default');
-          const label = String(tag.label || tag.title || '');
-          if (!label) {
-            return null;
-          }
-          const className = `label label-${theme}`;
-          return (
-            <span key={`tag-label-${index}`} className={className} style={{ marginRight: '6px' }}>
-              {label}
-            </span>
-          );
-        })}
-      </div>
+      <TopicEntrySummary
+        topic={topic}
+        parentTopic={relatedParentTopic}
+        tagLabels={tagLabels}
+        verdict={data?.verdict}
+        linkCount={data?.linkCount}
+        isMainTopic={isMainTopic}
+      />
 
       <EntryQuickActions
         entry={entry}

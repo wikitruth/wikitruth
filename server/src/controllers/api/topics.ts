@@ -7,6 +7,7 @@ import { applyViewModeFilter } from './viewFilter';
 import { parseNumericTags, parseOptionalDate } from './entryWriteHelpers';
 import { rejectBlockingDuplicate } from './duplicateWriteGuard';
 import { recordEntryRevision } from './revisionWriteRecorder';
+import { serializeHydratedEntry } from './entrySerialization';
 
 import * as flowUtilsNs from '../../utils/flowUtils';
 import appModForDb from '../../app';
@@ -421,6 +422,9 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
   if (!model.topic) {
     return res.status(404).json({ error: 'Topic not found' });
   }
+
+  // Mongoose omits transient username properties from Topic JSON serialization.
+  model.topic = serializeHydratedEntry(model.topic);
 
   if (!req.query.topic) {
     req.query.topic = model.topic._id as string;
