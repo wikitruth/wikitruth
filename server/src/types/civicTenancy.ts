@@ -39,6 +39,14 @@ export interface CivicTenantSection {
   enabled: boolean;
 }
 
+export interface CivicTenantSite {
+  homeTitle: string;
+  homeDescription: string;
+  aboutUrl: string;
+  exploreUrl: string;
+  knowledgeRootTopicId: string;
+}
+
 export interface CivicTenantDefinition {
   tenantId: string;
   status: CivicTenantStatus;
@@ -46,6 +54,7 @@ export interface CivicTenantDefinition {
   title: string;
   navTitle: string;
   slogan: string;
+  site: CivicTenantSite;
   domains: string[];
   branding: {
     logoIcon: string;

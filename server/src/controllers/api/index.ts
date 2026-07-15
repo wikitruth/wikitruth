@@ -8,6 +8,7 @@ import * as mobileContracts from '../../middlewares/mobileApiContracts';
 import { sanitizeContentMiddleware } from '../../middlewares/sanitizeContent';
 
 import attachHome from './home';
+import attachApplicationContext from './applicationContext';
 import attachTopics from './topics';
 import attachArguments from './arguments';
 import attachQuestions from './questions';
@@ -42,6 +43,7 @@ export = function (router: Router) {
   router.use(sanitizeContentMiddleware);
 
   const homeRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
+  const applicationContextRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const topicsRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const argumentsRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const questionsRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
@@ -72,6 +74,7 @@ export = function (router: Router) {
     .forEach((entryRouter) => entryRouter.use(requireContributorOnboarding));
 
   attachHome(homeRouter);
+  attachApplicationContext(applicationContextRouter);
   registerEntryRedirectMiddleware(topicsRouter, constants.OBJECT_TYPES.topic);
   registerEntryRedirectMiddleware(argumentsRouter, constants.OBJECT_TYPES.argument);
   registerEntryRedirectMiddleware(questionsRouter, constants.OBJECT_TYPES.question);
@@ -105,6 +108,7 @@ export = function (router: Router) {
   [civicRouter, explicitCivicRouter].forEach(attachCivic);
 
   router.use('/home', homeRouter);
+  router.use('/application-context', applicationContextRouter);
   router.use('/topics', topicsRouter);
   router.use('/arguments', argumentsRouter);
   router.use('/questions', questionsRouter);

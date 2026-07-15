@@ -43,16 +43,16 @@ seven-section Civic Core. The comparison identified these remaining gaps:
 
 ### Tenant Contract And Server Resolution
 
-- [ ] Add a validated tenant site contract for home identity, navigation
+- [x] Add a validated tenant site contract for home identity, navigation
   destinations, and the optional Wikitruth knowledge-root topic.
-- [ ] Preserve built-in defaults when an older persisted tenant lacks newer
+- [x] Preserve built-in defaults when an older persisted tenant lacks newer
   site fields.
-- [ ] Migrate the original FixPH home title, description, and Philippine root
+- [x] Migrate the original FixPH home title, description, and Philippine root
   topic into the built-in tenant configuration.
-- [ ] Restore application-scoped Home/Explore queries and sidebar categories.
-- [ ] Add a lightweight public application-context API for host domains and the
+- [x] Restore application-scoped Home/Explore queries and sidebar categories.
+- [x] Add a lightweight public application-context API for host domains and the
   local same-origin Civic workspace.
-- [ ] Reject conflicting tenant/host context and expose only public tenant
+- [x] Reject conflicting tenant/host context and expose only public tenant
   presentation fields.
 
 ### Modern Application Shell

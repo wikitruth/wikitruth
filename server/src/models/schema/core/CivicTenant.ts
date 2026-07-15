@@ -24,6 +24,13 @@ const factory: SchemaFactory = function (app, mongoose) {
     title: { type: String, required: true, trim: true },
     navTitle: { type: String, default: '', trim: true },
     slogan: { type: String, default: '' },
+    site: {
+      homeTitle: { type: String, default: '' },
+      homeDescription: { type: String, default: '' },
+      aboutUrl: { type: String, default: '/civic' },
+      exploreUrl: { type: String, default: '/explore' },
+      knowledgeRootTopicId: { type: String, default: '' },
+    },
     domains: [{ type: String, lowercase: true, trim: true }],
     branding: {
       logoIcon: { type: String, default: '' },

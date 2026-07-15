@@ -39,11 +39,13 @@ import {
   listCivicEntryLinks,
   validateLinkedEntry,
 } from '../../server/src/services/civicEntryLinkService';
+import { resolveActiveApplication } from '../../server/src/services/applicationContextService';
 
 function request(options: Record<string, unknown> = {}) {
   const headers = (options.headers || {}) as Record<string, string>;
   return {
     params: options.params || {},
+    query: options.query || {},
     hostname: options.hostname || 'localhost',
     get: (name: string) => headers[name.toLowerCase()] || headers[name] || '',
     user: options.user,
@@ -75,6 +77,26 @@ describe('civic tenant resolution and knowledge reuse', () => {
       params: { tenantId: 'fix-example' },
       headers: { host: 'fixthephilippines.org' },
     }))).rejects.toEqual(expect.objectContaining<CivicTenantResolutionError>({ statusCode: 409 }));
+  });
+
+  it('rejects a local civic shell that conflicts with an active tenant host', async () => {
+    await expect(resolveActiveApplication(
+      request({ query: { civic: '1' } }),
+      { locals: { application: { id: 'fix-example' } } } as never,
+    )).rejects.toEqual(expect.objectContaining({ statusCode: 409 }));
+  });
+
+  it('resolves the local civic shell through the public application contract', async () => {
+    const application = await resolveActiveApplication(
+      request({ query: { civic: 'true' } }),
+      { locals: {} } as never,
+    );
+
+    expect(application).toEqual(expect.objectContaining({
+      id: 'fixtheph',
+      homeUrl: expect.any(String),
+      civicTenant: expect.not.objectContaining({ createUserId: expect.anything() }),
+    }));
   });
 
   it('resolves a persisted second-country tenant by explicit route', async () => {

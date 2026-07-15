@@ -7,6 +7,7 @@ const { run: runCivicMigration } = require('../migrations/civic-core-tenancy');
 const TENANT_ID = 'fixtheph';
 const FIXTURE_SOURCE = 'local-fixph-qa-v1';
 const LOCAL_HOSTS = new Set(['localhost', '127.0.0.1', '[::1]', '::1']);
+const LOCAL_KNOWLEDGE_ROOT_FRIENDLY_URL = 'republic-of-the-philippines';
 
 function mongoUri() {
   return process.env.MONGOLAB_URI
@@ -168,15 +169,31 @@ async function seedFixtures(database) {
   return { recordsSeeded: records.length, jurisdictionsSeeded: jurisdictions.length };
 }
 
+async function configureLocalTenantSite(database) {
+  const root = await database.collection('topics').findOne(
+    { friendlyUrl: LOCAL_KNOWLEDGE_ROOT_FRIENDLY_URL },
+    { projection: { _id: 1, title: 1 } },
+  );
+  if (!root?._id) {
+    throw new Error(`Local FixPH setup could not find topic: ${LOCAL_KNOWLEDGE_ROOT_FRIENDLY_URL}`);
+  }
+  await database.collection('civictenants').updateOne(
+    { tenantId: TENANT_ID },
+    { $set: { 'site.knowledgeRootTopicId': String(root._id), editDate: new Date() } },
+  );
+  return { knowledgeRootTopicId: String(root._id), knowledgeRootTitle: root.title };
+}
+
 async function run({ clean = false } = {}) {
   const uri = mongoUri();
   assertLocalMongoUri(uri);
   if (!clean) await runCivicMigration({ apply: true });
 
   await mongoose.connect(uri, { dbName: process.env.MONGODB_DBNAME || undefined });
+  const site = clean ? {} : await configureLocalTenantSite(mongoose.connection.db);
   const result = clean
     ? await cleanFixtures(mongoose.connection.db)
-    : await seedFixtures(mongoose.connection.db);
+    : { ...await seedFixtures(mongoose.connection.db), ...site };
   await mongoose.disconnect();
   console.log(JSON.stringify({
     mode: clean ? 'clean' : 'seed', tenantId: TENANT_ID, fixtureSource: FIXTURE_SOURCE, ...result,
@@ -193,4 +210,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { assertLocalMongoUri, buildJurisdictions, buildRecords, run };
+module.exports = { assertLocalMongoUri, buildJurisdictions, buildRecords, configureLocalTenantSite, run };

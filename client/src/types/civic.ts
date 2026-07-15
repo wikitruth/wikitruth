@@ -33,6 +33,13 @@ export interface CivicTenant {
   title: string;
   navTitle: string;
   slogan: string;
+  site: {
+    homeTitle: string;
+    homeDescription: string;
+    aboutUrl: string;
+    exploreUrl: string;
+    knowledgeRootTopicId: string;
+  };
   domains: string[];
   branding: {
     logoIcon: string;

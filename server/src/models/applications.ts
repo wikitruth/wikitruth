@@ -1,7 +1,12 @@
 'use strict';
 
 import type { ApplicationDefinition } from '../types/domain';
-import { FIXPH_TENANT, builtInCivicTenantForHost } from '../config/civicTenants';
+import {
+  FIXPH_TENANT,
+  builtInCivicTenantForHost,
+  normalizeCivicTenant,
+  publicCivicTenantDefinition,
+} from '../config/civicTenants';
 import type { CivicTenantDefinition } from '../types/civicTenancy';
 
 /*var wikitruthDomains = [
@@ -35,20 +40,28 @@ function configuredTenantHomeUrl(tenant: CivicTenantDefinition): string {
 }
 
 function applicationFromCivicTenant(tenant: CivicTenantDefinition): ApplicationDefinition {
+  const normalized = normalizeCivicTenant(tenant as unknown as Record<string, any>);
+  const publicTenant = publicCivicTenantDefinition(normalized as unknown as Record<string, any>);
+  const homeUrl = configuredTenantHomeUrl(normalized);
+  const isSameOriginMount = homeUrl.startsWith('/');
   return {
-    id: tenant.tenantId,
-    title: tenant.title,
-    name: tenant.title,
-    navTitle: tenant.navTitle,
-    slogan: tenant.slogan,
-    logoIcon: tenant.branding.logoIcon,
-    homeUrl: configuredTenantHomeUrl(tenant),
-    aboutUrl: '/civic',
-    exploreUrl: '/civic',
-    domains: tenant.domains,
-    civicTenant: tenant,
-    jumbotron: { title: tenant.title, description: tenant.slogan },
-    sections: tenant.sections.filter((section) => section.enabled).map((section) => ({
+    id: normalized.tenantId,
+    title: normalized.title,
+    name: normalized.title,
+    navTitle: normalized.navTitle,
+    slogan: normalized.slogan,
+    logoIcon: normalized.branding.logoIcon,
+    homeUrl,
+    aboutUrl: isSameOriginMount ? homeUrl : normalized.site.aboutUrl || '/civic',
+    exploreUrl: isSameOriginMount ? homeUrl : normalized.site.exploreUrl || '/explore',
+    exploreTopicId: normalized.site.knowledgeRootTopicId || undefined,
+    domains: normalized.domains,
+    civicTenant: publicTenant,
+    jumbotron: {
+      title: normalized.site.homeTitle || normalized.title,
+      description: normalized.site.homeDescription || normalized.slogan,
+    },
+    sections: normalized.sections.filter((section) => section.enabled).map((section) => ({
       title: section.title,
       iconClass: `fa fa-${section.icon}`,
       url: `/civic/${section.slug}`,

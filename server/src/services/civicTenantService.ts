@@ -5,6 +5,8 @@ import {
   builtInCivicTenant,
   builtInCivicTenantForHost,
   BUILT_IN_CIVIC_TENANTS,
+  normalizeCivicTenant,
+  publicCivicTenantDefinition,
 } from '../config/civicTenants';
 import type { CivicTenantDefinition } from '../types/civicTenancy';
 import type { WikitruthRequest } from '../types/http';
@@ -26,31 +28,10 @@ function normalizeHost(value: unknown): string {
   return firstHost.trim().toLowerCase().split(':')[0] || '';
 }
 
-function normalizeTenant(raw: Record<string, any>): CivicTenantDefinition {
-  const fallback = builtInCivicTenant(String(raw.tenantId || ''));
-  return {
-    ...(fallback || {}),
-    ...raw,
-    tenantId: String(raw.tenantId || fallback?.tenantId || '').trim().toLowerCase(),
-    status: raw.status || fallback?.status || 'active',
-    countryCode: String(raw.countryCode || fallback?.countryCode || '').trim().toUpperCase(),
-    domains: Array.isArray(raw.domains) ? raw.domains.map(normalizeHost).filter(Boolean) : (fallback?.domains || []),
-    branding: { ...(fallback?.branding || {}), ...(raw.branding || {}) },
-    localization: { ...(fallback?.localization || {}), ...(raw.localization || {}) },
-    geography: { ...(fallback?.geography || {}), ...(raw.geography || {}) },
-    sections: Array.isArray(raw.sections) && raw.sections.length ? raw.sections : (fallback?.sections || []),
-    featureFlags: { ...(fallback?.featureFlags || {}), ...(raw.featureFlags || {}) },
-    extensionSchemas: { ...(fallback?.extensionSchemas || {}), ...(raw.extensionSchemas || {}) },
-    moderationPolicyVersion: String(raw.moderationPolicyVersion || fallback?.moderationPolicyVersion || '1'),
-    electionSystem: String(raw.electionSystem || fallback?.electionSystem || ''),
-    deploymentMode: raw.deploymentMode || fallback?.deploymentMode || 'shared',
-  } as CivicTenantDefinition;
-}
-
 async function persistedTenant(query: Record<string, unknown>): Promise<CivicTenantDefinition | null> {
   if (!db.CivicTenant?.findOne) return null;
   const result = await db.CivicTenant.findOne({ status: 'active', ...query }).lean();
-  return result ? normalizeTenant(result) : null;
+  return result ? normalizeCivicTenant(result) : null;
 }
 
 export async function getCivicTenant(tenantId: string): Promise<CivicTenantDefinition | null> {
@@ -112,23 +93,5 @@ export function publicCivicTenant(tenant: CivicTenantDefinition): CivicTenantDef
   if (!tenant) {
     throw new CivicTenantResolutionError('Civic tenant context is unavailable', 500);
   }
-  const normalized = normalizeTenant(tenant as unknown as Record<string, any>);
-  return {
-    tenantId: normalized.tenantId,
-    status: normalized.status,
-    countryCode: normalized.countryCode,
-    title: normalized.title,
-    navTitle: normalized.navTitle,
-    slogan: normalized.slogan,
-    domains: normalized.domains,
-    branding: normalized.branding,
-    localization: normalized.localization,
-    geography: normalized.geography,
-    sections: normalized.sections,
-    featureFlags: normalized.featureFlags,
-    extensionSchemas: normalized.extensionSchemas,
-    moderationPolicyVersion: normalized.moderationPolicyVersion,
-    electionSystem: normalized.electionSystem,
-    deploymentMode: normalized.deploymentMode,
-  };
+  return publicCivicTenantDefinition(tenant as unknown as Record<string, any>);
 }

@@ -16,6 +16,7 @@ const DEFAULT_SECTIONS: CivicTenantSection[] = [
 
 type FormState = {
   tenantId: string; title: string; navTitle: string; countryCode: string; domains: string; slogan: string;
+  homeTitle: string; homeDescription: string; aboutUrl: string; exploreUrl: string; knowledgeRootTopicId: string;
   status: CivicTenant['status']; locale: string; supportedLocales: string; timezone: string; currency: string;
   logoIcon: string; favicon: string; fontFamily: string; primaryColor: string; accentColor: string; surfaceColor: string;
   levels: string; addressFields: string; sections: string; featureFlags: string; extensionSchemas: string;
@@ -24,6 +25,7 @@ type FormState = {
 
 const EMPTY_FORM: FormState = {
   tenantId: '', title: '', navTitle: '', countryCode: '', domains: '', slogan: '', status: 'active', locale: 'en', supportedLocales: 'en', timezone: 'UTC', currency: 'USD',
+  homeTitle: '', homeDescription: '', aboutUrl: '/civic', exploreUrl: '/explore', knowledgeRootTopicId: '',
   logoIcon: '', favicon: '', fontFamily: '',
   primaryColor: '#1f6f50', accentColor: '#d96b27', surfaceColor: '#f5f1e8',
   levels: JSON.stringify([{ key: 'country', label: 'Country' }, { key: 'region', label: 'Region' }, { key: 'city', label: 'City' }], null, 2),
@@ -37,6 +39,8 @@ function formFromTenant(tenant: CivicTenant): FormState {
   return {
     tenantId: tenant.tenantId, title: tenant.title, navTitle: tenant.navTitle, countryCode: tenant.countryCode, status: tenant.status,
     domains: tenant.domains.join(', '), slogan: tenant.slogan, locale: tenant.localization.defaultLocale, supportedLocales: tenant.localization.supportedLocales.join(', '),
+    homeTitle: tenant.site?.homeTitle || '', homeDescription: tenant.site?.homeDescription || '',
+    aboutUrl: tenant.site?.aboutUrl || '/civic', exploreUrl: tenant.site?.exploreUrl || '/explore', knowledgeRootTopicId: tenant.site?.knowledgeRootTopicId || '',
     timezone: tenant.localization.timezone, currency: tenant.localization.currency,
     logoIcon: tenant.branding.logoIcon, favicon: tenant.branding.favicon, fontFamily: tenant.branding.fontFamily,
     primaryColor: tenant.branding.primaryColor, accentColor: tenant.branding.accentColor, surfaceColor: tenant.branding.surfaceColor,
@@ -83,6 +87,11 @@ const CivicTenantsPage: React.FC = () => {
       const payload: CivicTenant = {
         tenantId: form.tenantId.trim().toLowerCase(), status: form.status, countryCode: form.countryCode.trim().toUpperCase(),
         title: form.title.trim(), navTitle: form.navTitle.trim(), slogan: form.slogan.trim(),
+        site: {
+          homeTitle: form.homeTitle.trim(), homeDescription: form.homeDescription.trim(),
+          aboutUrl: form.aboutUrl.trim(), exploreUrl: form.exploreUrl.trim(),
+          knowledgeRootTopicId: form.knowledgeRootTopicId.trim(),
+        },
         domains: form.domains.split(',').map((value) => value.trim().toLowerCase()).filter(Boolean),
         branding: { logoIcon: form.logoIcon.trim(), favicon: form.favicon.trim(), primaryColor: form.primaryColor, accentColor: form.accentColor, surfaceColor: form.surfaceColor, fontFamily: form.fontFamily.trim() },
         localization: { defaultLocale: form.locale, supportedLocales: form.supportedLocales.split(',').map((value) => value.trim()).filter(Boolean), timezone: form.timezone, currency: form.currency.toUpperCase() },
@@ -129,6 +138,11 @@ const CivicTenantsPage: React.FC = () => {
         <div className="row"><div className="col-sm-8 form-group"><label htmlFor="tenant-title">Public title</label><input id="tenant-title" className="form-control" required value={form.title} onChange={(event) => setField('title', event.target.value)} /></div><div className="col-sm-4 form-group"><label htmlFor="tenant-nav">Navigation title</label><input id="tenant-nav" className="form-control" value={form.navTitle} onChange={(event) => setField('navTitle', event.target.value)} /></div></div>
         <div className="form-group"><label htmlFor="tenant-domains">Domains</label><input id="tenant-domains" className="form-control" required value={form.domains} onChange={(event) => setField('domains', event.target.value)} placeholder="fix.example, www.fix.example" /></div>
         <div className="form-group"><label htmlFor="tenant-slogan">Slogan / purpose</label><textarea id="tenant-slogan" className="form-control" value={form.slogan} onChange={(event) => setField('slogan', event.target.value)} /></div>
+        <fieldset><legend>Application shell</legend>
+          <div className="form-group"><label htmlFor="tenant-home-title">Home title</label><input id="tenant-home-title" className="form-control" value={form.homeTitle} onChange={(event) => setField('homeTitle', event.target.value)} placeholder="Let's Fix Example" /></div>
+          <div className="form-group"><label htmlFor="tenant-home-description">Home description</label><textarea id="tenant-home-description" className="form-control" value={form.homeDescription} onChange={(event) => setField('homeDescription', event.target.value)} /></div>
+          <div className="row"><div className="col-sm-4 form-group"><label htmlFor="tenant-about-url">About URL</label><input id="tenant-about-url" className="form-control" value={form.aboutUrl} onChange={(event) => setField('aboutUrl', event.target.value)} /></div><div className="col-sm-4 form-group"><label htmlFor="tenant-explore-url">Explore URL</label><input id="tenant-explore-url" className="form-control" value={form.exploreUrl} onChange={(event) => setField('exploreUrl', event.target.value)} /></div><div className="col-sm-4 form-group"><label htmlFor="tenant-knowledge-root">Knowledge root topic ID</label><input id="tenant-knowledge-root" className="form-control" pattern="[a-fA-F0-9]{24}" value={form.knowledgeRootTopicId} onChange={(event) => setField('knowledgeRootTopicId', event.target.value)} /></div></div>
+        </fieldset>
         <div className="row"><div className="col-sm-4 form-group"><label htmlFor="tenant-locale">Default locale</label><input id="tenant-locale" className="form-control" required value={form.locale} onChange={(event) => setField('locale', event.target.value)} /></div><div className="col-sm-4 form-group"><label htmlFor="tenant-locales">Supported locales</label><input id="tenant-locales" className="form-control" required value={form.supportedLocales} onChange={(event) => setField('supportedLocales', event.target.value)} placeholder="en, fil-PH" /></div><div className="col-sm-4 form-group"><label htmlFor="tenant-timezone">Timezone</label><input id="tenant-timezone" className="form-control" required value={form.timezone} onChange={(event) => setField('timezone', event.target.value)} /></div></div>
         <div className="row"><div className="col-sm-4 form-group"><label htmlFor="tenant-logo">Logo path</label><input id="tenant-logo" className="form-control" value={form.logoIcon} onChange={(event) => setField('logoIcon', event.target.value)} /></div><div className="col-sm-4 form-group"><label htmlFor="tenant-favicon">Favicon path</label><input id="tenant-favicon" className="form-control" value={form.favicon} onChange={(event) => setField('favicon', event.target.value)} /></div><div className="col-sm-4 form-group"><label htmlFor="tenant-font">Font family</label><input id="tenant-font" className="form-control" value={form.fontFamily} onChange={(event) => setField('fontFamily', event.target.value)} /></div></div>
         <div className="row"><div className="col-sm-4 form-group"><label htmlFor="tenant-primary">Primary</label><input id="tenant-primary" type="color" className="form-control" value={form.primaryColor} onChange={(event) => setField('primaryColor', event.target.value)} /></div><div className="col-sm-4 form-group"><label htmlFor="tenant-accent">Accent</label><input id="tenant-accent" type="color" className="form-control" value={form.accentColor} onChange={(event) => setField('accentColor', event.target.value)} /></div><div className="col-sm-4 form-group"><label htmlFor="tenant-surface">Surface</label><input id="tenant-surface" type="color" className="form-control" value={form.surfaceColor} onChange={(event) => setField('surfaceColor', event.target.value)} /></div></div>

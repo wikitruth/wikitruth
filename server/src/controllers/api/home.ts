@@ -6,18 +6,15 @@ import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../t
 
 import appModForDb from '../../app';
 import asyncMod from 'async';
-import applicationsMod from '../../models/applications';
 const async = asyncMod as unknown as {
   parallel: (tasks: Record<string, () => Promise<unknown>>) => Promise<unknown>;
 };
 import * as flowUtilsNs from '../../utils/flowUtils';
 import constantsMod from '../../models/constants';
 import { attachAuthorReputation } from '../../services/reputationService';
+import { resolveActiveApplication, visibleApplications } from '../../services/applicationContextService';
 const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
 const constants = constantsMod as unknown as ConstantsModule;
-const applications = applicationsMod as unknown as {
-  getApplications: () => unknown;
-};
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 interface HomeQuery {
   parentId?: unknown;
@@ -62,11 +59,14 @@ export = function (router: Router) {
 };
 
 async function GET_home(req: WikitruthRequest, res: WikitruthResponse) {
+  const application = await resolveActiveApplication(req, res);
+  const knowledgeRootTopicId = String(application?.exploreTopicId || '').trim();
   const injectCategoryId = function (query: HomeQuery) {
-    if (res.locals.application) {
-      query.categoryId = (res.locals.application as { exploreTopicId?: unknown }).exploreTopicId;
+    if (knowledgeRootTopicId) {
+      query.categoryId = knowledgeRootTopicId;
     }
   };
+  const hasTenantKnowledge = !application || Boolean(knowledgeRootTopicId);
 
   const MAX_RESULT = 5;
   const model: HomeModel = {};
@@ -81,6 +81,7 @@ async function GET_home(req: WikitruthRequest, res: WikitruthResponse) {
 
   await async.parallel({
     topics: async function () {
+      if (!hasTenantKnowledge) { model.topics = []; return; }
       const query: HomeQuery = {
         parentId: { $ne: null },
         private: false,
@@ -99,6 +100,7 @@ async function GET_home(req: WikitruthRequest, res: WikitruthResponse) {
       }
     },
     arguments: async function () {
+      if (!hasTenantKnowledge) { model.arguments = []; return; }
       const query: HomeQuery = {
         ownerType: constants.OBJECT_TYPES.topic,
         private: false,
@@ -121,6 +123,7 @@ async function GET_home(req: WikitruthRequest, res: WikitruthResponse) {
       }
     },
     questions: async function () {
+      if (!hasTenantKnowledge) { model.questions = []; return; }
       const query: HomeQuery = {
         ownerType: constants.OBJECT_TYPES.topic,
         private: false,
@@ -142,6 +145,7 @@ async function GET_home(req: WikitruthRequest, res: WikitruthResponse) {
       }
     },
     artifacts: async function () {
+      if (!hasTenantKnowledge) { model.artifacts = []; return; }
       const query: HomeQuery = {
         ownerType: constants.OBJECT_TYPES.topic,
         private: false,
@@ -163,10 +167,12 @@ async function GET_home(req: WikitruthRequest, res: WikitruthResponse) {
       }
     },
     answers: async function () {
+      if (!hasTenantKnowledge) { model.answers = []; return; }
       const query: HomeQuery = {
         private: false,
         'screening.status': model.screening?.status,
       };
+      injectCategoryId(query);
       const results = await db.Answer.find(query).sort({ editDate: -1 }).limit(MAX_RESULT).lean();
       await flowUtils.setEditorsUsername(results);
       await flowUtils.setEntryParents(results, constants.OBJECT_TYPES.answer);
@@ -179,6 +185,7 @@ async function GET_home(req: WikitruthRequest, res: WikitruthResponse) {
       }
     },
     issues: async function () {
+      if (!hasTenantKnowledge) { model.issues = []; return; }
       const query: HomeQuery = {
         ownerType: constants.OBJECT_TYPES.topic,
         private: false,
@@ -197,6 +204,7 @@ async function GET_home(req: WikitruthRequest, res: WikitruthResponse) {
       }
     },
     opinions: async function () {
+      if (!hasTenantKnowledge) { model.opinions = []; return; }
       const query: HomeQuery = {
         ownerType: constants.OBJECT_TYPES.topic,
         private: false,
@@ -222,17 +230,25 @@ async function GET_home(req: WikitruthRequest, res: WikitruthResponse) {
   flowUtils.createEntrySet(model);
 
   // Add application data
-  if (res.locals.application) {
-    model.application = res.locals.application;
+  if (application) {
+    model.application = application;
   }
 
   // Expose sidebar context so modern client can mirror legacy navigation.
   // Tenant hosts advertise their resolved civic app instead of the built-in discovery list.
-  model.applications = res.locals.application ? [res.locals.application] : applications.getApplications();
-  model.appCategories =
-    res.locals.appCategories ||
-    (req.app.locals as { appCategories?: unknown } | undefined)?.appCategories ||
-    [];
+  model.applications = visibleApplications(application);
+  if (application?.exploreTopicId) {
+    const categoryModel: { categories?: unknown[] } = {};
+    await flowUtils.getCategories(categoryModel, String(application.exploreTopicId), req);
+    model.appCategories = categoryModel.categories || [];
+  } else if (application) {
+    model.appCategories = [];
+  } else {
+    model.appCategories =
+      res.locals.appCategories ||
+      (req.app.locals as { appCategories?: unknown } | undefined)?.appCategories ||
+      [];
+  }
 
   if (req.user) {
     [model.diaryCategories, model.myGroups] = await Promise.all([

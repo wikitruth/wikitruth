@@ -22,6 +22,10 @@ import * as utils from '../../utils/utils';
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 const tenantIdSchema = z.string().trim().toLowerCase().regex(/^[a-z0-9][a-z0-9-]{1,62}$/);
 const colorSchema = z.string().trim().regex(/^#[0-9a-f]{6}$/i);
+const siteUrlSchema = z.string().trim().max(500).refine(
+  (value) => !value || /^\/(?!\/)/.test(value) || /^https:\/\//i.test(value),
+  'Site URLs must be same-origin paths or HTTPS URLs',
+);
 const sectionSchema = z.object({
   slug: z.string().trim().regex(/^[a-z0-9][a-z0-9-]*$/),
   title: z.string().trim().min(1).max(120),
@@ -38,6 +42,22 @@ const tenantSchema = z.object({
   title: z.string().trim().min(2).max(120),
   navTitle: z.string().trim().max(60).default(''),
   slogan: z.string().trim().max(500).default(''),
+  site: z.object({
+    homeTitle: z.string().trim().max(160).default(''),
+    homeDescription: z.string().trim().max(700).default(''),
+    aboutUrl: siteUrlSchema.default('/civic'),
+    exploreUrl: siteUrlSchema.default('/explore'),
+    knowledgeRootTopicId: z.string().trim().refine(
+      (value) => !value || mongoose.isValidObjectId(value),
+      'Invalid knowledge root topic id',
+    ).default(''),
+  }).default({
+    homeTitle: '',
+    homeDescription: '',
+    aboutUrl: '/civic',
+    exploreUrl: '/explore',
+    knowledgeRootTopicId: '',
+  }),
   domains: z.array(z.string().trim().toLowerCase().min(3)).min(1).max(20),
   branding: z.object({
     logoIcon: z.string().trim().default(''),

@@ -7,6 +7,13 @@ export const FIXPH_TENANT: CivicTenantDefinition = {
   title: 'Fix The Philippines',
   navTitle: 'FixPH',
   slogan: 'Promote transparency and accountability through a public civic record.',
+  site: {
+    homeTitle: "Let's Fix The Philippines",
+    homeDescription: 'A system to promote transparency and accountability, help citizens identify, raise and fix issues in the Philippine society and government.',
+    aboutUrl: '/civic',
+    exploreUrl: '/explore',
+    knowledgeRootTopicId: '57aa74e0b663fb1072c7766d',
+  },
   domains: ['fixthephilippines.org', 'www.fixthephilippines.org'],
   branding: {
     logoIcon: '/img/fixtheph/logo-64x64.png',
@@ -55,12 +62,62 @@ export const FIXPH_TENANT: CivicTenantDefinition = {
 
 export const BUILT_IN_CIVIC_TENANTS: CivicTenantDefinition[] = [FIXPH_TENANT];
 
+function normalizeHost(value: unknown): string {
+  const firstHost = String(value || '').split(',')[0] || '';
+  return firstHost.trim().toLowerCase().split(':')[0] || '';
+}
+
+export function normalizeCivicTenant(raw: Record<string, any>): CivicTenantDefinition {
+  const fallback = builtInCivicTenant(String(raw.tenantId || ''));
+  return {
+    ...(fallback || {}),
+    ...raw,
+    tenantId: String(raw.tenantId || fallback?.tenantId || '').trim().toLowerCase(),
+    status: raw.status || fallback?.status || 'active',
+    countryCode: String(raw.countryCode || fallback?.countryCode || '').trim().toUpperCase(),
+    domains: Array.isArray(raw.domains) ? raw.domains.map(normalizeHost).filter(Boolean) : (fallback?.domains || []),
+    site: { ...(fallback?.site || {}), ...(raw.site || {}) },
+    branding: { ...(fallback?.branding || {}), ...(raw.branding || {}) },
+    localization: { ...(fallback?.localization || {}), ...(raw.localization || {}) },
+    geography: { ...(fallback?.geography || {}), ...(raw.geography || {}) },
+    sections: Array.isArray(raw.sections) && raw.sections.length ? raw.sections : (fallback?.sections || []),
+    featureFlags: { ...(fallback?.featureFlags || {}), ...(raw.featureFlags || {}) },
+    extensionSchemas: { ...(fallback?.extensionSchemas || {}), ...(raw.extensionSchemas || {}) },
+    moderationPolicyVersion: String(raw.moderationPolicyVersion || fallback?.moderationPolicyVersion || '1'),
+    electionSystem: String(raw.electionSystem || fallback?.electionSystem || ''),
+    deploymentMode: raw.deploymentMode || fallback?.deploymentMode || 'shared',
+  } as CivicTenantDefinition;
+}
+
+export function publicCivicTenantDefinition(raw: Record<string, any>): CivicTenantDefinition {
+  const tenant = normalizeCivicTenant(raw);
+  return {
+    tenantId: tenant.tenantId,
+    status: tenant.status,
+    countryCode: tenant.countryCode,
+    title: tenant.title,
+    navTitle: tenant.navTitle,
+    slogan: tenant.slogan,
+    site: tenant.site,
+    domains: tenant.domains,
+    branding: tenant.branding,
+    localization: tenant.localization,
+    geography: tenant.geography,
+    sections: tenant.sections,
+    featureFlags: tenant.featureFlags,
+    extensionSchemas: tenant.extensionSchemas,
+    moderationPolicyVersion: tenant.moderationPolicyVersion,
+    electionSystem: tenant.electionSystem,
+    deploymentMode: tenant.deploymentMode,
+  };
+}
+
 export function builtInCivicTenant(tenantId: string): CivicTenantDefinition | null {
   const normalized = String(tenantId || '').trim().toLowerCase();
   return BUILT_IN_CIVIC_TENANTS.find((tenant) => tenant.tenantId === normalized) || null;
 }
 
 export function builtInCivicTenantForHost(hostname: string): CivicTenantDefinition | null {
-  const normalized = (String(hostname || '').split(':')[0] || '').trim().toLowerCase();
+  const normalized = normalizeHost(hostname);
   return BUILT_IN_CIVIC_TENANTS.find((tenant) => tenant.domains.includes(normalized)) || null;
 }
