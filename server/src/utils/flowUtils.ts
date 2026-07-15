@@ -429,63 +429,44 @@ async function setEntryParent(item?: Record<string, unknown>, typeId?: number): 
 }
 
 async function setEditorsUsername(items?: Record<string, unknown>[]): Promise<void> {
-  if (items && items.length > 0) {
-    let seen: Record<string, boolean> = {};
-    let userIds = items
-      .filter(function(item: Record<string, unknown>) {
-        let id = item.editUserId ? (item.editUserId as { valueOf(): string }).valueOf() : null;
-        if (!id || seen[id]) {
-          return false;
-        }
-        seen[id] = true;
-        return true;
-        //return !!item.editUserId;
-      }).map(function(item: Record<string, unknown>) {
-          return item.editUserId;
-        },
-      );
+  if (!items || items.length === 0) {
+    return;
+  }
 
-    let query = {
-      _id: {
-        $in: userIds,
-      },
-    };
-
-    let results = await db.User
-      .find(query, { username: 1 })
-      .exec();
-    let userNames: Record<string, unknown> = {};
-    results.forEach(function(result: Record<string, unknown>) {
-      userNames[(result._id as { valueOf(): string }).valueOf()] = result.username;
-    });
-    items.forEach(function(item: Record<string, unknown>) {
-      if (item.editUserId) {
-        item.editUsername = userNames[(item.editUserId as { valueOf(): string }).valueOf()];
+  const normalizeId = (id: unknown): string => String((id as { valueOf?: () => unknown })?.valueOf?.() || id || '');
+  const userIdsByValue = new Map<string, unknown>();
+  items.forEach((item) => {
+    [item.createUserId, item.editUserId].forEach((id) => {
+      const value = normalizeId(id);
+      if (value) {
+        userIdsByValue.set(value, id);
       }
     });
-  }
-}
+  });
 
-async function setCreateUsername(item?: Record<string, unknown>): Promise<void> {
-  if (!item || !item.createUserId) {
+  if (userIdsByValue.size === 0) {
     return;
   }
 
-  let user = await db.User.findOne({ _id: item.createUserId });
-  if (user) {
-    item.createUsername = user.username;
-  }
-}
+  const results = await db.User
+    .find({ _id: { $in: Array.from(userIdsByValue.values()) } }, { username: 1 })
+    .exec();
+  const usernames = new Map<string, unknown>();
+  results.forEach((result: Record<string, unknown>) => {
+    usernames.set(normalizeId(result._id), result.username);
+  });
 
-async function setEditUsername(item?: Record<string, unknown>): Promise<void> {
-  if (!item || !item.editUserId) {
-    return;
-  }
-
-  let user = await db.User.findOne({ _id: item.editUserId });
-  if (user) {
-    item.editUsername = user.username;
-  }
+  items.forEach((item) => {
+    const createUsername = usernames.get(normalizeId(item.createUserId));
+    const editUsername = usernames.get(normalizeId(item.editUserId));
+    if (createUsername) {
+      item.createUsername = createUsername;
+    }
+    if (editUsername) {
+      item.editUsername = editUsername;
+      item.editorUsername = editUsername;
+    }
+  });
 }
 
 async function setUsername(item?: Record<string, unknown>): Promise<void> {
@@ -493,12 +474,7 @@ async function setUsername(item?: Record<string, unknown>): Promise<void> {
     return;
   }
 
-  await setCreateUsername(item);
-  if (item.createUserId && item.createUserId === item.editUserId) {
-    item.editUsername = item.createUsername;
-  } else if (item.editUserId) {
-    await setEditUsername(item);
-  }
+  await setEditorsUsername([item]);
 }
 
 function buildGroupUrl(group?: { friendlyUrl?: unknown; _id?: unknown }): string {

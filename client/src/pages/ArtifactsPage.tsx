@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import LoadingSpinner from '../components/LoadingSpinner';
+import ArtifactEntryRow from '../components/EntryRow/ArtifactEntryRow';
 import apiService from '../services/api';
+import type { Artifact } from '../types';
 import type { LegacyEntity, LegacyResponse } from '../types/legacy';
 
 const ArtifactsPage: React.FC = () => {
@@ -51,26 +53,11 @@ const ArtifactsPage: React.FC = () => {
         </li>
         {data?.artifacts && data.artifacts.length > 0 ? (
           data.artifacts.map((artifact: LegacyEntity) => (
-            <li key={artifact._id} className="list-group-item">
-              <h4>
-                <Link to={`/artifacts/entry/${artifact.friendlyUrl}/${artifact._id}`}>
-                  {artifact.title}
-                </Link>
-              </h4>
-              {artifact.contentPreview && (
-                <p className="text-muted">{artifact.contentPreview}</p>
-              )}
-              {artifact.file && (
-                <div className="text-muted">
-                  <small>
-                    <span className="glyphicon glyphicon-file"></span> {artifact.file.type} - {artifact.file.name}
-                  </small>
-                </div>
-              )}
-              <small className="text-muted">
-                Edited by {artifact.editorUsername} on {new Date(artifact.editDate).toLocaleDateString()}
-              </small>
-            </li>
+            <ArtifactEntryRow
+              key={artifact._id}
+              artifact={artifact as unknown as Artifact}
+              subtitle={true}
+            />
           ))
         ) : (
           <li className="list-group-item">No artifacts found.</li>

@@ -1,6 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { Question } from '../../types';
+import type { LegacyEntity } from '../../types/legacy';
+import EntryRowDetails from './EntryRowDetails';
 
 interface QuestionEntryRowProps {
   question: Question;
@@ -11,7 +12,7 @@ interface QuestionEntryRowProps {
 const QuestionEntryRow: React.FC<QuestionEntryRowProps> = ({
   question,
   subtitle = false,
-  labels = false,
+  labels = true,
 }) => {
   const getQuestionLink = () => {
     return `/questions/entry/${question.friendlyUrl}/${question._id}`;
@@ -25,39 +26,13 @@ const QuestionEntryRow: React.FC<QuestionEntryRowProps> = ({
       data-private={question.private}
     >
       <span className="glyphicon glyphicon-question-sign text-color-3" aria-hidden="true"></span>
-      <div>
-        <Link to={getQuestionLink()}>
-          {question.title}
-        </Link>
-        {labels && (
-          <>
-            {question.private && (
-              <span className="label label-default">private</span>
-            )}
-            {question.screening?.status && (
-              <span className="label label-info">{question.screening.status}</span>
-            )}
-          </>
-        )}
-        {subtitle && (
-          <div className="text-muted">
-            <small>
-              {question.editorUsername && (
-                <>
-                  <i className="fa fa-user"></i> {question.editorUsername}
-                </>
-              )}
-              {question.editDate && (
-                <>
-                  {' '}
-                  <i className="fa fa-clock-o"></i>{' '}
-                  {new Date(question.editDate).toLocaleDateString()}
-                </>
-              )}
-            </small>
-          </div>
-        )}
-      </div>
+      <EntryRowDetails
+        entry={question as unknown as LegacyEntity}
+        kind="question"
+        entryPath={getQuestionLink()}
+        labels={labels}
+        subtitle={subtitle}
+      />
     </li>
   );
 };

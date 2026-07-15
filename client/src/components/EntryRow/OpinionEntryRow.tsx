@@ -1,6 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { Opinion } from '../../types';
+import type { LegacyEntity } from '../../types/legacy';
+import EntryRowDetails from './EntryRowDetails';
 
 interface OpinionEntryRowProps {
   opinion: Opinion;
@@ -11,7 +12,7 @@ interface OpinionEntryRowProps {
 const OpinionEntryRow: React.FC<OpinionEntryRowProps> = ({
   opinion,
   subtitle = false,
-  labels = false,
+  labels = true,
 }) => {
   const getOpinionLink = () => {
     return `/opinions/entry/${opinion._id}`;
@@ -25,45 +26,20 @@ const OpinionEntryRow: React.FC<OpinionEntryRowProps> = ({
       data-private={opinion.private}
     >
       <i className="fa fa-comment text-info" aria-hidden="true"></i>
-      <div>
-        <Link to={getOpinionLink()}>
-          {opinion.title}
-        </Link>
-        {opinion.discussionContext?.status === 'potentially_obsolete' ? (
-          <span className="label label-warning" style={{ marginLeft: 6 }}>older revision</span>
-        ) : null}
-        {opinion.discussionContext?.status === 'obsolete' ? (
-          <span className="label label-default" style={{ marginLeft: 6 }}>obsolete</span>
-        ) : null}
-        {labels && (
-          <>
-            {opinion.private && (
-              <span className="label label-default">private</span>
-            )}
-            {opinion.screening?.status && (
-              <span className="label label-info">{opinion.screening.status}</span>
-            )}
-          </>
-        )}
-        {subtitle && (
-          <div className="text-muted">
-            <small>
-              {opinion.editorUsername && (
-                <>
-                  <i className="fa fa-user"></i> {opinion.editorUsername}
-                </>
-              )}
-              {opinion.editDate && (
-                <>
-                  {' '}
-                  <i className="fa fa-clock-o"></i>{' '}
-                  {new Date(opinion.editDate).toLocaleDateString()}
-                </>
-              )}
-            </small>
-          </div>
-        )}
-      </div>
+      <EntryRowDetails
+        entry={opinion as unknown as LegacyEntity}
+        kind="opinion"
+        entryPath={getOpinionLink()}
+        labels={labels}
+        subtitle={subtitle}
+        extraLabels={
+          opinion.discussionContext?.status === 'potentially_obsolete' ? (
+            <span className="label label-warning">older revision</span>
+          ) : opinion.discussionContext?.status === 'obsolete' ? (
+            <span className="label label-default">obsolete</span>
+          ) : null
+        }
+      />
     </li>
   );
 };

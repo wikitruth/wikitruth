@@ -1,6 +1,7 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { Argument } from '../../types';
+import type { LegacyEntity } from '../../types/legacy';
+import EntryRowDetails from './EntryRowDetails';
 
 interface ArgumentEntryRowProps {
   argument: Argument;
@@ -11,7 +12,7 @@ interface ArgumentEntryRowProps {
 const ArgumentEntryRow: React.FC<ArgumentEntryRowProps> = ({
   argument,
   subtitle = false,
-  labels = false,
+  labels = true,
 }) => {
   const getArgumentLink = () => {
     return `/arguments/entry/${argument.friendlyUrl}/${argument._id}`;
@@ -39,48 +40,22 @@ const ArgumentEntryRow: React.FC<ArgumentEntryRowProps> = ({
       data-private={argument.private}
     >
       <span className={`glyphicon glyphicon-flash ${getVerdictClass()}`} aria-hidden="true"></span>
-      <div>
-        <Link to={getArgumentLink()}>
-          {argument.title}
-        </Link>
-        {labels && (
-          <>
-            {argument.private && (
-              <span className="label label-default">private</span>
-            )}
-            {argument.screening?.status && (
-              <span className="label label-info">{argument.screening.status}</span>
-            )}
-            {argument.verdict?.result && (
-              <span className={`label ${
-                argument.verdict.result === 'true' ? 'label-success' :
-                argument.verdict.result === 'false' ? 'label-danger' :
-                'label-warning'
-              }`}>
-                {argument.verdict.result}
-              </span>
-            )}
-          </>
-        )}
-        {subtitle && (
-          <div className="text-muted">
-            <small>
-              {argument.editorUsername && (
-                <>
-                  <i className="fa fa-user"></i> {argument.editorUsername}
-                </>
-              )}
-              {argument.editDate && (
-                <>
-                  {' '}
-                  <i className="fa fa-clock-o"></i>{' '}
-                  {new Date(argument.editDate).toLocaleDateString()}
-                </>
-              )}
-            </small>
-          </div>
-        )}
-      </div>
+      <EntryRowDetails
+        entry={argument as unknown as LegacyEntity}
+        kind="argument"
+        entryPath={getArgumentLink()}
+        labels={labels}
+        subtitle={subtitle}
+        extraLabels={
+          labels && argument.verdict?.result ? (
+            <span
+              className={`label ${argument.verdict.result === 'true' ? 'label-success' : argument.verdict.result === 'false' ? 'label-danger' : 'label-warning'}`}
+            >
+              {argument.verdict.result}
+            </span>
+          ) : null
+        }
+      />
     </li>
   );
 };

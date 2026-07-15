@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import apiService from '../services/api';
 import type { HomeDataResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
-import type { Answer, Argument, Issue, Opinion, Question, Topic } from '../types';
+import type { Answer, Argument, Artifact, Issue, Opinion, Question, Topic } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import PageMeta from '../components/common/PageMeta';
 import PageHeader from '../components/common/PageHeader';
@@ -13,6 +13,7 @@ import QuestionEntryRow from '../components/EntryRow/QuestionEntryRow';
 import AnswerEntryRow from '../components/EntryRow/AnswerEntryRow';
 import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
+import ArtifactEntryRow from '../components/EntryRow/ArtifactEntryRow';
 import GeoPatternBackground from '../components/common/GeoPatternBackground';
 import ContentViewFilter, { type ViewMode } from '../components/common/ContentViewFilter';
 import { useNotification } from '../context/NotificationContext';
@@ -551,11 +552,7 @@ const ExplorePage: React.FC = () => {
                     <OpinionEntryRow key={String(item._id)} opinion={item as unknown as Opinion} subtitle={true} />
                   ))}
                   {section.key === 'artifacts' && section.items.map((item) => (
-                    <li key={String(item._id)} className="list-group-item">
-                      <Link to={`/artifacts/entry/${encodeURIComponent(String(item.friendlyUrl || item._id))}/${encodeURIComponent(String(item._id))}`}>
-                        {String(item.title || '(Untitled)')}
-                      </Link>
-                    </li>
+                    <ArtifactEntryRow key={String(item._id)} artifact={item as unknown as Artifact} subtitle={true} />
                   ))}
                 </ul>
                 {section.more && (

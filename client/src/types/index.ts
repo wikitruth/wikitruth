@@ -87,7 +87,7 @@ export interface Topic {
   categoryId?: string;
   private?: boolean;
   screening?: {
-    status: string;
+    status: string | number;
   };
   editDate?: Date;
   createDate?: Date;
@@ -130,7 +130,7 @@ export interface Argument {
   ownerId?: string;
   private?: boolean;
   screening?: {
-    status: string;
+    status: string | number;
   };
   verdict?: {
     result: string;
@@ -150,7 +150,7 @@ export interface Question {
   ownerId?: string;
   private?: boolean;
   screening?: {
-    status: string;
+    status: string | number;
   };
   editDate?: Date;
   createDate?: Date;
@@ -165,7 +165,7 @@ export interface Answer {
   questionId?: string;
   private?: boolean;
   screening?: {
-    status: string;
+    status: string | number;
   };
   editDate?: Date;
   createDate?: Date;
@@ -181,7 +181,7 @@ export interface Issue {
   ownerId?: string;
   private?: boolean;
   screening?: {
-    status: string;
+    status: string | number;
   };
   editDate?: Date;
   createDate?: Date;
@@ -203,7 +203,7 @@ export interface Opinion {
   ownerId?: string;
   private?: boolean;
   screening?: {
-    status: string;
+    status: string | number;
   };
   editDate?: Date;
   createDate?: Date;
@@ -230,7 +230,7 @@ export interface Artifact {
   ownerId?: string;
   private?: boolean;
   screening?: {
-    status: string;
+    status: string | number;
   };
   editDate?: Date;
   createDate?: Date;

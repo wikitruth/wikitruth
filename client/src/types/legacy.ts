@@ -31,7 +31,7 @@ export interface LegacyEntity {
   authorReputationScore?: number;
   authorReputationLevel?: string;
   screening?: {
-    status?: number;
+    status?: number | string;
     history?: unknown[];
   };
   createUserId: string;
