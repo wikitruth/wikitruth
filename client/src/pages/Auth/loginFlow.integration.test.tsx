@@ -41,6 +41,6 @@ describe('Login flow integration', () => {
     await user.click(screen.getByRole('button', { name: /sign in/i }));
 
     expect(mockLogin).toHaveBeenCalledWith('demo-user', 'secret12');
-    expect(mockNavigate).toHaveBeenCalledWith('/');
+    expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true });
   });
 });
