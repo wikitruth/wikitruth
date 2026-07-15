@@ -78,15 +78,15 @@ The unchecked work is valid, but it should not be executed as one undifferentiat
 Current detailed evidence and page-family results are in
 `docs/qa/LEGACY_MODERN_LIVE_VISUAL_AUDIT_2026-07-15.md`.
 
-- [ ] Replace numeric screening status codes with semantic labels in all seven
+- [x] Replace numeric screening status codes with semantic labels in all seven
   entry row families.
-- [ ] Restore useful parent context, excerpts, authorship, status, dates,
+- [x] Restore useful parent context, excerpts, authorship, status, dates,
   interactions, and artifact media across Home, Explore, Search, lists, and
   related-entry sections.
 - [ ] Build visualization from the existing outline-tree API instead of only
   the five-item Home payload.
 - [ ] Add persistent About/Posts/Members navigation to every group subroute.
-- [ ] Repair creator/editor hydration and empty artifact-editor grammar.
+- [x] Repair creator/editor hydration and empty artifact-editor grammar.
 - [ ] Fix the mobile fixed-header collision that visually covers breadcrumbs.
 - [ ] Serve the branded React 404 for arbitrary direct browser URLs.
 - [ ] Add consistent route-level authentication/role guards for Notifications
@@ -142,6 +142,10 @@ The target-state inventory was revalidated against current code. All non-deferre
 
 ### Implementation Progress (2026-07-11)
 
+- `e963ed49` centralized rich entry-row presentation across all seven families,
+  replaced numeric screening codes with semantic labels, restored parent,
+  excerpt, author, date, interaction, and artifact-media context, and fixed
+  creator/editor hydration with focused client/server regression coverage.
 - `54bf2cc8` added the operating policy baseline for duplicate/merge decisions, source quality, moderation roles, and independent truth/ethics review.
 - `38fa284b` added scoped deterministic candidate detection, exact duplicate prevention for all seven entry families, stale-preview validation, moderator-approved merges, relationship migration summaries, durable API redirects, source tombstones, privileged merge events, and the modern duplicate-review UI.
 - `c8ac6673` added immutable numbered revision snapshots for all seven entry families, public revision metadata, partial change-request acceptance, stale-base detection, reviewer rollback, pre/post-merge revision links, hash-chained privileged events, chain verification UI/API, and backup coverage for integrity collections.
