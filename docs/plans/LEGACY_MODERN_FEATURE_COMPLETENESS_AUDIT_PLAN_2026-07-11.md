@@ -17,11 +17,18 @@ Re-open legacy-to-modern parity at feature and workflow depth, rather than treat
 
 ### Legacy replacement readiness
 
-**Verified for the audited web-replacement scope.** Core public reading, entry CRUD, discussion, search, visualization, member/group, moderation, admin, empty-database recovery, dynamic About content, disposable privileged-role journeys, and the external FixPH tenant are represented and runtime-verified in modern code.
+**Broad functional coverage is verified, but replacement readiness is reopened.**
+Core public reading, entry CRUD, discussion, search, member/group, moderation,
+admin, empty-database recovery, dynamic About content, disposable privileged-role
+journeys, and FixPH are represented in modern code. The 2026-07-15 visual and
+feature-depth revalidation found open information-density, navigation,
+visualization, authorization-UX, identity-hydration, and mobile breadcrumb gaps.
+The modern app must not be described as fully legacy-parity-complete until the
+open remediation checklist below passes a separate verification run.
 
 ### Modern target-state completeness
 
-**Core governance modernization and the FixPH civic product baseline are implemented and locally signed off.** The modern application includes deterministic duplicate/merge handling, immutable revisions, change requests and rollback, tamper-evident privileged audit events, evidence provenance and quality review, independent factual/ethical verdicts, policy-versioned onboarding, revision-linked discussion context, issue-first controls, controlled anonymous screening proposals, deterministic reputation scorecards, explicit archived/freshness UX, dedicated civic accountability workflows, tenant-scoped operations, and governed record maintenance. Automatic content expiry and React Native delivery are explicitly deferred.
+**Core governance modernization and the FixPH civic product baseline are implemented and locally signed off, while frontend completion remains open.** The modern application includes deterministic duplicate/merge handling, immutable revisions, change requests and rollback, tamper-evident privileged audit events, evidence provenance and quality review, independent factual/ethical verdicts, policy-versioned onboarding, revision-linked discussion context, issue-first controls, controlled anonymous screening proposals, deterministic reputation scorecards, explicit archived/freshness UX, dedicated civic accountability workflows, tenant-scoped operations, and governed record maintenance. Automatic content expiry and React Native delivery are explicitly deferred. The frontend gaps recorded by the 2026-07-15 revalidation are active implementation work, not deferred product decisions.
 
 ## Recommendation Review (2026-07-11)
 
@@ -51,20 +58,48 @@ The unchecked work is valid, but it should not be executed as one undifferentiat
 | --- | --- | --- | --- |
 | Global header and application sections | Corrected in this pass | Modern adds Create and account notification affordances | Modern previously omitted legacy Debates/Dictionary/Manuscripts and tenant sections even though `/api/home` returned them. |
 | Responsive shell and context sidebar | Corrected and runtime-verified | Modern retains a usable slide-out sidebar | Closed modern sidebar previously widened a 390 px document to 680 px; current mobile checks show no document overflow. |
-| Home / Explore / Search | Substantially present | Advanced Explore filters and keyboard navigation exceed legacy | FixPH/application feature-card URLs were normalized in this pass so client-side navigation does not 404. |
-| Topic / argument / question / answer / issue / opinion / artifact entries | Verified | Modern adds signals, appeals, persisted reactions, and timeline | Public semantic comparison and disposable reader/contributor/screener/reviewer/admin journeys cover all seven families without retained test identities. |
+| Home / Explore / Search | Partial presentation parity | Advanced Explore filters and keyboard navigation exceed legacy | Current rows omit parent context, excerpts, semantic statuses, authorship, interaction metadata, and artifact media that legacy and live production expose. |
+| Topic / argument / question / answer / issue / opinion / artifact entries | Core flows verified; presentation partial | Modern adds signals, appeals, persisted reactions, and timeline | All-role journeys pass, but creator hydration, mobile breadcrumb visibility, and related-entry row richness remain open. |
 | Comment terminology and URLs | Corrected in this pass | Opinion remains the canonical model | Added `/comment/*` and `/comments/*` compatibility paths to the modern opinion pages. |
-| Members, profiles, journals, groups | Verified in code, tests, and disposable role journeys | Modern follow/subscription support exceeds legacy | Disposable account/session fixtures are removed after verification. |
+| Members, profiles, journals, groups | Functional; navigation/presentation partial | Modern follow/subscription and reputation support exceed legacy | Shared group tabs are missing, avatars are less differentiated, and private journal requests log an avoidable anonymous `403`. |
 | Screening, verdicts, conversion, ownership | Verified in modern API/UI and disposable role journeys | Signals, appeals, and bulk verdict operations exceed legacy | Contributor, screener, reviewer, and administrator behavior is covered without retained test identities. |
 | Admin CRUD and backup/restore | Present for authenticated admins | Audit timeline is modern-only | Normal admin restore and secure empty-database bootstrap contracts are tested separately. |
 | Fresh install / empty database recovery | Implemented and tested | Secure one-time bootstrap plus normal admin restore | `/api/install` now requires an empty core database, server-side token, CSRF, `RESTORE`, backup preflight, rate limit, and post-restore checks. Initialized systems direct admins to `/admin/db-backup`. |
 | Dynamic application About pages | Implemented and live-verified | About hierarchy is public without exposing profile pages | `/about/:id` uses `/api/pages/about/:id`, limits results to the About root/children, sanitizes HTML, and serves direct nested routes from the React shell. |
 | Controlled anonymous contribution | Not required for legacy replacement | Implemented as screened proposals, never direct publication | `/contribute` submits quota- and risk-controlled proposals; `/admin/anonymous-contributions` supports review and adoption into authenticated create flows. Raw IP addresses and user agents are not retained. |
 | Reputation and scorecards | Modern-only | Implemented with deterministic, explainable snapshots | Member profiles expose four scoring dimensions and earned badges; Explore offers a trusted ranking using reputation, screening state, and popularity inputs. |
-| FixPH civic accountability | Modern-only | Implemented as a dedicated product workspace | `/civic` and `/api/civic` cover responsibility hierarchy, projects, citizen observations, locations, incidents, actions, candidate comparison, historical outcomes, tenant memberships, jurisdiction administration, and governed record editing. |
+| FixPH civic accountability | Modern-only | Implemented as a dedicated local product workspace | The deterministic local tenant covers all record kinds and sections. Active horizontal section navigation needs positioning and overflow affordances. |
 | Lifecycle reading modes | Improved over legacy | Implemented | Accepted, Pending, Archived, and All states are explicit; archived entries and reference-dated information show non-destructive reader notices. |
-| QA proof | Public and privileged semantic coverage complete | Improved | `migration-parity-semantic.mjs` covers all seven families and mobile overflow; the disposable parity and civic Chrome runners provision and remove isolated role, tenant, jurisdiction, and record fixtures while retaining only redacted manifests and immutable audit evidence. |
+| QA proof | Broad route and privileged semantic coverage; visual parity open | Improved | The fresh 306-render audit proves that route/overflow checks alone can miss information and navigation gaps. Disposable role and civic fixtures still clean up successfully. |
 | Mobile/native client | Not a legacy-web parity requirement | Deferred, not implemented | `docs/plans/deferred/REACT_NATIVE_MONOREPO_CHECKLIST_PLAN_2026-04-19.md` was explicitly deferred on 2026-07-13. |
+
+## Revalidation Findings (2026-07-15)
+
+Current detailed evidence and page-family results are in
+`docs/qa/LEGACY_MODERN_LIVE_VISUAL_AUDIT_2026-07-15.md`.
+
+- [ ] Replace numeric screening status codes with semantic labels in all seven
+  entry row families.
+- [ ] Restore useful parent context, excerpts, authorship, status, dates,
+  interactions, and artifact media across Home, Explore, Search, lists, and
+  related-entry sections.
+- [ ] Build visualization from the existing outline-tree API instead of only
+  the five-item Home payload.
+- [ ] Add persistent About/Posts/Members navigation to every group subroute.
+- [ ] Repair creator/editor hydration and empty artifact-editor grammar.
+- [ ] Fix the mobile fixed-header collision that visually covers breadcrumbs.
+- [ ] Serve the branded React 404 for arbitrary direct browser URLs.
+- [ ] Add consistent route-level authentication/role guards for Notifications
+  and Admin pages before protected forms and data requests mount.
+- [ ] Keep the active FixPH section visible in its horizontal navigation and
+  add an overflow affordance.
+- [ ] Implement a real `Remember me` session choice or remove the no-op field.
+- [ ] Decide whether answers need a dedicated discussion route and align route
+  inventory/tests with that decision.
+- [ ] Harden or isolate `/legacy/topics/create` and
+  `/legacy/members/contributors`; both currently crash the shared PM2 process.
+- [ ] Re-run the 306-render public sweep, seven-family semantic suite, and
+  disposable five-role audit after remediation.
 
 ## Verified Defects Corrected in This Pass
 
@@ -157,4 +192,8 @@ The target-state inventory was revalidated against current code. All non-deferre
 
 Keep this plan active until every item under **Open Legacy-Replacement Work** and **Verification Checklist** is complete. Modern target-state items may remain deferred only with an explicit product decision; they must not be represented as feature-complete.
 
-All non-deferred implementation and verification items are complete as of 2026-07-13. This plan remains outside `docs/plans/completed/` because it records explicit deferred product decisions, in accordance with the repository planning rules.
+The 2026-07-13 functional implementation remains valuable, but the 2026-07-15
+revalidation reopened non-deferred frontend and shared-runtime work. This plan
+must remain active until the revalidation checklist is implemented and passes a
+separate verification stage. The explicit legacy-retirement, automatic-expiry,
+and React Native deferrals remain unchanged.

@@ -1,5 +1,13 @@
 # Page-by-Page Legacy vs Modern Comparison Matrix (2026-04-22)
 
+> Revalidation notice (2026-07-15): the route/component mappings below remain
+> useful, but their historical `Aligned` labels do not establish current visual
+> or information parity. A fresh 306-render desktop/mobile audit found open
+> presentation, navigation, visualization, and authorization-UX gaps, plus
+> unavailable/crashing local legacy comparison routes. Use
+> `docs/qa/LEGACY_MODERN_LIVE_VISUAL_AUDIT_2026-07-15.md` as the current status
+> and remediation source.
+
 ## Matrix
 
 | Page family | Legacy route(s) | Legacy template(s) | Modern route(s) | Modern component(s) | Status | Notes / evidence anchor |
@@ -92,6 +100,9 @@ Runtime artifact anchor:
 - local raw artifacts (gitignored): `docs/qa/artifacts/runtime-evidence-2026-04-22-v2/`
 - local raw artifacts (gitignored): `docs/qa/artifacts/runtime-evidence-2026-04-22-auth-v5/`
 
-## Closure Evidence (2026-07-13)
+## Historical Closure Evidence (2026-07-13)
 
-All previously listed primary gaps are closed by repeatable field/search/admin tests, context-integrated discussion routing, disposable all-role evidence, and the all-route desktop/mobile interaction sweep. No production deployment is implied.
+The 2026-07-13 pass closed its route, contract, and interaction checklist. It did
+not prove visual or information-density parity. The 2026-07-15 revalidation
+reopened the gaps tracked in the current audit above. No production deployment
+is implied.
