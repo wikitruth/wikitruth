@@ -58,17 +58,17 @@ The unchecked work is valid, but it should not be executed as one undifferentiat
 | --- | --- | --- | --- |
 | Global header and application sections | Corrected in this pass | Modern adds Create and account notification affordances | Modern previously omitted legacy Debates/Dictionary/Manuscripts and tenant sections even though `/api/home` returned them. |
 | Responsive shell and context sidebar | Corrected and runtime-verified | Modern retains a usable slide-out sidebar | Closed modern sidebar previously widened a 390 px document to 680 px; current mobile checks show no document overflow. |
-| Home / Explore / Search | Partial presentation parity | Advanced Explore filters and keyboard navigation exceed legacy | Current rows omit parent context, excerpts, semantic statuses, authorship, interaction metadata, and artifact media that legacy and live production expose. |
-| Topic / argument / question / answer / issue / opinion / artifact entries | Core flows verified; presentation partial | Modern adds signals, appeals, persisted reactions, and timeline | All-role journeys pass, but creator hydration, mobile breadcrumb visibility, and related-entry row richness remain open. |
+| Home / Explore / Search | Presentation parity corrected | Advanced Explore filters and keyboard navigation exceed legacy | Rich shared rows now retain parent context, excerpts, semantic statuses, authorship, interaction metadata, and artifact media. |
+| Topic / argument / question / answer / issue / opinion / artifact entries | Core flows and presentation corrected | Modern adds signals, appeals, persisted reactions, and timeline | Rich related rows, creator hydration, mobile breadcrumbs, and focused answer discussion are implemented and covered. |
 | Comment terminology and URLs | Corrected in this pass | Opinion remains the canonical model | Added `/comment/*` and `/comments/*` compatibility paths to the modern opinion pages. |
-| Members, profiles, journals, groups | Functional; navigation/presentation partial | Modern follow/subscription and reputation support exceed legacy | Shared group tabs are missing, avatars are less differentiated, and private journal requests log an avoidable anonymous `403`. |
+| Members, profiles, journals, groups | Functional and navigation-corrected | Modern follow/subscription and reputation support exceed legacy | Shared group tabs, rich group rows, and deterministic member avatars are implemented; private journal authorization remains intentionally enforced. |
 | Screening, verdicts, conversion, ownership | Verified in modern API/UI and disposable role journeys | Signals, appeals, and bulk verdict operations exceed legacy | Contributor, screener, reviewer, and administrator behavior is covered without retained test identities. |
 | Admin CRUD and backup/restore | Present for authenticated admins | Audit timeline is modern-only | Normal admin restore and secure empty-database bootstrap contracts are tested separately. |
 | Fresh install / empty database recovery | Implemented and tested | Secure one-time bootstrap plus normal admin restore | `/api/install` now requires an empty core database, server-side token, CSRF, `RESTORE`, backup preflight, rate limit, and post-restore checks. Initialized systems direct admins to `/admin/db-backup`. |
 | Dynamic application About pages | Implemented and live-verified | About hierarchy is public without exposing profile pages | `/about/:id` uses `/api/pages/about/:id`, limits results to the About root/children, sanitizes HTML, and serves direct nested routes from the React shell. |
 | Controlled anonymous contribution | Not required for legacy replacement | Implemented as screened proposals, never direct publication | `/contribute` submits quota- and risk-controlled proposals; `/admin/anonymous-contributions` supports review and adoption into authenticated create flows. Raw IP addresses and user agents are not retained. |
 | Reputation and scorecards | Modern-only | Implemented with deterministic, explainable snapshots | Member profiles expose four scoring dimensions and earned badges; Explore offers a trusted ranking using reputation, screening state, and popularity inputs. |
-| FixPH civic accountability | Modern-only | Implemented as a dedicated local product workspace | The deterministic local tenant covers all record kinds and sections. Active horizontal section navigation needs positioning and overflow affordances. |
+| FixPH civic accountability | Modern-only | Implemented as a dedicated local product workspace | The deterministic local tenant covers all record kinds and sections; active mobile navigation is automatically centered with explicit overflow affordances. |
 | Lifecycle reading modes | Improved over legacy | Implemented | Accepted, Pending, Archived, and All states are explicit; archived entries and reference-dated information show non-destructive reader notices. |
 | QA proof | Broad route and privileged semantic coverage; visual parity open | Improved | The fresh 306-render audit proves that route/overflow checks alone can miss information and navigation gaps. Disposable role and civic fixtures still clean up successfully. |
 | Mobile/native client | Not a legacy-web parity requirement | Deferred, not implemented | `docs/plans/deferred/REACT_NATIVE_MONOREPO_CHECKLIST_PLAN_2026-04-19.md` was explicitly deferred on 2026-07-13. |
@@ -87,13 +87,13 @@ Current detailed evidence and page-family results are in
   the five-item Home payload.
 - [x] Add persistent About/Posts/Members navigation to every group subroute.
 - [x] Repair creator/editor hydration and empty artifact-editor grammar.
-- [ ] Fix the mobile fixed-header collision that visually covers breadcrumbs.
-- [ ] Serve the branded React 404 for arbitrary direct browser URLs.
-- [ ] Add consistent route-level authentication/role guards for Notifications
+- [x] Fix the mobile fixed-header collision that visually covers breadcrumbs.
+- [x] Serve the branded React 404 for arbitrary direct browser URLs.
+- [x] Add consistent route-level authentication/role guards for Notifications
   and Admin pages before protected forms and data requests mount.
-- [ ] Keep the active FixPH section visible in its horizontal navigation and
+- [x] Keep the active FixPH section visible in its horizontal navigation and
   add an overflow affordance.
-- [ ] Implement a real `Remember me` session choice or remove the no-op field.
+- [x] Implement a real `Remember me` session choice or remove the no-op field.
 - [x] Decide whether answers need a dedicated discussion route and align route
   inventory/tests with that decision.
 - [ ] Harden or isolate `/legacy/topics/create` and
@@ -142,6 +142,11 @@ The target-state inventory was revalidated against current code. All non-deferre
 
 ### Implementation Progress (2026-07-11)
 
+- `f5bcbd82` added route-level authentication and role guards, safe post-login
+  return URLs, branded direct-route `404` shell delivery, mobile fixed-header
+  breadcrumb clearance, auto-centered FixPH section navigation with overflow
+  affordances, and removed the no-op `Remember me` control. Focused tests,
+  production client build, and rendered `390x844` checks passed.
 - `83506978` switched visualization to the depth-four outline hierarchy with a
   bounded 500-node traversal, added persistent group About/Posts/Members tabs
   and rich group activity rows, introduced a focused answer discussion route,
