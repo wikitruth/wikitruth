@@ -3,6 +3,7 @@
 ## Active QA and Parity Artifacts
 
 - Current deep visual/feature audit: `docs/qa/LEGACY_MODERN_LIVE_VISUAL_AUDIT_2026-07-15.md`
+- Tenant application shell signoff: `docs/qa/TENANT_APPLICATION_SHELL_SIGNOFF_2026-07-16.md`
 - Final local modernization signoff: `docs/qa/MODERNIZATION_LOCAL_SIGNOFF_2026-07-13.md`
 - Civic core multi-tenancy signoff: `docs/qa/CIVIC_CORE_MULTI_TENANCY_SIGNOFF_2026-07-13.md`
 - Authenticated civic Chrome signoff: `docs/qa/CIVIC_AUTHENTICATED_BROWSER_SIGNOFF_2026-07-13.md`

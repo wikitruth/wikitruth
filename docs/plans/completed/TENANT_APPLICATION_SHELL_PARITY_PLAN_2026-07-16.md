@@ -1,7 +1,7 @@
 # Tenant Application Shell Parity Plan
 
 Date: 2026-07-16  
-Status: In progress
+Status: Complete and verified
 
 ## Objective
 
@@ -71,17 +71,17 @@ seven-section Civic Core. The comparison identified these remaining gaps:
 
 ### Verification
 
-- [ ] Add server tests for tenant defaults, host resolution, context conflicts,
+- [x] Add server tests for tenant defaults, host resolution, context conflicts,
   public serialization, and scoped home queries.
-- [ ] Add client tests for tenant header, footer, metadata, body theme, local
+- [x] Add client tests for tenant header, footer, metadata, body theme, local
   Civic context, app switching, and default Wikitruth fallback.
-- [ ] Verify Wikitruth and FixPH at desktop and mobile widths with no framework
+- [x] Verify Wikitruth and FixPH at desktop and mobile widths with no framework
   overlay, relevant console error, clipped navigation, or document overflow.
-- [ ] Exercise tenant Home, Explore, one tenant section, app switching, and the
+- [x] Exercise tenant Home, Explore, one tenant section, app switching, and the
   local `/civic` path.
-- [ ] Run focused tests, full server/client regressions, smoke guardrails, and
+- [x] Run focused tests, full server/client regressions, smoke guardrails, and
   production builds.
-- [ ] Record final evidence and move this plan only after a separate verification
+- [x] Record final evidence and move this plan only after a separate verification
   pass succeeds with no pending or deferred items.
 
 ## Delivery Boundaries
@@ -92,4 +92,10 @@ seven-section Civic Core. The comparison identified these remaining gaps:
 - Existing Civic Core sections and tenant isolation remain authoritative; this
   work restores the missing application-shell boundary rather than reintroducing
   a separate FixPH codebase.
-- Legacy renderer retirement and React Native remain explicitly deferred.
+- Legacy renderer retirement and React Native delivery are separate initiatives
+  outside this plan.
+
+## Verification Record
+
+Final implementation and rendered evidence is recorded in
+`docs/qa/TENANT_APPLICATION_SHELL_SIGNOFF_2026-07-16.md`.

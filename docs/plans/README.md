@@ -5,7 +5,6 @@ Active and historical planning documents are organized under this folder.
 ## Pending Snapshot (2026-07-16)
 
 - Active checklist backlog:
-  - `docs/plans/TENANT_APPLICATION_SHELL_PARITY_PLAN_2026-07-16.md` open `[ ]`: **6** (implementation is complete; focused, regression, build, and rendered verification remain)
   - `docs/plans/LEGACY_MODERN_FEATURE_COMPLETENESS_AUDIT_PLAN_2026-07-11.md` open `[ ]`: **0** (all non-deferred implementation and verification work is complete; retained here because it records explicit deferred product decisions)
 - Deferred checklist backlog:
   - `docs/plans/deferred/**` open `[ ]`: **190** total
@@ -16,7 +15,6 @@ Active and historical planning documents are organized under this folder.
 
 ## Active Plans
 
-- `docs/plans/TENANT_APPLICATION_SHELL_PARITY_PLAN_2026-07-16.md`
 - `docs/plans/LEGACY_MODERN_FEATURE_COMPLETENESS_AUDIT_PLAN_2026-07-11.md`
 
 ## Completed Plans
@@ -30,6 +28,7 @@ Active and historical planning documents are organized under this folder.
 - `docs/plans/completed/LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md`
 - `docs/plans/completed/LEGACY_MODERN_MIGRATION_PARITY_AUDIT_CHECKLIST_PLAN_2026-04-19.md`
 - `docs/plans/completed/MIGRATION_COMPLETION_PLAN_2026-04-12.md`
+- `docs/plans/completed/TENANT_APPLICATION_SHELL_PARITY_PLAN_2026-07-16.md`
 
 ## Deferred Plans
 

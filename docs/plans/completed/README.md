@@ -25,6 +25,7 @@ Historical planning and execution trackers that are fully completed.
 - `docs/plans/completed/PROJECT_ENHANCEMENT_PROPOSAL_2026-02-24.md`
 - `docs/plans/completed/SERVER_STRUCTURE_MIGRATION_PLAN_2026-02-26.md`
 - `docs/plans/completed/SYSTEM_MODERN_CLIENT_IMPLEMENTATION_PLAN_2026-02-26.md`
+- `docs/plans/completed/TENANT_APPLICATION_SHELL_PARITY_PLAN_2026-07-16.md`
 - `docs/plans/completed/TYPE_IMPROVEMENT_BACKLOG.md`
 - `docs/plans/completed/TYPE_IMPROVEMENT_PROJECT.md`
 
