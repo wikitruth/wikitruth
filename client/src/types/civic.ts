@@ -33,7 +33,7 @@ export interface CivicTenant {
   title: string;
   navTitle: string;
   slogan: string;
-  site: {
+  site?: {
     homeTitle: string;
     homeDescription: string;
     aboutUrl: string;

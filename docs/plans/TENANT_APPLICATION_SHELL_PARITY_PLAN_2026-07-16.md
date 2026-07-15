@@ -57,16 +57,16 @@ seven-section Civic Core. The comparison identified these remaining gaps:
 
 ### Modern Application Shell
 
-- [ ] Load application context once and share it across header, sidebar, footer,
+- [x] Load application context once and share it across header, sidebar, footer,
   metadata, and page content.
-- [ ] Use tenant logo, navigation title, home/about/explore destinations, and
+- [x] Use tenant logo, navigation title, home/about/explore destinations, and
   enabled sections throughout the global shell.
-- [ ] Apply a stable tenant body class and safe CSS color/font variables.
-- [ ] Update document title, description, OpenGraph identity, favicon, manifest,
+- [x] Apply a stable tenant body class and safe CSS color/font variables.
+- [x] Update document title, description, OpenGraph identity, favicon, manifest,
   theme color, and structured website name for the active tenant.
-- [ ] Keep Wikitruth as the default shell when no tenant host or local Civic
+- [x] Keep Wikitruth as the default shell when no tenant host or local Civic
   context is active.
-- [ ] Keep local FixPH navigation same-origin and never redirect local QA to the
+- [x] Keep local FixPH navigation same-origin and never redirect local QA to the
   live production domain.
 
 ### Verification

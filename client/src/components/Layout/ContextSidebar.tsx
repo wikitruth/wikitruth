@@ -1,6 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useApplicationContext } from '../../context/ApplicationContext';
+import ApplicationLink from '../common/ApplicationLink';
 import apiService from '../../services/api';
 import type {
   AnswerEntryResponse,
@@ -13,13 +15,6 @@ import type {
   TopicEntryResponse,
 } from '../../types/api';
 import type { LegacyEntity } from '../../types/legacy';
-
-type SidebarApplication = LegacyEntity & {
-  id?: string;
-  title?: string;
-  homeUrl?: string;
-  logoIcon?: string;
-};
 
 type SidebarCategory = LegacyEntity & {
   title?: string;
@@ -111,6 +106,14 @@ function normalizeEntryTopicLinks(raw: unknown): SidebarCategory[] {
 const ContextSidebar: React.FC = () => {
   const location = useLocation();
   const { user } = useAuth();
+  const {
+    application,
+    applications,
+    appCategories,
+    applicationPath,
+    localTenantContext,
+    platformHomeUrl,
+  } = useApplicationContext();
   const section = getSectionFromPath(location.pathname);
   const entryId = getEntryIdFromPath(location.pathname);
   const memberUsernameFromPath = getMemberUsernameFromPath(location.pathname);
@@ -128,7 +131,7 @@ const ContextSidebar: React.FC = () => {
     let mounted = true;
     const load = async () => {
       try {
-        const data = await apiService.getHomeData();
+        const data = await apiService.getHomeData(localTenantContext);
         if (mounted) {
           setHomeContext(data);
         }
@@ -142,7 +145,7 @@ const ContextSidebar: React.FC = () => {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [localTenantContext]);
 
   useEffect(() => {
     if (!entryId) {
@@ -296,12 +299,11 @@ const ContextSidebar: React.FC = () => {
       {
         key: 'app-core',
         label: 'Wikitruth',
-        href: '/',
+        href: platformHomeUrl,
         logoIcon: '/img/logo-64x64.png',
       },
     ];
 
-    const applications = (homeContext?.applications || []) as SidebarApplication[];
     applications.forEach((app, index) => {
       const title = String(app.title || app.id || '').trim();
       const homeUrl = String(app.homeUrl || '').trim();
@@ -321,10 +323,10 @@ const ContextSidebar: React.FC = () => {
       title: 'Apps',
       items: appItems,
     };
-  }, [homeContext?.applications]);
+  }, [applications, platformHomeUrl]);
 
   const exploreSection = useMemo<SidebarSection>(() => {
-    const categories = (homeContext?.appCategories || []) as SidebarCategory[];
+    const categories = appCategories as SidebarCategory[];
     const items: SidebarNavItem[] = categories.map((category, index) => {
       const acceptedTopics = Number(category.childrenCount?.topics?.accepted || 0);
       const icon = String(category.icon || '').trim() || 'folder-open';
@@ -339,10 +341,10 @@ const ContextSidebar: React.FC = () => {
 
     return {
       title: 'Explore',
-      titleTo: '/explore',
+      titleTo: application?.exploreUrl || '/explore',
       items,
     };
-  }, [homeContext?.appCategories]);
+  }, [appCategories, application?.exploreUrl]);
 
   const sectionItemsByRoot = useMemo<Record<string, SidebarSection>>(() => ({
     topics: {
@@ -642,12 +644,12 @@ const ContextSidebar: React.FC = () => {
             {sectionIndex > 0 && <li role="separator" className="divider"></li>}
             <li className="dropdown-header">
               {buildSectionLink(navSection) ? (
-                <Link to={String(buildSectionLink(navSection))}>{navSection.title}</Link>
+                <ApplicationLink href={applicationPath(String(buildSectionLink(navSection)))}>{navSection.title}</ApplicationLink>
               ) : (
                 navSection.title
               )}
               {navSection.titleAction ? (
-                <Link to={navSection.titleAction.to} className="pull-right">
+                <Link to={applicationPath(navSection.titleAction.to)} className="pull-right">
                   {navSection.titleAction.label}
                 </Link>
               ) : null}
@@ -662,12 +664,12 @@ const ContextSidebar: React.FC = () => {
               return (
                 <li key={item.key} className={isActive ? 'active' : ''}>
                   {item.to ? (
-                    <Link to={item.to} style={linkStyle}>
+                    <Link to={applicationPath(item.to)} style={linkStyle}>
                       <i className={`fa fa-${iconName}`} aria-hidden="true"></i> {item.label}
                       {typeof item.badge === 'number' ? <span className="wt-label label label-default">{item.badge}</span> : null}
                     </Link>
                   ) : (
-                    <a href={item.href || '#'} style={linkStyle}>
+                    <ApplicationLink href={item.href || '#'} style={linkStyle}>
                       {item.logoIcon ? (
                         <img
                           src={item.logoIcon}
@@ -679,7 +681,7 @@ const ContextSidebar: React.FC = () => {
                         <i className={`fa fa-${iconName}`} aria-hidden="true"></i>
                       )}{' '}
                       {item.label}
-                    </a>
+                    </ApplicationLink>
                   )}
                 </li>
               );

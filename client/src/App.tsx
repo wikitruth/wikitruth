@@ -6,6 +6,7 @@ import MainLayout from './components/Layout/MainLayout';
 import { appRoutes } from './routes/routeConfig';
 import { APP_BASE_PATH } from './utils/constants';
 import { initAnalytics, trackPageView } from './utils/analytics';
+import { ApplicationProvider } from './context/ApplicationContext';
 
 const RouteTracker: React.FC = () => {
   const location = useLocation();
@@ -121,18 +122,20 @@ const App: React.FC = () => {
 
   return (
     <Router basename={resolvedBasePath}>
-      <RouteTracker />
-      <MainLayout>
-        <ErrorBoundary>
-          <Suspense fallback={<LoadingSpinner />}>
-            <Routes>
-              {appRoutes.map((route) => (
-                <Route key={route.path} path={route.path} element={route.element} />
-              ))}
-            </Routes>
-          </Suspense>
-        </ErrorBoundary>
-      </MainLayout>
+      <ApplicationProvider>
+        <RouteTracker />
+        <MainLayout>
+          <ErrorBoundary>
+            <Suspense fallback={<LoadingSpinner />}>
+              <Routes>
+                {appRoutes.map((route) => (
+                  <Route key={route.path} path={route.path} element={route.element} />
+                ))}
+              </Routes>
+            </Suspense>
+          </ErrorBoundary>
+        </MainLayout>
+      </ApplicationProvider>
     </Router>
   );
 };

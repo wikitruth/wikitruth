@@ -1,0 +1,34 @@
+body.wt-tenant-app {
+  background: color-mix(in srgb, var(--tenant-surface, #fff) 32%, #fff);
+  font-family: var(--tenant-font, inherit);
+}
+
+body.wt-tenant-app .navbar-default {
+  border-bottom-color: var(--tenant-primary, #337ab7);
+  box-shadow: 0 2px 0 color-mix(in srgb, var(--tenant-primary, #337ab7) 18%, transparent);
+}
+
+body.wt-tenant-app .navbar-brand-label,
+body.wt-tenant-app .navbar-default .navbar-nav > li > a:hover,
+body.wt-tenant-app .navbar-default .navbar-nav > li > a:focus {
+  color: var(--tenant-primary, #337ab7);
+}
+
+body.wt-tenant-app .jumbotron {
+  border-top: 4px solid var(--tenant-primary, #337ab7);
+  background: linear-gradient(135deg, var(--tenant-surface, #f5f5f5), #fff 72%);
+}
+
+body.wt-tenant-app .wt-btn-explore {
+  border-color: var(--tenant-primary, #337ab7);
+  background-color: var(--tenant-primary, #337ab7);
+}
+
+body.wt-tenant-app .wt-btn-explore:hover,
+body.wt-tenant-app .wt-btn-explore:focus {
+  filter: brightness(0.92);
+}
+
+body.wt-tenant-app .footer {
+  border-top-color: var(--tenant-accent, #ddd);
+}

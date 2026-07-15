@@ -12,9 +12,11 @@ import ArtifactEntryRow from '../components/EntryRow/ArtifactEntryRow';
 import IssueEntryRow from '../components/EntryRow/IssueEntryRow';
 import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
 import PageMeta from '../components/common/PageMeta';
+import ApplicationLink from '../components/common/ApplicationLink';
 import { useNotification } from '../context/NotificationContext';
+import { useApplicationContext } from '../context/ApplicationContext';
 import { toModernAppSectionUrl } from '../utils/paths';
-import { createGeoPatternDataUrl } from '../utils/geoPattern';
+import { buildFeatureHeaderStyle, FALLBACK_FEATURE_SECTION_TITLES } from './home/featureHeaders';
 
 type HomeEntrySetColumn = {
   entries?: LegacyEntity[];
@@ -39,30 +41,12 @@ interface HomeData {
   artifactsMore?: boolean;
 }
 
-const FALLBACK_FEATURE_SECTION_TITLES = [
-  'Truth & Reality',
-  'Religion & Worldviews',
-  'Morality & Ethics',
-];
-
-const buildFeatureHeaderStyle = (title: string): React.CSSProperties => {
-  const seed = String(title || 'feature');
-  try {
-    return {
-      backgroundImage: createGeoPatternDataUrl(seed),
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-    };
-  } catch (_error) {
-    return {};
-  }
-};
-
 const HomePage: React.FC = () => {
   const [data, setData] = useState<HomeData>({});
   const [loading, setLoading] = useState(true);
   const { addToast } = useNotification();
-  const { application } = data;
+  const { application: shellApplication, applicationPath, localTenantContext } = useApplicationContext();
+  const application = data.application || shellApplication || undefined;
   const entrySetColumns = (data.entrySet || []) as HomeEntrySetColumn[];
   const featureHeaderStyles = useMemo(() => {
     const styleMap = new Map<string, React.CSSProperties>();
@@ -90,14 +74,14 @@ const HomePage: React.FC = () => {
 
   const fetchHomeData = useCallback(async () => {
     try {
-      const result = (await apiService.getHomeData()) as HomeData;
+      const result = (await apiService.getHomeData(localTenantContext)) as HomeData;
       setData(result);
       setLoading(false);
     } catch {
       addToast('danger', 'Failed to load homepage data');
       setLoading(false);
     }
-  }, [addToast]);
+  }, [addToast, localTenantContext]);
 
   useEffect(() => {
     void fetchHomeData();
@@ -180,7 +164,10 @@ const HomePage: React.FC = () => {
 
   return (
     <div>
-      <PageMeta title="Home" description="A systematic discourse and knowledge contribution using dialectics and vetting" />
+      <PageMeta
+        title={application?.jumbotron?.title || 'Home'}
+        description={application?.jumbotron?.description || 'A systematic discourse and knowledge contribution using dialectics and vetting'}
+      />
       {/* Jumbotron */}
       <div className="jumbotron">
         {application ? (
@@ -198,23 +185,27 @@ const HomePage: React.FC = () => {
           </>
         )}
         <p>
-          <Link className="btn btn-lg btn-success wt-btn-explore" to="/topics" role="button">
+          <ApplicationLink
+            className="btn btn-lg btn-success wt-btn-explore"
+            href={applicationPath(application?.exploreUrl || '/topics')}
+            role="button"
+          >
             <i className="fa fa-globe"></i> Explore
-          </Link>
+          </ApplicationLink>
           <Link
             className="btn btn-lg btn-info wt-btn-visualize"
-            to="/visualize"
+            to={applicationPath('/visualize')}
             role="button"
           >
             <i className="fa fa-snowflake-o"></i> Visualize
           </Link>
-          <Link
+          <ApplicationLink
             className="btn btn-lg btn-warning"
-            to={toModernAppSectionUrl(application?.aboutUrl || '/about')}
+            href={applicationPath(toModernAppSectionUrl(application?.aboutUrl || '/about'))}
             role="button"
           >
             Learn more
-          </Link>
+          </ApplicationLink>
         </p>
       </div>
 
@@ -233,9 +224,13 @@ const HomePage: React.FC = () => {
               <p>{section.description}</p>
               {section.url && (
                 <p>
-                  <Link className="btn btn-default btn-block" to={toModernAppSectionUrl(section.url)} role="button">
+                  <ApplicationLink
+                    className="btn btn-default btn-block"
+                    href={applicationPath(toModernAppSectionUrl(section.url))}
+                    role="button"
+                  >
                     Explore &raquo;
-                  </Link>
+                  </ApplicationLink>
                 </p>
               )}
             </div>
@@ -301,7 +296,7 @@ const HomePage: React.FC = () => {
                   {(column.entries || []).map((entry) => renderMixedEntry(entry))}
                 </ul>
                 <div className="top-list-items-more">
-                  <Link to="/explore#browse" role="button" className="btn btn-default btn-sm">
+                  <Link to={applicationPath('/explore#browse')} role="button" className="btn btn-default btn-sm">
                     <i className="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i> view more
                   </Link>
                 </div>

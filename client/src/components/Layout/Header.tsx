@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import OptimizedImage from '../common/OptimizedImage';
-import type { Application, User } from '../../types';
+import ApplicationLink from '../common/ApplicationLink';
+import type { User } from '../../types';
 import { useAuth } from '../../context/AuthContext';
+import { useApplicationContext } from '../../context/ApplicationContext';
 import authApi from '../../services/api/auth';
-import apiService from '../../services/api';
 import notificationsApi from '../../services/api/notifications';
 import { toModernAppSectionUrl } from '../../utils/paths';
 
@@ -14,17 +15,6 @@ interface HeaderSection {
   description?: string;
   iconClass?: string;
   url?: string;
-}
-
-type HeaderApplication = Partial<Pick<Application, '_id' | 'name' | 'sections' | 'aboutUrl'>> & {
-  id?: string;
-  name?: string;
-  title?: string;
-  logoIcon?: string;
-};
-
-interface HomePayload {
-  application?: HeaderApplication;
 }
 
 interface HeaderProps {
@@ -61,8 +51,8 @@ const DEFAULT_SECTIONS: HeaderSection[] = [
 const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false }) => {
   const location = useLocation();
   const { activeRole, setActiveRole, availableRoles } = useAuth();
+  const { application, applicationPath } = useApplicationContext();
   const [user, setUser] = useState<HeaderUser | null>(null);
-  const [application, setApplication] = useState<HeaderApplication | null>(null);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
@@ -75,10 +65,10 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
     let isMounted = true;
 
     const loadHeaderData = async () => {
-      const [userResult, homeResult] = await Promise.allSettled([
-        authApi.me(),
-        apiService.getHomeData() as Promise<HomePayload>,
-      ]);
+      const userResult = await Promise.resolve(authApi.me()).then(
+        (value) => ({ status: 'fulfilled' as const, value }),
+        (reason) => ({ status: 'rejected' as const, reason }),
+      );
 
       if (!isMounted) {
         return;
@@ -93,12 +83,6 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
         });
       } else {
         setUser(null);
-      }
-
-      if (homeResult.status === 'fulfilled' && homeResult.value.application) {
-        setApplication(homeResult.value.application);
-      } else {
-        setApplication(null);
       }
 
       if (userResult.status === 'fulfilled' && userResult.value.user) {
@@ -134,7 +118,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
     <div className="navbar navbar-default navbar-fixed-top">
       <div className="container-fluid">
         <div className="navbar-header">
-          <Link to="/" className="navbar-brand">
+          <ApplicationLink href={application?.homeUrl || '/'} className="navbar-brand">
             <OptimizedImage
               src={application?.logoIcon || '/img/logo-64x64.png'}
               alt="Logo"
@@ -143,9 +127,9 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
               className="navbar-logo"
             />
             <span className="navbar-brand-label">
-              <span className="hidden-xxs">{application?.name || application?.title || 'Wikitruth'}</span>
+              <span className="hidden-xxs">{application?.navTitle || application?.name || application?.title || 'Wikitruth'}</span>
             </span>
-          </Link>
+          </ApplicationLink>
           <button
             type="button"
             className="navbar-toggle collapsed"
@@ -162,19 +146,19 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
           <nav aria-label="Primary navigation">
             <ul className="nav navbar-nav">
               <li>
-                <Link
-                  to="/explore"
+                <ApplicationLink
+                  href={applicationPath(application?.exploreUrl || '/explore')}
                   title="Explore"
                   aria-label="Explore topics"
                   onClick={() => setIsMobileNavOpen(false)}
                 >
                   <i className="fa fa-globe"></i>
                   <span className="hidden-xs"> Explore</span>
-                </Link>
+                </ApplicationLink>
               </li>
               <li>
                 <Link
-                  to="/search"
+                  to={applicationPath('/search')}
                   title="Search"
                   aria-label="Search content"
                   onClick={() => setIsMobileNavOpen(false)}
@@ -204,7 +188,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
                 <ul id="header-more-menu" className="dropdown-menu dropdown-menu-right">
                   <li className="dropdown-header">more</li>
                   <li>
-                    <Link to="/create" onClick={() => {
+                    <Link to={applicationPath('/create')} onClick={() => {
                       setIsMoreOpen(false);
                       setIsMobileNavOpen(false);
                     }}>
@@ -212,7 +196,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
                     </Link>
                   </li>
                   <li>
-                    <Link to="/groups" onClick={() => {
+                    <Link to={applicationPath('/groups')} onClick={() => {
                       setIsMoreOpen(false);
                       setIsMobileNavOpen(false);
                     }}>
@@ -220,7 +204,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
                     </Link>
                   </li>
                   <li>
-                    <Link to="/members" onClick={() => {
+                    <Link to={applicationPath('/members')} onClick={() => {
                       setIsMoreOpen(false);
                       setIsMobileNavOpen(false);
                     }}>
@@ -230,8 +214,8 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
                   <li className="divider" aria-hidden="true"></li>
                   {headerSections.map((section) => (
                     <li key={`${section.title}-${section.url || ''}`}>
-                      <Link
-                        to={toModernAppSectionUrl(section.url)}
+                      <ApplicationLink
+                        href={applicationPath(toModernAppSectionUrl(section.url))}
                         title={section.description}
                         onClick={() => {
                           setIsMoreOpen(false);
@@ -240,20 +224,20 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
                       >
                         <i className={section.iconClass || 'fa fa-folder-open'} aria-hidden="true"></i>{' '}
                         {section.title}
-                      </Link>
+                      </ApplicationLink>
                     </li>
                   ))}
                   <li className="divider" aria-hidden="true"></li>
                   <li>
-                    <Link to={toModernAppSectionUrl(application?.aboutUrl || '/about')} onClick={() => {
+                    <ApplicationLink href={applicationPath(toModernAppSectionUrl(application?.aboutUrl || '/about'))} onClick={() => {
                       setIsMoreOpen(false);
                       setIsMobileNavOpen(false);
                     }}>
                       <i className="fa fa-info-circle"></i> About
-                    </Link>
+                    </ApplicationLink>
                   </li>
                   <li>
-                    <Link to="/contact" onClick={() => {
+                    <Link to={applicationPath('/contact')} onClick={() => {
                       setIsMoreOpen(false);
                       setIsMobileNavOpen(false);
                     }}>
@@ -281,7 +265,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
             {user ? (
               <>
                 <li>
-                  <Link to="/notifications" title="Notifications" aria-label="Notifications">
+                  <Link to={applicationPath('/notifications')} title="Notifications" aria-label="Notifications">
                     <i className="fa fa-bell-o"></i>
                     {unreadNotifications > 0 ? (
                       <span className="badge" style={{ marginLeft: 6, background: '#d9534f' }}>
@@ -314,7 +298,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
                     <ul id="header-user-menu" className="dropdown-menu dropdown-menu-right">
                       <li className="dropdown-header">Account</li>
                     <li>
-                      <Link to={`/members/${user.username}`} onClick={() => {
+                      <Link to={applicationPath(`/members/${user.username}`)} onClick={() => {
                         setIsUserMenuOpen(false);
                         setIsMobileNavOpen(false);
                       }}>
@@ -322,7 +306,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
                       </Link>
                     </li>
                       <li>
-                        <Link to={`/members/${user.username}/journal`} onClick={() => {
+                        <Link to={applicationPath(`/members/${user.username}/journal`)} onClick={() => {
                           setIsUserMenuOpen(false);
                           setIsMobileNavOpen(false);
                         }}>
@@ -331,7 +315,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
                       </li>
                       {Boolean(user.roles?.admin) && (
                         <li>
-                          <Link to="/admin" onClick={() => {
+                          <Link to={applicationPath('/admin')} onClick={() => {
                             setIsUserMenuOpen(false);
                             setIsMobileNavOpen(false);
                           }}>
@@ -364,7 +348,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
                       )}
                       <li className="divider" aria-hidden="true"></li>
                       <li>
-                        <Link to="/logout" onClick={() => {
+                        <Link to={applicationPath('/logout')} onClick={() => {
                           setIsUserMenuOpen(false);
                           setIsMobileNavOpen(false);
                         }}>
@@ -377,13 +361,13 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
             ) : (
               <>
                 <li>
-                  <Link to="/contribute" className="nav-narrow" aria-label="Contribute anonymously">
+                  <Link to={applicationPath('/contribute')} className="nav-narrow" aria-label="Contribute anonymously">
                     <i className="fa fa-user-secret"></i>
                     <span className="hidden-xs"> Contribute</span>
                   </Link>
                 </li>
                 <li>
-                  <Link to="/login" className="nav-narrow" aria-label="Sign in">
+                  <Link to={applicationPath('/login')} className="nav-narrow" aria-label="Sign in">
                     <i className="fa fa-user"></i>
                     <span className="hidden-xxxxs"> Sign In</span>
                   </Link>

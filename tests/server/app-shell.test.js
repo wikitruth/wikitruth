@@ -14,8 +14,14 @@ describe('React shell routes', function () {
     return app;
   }
 
-  function createRootApp() {
+  function createRootApp(application = null) {
     const app = express();
+    if (application) {
+      app.use(function (_req, res, next) {
+        res.locals.application = application;
+        next();
+      });
+    }
     registerLegacyPathRedirects(app, null);
     return app;
   }
@@ -25,7 +31,7 @@ describe('React shell routes', function () {
     const res = await request(app).get('/app').expect(200);
 
     expect(res.text).toContain('<!DOCTYPE html>');
-    expect(res.text).toContain('Wikitruth - React App');
+    expect(res.text).toContain('Wikitruth, the truth in totality of human knowledge');
   });
 
   it('serves the React shell for nested app routes', async function () {
@@ -33,7 +39,7 @@ describe('React shell routes', function () {
     const res = await request(app).get('/app/topic/123').expect(200);
 
     expect(res.text).toContain('<!DOCTYPE html>');
-    expect(res.text).toContain('Wikitruth - React App');
+    expect(res.text).toContain('Wikitruth, the truth in totality of human knowledge');
   });
 
   it('serves the React shell at the root route', async function () {
@@ -41,7 +47,34 @@ describe('React shell routes', function () {
     const res = await request(app).get('/').expect(200);
 
     expect(res.text).toContain('<!DOCTYPE html>');
-    expect(res.text).toContain('Wikitruth - React App');
+    expect(res.text).toContain('Wikitruth, the truth in totality of human knowledge');
+  });
+
+  it('renders tenant document identity before the React bundle starts', async function () {
+    const app = createRootApp({
+      id: 'fixtheph',
+      title: 'Fix The Philippines',
+      navTitle: 'FixPH',
+      slogan: 'Promote transparency and accountability.',
+      logoIcon: '/img/fixtheph/logo-64x64.png',
+      civicTenant: {
+        branding: {
+          favicon: '/img/fixtheph/favicons/favicon.ico',
+          primaryColor: '#2f6b4f',
+        },
+      },
+    });
+    const res = await request(app)
+      .get('/civic/projects')
+      .set('Host', 'fixthephilippines.org')
+      .expect(200);
+
+    expect(res.text).toContain('<title>Fix The Philippines, Promote transparency and accountability.</title>');
+    expect(res.text).toContain('class="wt-tenant-app app-fixtheph"');
+    expect(res.text).toContain('content="FixPH"');
+    expect(res.text).toContain('/img/fixtheph/favicons/favicon.ico');
+    expect(res.text).toContain('content="http://fixthephilippines.org/civic/projects"');
+    expect(res.text).not.toContain('__WT_');
   });
 
   it('serves the React shell for dynamic About pages', async function () {
@@ -49,7 +82,7 @@ describe('React shell routes', function () {
     const res = await request(app).get('/about/what-is-wikitruth').expect(200);
 
     expect(res.text).toContain('<!DOCTYPE html>');
-    expect(res.text).toContain('Wikitruth - React App');
+    expect(res.text).toContain('Wikitruth, the truth in totality of human knowledge');
   });
 
   it('serves the branded React not-found page for an arbitrary browser URL', async function () {
@@ -60,7 +93,7 @@ describe('React shell routes', function () {
       .expect(404);
 
     expect(res.text).toContain('<!DOCTYPE html>');
-    expect(res.text).toContain('Wikitruth - React App');
+    expect(res.text).toContain('Wikitruth, the truth in totality of human knowledge');
   });
 
   it('does not turn missing API or asset requests into HTML', async function () {
@@ -68,8 +101,8 @@ describe('React shell routes', function () {
     const apiResponse = await request(app).get('/api/not-real').set('Accept', 'text/html').expect(404);
     const assetResponse = await request(app).get('/js/not-real.js').set('Accept', 'text/html').expect(404);
 
-    expect(apiResponse.text).not.toContain('Wikitruth - React App');
-    expect(assetResponse.text).not.toContain('Wikitruth - React App');
+    expect(apiResponse.text).not.toContain('Wikitruth, the truth in totality of human knowledge');
+    expect(assetResponse.text).not.toContain('Wikitruth, the truth in totality of human knowledge');
   });
 
   it('redirects /app alias routes to root-based modern routes', async function () {

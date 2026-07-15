@@ -1,8 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { useApplicationContext } from '../../context/ApplicationContext';
+import ApplicationLink from '../common/ApplicationLink';
+import { toModernAppSectionUrl } from '../../utils/paths';
 
 const Footer: React.FC = () => {
   const year = new Date().getFullYear();
+  const { application, applicationPath } = useApplicationContext();
 
   return (
     <div className="footer">
@@ -15,10 +19,10 @@ const Footer: React.FC = () => {
         </span>
         <ul className="links">
           <li>
-            <Link to="/" className="no-underline">
+            <ApplicationLink href={application?.homeUrl || '/'} className="no-underline">
               <i className="fa fa-home"></i>
               <span className="hidden-xxs"> Home</span>
-            </Link>
+            </ApplicationLink>
           </li>
           <li>
             <a href="https://www.facebook.com/wikitruth.project" className="no-underline" target="_blank" rel="noreferrer">
@@ -33,13 +37,16 @@ const Footer: React.FC = () => {
             </a>
           </li>
           <li>
-            <Link to="/about" className="no-underline">
+            <ApplicationLink
+              href={applicationPath(toModernAppSectionUrl(application?.aboutUrl || '/about'))}
+              className="no-underline"
+            >
               <i className="fa fa-info-circle"></i>
               <span className="hidden-xs"> About</span>
-            </Link>
+            </ApplicationLink>
           </li>
           <li>
-            <Link to="/contact" className="no-underline">
+            <Link to={applicationPath('/contact')} className="no-underline">
               <i className="fa fa-comment"></i>
               <span className="hidden-xs"> Contact</span>
             </Link>

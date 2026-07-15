@@ -61,11 +61,20 @@ export interface ReputationSnapshot {
 }
 
 export interface Application {
-  _id: string;
-  name: string;
+  _id?: string;
+  id?: string;
+  title?: string;
+  name?: string;
+  navTitle?: string;
+  slogan?: string;
+  logoIcon?: string;
+  homeUrl?: string;
   aboutUrl?: string;
+  exploreUrl?: string;
   exploreTopicId?: string;
+  domains?: string[];
   resPath?: string;
+  civicTenant?: import('./civic').CivicTenant;
   jumbotron?: {
     title: string;
     description: string;

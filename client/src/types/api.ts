@@ -1,5 +1,5 @@
 import type { LegacyEntity, LegacyResponse } from './legacy';
-import type { Artifact } from './index';
+import type { Application, Artifact } from './index';
 
 export interface ApiBaseResponse {
   success?: boolean;
@@ -126,6 +126,12 @@ export interface HomeDataResponse extends ApiBaseResponse, EntityBuckets {
   issuesMore?: boolean;
   opinionsMore?: boolean;
   artifactsMore?: boolean;
+}
+
+export interface ApplicationContextResponse extends ApiBaseResponse {
+  application?: Application | null;
+  applications?: Application[];
+  appCategories?: LegacyEntity[];
 }
 
 export interface OutlineTreeNode {

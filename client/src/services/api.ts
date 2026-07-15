@@ -2,6 +2,7 @@
 import type {
   LegacyApiResponse,
   HomeDataResponse,
+  ApplicationContextResponse,
   SearchResponse,
   TopicEntryResponse,
   ArgumentEntryResponse,
@@ -178,8 +179,12 @@ class ApiService {
   }
 
   // Home
-  async getHomeData(): Promise<HomeDataResponse> {
-    return this.request<HomeDataResponse>('/home');
+  async getHomeData(civic = false): Promise<HomeDataResponse> {
+    return this.request<HomeDataResponse>(`/home${civic ? '?civic=1' : ''}`);
+  }
+
+  async getApplicationContext(civic = false): Promise<ApplicationContextResponse> {
+    return this.request<ApplicationContextResponse>(`/application-context${civic ? '?civic=1' : ''}`);
   }
 
   async getInstallStatus(): Promise<InstallStatusResponse> {

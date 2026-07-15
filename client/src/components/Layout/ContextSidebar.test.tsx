@@ -24,12 +24,25 @@ jest.mock('../../services/api', () => ({
 
 const mockedApi = apiService as jest.Mocked<typeof apiService>;
 const mockedUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
+const mockUseApplicationContext = jest.fn();
+
+jest.mock('../../context/ApplicationContext', () => ({
+  useApplicationContext: () => mockUseApplicationContext(),
+}));
 
 describe('ContextSidebar', () => {
   beforeEach(() => {
     mockedApi.getHomeData.mockReset();
     mockedApi.getTopicEntry.mockReset();
     mockedApi.getAnswerEntry.mockReset();
+    mockUseApplicationContext.mockReturnValue({
+      application: null,
+      applications: [],
+      appCategories: [],
+      applicationPath: (path: string) => path,
+      localTenantContext: false,
+      platformHomeUrl: '/',
+    });
     mockedUseAuth.mockReturnValue({
       user: { _id: 'user-1', username: 'demo', roles: {} },
       isAuthenticated: true,
@@ -46,10 +59,16 @@ describe('ContextSidebar', () => {
 
   it('matches legacy section ordering and renders nested topic ancestry', async () => {
     mockedApi.getHomeData.mockResolvedValue({
-      applications: [],
-      appCategories: [makeEntity({ _id: 'explore-1', friendlyUrl: 'science', title: 'Science' })],
       diaryCategories: [makeEntity({ _id: 'diary-1', friendlyUrl: 'notes', title: 'Notes' })],
       myGroups: [makeEntity({ _id: 'group-1', friendlyUrl: 'research', title: 'Research' })],
+    });
+    mockUseApplicationContext.mockReturnValue({
+      application: null,
+      applications: [],
+      appCategories: [makeEntity({ _id: 'explore-1', friendlyUrl: 'science', title: 'Science' })],
+      applicationPath: (path: string) => path,
+      localTenantContext: false,
+      platformHomeUrl: '/',
     });
     mockedApi.getTopicEntry.mockResolvedValue({
       topic: makeEntity({ _id: 'topic-1', friendlyUrl: 'topic', title: 'Long Topic', contextTitle: 'Topic' }),
@@ -86,7 +105,7 @@ describe('ContextSidebar', () => {
   });
 
   it('uses the answer id rather than a discussion subroute as sidebar context', async () => {
-    mockedApi.getHomeData.mockResolvedValue({ applications: [], appCategories: [] });
+    mockedApi.getHomeData.mockResolvedValue({});
     mockedApi.getAnswerEntry.mockResolvedValue({
       answer: makeEntity({ _id: 'answer-1', title: 'Answer' }),
       topicLinks: [],
@@ -96,5 +115,26 @@ describe('ContextSidebar', () => {
 
     await waitFor(() => expect(mockedApi.getAnswerEntry).toHaveBeenCalledWith('answer-1'));
     expect(mockedApi.getAnswerEntry).not.toHaveBeenCalledWith('discussion');
+  });
+
+  it('renders tenant apps and keeps local category navigation in the civic shell', async () => {
+    mockedApi.getHomeData.mockResolvedValue({});
+    mockUseApplicationContext.mockReturnValue({
+      application: { id: 'fixtheph', exploreUrl: '/civic' },
+      applications: [{ id: 'fixtheph', title: 'Fix The Philippines', homeUrl: '/civic', logoIcon: '/fixph.png' }],
+      appCategories: [makeEntity({ _id: 'ph-1', friendlyUrl: 'ph-subtopic', title: 'PH subtopic' })],
+      applicationPath: (path: string) => path.startsWith('/civic') ? path : `${path}${path.includes('?') ? '&' : '?'}civic=1`,
+      localTenantContext: true,
+      platformHomeUrl: '/',
+    });
+
+    render(<ContextSidebar />, { route: '/civic' });
+
+    expect(await screen.findByRole('link', { name: 'Fix The Philippines' })).toHaveAttribute('href', '/civic');
+    expect(screen.getByRole('link', { name: 'Wikitruth' })).toHaveAttribute('href', '/');
+    expect(screen.getByRole('link', { name: 'PH subtopic' })).toHaveAttribute(
+      'href',
+      '/topics/entry/ph-subtopic/ph-1?civic=1',
+    );
   });
 });

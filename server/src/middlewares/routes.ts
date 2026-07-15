@@ -2,9 +2,8 @@
 
 import type { NextFunction, Request, Response } from 'express';
 import type { AppContext } from '../types/models';
-import path from 'path';
-
-const reactShellPath = path.join(process.cwd(), 'public/react-app.html');
+import type { ApplicationDefinition } from '../types/domain';
+import { renderReactShell } from '../services/reactShellService';
 
 type AppRouteRegistrar = AppContext & {
   get: (...args: unknown[]) => unknown;
@@ -315,8 +314,10 @@ function redirectToModernApp(req: Request, res: Response): void {
   res.redirect(target);
 }
 
-function serveModernShell(_req: Request, res: Response): void {
-  res.sendFile(reactShellPath);
+function serveModernShell(req: Request, res: Response, next: NextFunction): void {
+  void renderReactShell(req, (res.locals.application || null) as ApplicationDefinition | null)
+    .then((html) => res.type('html').send(html))
+    .catch(next);
 }
 
 function serveModernNotFoundShell(req: Request, res: Response, next: NextFunction): void {
@@ -329,7 +330,9 @@ function serveModernNotFoundShell(req: Request, res: Response, next: NextFunctio
     return;
   }
 
-  res.status(404).sendFile(reactShellPath);
+  void renderReactShell(req, (res.locals.application || null) as ApplicationDefinition | null)
+    .then((html) => res.status(404).type('html').send(html))
+    .catch(next);
 }
 
 export default function registerLegacyPathRedirects(app: AppRouteRegistrar, _passport: unknown): void {

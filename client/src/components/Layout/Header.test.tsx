@@ -1,16 +1,9 @@
 import React from 'react';
-import { fireEvent, render, screen, waitFor } from '../../test-utils/render';
+import { fireEvent, render, screen } from '../../test-utils/render';
 import Header from './Header';
 
-const mockGetHomeData = jest.fn();
 const mockMe = jest.fn();
-
-jest.mock('../../services/api', () => ({
-  __esModule: true,
-  default: {
-    getHomeData: (...args: unknown[]) => mockGetHomeData(...args),
-  },
-}));
+const mockUseApplicationContext = jest.fn();
 
 jest.mock('../../services/api/auth', () => ({
   __esModule: true,
@@ -34,10 +27,17 @@ jest.mock('../../context/AuthContext', () => ({
   }),
 }));
 
+jest.mock('../../context/ApplicationContext', () => ({
+  useApplicationContext: () => mockUseApplicationContext(),
+}));
+
 describe('Header parity navigation', () => {
   beforeEach(() => {
     mockMe.mockResolvedValue({ user: null });
-    mockGetHomeData.mockResolvedValue({});
+    mockUseApplicationContext.mockReturnValue({
+      application: null,
+      applicationPath: (path: string) => path,
+    });
   });
 
   it('restores the legacy default section links in the More menu', async () => {
@@ -60,10 +60,14 @@ describe('Header parity navigation', () => {
   });
 
   it('renders application sections and converts legacy topic URLs', async () => {
-    mockGetHomeData.mockResolvedValue({
+    mockUseApplicationContext.mockReturnValue({
       application: {
         id: 'fixtheph',
         title: 'Fix The Philippines',
+        navTitle: 'FixPH',
+        logoIcon: '/img/fixtheph/logo-64x64.png',
+        homeUrl: '/civic',
+        exploreUrl: '/civic',
         aboutUrl: '/topic/fixthephilippines-org',
         sections: [
           {
@@ -74,11 +78,13 @@ describe('Header parity navigation', () => {
           },
         ],
       },
+      applicationPath: (path: string) => path,
     });
 
     render(<Header />);
 
-    await waitFor(() => expect(mockGetHomeData).toHaveBeenCalled());
+    expect(screen.getByRole('link', { name: /fixph/i })).toHaveAttribute('href', '/civic');
+    expect(screen.getByRole('link', { name: /explore/i })).toHaveAttribute('href', '/civic');
     fireEvent.click(screen.getByRole('button', { name: /more navigation options/i }));
 
     expect(await screen.findByRole('link', { name: /incidents/i })).toHaveAttribute(
