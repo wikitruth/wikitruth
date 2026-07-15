@@ -5,6 +5,7 @@ import path from 'path';
 import fs from 'fs';
 
 import { mountLegacyCompatibility } from './mount';
+import { createAsyncSafeLegacyRouter } from './asyncRouter';
 import legacyPaths from '../../server/models/paths';
 
 const LEGACY_SERVER_ROOT = path.join(process.cwd(), 'legacy', 'server');
@@ -97,7 +98,7 @@ function loadLegacyTemplateController<T>(pathParts: string[]): T {
 }
 
 function attachController(legacyRouter: Router, routePath: string, controllerPath: string): void {
-  const router = express.Router();
+  const router = createAsyncSafeLegacyRouter();
   const controllerModule = require(path.join(LEGACY_SERVER_ROOT, 'controllers', controllerPath)) as
     | LegacyControllerFactory
     | { default?: LegacyControllerFactory };

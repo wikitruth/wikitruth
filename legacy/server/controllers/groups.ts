@@ -58,6 +58,9 @@ const mountGroupsController: LegacyControllerFactory = function (router) {
         const model = {};
         req.query.group = req.params.id;
         await flowUtils.setGroupModel(req, model);
+        if (!model.group) {
+            return res.status(404).render(templates.errors.http404);
+        }
         const groupFilter = {
             $or: [
                 {ownerId: model.group._id, ownerType: constants.OBJECT_TYPES.group},
@@ -74,6 +77,9 @@ const mountGroupsController: LegacyControllerFactory = function (router) {
         const model = {};
         req.query.group = req.params.id;
         await flowUtils.setGroupModel(req, model);
+        if (!model.group) {
+            return res.status(404).render(templates.errors.http404);
+        }
         res.render(templates.groups.group.members, model);
     });
 
