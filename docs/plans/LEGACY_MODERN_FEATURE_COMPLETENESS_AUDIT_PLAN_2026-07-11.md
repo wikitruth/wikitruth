@@ -96,7 +96,7 @@ Current detailed evidence and page-family results are in
 - [x] Implement a real `Remember me` session choice or remove the no-op field.
 - [x] Decide whether answers need a dedicated discussion route and align route
   inventory/tests with that decision.
-- [ ] Harden or isolate `/legacy/topics/create` and
+- [x] Harden or isolate `/legacy/topics/create` and
   `/legacy/members/contributors`; both currently crash the shared PM2 process.
 - [ ] Re-run the 306-render public sweep, seven-family semantic suite, and
   disposable five-role audit after remediation.
@@ -142,6 +142,10 @@ The target-state inventory was revalidated against current code. All non-deferre
 
 ### Implementation Progress (2026-07-11)
 
+- `ef6792ff` hardened anonymous legacy topic creation, restored the named
+  contributors-directory route ahead of the username route, intercepted
+  unknown member profiles, and fixed exact legacy-mount redirects. Modern and
+  legacy type checks plus 35 focused legacy runtime tests passed.
 - `f5bcbd82` added route-level authentication and role guards, safe post-login
   return URLs, branded direct-route `404` shell delivery, mobile fixed-header
   breadcrumb clearance, auto-centered FixPH section navigation with overflow
