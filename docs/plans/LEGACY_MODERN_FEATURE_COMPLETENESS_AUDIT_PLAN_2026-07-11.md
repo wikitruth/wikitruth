@@ -142,6 +142,13 @@ The target-state inventory was revalidated against current code. All non-deferre
 
 ### Implementation Progress (2026-07-11)
 
+- `110afa37` corrected the final two modern console defects found by the
+  independent public sweep: answer discussion context now resolves the answer
+  identifier instead of the `discussion` suffix, and unauthorized journal
+  views render an explicit private state without issuing a forbidden request.
+  Owner and administrator journal access remain covered. The same group aligned
+  a stale Civic overview test fixture with the current typed API contract; all
+  82 client suites / 201 tests and the production client build passed.
 - `aa7ced4f` closed an additional missing-group crash exposed by the independent
   306-render rerun and wrapped all mounted legacy controller GET/POST promises
   so rejected handlers are forwarded to Express instead of terminating the
