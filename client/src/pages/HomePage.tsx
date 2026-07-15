@@ -16,7 +16,7 @@ import ApplicationLink from '../components/common/ApplicationLink';
 import { useNotification } from '../context/NotificationContext';
 import { useApplicationContext } from '../context/ApplicationContext';
 import { toModernAppSectionUrl } from '../utils/paths';
-import { buildFeatureHeaderStyle, FALLBACK_FEATURE_SECTION_TITLES } from './home/featureHeaders';
+import { buildFeatureHeaderStyle, FALLBACK_FEATURE_SECTION_TITLES } from './Home/featureHeaders';
 
 type HomeEntrySetColumn = {
   entries?: LegacyEntity[];
