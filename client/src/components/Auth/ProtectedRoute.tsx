@@ -30,7 +30,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
     return (
       <div className="alert alert-info wt-protected-route-message" role="status">
         <h3>Sign in required</h3>
-        <p>This page contains account or operational information.</p>
+        <p>This page requires an authenticated account.</p>
         <Link className="btn btn-primary" to={`/login?returnUrl=${encodeURIComponent(returnUrl)}`}>
           <i className="fa fa-sign-in" aria-hidden="true"></i> Sign In
         </Link>

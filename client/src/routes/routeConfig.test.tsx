@@ -63,8 +63,31 @@ describe('routeConfig', () => {
     expect(paths).toContain('/answers/entry/:id/discussion');
   });
 
-  it('guards notification and administration pages before they mount', () => {
+  it('guards account, authoring, profile-workspace, moderation, and administration pages before they mount', () => {
     const protectedPaths = [
+      '/account',
+      '/account/settings',
+      '/topics/create',
+      '/arguments/create',
+      '/questions/create',
+      '/questions/edit/:id',
+      '/issues/create',
+      '/issues/edit/:id',
+      '/opinions/create',
+      '/comments/create',
+      '/answers/create',
+      '/answers/edit/:id',
+      '/artifacts/create',
+      '/artifacts/edit/:id',
+      '/groups/create',
+      '/members/profile',
+      '/members/profile/settings',
+      '/members/profile/journal',
+      '/members/profile/pages',
+      '/members/profile/pages/create',
+      '/screening',
+      '/convert',
+      '/outline/link',
       '/notifications',
       '/admin',
       '/admin/users',
