@@ -11,7 +11,7 @@ import { chromium } from 'playwright';
 
 const require = createRequire(import.meta.url);
 const config = require('../../server/src/config/config.js');
-const baseUrl = process.argv[2] || 'https://127.0.0.1:9443';
+const baseUrl = process.argv[2] || process.env.WT_BASE_URL || 'https://127.0.0.1:9443';
 const runDate = new Date().toISOString().slice(0, 10);
 const outDir = process.argv[3] || path.join('docs', 'qa', 'artifacts', `civic-browser-disposable-${runDate}`);
 const browserChannel = process.env.WT_CIVIC_BROWSER_CHANNEL || 'chrome';
