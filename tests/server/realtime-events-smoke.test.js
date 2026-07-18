@@ -21,5 +21,7 @@ describe('Realtime event channel smoke coverage', function () {
     expect(realtimeEventsService).toContain('function subscribeRealtime(');
     expect(realtimeEventsService).toContain('function publishRealtimeEvent(');
     expect(realtimeEventsService).toContain('function getRealtimeSubscriberCount(');
+    expect(realtimeEventsService).toContain('function getRealtimeAdapterName(');
+    expect(realtimeEventsService).toContain('createMongoRealtimeAdapter()');
   });
 });

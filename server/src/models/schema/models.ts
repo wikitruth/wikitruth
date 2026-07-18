@@ -38,6 +38,7 @@ export = function (app: Application, mongoose: Mongoose) {
   require('./core/EntryEvent')(app, mongoose);
   require('./core/EntryRedirect')(app, mongoose);
   require('./core/VerdictVote')(app, mongoose);
+  require('./core/RealtimeEvent')(app, mongoose);
   require('./core/ReaderSignal')(app, mongoose);
   require('./core/Appeal')(app, mongoose);
   require('./core/Subscription')(app, mongoose);

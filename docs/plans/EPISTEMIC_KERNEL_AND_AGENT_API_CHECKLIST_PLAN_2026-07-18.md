@@ -82,9 +82,9 @@ auditable contributions through the same moderation lifecycle as people.
 - [x] Render entry-specific title, description, canonical, OpenGraph, and structured data in the initial server response.
 - [x] Complete OpenAPI coverage for all mounted public and governed API surfaces.
 - [x] Give `/api/v1` an explicit contract/version policy and agent-safe error semantics.
-- [ ] Replace recursive outline N+1 traversal with bounded batched traversal.
-- [ ] Add an optional durable realtime event adapter while retaining local in-memory development behavior.
-- [ ] Add repeatable API/database load tests and publish measured results.
+- [x] Replace recursive outline N+1 traversal with bounded batched traversal.
+- [x] Add an optional durable realtime event adapter while retaining local in-memory development behavior.
+- [x] Add repeatable API/database load tests and publish measured local results.
 
 ## 8. Flagship Epistemic Workflow Pilot
 

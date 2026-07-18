@@ -26,6 +26,7 @@
     "test:coverage": "jest --config jest.config.client.js --coverage",
     "test:e2e": "playwright test",
     "test:perf:budgets": "node scripts/perf/check-perf-budgets.mjs",
+    "test:load:api-db": "node --env-file-if-exists=.env scripts/perf/api-database-load.mjs",
     "openapi:sync": "node scripts/openapi/check-openapi-coverage.mjs --write",
     "openapi:check": "node scripts/openapi/check-openapi-coverage.mjs",
     "test:parity:server:checklist": "jest --config jest.config.server.js tests/server/parity-checklist.test.js",

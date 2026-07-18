@@ -7,6 +7,7 @@ import type { RealtimeEvent } from '../../services/realtimeEvents';
 import {
   subscribeRealtime,
   getRealtimeSubscriberCount,
+  getRealtimeAdapterName,
 } from '../../services/realtimeEvents';
 
 const HEARTBEAT_INTERVAL_MS = 30_000;
@@ -32,6 +33,7 @@ export = function (router: Router) {
       timestamp: new Date().toISOString(),
       data: {
         subscribers: getRealtimeSubscriberCount() + 1,
+        adapter: getRealtimeAdapterName(),
         user: req.user?.username || null,
       },
     });

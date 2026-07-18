@@ -1,0 +1,50 @@
+{
+  "generatedAt": "2026-07-18T08:59:31.733Z",
+  "mode": "read-only-api-and-database",
+  "baseUrl": "https://127.0.0.1:9443",
+  "api": {
+    "requests": 300,
+    "successes": 300,
+    "failures": 0,
+    "errorRate": 0,
+    "p50Ms": 65.11,
+    "p95Ms": 95.21,
+    "p99Ms": 153.85,
+    "maximumMs": 158.42,
+    "statuses": {
+      "200": 300
+    },
+    "durationSeconds": 10,
+    "concurrency": 10,
+    "requestsPerSecondPerWorker": 3,
+    "paths": [
+      "/api/v1/home",
+      "/api/v1/topics?limit=20",
+      "/api/v1/civic/overview"
+    ]
+  },
+  "database": {
+    "requests": 100,
+    "successes": 100,
+    "failures": 0,
+    "errorRate": 0,
+    "p50Ms": 3.21,
+    "p95Ms": 11.27,
+    "p99Ms": 13.52,
+    "maximumMs": 17.11,
+    "iterations": 100,
+    "concurrency": 10
+  },
+  "thresholds": {
+    "apiP95Ms": 1500,
+    "databaseP95Ms": 500,
+    "maximumErrorRate": 0.01
+  },
+  "checks": {
+    "apiP95": true,
+    "databaseP95": true,
+    "apiErrors": true,
+    "databaseErrors": true
+  },
+  "passed": true
+}

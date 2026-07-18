@@ -140,6 +140,11 @@ exports.security = {
     }
   }
 };
+exports.realtime = {
+  adapter: process.env.REALTIME_EVENT_ADAPTER || 'memory',
+  mongoPollMs: Number(process.env.REALTIME_MONGO_POLL_MS || 1000),
+  mongoRetentionHours: Number(process.env.REALTIME_MONGO_RETENTION_HOURS || 24)
+};
 exports.googleAnalyticsTrackingId = process.env.GOOGLE_ANALYTICS_TRACKING_ID || '';
 exports.loginAttempts = {
   forIp: Number(process.env.LOGIN_ATTEMPTS_FOR_IP || 50),

@@ -11,7 +11,8 @@ Define the current realtime event channel and client monitoring behavior.
 - emits a `connected` event
 - tracks subscriber count
 - emits periodic heartbeat events
-- Event bus is in-memory publish/subscribe for current server process.
+- Event bus is in-memory publish/subscribe by default.
+- `REALTIME_EVENT_ADAPTER=mongo` enables durable, TTL-bounded cross-process fan-out for multi-worker deployments while preserving immediate local delivery.
 
 ## Monitoring Ingestion
 
@@ -29,4 +30,4 @@ Define the current realtime event channel and client monitoring behavior.
 
 ## Operational Invariant
 
-Realtime monitoring is best-effort and process-local; it is intended for live observability in the running node process, not durable event storage or cross-process guaranteed delivery.
+Realtime monitoring remains best-effort. Memory mode is process-local; Mongo mode shares short-lived events across processes but is not a permanent audit log. Privileged actions continue to use the immutable entry-event audit chain.
