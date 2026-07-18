@@ -7,12 +7,14 @@ interface OpinionEntryRowProps {
   opinion: Opinion;
   subtitle?: boolean;
   labels?: boolean;
+  hideAcceptedStatus?: boolean;
 }
 
 const OpinionEntryRow: React.FC<OpinionEntryRowProps> = ({
   opinion,
   subtitle = false,
   labels = true,
+  hideAcceptedStatus = false,
 }) => {
   const getOpinionLink = () => {
     return `/opinions/entry/${opinion._id}`;
@@ -32,6 +34,7 @@ const OpinionEntryRow: React.FC<OpinionEntryRowProps> = ({
         entryPath={getOpinionLink()}
         labels={labels}
         subtitle={subtitle}
+        hideAcceptedStatus={hideAcceptedStatus}
         extraLabels={
           opinion.discussionContext?.status === 'potentially_obsolete' ? (
             <span className="label label-warning">older revision</span>

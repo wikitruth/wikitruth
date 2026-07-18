@@ -97,4 +97,15 @@ describe('Header parity navigation', () => {
     );
     expect(screen.queryByRole('link', { name: /debates/i })).not.toBeInTheDocument();
   });
+
+  it('keeps anonymous contribution available without occupying the mobile navbar', async () => {
+    const { container } = render(<Header />);
+
+    const directContribution = container.querySelector('.wt-account-nav > li.hidden-xs a[href="/contribute"]');
+    expect(directContribution).toHaveAttribute('aria-label', 'Contribute anonymously');
+
+    fireEvent.click(screen.getByRole('button', { name: /more navigation options/i }));
+    const mobileContribution = container.querySelector('#header-more-menu > li.visible-xs a[href="/contribute"]');
+    expect(mobileContribution).toHaveTextContent('Contribute anonymously');
+  });
 });

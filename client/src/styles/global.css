@@ -15,6 +15,15 @@
   vertical-align: 2px;
 }
 
+.wt-entry-row-title > .wt-screening-status {
+  display: inline-block;
+  margin-left: 6px;
+  color: #4cae4c;
+  font-size: 14px;
+  line-height: 1;
+  vertical-align: 1px;
+}
+
 .wt-entry-row-subtitle {
   margin-bottom: 2px;
   color: #777;
@@ -214,7 +223,7 @@ button:focus-visible,
 
 @media (max-width: 767px) {
   body {
-    padding-top: 80px;
+    padding-top: 50px;
   }
 
   .breadcrumb.wt-bc {
@@ -223,7 +232,49 @@ button:focus-visible,
   }
 
   .navbar-brand-label .hidden-xxs {
-    display: inline !important;
+    display: none !important;
+  }
+}
+
+.wt-explore-page-header {
+  position: relative;
+}
+
+.wt-explore-header-actions {
+  padding: 8px 0;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.wt-explore-header-actions > a {
+  color: #767676;
+  text-decoration: none;
+}
+
+.wt-explore-header-actions > a + a {
+  margin-left: 15px;
+}
+
+.wt-explore-filter-toggle {
+  margin-bottom: 10px;
+}
+
+.wt-explore-filter-toggle .badge {
+  margin-left: 6px;
+}
+
+@media (max-width: 767px) {
+  .wt-explore-advanced-filters {
+    display: none;
+  }
+
+  .wt-explore-advanced-filters.is-open {
+    display: block;
+  }
+
+  .wt-explore-tabs > li > a {
+    padding-right: 9px;
+    padding-left: 9px;
   }
 }
 

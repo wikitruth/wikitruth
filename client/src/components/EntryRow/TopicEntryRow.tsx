@@ -10,6 +10,7 @@ interface TopicEntryRowProps {
   labels?: boolean;
   contentPreview?: string;
   showMore?: boolean;
+  hideAcceptedStatus?: boolean;
 }
 
 const TopicEntryRow: React.FC<TopicEntryRowProps> = ({
@@ -18,6 +19,7 @@ const TopicEntryRow: React.FC<TopicEntryRowProps> = ({
   labels = true,
   contentPreview,
   showMore = false,
+  hideAcceptedStatus = false,
 }) => {
   const getTopicLink = () => {
     return `/topics/entry/${topic.friendlyUrl}/${topic._id}`;
@@ -39,6 +41,7 @@ const TopicEntryRow: React.FC<TopicEntryRowProps> = ({
         subtitle={subtitle}
         contentPreview={contentPreview}
         showMore={showMore}
+        hideAcceptedStatus={hideAcceptedStatus}
       />
     </li>
   );

@@ -6,7 +6,6 @@ import type { LegacyEntity } from '../types/legacy';
 import type { Answer, Argument, Artifact, Issue, Opinion, Question, Topic } from '../types';
 import LoadingSpinner from '../components/LoadingSpinner';
 import PageMeta from '../components/common/PageMeta';
-import PageHeader from '../components/common/PageHeader';
 import TopicEntryRow from '../components/EntryRow/TopicEntryRow';
 import ArgumentEntryRow from '../components/EntryRow/ArgumentEntryRow';
 import QuestionEntryRow from '../components/EntryRow/QuestionEntryRow';
@@ -18,9 +17,26 @@ import GeoPatternBackground from '../components/common/GeoPatternBackground';
 import ContentViewFilter, { type ViewMode } from '../components/common/ContentViewFilter';
 import { useNotification } from '../context/NotificationContext';
 import { useAuth } from '../context/AuthContext';
+import { useApplicationContext } from '../context/ApplicationContext';
 import { getTrustedRankingScore } from '../utils/trustedRanking';
 
 type ExploreTab = 'all' | 'topics' | 'arguments' | 'questions' | 'answers' | 'artifacts' | 'issues' | 'opinions';
+
+const EXPLORE_TABS: Array<{
+  key: ExploreTab;
+  icon: string;
+  label: string;
+  mobileLabelClass?: string;
+}> = [
+  { key: 'all', icon: 'globe', label: 'All' },
+  { key: 'topics', icon: 'folder-open', label: 'Topics', mobileLabelClass: 'hidden-xxs' },
+  { key: 'arguments', icon: 'flash', label: 'Facts', mobileLabelClass: 'hidden-xs' },
+  { key: 'questions', icon: 'question-circle', label: 'Questions', mobileLabelClass: 'hidden-xs' },
+  { key: 'answers', icon: 'check-circle', label: 'Answers', mobileLabelClass: 'hidden-xs' },
+  { key: 'artifacts', icon: 'puzzle-piece', label: 'Artifacts', mobileLabelClass: 'hidden-xs' },
+  { key: 'issues', icon: 'exclamation-circle', label: 'Issues', mobileLabelClass: 'hidden-xs' },
+  { key: 'opinions', icon: 'comments-o', label: 'Comments', mobileLabelClass: 'hidden-xs' },
+];
 
 type ExploreCategory = LegacyEntity & {
   title?: string;
@@ -65,7 +81,7 @@ const ExplorePage: React.FC = () => {
   })();
   const viewMode: ViewMode = (() => {
     const raw = String(searchParams.get('view') || storedViewMode).toLowerCase();
-    return raw === 'wiki' || raw === 'original' ? raw : 'all';
+    return raw === 'wiki' || raw === 'original' || raw === 'archived' ? raw : 'all';
   })();
   const keyword = String(searchParams.get('q') || '').trim();
   const screeningFilter = String(searchParams.get('screening') || 'all').trim();
@@ -75,6 +91,17 @@ const ExplorePage: React.FC = () => {
   const sortValue = String(searchParams.get('sort') || 'latest').toLowerCase();
   const sortMode: 'latest' | 'popular' | 'trusted' = sortValue === 'popular' || sortValue === 'trusted' ? sortValue : 'latest';
   const { addToast } = useNotification();
+  const { application, applicationPath } = useApplicationContext();
+  const hasAdvancedFilters = Boolean(
+    keyword || screeningFilter !== 'all' || verdictFilter !== 'all' || relationshipFilter !== 'all' || tagFilter
+  );
+  const [advancedFiltersOpen, setAdvancedFiltersOpen] = useState(hasAdvancedFilters);
+  const hideAcceptedStatus = viewMode === 'wiki';
+  const visualizePath = applicationPath(
+    application?.exploreTopicId
+      ? `/visualize/topic/${encodeURIComponent(String(application.exploreTopicId))}`
+      : '/visualize'
+  );
 
   useEffect(() => {
     let mounted = true;
@@ -100,9 +127,16 @@ const ExplorePage: React.FC = () => {
     };
   }, [addToast]);
 
+  useEffect(() => {
+    if (hasAdvancedFilters) {
+      setAdvancedFiltersOpen(true);
+    }
+  }, [hasAdvancedFilters]);
+
   const handleViewModeChange = (mode: ViewMode) => {
     localStorage.setItem('wt_view_mode', mode);
     const next = new URLSearchParams(searchParams);
+    next.delete('screening');
     if (mode === 'all') {
       next.delete('view');
     } else {
@@ -113,6 +147,10 @@ const ExplorePage: React.FC = () => {
 
   const updateFilter = (name: string, value: string) => {
     const next = new URLSearchParams(searchParams);
+    if (name === 'screening') {
+      localStorage.setItem('wt_view_mode', 'all');
+      next.delete('view');
+    }
     if (!value || value === 'all') {
       next.delete(name);
     } else {
@@ -198,6 +236,13 @@ const ExplorePage: React.FC = () => {
       }
     }
 
+    if (viewMode !== 'all') {
+      const expectedStatus = viewMode === 'wiki' ? 1 : viewMode === 'original' ? 0 : 3;
+      if (Number(entry.screening?.status) !== expectedStatus) {
+        return false;
+      }
+    }
+
     if (verdictFilter !== 'all') {
       const verdictStatus = Number((entry.verdict as { status?: number } | undefined)?.status);
       if (verdictFilter === 'verified' && verdictStatus !== 1) {
@@ -239,7 +284,7 @@ const ExplorePage: React.FC = () => {
     }
 
     return true;
-  }, [keyword, relationshipFilter, screeningFilter, tagFilter, verdictFilter]);
+  }, [keyword, relationshipFilter, screeningFilter, tagFilter, verdictFilter, viewMode]);
 
   const filteredSections = useMemo(() => {
     const getPopularityScore = (entry: LegacyEntity): number => {
@@ -296,7 +341,17 @@ const ExplorePage: React.FC = () => {
   return (
     <div>
       <PageMeta title="Explore" description="Discover categories and latest posts" />
-      <PageHeader title="Explore" icon="globe" iconColor="text-muted-x" />
+      <h1 className="page-header wt-header-2 wt-explore-page-header">
+        <i className="fa fa-globe text-muted-x" aria-hidden="true"></i> Explore
+        <span className="pull-right wt-explore-header-actions">
+          <a href="#browse" aria-label="Jump to latest posts" title="Jump to latest posts">
+            <i className="fa fa-arrow-down" aria-hidden="true"></i>
+          </a>
+          <Link to={visualizePath} aria-label="Visualize" title="Visualize">
+            <i className="fa fa-snowflake-o" aria-hidden="true"></i>
+          </Link>
+        </span>
+      </h1>
 
       {categories.length > 0 && (
         <div className="row">
@@ -397,7 +452,21 @@ const ExplorePage: React.FC = () => {
         &nbsp;&nbsp;
         <ContentViewFilter value={viewMode} onChange={handleViewModeChange} />
       </div>
-      <div className="panel panel-default">
+      <button
+        type="button"
+        className="btn btn-default btn-sm visible-xs wt-explore-filter-toggle"
+        aria-expanded={advancedFiltersOpen}
+        aria-controls="explore-advanced-filters"
+        onClick={() => setAdvancedFiltersOpen((open) => !open)}
+      >
+        <i className="fa fa-sliders" aria-hidden="true"></i>{' '}
+        {advancedFiltersOpen ? 'Hide advanced filters' : 'Advanced filters'}
+        {hasAdvancedFilters ? <span className="badge">Active</span> : null}
+      </button>
+      <div
+        id="explore-advanced-filters"
+        className={`panel panel-default wt-explore-advanced-filters${advancedFiltersOpen ? ' is-open' : ''}`}
+      >
         <div className="panel-body">
           <div className="row">
             <div className="col-sm-3">
@@ -470,27 +539,20 @@ const ExplorePage: React.FC = () => {
         </div>
       </div>
 
-      <ul className="nav nav-tabs wt-tabs" role="tablist">
-        {([
-          { key: 'all', icon: 'globe', label: 'All' },
-          { key: 'topics', icon: 'folder-open', label: 'Topics' },
-          { key: 'arguments', icon: 'flash', label: 'Facts' },
-          { key: 'questions', icon: 'question-circle', label: 'Questions' },
-          { key: 'answers', icon: 'check-circle', label: 'Answers' },
-          { key: 'artifacts', icon: 'puzzle-piece', label: 'Artifacts' },
-          { key: 'issues', icon: 'exclamation-circle', label: 'Issues' },
-          { key: 'opinions', icon: 'comments-o', label: 'Comments' },
-        ] as Array<{ key: ExploreTab; icon: string; label: string }>).map((tab) => (
+      <ul className="nav nav-tabs wt-tabs wt-explore-tabs" role="tablist">
+        {EXPLORE_TABS.map((tab) => (
           <li key={tab.key} role="presentation" className={activeTab === tab.key ? 'active' : ''}>
             <a
               href="#browse"
               role="tab"
+              aria-label={tab.label}
               onClick={(event) => {
                 event.preventDefault();
                 updateFilter('tab', tab.key === 'all' ? '' : tab.key);
               }}
             >
-              <i className={`fa fa-${tab.icon}`} aria-hidden="true"></i> {tab.label}
+              <i className={`fa fa-${tab.icon}`} aria-hidden="true"></i>{' '}
+              <span className={tab.mobileLabelClass}>{tab.label}</span>
             </a>
           </li>
         ))}
@@ -534,25 +596,25 @@ const ExplorePage: React.FC = () => {
                     <div>{section.label}</div>
                   </li>
                   {section.key === 'topics' && section.items.map((item) => (
-                    <TopicEntryRow key={String(item._id)} topic={item as unknown as Topic} subtitle={true} />
+                    <TopicEntryRow key={String(item._id)} topic={item as unknown as Topic} subtitle={true} hideAcceptedStatus={hideAcceptedStatus} />
                   ))}
                   {section.key === 'arguments' && section.items.map((item) => (
-                    <ArgumentEntryRow key={String(item._id)} argument={item as unknown as Argument} subtitle={true} />
+                    <ArgumentEntryRow key={String(item._id)} argument={item as unknown as Argument} subtitle={true} hideAcceptedStatus={hideAcceptedStatus} />
                   ))}
                   {section.key === 'questions' && section.items.map((item) => (
-                    <QuestionEntryRow key={String(item._id)} question={item as unknown as Question} subtitle={true} />
+                    <QuestionEntryRow key={String(item._id)} question={item as unknown as Question} subtitle={true} hideAcceptedStatus={hideAcceptedStatus} />
                   ))}
                   {section.key === 'answers' && section.items.map((item) => (
-                    <AnswerEntryRow key={String(item._id)} answer={item as unknown as Answer} subtitle={true} />
+                    <AnswerEntryRow key={String(item._id)} answer={item as unknown as Answer} subtitle={true} hideAcceptedStatus={hideAcceptedStatus} />
                   ))}
                   {section.key === 'issues' && section.items.map((item) => (
-                    <IssueEntryRow key={String(item._id)} issue={item as unknown as Issue} subtitle={true} />
+                    <IssueEntryRow key={String(item._id)} issue={item as unknown as Issue} subtitle={true} hideAcceptedStatus={hideAcceptedStatus} />
                   ))}
                   {section.key === 'opinions' && section.items.map((item) => (
-                    <OpinionEntryRow key={String(item._id)} opinion={item as unknown as Opinion} subtitle={true} />
+                    <OpinionEntryRow key={String(item._id)} opinion={item as unknown as Opinion} subtitle={true} hideAcceptedStatus={hideAcceptedStatus} />
                   ))}
                   {section.key === 'artifacts' && section.items.map((item) => (
-                    <ArtifactEntryRow key={String(item._id)} artifact={item as unknown as Artifact} subtitle={true} />
+                    <ArtifactEntryRow key={String(item._id)} artifact={item as unknown as Artifact} subtitle={true} hideAcceptedStatus={hideAcceptedStatus} />
                   ))}
                 </ul>
                 {section.more && (

@@ -7,12 +7,14 @@ interface ArgumentEntryRowProps {
   argument: Argument;
   subtitle?: boolean;
   labels?: boolean;
+  hideAcceptedStatus?: boolean;
 }
 
 const ArgumentEntryRow: React.FC<ArgumentEntryRowProps> = ({
   argument,
   subtitle = false,
   labels = true,
+  hideAcceptedStatus = false,
 }) => {
   const getArgumentLink = () => {
     return `/arguments/entry/${argument.friendlyUrl}/${argument._id}`;
@@ -46,6 +48,7 @@ const ArgumentEntryRow: React.FC<ArgumentEntryRowProps> = ({
         entryPath={getArgumentLink()}
         labels={labels}
         subtitle={subtitle}
+        hideAcceptedStatus={hideAcceptedStatus}
         extraLabels={
           labels && argument.verdict?.result ? (
             <span

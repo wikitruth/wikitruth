@@ -7,12 +7,14 @@ interface AnswerEntryRowProps {
   answer: Answer;
   subtitle?: boolean;
   labels?: boolean;
+  hideAcceptedStatus?: boolean;
 }
 
 const AnswerEntryRow: React.FC<AnswerEntryRowProps> = ({
   answer,
   subtitle = false,
   labels = true,
+  hideAcceptedStatus = false,
 }) => {
   const getAnswerLink = () => {
     return `/answers/entry/${answer._id}`;
@@ -32,6 +34,7 @@ const AnswerEntryRow: React.FC<AnswerEntryRowProps> = ({
         entryPath={getAnswerLink()}
         labels={labels}
         subtitle={subtitle}
+        hideAcceptedStatus={hideAcceptedStatus}
       />
     </li>
   );

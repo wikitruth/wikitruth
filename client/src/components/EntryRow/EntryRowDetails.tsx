@@ -15,6 +15,7 @@ type EntryRowDetailsProps = {
   subtitle?: boolean;
   contentPreview?: string;
   showMore?: boolean;
+  hideAcceptedStatus?: boolean;
   extraLabels?: React.ReactNode;
 };
 
@@ -61,9 +62,11 @@ const EntryRowDetails: React.FC<EntryRowDetailsProps> = ({
   subtitle = true,
   contentPreview,
   showMore = false,
+  hideAcceptedStatus = false,
   extraLabels,
 }) => {
   const status = getScreeningStatusPresentation(entry.screening?.status);
+  const acceptedStatus = status?.label === 'accepted';
   const parent = resolveParent(entry);
   const preview = String(contentPreview || entry.contentPreview || entry.description || '').trim();
   const editor = String(
@@ -93,8 +96,19 @@ const EntryRowDetails: React.FC<EntryRowDetailsProps> = ({
       <div className="wt-entry-row-title">
         <Link to={path}>{entry.title || '(Untitled)'}</Link>
         {labels && entry.private ? <span className="label label-default">private</span> : null}
-        {labels && status ? (
-          <span className={`label ${status.className}`}>{status.label}</span>
+        {labels && status && !(acceptedStatus && hideAcceptedStatus) ? (
+          acceptedStatus ? (
+            <span
+              className="wt-screening-status wt-screening-status-accepted"
+              role="img"
+              aria-label="Accepted after screening"
+              title="Accepted after screening"
+            >
+              <i className="fa fa-check-circle" aria-hidden="true"></i>
+            </span>
+          ) : (
+            <span className={`label ${status.className}`}>{status.label}</span>
+          )
         ) : null}
         {extraLabels}
       </div>

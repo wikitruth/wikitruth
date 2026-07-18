@@ -7,12 +7,14 @@ interface QuestionEntryRowProps {
   question: Question;
   subtitle?: boolean;
   labels?: boolean;
+  hideAcceptedStatus?: boolean;
 }
 
 const QuestionEntryRow: React.FC<QuestionEntryRowProps> = ({
   question,
   subtitle = false,
   labels = true,
+  hideAcceptedStatus = false,
 }) => {
   const getQuestionLink = () => {
     return `/questions/entry/${question.friendlyUrl}/${question._id}`;
@@ -32,6 +34,7 @@ const QuestionEntryRow: React.FC<QuestionEntryRowProps> = ({
         entryPath={getQuestionLink()}
         labels={labels}
         subtitle={subtitle}
+        hideAcceptedStatus={hideAcceptedStatus}
       />
     </li>
   );

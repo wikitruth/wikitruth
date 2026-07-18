@@ -9,6 +9,7 @@ interface ArtifactEntryRowProps {
   labels?: boolean;
   contentPreview?: string;
   showMore?: boolean;
+  hideAcceptedStatus?: boolean;
 }
 
 const ArtifactEntryRow: React.FC<ArtifactEntryRowProps> = ({
@@ -17,6 +18,7 @@ const ArtifactEntryRow: React.FC<ArtifactEntryRowProps> = ({
   labels = true,
   contentPreview,
   showMore = false,
+  hideAcceptedStatus = false,
 }) => {
   const friendly = encodeURIComponent(String(artifact.friendlyUrl || artifact._id || ''));
   const id = encodeURIComponent(String(artifact._id || ''));
@@ -38,6 +40,7 @@ const ArtifactEntryRow: React.FC<ArtifactEntryRowProps> = ({
         subtitle={subtitle}
         contentPreview={contentPreview}
         showMore={showMore}
+        hideAcceptedStatus={hideAcceptedStatus}
       />
     </li>
   );

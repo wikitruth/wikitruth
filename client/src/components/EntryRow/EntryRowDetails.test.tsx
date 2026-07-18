@@ -100,4 +100,32 @@ describe('EntryRowDetails', () => {
     expect(screen.getByTitle('Open original file')).toHaveAttribute('href', '/media/original.jpg');
     expect(screen.queryByText('reply')).not.toBeInTheDocument();
   });
+
+  it('uses a compact accessible icon for accepted screening status', () => {
+    render(
+      <EntryRowDetails
+        entry={entry({ screening: { status: 1 } })}
+        kind="question"
+        entryPath="/questions/entry/sample-question/question-1"
+      />
+    );
+
+    const accepted = screen.getByLabelText('Accepted after screening');
+    expect(accepted).toHaveAttribute('title', 'Accepted after screening');
+    expect(accepted.querySelector('.fa-check-circle')).toBeInTheDocument();
+    expect(screen.queryByText('accepted')).not.toBeInTheDocument();
+  });
+
+  it('suppresses redundant accepted status in accepted-only lists', () => {
+    render(
+      <EntryRowDetails
+        entry={entry({ screening: { status: 1 } })}
+        kind="question"
+        entryPath="/questions/entry/sample-question/question-1"
+        hideAcceptedStatus={true}
+      />
+    );
+
+    expect(screen.queryByLabelText('Accepted after screening')).not.toBeInTheDocument();
+  });
 });

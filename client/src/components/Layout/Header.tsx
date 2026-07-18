@@ -187,6 +187,16 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
                 </button>
                 <ul id="header-more-menu" className="dropdown-menu dropdown-menu-right">
                   <li className="dropdown-header">more</li>
+                  {!user ? (
+                    <li className="visible-xs">
+                      <Link to={applicationPath('/contribute')} onClick={() => {
+                        setIsMoreOpen(false);
+                        setIsMobileNavOpen(false);
+                      }}>
+                        <i className="fa fa-user-secret"></i> Contribute anonymously
+                      </Link>
+                    </li>
+                  ) : null}
                   <li>
                     <Link to={applicationPath('/create')} onClick={() => {
                       setIsMoreOpen(false);
@@ -360,7 +370,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
               </>
             ) : (
               <>
-                <li>
+                <li className="hidden-xs">
                   <Link to={applicationPath('/contribute')} className="nav-narrow" aria-label="Contribute anonymously">
                     <i className="fa fa-user-secret"></i>
                     <span className="hidden-xs"> Contribute</span>

@@ -7,12 +7,14 @@ interface IssueEntryRowProps {
   issue: Issue;
   subtitle?: boolean;
   labels?: boolean;
+  hideAcceptedStatus?: boolean;
 }
 
 const IssueEntryRow: React.FC<IssueEntryRowProps> = ({
   issue,
   subtitle = false,
   labels = true,
+  hideAcceptedStatus = false,
 }) => {
   const getIssueLink = () => {
     return `/issues/entry/${issue._id}`;
@@ -32,6 +34,7 @@ const IssueEntryRow: React.FC<IssueEntryRowProps> = ({
         entryPath={getIssueLink()}
         labels={labels}
         subtitle={subtitle}
+        hideAcceptedStatus={hideAcceptedStatus}
       />
     </li>
   );
