@@ -83,6 +83,9 @@ export const civicApi = {
   updateTenant: (tenantId: string, payload: Partial<CivicTenant>) => request<{ tenant: CivicTenant }>(`/civic/platform/tenants/${encodeURIComponent(tenantId)}`, {
     method: 'PUT', body: JSON.stringify(payload),
   }),
+  provisionTenantMembership: (tenantId: string, userId: string, payload: { roles: CivicTenantRole[]; active: boolean }) => request<{ membership: CivicTenantMembership }>(`/civic/platform/tenants/${encodeURIComponent(tenantId)}/memberships/${encodeURIComponent(userId)}`, {
+    method: 'PUT', body: JSON.stringify(payload),
+  }),
   adminMemberships: () => request<{ memberships: CivicTenantMembership[] }>('/civic/admin/memberships'),
   searchMembershipCandidates: (query: string) => request<{ users: CivicMembershipUser[] }>(`/civic/admin/membership-candidates?q=${encodeURIComponent(query)}`),
   updateMembership: (userId: string, payload: { roles: CivicTenantRole[]; active: boolean }) => request<{ membership: CivicTenantMembership }>(`/civic/admin/memberships/${encodeURIComponent(userId)}`, {

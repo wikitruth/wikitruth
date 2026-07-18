@@ -39,7 +39,7 @@ export const civicRecordInput = z.object({
       latitude: z.number().min(-90).max(90).nullable().optional(),
       longitude: z.number().min(-180).max(180).nullable().optional(),
     }).optional(),
-  }).optional(),
+  }).catchall(z.string().trim().max(300)).optional(),
   responsibility: z.object({
     institutionId: optionalId,
     officeId: optionalId,
@@ -73,6 +73,7 @@ export const civicRecordInput = z.object({
     summary: z.string().trim().max(5000).optional(),
     happenedAt: optionalDate,
   }).optional(),
+  extensions: z.record(z.string(), z.unknown()).optional().default({}),
   private: z.boolean().optional().default(false),
 });
 

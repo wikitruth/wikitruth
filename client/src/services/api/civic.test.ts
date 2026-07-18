@@ -80,6 +80,15 @@ describe('civicApi', () => {
     expect(fetchMock).toHaveBeenLastCalledWith('/api/civic/admin/jurisdictions', expect.objectContaining({ method: 'POST' }));
   });
 
+  it('explicitly provisions tenant authority through the platform route', async () => {
+    document.cookie = '_csrfToken=platform-token; path=/';
+    fetchMock.mockResolvedValue({ ok: true, json: async () => ({ membership: { userId: 'user-1', roles: ['admin'] } }) } as Response);
+    await civicApi.provisionTenantMembership('fix-example', 'user-1', { roles: ['admin'], active: true });
+    expect(fetchMock).toHaveBeenLastCalledWith('/api/civic/platform/tenants/fix-example/memberships/user-1', expect.objectContaining({
+      method: 'PUT', headers: expect.objectContaining({ 'x-csrf-token': 'platform-token' }),
+    }));
+  });
+
   it('creates a typed Wikitruth knowledge link with CSRF protection', async () => {
     document.cookie = '_csrfToken=link-token; path=/';
     fetchMock.mockResolvedValue({ ok: true, json: async () => ({ link: { _id: 'link-1' } }) } as Response);

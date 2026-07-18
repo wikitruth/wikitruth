@@ -9,8 +9,6 @@ import {
 } from '../civicEnums';
 
 const factory: SchemaFactory = function (app, mongoose) {
-  const defaultTenantId = String(process.env.CIVIC_DEFAULT_TENANT_ID || 'fixtheph').trim().toLowerCase();
-  const defaultCountryCode = String(process.env.CIVIC_DEFAULT_COUNTRY_CODE || 'PH').trim().toUpperCase();
   const historySchema = new mongoose.Schema({
     action: { type: String, required: true },
     summary: { type: String, required: true },
@@ -26,8 +24,8 @@ const factory: SchemaFactory = function (app, mongoose) {
   }, { _id: true });
 
   const schema = new mongoose.Schema({
-    tenantId: { type: String, required: true, default: defaultTenantId, lowercase: true, trim: true, index: true },
-    countryCode: { type: String, required: true, default: defaultCountryCode, uppercase: true, trim: true, index: true },
+    tenantId: { type: String, required: true, lowercase: true, trim: true, index: true },
+    countryCode: { type: String, required: true, uppercase: true, trim: true, index: true },
     jurisdictionId: { type: mongoose.Schema.ObjectId, ref: 'Jurisdiction', default: null, index: true },
     kind: { type: String, enum: CIVIC_RECORD_KINDS, required: true, index: true },
     title: { type: String, required: true, trim: true },
@@ -41,18 +39,8 @@ const factory: SchemaFactory = function (app, mongoose) {
     relatedRecordIds: [{ type: mongoose.Schema.ObjectId, ref: 'CivicRecord' }],
     artifactIds: [{ type: mongoose.Schema.ObjectId, ref: 'Artifact' }],
     issueIds: [{ type: mongoose.Schema.ObjectId, ref: 'Issue' }],
-    location: {
-      countryCode: { type: String, default: defaultCountryCode, uppercase: true },
-      region: { type: String, default: '' },
-      province: { type: String, default: '' },
-      city: { type: String, default: '' },
-      barangay: { type: String, default: '' },
-      address: { type: String, default: '' },
-      coordinates: {
-        latitude: { type: Number, min: -90, max: 90, default: null },
-        longitude: { type: Number, min: -180, max: 180, default: null },
-      },
-    },
+    location: { type: mongoose.Schema.Types.Mixed, default: {} },
+    extensions: { type: mongoose.Schema.Types.Mixed, default: {} },
     responsibility: {
       institutionId: { type: mongoose.Schema.ObjectId, ref: 'CivicRecord', default: null },
       officeId: { type: mongoose.Schema.ObjectId, ref: 'CivicRecord', default: null },

@@ -122,6 +122,14 @@ async function configureDisposableTenant(page, fixture) {
   await waitForStatus(page, 'Tenant configuration updated.');
 }
 
+async function provisionFixphTenantAdmin(page, admin) {
+  await page.goto(`${baseUrl}/admin/civic-tenants`, { waitUntil: 'domcontentloaded' });
+  await page.getByLabel('Tenant').selectOption('fixtheph');
+  await page.getByLabel('User ID').fill(String(admin.userId));
+  await page.getByRole('button', { name: 'Provision tenant admin' }).click();
+  await waitForStatus(page, 'Explicit tenant administrator access provisioned for fixtheph.');
+}
+
 async function assignMembershipAndJurisdiction(page, contributor, fixture) {
   await page.goto(`${baseUrl}/admin/civic-operations`, { waitUntil: 'domcontentloaded' });
   await page.getByRole('heading', { name: /Fix The Philippines operations/i }).waitFor();
@@ -290,6 +298,8 @@ async function main() {
 
     await login(adminPage, admin);
     steps.push('platform-admin-login');
+    await provisionFixphTenantAdmin(adminPage, admin);
+    steps.push('explicit-tenant-admin-provision');
     await configureDisposableTenant(adminPage, fixture);
     steps.push('tenant-create-update-inactivate');
     await assignMembershipAndJurisdiction(adminPage, contributor, fixture);

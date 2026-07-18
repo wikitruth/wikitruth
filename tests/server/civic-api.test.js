@@ -170,7 +170,8 @@ describe('FixPH civic API', () => {
         title: 'Barangay health center upgrade',
         summary: 'Track the public budget and construction progress.',
         project: { budget: 2500000, currency: 'PHP', progressPercent: 35 },
-        location: { countryCode: 'PH', region: 'NCR', city: 'Quezon City' },
+        location: { countryCode: 'XZ', region: 'NCR', city: 'Quezon City' },
+        extensions: { funding_source: 'National budget', procurement_method: 'public_bidding' },
       })
       .expect(201);
 
@@ -182,6 +183,8 @@ describe('FixPH civic API', () => {
       status: 'pending',
       stage: 'reported',
       friendlyUrl: 'barangay-health-center-upgrade',
+      location: expect.objectContaining({ countryCode: 'PH' }),
+      extensions: { funding_source: 'National budget', procurement_method: 'public_bidding' },
       history: [expect.objectContaining({ action: 'created', toStatus: 'pending' })],
     }));
     expect(logEntryEvent).toHaveBeenCalledWith(expect.objectContaining({ eventType: 'civic.record.created' }));
@@ -189,6 +192,27 @@ describe('FixPH civic API', () => {
       objectType: 40,
       source: 'create',
     }));
+  });
+
+  it('rejects undeclared or invalid tenant extension values before persistence', async () => {
+    const user = {
+      _id: '66f000000000000000000010', username: 'citizen',
+      canPlayRoleOf: (role) => role === 'contributor',
+    };
+    const response = await request(createApp(user))
+      .post('/api/civic/records')
+      .send({
+        kind: 'project', title: 'Project with invalid local fields',
+        extensions: { procurement_method: 'secret_method', arbitrary_code: 'unsafe' },
+      })
+      .expect(400);
+
+    expect(response.body.message).toBe('Invalid tenant-specific civic data');
+    expect(response.body.details).toEqual(expect.arrayContaining([
+      expect.objectContaining({ path: 'extensions.procurement_method' }),
+      expect.objectContaining({ path: 'extensions.arbitrary_code' }),
+    ]));
+    expect(create).not.toHaveBeenCalled();
   });
 
   it('records reviewer lifecycle decisions with privileged audit evidence', async () => {

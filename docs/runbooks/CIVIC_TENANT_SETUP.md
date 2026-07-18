@@ -10,8 +10,9 @@ Create a branded country or jurisdiction instance on the shared Wikitruth Civic 
 2. Open `/admin/civic-tenants`.
 3. Bootstrap built-in tenants once to persist the FixPH compatibility configuration.
 4. Create a tenant ID, country code, domains, locale, timezone, currency, colors, geography levels, and ordered sections.
-5. Add jurisdictions and tenant memberships through the tenant-scoped API.
-6. Pointing a domain, changing a proxy, or deploying remains a separate production operation requiring explicit authorization.
+5. Use the explicit tenant-admin bootstrap panel to grant the first selected user tenant administration. This action is audited and does not make every platform administrator a country administrator.
+6. Add jurisdictions and later tenant memberships through the tenant-scoped API.
+7. Pointing a domain, changing a proxy, or deploying remains a separate production operation requiring explicit authorization.
 
 The shared API resolves the host automatically:
 
@@ -90,6 +91,6 @@ Open `/civic` on the local Wikitruth host to test the overview, all tenant secti
 
 - Requests for one tenant never return another tenant's civic records.
 - Conflicting host and explicit tenant IDs return `409`.
-- Mutations require a tenant membership or the temporary FixPH global-role compatibility path.
+- Mutations require an active tenant membership or the temporary non-admin FixPH global-role compatibility path.
 - Backups include tenant, jurisdiction, membership, link, and civic-record collections.
 - Use `tests/fixtures/civic-tenants/fix-example.json` as the fictional non-Philippine test tenant.

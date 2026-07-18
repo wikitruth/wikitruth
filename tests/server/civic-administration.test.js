@@ -12,6 +12,7 @@ const jurisdictionCreate = jest.fn();
 const jurisdictionUpdate = jest.fn();
 const jurisdictionCount = jest.fn();
 const logEntryEvent = jest.fn();
+const tenantFindOne = jest.fn();
 
 function queryResult(value) {
   const chain = {
@@ -26,7 +27,7 @@ function queryResult(value) {
 jest.mock('../../server/src/app', () => ({
   db: {
     models: {
-      CivicTenant: { find: jest.fn(), findOne: jest.fn(), findOneAndUpdate: jest.fn(), create: jest.fn() },
+      CivicTenant: { find: jest.fn(), findOne: (...args) => tenantFindOne(...args), findOneAndUpdate: jest.fn(), create: jest.fn() },
       TenantMembership: {
         find: (...args) => membershipFind(...args),
         findOne: jest.fn(),
@@ -85,6 +86,7 @@ describe('civic tenant administration', () => {
     jurisdictionUpdate.mockResolvedValue(null);
     jurisdictionCount.mockResolvedValue(0);
     logEntryEvent.mockResolvedValue(undefined);
+    tenantFindOne.mockReturnValue(queryResult(null));
   });
 
   it('enriches memberships with a privacy-limited user identity', async () => {
@@ -138,6 +140,28 @@ describe('civic tenant administration', () => {
     expect(logEntryEvent).toHaveBeenCalledWith(expect.objectContaining({
       eventType: 'civic.jurisdiction.deactivated',
       payload: expect.objectContaining({ tenantId: 'fix-example', code: 'D1' }),
+    }));
+  });
+
+  it('lets a platform admin explicitly provision tenant authority without implicit access', async () => {
+    tenantFindOne.mockReturnValue(queryResult({ _id: 'tenant-1' }));
+    userFindById.mockReturnValue(queryResult({ _id: '66f000000000000000000010', username: 'country-admin' }));
+    membershipUpdate.mockResolvedValue({ _id: 'membership-1', roles: ['admin'], active: true });
+
+    const response = await request(createApp())
+      .put('/api/civic/platform/tenants/fix-example/memberships/66f000000000000000000010')
+      .send({ roles: ['admin'], active: true })
+      .expect(200);
+
+    expect(response.body.membership).toEqual(expect.objectContaining({ roles: ['admin'] }));
+    expect(membershipUpdate).toHaveBeenCalledWith(
+      { tenantId: 'fix-example', userId: '66f000000000000000000010' },
+      expect.objectContaining({ $set: expect.objectContaining({ roles: ['admin'], active: true }) }),
+      expect.objectContaining({ upsert: true, new: true }),
+    );
+    expect(logEntryEvent).toHaveBeenCalledWith(expect.objectContaining({
+      eventType: 'civic.membership.platform_provisioned',
+      payload: expect.objectContaining({ tenantId: 'fix-example', userId: '66f000000000000000000010' }),
     }));
   });
 });

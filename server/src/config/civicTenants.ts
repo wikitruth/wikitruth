@@ -54,7 +54,35 @@ export const FIXPH_TENANT: CivicTenantDefinition = {
     elections: true,
     knowledgeLinks: true,
   },
-  extensionSchemas: {},
+  extensionSchemas: {
+    project: {
+      title: 'Philippine project details',
+      description: 'Optional public-procurement context configured specifically for FixPH.',
+      fields: [
+        { key: 'funding_source', label: 'Funding source', type: 'text', maxLength: 180 },
+        {
+          key: 'procurement_method', label: 'Procurement method', type: 'select',
+          options: [
+            { value: 'public_bidding', label: 'Public bidding' },
+            { value: 'alternative_method', label: 'Alternative procurement method' },
+            { value: 'not_recorded', label: 'Not yet recorded' },
+          ],
+        },
+      ],
+    },
+    observation: {
+      title: 'Local reporting details',
+      fields: [
+        { key: 'report_reference', label: 'Barangay or agency report reference', type: 'text', maxLength: 120 },
+      ],
+    },
+    candidate: {
+      title: 'Candidate context',
+      fields: [
+        { key: 'political_affiliation', label: 'Political affiliation', type: 'text', maxLength: 180 },
+      ],
+    },
+  },
   moderationPolicyVersion: '1',
   electionSystem: 'plurality-and-country-defined',
   deploymentMode: 'shared',

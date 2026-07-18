@@ -57,6 +57,9 @@ const CivicTenantsPage: React.FC = () => {
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [provisionTenantId, setProvisionTenantId] = useState('fixtheph');
+  const [provisionUserId, setProvisionUserId] = useState('');
+  const [provisioning, setProvisioning] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -83,7 +86,7 @@ const CivicTenantsPage: React.FC = () => {
       const addressFields = JSON.parse(form.addressFields) as string[];
       const sections = JSON.parse(form.sections) as CivicTenantSection[];
       const featureFlags = JSON.parse(form.featureFlags) as Record<string, boolean>;
-      const extensionSchemas = JSON.parse(form.extensionSchemas) as Record<string, unknown>;
+      const extensionSchemas = JSON.parse(form.extensionSchemas) as CivicTenant['extensionSchemas'];
       const payload: CivicTenant = {
         tenantId: form.tenantId.trim().toLowerCase(), status: form.status, countryCode: form.countryCode.trim().toUpperCase(),
         title: form.title.trim(), navTitle: form.navTitle.trim(), slogan: form.slogan.trim(),
@@ -122,6 +125,21 @@ const CivicTenantsPage: React.FC = () => {
     }
   };
 
+  const provisionTenantAdmin = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setProvisioning(true);
+    setMessage(null);
+    try {
+      await civicApi.provisionTenantMembership(provisionTenantId, provisionUserId, { roles: ['admin'], active: true });
+      setProvisionUserId('');
+      setMessage(`Explicit tenant administrator access provisioned for ${provisionTenantId}.`);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Unable to provision tenant administration.');
+    } finally {
+      setProvisioning(false);
+    }
+  };
+
   return <div>
     <PageMeta title="Civic Tenants" description="Configure country and jurisdiction civic-accountability instances." />
     <div className="page-header wt-header"><h1>Civic tenants</h1><p className="text-muted">One Civic Core, independently branded and isolated country or jurisdiction instances.</p></div>
@@ -131,6 +149,7 @@ const CivicTenantsPage: React.FC = () => {
         <div className="panel panel-default"><div className="panel-heading"><strong>Configured tenants</strong><button type="button" className="btn btn-default btn-xs pull-right" onClick={() => void bootstrap()}>Bootstrap built-ins</button></div><div className="panel-body">
           {loading ? <LoadingSpinner message="Loading civic tenants..." /> : tenants.length ? <div className="list-group">{tenants.map((tenant) => <button type="button" className="list-group-item" key={tenant.tenantId} onClick={() => { setForm(formFromTenant(tenant)); setEditing(true); }}><strong>{tenant.title}</strong><span className="label label-default pull-right">{tenant.countryCode}</span><small className="text-muted" style={{ display: 'block' }}>{tenant.tenantId} · {tenant.domains.join(', ')}</small></button>)}</div> : <p>No civic tenants configured.</p>}
         </div></div>
+        <form className="panel panel-default" onSubmit={provisionTenantAdmin}><div className="panel-heading"><strong>Explicit tenant admin bootstrap</strong></div><div className="panel-body"><p className="text-muted">Platform authority does not imply country authority. This audited action grants a selected user administration of one tenant.</p><div className="form-group"><label htmlFor="provision-tenant">Tenant</label><select id="provision-tenant" className="form-control" value={provisionTenantId} onChange={(event) => setProvisionTenantId(event.target.value)}>{tenants.map((tenant) => <option key={tenant.tenantId} value={tenant.tenantId}>{tenant.title}</option>)}</select></div><div className="form-group"><label htmlFor="provision-user">User ID</label><input id="provision-user" className="form-control" required pattern="[a-fA-F0-9]{24}" value={provisionUserId} onChange={(event) => setProvisionUserId(event.target.value)} /></div></div><div className="panel-footer"><button type="submit" className="btn btn-default" disabled={provisioning || !tenants.length}>{provisioning ? 'Provisioning...' : 'Provision tenant admin'}</button></div></form>
       </div>
       <div className="col-md-7"><form className="panel panel-default" onSubmit={submit}><div className="panel-heading"><strong>{editing ? `Edit ${form.tenantId}` : 'Create tenant'}</strong></div><div className="panel-body">
         <div className="row"><div className="col-sm-6 form-group"><label htmlFor="tenant-id">Tenant ID</label><input id="tenant-id" className="form-control" required pattern="[a-z0-9][a-z0-9\-]{1,62}" disabled={editing} value={form.tenantId} onChange={(event) => setField('tenantId', event.target.value)} /></div><div className="col-sm-3 form-group"><label htmlFor="country-code">Country code</label><input id="country-code" className="form-control" required minLength={2} maxLength={2} value={form.countryCode} onChange={(event) => setField('countryCode', event.target.value)} /></div><div className="col-sm-3 form-group"><label htmlFor="currency">Currency</label><input id="currency" className="form-control" required minLength={3} maxLength={3} value={form.currency} onChange={(event) => setField('currency', event.target.value)} /></div></div>
@@ -149,7 +168,7 @@ const CivicTenantsPage: React.FC = () => {
         <div className="form-group"><label htmlFor="tenant-levels">Geography levels (JSON)</label><textarea id="tenant-levels" className="form-control" rows={6} required value={form.levels} onChange={(event) => setField('levels', event.target.value)} /></div>
         <div className="form-group"><label htmlFor="tenant-address-fields">Address fields (JSON)</label><textarea id="tenant-address-fields" className="form-control" rows={4} required value={form.addressFields} onChange={(event) => setField('addressFields', event.target.value)} /></div>
         <div className="form-group"><label htmlFor="tenant-sections">Sections and arrangement (JSON)</label><textarea id="tenant-sections" className="form-control" rows={12} required value={form.sections} onChange={(event) => setField('sections', event.target.value)} /></div>
-        <div className="row"><div className="col-sm-6 form-group"><label htmlFor="tenant-flags">Feature flags (JSON)</label><textarea id="tenant-flags" className="form-control" rows={7} required value={form.featureFlags} onChange={(event) => setField('featureFlags', event.target.value)} /></div><div className="col-sm-6 form-group"><label htmlFor="tenant-extensions">Extension schemas (JSON)</label><textarea id="tenant-extensions" className="form-control" rows={7} required value={form.extensionSchemas} onChange={(event) => setField('extensionSchemas', event.target.value)} /></div></div>
+        <div className="row"><div className="col-sm-6 form-group"><label htmlFor="tenant-flags">Feature flags (JSON)</label><textarea id="tenant-flags" className="form-control" rows={7} required value={form.featureFlags} onChange={(event) => setField('featureFlags', event.target.value)} /></div><div className="col-sm-6 form-group"><label htmlFor="tenant-extensions">Extension schemas (JSON)</label><textarea id="tenant-extensions" className="form-control" rows={7} required value={form.extensionSchemas} onChange={(event) => setField('extensionSchemas', event.target.value)} aria-describedby="tenant-extensions-help" /><small id="tenant-extensions-help" className="help-block">Use * or a record kind as the schema key. Fields support text, textarea, number, boolean, date, URL, and select controls.</small></div></div>
         <div className="row"><div className="col-sm-6 form-group"><label htmlFor="tenant-policy">Moderation policy version</label><input id="tenant-policy" className="form-control" required value={form.moderationPolicyVersion} onChange={(event) => setField('moderationPolicyVersion', event.target.value)} /></div><div className="col-sm-6 form-group"><label htmlFor="tenant-election">Election system</label><input id="tenant-election" className="form-control" value={form.electionSystem} onChange={(event) => setField('electionSystem', event.target.value)} /></div></div>
       </div><div className="panel-footer"><button className="btn btn-primary" disabled={saving} type="submit">{saving ? 'Saving...' : editing ? 'Update tenant' : 'Create tenant'}</button>{editing && <button className="btn btn-link" type="button" onClick={() => { setEditing(false); setForm(EMPTY_FORM); }}>Cancel</button>}</div></form></div>
     </div>

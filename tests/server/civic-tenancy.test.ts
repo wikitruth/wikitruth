@@ -106,11 +106,12 @@ describe('civic tenant resolution and knowledge reuse', () => {
         tenantId: 'fix-example', status: 'active', countryCode: 'XZ', title: 'Fix Example', navTitle: 'FixXZ', slogan: '',
         domains: ['fix.example'], branding: {}, localization: { defaultLocale: 'en-XZ', supportedLocales: ['en-XZ'], timezone: 'UTC', currency: 'XZD' },
         geography: { levels: [{ key: 'district', label: 'District' }], addressFields: ['district'] }, sections: [], featureFlags: {},
+        extensionSchemas: { project: { fields: [{ key: 'district_code', label: 'District code', type: 'text' }] } },
         moderationPolicyVersion: '1', electionSystem: '', deploymentMode: 'shared',
       }));
     const tenant = await resolveCivicTenant(request({ params: { tenantId: 'fix-example' } }));
     expect(tenant).toEqual(expect.objectContaining({ tenantId: 'fix-example', countryCode: 'XZ' }));
-    expect(tenant.extensionSchemas).toEqual({});
+    expect(tenant.extensionSchemas).toEqual({ project: { fields: [{ key: 'district_code', label: 'District code', type: 'text' }] } });
     expect(tenant.moderationPolicyVersion).toBe('1');
     expect(tenant.deploymentMode).toBe('shared');
   });
@@ -120,6 +121,22 @@ describe('civic tenant resolution and knowledge reuse', () => {
       user: { _id: '66f000000000000000000001', canPlayRoleOf: (role: string) => role === 'contributor' },
     }), 'fixtheph');
     expect([...roles]).toEqual(['contributor']);
+  });
+
+  it('does not grant a platform administrator implicit authority in a country tenant', async () => {
+    const roles = await civicTenantRoles(request({
+      user: { _id: '66f000000000000000000001', canPlayRoleOf: (role: string) => role === 'admin' },
+    }), 'fix-example');
+    expect([...roles]).toEqual([]);
+    expect(membershipFindOne).toHaveBeenCalledWith(expect.objectContaining({ tenantId: 'fix-example' }));
+  });
+
+  it('uses only the explicit membership roles for a second-country tenant', async () => {
+    membershipFindOne.mockReturnValue(leanResult({ roles: ['reviewer'], active: true }));
+    const roles = await civicTenantRoles(request({
+      user: { _id: '66f000000000000000000001', canPlayRoleOf: () => false },
+    }), 'fix-example');
+    expect([...roles]).toEqual(['reviewer']);
   });
 
   it('maps civic relationships to the matching Wikitruth model', async () => {

@@ -36,6 +36,7 @@ FixPH becomes the first configured tenant of a reusable Civic Core powered by Wi
 - Public title, navigation title, slogan, logos, favicon, and theme tokens.
 - Default locale, supported locales, timezone, currency, and date formatting preferences.
 - Configurable geography levels and address-field labels.
+- Bounded declarative extension schemas for local fields, rendered and validated uniformly for humans and agents.
 - Ordered section definitions and feature flags.
 - Moderation policy version and optional election-system identifier.
 - Shared/dedicated deployment metadata that contains no secrets.

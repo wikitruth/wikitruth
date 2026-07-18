@@ -66,14 +66,14 @@ auditable contributions through the same moderation lifecycle as people.
 
 ## 6. Generic Civic Tenant Extensions
 
-- [ ] Replace Philippines-specific civic defaults with resolved tenant context.
-- [ ] Define and validate a bounded tenant-owned extension schema contract.
-- [ ] Validate civic record extension values on create and update.
-- [ ] Store extension data separately from typed common civic fields.
-- [ ] Render configured extension fields in civic create/edit/detail pages.
-- [ ] Keep geography configuration generic while preserving FixPH compatibility through tenant configuration.
-- [ ] Keep platform and tenant administrator authorization scopes distinct.
-- [ ] Add multi-country extension, isolation, and invalid-payload tests.
+- [x] Replace Philippines-specific civic defaults with resolved tenant context.
+- [x] Define and validate a bounded tenant-owned extension schema contract.
+- [x] Validate civic record extension values on create and update.
+- [x] Store extension data separately from typed common civic fields.
+- [x] Render configured extension fields in civic create/edit/detail pages.
+- [x] Keep geography configuration generic while preserving FixPH compatibility through tenant configuration.
+- [x] Keep platform and tenant administrator authorization scopes distinct, with audited explicit tenant-admin provisioning.
+- [x] Add multi-country extension, isolation, and invalid-payload tests.
 
 ## 7. Accessibility, Discoverability, API, and Runtime
 

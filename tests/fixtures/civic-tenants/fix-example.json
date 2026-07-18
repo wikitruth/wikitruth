@@ -43,7 +43,23 @@
     "projects": true,
     "knowledgeLinks": true
   },
-  "extensionSchemas": {},
+  "extensionSchemas": {
+    "project": {
+      "title": "District project details",
+      "fields": [
+        { "key": "district_code", "label": "District code", "type": "text", "required": true, "maxLength": 40 },
+        {
+          "key": "delivery_model",
+          "label": "Delivery model",
+          "type": "select",
+          "options": [
+            { "value": "public", "label": "Public delivery" },
+            { "value": "partnership", "label": "Public-private partnership" }
+          ]
+        }
+      ]
+    }
+  },
   "moderationPolicyVersion": "1",
   "electionSystem": "fictional",
   "deploymentMode": "shared"

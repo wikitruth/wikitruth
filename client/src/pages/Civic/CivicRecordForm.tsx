@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import civicApi from '../../services/api/civic';
-import type { CivicJurisdiction, CivicRecord, CivicRecordInput, CivicRecordKind, CivicSeverity, CivicTenant } from '../../types/civic';
+import type { CivicExtensionValue, CivicJurisdiction, CivicRecord, CivicRecordInput, CivicRecordKind, CivicSeverity, CivicTenant } from '../../types/civic';
+import { CivicExtensionFormFields, extensionFieldsForKind } from './CivicExtensionFields';
 
 interface CivicRecordFormProps {
   kinds: CivicRecordKind[];
@@ -33,8 +34,10 @@ const CivicRecordForm: React.FC<CivicRecordFormProps> = ({ kinds, parentId, tena
   const [summary, setSummary] = useState(record?.summary || '');
   const [description, setDescription] = useState(record?.description || '');
   const [severity, setSeverity] = useState<CivicSeverity>(record?.severity || 'info');
-  const [region, setRegion] = useState(record?.location?.region || '');
-  const [city, setCity] = useState(record?.location?.city || '');
+  const [location, setLocation] = useState<Record<string, string>>(() => Object.fromEntries(
+    tenant.geography.addressFields.map((field) => [field, String((record?.location as Record<string, unknown> | undefined)?.[field] || '')]),
+  ));
+  const [extensions, setExtensions] = useState<Record<string, CivicExtensionValue | undefined>>(record?.extensions || {});
   const [budget, setBudget] = useState(record?.project?.budget == null ? '' : String(record.project.budget));
   const [progress, setProgress] = useState(record?.project?.progressPercent == null ? '' : String(record.project.progressPercent));
   const [position, setPosition] = useState(record?.election?.position || '');
@@ -48,6 +51,14 @@ const CivicRecordForm: React.FC<CivicRecordFormProps> = ({ kinds, parentId, tena
     event.preventDefault();
     setSubmitting(true);
     setMessage(null);
+    const activeExtensions = Object.fromEntries(
+      extensionFieldsForKind(tenant, kind)
+        .filter((field) => extensions[field.key] !== undefined && extensions[field.key] !== '')
+        .map((field) => [field.key, extensions[field.key] as CivicExtensionValue]),
+    );
+    const activeLocation = Object.fromEntries(
+      tenant.geography.addressFields.filter((field) => location[field]).map((field) => [field, location[field]]),
+    );
     const payload: CivicRecordInput = {
       kind,
       title,
@@ -56,9 +67,8 @@ const CivicRecordForm: React.FC<CivicRecordFormProps> = ({ kinds, parentId, tena
       severity,
       parentId: record?.parentId || parentId,
       jurisdictionId: editing ? jurisdictionId : jurisdictionId || undefined,
-      location: editing
-        ? { countryCode: tenant.countryCode, region, city }
-        : region || city ? { countryCode: tenant.countryCode, region, city } : { countryCode: tenant.countryCode },
+      location: { countryCode: tenant.countryCode, ...activeLocation },
+      extensions: activeExtensions,
       project: kind === 'project' ? {
         budget: budget ? Number(budget) : null,
         currency: tenant.localization.currency,
@@ -92,8 +102,8 @@ const CivicRecordForm: React.FC<CivicRecordFormProps> = ({ kinds, parentId, tena
     }
   };
 
-  const regionLabel = tenant.geography.levels.find((level) => level.key === 'region')?.label || tenant.geography.levels[1]?.label || 'Region';
-  const cityLabel = tenant.geography.levels.find((level) => ['city', 'municipality'].includes(level.key))?.label || 'City / municipality';
+  const locationLabel = (field: string) => tenant.geography.levels.find((level) => level.key === field)?.label
+    || field.replace(/_/g, ' ').replace(/\b\w/g, (character) => character.toUpperCase());
 
   return (
     <form className="wt-civic-form" onSubmit={submit}>
@@ -135,10 +145,7 @@ const CivicRecordForm: React.FC<CivicRecordFormProps> = ({ kinds, parentId, tena
           {kind === 'observation' && <div className="col-sm-8 form-group"><label htmlFor="civic-source">Evidence URL</label><input id="civic-source" type="url" className="form-control" value={sourceUrl} onChange={(event) => setSourceUrl(event.target.value)} /></div>}
         </div>
       )}
-      <div className="row">
-        <div className="col-sm-6 form-group"><label htmlFor="civic-region">{regionLabel}</label><input id="civic-region" className="form-control" value={region} onChange={(event) => setRegion(event.target.value)} /></div>
-        <div className="col-sm-6 form-group"><label htmlFor="civic-city">{cityLabel}</label><input id="civic-city" className="form-control" value={city} onChange={(event) => setCity(event.target.value)} /></div>
-      </div>
+      <fieldset><legend>Location</legend><div className="row">{tenant.geography.addressFields.map((field) => <div className="col-sm-6 form-group" key={field}><label htmlFor={`civic-location-${field}`}>{locationLabel(field)}</label><input id={`civic-location-${field}`} className="form-control" maxLength={300} value={location[field] || ''} onChange={(event) => setLocation((current) => ({ ...current, [field]: event.target.value }))} /></div>)}</div></fieldset>
       {jurisdictions.length > 0 && <div className="form-group"><label htmlFor="civic-jurisdiction">Official jurisdiction</label><select id="civic-jurisdiction" className="form-control" value={jurisdictionId} onChange={(event) => setJurisdictionId(event.target.value)}><option value="">Not specified</option>{jurisdictions.map((jurisdiction) => <option key={jurisdiction._id} value={jurisdiction._id}>{jurisdiction.name}</option>)}</select></div>}
       {kind === 'project' && (
         <div className="row">
@@ -152,6 +159,7 @@ const CivicRecordForm: React.FC<CivicRecordFormProps> = ({ kinds, parentId, tena
           <div className="col-sm-5 form-group"><label htmlFor="civic-election-date">Election date</label><input id="civic-election-date" type="date" className="form-control" value={electionDate} onChange={(event) => setElectionDate(event.target.value)} /></div>
         </div>
       )}
+      <CivicExtensionFormFields tenant={tenant} kind={kind} values={extensions} onChange={(key, value) => setExtensions((current) => ({ ...current, [key]: value }))} />
       {message && <p className="help-block" role="status">{message}</p>}
       <button className="btn btn-primary" type="submit" disabled={submitting}>{submitting ? 'Saving...' : editing ? 'Save record details' : 'Submit civic record'}</button>
       {editing && onCancel && <button className="btn btn-link" type="button" onClick={onCancel}>Cancel</button>}

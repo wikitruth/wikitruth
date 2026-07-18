@@ -10,6 +10,7 @@ import { BUILT_IN_CIVIC_TENANTS } from '../../config/civicTenants';
 import { ensureCivicTenantRole } from '../../services/civicAuthorizationService';
 import { bootstrapBuiltInCivicTenants, publicCivicTenant } from '../../services/civicTenantService';
 import { logEntryEvent } from '../../services/entryEventsService';
+import { civicExtensionSchemasInput } from '../../services/civicExtensionService';
 import { CIVIC_RECORD_KINDS } from '../../types/civic';
 import {
   CIVIC_DEPLOYMENT_MODES,
@@ -82,7 +83,7 @@ const tenantSchema = z.object({
   }),
   sections: z.array(sectionSchema).min(1).max(20),
   featureFlags: z.record(z.string(), z.boolean()).default({}),
-  extensionSchemas: z.record(z.string(), z.unknown()).optional().default({}),
+  extensionSchemas: civicExtensionSchemasInput.optional().default({}),
   moderationPolicyVersion: z.string().trim().min(1).max(50).default('1'),
   electionSystem: z.string().trim().max(200).default(''),
   deploymentMode: z.enum(CIVIC_DEPLOYMENT_MODES).default('shared'),
@@ -210,6 +211,43 @@ export function registerCivicAdministrationRoutes(router: Router): void {
     }
     await auditTenantChange(req, tenant, 'civic.tenant.updated', 'Civic tenant configuration updated');
     res.json({ tenant });
+  });
+
+  router.put('/platform/tenants/:managedTenantId/memberships/:userId', async (req: WikitruthRequest, res: WikitruthResponse) => {
+    if (!ensurePlatformAdmin(req, res)) return;
+    const managedTenantId = tenantIdSchema.safeParse(req.params.managedTenantId);
+    const parsed = membershipSchema.safeParse({ ...req.body, userId: req.params.userId });
+    if (!managedTenantId.success || !parsed.success) {
+      res.status(400).json({ success: false, message: 'Invalid explicit tenant membership', details: parsed.success ? [] : parsed.error.issues });
+      return;
+    }
+    const builtIn = BUILT_IN_CIVIC_TENANTS.some((tenant) => tenant.tenantId === managedTenantId.data);
+    const persisted = builtIn ? true : await db.CivicTenant.findOne({ tenantId: managedTenantId.data }).select('_id').lean();
+    const user = await db.User.findById(parsed.data.userId).select('_id username').lean();
+    if (!persisted || !user) {
+      res.status(404).json({ success: false, message: persisted ? 'User not found' : 'Civic tenant not found' });
+      return;
+    }
+    const membership = await db.TenantMembership.findOneAndUpdate(
+      { tenantId: managedTenantId.data, userId: parsed.data.userId },
+      {
+        $set: { roles: parsed.data.roles, active: parsed.data.active, editUserId: actorId(req), editDate: new Date() },
+        $setOnInsert: { createUserId: actorId(req), createDate: new Date() },
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true },
+    );
+    await logEntryEvent({
+      scope: 'privileged',
+      eventType: 'civic.membership.platform_provisioned',
+      objectType: constants.OBJECT_TYPES.tenantMembership,
+      objectName: 'tenantMembership',
+      objectId: String(membership._id),
+      actorUserId: actorId(req),
+      actorUsername: String(req.user?.username || ''),
+      message: 'Platform administrator explicitly provisioned civic tenant access',
+      payload: { tenantId: managedTenantId.data, userId: parsed.data.userId, roles: parsed.data.roles, active: parsed.data.active },
+    });
+    res.json({ membership });
   });
 
   router.get('/admin/memberships', async (req: WikitruthRequest, res: WikitruthResponse) => {

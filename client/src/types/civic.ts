@@ -15,6 +15,28 @@ export type CivicRecordStage = 'reported' | 'screening' | 'investigating' | 'act
 export type CivicSeverity = 'info' | 'low' | 'medium' | 'high' | 'critical';
 export type CivicEntryRelationship = 'subject' | 'claim' | 'question' | 'answer' | 'evidence' | 'discussion' | 'review_issue';
 export type CivicTenantRole = 'reader' | 'contributor' | 'screener' | 'reviewer' | 'admin';
+export type CivicExtensionFieldType = 'text' | 'textarea' | 'number' | 'boolean' | 'date' | 'url' | 'select';
+export type CivicExtensionValue = string | number | boolean;
+
+export interface CivicExtensionField {
+  key: string;
+  label: string;
+  type: CivicExtensionFieldType;
+  description?: string;
+  placeholder?: string;
+  required?: boolean;
+  options?: Array<{ value: string; label: string }>;
+  min?: number;
+  max?: number;
+  minLength?: number;
+  maxLength?: number;
+}
+
+export interface CivicExtensionSchema {
+  title?: string;
+  description?: string;
+  fields: CivicExtensionField[];
+}
 
 export interface CivicTenantSection {
   slug: string;
@@ -61,7 +83,7 @@ export interface CivicTenant {
   };
   sections: CivicTenantSection[];
   featureFlags: Record<string, boolean>;
-  extensionSchemas: Record<string, unknown>;
+  extensionSchemas: Record<string, CivicExtensionSchema>;
   moderationPolicyVersion: string;
   electionSystem: string;
   deploymentMode: 'shared' | 'dedicated' | 'headless';
@@ -173,6 +195,7 @@ export interface CivicRecord {
     platform?: string;
   };
   outcome?: { summary?: string; happenedAt?: string | null };
+  extensions?: Record<string, CivicExtensionValue>;
   history?: Array<{
     _id?: string;
     action: string;
@@ -204,6 +227,7 @@ export interface CivicRecordInput {
   observation?: CivicRecord['observation'];
   election?: CivicRecord['election'];
   outcome?: CivicRecord['outcome'];
+  extensions?: CivicRecord['extensions'];
   private?: boolean;
 }
 

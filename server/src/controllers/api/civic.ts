@@ -2,7 +2,6 @@
 
 import type { Router } from 'express';
 import mongoose from 'mongoose';
-import type { ZodError } from 'zod';
 
 import appModForDb from '../../app';
 import { civicTenantContext } from '../../middlewares/civicTenantContext';
@@ -11,17 +10,8 @@ import { logEntryEvent } from '../../services/entryEventsService';
 import { civicTenantRoles, ensureCivicTenantRole } from '../../services/civicAuthorizationService';
 import { publicCivicTenant } from '../../services/civicTenantService';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
-import {
-  CIVIC_RECORD_KINDS,
-  CIVIC_RECORD_STAGES,
-  CIVIC_RECORD_STATUSES,
-  CIVIC_SEVERITIES,
-  type CivicRecordKind,
-  type CivicHistoryItem,
-  type CivicRecordStage,
-  type CivicRecordStatus,
-  type CivicSeverity,
-} from '../../types/civic';
+import { CIVIC_RECORD_KINDS, CIVIC_RECORD_STAGES, CIVIC_RECORD_STATUSES, CIVIC_SEVERITIES } from '../../types/civic';
+import type { CivicHistoryItem, CivicRecordKind, CivicRecordStage, CivicRecordStatus, CivicSeverity } from '../../types/civic';
 import * as utils from '../../utils/utils';
 import constants from '../../models/constants';
 import { recordEntryRevision } from './revisionWriteRecorder';
@@ -31,6 +21,8 @@ import { registerCivicEntryLinkRoutes } from './civicEntryLinks';
 import { registerCivicAdministrationRoutes } from './civicAdministration';
 import { civicRecordInput, civicRecordUpdate, civicTransitionInput } from './civicRecordValidation';
 import { CIVIC_TENANT_ROLES } from '../../types/civicTenancy';
+import { validateCivicExtensions } from '../../services/civicExtensionService';
+import { normalizeCivicLocation, sendCivicValidationError, sendExtensionValidationError } from './civicRecordRequestValidation';
 
 interface CivicRecordShape {
   _id: mongoose.Types.ObjectId;
@@ -51,6 +43,7 @@ interface CivicRecordShape {
   location?: Record<string, unknown>;
   observation?: Record<string, unknown>;
   election?: Record<string, unknown>;
+  extensions?: Record<string, string | number | boolean>;
   private: boolean;
   createUserId?: mongoose.Types.ObjectId | string;
   editUserId?: mongoose.Types.ObjectId | string;
@@ -76,28 +69,17 @@ function actorId(req: WikitruthRequest): string {
   return String(req.user?._id || req.user?.id || '');
 }
 
-function canPlayRole(req: WikitruthRequest, role: string): boolean {
-  return Boolean(req.user?.canPlayRoleOf?.(role));
-}
-
 async function canViewPrivate(req: WikitruthRequest, record: Record<string, unknown>): Promise<boolean> {
-  if (!record.private || canPlayRole(req, 'admin') || String(record.createUserId || '') === actorId(req)) return true;
+  if (!record.private || String(record.createUserId || '') === actorId(req)) return true;
   const roles = await civicTenantRoles(req, tenantId(req));
   return roles.has('admin');
 }
 
 async function canEdit(req: WikitruthRequest, record: Record<string, unknown>): Promise<boolean> {
   if (!req.user) return false;
-  if (canPlayRole(req, 'admin') || String(record.createUserId || '') === actorId(req)) return true;
+  if (String(record.createUserId || '') === actorId(req)) return true;
   const roles = await civicTenantRoles(req, tenantId(req));
   return roles.has('admin');
-}
-
-function validationError(res: WikitruthResponse, error: ZodError): void {
-  res.status(400).json({
-    message: 'Invalid civic record data',
-    details: error.issues.map((issue) => ({ path: issue.path.join('.'), message: issue.message })),
-  });
 }
 
 function tenantId(req: WikitruthRequest): string {
@@ -235,7 +217,7 @@ async function createRecord(req: WikitruthRequest, res: WikitruthResponse): Prom
   if (!await ensureCivicTenantRole(req, res, ['contributor', 'admin'])) return;
   const parsed = civicRecordInput.safeParse(req.body || {});
   if (!parsed.success) {
-    validationError(res, parsed.error);
+    sendCivicValidationError(res, parsed.error);
     return;
   }
   const parentValidation = await validateParent(req, parsed.data.kind, parsed.data.parentId);
@@ -248,21 +230,33 @@ async function createRecord(req: WikitruthRequest, res: WikitruthResponse): Prom
     res.status(400).json({ message: jurisdictionValidation.message });
     return;
   }
+  const extensionValidation = validateCivicExtensions(
+    req.civicTenant!.extensionSchemas,
+    parsed.data.kind,
+    parsed.data.extensions,
+  );
+  if (!extensionValidation.success) {
+    sendExtensionValidationError(res, extensionValidation.issues);
+    return;
+  }
+  const locationValidation = normalizeCivicLocation(req.civicTenant!, parsed.data.location);
+  if (!locationValidation.ok) {
+    res.status(400).json({ message: locationValidation.message });
+    return;
+  }
   const now = new Date();
   const tenant = req.civicTenant!;
   const project = parsed.data.project
     ? { ...parsed.data.project, currency: parsed.data.project.currency || tenant.localization.currency }
     : undefined;
-  const location = parsed.data.location
-    ? { ...parsed.data.location, countryCode: parsed.data.location.countryCode || tenant.countryCode }
-    : { countryCode: tenant.countryCode };
   const record = await db.CivicRecord.create({
     ...parsed.data,
     tenantId: tenant.tenantId,
     countryCode: tenant.countryCode,
     jurisdictionId: parsed.data.jurisdictionId || null,
     project,
-    location,
+    location: locationValidation.location,
+    extensions: extensionValidation.data,
     parentId: parsed.data.parentId || null,
     friendlyUrl: utils.urlify(parsed.data.title),
     status: 'pending',
@@ -314,7 +308,7 @@ async function updateRecord(req: WikitruthRequest, res: WikitruthResponse): Prom
   }
   const parsed = civicRecordUpdate.safeParse(req.body || {});
   if (!parsed.success) {
-    validationError(res, parsed.error);
+    sendCivicValidationError(res, parsed.error);
     return;
   }
   const parentId = parsed.data.parentId ?? (record.parentId ? String(record.parentId) : undefined);
@@ -337,9 +331,24 @@ async function updateRecord(req: WikitruthRequest, res: WikitruthResponse): Prom
       currency: parsed.data.project.currency || currentRecord.project?.currency || req.civicTenant!.localization.currency,
     }
     : undefined;
-  const location = parsed.data.location
-    ? { ...(currentRecord.location || {}), ...parsed.data.location }
-    : undefined;
+  const locationValidation = normalizeCivicLocation(req.civicTenant!, parsed.data.location, currentRecord.location || {});
+  if (!locationValidation.ok) {
+    res.status(400).json({ message: locationValidation.message });
+    return;
+  }
+  let extensions: Record<string, string | number | boolean> | undefined;
+  if (parsed.data.extensions !== undefined) {
+    const extensionValidation = validateCivicExtensions(
+      req.civicTenant!.extensionSchemas,
+      record.kind,
+      { ...(currentRecord.extensions || {}), ...parsed.data.extensions },
+    );
+    if (!extensionValidation.success) {
+      sendExtensionValidationError(res, extensionValidation.issues);
+      return;
+    }
+    extensions = extensionValidation.data;
+  }
   const observation = parsed.data.observation
     ? { ...(currentRecord.observation || {}), ...parsed.data.observation }
     : undefined;
@@ -350,7 +359,8 @@ async function updateRecord(req: WikitruthRequest, res: WikitruthResponse): Prom
     parentId: parentId || null,
     jurisdictionId: jurisdictionId || null,
     ...(project ? { project } : {}),
-    ...(location ? { location } : {}),
+    ...(parsed.data.location ? { location: locationValidation.location } : {}),
+    ...(extensions ? { extensions } : {}),
     ...(observation ? { observation } : {}),
     ...(election ? { election } : {}),
     friendlyUrl: parsed.data.title ? utils.urlify(parsed.data.title) : record.friendlyUrl,
@@ -379,7 +389,7 @@ async function transitionRecord(req: WikitruthRequest, res: WikitruthResponse): 
   if (!await ensureCivicTenantRole(req, res, ['reviewer', 'admin'])) return;
   const parsed = civicTransitionInput.safeParse(req.body || {});
   if (!parsed.success) {
-    validationError(res, parsed.error);
+    sendCivicValidationError(res, parsed.error);
     return;
   }
   const record = await db.CivicRecord.findOne({ _id: req.params.id, tenantId: tenantId(req) });

@@ -29,6 +29,46 @@ export const CIVIC_LINKED_OBJECT_NAMES = [
 ] as const;
 export type CivicLinkedObjectName = (typeof CIVIC_LINKED_OBJECT_NAMES)[number];
 
+export const CIVIC_EXTENSION_FIELD_TYPES = [
+  'text',
+  'textarea',
+  'number',
+  'boolean',
+  'date',
+  'url',
+  'select',
+] as const;
+export type CivicExtensionFieldType = (typeof CIVIC_EXTENSION_FIELD_TYPES)[number];
+
+export interface CivicExtensionOption {
+  value: string;
+  label: string;
+}
+
+export interface CivicExtensionField {
+  key: string;
+  label: string;
+  type: CivicExtensionFieldType;
+  description?: string;
+  placeholder?: string;
+  required?: boolean;
+  options?: CivicExtensionOption[];
+  min?: number;
+  max?: number;
+  minLength?: number;
+  maxLength?: number;
+}
+
+export interface CivicExtensionSchema {
+  title?: string;
+  description?: string;
+  fields: CivicExtensionField[];
+}
+
+export type CivicExtensionSchemas = Record<string, CivicExtensionSchema>;
+export type CivicExtensionValue = string | number | boolean;
+export type CivicExtensionValues = Record<string, CivicExtensionValue>;
+
 export interface CivicTenantSection {
   slug: string;
   title: string;
@@ -76,7 +116,7 @@ export interface CivicTenantDefinition {
   };
   sections: CivicTenantSection[];
   featureFlags: Record<string, boolean>;
-  extensionSchemas: Record<string, unknown>;
+  extensionSchemas: CivicExtensionSchemas;
   moderationPolicyVersion: string;
   electionSystem: string;
   deploymentMode: CivicDeploymentMode;

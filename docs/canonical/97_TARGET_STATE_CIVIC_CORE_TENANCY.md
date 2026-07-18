@@ -39,9 +39,10 @@ Define the reusable civic-accountability platform contract that powers FixPH and
 
 ## Target State Status
 
-- Core tenancy is `implemented`; validated tenant record extensions and country-neutral persistence defaults are active hardening work under the 2026-07-18 epistemic-kernel plan.
+- Core tenancy, validated tenant record extensions, country-neutral persistence defaults, and explicit platform-to-tenant administrator provisioning are `implemented`.
 - FixPH is the first persisted compatibility tenant; shared, dedicated, and headless profiles use the same models and APIs.
 - A fictional second tenant verified country, currency, geography, branding, navigation, isolation, and responsive rendering.
 - Detailed architecture: `docs/architecture/CIVIC_CORE_MULTI_TENANCY_ARCHITECTURE.md`.
+- Extension contract: `docs/architecture/CIVIC_TENANT_EXTENSION_SCHEMAS.md`.
 - Completed checklist: `docs/plans/completed/CIVIC_CORE_MULTI_TENANCY_CHECKLIST_PLAN_2026-07-13.md`.
 - QA evidence: `docs/qa/CIVIC_CORE_MULTI_TENANCY_SIGNOFF_2026-07-13.md`.

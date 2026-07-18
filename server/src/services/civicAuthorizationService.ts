@@ -14,10 +14,6 @@ export async function civicTenantRoles(req: WikitruthRequest, tenantId: string):
   const roles = new Set<CivicTenantRole>();
   if (!req.user) return roles;
 
-  if (hasGlobalRole(req, 'admin')) {
-    return new Set<CivicTenantRole>(['reader', 'contributor', 'screener', 'reviewer', 'admin']);
-  }
-
   const userId = String(req.user._id || req.user.id || '');
   const membership = userId && db.TenantMembership?.findOne
     ? await db.TenantMembership.findOne({ tenantId, userId, active: true }).lean()
@@ -26,7 +22,7 @@ export async function civicTenantRoles(req: WikitruthRequest, tenantId: string):
     membership.roles.forEach((role: CivicTenantRole) => roles.add(role));
   }
 
-  // Existing FixPH users retain their current capabilities until memberships are backfilled.
+  // Existing non-admin FixPH roles retain compatibility until memberships are backfilled.
   if (!membership && tenantId === 'fixtheph') {
     (['reader', 'contributor', 'screener', 'reviewer'] as CivicTenantRole[]).forEach((role) => {
       if (hasGlobalRole(req, role)) roles.add(role);
