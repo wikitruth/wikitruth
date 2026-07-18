@@ -1,22 +1,23 @@
 {
-  "generatedAt": "2026-07-18T09:26:08.666Z",
+  "generatedAt": "2026-07-18T09:32:24.615Z",
   "mode": "read-only-api-and-database",
   "baseUrl": "https://127.0.0.1:9443",
   "warmup": {
-    "apiRequests": 3,
-    "databaseReads": 4
+    "rounds": 3,
+    "apiRequests": 9,
+    "databaseReads": 12
   },
   "api": {
-    "requests": 300,
-    "successes": 300,
+    "requests": 281,
+    "successes": 281,
     "failures": 0,
     "errorRate": 0,
-    "p50Ms": 83.33,
-    "p95Ms": 180.65,
-    "p99Ms": 206.58,
-    "maximumMs": 235.95,
+    "p50Ms": 47.1,
+    "p95Ms": 485.69,
+    "p99Ms": 1000.76,
+    "maximumMs": 1032.55,
     "statuses": {
-      "200": 300
+      "200": 281
     },
     "durationSeconds": 10,
     "concurrency": 10,
@@ -32,10 +33,10 @@
     "successes": 100,
     "failures": 0,
     "errorRate": 0,
-    "p50Ms": 9.54,
-    "p95Ms": 43.79,
-    "p99Ms": 133.55,
-    "maximumMs": 204.75,
+    "p50Ms": 8.91,
+    "p95Ms": 254.31,
+    "p99Ms": 287.55,
+    "maximumMs": 339.03,
     "iterations": 100,
     "concurrency": 10
   },

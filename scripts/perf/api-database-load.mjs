@@ -15,6 +15,7 @@ const durationMs = Math.max(1000, Number(process.env.WT_LOAD_DURATION_SECONDS ||
 const concurrency = Math.max(1, Math.min(100, Number(process.env.WT_LOAD_CONCURRENCY || 10)));
 const databaseIterations = Math.max(1, Math.min(1000, Number(process.env.WT_LOAD_DB_ITERATIONS || 50)));
 const requestsPerSecondPerWorker = Math.max(0.1, Math.min(4, Number(process.env.WT_LOAD_RPS_PER_WORKER || 3)));
+const warmupRounds = Math.max(1, Math.min(10, Number(process.env.WT_LOAD_WARMUP_ROUNDS || 3)));
 const runId = crypto.randomBytes(4).toString('hex');
 const outputPath = process.env.WT_LOAD_OUTPUT || path.join('docs', 'performance', `API_DATABASE_LOAD_REPORT_${new Date().toISOString().slice(0, 10)}.json`);
 const requestPaths = String(process.env.WT_LOAD_PATHS || '/api/v1/home,/api/v1/topics?limit=20,/api/v1/civic/overview').split(',').map((value) => value.trim()).filter(Boolean);
@@ -75,16 +76,21 @@ async function apiLoad() {
 }
 
 async function warmup() {
-  const apiResults = await Promise.all(requestPaths.map((route, index) => get(new URL(route, baseUrl), `warmup-${index}`)));
+  const apiResults = [];
+  for (let round = 0; round < warmupRounds; round += 1) {
+    apiResults.push(...await Promise.all(requestPaths.map((route, index) => get(new URL(route, baseUrl), `warmup-${round}-${index}`))));
+  }
   if (apiResults.some((result) => !result.ok)) throw new Error('API warm-up failed');
   const connection = await mongoose.createConnection(config.mongodb.uri, { serverSelectionTimeoutMS: 10_000, maxPoolSize: 10 }).asPromise();
   try {
-    await Promise.all(databaseCollections.map((collection) => connection.collection(collection)
-      .find({ private: { $ne: true } }).sort({ editDate: -1 }).limit(1).toArray()));
+    for (let round = 0; round < warmupRounds; round += 1) {
+      await Promise.all(databaseCollections.map((collection) => connection.collection(collection)
+        .find({ private: { $ne: true } }).sort({ editDate: -1 }).limit(1).toArray()));
+    }
   } finally {
     await connection.close();
   }
-  return { apiRequests: apiResults.length, databaseReads: databaseCollections.length };
+  return { rounds: warmupRounds, apiRequests: apiResults.length, databaseReads: databaseCollections.length * warmupRounds };
 }
 
 async function databaseLoad() {

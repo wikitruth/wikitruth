@@ -8,8 +8,9 @@ The repeatable read-only harness exercised the local PM2 Wikitruth runtime and
 the same local Mongo database concurrently. It used stable `/api/v1` requests,
 ten distinct synthetic clients, and a sustainable three requests/second per
 client so the test measured application latency rather than intentionally
-triggering the per-client rate limiter. One unmeasured read per API route and
-database collection warms connection pools and local caches before measurement.
+triggering the per-client rate limiter. Three unmeasured rounds across every API
+route and database collection warm connection pools, JIT paths, and local caches
+before measurement.
 
 ```bash
 WT_LOAD_BASE_URL=https://127.0.0.1:9443 \
@@ -23,8 +24,8 @@ npm run test:load:api-db
 
 | Surface | Successful | Failed | p50 | p95 | p99 | Maximum |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| API | 300 | 0 | 83.33 ms | 180.65 ms | 206.58 ms | 235.95 ms |
-| Mongo reads | 100 | 0 | 9.54 ms | 43.79 ms | 133.55 ms | 204.75 ms |
+| API | 281 | 0 | 47.10 ms | 485.69 ms | 1,000.76 ms | 1,032.55 ms |
+| Mongo reads | 100 | 0 | 8.91 ms | 254.31 ms | 287.55 ms | 339.03 ms |
 
 All API responses were HTTP 200. API p95 remained below 1,500 ms, database p95
 below 500 ms, and both error rates below 1%. The run passed every configured
