@@ -38,8 +38,10 @@ import constants from '../../models/constants';
 import { requireContributorOnboarding } from '../../middlewares/onboarding';
 import { enforceApiClientScope } from '../../middlewares/apiClientScopes';
 import attachAgent from './agent';
+import { apiVersionPolicy } from '../../middlewares/apiVersionPolicy';
 
 export = function (router: Router) {
+  router.use(apiVersionPolicy);
   router.use(apiError.apiEnvelopeMiddleware);
   router.use(mobileContracts.mobileApiContractMiddleware);
   router.use(sanitizeContentMiddleware);

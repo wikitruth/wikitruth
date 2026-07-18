@@ -26,7 +26,8 @@ export WIKITRUTH_URL=http://localhost:3000
 export WIKITRUTH_AGENT_TOKEN='wt_agent_<clientId>.<secret>'
 
 curl -sS "$WIKITRUTH_URL/api/v1/agent/identity" \
-  -H "Authorization: Bearer $WIKITRUTH_AGENT_TOKEN"
+  -H "Authorization: Bearer $WIKITRUTH_AGENT_TOKEN" \
+  -H 'Accept-Version: 1'
 
 curl -sS "$WIKITRUTH_URL/api/v1/agent/capabilities" \
   -H "Authorization: Bearer $WIKITRUTH_AGENT_TOKEN"
@@ -65,9 +66,36 @@ With `moderation:write`, agents may submit channel votes, reader signals,
 appeals, and change requests. Role and onboarding checks still apply to the
 accountable user.
 
+## Contribute to a Country Tenant
+
+The token needs `civic:write`, and its accountable user needs an active
+membership in the selected tenant. The tenant in the path is authoritative;
+agents cannot choose `tenantId` or `countryCode` in the record body.
+
+```bash
+curl -sS -X POST "$WIKITRUTH_URL/api/v1/tenants/fix-example/civic/records" \
+  -H "Authorization: Bearer $WIKITRUTH_AGENT_TOKEN" \
+  -H 'Accept-Version: 1' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "kind": "project",
+    "title": "District water project",
+    "summary": "Public project submitted for tenant screening.",
+    "location": { "district": "North", "ward": "Ward 4" },
+    "extensions": { "district_code": "N-04", "delivery_model": "public" }
+  }'
+```
+
+Read `GET /api/v1/tenants/{tenantId}/civic/tenant` first to discover geography,
+sections, localization, and extension schemas. Unknown country fields fail with
+field-addressable `400` details.
+
 ## Errors and Limits
 
 - `AGENT_TOKEN_INVALID`, `AGENT_TOKEN_EXPIRED`, and `AGENT_OWNER_INACTIVE` return `401`.
 - `AGENT_SCOPE_REQUIRED` and contribution-only policy failures return `403`.
 - `AGENT_RATE_LIMITED` returns `429` with `Retry-After` and rate-limit headers.
 - Never log or place raw tokens in prompts, contribution content, source control, or URLs.
+- Send `Accept-Version: 1`; unsupported versions return `406` with
+  `UNSUPPORTED_API_VERSION`. Branch on error codes and retain `requestId` for
+  support diagnostics.

@@ -26,6 +26,8 @@
     "test:coverage": "jest --config jest.config.client.js --coverage",
     "test:e2e": "playwright test",
     "test:perf:budgets": "node scripts/perf/check-perf-budgets.mjs",
+    "openapi:sync": "node scripts/openapi/check-openapi-coverage.mjs --write",
+    "openapi:check": "node scripts/openapi/check-openapi-coverage.mjs",
     "test:parity:server:checklist": "jest --config jest.config.server.js tests/server/parity-checklist.test.js",
     "test:parity:url-contracts": "jest --config jest.config.server.js tests/server/url-format-drift-approvals.test.js tests/server/url-format-drift-runtime.test.js",
     "test:contracts:legacy-modern": "jest --config jest.config.server.js tests/server/legacy-modern-adapter-contracts.test.js",

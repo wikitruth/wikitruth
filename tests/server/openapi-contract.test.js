@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const childProcess = require('child_process');
 
 function readOpenApi() {
   const file = path.join(process.cwd(), 'docs/api/openapi.json');
@@ -9,6 +10,20 @@ function readOpenApi() {
 }
 
 describe('OpenAPI contract', function () {
+  it('covers every mounted controller operation', function () {
+    expect(() => childProcess.execFileSync(process.execPath, ['scripts/openapi/check-openapi-coverage.mjs'], {
+      cwd: process.cwd(), stdio: 'pipe',
+    })).not.toThrow();
+  });
+
+  it('publishes the stable v1 and compatibility server policy', function () {
+    const spec = readOpenApi();
+    expect(spec.info.version).toBe('1.1.0');
+    expect(spec.servers).toEqual(expect.arrayContaining([
+      expect.objectContaining({ url: '/api/v1' }), expect.objectContaining({ url: '/api' }),
+    ]));
+    expect(spec['x-version-policy']).toBe('docs/api/API_VERSION_POLICY.md');
+  });
   it('defines core auth endpoints used by modern client', function () {
     const spec = readOpenApi();
     const paths = spec.paths || {};
@@ -91,6 +106,16 @@ describe('OpenAPI contract', function () {
       '/civic/admin/jurisdictions',
       '/civic/admin/jurisdictions/{id}',
       '/civic/admin/membership-candidates',
+      '/civic/platform/tenants/{managedTenantId}/memberships/{userId}',
+      '/agent/identity',
+      '/agent/capabilities',
+      '/admin/api-clients',
+      '/admin/api-clients/{id}/rotate',
+      '/admin/api-clients/{id}',
+      '/outline/link',
+      '/moderation/verdict-votes',
+      '/moderation/signals',
+      '/moderation/appeals',
       '/tenants/{tenantId}/civic/records',
       '/tenants/{tenantId}/civic/records/{id}',
       '/tenants/{tenantId}/civic/admin/jurisdictions/{id}',
@@ -142,6 +167,16 @@ describe('OpenAPI contract', function () {
       'CivicActorContext',
       'CivicMembershipUser',
       'CivicTenantMembership',
+      'ApiErrorResponse',
+      'ApiClientIdentity',
+      'ApiClientCreateRequest',
+      'ApiClientCredentialResponse',
+      'AgentCapabilities',
+      'GraphLinkRequest',
+      'VerdictVoteRequest',
+      'AdminFinalSayRequest',
+      'CivicExtensionField',
+      'CivicExtensionSchema',
     ].forEach((schemaName) => expect(schemas[schemaName]).toBeDefined());
   });
 
@@ -152,10 +187,19 @@ describe('OpenAPI contract', function () {
     const headers = homeGet?.responses?.['200']?.headers || {};
 
     expect(securitySchemes.BearerAuth).toBeDefined();
+    expect(securitySchemes.AgentBearerAuth).toBeDefined();
     expect(headers['RateLimit-Limit']).toBeDefined();
     expect(headers['RateLimit-Remaining']).toBeDefined();
     expect(headers['RateLimit-Reset']).toBeDefined();
     expect(headers.Deprecation).toBeDefined();
     expect(headers.Sunset).toBeDefined();
+  });
+
+  it('documents agent scopes and final-say separation', function () {
+    const spec = readOpenApi();
+    expect(spec.paths['/topics'].post['x-required-agent-scope']).toBe('contributions:write');
+    expect(spec.paths['/outline/link'].post['x-required-agent-scope']).toBe('graph:write');
+    expect(spec.paths['/moderation/verdict-votes'].post['x-required-agent-scope']).toBe('moderation:write');
+    expect(spec.paths['/moderation/verdict-channel'].put.description).toMatch(/unavailable to API clients/i);
   });
 });

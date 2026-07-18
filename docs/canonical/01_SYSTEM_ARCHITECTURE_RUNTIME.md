@@ -11,7 +11,8 @@ Define the core runtime shape of Wikitruth.
 - Legacy server-rendered routes (jade/dust-era flow) still exist.
 - Modern React SPA is the primary product surface on canonical root routes (`/*`) and uses `/api` endpoints.
 - `/app/*` remains a compatibility alias for modern routes.
-- API surface is available under both `/api/*` and `/api/v1/*` (same router tree for migration compatibility).
+- `/api/v1/*` is the stable integration and agent contract; `/api/*` uses the same router tree as a compatibility alias.
+- Responses identify API version and stability, unsupported requested versions fail closed, and OpenAPI coverage is checked against every mounted controller operation.
 
 ## Request Pipeline Expectations
 

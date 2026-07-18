@@ -62,7 +62,7 @@ auditable contributions through the same moderation lifecycle as people.
 - [x] Permit scoped agents to use the standard seven entry contribution endpoints with pending screening and normal duplicate/onboarding checks.
 - [x] Record API-client identity in revisions and audit events without exposing secrets.
 - [x] Add per-client rate limiting, expiry, revocation, and last-used tracking.
-- [ ] Publish complete OpenAPI schemas, examples, and an agent integration runbook.
+- [x] Publish complete OpenAPI schemas, examples, source-scanned route coverage, and an agent integration runbook.
 
 ## 6. Generic Civic Tenant Extensions
 
@@ -80,8 +80,8 @@ auditable contributions through the same moderation lifecycle as people.
 - [x] Restore visible keyboard focus and add automated focus-style regression coverage.
 - [x] Generate host-aware root, entry, and civic-tenant sitemaps without stale `/app` URLs.
 - [x] Render entry-specific title, description, canonical, OpenGraph, and structured data in the initial server response.
-- [ ] Complete OpenAPI coverage for all mounted public and governed API surfaces.
-- [ ] Give `/api/v1` an explicit contract/version policy and agent-safe error semantics.
+- [x] Complete OpenAPI coverage for all mounted public and governed API surfaces.
+- [x] Give `/api/v1` an explicit contract/version policy and agent-safe error semantics.
 - [ ] Replace recursive outline N+1 traversal with bounded batched traversal.
 - [ ] Add an optional durable realtime event adapter while retaining local in-memory development behavior.
 - [ ] Add repeatable API/database load tests and publish measured results.
