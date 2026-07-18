@@ -8,10 +8,11 @@ import { createRequire } from 'node:module';
 import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
 import { chromium } from 'playwright';
+import { assertLocalPilotTargets } from './epistemic-pilot-support.mjs';
 
 const require = createRequire(import.meta.url);
 const config = require('../../server/src/config/config.js');
-const baseUrl = process.argv[2] || process.env.WT_BASE_URL || 'https://127.0.0.1:9443';
+const baseUrl = process.argv[2] || process.env.WT_CIVIC_BROWSER_BASE_URL || 'https://127.0.0.1:9443';
 const runDate = new Date().toISOString().slice(0, 10);
 const outDir = process.argv[3] || path.join('docs', 'qa', 'artifacts', `civic-browser-disposable-${runDate}`);
 const browserChannel = process.env.WT_CIVIC_BROWSER_CHANNEL || 'chrome';
@@ -97,11 +98,17 @@ async function assertFormValid(page, submitButtonName) {
   assert.deepEqual(invalid, [], `Invalid ${submitButtonName} fields: ${JSON.stringify(invalid)}`);
 }
 
-function observeConsole(page, errors) {
+function observeConsole(page, errors, environmentWarnings) {
   page.on('console', (message) => {
-    if (message.type() === 'error') errors.push(message.text());
+    if (message.type() !== 'error') return;
+    const detail = { message: message.text(), url: message.location().url || '' };
+    if (['An SSL certificate error occurred when fetching the script.', 'An unknown error occurred when fetching the script.'].includes(detail.message)) {
+      environmentWarnings.push(detail);
+    } else {
+      errors.push(detail);
+    }
   });
-  page.on('pageerror', (error) => errors.push(error.message));
+  page.on('pageerror', (error) => errors.push({ message: error.message, url: page.url() }));
 }
 
 async function configureDisposableTenant(page, fixture) {
@@ -124,7 +131,7 @@ async function configureDisposableTenant(page, fixture) {
 
 async function provisionFixphTenantAdmin(page, admin) {
   await page.goto(`${baseUrl}/admin/civic-tenants`, { waitUntil: 'domcontentloaded' });
-  await page.getByLabel('Tenant').selectOption('fixtheph');
+  await page.getByLabel('Tenant', { exact: true }).selectOption('fixtheph');
   await page.getByLabel('User ID').fill(String(admin.userId));
   await page.getByRole('button', { name: 'Provision tenant admin' }).click();
   await waitForStatus(page, 'Explicit tenant administrator access provisioned for fixtheph.');
@@ -257,6 +264,7 @@ async function cleanup(connection, identities, fixture) {
 }
 
 async function main() {
+  assertLocalPilotTargets(baseUrl, config.mongodb.uri);
   await fs.mkdir(outDir, { recursive: true });
   const connection = await mongoose.createConnection(config.mongodb.uri, { serverSelectionTimeoutMS: 10_000 }).asPromise();
   const token = stamp();
@@ -273,6 +281,7 @@ async function main() {
   };
   const identities = [];
   const consoleErrors = [];
+  const environmentWarnings = [];
   const steps = [];
   let browser = null;
   let runError = null;
@@ -293,8 +302,8 @@ async function main() {
     const contributorContext = await browser.newContext({ ignoreHTTPSErrors: true, viewport: { width: 1280, height: 800 } });
     const adminPage = await adminContext.newPage();
     const contributorPage = await contributorContext.newPage();
-    observeConsole(adminPage, consoleErrors);
-    observeConsole(contributorPage, consoleErrors);
+    observeConsole(adminPage, consoleErrors, environmentWarnings);
+    observeConsole(contributorPage, consoleErrors, environmentWarnings);
 
     await login(adminPage, admin);
     steps.push('platform-admin-login');
@@ -317,7 +326,7 @@ async function main() {
     await deactivateFixtures(adminPage, contributor, fixture);
     steps.push('jurisdiction-deactivate');
     steps.push('membership-deactivate');
-    assert.deepEqual(consoleErrors, [], `Browser console errors: ${consoleErrors.join(' | ')}`);
+    assert.deepEqual(consoleErrors, [], `Browser console errors: ${JSON.stringify(consoleErrors)}`);
   } catch (error) {
     runError = error;
   } finally {
@@ -334,6 +343,7 @@ async function main() {
     tenant: 'fixtheph',
     steps,
     consoleErrors,
+    environmentWarnings,
     cleanup: {
       mutableFixtureResidue: cleanupResidue,
       immutableAuditEventsRetained: true,

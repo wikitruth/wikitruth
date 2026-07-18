@@ -25,6 +25,8 @@
 - Latest runtime evidence bundle: `docs/qa/LEGACY_MODERN_RUNTIME_EVIDENCE_SUMMARY_2026-04-22.md`
 - Authenticated parity automation script: `scripts/qa/migration-authenticated-parity.mjs`
 - Disposable authenticated civic Chrome runner: `scripts/qa/run-disposable-civic-browser.mjs`
+- Disposable agent-credential Chrome runner: `scripts/qa/run-disposable-agent-browser.mjs`
+- Public modern desktop/mobile Chrome runner: `scripts/qa/run-public-modern-browser.mjs`
 - Disposable epistemic workflow runner: `scripts/qa/epistemic-flagship-pilot.mjs`
 - Test-credential setup script: `scripts/qa/setup-parity-test-creds.mjs`
 - Test-credential setup runbook: `docs/qa/PARITY_TEST_CREDENTIALS_RUNBOOK_2026-04-22.md`
