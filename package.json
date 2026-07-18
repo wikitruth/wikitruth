@@ -74,6 +74,8 @@
     "migrate:civic-core:apply": "node --env-file-if-exists=.env scripts/migrations/civic-core-tenancy.js --apply",
     "setup:local-fixph": "node --env-file-if-exists=.env scripts/setup/local-fixph-tenant.js",
     "setup:local-fixph:clean": "node --env-file-if-exists=.env scripts/setup/local-fixph-tenant.js --clean",
+    "setup:local-explore-parity": "node --env-file-if-exists=.env scripts/setup/local-explore-parity.js",
+    "setup:local-explore-parity:clean": "node --env-file-if-exists=.env scripts/setup/local-explore-parity.js --clean",
     "runtime:pm2:check": "bash scripts/runtime/pm2-restart-check.sh",
     "runtime:preflight": "bash scripts/runtime/preflight-check.sh",
     "analyze:bundle": "npm run build:client:stats",
