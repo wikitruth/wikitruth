@@ -21,6 +21,8 @@ const factory: SchemaFactory = function (app, mongoose) {
     createDate: { type: Date, default: Date.now, index: true, immutable: true },
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User', default: null, immutable: true },
     createUsername: { type: String, default: '', immutable: true },
+    apiClientId: { type: mongoose.Schema.ObjectId, ref: 'ApiClient', default: null, immutable: true },
+    apiClientName: { type: String, default: '', immutable: true },
   });
 
   schema.index({ objectType: 1, objectId: 1, revisionNumber: 1 }, { unique: true });
@@ -31,4 +33,3 @@ const factory: SchemaFactory = function (app, mongoose) {
 };
 
 export = factory;
-

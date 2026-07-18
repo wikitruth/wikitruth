@@ -30,6 +30,7 @@ const factory: SchemaFactory = function (app, mongoose) {
       ],
     },
     linkType: { type: Number, default: constants.LINK_TYPES.child },
+    relationship: { type: String, enum: ['child', 'support', 'oppose', 'related', 'evidence', 'source', 'dependency'], default: 'child', index: true },
     bidirectional: { type: Boolean, default: true }, // If yes, it will show the corresponding behavior on the opposite side.
     private: { type: Boolean, default: false }, // if true, should be restricted to group/user owners and not included in public backup
     negative: { type: Boolean, default: false }, // a negative or positive statement
@@ -55,6 +56,7 @@ const factory: SchemaFactory = function (app, mongoose) {
   schema.methods.getType = function () {
     return constants.OBJECT_TYPES.argumentLink;
   };
+  schema.index({ argumentId: 1, parentId: 1, ownerId: 1, relationship: 1 }, { unique: true });
   // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
   schema.plugin(require('../plugins/pagedFind'));
   schema.set('autoIndex', app.get('env') === 'development');

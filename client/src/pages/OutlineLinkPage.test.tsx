@@ -72,12 +72,14 @@ describe('OutlineLinkPage', () => {
     );
 
     await user.click(await screen.findByRole('button', { name: /argument one/i }));
+    await user.selectOptions(screen.getByLabelText(/relationship/i), 'support');
     await user.click(screen.getByRole('button', { name: /create link/i }));
 
     await waitFor(() =>
       expect(mockedApi.createOutlineLink).toHaveBeenCalledWith({
         parentId: 'topic-1',
         targetId: 'arg-1',
+        relationship: 'support',
       }),
     );
     expect(await screen.findByText(/link created successfully/i)).toBeInTheDocument();

@@ -888,7 +888,11 @@ class ApiService {
     });
   }
 
-  async createOutlineLink(payload: { parentId: string; targetId: string }): Promise<LegacyApiResponse> {
+  async createOutlineLink(payload: {
+    parentId: string;
+    targetId: string;
+    relationship: 'child' | 'support' | 'oppose' | 'related' | 'evidence' | 'source' | 'dependency';
+  }): Promise<LegacyApiResponse> {
     return this.request<LegacyApiResponse>('/outline/link', {
       method: 'POST',
       body: JSON.stringify(payload),

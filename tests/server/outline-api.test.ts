@@ -2,6 +2,9 @@ import express from 'express';
 import request from 'supertest';
 
 const mockUpdateChildrenCount = jest.fn();
+const mockRecordEntryRevision = jest.fn();
+const mockLogEntryEvent = jest.fn();
+const mockNotifySubscribers = jest.fn();
 
 const mockDb = {
   Topic: {
@@ -12,6 +15,11 @@ const mockDb = {
     findById: jest.fn(),
     find: jest.fn(),
   },
+  Artifact: { findById: jest.fn(), find: jest.fn() },
+  Question: { findById: jest.fn(), find: jest.fn() },
+  Answer: { findById: jest.fn(), find: jest.fn() },
+  Issue: { findById: jest.fn(), find: jest.fn() },
+  Opinion: { findById: jest.fn(), find: jest.fn() },
   TopicLink: {
     findOne: jest.fn(),
     findOneAndUpdate: jest.fn(),
@@ -20,6 +28,7 @@ const mockDb = {
     findOne: jest.fn(),
     findOneAndUpdate: jest.fn(),
   },
+  ObjectLink: { findOne: jest.fn(), findOneAndUpdate: jest.fn() },
 };
 
 jest.mock('../../server/src/app', () => ({
@@ -30,6 +39,15 @@ jest.mock('../../server/src/app', () => ({
 
 jest.mock('../../server/src/utils/flowUtils', () => ({
   updateChildrenCount: (...args: unknown[]) => mockUpdateChildrenCount(...args),
+}));
+jest.mock('../../server/src/controllers/api/revisionWriteRecorder', () => ({
+  recordEntryRevision: (...args: unknown[]) => mockRecordEntryRevision(...args),
+}));
+jest.mock('../../server/src/services/entryEventsService', () => ({
+  logEntryEvent: (...args: unknown[]) => mockLogEntryEvent(...args),
+}));
+jest.mock('../../server/src/services/notificationsService', () => ({
+  notifySubscribers: (...args: unknown[]) => mockNotifySubscribers(...args),
 }));
 
 const registerOutlineRoutes = require('../../server/src/controllers/api/outline');
@@ -50,7 +68,7 @@ function leanDoc<T>(doc: T) {
   };
 }
 
-function createApp(user?: { id: string; _id: string; username: string } | null) {
+function createApp(user?: { id: string; _id: string; username: string; onboarding?: unknown; canPlayRoleOf?: (role: string) => boolean } | null) {
   const app = express();
   app.use(express.json());
   app.use((req: { session?: Record<string, unknown> }, _res, next) => {
@@ -68,8 +86,16 @@ describe('outline api endpoints', () => {
     jest.clearAllMocks();
     mockDb.Topic.find.mockImplementation(() => chain([]));
     mockDb.Argument.find.mockImplementation(() => chain([]));
+    for (const modelName of ['Artifact', 'Question', 'Answer', 'Issue', 'Opinion'] as const) {
+      mockDb[modelName].findById.mockResolvedValue(null);
+      mockDb[modelName].find.mockImplementation(() => chain([]));
+    }
     mockDb.TopicLink.findOne.mockReturnValue(leanDoc(null));
     mockDb.ArgumentLink.findOne.mockReturnValue(leanDoc(null));
+    mockDb.ObjectLink.findOne.mockReturnValue(leanDoc(null));
+    mockRecordEntryRevision.mockResolvedValue(undefined);
+    mockLogEntryEvent.mockResolvedValue(undefined);
+    mockNotifySubscribers.mockResolvedValue(0);
   });
 
   it('returns topic tree for a root id', async () => {
@@ -89,6 +115,7 @@ describe('outline api endpoints', () => {
     expect(response.body.success).toBe(true);
     expect(response.body.tree.title).toBe('Root Topic');
     expect(response.body.truncated).toBe(false);
+    expect(mockDb.Topic.find).toHaveBeenCalledTimes(1);
   });
 
   it('searches topics and arguments by query', async () => {
@@ -135,15 +162,81 @@ describe('outline api endpoints', () => {
       }),
     );
 
-    const app = createApp({ id: 'user-1', _id: 'user-1', username: 'admin' });
+    const app = createApp({
+      id: 'user-1', _id: 'user-1', username: 'contributor',
+      onboarding: { contributor: { completed: true } }, canPlayRoleOf: () => false,
+    });
     const response = await request(app).post('/outline/link').send({
       parentId: 'topic-parent',
       targetId: 'argument-target',
+      relationship: 'support',
     });
 
     expect(response.status).toBe(201);
     expect(response.body.success).toBe(true);
     expect(mockDb.ArgumentLink.findOneAndUpdate).toHaveBeenCalled();
+    expect(mockDb.ArgumentLink.findOneAndUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ relationship: 'support' }),
+      expect.objectContaining({ relationship: 'support', against: false }),
+      expect.objectContaining({ upsert: true }),
+    );
     expect(mockUpdateChildrenCount).toHaveBeenCalled();
+    expect(mockRecordEntryRevision).toHaveBeenCalledWith(expect.objectContaining({ objectType: 31 }));
+    expect(mockLogEntryEvent).toHaveBeenCalledWith(expect.objectContaining({ eventType: 'graph.relationship.created' }));
+    expect(mockNotifySubscribers).toHaveBeenCalled();
+  });
+
+  it('rejects contributors who have not completed onboarding', async () => {
+    const response = await request(createApp({
+      id: 'user-1', _id: 'user-1', username: 'new-user', onboarding: { contributor: { completed: false } },
+    })).post('/outline/link').send({ parentId: 'topic-parent', targetId: 'argument-target', relationship: 'child' });
+    expect(response.status).toBe(403);
+    expect(response.body.code).toBe('ONBOARDING_REQUIRED');
+  });
+
+  it('does not expose or link a private target owned by another user', async () => {
+    mockDb.Topic.findById
+      .mockResolvedValueOnce({ _id: 'topic-parent', private: false })
+      .mockResolvedValueOnce(null);
+    mockDb.Argument.findById.mockResolvedValueOnce({
+      _id: 'argument-target', private: true, createUserId: 'different-user',
+    });
+    const response = await request(createApp({
+      id: 'user-1', _id: 'user-1', username: 'contributor', onboarding: { contributor: { completed: true } },
+    })).post('/outline/link').send({ parentId: 'topic-parent', targetId: 'argument-target', relationship: 'support' });
+    expect(response.status).toBe(403);
+    expect(mockDb.ArgumentLink.findOneAndUpdate).not.toHaveBeenCalled();
+  });
+
+  it('returns an idempotent duplicate result without new audit activity', async () => {
+    mockDb.Topic.findById
+      .mockResolvedValueOnce({ _id: 'topic-parent' })
+      .mockResolvedValueOnce({ _id: 'topic-target' });
+    mockDb.TopicLink.findOne.mockReturnValueOnce(leanDoc({ _id: 'existing-link', relationship: 'related' }));
+    const response = await request(createApp({
+      id: 'user-1', _id: 'user-1', username: 'contributor', onboarding: { contributor: { completed: true } },
+    })).post('/outline/link').send({ parentId: 'topic-parent', targetId: 'topic-target', relationship: 'related' });
+    expect(response.status).toBe(200);
+    expect(response.body.conflict).toBe('already_linked');
+    expect(mockRecordEntryRevision).not.toHaveBeenCalled();
+  });
+
+  it('creates typed evidence links to accessible artifacts', async () => {
+    mockDb.Topic.findById
+      .mockResolvedValueOnce({ _id: 'topic-parent', private: false })
+      .mockResolvedValueOnce(null);
+    mockDb.Argument.findById.mockResolvedValueOnce(null);
+    mockDb.Artifact.findById.mockResolvedValueOnce({ _id: 'artifact-target', private: false, 'screening.status': 1 });
+    mockDb.ObjectLink.findOneAndUpdate.mockReturnValueOnce(leanDoc({ _id: 'object-link-1', relationship: 'evidence' }));
+    const response = await request(createApp({
+      id: 'user-1', _id: 'user-1', username: 'contributor', onboarding: { contributor: { completed: true } },
+    })).post('/outline/link').send({ parentId: 'topic-parent', targetId: 'artifact-target', relationship: 'evidence' });
+    expect(response.status).toBe(201);
+    expect(response.body.link).toEqual(expect.objectContaining({ objectName: 'objectLink', relationship: 'evidence' }));
+    expect(mockDb.ObjectLink.findOneAndUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({ leftType: 1, rightType: 6, relationship: 'evidence' }),
+      expect.objectContaining({ relationship: 'evidence' }),
+      expect.objectContaining({ upsert: true }),
+    );
   });
 });

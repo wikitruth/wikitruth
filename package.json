@@ -74,6 +74,8 @@
     "migrate:civic-core:apply": "node --env-file-if-exists=.env scripts/migrations/civic-core-tenancy.js --apply",
     "migrate:verdict-votes": "node --env-file-if-exists=.env scripts/migrations/verdict-vote-channels.js",
     "migrate:verdict-votes:apply": "node --env-file-if-exists=.env scripts/migrations/verdict-vote-channels.js --apply",
+    "migrate:graph-relationships": "node --env-file-if-exists=.env scripts/migrations/graph-relationships.js",
+    "migrate:graph-relationships:apply": "node --env-file-if-exists=.env scripts/migrations/graph-relationships.js --apply",
     "setup:local-fixph": "node --env-file-if-exists=.env scripts/setup/local-fixph-tenant.js",
     "setup:local-fixph:clean": "node --env-file-if-exists=.env scripts/setup/local-fixph-tenant.js --clean",
     "setup:local-explore-parity": "node --env-file-if-exists=.env scripts/setup/local-explore-parity.js",

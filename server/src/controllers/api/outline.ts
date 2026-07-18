@@ -2,39 +2,36 @@
 
 import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
-
 import appModForDb from '../../app';
 import constantsMod from '../../models/constants';
+import * as flowUtilsNs from '../../utils/flowUtils';
+import { isOnboardingComplete } from './authHelpers';
+import { logEntryEvent } from '../../services/entryEventsService';
+import { notifySubscribers } from '../../services/notificationsService';
+import { recordEntryRevision } from './revisionWriteRecorder';
+
 const constants = constantsMod as unknown as {
-  OBJECT_TYPES: {
-    topic: number;
-    argument: number;
-  };
-  SCREENING_STATUS: {
-    status0: { code: number };
-    status1: { code: number };
-  };
+  OBJECT_TYPES: Record<string, number>;
+  LINK_TYPES: { child: number; reference: number };
+  SCREENING_STATUS: { status0: { code: number }; status1: { code: number } };
 };
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
-import * as flowUtilsNs from '../../utils/flowUtils';
 const flowUtils = flowUtilsNs as unknown as {
   updateChildrenCount: (entryId: unknown, entryType: unknown, specificEntryType?: unknown) => Promise<void>;
 };
 
-type OutlineTreeNode = {
-  _id: string;
-  objectName: 'topic';
-  title: string;
-  friendlyUrl?: string;
-  children: OutlineTreeNode[];
-};
-
-type TreeBudget = {
-  remaining: number;
-  truncated: boolean;
-};
+const GRAPH_RELATIONSHIPS = ['child', 'support', 'oppose', 'related', 'evidence', 'source', 'dependency'] as const;
+type GraphRelationship = (typeof GRAPH_RELATIONSHIPS)[number];
+type EntryKind = 'topic' | 'argument' | 'artifact' | 'question' | 'answer' | 'issue' | 'opinion';
+type OutlineEntry = { _id: unknown; private?: unknown; createUserId?: unknown; screening?: { status?: unknown }; [key: string]: unknown };
+type ResolvedEntry = { kind: EntryKind; entry: OutlineEntry };
+type OutlineTreeNode = { _id: string; objectName: 'topic'; title: string; friendlyUrl?: string; children: OutlineTreeNode[] };
+type TreeBudget = { remaining: number; truncated: boolean };
 
 const MAX_TREE_NODES = 500;
+const TARGET_MODEL_NAMES: Record<EntryKind, string> = {
+  topic: 'Topic', argument: 'Argument', artifact: 'Artifact', question: 'Question', answer: 'Answer', issue: 'Issue', opinion: 'Opinion',
+};
 
 function escapeRegex(raw: string): string {
   return raw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -42,95 +39,110 @@ function escapeRegex(raw: string): string {
 
 function sanitizeLimit(raw: unknown, fallback = 20, max = 100): number {
   const parsed = Number(raw);
-  if (!Number.isFinite(parsed) || parsed <= 0) {
-    return fallback;
-  }
-  return Math.min(Math.floor(parsed), max);
+  return Number.isFinite(parsed) && parsed > 0 ? Math.min(Math.floor(parsed), max) : fallback;
 }
 
-async function buildTopicTree(topicId: string, depth: number, budget: TreeBudget): Promise<OutlineTreeNode | null> {
-  if (budget.remaining <= 0) {
-    budget.truncated = true;
-    return null;
-  }
-
-  const topic = await db.Topic.findById(topicId).lean();
-  if (!topic) {
-    return null;
-  }
-
-  budget.remaining -= 1;
-
-  const node: OutlineTreeNode = {
-    _id: String(topic._id),
-    objectName: 'topic',
-    title: String(topic.title || ''),
-    friendlyUrl: topic.friendlyUrl || '',
-    children: [],
+function topicNode(topic: Record<string, unknown>): OutlineTreeNode {
+  return {
+    _id: String(topic._id || ''), objectName: 'topic', title: String(topic.title || ''),
+    friendlyUrl: String(topic.friendlyUrl || ''), children: [],
   };
-
-  if (depth <= 0) {
-    return node;
-  }
-
-  const children = await db.Topic.find({
-    parentId: topic._id,
-    private: false,
-    'screening.status': constants.SCREENING_STATUS.status1.code,
-  })
-    .sort({ editDate: -1 })
-    .limit(30)
-    .lean();
-
-  for (const child of children) {
-    const childNode = await buildTopicTree(String(child._id), depth - 1, budget);
-    if (childNode) {
-      node.children.push(childNode);
-    }
-    if (budget.remaining <= 0) {
-      budget.truncated = true;
-      break;
-    }
-  }
-
-  return node;
 }
 
-type OutlineEntry = {
-  _id: unknown;
-  ownerId?: unknown;
-  ownerType?: unknown;
-  [key: string]: unknown;
-};
-
-async function resolveParent(parentId: string): Promise<{
-  kind: 'topic' | 'argument';
-  entry: OutlineEntry;
-} | null> {
-  const topic = await db.Topic.findById(parentId);
-  if (topic) {
-    return { kind: 'topic', entry: topic };
+async function buildTopicForest(roots: Record<string, unknown>[], depth: number, budget: TreeBudget): Promise<OutlineTreeNode[]> {
+  const selectedRoots = roots.slice(0, Math.max(0, budget.remaining));
+  if (selectedRoots.length < roots.length) budget.truncated = true;
+  budget.remaining -= selectedRoots.length;
+  const trees = selectedRoots.map(topicNode);
+  let parents = trees;
+  for (let level = 0; level < depth && parents.length && budget.remaining > 0; level += 1) {
+    const parentById = new Map(parents.map((node) => [node._id, node]));
+    const children = await db.Topic.find({
+      parentId: { $in: Array.from(parentById.keys()) },
+      private: false,
+      'screening.status': constants.SCREENING_STATUS.status1.code,
+    }).sort({ editDate: -1 }).limit(Math.min(MAX_TREE_NODES, budget.remaining + parents.length * 30)).lean();
+    const next: OutlineTreeNode[] = [];
+    const perParent = new Map<string, number>();
+    for (const child of children) {
+      if (budget.remaining <= 0) { budget.truncated = true; break; }
+      const parentId = String(child.parentId || '');
+      const parent = parentById.get(parentId);
+      const count = perParent.get(parentId) || 0;
+      if (!parent || count >= 30) { if (count >= 30) budget.truncated = true; continue; }
+      const node = topicNode(child);
+      parent.children.push(node);
+      next.push(node);
+      perParent.set(parentId, count + 1);
+      budget.remaining -= 1;
+    }
+    parents = next;
   }
-  const argument = await db.Argument.findById(parentId);
-  if (argument) {
-    return { kind: 'argument', entry: argument };
+  if (budget.remaining <= 0) budget.truncated = true;
+  return trees;
+}
+
+async function resolveEntry(id: string, kinds: EntryKind[]): Promise<ResolvedEntry | null> {
+  for (const kind of kinds) {
+    const entry = await db[TARGET_MODEL_NAMES[kind]].findById(id);
+    if (entry) return { kind, entry };
   }
   return null;
 }
 
-async function resolveTarget(targetId: string): Promise<{
-  kind: 'topic' | 'argument';
-  entry: OutlineEntry;
-} | null> {
-  const topic = await db.Topic.findById(targetId);
-  if (topic) {
-    return { kind: 'topic', entry: topic };
-  }
-  const argument = await db.Argument.findById(targetId);
-  if (argument) {
-    return { kind: 'argument', entry: argument };
-  }
-  return null;
+function isAdmin(req: WikitruthRequest): boolean {
+  return Boolean(req.user?.canPlayRoleOf?.('admin'));
+}
+
+function actorId(req: WikitruthRequest): string {
+  return String(req.user?._id || req.user?.id || '');
+}
+
+function canAccess(req: WikitruthRequest, resolved: ResolvedEntry): boolean {
+  const actor = actorId(req);
+  if (isAdmin(req) || String(resolved.entry.createUserId || '') === actor) return true;
+  if (resolved.entry.private === true) return false;
+  const screeningStatus = resolved.entry.screening?.status;
+  return typeof screeningStatus === 'undefined' || Number(screeningStatus) === constants.SCREENING_STATUS.status1.code;
+}
+
+function parseRelationship(value: unknown): GraphRelationship | null {
+  const relationship = String(value || 'child').trim().toLowerCase();
+  return GRAPH_RELATIONSHIPS.includes(relationship as GraphRelationship) ? relationship as GraphRelationship : null;
+}
+
+function relationshipIsCompatible(relationship: GraphRelationship, target: ResolvedEntry): boolean {
+  if (relationship === 'child' || relationship === 'related' || relationship === 'dependency') return true;
+  if (relationship === 'support' || relationship === 'oppose') return target.kind === 'argument';
+  return target.kind === 'artifact';
+}
+
+async function finalizeLink(
+  req: WikitruthRequest,
+  parent: ResolvedEntry,
+  target: ResolvedEntry,
+  relationship: GraphRelationship,
+  link: Record<string, unknown>,
+  objectName: 'topicLink' | 'argumentLink' | 'objectLink',
+): Promise<void> {
+  const objectType = Number(constants.OBJECT_TYPES[objectName]);
+  await recordEntryRevision({ req, objectType, entry: link, source: 'create', summary: `${relationship} graph relationship created` });
+  await logEntryEvent({
+    scope: 'privileged', eventType: 'graph.relationship.created',
+    objectType: Number(constants.OBJECT_TYPES[parent.kind]), objectName: parent.kind, objectId: String(parent.entry._id),
+    actorUserId: actorId(req), actorUsername: String(req.user?.username || ''),
+    message: `${relationship} relationship created to ${target.kind}`,
+    payload: {
+      relationship, linkId: String(link._id || ''), linkObjectName: objectName,
+      targetType: target.kind, targetId: String(target.entry._id || ''), apiClientId: req.apiClient?.id || null,
+    },
+  });
+  await notifySubscribers({
+    target: { objectType: Number(constants.OBJECT_TYPES[parent.kind]), objectName: parent.kind, objectId: String(parent.entry._id) },
+    type: 'graph', trigger: 'reply', title: 'Knowledge graph relationship added',
+    body: `${relationship} relationship added to this entry.`, excludeUserIds: [actorId(req)],
+    payload: { relationship, targetType: target.kind, targetId: String(target.entry._id || '') },
+  });
 }
 
 export = function (router: Router) {
@@ -138,244 +150,116 @@ export = function (router: Router) {
     const rootId = String(req.query.rootId || '').trim();
     const depth = sanitizeLimit(req.query.depth, 2, 4);
     const budget: TreeBudget = { remaining: MAX_TREE_NODES, truncated: false };
-
     if (rootId) {
-      const tree = await buildTopicTree(rootId, depth, budget);
-      if (!tree) {
-        res.status(404).json({ success: false, message: 'Root topic not found' });
-        return;
-      }
+      const root = await db.Topic.findById(rootId).lean();
+      if (!root) { res.status(404).json({ success: false, message: 'Root topic not found' }); return; }
+      const [tree] = await buildTopicForest([root], depth, budget);
       res.json({ success: true, tree, truncated: budget.truncated });
       return;
     }
-
     const roots = await db.Topic.find({
-      parentId: null,
-      private: false,
-      'screening.status': constants.SCREENING_STATUS.status1.code,
-    })
-      .sort({ editDate: -1 })
-      .limit(20)
-      .lean();
-
-    const trees: OutlineTreeNode[] = [];
-    for (const root of roots) {
-      const tree = await buildTopicTree(String(root._id), depth, budget);
-      if (tree) {
-        trees.push(tree);
-      }
-      if (budget.remaining <= 0) {
-        budget.truncated = true;
-        break;
-      }
-    }
-
-    res.json({ success: true, trees, truncated: budget.truncated });
+      parentId: null, private: false, 'screening.status': constants.SCREENING_STATUS.status1.code,
+    }).sort({ editDate: -1 }).limit(20).lean();
+    res.json({ success: true, trees: await buildTopicForest(roots, depth, budget), truncated: budget.truncated });
   });
 
   router.get('/search', async function (req: WikitruthRequest, res: WikitruthResponse) {
     const term = String(req.query.q || '').trim();
     const limit = sanitizeLimit(req.query.limit, 20, 100);
-    const includeTopics = String(req.query.types || '').toLowerCase() !== 'argument';
-    const includeArguments = String(req.query.types || '').toLowerCase() !== 'topic';
-
-    if (!term || term.length < 2) {
-      res.json({ success: true, results: [] });
-      return;
-    }
-
+    const requested = String(req.query.types || 'topic,argument').split(',').map((value) => value.trim());
+    if (term.length < 2) { res.json({ success: true, results: [] }); return; }
     const regex = new RegExp(escapeRegex(term), 'i');
-    const [topics, argumentsList] = await Promise.all([
-      includeTopics
-        ? db.Topic.find({
-            title: regex,
-            private: false,
-            'screening.status': constants.SCREENING_STATUS.status1.code,
-          })
-            .sort({ editDate: -1 })
-            .limit(limit)
-            .lean()
-        : Promise.resolve([]),
-      includeArguments
-        ? db.Argument.find({
-            title: regex,
-            private: false,
-            'screening.status': constants.SCREENING_STATUS.status1.code,
-          })
-            .sort({ editDate: -1 })
-            .limit(limit)
-            .lean()
-        : Promise.resolve([]),
-    ]);
-
-    const results = [
-      ...topics.map((topic: { _id: unknown; title?: unknown; friendlyUrl?: unknown }) => ({
-        _id: String(topic._id),
-        title: String(topic.title || ''),
-        friendlyUrl: topic.friendlyUrl || '',
-        objectName: 'topic',
-      })),
-      ...argumentsList.map((argument: { _id: unknown; title?: unknown; friendlyUrl?: unknown }) => ({
-        _id: String(argument._id),
-        title: String(argument.title || ''),
-        friendlyUrl: argument.friendlyUrl || '',
-        objectName: 'argument',
-      })),
-    ].slice(0, limit);
-
-    res.json({ success: true, results });
+    const kinds = (Object.keys(TARGET_MODEL_NAMES) as EntryKind[]).filter((kind) => requested.includes(kind));
+    const rows = await Promise.all(kinds.map(async (kind) => {
+      const entries = await db[TARGET_MODEL_NAMES[kind]].find({
+        title: regex, private: false, 'screening.status': constants.SCREENING_STATUS.status1.code,
+      }).sort({ editDate: -1 }).limit(limit).lean();
+      return entries.map((entry: Record<string, unknown>) => ({
+        _id: String(entry._id || ''), title: String(entry.title || ''), friendlyUrl: entry.friendlyUrl || '', objectName: kind,
+      }));
+    }));
+    res.json({ success: true, results: rows.flat().slice(0, limit) });
   });
 
   router.post('/link', async function (req: WikitruthRequest, res: WikitruthResponse) {
-    if (!req.user) {
-      res.status(401).json({ success: false, message: 'Authentication required' });
+    if (!req.user) { res.status(401).json({ success: false, message: 'Authentication required' }); return; }
+    if (!isOnboardingComplete(req.user as never, 'contributor')) {
+      res.status(403).json({ success: false, code: 'ONBOARDING_REQUIRED', message: 'Complete contributor onboarding before editing the graph.' });
       return;
     }
-
     const parentId = String(req.body?.parentId || '').trim();
     const targetId = String(req.body?.targetId || '').trim();
-    if (!parentId || !targetId) {
-      res.status(400).json({ success: false, message: 'parentId and targetId are required' });
+    const relationship = parseRelationship(req.body?.relationship);
+    if (!parentId || !targetId || !relationship) {
+      res.status(400).json({ success: false, message: 'parentId, targetId, and a valid relationship are required' });
       return;
     }
-    if (parentId === targetId) {
-      res.status(400).json({ success: false, message: 'Cannot link an entry to itself' });
+    if (parentId === targetId) { res.status(400).json({ success: false, message: 'Cannot link an entry to itself' }); return; }
+    const parent = await resolveEntry(parentId, ['topic', 'argument']);
+    const target = await resolveEntry(targetId, Object.keys(TARGET_MODEL_NAMES) as EntryKind[]);
+    if (!parent || !target) { res.status(404).json({ success: false, message: !parent ? 'Parent entry not found' : 'Target entry not found' }); return; }
+    if (!canAccess(req, parent) || !canAccess(req, target)) {
+      res.status(403).json({ success: false, message: 'The parent or target is not accessible in this context' });
       return;
     }
-
-    const parent = await resolveParent(parentId);
-    if (!parent) {
-      res.status(404).json({ success: false, message: 'Parent entry not found' });
-      return;
-    }
-
-    const target = await resolveTarget(targetId);
-    if (!target) {
-      res.status(404).json({ success: false, message: 'Target entry not found' });
+    if (!relationshipIsCompatible(relationship, target)) {
+      res.status(400).json({ success: false, message: `${relationship} is not compatible with a ${target.kind} target` });
       return;
     }
 
-    const editUserId = req.user.id || req.user._id;
     const now = new Date();
-
-    if (target.kind === 'topic') {
-      if (parent.kind !== 'topic') {
-        res.status(400).json({ success: false, message: 'Topic links require a topic parent' });
-        return;
+    const common = { relationship, editUserId: actorId(req), editDate: now, createUserId: actorId(req), createDate: now };
+    let link: Record<string, unknown>;
+    let objectName: 'topicLink' | 'argumentLink' | 'objectLink';
+    if (target.kind === 'topic' && ['child', 'related', 'dependency'].includes(relationship)) {
+      if (relationship === 'child' && parent.kind !== 'topic') {
+        res.status(400).json({ success: false, message: 'A child topic requires a topic parent' }); return;
       }
-
+      const query = { topicId: target.entry._id, parentId: parent.entry._id, relationship };
+      const existing = await db.TopicLink.findOne(query).lean();
+      if (existing) { res.json({ success: true, created: false, conflict: 'already_linked', link: existing }); return; }
+      link = await db.TopicLink.findOneAndUpdate(query, {
+        ...common, topicId: target.entry._id, parentId: parent.entry._id,
+        ownerId: parent.entry.ownerId || parent.entry._id, ownerType: parent.entry.ownerType || constants.OBJECT_TYPES.topic,
+        linkType: relationship === 'child' ? constants.LINK_TYPES.child : constants.LINK_TYPES.reference,
+        private: Boolean(parent.entry.private || target.entry.private),
+      }, { upsert: true, new: true, setDefaultsOnInsert: true }).lean();
+      objectName = 'topicLink';
+      if (relationship === 'child') await flowUtils.updateChildrenCount(parent.entry._id, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic);
+    } else if (target.kind === 'argument' && ['child', 'support', 'oppose', 'related', 'dependency'].includes(relationship)) {
+      const topicParent = parent.kind === 'topic';
+      const query = topicParent
+        ? { argumentId: target.entry._id, parentId: null, ownerId: parent.entry._id, relationship }
+        : { argumentId: target.entry._id, parentId: parent.entry._id, relationship };
+      const existing = await db.ArgumentLink.findOne(query).lean();
+      if (existing) { res.json({ success: true, created: false, conflict: 'already_linked', link: existing }); return; }
+      link = await db.ArgumentLink.findOneAndUpdate(query, {
+        ...common, argumentId: target.entry._id, parentId: topicParent ? null : parent.entry._id,
+        ownerId: topicParent ? parent.entry._id : parent.entry.ownerId,
+        ownerType: topicParent ? constants.OBJECT_TYPES.topic : parent.entry.ownerType,
+        threadId: topicParent ? null : parent.entry.threadId || parent.entry._id,
+        against: relationship === 'oppose',
+        linkType: relationship === 'child' ? constants.LINK_TYPES.child : constants.LINK_TYPES.reference,
+        private: Boolean(parent.entry.private || target.entry.private),
+      }, { upsert: true, new: true, setDefaultsOnInsert: true }).lean();
+      objectName = 'argumentLink';
+      await flowUtils.updateChildrenCount(parent.entry._id, constants.OBJECT_TYPES[parent.kind], constants.OBJECT_TYPES.argument);
+    } else {
       const query = {
-        topicId: target.entry._id,
-        parentId: parent.entry._id,
+        leftType: constants.OBJECT_TYPES[parent.kind], leftId: parent.entry._id,
+        rightType: constants.OBJECT_TYPES[target.kind], rightId: target.entry._id, relationship,
       };
-      const existingLink = await db.TopicLink.findOne(query).lean();
-      if (existingLink) {
-        res.status(200).json({
-          success: true,
-          created: false,
-          conflict: 'already_linked',
-          message: 'Link already exists',
-          link: {
-            _id: String(existingLink?._id || ''),
-            objectName: 'topicLink',
-            parentId,
-            targetId,
-          },
-        });
-        return;
-      }
-      const payload = {
-        topicId: target.entry._id,
-        parentId: parent.entry._id,
-        ownerId: parent.entry.ownerId || parent.entry._id,
-        ownerType: parent.entry.ownerType || constants.OBJECT_TYPES.topic,
-        editUserId,
-        editDate: now,
-        createUserId: editUserId,
-        createDate: now,
-      };
-
-      const link = await db.TopicLink.findOneAndUpdate(query, payload, {
-        upsert: true,
-        new: true,
-        setDefaultsOnInsert: true,
-      }).lean();
-
-      await flowUtils.updateChildrenCount(parent.entry._id, constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.topic);
-
-      res.status(201).json({
-        success: true,
-        created: true,
-        link: {
-          _id: String(link?._id || ''),
-          objectName: 'topicLink',
-          parentId,
-          targetId,
-        },
-      });
-      return;
+      const existing = await db.ObjectLink.findOne(query).lean();
+      if (existing) { res.json({ success: true, created: false, conflict: 'already_linked', link: existing }); return; }
+      link = await db.ObjectLink.findOneAndUpdate(query, {
+        ...common, ...query, private: Boolean(parent.entry.private || target.entry.private),
+      }, { upsert: true, new: true, setDefaultsOnInsert: true }).lean();
+      objectName = 'objectLink';
     }
-
-    const isTopicParent = parent.kind === 'topic';
-    const argumentQuery = isTopicParent
-      ? {
-          argumentId: target.entry._id,
-          parentId: null,
-          ownerId: parent.entry._id,
-        }
-      : {
-          argumentId: target.entry._id,
-          parentId: parent.entry._id,
-        };
-    const existingArgumentLink = await db.ArgumentLink.findOne(argumentQuery).lean();
-    if (existingArgumentLink) {
-      res.status(200).json({
-        success: true,
-        created: false,
-        conflict: 'already_linked',
-        message: 'Link already exists',
-        link: {
-          _id: String(existingArgumentLink?._id || ''),
-          objectName: 'argumentLink',
-          parentId,
-          targetId,
-        },
-      });
-      return;
-    }
-    const argumentPayload = {
-      argumentId: target.entry._id,
-      parentId: isTopicParent ? null : parent.entry._id,
-      ownerId: isTopicParent ? parent.entry._id : parent.entry.ownerId,
-      ownerType: isTopicParent ? constants.OBJECT_TYPES.topic : parent.entry.ownerType,
-      threadId: isTopicParent ? null : parent.entry.threadId || parent.entry._id,
-      editUserId,
-      editDate: now,
-      createUserId: editUserId,
-      createDate: now,
-    };
-
-    const argumentLink = await db.ArgumentLink.findOneAndUpdate(argumentQuery, argumentPayload, {
-      upsert: true,
-      new: true,
-      setDefaultsOnInsert: true,
-    }).lean();
-
-    await flowUtils.updateChildrenCount(
-      isTopicParent ? parent.entry._id : parent.entry._id,
-      isTopicParent ? constants.OBJECT_TYPES.topic : constants.OBJECT_TYPES.argument,
-      constants.OBJECT_TYPES.argument,
-    );
-
+    await finalizeLink(req, parent, target, relationship, link, objectName);
     res.status(201).json({
-      success: true,
-      created: true,
-      link: {
-        _id: String(argumentLink?._id || ''),
-        objectName: 'argumentLink',
-        parentId,
-        targetId,
-      },
+      success: true, created: true,
+      link: { _id: String(link._id || ''), objectName, parentId, targetId, relationship },
     });
   });
 };

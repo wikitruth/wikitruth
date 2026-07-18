@@ -10,6 +10,7 @@ import registerRoutes from './middlewares/routes';
 import { apiErrorHandler } from './middlewares/apiError';
 import { createCsrfProtection } from './middlewares/csrfProtection';
 import { civicCors } from './middlewares/civicCors';
+import { authenticateApiClient } from './middlewares/apiClientAuthentication';
 
 import contents from './models/contents';
 import templates from './models/templates';
@@ -159,13 +160,15 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(authenticateApiClient);
 const csrfConfig = config.csrf || {};
 const csrfCookie = csrfConfig.cookie || {};
 const csrfProtection = createCsrfProtection({
     ignoreMethods: Array.isArray(csrfConfig.ignoreMethods) ? csrfConfig.ignoreMethods : ['GET', 'HEAD', 'OPTIONS'],
     // Runtime error beacons may come from sendBeacon and cannot reliably attach CSRF headers.
     skip: function (req) {
-        return /^\/api\/(?:v1\/)?monitoring\/(?:errors|csp)\/?$/.test(req.path);
+        return Boolean((req as { apiClient?: unknown }).apiClient)
+            || /^\/api\/(?:v1\/)?monitoring\/(?:errors|csp)\/?$/.test(req.path);
     },
     cookie: {
         signed: csrfCookie.signed !== false,

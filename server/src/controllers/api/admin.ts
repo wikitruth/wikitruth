@@ -18,6 +18,7 @@ import constants from '../../models/constants';
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 import { registerAdminBackupRoutes } from './adminBackupRoutes';
 import { logEntryEvent } from '../../services/entryEventsService';
+import { registerAdminApiClientRoutes } from './adminApiClientRoutes';
 
 function ensureAdmin(req: WikitruthRequest, res: WikitruthResponse): boolean {
   if (!req.user || !req.user.canPlayRoleOf || !req.user.canPlayRoleOf('admin')) {
@@ -123,6 +124,7 @@ function encryptPassword(password: string): Promise<string> {
 }
 
 export = function (router: Router) {
+  registerAdminApiClientRoutes(router, ensureAdmin);
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAdmin(req, res)) {
       return;

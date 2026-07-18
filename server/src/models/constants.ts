@@ -355,6 +355,7 @@ const OBJECT_TYPES = {
   jurisdiction: 42,
   tenantMembership: 43,
   civicEntryLink: 44,
+  objectLink: 45,
   user: 21,
   group: 30,
 };
@@ -404,6 +405,7 @@ const constants = {
     42: 'jurisdictions',
     43: 'tenantMemberships',
     44: 'civicEntryLinks',
+    45: 'objectLinks',
   },
   OBJECT_ID_NAME_MAP: {
     1: 'topic',
@@ -418,6 +420,7 @@ const constants = {
     42: 'jurisdiction',
     43: 'tenantMembership',
     44: 'civicEntryLink',
+    45: 'objectLink',
   },
   OBJECT_FORMAL_NAME_MAP: {
     1: 'Topic',

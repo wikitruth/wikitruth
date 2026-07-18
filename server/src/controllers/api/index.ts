@@ -36,11 +36,14 @@ import attachCivic from './civic';
 import { registerEntryRedirectMiddleware } from './entryRedirectMiddleware';
 import constants from '../../models/constants';
 import { requireContributorOnboarding } from '../../middlewares/onboarding';
+import { enforceApiClientScope } from '../../middlewares/apiClientScopes';
+import attachAgent from './agent';
 
 export = function (router: Router) {
   router.use(apiError.apiEnvelopeMiddleware);
   router.use(mobileContracts.mobileApiContractMiddleware);
   router.use(sanitizeContentMiddleware);
+  router.use(enforceApiClientScope);
 
   const homeRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const applicationContextRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
@@ -69,9 +72,11 @@ export = function (router: Router) {
   const anonymousContributionsRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const civicRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const explicitCivicRouter = apiError.wrapAsyncRouter(express.Router({ mergeParams: true })) as Router;
+  const agentRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
 
   [topicsRouter, argumentsRouter, questionsRouter, answersRouter, issuesRouter, opinionsRouter, artifactsRouter]
     .forEach((entryRouter) => entryRouter.use(requireContributorOnboarding));
+  outlineRouter.use(requireContributorOnboarding);
 
   attachHome(homeRouter);
   attachApplicationContext(applicationContextRouter);
@@ -106,6 +111,7 @@ export = function (router: Router) {
   attachPages(pagesRouter);
   attachAnonymousContributions(anonymousContributionsRouter);
   [civicRouter, explicitCivicRouter].forEach(attachCivic);
+  attachAgent(agentRouter);
 
   router.use('/home', homeRouter);
   router.use('/application-context', applicationContextRouter);
@@ -134,4 +140,5 @@ export = function (router: Router) {
   router.use('/anonymous-contributions', anonymousContributionsRouter);
   router.use('/civic', civicRouter);
   router.use('/tenants/:tenantId/civic', explicitCivicRouter);
+  router.use('/agent', agentRouter);
 };

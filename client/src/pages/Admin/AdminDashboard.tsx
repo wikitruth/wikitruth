@@ -130,6 +130,15 @@ const AdminDashboard: React.FC = () => {
       {!isLoading && !error && counts ? (
         <div className="row">
           <div className="col-sm-3">
+            <div className="panel panel-primary">
+              <div className="panel-heading">Agent API</div>
+              <div className="panel-body">
+                <p className="text-muted" style={{ marginBottom: 10 }}>Issue scoped, accountable credentials for software agents.</p>
+                <Link to="/admin/api-clients" className="btn btn-primary btn-xs">Manage Credentials</Link>
+              </div>
+            </div>
+          </div>
+          <div className="col-sm-3">
             <div className="panel panel-default">
               <div className="panel-heading">Users</div>
               <div className="panel-body">

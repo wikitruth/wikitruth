@@ -102,6 +102,7 @@ const CivicRecordPage = lazy(() => import('../pages/Civic/CivicRecordPage'));
 const CivicTenantsPage = lazy(() => import('../pages/Admin/CivicTenants/CivicTenantsPage'));
 const CivicOperationsPage = lazy(() => import('../pages/Admin/CivicOperations/CivicOperationsPage'));
 const PolicyCenterPage = lazy(() => import('../pages/PolicyCenterPage'));
+const ApiClientsPage = lazy(() => import('../pages/Admin/ApiClients/ApiClientsPage'));
 
 export interface AppRoute {
   path: string;
@@ -143,6 +144,7 @@ export const appRoutes: AppRoute[] = [
   { path: '/admin/anonymous-contributions', element: protectedRoute(<AnonymousContributionsPage />, ['screener', 'reviewer', 'admin']) },
   { path: '/admin/civic-tenants', element: protectedRoute(<CivicTenantsPage />, ['admin']) },
   { path: '/admin/civic-operations', element: protectedRoute(<CivicTenantProvider><CivicOperationsPage /></CivicTenantProvider>) },
+  { path: '/admin/api-clients', element: protectedRoute(<ApiClientsPage />, ['admin']) },
   { path: '/civic', element: <CivicTenantProvider><CivicWorkspacePage /></CivicTenantProvider> },
   { path: '/civic/:section', element: <CivicTenantProvider><CivicWorkspacePage /></CivicTenantProvider> },
   { path: '/civic/records/:id', element: <CivicTenantProvider><CivicRecordPage /></CivicTenantProvider> },

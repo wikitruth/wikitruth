@@ -28,6 +28,8 @@ export async function captureEntryRevision(options: {
   summary?: string;
   actorId?: string | null;
   actorUsername?: string | null;
+  apiClientId?: string | null;
+  apiClientName?: string | null;
 }): Promise<RevisionRecord> {
   const snapshot = toSnapshot(options.entry);
   const snapshotHash = sha256IntegrityHash(snapshot);
@@ -58,6 +60,8 @@ export async function captureEntryRevision(options: {
       changedFields: changedFields(latest?.snapshot || null, snapshot),
       createUserId: options.actorId || null,
       createUsername: options.actorUsername || '',
+      apiClientId: options.apiClientId || null,
+      apiClientName: options.apiClientName || '',
     });
     if (!['bootstrap', 'create'].includes(options.source)) {
       await markCommentsPotentiallyObsolete({
@@ -66,6 +70,17 @@ export async function captureEntryRevision(options: {
         revisionId: String(revision._id || ''),
         revisionNumber,
         reason: `Entry changed in revision ${revisionNumber}`,
+      });
+    }
+    if (options.apiClientId) {
+      await logEntryEvent({
+        eventType: 'agent.contribution.revision',
+        objectType: options.objectType,
+        objectId: options.objectId,
+        actorUserId: options.actorId || null,
+        actorUsername: options.actorUsername || '',
+        message: `${options.apiClientName || 'Agent'} created revision ${revisionNumber}`,
+        payload: { apiClientId: options.apiClientId, apiClientName: options.apiClientName || '', revisionNumber, source: options.source },
       });
     }
     return revision;
@@ -134,6 +149,8 @@ export async function listEntryRevisions(options: {
       createDate: record.createDate,
       createUserId: record.createUserId || null,
       createUsername: record.createUsername || '',
+      apiClientId: record.apiClientId || null,
+      apiClientName: record.apiClientName || '',
     })),
   };
 }

@@ -24,6 +24,7 @@ export async function recordEntryRevision(options: {
     summary: options.summary,
     actorId: String(options.req.user?.id || options.req.user?._id || '') || null,
     actorUsername: String(options.req.user?.username || ''),
+    apiClientId: options.req.apiClient?.id || null,
+    apiClientName: options.req.apiClient?.name || '',
   });
 }
-

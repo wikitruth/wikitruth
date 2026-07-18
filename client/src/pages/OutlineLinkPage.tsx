@@ -23,12 +23,25 @@ type TopicTreeNode = {
   children?: TopicTreeNode[];
 };
 
+type GraphRelationship = 'child' | 'support' | 'oppose' | 'related' | 'evidence' | 'source' | 'dependency';
+
+const RELATIONSHIPS: Array<{ value: GraphRelationship; label: string }> = [
+  { value: 'child', label: 'Child: belongs under the parent' },
+  { value: 'support', label: 'Support: provides a supporting claim' },
+  { value: 'oppose', label: 'Oppose: provides a counterclaim' },
+  { value: 'related', label: 'Related: useful contextual connection' },
+  { value: 'evidence', label: 'Evidence: artifact substantiates the parent' },
+  { value: 'source', label: 'Source: artifact is a source for the parent' },
+  { value: 'dependency', label: 'Dependency: parent depends on the target' },
+];
+
 const OutlineLinkPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const parentId = searchParams.get('parentId') || '';
   const parentTitle = searchParams.get('parentTitle') || '';
   const [targetId, setTargetId] = useState('');
+  const [relationship, setRelationship] = useState<GraphRelationship>('child');
   const [searchTerm, setSearchTerm] = useState('');
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<OutlineSearchItem[]>([]);
@@ -119,6 +132,7 @@ const OutlineLinkPage: React.FC = () => {
       await apiService.createOutlineLink({
         parentId,
         targetId: selectedTargetId,
+        relationship,
       });
       setSuccess(true);
       setTimeout(() => navigate(-1), 1200);
@@ -256,6 +270,18 @@ const OutlineLinkPage: React.FC = () => {
               placeholder="Enter or pick the ID of the entry to link"
               required
             />
+            <div className="form-group">
+              <label htmlFor="outline-relationship">Relationship</label>
+              <select
+                id="outline-relationship"
+                className="form-control"
+                value={relationship}
+                onChange={(event) => setRelationship(event.target.value as GraphRelationship)}
+              >
+                {RELATIONSHIPS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+              </select>
+              <p className="help-block">Evidence and source relationships require an artifact target; support and oppose require an argument.</p>
+            </div>
             {selectedTarget ? (
               <p className="text-muted">
                 Selected target: <strong>{selectedTarget.title}</strong> ({selectedTarget.objectName})

@@ -1,6 +1,7 @@
 import type { RequestContextUser, ApplicationDefinition } from './domain';
 import type { WikitruthSessionData } from './http';
 import type { CivicTenantDefinition } from './civicTenancy';
+import type { ApiClientIdentity } from '../services/apiClientService';
 
 declare global {
   namespace Express {
@@ -9,6 +10,7 @@ declare global {
     interface Request {
       requestId?: string;
       civicTenant?: CivicTenantDefinition;
+      apiClient?: ApiClientIdentity;
       user?: RequestContextUser;
       csrfToken(): string;
       session: import('express-session').Session &

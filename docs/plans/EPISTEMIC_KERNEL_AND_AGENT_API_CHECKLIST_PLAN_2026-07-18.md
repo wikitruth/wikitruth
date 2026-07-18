@@ -11,8 +11,8 @@ auditable contributions through the same moderation lifecycle as people.
 
 - [x] Consensus remains the normal decision path; administrator overrides are explicit exceptions, never silent edits.
 - [x] Every final decision and override records reasoning, evidence, policy version, actor, timestamp, and audit history.
-- [ ] Agent credentials are hashed, scoped, revocable, rate-limited, and attached to a real accountable user identity.
-- [ ] Agent contributions start pending and receive no automatic screening or verdict privileges.
+- [x] Agent credentials are hashed, scoped, revocable, rate-limited, and attached to a real accountable user identity.
+- [x] Agent contributions start pending and receive no automatic screening or verdict privileges.
 - [x] Do not deploy to production or modify VPS, proxy, DNS, or production process state.
 - [x] Keep legacy rendering and React Native explicitly deferred.
 - [x] Keep source files within the repository size rule wherever practical.
@@ -46,22 +46,22 @@ auditable contributions through the same moderation lifecycle as people.
 
 ## 4. Governed Knowledge Graph
 
-- [ ] Require contributor role and onboarding for outline link creation.
-- [ ] Add privacy/context validation and prevent links to inaccessible targets.
-- [ ] Record graph revisions, privileged audit events, and subscriber notifications.
-- [ ] Add typed relationship semantics for child, support, oppose, related, evidence, source, and dependency links.
-- [ ] Cover unauthorized, duplicate, private-target, and successful graph mutations with tests.
+- [x] Require contributor role and onboarding for outline link creation.
+- [x] Add privacy/context validation and prevent links to inaccessible targets.
+- [x] Record graph revisions, privileged audit events, and subscriber notifications.
+- [x] Add typed relationship semantics for child, support, oppose, related, evidence, source, and dependency links.
+- [x] Cover unauthorized, duplicate, private-target, and successful graph mutations with tests.
 
 ## 5. Scoped Agent Contribution APIs
 
-- [ ] Add a dedicated API-client credential model with hashed token secret, prefix, scopes, status, expiry, use metadata, and rate policy.
-- [ ] Add administrator create/list/rotate/revoke APIs; return raw secrets only once.
-- [ ] Authenticate API clients before CSRF evaluation and attach their accountable user identity to the request.
-- [ ] Enforce least-privilege scopes across read, contribution, graph, civic, moderation, and administration operations.
-- [ ] Expose agent capability and identity endpoints under `/api/v1/agent/*`.
-- [ ] Permit scoped agents to use the standard seven entry contribution endpoints with pending screening and normal duplicate/onboarding checks.
-- [ ] Record API-client identity in revisions and audit events without exposing secrets.
-- [ ] Add per-client rate limiting, expiry, revocation, and last-used tracking.
+- [x] Add a dedicated API-client credential model with hashed token secret, prefix, scopes, status, expiry, use metadata, and rate policy.
+- [x] Add administrator create/list/rotate/revoke APIs; return raw secrets only once.
+- [x] Authenticate API clients before CSRF evaluation and attach their accountable user identity to the request.
+- [x] Enforce least-privilege scopes across read, contribution, graph, civic, moderation, and administration operations.
+- [x] Expose agent capability and identity endpoints under `/api/v1/agent/*`.
+- [x] Permit scoped agents to use the standard seven entry contribution endpoints with pending screening and normal duplicate/onboarding checks.
+- [x] Record API-client identity in revisions and audit events without exposing secrets.
+- [x] Add per-client rate limiting, expiry, revocation, and last-used tracking.
 - [ ] Publish complete OpenAPI schemas, examples, and an agent integration runbook.
 
 ## 6. Generic Civic Tenant Extensions

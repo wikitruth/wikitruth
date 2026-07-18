@@ -182,6 +182,29 @@ describe('entry revision and change-request service', () => {
     expect(mockRevisions.at(-1)).toEqual(expect.objectContaining({ source: 'change_request' }));
   });
 
+  it('stores API client attribution and emits an agent revision event', async () => {
+    await captureEntryRevision({
+      objectType: 1,
+      objectId: 'topic-1',
+      entry: { ...mockCurrentEntry },
+      source: 'create',
+      summary: 'Agent-created topic',
+      actorId: 'user-1',
+      actorUsername: 'accountable-user',
+      apiClientId: '507f1f77bcf86cd799439011',
+      apiClientName: 'Research agent',
+    });
+    expect(mockRevisions[0]).toEqual(expect.objectContaining({
+      apiClientId: '507f1f77bcf86cd799439011', apiClientName: 'Research agent',
+    }));
+    expect(mockLogEntryEvent).toHaveBeenCalledWith(expect.objectContaining({
+      eventType: 'agent.contribution.revision',
+      payload: expect.objectContaining({ apiClientName: 'Research agent', revisionNumber: 1 }),
+    }));
+    const history = await listEntryRevisions({ objectType: 1, objectId: 'topic-1' });
+    expect(history.revisions[0]).toEqual(expect.objectContaining({ apiClientName: 'Research agent' }));
+  });
+
   it('marks a request stale when a newer revision exists', async () => {
     const request = await createChangeRequest({
       objectType: 1,
