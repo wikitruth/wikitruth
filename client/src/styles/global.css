@@ -264,6 +264,15 @@ button:focus-visible,
 }
 
 @media (max-width: 767px) {
+  .wt-explore-tabs {
+    display: flex;
+  }
+
+  .wt-explore-tabs > li {
+    float: none;
+    width: 12.5%;
+  }
+
   .wt-explore-advanced-filters {
     display: none;
   }
@@ -273,8 +282,10 @@ button:focus-visible,
   }
 
   .wt-explore-tabs > li > a {
+    margin-right: 0;
     padding-right: 9px;
     padding-left: 9px;
+    text-align: center;
   }
 }
 
