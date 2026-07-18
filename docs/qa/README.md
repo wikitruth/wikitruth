@@ -2,6 +2,7 @@
 
 ## Active QA and Parity Artifacts
 
+- Epistemic governance flagship pilot: `docs/qa/EPISTEMIC_FLAGSHIP_PILOT_2026-07-18.md`
 - Current deep visual/feature audit: `docs/qa/LEGACY_MODERN_LIVE_VISUAL_AUDIT_2026-07-15.md`
 - Tenant application shell signoff: `docs/qa/TENANT_APPLICATION_SHELL_SIGNOFF_2026-07-16.md`
 - Final local modernization signoff: `docs/qa/MODERNIZATION_LOCAL_SIGNOFF_2026-07-13.md`
@@ -24,5 +25,6 @@
 - Latest runtime evidence bundle: `docs/qa/LEGACY_MODERN_RUNTIME_EVIDENCE_SUMMARY_2026-04-22.md`
 - Authenticated parity automation script: `scripts/qa/migration-authenticated-parity.mjs`
 - Disposable authenticated civic Chrome runner: `scripts/qa/run-disposable-civic-browser.mjs`
+- Disposable epistemic workflow runner: `scripts/qa/epistemic-flagship-pilot.mjs`
 - Test-credential setup script: `scripts/qa/setup-parity-test-creds.mjs`
 - Test-credential setup runbook: `docs/qa/PARITY_TEST_CREDENTIALS_RUNBOOK_2026-04-22.md`

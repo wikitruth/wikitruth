@@ -1,0 +1,152 @@
+{
+  "result": "PASS",
+  "generatedAt": "2026-07-18T09:08:07.810Z",
+  "baseUrl": "https://127.0.0.1:9443",
+  "policyVersion": "2026-07-v2",
+  "fixture": {
+    "token": "mrq595fqe81145",
+    "identities": 5,
+    "topic": 1,
+    "claim": 1,
+    "artifacts": 2,
+    "criticalIssues": 1,
+    "civicRecords": 1
+  },
+  "steps": [
+    "disposable-identities-and-epistemic-fixture-created",
+    "admin-reviewer-reader-sessions-authenticated",
+    "initial-audit-chain-valid",
+    "provenance-and-source-quality-reviewed",
+    "accepted-critical-issue-resolved",
+    "factual-consensus-published",
+    "ethical-consensus-published",
+    "admin-final-say-and-reversal",
+    "reader-signal-and-appeal",
+    "tenant-scoped-civic-evidence-link",
+    "revision-history-and-final-audit-verified"
+  ],
+  "evidence": {
+    "agreement": {
+      "factual": {
+        "channel": "factual",
+        "policyVersion": "2026-07-v2",
+        "totalVotes": 3,
+        "eligibleVotes": 3,
+        "excludedConflictVotes": 0,
+        "abstentions": 0,
+        "threshold": 2,
+        "leadingStatus": "supported",
+        "leadingCount": 3,
+        "leadingRatio": 1,
+        "leadingAverageConfidence": 90,
+        "reached": true,
+        "counts": [
+          {
+            "status": "supported",
+            "count": 3
+          }
+        ],
+        "consensusReached": true,
+        "consensusStatus": "supported"
+      },
+      "ethical": {
+        "channel": "ethical",
+        "policyVersion": "2026-07-v2",
+        "totalVotes": 3,
+        "eligibleVotes": 3,
+        "excludedConflictVotes": 0,
+        "abstentions": 0,
+        "threshold": 2,
+        "leadingStatus": "permissible",
+        "leadingCount": 3,
+        "leadingRatio": 1,
+        "leadingAverageConfidence": 90,
+        "reached": true,
+        "counts": [
+          {
+            "status": "permissible",
+            "count": 3
+          }
+        ],
+        "consensusReached": true,
+        "consensusStatus": "permissible"
+      }
+    },
+    "decisionPath": [
+      "factual consensus: supported",
+      "ethical consensus: permissible",
+      "administrator override: refuted",
+      "administrator reversal: supported"
+    ],
+    "provenanceCoverage": {
+      "artifacts": 2,
+      "reviewedArtifacts": 2,
+      "evidenceRefsPerVote": 2
+    },
+    "revisions": {
+      "total": 4,
+      "summaries": [
+        "Factual verdict set by administrator final say",
+        "Factual verdict set by administrator final say",
+        "Ethical verdict published by consensus",
+        "Factual verdict published by consensus"
+      ]
+    },
+    "unresolvedIssues": 0,
+    "feedback": {
+      "signalId": "6a5b4276f017a765ae19fa0f",
+      "appealId": "6a5b4276f017a765ae19fa16"
+    },
+    "civicEvidenceLinkId": "6a5b4276a09753ceec21dee8",
+    "audit": {
+      "before": {
+        "valid": true,
+        "verifiedEvents": 59,
+        "legacyEvents": 0,
+        "headSequence": 59,
+        "headHash": "fe56d0b880db22e52ac69504890d40175fbd0c5b016ac36fdeb02e6de80df982",
+        "brokenAtSequence": null,
+        "reason": null
+      },
+      "after": {
+        "valid": true,
+        "verifiedEvents": 67,
+        "legacyEvents": 0,
+        "headSequence": 67,
+        "headHash": "b0e640d78622840275ef35aca08d68df9e4026efa62945e300fce3f39218e2e9",
+        "brokenAtSequence": null,
+        "reason": null
+      }
+    }
+  },
+  "cleanup": {
+    "mutableFixtureResidue": {
+      "civicentrylinks": 0,
+      "verdictvotes": 0,
+      "readersignals": 0,
+      "appeals": 0,
+      "entryrevisions": 0,
+      "entryrevisioncounters": 0,
+      "notifications": 0,
+      "reputationsnapshots": 0,
+      "realtimeevents": 0,
+      "tenantmemberships": 0,
+      "civicrecords": 0,
+      "issues": 0,
+      "artifacts": 0,
+      "arguments": 0,
+      "topics": 0,
+      "sessions": 0,
+      "users": 0,
+      "accounts": 0,
+      "admins": 0
+    },
+    "immutableEventEvidenceRetained": true,
+    "credentialsRetained": false
+  },
+  "operatingWork": [
+    "Seed real-world evidence with non-test provenance.",
+    "Recruit and onboard independent subject-matter reviewers."
+  ],
+  "error": null
+}

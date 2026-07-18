@@ -88,15 +88,15 @@ auditable contributions through the same moderation lifecycle as people.
 
 ## 8. Flagship Epistemic Workflow Pilot
 
-- [ ] Create an idempotent disposable pilot fixture with a topic, claim, artifacts, provenance, source-quality reviews, issue, and reviewers.
-- [ ] Exercise channel votes, consensus publication, administrator override, override reversal, revision history, reader signal, appeal, and civic evidence link.
-- [ ] Verify audit-chain integrity and cleanup every disposable identity and record.
-- [ ] Report agreement, decision path, provenance coverage, revisions, unresolved issues, and cleanup evidence.
-- [ ] Keep real-world content seeding and reviewer recruitment as explicit operating work rather than fabricated completion.
+- [x] Create an idempotent disposable pilot fixture with a topic, claim, artifacts, provenance, source-quality reviews, issue, and reviewers.
+- [x] Exercise channel votes, consensus publication, administrator override, override reversal, revision history, reader signal, appeal, and civic evidence link.
+- [x] Verify audit-chain integrity and cleanup every disposable identity and record.
+- [x] Report agreement, decision path, provenance coverage, revisions, unresolved issues, and cleanup evidence.
+- [x] Keep real-world content seeding and reviewer recruitment as explicit operating work rather than fabricated completion.
 
 ## 9. Verification and Closure
 
-- [ ] Run focused server/client suites after each implementation group.
+- [x] Run focused server/client suites after each implementation group.
 - [ ] Run full server and client suites, lint, type checks, source guardrails, and production builds.
 - [ ] Run OpenAPI, accessibility, SEO, load, audit-chain, policy-pilot, and flagship-pilot checks.
 - [ ] Restart and verify only the local PM2 Wikitruth process if runtime verification requires it.
