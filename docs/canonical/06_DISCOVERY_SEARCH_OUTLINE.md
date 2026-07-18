@@ -27,6 +27,8 @@ Define how users discover and navigate knowledge graph content.
 - topic-to-topic links via `TopicLink`
 - topic/argument to argument links via `ArgumentLink`
 - Link operations trigger children-count updates.
+- Link mutations require contributor onboarding and, for API clients, `graph:write` scope.
+- Link mutations validate visibility and relationship semantics and produce revision/audit evidence.
 
 ## Routing Surface (Modern Client)
 

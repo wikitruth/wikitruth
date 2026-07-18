@@ -19,6 +19,7 @@ This folder contains active engineering documentation, planning docs, and histor
 ## Architecture Decisions
 
 - ADR index: `docs/adr/README.md`
+- Epistemic kernel and agent API architecture: `docs/architecture/EPISTEMIC_KERNEL_AND_AGENT_API_ARCHITECTURE.md`
 
 ## Strategy Docs
 

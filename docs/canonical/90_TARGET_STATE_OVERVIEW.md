@@ -19,5 +19,5 @@ Capture the intended future-state direction for Wikitruth, including unimplement
 
 ## Target State Status
 
-- This card is an active directional product contract. Its governance, traceability, lifecycle, and truth-versus-ethics foundations are implemented; content quality, calibration, and operating adoption remain ongoing.
+- This card is an active directional product contract. Governance, traceability, lifecycle, and truth-versus-ethics foundations are implemented, while channel-specific consensus hardening, durable reputation calibration, content quality, and operating adoption are active work under the 2026-07-18 epistemic-kernel plan.
 - Source baseline: `docs/system-reference/01_SYSTEM_OVERVIEW_AND_PRINCIPLES.md`.

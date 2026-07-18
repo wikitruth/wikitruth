@@ -21,6 +21,10 @@ The ethical channel asks how an action or position should be evaluated under an 
 - A factual verdict cannot be inferred from ethical approval or disapproval.
 - An ethical verdict cannot be inferred from factual truth or falsity.
 - Each channel stores its own status, reasoning, votes, reviewer, decision date, and evidence references.
+- Consensus is the normal final-decision path and is computed independently for each channel under a versioned policy.
+- Conflicted votes remain visible for audit but do not count toward consensus; abstentions do not count toward a status majority.
+- An administrator may make the final decision through an explicit override that records the reason, evidence, policy version, available consensus snapshot, actor, and date.
+- Administrator overrides must be visibly labeled and remain reversible through a later revision; they never rewrite or hide prior consensus.
 - Legacy verdict fields remain readable during migration and map only to the factual channel.
 - Automatic unresolved-content expiry is disabled until a separate approved policy defines thresholds, notices, exceptions, and administrator overrides.
 - Critical unresolved issues block a final factual verdict only after the issue-first gate and exception process are implemented.
@@ -29,3 +33,4 @@ The ethical channel asks how an action or position should be evaluated under an 
 
 User interfaces must label both channels explicitly, show `Not reviewed` instead of implying a default result, and display the reasoning and evidence associated with the selected channel.
 
+Consensus decisions and administrator final-say decisions must be visually distinct. Minority and excluded vote reasoning remains available to reviewers and administrators.

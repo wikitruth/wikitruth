@@ -29,6 +29,7 @@ Define the reusable civic-accountability platform contract that powers FixPH and
 - Country and jurisdiction assumptions are configuration, not hardcoded UI or schema defaults.
 - Configuration includes ISO country code, locale, timezone, currency, geography labels, domains, branding, navigation, feature flags, and policy version.
 - Common civic fields remain typed; country-specific extensions require a tenant-owned validated schema.
+- Tenant extension schemas are declarative data contracts, never executable code, and civic records store only values that pass the resolved tenant schema.
 
 ## Delivery Contract
 
@@ -38,7 +39,7 @@ Define the reusable civic-accountability platform contract that powers FixPH and
 
 ## Target State Status
 
-- `implemented` and locally verified on 2026-07-13.
+- Core tenancy is `implemented`; validated tenant record extensions and country-neutral persistence defaults are active hardening work under the 2026-07-18 epistemic-kernel plan.
 - FixPH is the first persisted compatibility tenant; shared, dedicated, and headless profiles use the same models and APIs.
 - A fictional second tenant verified country, currency, geography, branding, navigation, isolation, and responsive rendering.
 - Detailed architecture: `docs/architecture/CIVIC_CORE_MULTI_TENANCY_ARCHITECTURE.md`.

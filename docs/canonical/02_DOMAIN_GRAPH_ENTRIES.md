@@ -35,8 +35,12 @@ Define the core knowledge graph objects and how they relate.
 
 - `Topic`, `Argument`, and `Answer` support independently queryable factual and ethical verdict channels with reasoning, evidence references, editor, and date metadata.
 - Factual channel updates preserve the legacy verdict projection for compatibility.
-- Reviewer votes and deterministic consensus summaries are separate from the persisted final channel state.
+- Reviewer votes and deterministic consensus summaries are channel-specific.
+- Consensus is the normal final-decision source; an explicitly labeled and audited administrator override may publish the final channel state.
+- Final channel state preserves decision mode, policy version, decision provenance, and the available consensus snapshot.
 
 ## Graph Invariant
 
 Entries are not flat records. Every entry is expected to be in a context (topic, argument thread, group, or user/journal ownership) and that context drives visibility, routing, and child-count aggregation.
+
+Graph links are governed content mutations. Creation requires contributor authorization and onboarding, and successful changes create revision and audit evidence.

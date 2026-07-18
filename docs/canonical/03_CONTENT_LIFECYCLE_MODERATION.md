@@ -20,6 +20,10 @@ Capture the canonical lifecycle of submitted content and moderation flow.
 ## Verdict Lifecycle
 
 - Factual and ethical verdict channels apply to `Topic`, `Argument`, and `Answer`.
+- Reviewers submit independent factual or ethical votes with reasoning, evidence, confidence, expertise, conflict declaration, and policy version.
+- A versioned quorum and supermajority policy determines channel consensus.
+- Reaching valid consensus may publish the final channel decision after applicable issue-first gates pass.
+- Administrators may make a reasoned final-say override; overrides are explicit, visible, revisioned, and tamper-evident.
 - Verdict-channel updates and reviewer votes require reviewer/admin privileges and completed reviewer onboarding where applicable.
 - Final factual verdicts are blocked by accepted critical issues unless the issue is resolved or an audited administrator override is supplied.
 - Verdict queue supports:
