@@ -40,3 +40,9 @@ Define how users discover and navigate knowledge graph content.
 ## Discovery Invariant
 
 Discovery surfaces must remain moderation-aware and privacy-aware, so accepted/public content is the default public experience while private and pending views remain explicit.
+
+## Search Engine Contract
+
+- `/sitemap.xml` and `/robots.txt` are generated for the active request host and never publish the retired `/app` prefix.
+- Root, core entry, and active civic-tenant URLs are included; private records are excluded.
+- The initial HTML for public entry and civic detail routes contains record-specific title, description, canonical URL, OpenGraph metadata, and structured data before React loads.

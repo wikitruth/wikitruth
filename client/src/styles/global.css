@@ -105,21 +105,16 @@
   text-decoration: none;
 }
 
-/* Suppress default browser focus ring for links/buttons to match legacy UI behavior. */
-a:focus,
+/* Keep keyboard location unmistakable without adding a ring to pointer clicks. */
 a:focus-visible,
-button:focus,
 button:focus-visible,
-[role='button']:focus,
 [role='button']:focus-visible,
-.btn:focus,
 .btn:focus-visible,
-.btn-link:focus,
 .btn-link:focus-visible,
-.nav > li > a:focus,
 .nav > li > a:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
+  outline: 3px solid #0b6b9c !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 2px #fff !important;
 }
 
 .wt-context-sidebar .wt-nav.nav {

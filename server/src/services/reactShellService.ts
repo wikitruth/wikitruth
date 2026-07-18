@@ -5,6 +5,7 @@ import type { ApplicationDefinition } from '../types/domain';
 import type { CivicTenantDefinition } from '../types/civicTenancy';
 import applicationsMod from '../models/applications';
 import { builtInCivicTenant } from '../config/civicTenants';
+import { resolveReactShellMetadata } from './reactShellMetadataService';
 
 const shellPath = path.join(process.cwd(), 'public/react-app.html');
 let shellTemplate: Promise<string> | null = null;
@@ -114,19 +115,21 @@ export async function renderReactShell(req: Request, application: ApplicationDef
     branding?: { favicon?: string; primaryColor?: string };
   } | null;
   const origin = requestOrigin(req);
-  const canonicalUrl = absoluteUrl(req.originalUrl || req.url || '/', origin);
   const siteName = String(application?.navTitle || application?.title || 'Wikitruth');
-  const description = String(
+  const defaultDescription = String(
     application?.slogan ||
     (application?.jumbotron as { description?: string } | undefined)?.description ||
     'A systematic discourse and knowledge contribution using dialectics and vetting.',
   );
-  const documentTitle = application
-    ? `${String(application.title || siteName)}, ${description}`
-    : 'Wikitruth, the truth in totality of human knowledge';
+  const routeMetadata = await resolveReactShellMetadata(req, application);
+  const description = routeMetadata?.description || defaultDescription;
+  const documentTitle = routeMetadata
+    ? `${routeMetadata.title} | ${siteName}`
+    : application ? `${String(application.title || siteName)}, ${description}` : 'Wikitruth, the truth in totality of human knowledge';
+  const canonicalUrl = absoluteUrl(routeMetadata?.canonicalPath || req.path || '/', origin);
   const logo = absoluteUrl(String(application?.logoIcon || '/img/logo-64x64.png'), origin);
   const appId = safeApplicationId(application);
-  const structuredData = JSON.stringify({
+  const structuredData = JSON.stringify(routeMetadata?.structuredData || {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: siteName,
@@ -145,6 +148,7 @@ export async function renderReactShell(req: Request, application: ApplicationDef
     '__WT_DESCRIPTION__': escapeHtml(description),
     '__WT_CANONICAL_URL__': escapeHtml(canonicalUrl),
     '__WT_LOGO_URL__': escapeHtml(logo),
+    '__WT_OG_TYPE__': escapeHtml(routeMetadata?.ogType || 'website'),
     '__WT_ICON_LINKS__': faviconLinks(tenant?.branding?.favicon),
     '__WT_THEME_COLOR__': escapeHtml(tenant?.branding?.primaryColor || '#ffffff'),
     '__WT_TILE_IMAGE__': escapeHtml(`${tenant?.branding?.favicon?.replace(/\/[^/]+$/, '') || '/img/favicons'}/ms-icon-144x144.png`),

@@ -2,8 +2,8 @@
 set -euo pipefail
 
 HTML_FILE="public/react-app.html"
-SITEMAP_FILE="public/sitemap.xml"
-ROBOTS_FILE="public/robots.txt"
+SITEMAP_SERVICE="server/src/services/sitemapService.ts"
+ROUTES_FILE="server/src/middlewares/routes.ts"
 
 checks=(
   '<meta name="description"'
@@ -25,18 +25,25 @@ for pattern in "${checks[@]}"; do
   fi
 done
 
-if [[ -f "$SITEMAP_FILE" ]]; then
-  echo "- [ok] sitemap exists: $SITEMAP_FILE"
+if rg -q "renderSitemap" "$SITEMAP_SERVICE" && rg -q "'/sitemap.xml'" "$ROUTES_FILE"; then
+  echo "- [ok] host-aware sitemap route"
 else
-  echo "- [missing] sitemap: $SITEMAP_FILE"
+  echo "- [missing] host-aware sitemap route"
   status=1
 fi
 
-if [[ -f "$ROBOTS_FILE" ]]; then
-  echo "- [ok] robots exists: $ROBOTS_FILE"
+if rg -q "renderRobots" "$SITEMAP_SERVICE" && rg -q "'/robots.txt'" "$ROUTES_FILE"; then
+  echo "- [ok] host-aware robots route"
 else
-  echo "- [missing] robots: $ROBOTS_FILE"
+  echo "- [missing] host-aware robots route"
   status=1
+fi
+
+if rg -q '/app/' "$SITEMAP_SERVICE"; then
+  echo "- [invalid] stale /app sitemap path"
+  status=1
+else
+  echo "- [ok] canonical root paths"
 fi
 
 exit $status

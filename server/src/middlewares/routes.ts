@@ -3,6 +3,7 @@
 import type { NextFunction, Request, Response } from 'express';
 import type { AppContext } from '../types/models';
 import { renderReactShell, resolveReactShellApplication } from '../services/reactShellService';
+import { renderRobots, renderSitemap } from '../services/sitemapService';
 
 type AppRouteRegistrar = AppContext & {
   get: (...args: unknown[]) => unknown;
@@ -336,7 +337,16 @@ function serveModernNotFoundShell(req: Request, res: Response, next: NextFunctio
     .catch(next);
 }
 
+function serveSitemap(req: Request, res: Response, next: NextFunction): void {
+  void resolveReactShellApplication(req, res.locals.application || null)
+    .then((application) => renderSitemap(req, application))
+    .then((body) => res.type('application/xml').set('Cache-Control', 'public, max-age=900').send(body))
+    .catch(next);
+}
+
 export default function registerLegacyPathRedirects(app: AppRouteRegistrar, _passport: unknown): void {
+  app.get('/sitemap.xml', serveSitemap);
+  app.get('/robots.txt', (req: Request, res: Response) => res.type('text/plain').send(renderRobots(req)));
   const modernShellPatterns = [
     '/',
     '/about',

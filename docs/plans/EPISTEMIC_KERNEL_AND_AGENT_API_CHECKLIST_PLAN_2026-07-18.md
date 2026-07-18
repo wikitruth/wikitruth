@@ -77,9 +77,9 @@ auditable contributions through the same moderation lifecycle as people.
 
 ## 7. Accessibility, Discoverability, API, and Runtime
 
-- [ ] Restore visible keyboard focus and add automated focus-style regression coverage.
-- [ ] Generate host-aware root, entry, and civic-tenant sitemaps without stale `/app` URLs.
-- [ ] Render entry-specific title, description, canonical, OpenGraph, and structured data in the initial server response.
+- [x] Restore visible keyboard focus and add automated focus-style regression coverage.
+- [x] Generate host-aware root, entry, and civic-tenant sitemaps without stale `/app` URLs.
+- [x] Render entry-specific title, description, canonical, OpenGraph, and structured data in the initial server response.
 - [ ] Complete OpenAPI coverage for all mounted public and governed API surfaces.
 - [ ] Give `/api/v1` an explicit contract/version policy and agent-safe error semantics.
 - [ ] Replace recursive outline N+1 traversal with bounded batched traversal.
