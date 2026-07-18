@@ -18,6 +18,7 @@ const requestsPerSecondPerWorker = Math.max(0.1, Math.min(4, Number(process.env.
 const runId = crypto.randomBytes(4).toString('hex');
 const outputPath = process.env.WT_LOAD_OUTPUT || path.join('docs', 'performance', `API_DATABASE_LOAD_REPORT_${new Date().toISOString().slice(0, 10)}.json`);
 const requestPaths = String(process.env.WT_LOAD_PATHS || '/api/v1/home,/api/v1/topics?limit=20,/api/v1/civic/overview').split(',').map((value) => value.trim()).filter(Boolean);
+const databaseCollections = ['topics', 'arguments', 'artifacts', 'civicrecords'];
 
 function percentile(values, percentage) {
   if (!values.length) return 0;
@@ -73,19 +74,31 @@ async function apiLoad() {
   return { ...summary(durations, failures), statuses, durationSeconds: durationMs / 1000, concurrency, requestsPerSecondPerWorker, paths: requestPaths };
 }
 
+async function warmup() {
+  const apiResults = await Promise.all(requestPaths.map((route, index) => get(new URL(route, baseUrl), `warmup-${index}`)));
+  if (apiResults.some((result) => !result.ok)) throw new Error('API warm-up failed');
+  const connection = await mongoose.createConnection(config.mongodb.uri, { serverSelectionTimeoutMS: 10_000, maxPoolSize: 10 }).asPromise();
+  try {
+    await Promise.all(databaseCollections.map((collection) => connection.collection(collection)
+      .find({ private: { $ne: true } }).sort({ editDate: -1 }).limit(1).toArray()));
+  } finally {
+    await connection.close();
+  }
+  return { apiRequests: apiResults.length, databaseReads: databaseCollections.length };
+}
+
 async function databaseLoad() {
   const connection = await mongoose.createConnection(config.mongodb.uri, { serverSelectionTimeoutMS: 10_000, maxPoolSize: 20 }).asPromise();
   const durations = [];
   let failures = 0;
   try {
-    const collections = ['topics', 'arguments', 'artifacts', 'civicrecords'];
     let sequence = 0;
     const worker = async () => {
       while (sequence < databaseIterations) {
         const iteration = sequence++;
         const started = performance.now();
         try {
-          await connection.collection(collections[iteration % collections.length]).find({ private: { $ne: true } }).sort({ editDate: -1 }).limit(20).toArray();
+          await connection.collection(databaseCollections[iteration % databaseCollections.length]).find({ private: { $ne: true } }).sort({ editDate: -1 }).limit(20).toArray();
           durations.push(performance.now() - started);
         } catch (_error) {
           failures += 1;
@@ -100,6 +113,7 @@ async function databaseLoad() {
 }
 
 async function main() {
+  const warmupResult = await warmup();
   const [api, database] = await Promise.all([apiLoad(), databaseLoad()]);
   const thresholds = {
     apiP95Ms: Number(process.env.WT_LOAD_API_P95_MS || 1500),
@@ -114,7 +128,7 @@ async function main() {
   };
   const report = {
     generatedAt: new Date().toISOString(), mode: 'read-only-api-and-database', baseUrl,
-    api, database, thresholds, checks, passed: Object.values(checks).every(Boolean),
+    warmup: warmupResult, api, database, thresholds, checks, passed: Object.values(checks).every(Boolean),
   };
   await fs.mkdir(path.dirname(outputPath), { recursive: true });
   await fs.writeFile(outputPath, `${JSON.stringify(report, null, 2)}\n`, 'utf8');
