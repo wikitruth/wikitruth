@@ -2,6 +2,7 @@ import API_BASE_URL from './baseUrl';
 import type {
   ModerationEntry,
   ModerationEntryResponse,
+  ModerationStatusOption,
   ModerationTarget,
   VerdictChannel,
   VerdictChannelValue,

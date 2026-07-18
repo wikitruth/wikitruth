@@ -139,6 +139,7 @@ const ClipboardPage: React.FC = () => {
         const response = await apiService.createOutlineLink({
           parentId: targetParentId.trim(),
           targetId: item.entryId,
+          relationship: 'child',
         }) as { created?: boolean; conflict?: string };
 
         if (response?.created === false || response?.conflict === 'already_linked') {
