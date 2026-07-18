@@ -46,8 +46,8 @@ export const CivicExtensionFormFields: React.FC<CivicExtensionFormFieldsProps> =
           ) : <>
             <label htmlFor={id}>{field.label}</label>
             {field.type === 'textarea' && <textarea {...common} rows={4} minLength={field.minLength} maxLength={field.maxLength || 5000} placeholder={field.placeholder} value={String(value ?? '')} onChange={(event) => onChange(field.key, event.target.value)} />}
-            {field.type === 'select' && <select {...common} value={String(value ?? '')} onChange={(event) => onChange(field.key, event.target.value || undefined)}><option value="">Select...</option>{field.options?.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select>}
-            {!['textarea', 'select'].includes(field.type) && <input {...common} type={field.type} min={field.min} max={field.max} minLength={field.minLength} maxLength={field.maxLength} placeholder={field.placeholder} value={value == null ? '' : String(value)} onChange={(event) => onChange(field.key, field.type === 'number' ? (event.target.value === '' ? undefined : Number(event.target.value)) : event.target.value)} />}
+            {field.type === 'select' && <select {...common} value={String(value ?? '')} onChange={(event) => onChange(field.key, event.target.value)}><option value="">Select...</option>{field.options?.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select>}
+            {!['textarea', 'select'].includes(field.type) && <input {...common} type={field.type} min={field.min} max={field.max} minLength={field.minLength} maxLength={field.maxLength} placeholder={field.placeholder} value={value == null ? '' : String(value)} onChange={(event) => onChange(field.key, field.type === 'number' ? (event.target.value === '' ? '' : Number(event.target.value)) : event.target.value)} />}
           </>}
           {field.description && <small className="help-block" id={`${id}-help`}>{field.description}</small>}
         </div>;

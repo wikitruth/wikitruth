@@ -39,4 +39,28 @@ describe('CivicRecordForm', () => {
     expect(mockedApi.update).toHaveBeenCalledWith('record-1', expect.not.objectContaining({ kind: expect.anything() }));
     expect(onUpdated).toHaveBeenCalledWith(updated);
   });
+
+  it('sends explicit clears for optional tenant fields while editing', async () => {
+    const user = userEvent.setup();
+    const tenantWithExtensions = {
+      ...tenant,
+      extensionSchemas: {
+        project: {
+          fields: [
+            { key: 'delivery_model', label: 'Delivery model', type: 'select', options: [{ value: 'public', label: 'Public' }] },
+            { key: 'beneficiary_count', label: 'Beneficiary count', type: 'number' },
+          ],
+        },
+      },
+    } as CivicTenant;
+    const extendedRecord = { ...record, extensions: { delivery_model: 'public', beneficiary_count: 120 } } as CivicRecord;
+    mockedApi.update.mockResolvedValue({ record: extendedRecord });
+    render(<CivicRecordForm record={extendedRecord} kinds={['project']} tenant={tenantWithExtensions} jurisdictions={[]} />);
+    await user.selectOptions(screen.getByLabelText(/delivery model/i), '');
+    await user.clear(screen.getByLabelText(/beneficiary count/i));
+    await user.click(screen.getByRole('button', { name: /save record details/i }));
+    await waitFor(() => expect(mockedApi.update).toHaveBeenCalledWith('record-1', expect.objectContaining({
+      extensions: { delivery_model: '', beneficiary_count: '' },
+    })));
+  });
 });

@@ -53,11 +53,11 @@ const CivicRecordForm: React.FC<CivicRecordFormProps> = ({ kinds, parentId, tena
     setMessage(null);
     const activeExtensions = Object.fromEntries(
       extensionFieldsForKind(tenant, kind)
-        .filter((field) => extensions[field.key] !== undefined && extensions[field.key] !== '')
+        .filter((field) => editing || (extensions[field.key] !== undefined && extensions[field.key] !== ''))
         .map((field) => [field.key, extensions[field.key] as CivicExtensionValue]),
     );
     const activeLocation = Object.fromEntries(
-      tenant.geography.addressFields.filter((field) => location[field]).map((field) => [field, location[field]]),
+      tenant.geography.addressFields.filter((field) => editing || location[field]).map((field) => [field, location[field]]),
     );
     const payload: CivicRecordInput = {
       kind,
