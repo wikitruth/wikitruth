@@ -1,85 +1,24 @@
 import API_BASE_URL from './baseUrl';
+import type {
+  ModerationEntry,
+  ModerationEntryResponse,
+  ModerationTarget,
+  VerdictChannel,
+  VerdictChannelValue,
+  VerdictConsensusSummary,
+} from './moderationVerdictTypes';
 
-export type ModerationTargetKey =
-  | 'topic'
-  | 'topicLink'
-  | 'argument'
-  | 'argumentLink'
-  | 'artifact'
-  | 'question'
-  | 'answer'
-  | 'issue'
-  | 'opinion';
-
-export interface ModerationTarget {
-  key: ModerationTargetKey;
-  id: string;
-}
-
-export interface ModerationStatusOption {
-  code: number;
-  text: string;
-}
-
-export type VerdictChannel = 'factual' | 'ethical';
-
-export interface VerdictChannelValue {
-  status: string;
-  reasoning?: string;
-  framework?: string;
-  evidenceRefs?: string[];
-  editDate?: string | null;
-  editUserId?: string | null;
-}
-
-export interface ModerationEntry {
-  _id?: string;
-  title?: string;
-  friendlyUrl?: string;
-  objectType?: number;
-  objectName?: string;
-  editDate?: string;
-  createDate?: string;
-  screening?: {
-    status?: number | null;
-  };
-  verdict?: {
-    status?: number | null;
-    reasoning?: string | null;
-  };
-  verdictReasoning?: string | null;
-  verdictChannels?: {
-    factual: VerdictChannelValue;
-    ethical: VerdictChannelValue;
-  };
-  ownerId?: string | null;
-  ownerType?: number | null;
-  parentId?: string | null;
-  questionId?: string | null;
-  voteSummary?: {
-    totalVotes: number;
-    threshold: number;
-    consensusReached: boolean;
-    consensusStatus: number | null;
-    counts: Array<{ status: number; count: number }>;
-  };
-}
-
-export interface ModerationEntryResponse {
-  success: boolean;
-  target: {
-    objectType: number;
-    objectName: string;
-    id: string;
-  };
-  entry: ModerationEntry;
-  screeningStatuses: ModerationStatusOption[];
-  verdictStatuses: ModerationStatusOption[];
-  verdictChannelStatuses: {
-    factual: string[];
-    ethical: string[];
-  };
-}
+export type {
+  ModerationEntry,
+  ModerationEntryResponse,
+  ModerationStatusOption,
+  ModerationTarget,
+  ModerationTargetKey,
+  VerdictChannel,
+  VerdictChannelValue,
+  VerdictConsensusSummary,
+  VerdictDecisionHistory,
+} from './moderationVerdictTypes';
 
 interface ModerationMutationResponse {
   success: boolean;
@@ -144,23 +83,15 @@ interface ConvertTypeResponse {
 interface VerdictVoteResponse {
   success: boolean;
   vote: Record<string, unknown>;
-  summary: {
-    threshold: number;
-    totalVotes: number;
-    consensusReached: boolean;
-    consensusStatus: number | null;
-  };
+  summary: VerdictConsensusSummary & { consensusReached: boolean; consensusStatus: string | null };
+  decision: { published: boolean; blockedByIssues?: number; entry?: ModerationEntry };
 }
 
 interface VerdictVotesListResponse {
   success: boolean;
   votes: Array<Record<string, unknown>>;
-  summary: {
-    threshold: number;
-    totalVotes: number;
-    consensusReached: boolean;
-    consensusStatus: number | null;
-  };
+  summary: VerdictConsensusSummary & { consensusReached: boolean; consensusStatus: string | null };
+  channels: { factual: VerdictConsensusSummary; ethical: VerdictConsensusSummary };
 }
 
 export interface DuplicateCandidate {
@@ -332,6 +263,8 @@ export const moderationApi = {
       reasoning?: string;
       framework?: string;
       evidenceRefs?: string[];
+      acknowledgeOverride: true;
+      overrideReason: string;
     },
   ) =>
     request<ModerationMutationResponse>(`/moderation/verdict-channel?${toQuery(target)}`, {
@@ -343,16 +276,18 @@ export const moderationApi = {
     payload: {
       factual: Omit<VerdictChannelValue, 'editDate' | 'editUserId'>;
       ethical: Omit<VerdictChannelValue, 'editDate' | 'editUserId'>;
+      acknowledgeOverride: true;
+      overrideReason: string;
     },
   ) =>
     request<ModerationMutationResponse>(`/moderation/verdict-channels?${toQuery(target)}`, {
       method: 'PUT',
       body: JSON.stringify(payload),
     }),
-  updateVerdict: (target: ModerationTarget, status: number) =>
+  updateVerdict: (target: ModerationTarget, status: number, reasoning: string, overrideReason: string) =>
     request<ModerationMutationResponse>(`/moderation/verdict?${toQuery(target)}`, {
       method: 'PUT',
-      body: JSON.stringify({ status }),
+      body: JSON.stringify({ status, reasoning, overrideReason, acknowledgeOverride: true }),
     }),
   convertEntryType: (
     target: ModerationTarget,
@@ -398,6 +333,8 @@ export const moderationApi = {
       type: number;
       status: number;
       reasoning?: string;
+      overrideReason: string;
+      acknowledgeOverride: true;
     }>,
   ) =>
     request<ModerationBulkVerdictResponse>('/moderation/verdicts/bulk', {
@@ -426,16 +363,23 @@ export const moderationApi = {
   submitVerdictVote: (
     target: ModerationTarget,
     payload: {
-      status: number;
-      rationale?: string;
+      channel: VerdictChannel;
+      channelStatus: string;
+      rationale: string;
+      framework?: string;
+      evidenceRefs?: string[];
+      confidence: number;
+      expertise?: string;
+      conflictDeclared?: boolean;
+      conflictDetails?: string;
     },
   ) =>
     request<VerdictVoteResponse>(`/moderation/verdict-votes?${toQuery(target)}`, {
       method: 'POST',
       body: JSON.stringify(payload),
     }),
-  listVerdictVotes: (target: ModerationTarget) =>
-    request<VerdictVotesListResponse>(`/moderation/verdict-votes?${toQuery(target)}`),
+  listVerdictVotes: (target: ModerationTarget, channel?: VerdictChannel) =>
+    request<VerdictVotesListResponse>(`/moderation/verdict-votes?${toQuery(target)}${channel ? `&channel=${channel}` : ''}`),
   submitReaderSignal: (
     target: ModerationTarget,
     payload: {

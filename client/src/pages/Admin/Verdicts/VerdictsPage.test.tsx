@@ -110,6 +110,8 @@ describe('VerdictsPage', () => {
 
     await user.click(await screen.findByLabelText(/select climate policy/i));
     await user.selectOptions(screen.getByLabelText(/bulk verdict status/i), '1');
+    await user.type(screen.getByLabelText(/required final-say reason/i), 'Reviewed evidence requires an exceptional correction.');
+    await user.click(screen.getByLabelText(/acknowledge these changes/i));
     await user.click(screen.getByRole('button', { name: /apply to selected/i }));
 
     await waitFor(() =>
@@ -118,6 +120,8 @@ describe('VerdictsPage', () => {
           id: 'topic-1',
           type: 1,
           status: 1,
+          overrideReason: 'Reviewed evidence requires an exceptional correction.',
+          acknowledgeOverride: true,
         }),
       ]),
     );

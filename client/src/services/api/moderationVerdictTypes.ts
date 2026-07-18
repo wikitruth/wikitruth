@@ -1,0 +1,107 @@
+export type ModerationTargetKey =
+  | 'topic'
+  | 'topicLink'
+  | 'argument'
+  | 'argumentLink'
+  | 'artifact'
+  | 'question'
+  | 'answer'
+  | 'issue'
+  | 'opinion';
+
+export interface ModerationTarget {
+  key: ModerationTargetKey;
+  id: string;
+}
+
+export interface ModerationStatusOption {
+  code: number;
+  text: string;
+}
+
+export type VerdictChannel = 'factual' | 'ethical';
+
+export interface VerdictChannelValue {
+  status: string;
+  reasoning?: string;
+  framework?: string;
+  evidenceRefs?: string[];
+  decisionMode?: 'none' | 'consensus' | 'admin_override';
+  policyVersion?: string;
+  overrideReason?: string;
+  consensusSnapshot?: VerdictConsensusSummary | null;
+  editDate?: string | null;
+  editUserId?: string | null;
+}
+
+export interface VerdictConsensusSummary {
+  channel: VerdictChannel;
+  policyVersion: string;
+  totalVotes: number;
+  eligibleVotes: number;
+  excludedConflictVotes: number;
+  abstentions: number;
+  threshold: number;
+  leadingStatus: string | null;
+  leadingCount: number;
+  leadingRatio: number;
+  leadingAverageConfidence: number;
+  reached: boolean;
+  counts: Array<{ status: string; count: number }>;
+}
+
+export interface ModerationEntry {
+  _id?: string;
+  title?: string;
+  friendlyUrl?: string;
+  objectType?: number;
+  objectName?: string;
+  editDate?: string;
+  createDate?: string;
+  screening?: { status?: number | null };
+  verdict?: { status?: number | null; reasoning?: string | null };
+  verdictReasoning?: string | null;
+  verdictChannels?: {
+    factual: VerdictChannelValue;
+    ethical: VerdictChannelValue;
+  };
+  ownerId?: string | null;
+  ownerType?: number | null;
+  parentId?: string | null;
+  questionId?: string | null;
+  voteSummary?: {
+    totalVotes: number;
+    threshold: number;
+    consensusReached: boolean;
+    consensusStatus: number | null;
+    counts: Array<{ status: string; count: number }>;
+    channels?: { factual: VerdictConsensusSummary; ethical: VerdictConsensusSummary };
+  };
+}
+
+export interface VerdictDecisionHistory {
+  _id?: string;
+  eventType: string;
+  actorUsername?: string;
+  message?: string;
+  payload?: {
+    channel?: VerdictChannel;
+    status?: string;
+    decisionMode?: 'consensus' | 'admin_override';
+    overrideReason?: string;
+    policyVersion?: string;
+  };
+  createDate?: string;
+  chainSequence?: number;
+  eventHash?: string;
+}
+
+export interface ModerationEntryResponse {
+  success: boolean;
+  target: { objectType: number; objectName: string; id: string };
+  entry: ModerationEntry;
+  screeningStatuses: ModerationStatusOption[];
+  verdictStatuses: ModerationStatusOption[];
+  verdictChannelStatuses: { factual: string[]; ethical: string[] };
+  decisionHistory: VerdictDecisionHistory[];
+}

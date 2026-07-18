@@ -244,7 +244,7 @@ export const appRoutes: AppRoute[] = [
   { path: '/notifications', element: protectedRoute(<NotificationsPage />) },
   { path: '/timeline', element: <EntryTimelinePage /> },
   { path: '/outline/link', element: protectedRoute(<OutlineLinkPage />) },
-  { path: '/admin/verdicts', element: protectedRoute(<VerdictsPage />, ['admin']) },
+  { path: '/admin/verdicts', element: protectedRoute(<VerdictsPage />, ['reviewer', 'admin']) },
   { path: '/admin/verdicts/:id', element: protectedRoute(<VerdictUpdatePage />, ['reviewer', 'admin']) },
   { path: '/500', element: <ServerError500 /> },
   { path: '/503', element: <ServiceUnavailable503 /> },

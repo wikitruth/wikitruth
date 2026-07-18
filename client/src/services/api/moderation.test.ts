@@ -60,6 +60,8 @@ describe('moderationApi', () => {
         status: 'contested',
         reasoning: 'Reasonable people applying the principle may disagree.',
         framework: 'human rights',
+        acknowledgeOverride: true,
+        overrideReason: 'Exceptional policy decision by the administrator.',
       },
     );
 
@@ -73,6 +75,8 @@ describe('moderationApi', () => {
           status: 'contested',
           reasoning: 'Reasonable people applying the principle may disagree.',
           framework: 'human rights',
+          acknowledgeOverride: true,
+          overrideReason: 'Exceptional policy decision by the administrator.',
         }),
       }),
     );
@@ -87,6 +91,8 @@ describe('moderationApi', () => {
     const payload = {
       factual: { status: 'supported', reasoning: 'Primary evidence supports the claim.' },
       ethical: { status: 'contested', reasoning: 'Competing rights produce different conclusions.', framework: 'human rights' },
+      acknowledgeOverride: true as const,
+      overrideReason: 'Exceptional policy decision by the administrator.',
     };
 
     await moderationApi.updateVerdictChannels({ key: 'topic', id: 't1' }, payload);
@@ -153,8 +159,8 @@ describe('moderationApi', () => {
     globalThis.fetch = fetchMock as unknown as typeof fetch;
 
     await moderationApi.bulkUpdateVerdicts([
-      { id: 'topic-1', type: 1, status: 1, reasoning: '<p>Verified</p>' },
-      { id: 'arg-1', type: 2, status: 2 },
+      { id: 'topic-1', type: 1, status: 1, reasoning: '<p>Verified</p>', overrideReason: 'Urgent administrator review outcome.', acknowledgeOverride: true },
+      { id: 'arg-1', type: 2, status: 2, overrideReason: 'Urgent administrator review outcome.', acknowledgeOverride: true },
     ]);
 
     expect(fetchMock).toHaveBeenCalledWith(
@@ -164,8 +170,8 @@ describe('moderationApi', () => {
         headers: expect.objectContaining({ 'x-csrf-token': 'test-csrf-token' }),
         body: JSON.stringify({
           updates: [
-            { id: 'topic-1', type: 1, status: 1, reasoning: '<p>Verified</p>' },
-            { id: 'arg-1', type: 2, status: 2 },
+            { id: 'topic-1', type: 1, status: 1, reasoning: '<p>Verified</p>', overrideReason: 'Urgent administrator review outcome.', acknowledgeOverride: true },
+            { id: 'arg-1', type: 2, status: 2, overrideReason: 'Urgent administrator review outcome.', acknowledgeOverride: true },
           ],
         }),
       }),

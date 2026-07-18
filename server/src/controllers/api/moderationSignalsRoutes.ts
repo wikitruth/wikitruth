@@ -16,9 +16,62 @@ import {
   ensureReviewerOrAdmin,
   parseModerationTarget,
   toNumber,
-  isSupportedVerdictStatus,
-  computeConsensus,
+  mapLegacyVerdictToFactual,
 } from './moderationShared';
+import {
+  computeChannelConsensus,
+  consensusDecisionDetails,
+  DEFAULT_VERDICT_CONSENSUS_POLICY,
+  isVerdictChannel,
+  isVoteStatusForChannel,
+  type VerdictChannel,
+} from '../../services/verdictConsensusService';
+import { writeVerdictDecision } from './verdictDecisionWriter';
+
+function validObjectIds(value: unknown): string[] {
+  return Array.isArray(value)
+    ? Array.from(new Set(value.map((id) => String(id || '').trim()).filter((id) => /^[a-f\d]{24}$/i.test(id))))
+    : [];
+}
+
+function parseVote(req: WikitruthRequest): { value?: Record<string, unknown>; error?: string } {
+  const body = req.body || {};
+  const numericLegacyStatus = toNumber(body.status ?? body.verdictStatus);
+  const channel: VerdictChannel = isVerdictChannel(body.channel) ? body.channel : 'factual';
+  const channelStatus = String(
+    body.channelStatus || (numericLegacyStatus === null ? body.status : mapLegacyVerdictToFactual(numericLegacyStatus)),
+  ).trim().toLowerCase();
+  if (!isVoteStatusForChannel(channel, channelStatus)) return { error: `Unsupported ${channel} vote status` };
+
+  const rationale = String(body.rationale || body.reasoning || '').trim();
+  const framework = String(body.framework || '').trim();
+  const conflictDeclared = body.conflictDeclared === true;
+  const conflictDetails = String(body.conflictDetails || '').trim();
+  const confidence = Number(body.confidence ?? 50);
+  if (channelStatus !== 'abstain' && rationale.length < 10) return { error: 'Vote rationale must be at least 10 characters' };
+  if (channel === 'ethical' && !['abstain', 'not_applicable'].includes(channelStatus) && framework.length < 3) {
+    return { error: 'An ethical framework or principle is required' };
+  }
+  if (!Number.isFinite(confidence) || confidence < 0 || confidence > 100) return { error: 'Confidence must be from 0 to 100' };
+  if (conflictDeclared && conflictDetails.length < 5) return { error: 'Describe the declared conflict' };
+  return {
+    value: {
+      channel,
+      channelStatus,
+      verdictStatus: channel === 'factual' ? numericLegacyStatus : null,
+      rationale,
+      framework,
+      evidenceRefs: validObjectIds(body.evidenceRefs),
+      confidence,
+      expertise: String(body.expertise || '').trim(),
+            conflictDeclared,
+            conflictDetails,
+            policyVersion: DEFAULT_VERDICT_CONSENSUS_POLICY.version,
+            outcomeStatus: 'active',
+            outcomeDate: null,
+    },
+  };
+}
 
 export function registerModerationSignalsRoutes(router: Router): void {
     router.post('/verdict-votes', async function (req: WikitruthRequest, res: WikitruthResponse) {
@@ -32,14 +85,12 @@ export function registerModerationSignalsRoutes(router: Router): void {
         return;
       }
   
-      const body = bodyOf<ModerationStatusBodyContract>(req);
-      const verdictStatus = toNumber(body.status ?? body.verdictStatus);
-      if (verdictStatus === null || !isSupportedVerdictStatus(verdictStatus)) {
-        res.status(400).json({ success: false, message: 'A valid verdict status is required' });
+      const parsed = parseVote(req);
+      if (!parsed.value) {
+        res.status(400).json({ success: false, message: parsed.error });
         return;
       }
-  
-      const rationale = String(body.rationale || '').trim();
+      const voteInput = parsed.value;
       const voterUserId = String(req.user?._id || req.user?.id || '');
       const voterUsername = String(req.user?.username || '');
   
@@ -47,6 +98,7 @@ export function registerModerationSignalsRoutes(router: Router): void {
         {
           objectType: target.objectType,
           objectId: target.id,
+          channel: voteInput.channel,
           voterUserId: voterUserId,
         },
         {
@@ -54,8 +106,7 @@ export function registerModerationSignalsRoutes(router: Router): void {
             objectType: target.objectType,
             objectName: target.objectName,
             objectId: target.id,
-            verdictStatus: verdictStatus,
-            rationale: rationale,
+            ...voteInput,
             voterUserId: voterUserId,
             voterUsername: voterUsername,
             editDate: new Date(),
@@ -74,25 +125,42 @@ export function registerModerationSignalsRoutes(router: Router): void {
         objectId: target.id,
         actorUserId: voterUserId,
         actorUsername: voterUsername,
-        message: `Verdict vote submitted for status ${verdictStatus}`,
-        payload: { verdictStatus, rationale },
+        message: `${voteInput.channel} verdict vote submitted for ${voteInput.channelStatus}`,
+        payload: voteInput,
       });
   
       const votes = await db.VerdictVote.find({
         objectType: target.objectType,
         objectId: target.id,
       }).lean();
-      const consensus = computeConsensus(votes);
+      const channel = voteInput.channel as VerdictChannel;
+      const consensus = computeChannelConsensus(channel, votes);
+      let decision = { published: false } as Awaited<ReturnType<typeof writeVerdictDecision>>;
+      if (consensus.reached && consensus.leadingStatus) {
+        const details = consensusDecisionDetails(consensus, votes);
+        decision = await writeVerdictDecision({
+          req,
+          target,
+          channel,
+          status: consensus.leadingStatus,
+          reasoning: details.reasoning,
+          framework: details.framework,
+          evidenceRefs: details.evidenceRefs,
+          decisionMode: 'consensus',
+          policyVersion: consensus.policyVersion,
+          consensusSnapshot: consensus,
+        });
+      }
   
       res.json({
         success: true,
         vote,
         summary: {
-          threshold: consensus.threshold,
-          totalVotes: consensus.totalVotes,
+          ...consensus,
           consensusReached: consensus.reached,
           consensusStatus: consensus.leadingStatus,
         },
+        decision,
       });
     });
   
@@ -107,24 +175,27 @@ export function registerModerationSignalsRoutes(router: Router): void {
         return;
       }
   
-      const votes = await db.VerdictVote.find({
+      const voteQuery: Record<string, unknown> = {
         objectType: target.objectType,
         objectId: target.id,
-      })
+      };
+      if (isVerdictChannel(req.query.channel)) voteQuery.channel = req.query.channel;
+      const votes = await db.VerdictVote.find(voteQuery)
         .sort({ createDate: 1 })
         .lean();
-  
-      const consensus = computeConsensus(votes);
+      const factual = computeChannelConsensus('factual', votes);
+      const ethical = computeChannelConsensus('ethical', votes);
+      const selected = req.query.channel === 'ethical' ? ethical : factual;
   
       res.json({
         success: true,
         votes,
         summary: {
-          threshold: consensus.threshold,
-          totalVotes: consensus.totalVotes,
-          consensusReached: consensus.reached,
-          consensusStatus: consensus.leadingStatus,
+          ...selected,
+          consensusReached: selected.reached,
+          consensusStatus: selected.leadingStatus,
         },
+        channels: { factual, ethical },
       });
     });
   

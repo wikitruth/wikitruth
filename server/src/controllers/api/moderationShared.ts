@@ -10,6 +10,11 @@ import {
 import * as flowUtils from '../../utils/flowUtils';
 import constants from '../../models/constants';
 import { isOnboardingComplete } from './authHelpers';
+import {
+  computeChannelConsensus,
+  DEFAULT_VERDICT_CONSENSUS_POLICY,
+  type VerdictConsensusSummary,
+} from '../../services/verdictConsensusService';
 
 import appModForDb from '../../app';
 
@@ -238,6 +243,10 @@ function toModerationEntry(entry: Record<string, unknown> | null | undefined, ta
         status: e.verdicts?.factual?.status || mapLegacyVerdictToFactual(Number(e.verdict?.status || 0)),
         reasoning: e.verdicts?.factual?.reasoning || e.verdict?.reasoning || e.verdictReasoning || '',
         evidenceRefs: e.verdicts?.factual?.evidenceRefs || [],
+        decisionMode: e.verdicts?.factual?.decisionMode || 'none',
+        policyVersion: e.verdicts?.factual?.policyVersion || '',
+        overrideReason: e.verdicts?.factual?.overrideReason || '',
+        consensusSnapshot: e.verdicts?.factual?.consensusSnapshot || null,
         editDate: e.verdicts?.factual?.editDate || e.verdict?.editDate || null,
         editUserId: e.verdicts?.factual?.editUserId || e.verdict?.editUserId || null,
       },
@@ -246,6 +255,10 @@ function toModerationEntry(entry: Record<string, unknown> | null | undefined, ta
         reasoning: e.verdicts?.ethical?.reasoning || '',
         framework: e.verdicts?.ethical?.framework || '',
         evidenceRefs: e.verdicts?.ethical?.evidenceRefs || [],
+        decisionMode: e.verdicts?.ethical?.decisionMode || 'none',
+        policyVersion: e.verdicts?.ethical?.policyVersion || '',
+        overrideReason: e.verdicts?.ethical?.overrideReason || '',
+        consensusSnapshot: e.verdicts?.ethical?.consensusSnapshot || null,
         editDate: e.verdicts?.ethical?.editDate || null,
         editUserId: e.verdicts?.ethical?.editUserId || null,
       },
@@ -344,68 +357,27 @@ function buildEntryPath(target: { objectName: string; id: string; friendlyUrl?: 
   }
 }
 
-function computeConsensus(votes: Array<{ verdictStatus: number; voterUserId?: unknown }>): {
-  threshold: number;
-  totalVotes: number;
-  leadingStatus: number | null;
-  leadingCount: number;
-  reached: boolean;
-} {
-  const totalVotes = votes.length;
-  const threshold = Math.max(2, Math.ceil(3 * (2 / 3)));
-  if (!totalVotes) {
-    return {
-      threshold,
-      totalVotes,
-      leadingStatus: null,
-      leadingCount: 0,
-      reached: false,
-    };
-  }
-
-  const byStatus = new Map<number, number>();
-  votes.forEach((vote) => {
-    const status = Number(vote.verdictStatus);
-    if (!Number.isFinite(status)) {
-      return;
-    }
-    byStatus.set(status, Number(byStatus.get(status) || 0) + 1);
-  });
-
-  let leadingStatus: number | null = null;
-  let leadingCount = 0;
-  byStatus.forEach((count, status) => {
-    if (count > leadingCount) {
-      leadingStatus = status;
-      leadingCount = count;
-    }
-  });
-
-  return {
-    threshold,
-    totalVotes,
-    leadingStatus,
-    leadingCount,
-    reached: leadingCount >= threshold,
-  };
-}
-
 async function buildVoteSummary(entry: Record<string, unknown>): Promise<{
   totalVotes: number;
   threshold: number;
   consensusReached: boolean;
   consensusStatus: number | null;
-  counts: Array<{ status: number; count: number }>;
+  counts: Array<{ status: string; count: number }>;
+  channels: { factual: VerdictConsensusSummary; ethical: VerdictConsensusSummary };
 }> {
   const objectType = Number(entry.objectType || 0);
   const objectId = String(entry._id || '');
   if (!objectType || !objectId) {
     return {
       totalVotes: 0,
-      threshold: 2,
+      threshold: DEFAULT_VERDICT_CONSENSUS_POLICY.minimumLeadingVotes,
       consensusReached: false,
       consensusStatus: null,
       counts: [],
+      channels: {
+        factual: computeChannelConsensus('factual', []),
+        ethical: computeChannelConsensus('ethical', []),
+      },
     };
   }
 
@@ -414,19 +386,16 @@ async function buildVoteSummary(entry: Record<string, unknown>): Promise<{
     objectId,
   }).lean();
 
-  const consensus = computeConsensus(votes);
-  const statusCountMap = new Map<number, number>();
-  votes.forEach((vote: { verdictStatus: number }) => {
-    const status = Number(vote.verdictStatus);
-    statusCountMap.set(status, Number(statusCountMap.get(status) || 0) + 1);
-  });
+  const factual = computeChannelConsensus('factual', votes);
+  const ethical = computeChannelConsensus('ethical', votes);
 
   return {
-    totalVotes: consensus.totalVotes,
-    threshold: consensus.threshold,
-    consensusReached: consensus.reached,
-    consensusStatus: consensus.leadingStatus,
-    counts: Array.from(statusCountMap.entries()).map(([status, count]) => ({ status, count })),
+    totalVotes: factual.totalVotes + ethical.totalVotes,
+    threshold: factual.threshold,
+    consensusReached: factual.reached,
+    consensusStatus: factual.leadingStatus ? mapFactualVerdictToLegacy(factual.leadingStatus) : null,
+    counts: factual.counts,
+    channels: { factual, ethical },
   };
 }
 
@@ -453,7 +422,6 @@ export {
   isSupportedVerdictStatus,
   resolveConversionTargetType,
   buildEntryPath,
-  computeConsensus,
   buildVoteSummary,
 };
 

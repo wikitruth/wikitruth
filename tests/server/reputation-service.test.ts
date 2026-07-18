@@ -12,6 +12,8 @@ const emptyCounts: ReputationCounts = {
   artifactReviews: 0,
   verdictVotes: 0,
   privilegedActions: 0,
+  durableVerdictVotes: 0,
+  overturnedVerdictVotes: 0,
   acceptedChangeRequests: 0,
   rejectedChangeRequests: 0,
 };
@@ -34,6 +36,8 @@ describe('deterministic reputation scorecard', () => {
       artifactReviews: 8,
       verdictVotes: 12,
       privilegedActions: 25,
+      durableVerdictVotes: 24,
+      overturnedVerdictVotes: 2,
       acceptedChangeRequests: 6,
       rejectedChangeRequests: 1,
     });
@@ -48,6 +52,30 @@ describe('deterministic reputation scorecard', () => {
       'revision-steward',
       'trusted-reviewer',
     ]));
+  });
+
+  it('does not grant quality credit for raw votes or privileged actions', () => {
+    const snapshot = calculateReputationFromCounts('u', 'busy-admin', {
+      ...emptyCounts,
+      verdictVotes: 500,
+      privilegedActions: 500,
+    });
+    expect(snapshot.score).toBe(0);
+    expect(snapshot.badges).toEqual([]);
+  });
+
+  it('penalizes overturned review outcomes', () => {
+    const upheld = calculateReputationFromCounts('u', 'reviewer', {
+      ...emptyCounts,
+      durableVerdictVotes: 12,
+    });
+    const overturned = calculateReputationFromCounts('u', 'reviewer', {
+      ...emptyCounts,
+      durableVerdictVotes: 12,
+      overturnedVerdictVotes: 8,
+    });
+    expect(overturned.dimensions.stewardship).toBeLessThan(upheld.dimensions.stewardship);
+    expect(overturned.score).toBeLessThan(upheld.score);
   });
 
   it('is deterministic for the same evidence counts', () => {

@@ -6,10 +6,10 @@ type Props = {
 };
 
 const DIMENSION_LABELS: Array<[keyof ReputationSnapshot['dimensions'], string, string]> = [
-  ['quality', 'Quality', 'Accepted contribution record, adjusted for sample size'],
-  ['participation', 'Participation', 'Sustained contribution activity'],
-  ['stewardship', 'Stewardship', 'Review, verdict, and accepted revision activity'],
-  ['evidence', 'Evidence', 'Accepted artifacts and source-quality reviews'],
+  ['quality', 'Quality', 'Durably accepted versus rejected contributions, adjusted for sample size.'],
+  ['participation', 'Participation', 'Contributions that completed review; raw posting volume receives no quality credit.'],
+  ['stewardship', 'Stewardship', 'Upheld verdict votes and accepted revisions, reduced by overturned or rejected outcomes.'],
+  ['evidence', 'Evidence', 'Durably accepted artifacts and source-quality reviews on accepted evidence.'],
 ];
 
 const ReputationScorecard: React.FC<Props> = ({ reputation }) => (
@@ -34,6 +34,7 @@ const ReputationScorecard: React.FC<Props> = ({ reputation }) => (
                   <span className="sr-only">{reputation.dimensions[key]} percent</span>
                 </div>
               </div>
+              <p className="text-muted small">{help}</p>
             </div>
           ))}
         </div>

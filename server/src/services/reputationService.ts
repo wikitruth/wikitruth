@@ -1,4 +1,5 @@
-export const REPUTATION_FORMULA_VERSION = '2026-07-v1';
+export const REPUTATION_FORMULA_VERSION = '2026-07-v2';
+export const REPUTATION_DURABILITY_DAYS = 14;
 
 type Badge = { key: string; label: string; description: string };
 
@@ -10,6 +11,8 @@ export type ReputationCounts = {
   artifactReviews: number;
   verdictVotes: number;
   privilegedActions: number;
+  durableVerdictVotes: number;
+  overturnedVerdictVotes: number;
   acceptedChangeRequests: number;
   rejectedChangeRequests: number;
 };
@@ -47,16 +50,18 @@ export function calculateReputationFromCounts(
   calculatedAt = new Date(),
 ): ReputationSnapshotValue {
   const reviewed = counts.acceptedContributions + counts.rejectedContributions;
-  const activity = counts.contributions + counts.verdictVotes + counts.privilegedActions + counts.artifactReviews;
-  const quality = activity === 0 ? 0 : clampScore(((counts.acceptedContributions + 2) / (reviewed + 4)) * 100);
-  const participation = clampScore(Math.log2(counts.contributions + 1) * 18);
+  const activity = reviewed + counts.acceptedArtifacts + counts.artifactReviews
+    + counts.durableVerdictVotes + counts.acceptedChangeRequests;
+  const quality = reviewed === 0 ? 0 : clampScore(((counts.acceptedContributions + 2) / (reviewed + 4)) * 100);
+  const participation = clampScore(Math.log2(reviewed + 1) * 18);
   const stewardship = clampScore(
-    counts.verdictVotes * 4 + counts.privilegedActions * 5 + counts.acceptedChangeRequests * 8,
+    counts.durableVerdictVotes * 6 + counts.acceptedChangeRequests * 8
+      - counts.overturnedVerdictVotes * 8 - counts.rejectedChangeRequests * 4,
   );
-  const evidence = clampScore(counts.acceptedArtifacts * 12 + counts.artifactReviews * 8);
+  const evidence = clampScore(counts.acceptedArtifacts * 12 + counts.artifactReviews * 6);
   const score = activity === 0
     ? 0
-    : clampScore(quality * 0.5 + participation * 0.25 + stewardship * 0.15 + evidence * 0.1);
+    : clampScore(quality * 0.45 + participation * 0.2 + stewardship * 0.2 + evidence * 0.15);
 
   const badges: Badge[] = [];
   if (counts.contributions >= 1) {
@@ -68,14 +73,14 @@ export function calculateReputationFromCounts(
   if (counts.acceptedArtifacts >= 5) {
     badges.push({ key: 'evidence-builder', label: 'Evidence Builder', description: 'At least five accepted artifacts.' });
   }
-  if (counts.verdictVotes >= 10) {
-    badges.push({ key: 'consensus-builder', label: 'Consensus Builder', description: 'Participated in at least ten verdict reviews.' });
+  if (counts.durableVerdictVotes >= 10) {
+    badges.push({ key: 'consensus-builder', label: 'Consensus Builder', description: 'At least ten review decisions remained upheld through the durability window.' });
   }
   if (counts.acceptedChangeRequests >= 5) {
     badges.push({ key: 'revision-steward', label: 'Revision Steward', description: 'Authored at least five accepted change requests.' });
   }
-  if (counts.privilegedActions >= 20 && score >= 60) {
-    badges.push({ key: 'trusted-reviewer', label: 'Trusted Reviewer', description: 'Sustained, auditable moderation activity.' });
+  if (counts.durableVerdictVotes >= 20 && counts.overturnedVerdictVotes <= Math.floor(counts.durableVerdictVotes / 4) && score >= 60) {
+    badges.push({ key: 'trusted-reviewer', label: 'Trusted Reviewer', description: 'Sustained review outcomes that remained valid over time.' });
   }
 
   return {
@@ -99,18 +104,21 @@ async function count(model: any, query: Record<string, unknown>): Promise<number
 export async function calculateReputation(db: Record<string, any>, user: { _id: unknown; username?: unknown }) {
   const userId = String(user._id || '');
   const username = String(user.username || '');
+  const durabilityCutoff = new Date(Date.now() - REPUTATION_DURABILITY_DAYS * 24 * 60 * 60 * 1000);
   const contributionQueries = CONTRIBUTION_MODELS.flatMap((modelName) => [
     count(db[modelName], { createUserId: userId }),
-    count(db[modelName], { createUserId: userId, 'screening.status': 1 }),
+    count(db[modelName], { createUserId: userId, 'screening.status': 1, editDate: { $lte: durabilityCutoff } }),
     count(db[modelName], { createUserId: userId, 'screening.status': 2 }),
   ]);
-  const [contributionValues, acceptedArtifacts, artifactReviews, verdictVotes, privilegedActions, acceptedChangeRequests, rejectedChangeRequests] = await Promise.all([
+  const [contributionValues, acceptedArtifacts, artifactReviews, verdictVotes, privilegedActions, durableVerdictVotes, overturnedVerdictVotes, acceptedChangeRequests, rejectedChangeRequests] = await Promise.all([
     Promise.all(contributionQueries),
-    count(db.Artifact, { createUserId: userId, 'screening.status': 1 }),
-    count(db.Artifact, { 'provenance.sourceQuality.reviewUserId': userId }),
+    count(db.Artifact, { createUserId: userId, 'screening.status': 1, editDate: { $lte: durabilityCutoff } }),
+    count(db.Artifact, { 'provenance.sourceQuality.reviewUserId': userId, 'screening.status': 1, editDate: { $lte: durabilityCutoff } }),
     count(db.VerdictVote, { voterUserId: userId }),
     count(db.EntryEvent, { actorUserId: userId, scope: 'privileged' }),
-    count(db.ChangeRequest, { createUserId: userId, status: { $in: ['accepted', 'partially_accepted'] } }),
+    count(db.VerdictVote, { voterUserId: userId, outcomeStatus: 'upheld', outcomeDate: { $lte: durabilityCutoff } }),
+    count(db.VerdictVote, { voterUserId: userId, outcomeStatus: 'overturned' }),
+    count(db.ChangeRequest, { createUserId: userId, status: { $in: ['accepted', 'partially_accepted'] }, editDate: { $lte: durabilityCutoff } }),
     count(db.ChangeRequest, { createUserId: userId, status: 'rejected' }),
   ]);
 
@@ -126,6 +134,8 @@ export async function calculateReputation(db: Record<string, any>, user: { _id: 
     artifactReviews,
     verdictVotes,
     privilegedActions,
+    durableVerdictVotes,
+    overturnedVerdictVotes,
     acceptedChangeRequests,
     rejectedChangeRequests,
   });

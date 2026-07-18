@@ -66,6 +66,13 @@ export interface LegacyEntity {
   verdict?: {
     result?: string;
   };
+  verdicts?: {
+    factual?: { status?: string; decisionMode?: string; evidenceRefs?: string[] };
+    ethical?: { status?: string; decisionMode?: string; evidenceRefs?: string[] };
+  };
+  provenance?: {
+    sourceQuality?: { total?: number };
+  };
   roles?: {
     admin?: string;
     account?: string;

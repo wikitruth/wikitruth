@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PageMeta from '../../../components/common/PageMeta';
-import moderationApi, { type ModerationEntry, type ModerationStatusOption, type ModerationTargetKey } from '../../../services/api/moderation';
+import moderationApi, { type ModerationEntry, type ModerationStatusOption } from '../../../services/api/moderation';
 import { useAuth } from '../../../context/AuthContext';
 
 const TOPIC_OBJECT_TYPE = 1;
@@ -40,13 +40,15 @@ const VerdictsPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [bulkStatus, setBulkStatus] = useState<number | ''>('');
+  const [overrideReason, setOverrideReason] = useState('');
+  const [acknowledgeOverride, setAcknowledgeOverride] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isApplying, setIsApplying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
 
   const canManageVerdicts = Boolean(user?.roles?.admin);
-  const canVoteVerdicts = Boolean(user?.roles?.reviewer || user?.roles?.admin);
+  const canReviewVerdicts = Boolean(user?.roles?.reviewer || user?.roles?.admin);
   const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
 
   const selectedEntries = useMemo(() => {
@@ -60,8 +62,8 @@ const VerdictsPage: React.FC = () => {
     if (isAuthLoading) {
       return;
     }
-    if (!canManageVerdicts) {
-      setError('Admin privileges are required');
+    if (!canReviewVerdicts) {
+      setError('Reviewer privileges are required');
       setIsLoading(false);
       return;
     }
@@ -114,7 +116,7 @@ const VerdictsPage: React.FC = () => {
     return () => {
       mounted = false;
     };
-  }, [canManageVerdicts, isAuthLoading, objectTypeFilter, verdictFilter, page, submittedQuery]);
+  }, [canReviewVerdicts, isAuthLoading, objectTypeFilter, verdictFilter, page, submittedQuery]);
 
   const updateDraft = (entry: ModerationEntry, changes: Partial<{ status: number; reasoning: string }>) => {
     const key = rowKey(entry);
@@ -139,6 +141,8 @@ const VerdictsPage: React.FC = () => {
       type: number;
       status: number;
       reasoning?: string;
+      overrideReason: string;
+      acknowledgeOverride: true;
     }>,
     successMessage: string,
   ) => {
@@ -184,6 +188,10 @@ const VerdictsPage: React.FC = () => {
     }
     const key = rowKey(entry);
     const draft = drafts[key];
+    if (!acknowledgeOverride || overrideReason.trim().length < 10) {
+      setError('A reason of at least 10 characters and explicit final-say acknowledgement are required.');
+      return;
+    }
     await applyUpdates(
       [
         {
@@ -191,6 +199,8 @@ const VerdictsPage: React.FC = () => {
           type: resolveObjectType(entry),
           status: typeof draft?.status === 'number' ? draft.status : 0,
           reasoning: String(draft?.reasoning || '').trim() || undefined,
+          overrideReason: overrideReason.trim(),
+          acknowledgeOverride: true,
         },
       ],
       'Verdict updated.',
@@ -200,6 +210,10 @@ const VerdictsPage: React.FC = () => {
   const handleBulkApply = async () => {
     if (typeof bulkStatus !== 'number' || selectedEntries.length === 0) {
       setError('Select at least one row and a verdict status for bulk update.');
+      return;
+    }
+    if (!acknowledgeOverride || overrideReason.trim().length < 10) {
+      setError('A reason of at least 10 characters and explicit final-say acknowledgement are required.');
       return;
     }
     const updates = selectedEntries
@@ -212,85 +226,20 @@ const VerdictsPage: React.FC = () => {
           type: resolveObjectType(entry),
           status: bulkStatus,
           reasoning: String(draft?.reasoning || '').trim() || undefined,
+          overrideReason: overrideReason.trim(),
+          acknowledgeOverride: true as const,
         };
       });
     await applyUpdates(updates, `Applied bulk verdict update to ${updates.length} entr${updates.length === 1 ? 'y' : 'ies'}.`);
     setSelectedRows({});
-  };
-
-  const handleVoteRow = async (entry: ModerationEntry) => {
-    if (!canVoteVerdicts || !entry._id) {
-      return;
-    }
-    const key = rowKey(entry);
-    const draft = drafts[key];
-    try {
-      setError(null);
-      setMessage(null);
-      const response = await moderationApi.submitVerdictVote(
-        {
-          key: (entry.objectName || 'argument') as ModerationTargetKey,
-          id: String(entry._id),
-        },
-        {
-          status: typeof draft?.status === 'number' ? draft.status : 0,
-          rationale: String(draft?.reasoning || '').trim() || undefined,
-        },
-      );
-      setEntries((prev) =>
-        prev.map((row) =>
-          rowKey(row) === key
-            ? {
-                ...row,
-                voteSummary: {
-                  ...(row.voteSummary || {
-                    totalVotes: 0,
-                    threshold: 2,
-                    consensusReached: false,
-                    consensusStatus: null,
-                    counts: [],
-                  }),
-                  totalVotes: response.summary.totalVotes,
-                  threshold: response.summary.threshold,
-                  consensusReached: response.summary.consensusReached,
-                  consensusStatus: response.summary.consensusStatus,
-                },
-              }
-            : row,
-        ),
-      );
-      setMessage('Vote saved.');
-    } catch (voteError) {
-      setError(voteError instanceof Error ? voteError.message : 'Unable to save vote');
-    }
-  };
-
-  const handleViewVotes = async (entry: ModerationEntry) => {
-    if (!canVoteVerdicts || !entry._id) {
-      return;
-    }
-    try {
-      const response = await moderationApi.listVerdictVotes({
-        key: (entry.objectName || 'argument') as ModerationTargetKey,
-        id: String(entry._id),
-      });
-      const lines = response.votes.map((vote) => {
-        const username = String(vote.voterUsername || 'reviewer');
-        const status = String(vote.verdictStatus || '-');
-        const rationale = String(vote.rationale || '').trim();
-        return `${username}: ${status}${rationale ? ` — ${rationale}` : ''}`;
-      });
-      window.alert(lines.length > 0 ? lines.join('\n') : 'No votes yet.');
-    } catch (_error) {
-      setError('Unable to load vote provenance.');
-    }
+    setAcknowledgeOverride(false);
   };
 
   return (
     <div className="container">
       <PageMeta title="Verdict Queue" description="Review and update verdict status for topics and arguments." />
       <h2>Verdict Queue</h2>
-      <p className="text-muted">Filter by entity and verdict, then update one-by-one or in bulk.</p>
+      <p className="text-muted">Review channel consensus, or use the exceptional administrator final-say path with an audited reason.</p>
 
       <div className="panel panel-default">
         <div className="panel-body">
@@ -361,9 +310,9 @@ const VerdictsPage: React.FC = () => {
       {error ? <div className="alert alert-danger">{error}</div> : null}
       {message ? <div className="alert alert-success">{message}</div> : null}
 
-      <div className="panel panel-default">
+      {canManageVerdicts ? <div className="panel panel-default">
         <div className="panel-heading">
-          <strong>Bulk Update</strong>
+          <strong>Administrator Final Say</strong>
         </div>
         <div className="panel-body">
           <div className="row">
@@ -394,15 +343,36 @@ const VerdictsPage: React.FC = () => {
               <button
                 type="button"
                 className="btn btn-warning btn-block"
-                disabled={isApplying || selectedCount === 0 || typeof bulkStatus !== 'number'}
+                disabled={isApplying || selectedCount === 0 || typeof bulkStatus !== 'number' || !acknowledgeOverride || overrideReason.trim().length < 10}
                 onClick={() => void handleBulkApply()}
               >
                 {isApplying ? 'Applying...' : 'Apply to Selected'}
               </button>
             </div>
           </div>
+          <div className="form-group" style={{ marginTop: 14 }}>
+            <label htmlFor="bulk-override-reason">Required final-say reason</label>
+            <textarea
+              id="bulk-override-reason"
+              className="form-control"
+              rows={2}
+              value={overrideReason}
+              onChange={(event) => setOverrideReason(event.target.value)}
+              placeholder="Explain why an administrator decision is necessary instead of the normal consensus path"
+            />
+          </div>
+          <div className="checkbox">
+            <label>
+              <input
+                type="checkbox"
+                checked={acknowledgeOverride}
+                onChange={(event) => setAcknowledgeOverride(event.target.checked)}
+              />{' '}
+              I acknowledge these changes are administrator final-say decisions and will be distinguishable from consensus.
+            </label>
+          </div>
         </div>
-      </div>
+      </div> : null}
 
       {isLoading ? <p className="text-muted">Loading verdict queue...</p> : null}
 
@@ -417,7 +387,7 @@ const VerdictsPage: React.FC = () => {
               <thead>
                 <tr>
                   <th style={{ width: 40 }}>
-                    <input
+                    {canManageVerdicts ? <input
                       type="checkbox"
                       aria-label="Select all rows"
                       checked={allRowsSelected}
@@ -433,7 +403,7 @@ const VerdictsPage: React.FC = () => {
                         });
                         setSelectedRows(next);
                       }}
-                    />
+                    /> : null}
                   </th>
                   <th>Entry</th>
                   <th style={{ width: 110 }}>Type</th>
@@ -453,7 +423,7 @@ const VerdictsPage: React.FC = () => {
                   return (
                     <tr key={key}>
                       <td>
-                        <input
+                        {canManageVerdicts ? <input
                           type="checkbox"
                           aria-label={`Select ${entry.title || entry._id || 'entry'}`}
                           checked={Boolean(selectedRows[key])}
@@ -461,7 +431,7 @@ const VerdictsPage: React.FC = () => {
                             const checked = event.target.checked;
                             setSelectedRows((prev) => ({ ...prev, [key]: checked }));
                           }}
-                        />
+                        /> : null}
                       </td>
                       <td>
                         <strong>{entry.title || '(Untitled)'}</strong>
@@ -474,6 +444,7 @@ const VerdictsPage: React.FC = () => {
                           className="form-control input-sm"
                           aria-label={`Verdict for ${entry.title || entry._id || 'entry'}`}
                           value={String(draft.status)}
+                          disabled={!canManageVerdicts}
                           onChange={(event) => updateDraft(entry, { status: Number(event.target.value) })}
                         >
                           {statuses.map((status) => (
@@ -488,57 +459,33 @@ const VerdictsPage: React.FC = () => {
                           className="form-control input-sm"
                           aria-label={`Reasoning for ${entry.title || entry._id || 'entry'}`}
                           value={draft.reasoning}
+                          disabled={!canManageVerdicts}
                           onChange={(event) => updateDraft(entry, { reasoning: event.target.value })}
                           placeholder="Optional reasoning"
                         />
                       </td>
                       <td>
                         <div>
-                          <span className={`label ${entry.voteSummary?.consensusReached ? 'label-success' : 'label-default'}`}>
-                            {entry.voteSummary?.totalVotes || 0}/{entry.voteSummary?.threshold || 2}
+                          <span className={`label ${entry.voteSummary?.channels?.factual.reached ? 'label-success' : 'label-default'}`}>
+                            F {entry.voteSummary?.channels?.factual.eligibleVotes || 0}/{entry.voteSummary?.channels?.factual.threshold || 2}
                           </span>{' '}
-                          {typeof entry.voteSummary?.consensusStatus === 'number' ? (
-                            <span className="text-muted">status {entry.voteSummary.consensusStatus}</span>
-                          ) : (
-                            <span className="text-muted">no consensus</span>
-                          )}
-                        </div>
-                        <div style={{ marginTop: 6 }}>
-                          <button
-                            type="button"
-                            className="btn btn-xs btn-default"
-                            onClick={() => void handleViewVotes(entry)}
-                            disabled={!canVoteVerdicts}
-                          >
-                            Provenance
-                          </button>
+                          <span className={`label ${entry.voteSummary?.channels?.ethical.reached ? 'label-success' : 'label-default'}`}>
+                            E {entry.voteSummary?.channels?.ethical.eligibleVotes || 0}/{entry.voteSummary?.channels?.ethical.threshold || 2}
+                          </span>
                         </div>
                       </td>
                       <td>
-                        <button
+                        {canManageVerdicts ? <button
                           type="button"
                           className="btn btn-xs btn-warning"
-                          disabled={isApplying}
+                          disabled={isApplying || !acknowledgeOverride || overrideReason.trim().length < 10}
                           onClick={() => void handleSaveRow(entry)}
                         >
-                          Save
-                        </button>{' '}
-                        <Link className="btn btn-xs btn-default" to={entryDetailsPath(entry)}>
-                          Open
+                          Final Say
+                        </button> : null}{canManageVerdicts ? ' ' : null}
+                        <Link className="btn btn-xs btn-info" to={entryDetailsPath(entry)}>
+                          Review Channels
                         </Link>
-                        {canVoteVerdicts ? (
-                          <>
-                            {' '}
-                            <button
-                              type="button"
-                              className="btn btn-xs btn-info"
-                              disabled={isApplying}
-                              onClick={() => void handleVoteRow(entry)}
-                            >
-                              Vote
-                            </button>
-                          </>
-                        ) : null}
                       </td>
                     </tr>
                   );

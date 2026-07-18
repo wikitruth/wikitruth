@@ -42,8 +42,8 @@ import { registerModerationRevisionRoutes } from './moderationRevisionRoutes';
 import { registerModerationArtifactRoutes } from './moderationArtifactRoutes';
 import { registerModerationVerdictChannelRoutes } from './moderationVerdictChannelRoutes';
 import { registerModerationIssueRoutes } from './moderationIssueRoutes';
-import { recordEntryRevision } from './revisionWriteRecorder';
-import { countBlockingIssues, enforceIssueFirstGate } from '../../services/issueGateService';
+import { computeChannelConsensus, DEFAULT_VERDICT_CONSENSUS_POLICY } from '../../services/verdictConsensusService';
+import { writeVerdictDecision } from './verdictDecisionWriter';
 
 export = function (router: Router) {
   registerModerationDuplicateRoutes(router);
@@ -74,6 +74,18 @@ export = function (router: Router) {
       return;
     }
 
+    const decisionHistory = db.EntryEvent?.find
+      ? await db.EntryEvent.find({
+        objectType: target.objectType,
+        objectId: target.id,
+        eventType: { $regex: '^moderation\\.verdict\\.(factual|ethical)\\.(consensus_published|admin_override)$' },
+      })
+        .sort({ createDate: -1 })
+        .limit(50)
+        .select('eventType actorUserId actorUsername message payload createDate chainSequence eventHash')
+        .lean()
+      : [];
+
     res.json({
       success: true,
       target,
@@ -81,6 +93,7 @@ export = function (router: Router) {
       screeningStatuses: getScreeningStatuses(),
       verdictStatuses: getVerdictStatuses(),
       verdictChannelStatuses: getVerdictChannelStatuses(),
+      decisionHistory,
     });
   });
 
@@ -169,103 +182,43 @@ export = function (router: Router) {
       return;
     }
 
-    if (![constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.argument].includes(target.objectType)) {
-      res.status(400).json({ success: false, message: 'Verdicts are only supported for topics and arguments' });
+    if (![constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.answer].includes(target.objectType)) {
+      res.status(400).json({ success: false, message: 'Verdicts are only supported for topics, arguments, and answers' });
       return;
     }
 
     const body = bodyOf<ModerationStatusBodyContract>(req);
     const status = toNumber(body.status ?? body.verdictStatus);
     const reasoning = String(body.reasoning || body.verdictReasoning || '').trim();
+    const overrideReason = String(body.overrideReason || '').trim();
     if (status === null || !isSupportedVerdictStatus(status)) {
       res.status(400).json({ success: false, message: 'A valid verdict status is required' });
       return;
     }
+    if (req.body?.acknowledgeOverride !== true || overrideReason.length < 10) {
+      res.status(400).json({ success: false, message: 'Administrator final-say acknowledgement and a 10-character override reason are required' });
+      return;
+    }
     const factualStatus = mapLegacyVerdictToFactual(status);
-    if (!['pending', 'insufficient_evidence'].includes(factualStatus) && !await enforceIssueFirstGate({
+    const votes = await db.VerdictVote.find({ objectType: target.objectType, objectId: target.id, channel: 'factual' }).lean();
+    const consensus = computeChannelConsensus('factual', votes);
+    const decision = await writeVerdictDecision({
       req,
-      res,
-      objectType: target.objectType,
-      objectName: target.objectName,
-      objectId: target.id,
-      action: 'factual_verdict',
-    })) {
-      return;
-    }
-
-    const dbModel = getDbModelByObjectType(target.objectType);
-    if (!dbModel) {
-      res.status(400).json({ success: false, message: 'Unsupported moderation target' });
-      return;
-    }
-
-    const entry = await dbModel.findById(target.id);
-    if (!entry) {
+      target,
+      channel: 'factual',
+      status: factualStatus,
+      reasoning,
+      evidenceRefs: [],
+      decisionMode: 'admin_override',
+      policyVersion: DEFAULT_VERDICT_CONSENSUS_POLICY.version,
+      overrideReason,
+      consensusSnapshot: consensus,
+    });
+    if (!decision.published) {
       res.status(404).json({ success: false, message: 'Entry not found' });
       return;
     }
-
-    entry.verdict = {
-      ...(entry.verdict || {}),
-      status,
-      editDate: Date.now(),
-      editUserId: req.user?.id || req.user?._id || entry.editUserId,
-      ...(reasoning ? { reasoning } : {}),
-    };
-    entry.verdicts = entry.verdicts || {};
-    entry.verdicts.factual = {
-      ...(entry.verdicts.factual || {}),
-      status: factualStatus,
-      reasoning,
-      editDate: new Date(),
-      editUserId: req.user?.id || req.user?._id || entry.editUserId,
-    };
-    if (reasoning && typeof entry.verdictReasoning !== 'undefined') {
-      entry.verdictReasoning = reasoning;
-    }
-    entry.editDate = new Date();
-    entry.editUserId = req.user?.id || req.user?._id || entry.editUserId;
-    await entry.save();
-    await recordEntryRevision({
-      req,
-      objectType: target.objectType,
-      entry,
-      source: 'update',
-      summary: 'Factual verdict updated',
-    });
-
-    await logEntryEvent({
-      scope: 'privileged',
-      eventType: 'moderation.verdict.updated',
-      objectType: target.objectType,
-      objectName: target.objectName,
-      objectId: target.id,
-      actorUserId: String(req.user?.id || req.user?._id || ''),
-      actorUsername: String(req.user?.username || ''),
-      message: `Verdict updated to ${status}`,
-      payload: { status, reasoning },
-    });
-
-    await notifySubscribers({
-      target: {
-        objectType: target.objectType,
-        objectName: target.objectName,
-        objectId: target.id,
-      },
-      type: 'verdict',
-      trigger: 'verdict',
-      title: 'Verdict updated',
-      body: `${target.objectName} verdict changed to ${constants.VERDICT_STATUS.getLabel(status) || status}.`,
-      link: `/${target.objectName}s/entry/${encodeURIComponent(String(entry.friendlyUrl || target.id))}/${encodeURIComponent(target.id)}`,
-      excludeUserIds: [String(req.user?.id || req.user?._id || '')],
-      payload: { status, reasoning },
-    });
-
-    res.json({
-      success: true,
-      target,
-      entry: toModerationEntry(entry.toObject(), target),
-    });
+    res.json({ success: true, target, entry: decision.entry });
   });
 
   router.post('/convert-type', async function (req: WikitruthRequest, res: WikitruthResponse) {
@@ -581,7 +534,6 @@ export = function (router: Router) {
       return;
     }
 
-    const userId = req.user?.id || req.user?._id;
     const results: Array<{ id: string; success: boolean; message?: string }> = [];
 
     for (const update of updates) {
@@ -589,6 +541,7 @@ export = function (router: Router) {
       const objectType = toNumber(update.type ?? update.objectType);
       const status = toNumber(update.status ?? update.verdictStatus);
       const reasoning = String(update.reasoning || '').trim();
+      const overrideReason = String(update.overrideReason || '').trim();
 
       if (!id || !objectType || status === null || !isSupportedVerdictStatus(status)) {
         results.push({
@@ -598,82 +551,30 @@ export = function (router: Router) {
         });
         continue;
       }
-
-      const dbModel = getDbModelByObjectType(objectType);
-      if (!dbModel) {
+      if (update.acknowledgeOverride !== true || overrideReason.length < 10) {
+        results.push({ id, success: false, message: 'Administrator final-say acknowledgement and override reason are required' });
+        continue;
+      }
+      const objectName = String(constants.OBJECT_ID_NAME_MAP?.[objectType] || '').trim();
+      if (!objectName || ![constants.OBJECT_TYPES.topic, constants.OBJECT_TYPES.argument, constants.OBJECT_TYPES.answer].includes(objectType)) {
         results.push({ id, success: false, message: 'Unsupported object type' });
         continue;
       }
       const factualStatus = mapLegacyVerdictToFactual(status);
-      const blockingCount = ['pending', 'insufficient_evidence'].includes(factualStatus)
-        ? 0
-        : await countBlockingIssues(objectType, id);
-      if (blockingCount) {
-        const overrideReason = String(update.issueGateOverrideReason || '').trim();
-        if (overrideReason.length < 10) {
-          results.push({ id, success: false, message: `${blockingCount} accepted critical issue(s) must be resolved first` });
-          continue;
-        }
-        await logEntryEvent({
-          scope: 'privileged',
-          eventType: 'moderation.issue-gate.overridden',
-          objectType,
-          objectName: String(constants.OBJECT_ID_NAME_MAP?.[objectType] || 'entry'),
-          objectId: id,
-          actorUserId: String(userId || ''),
-          actorUsername: String(req.user?.username || ''),
-          message: overrideReason,
-          payload: { action: 'factual_verdict', blockingCount, bulk: true },
-        });
-      }
-
-      const entry = await dbModel.findById(id);
-      if (!entry) {
-        results.push({ id, success: false, message: 'Entry not found' });
-        continue;
-      }
-
-      entry.verdict = {
-        ...(entry.verdict || {}),
-        status,
-        editDate: Date.now(),
-        editUserId: userId || entry.editUserId,
-        ...(reasoning ? { reasoning } : {}),
-      };
-      entry.verdicts = entry.verdicts || {};
-      entry.verdicts.factual = {
-        ...(entry.verdicts.factual || {}),
+      const votes = await db.VerdictVote.find({ objectType, objectId: id, channel: 'factual' }).lean();
+      const decision = await writeVerdictDecision({
+        req,
+        target: { objectType, objectName, id },
+        channel: 'factual',
         status: factualStatus,
         reasoning,
-        editDate: new Date(),
-        editUserId: userId || entry.editUserId,
-      };
-      if (reasoning && typeof entry.verdictReasoning !== 'undefined') {
-        entry.verdictReasoning = reasoning;
-      }
-      entry.editDate = new Date();
-      entry.editUserId = userId || entry.editUserId;
-      await entry.save();
-      await recordEntryRevision({
-        req,
-        objectType,
-        entry,
-        source: 'update',
-        summary: 'Factual verdict updated in bulk',
+        evidenceRefs: [],
+        decisionMode: 'admin_override',
+        policyVersion: DEFAULT_VERDICT_CONSENSUS_POLICY.version,
+        overrideReason,
+        consensusSnapshot: computeChannelConsensus('factual', votes),
       });
-
-      await logEntryEvent({
-        scope: 'privileged',
-        eventType: 'moderation.verdict.bulk-updated',
-        objectType,
-        objectId: id,
-        actorUserId: String(req.user?.id || req.user?._id || ''),
-        actorUsername: String(req.user?.username || ''),
-        message: `Bulk verdict update to ${status}`,
-        payload: { status, reasoning },
-      });
-
-      results.push({ id, success: true });
+      results.push(decision.published ? { id, success: true } : { id, success: false, message: 'Entry not found' });
     }
 
     res.json({

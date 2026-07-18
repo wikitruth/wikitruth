@@ -9,13 +9,13 @@ auditable contributions through the same moderation lifecycle as people.
 
 ## Constraints
 
-- [ ] Consensus remains the normal decision path; administrator overrides are explicit exceptions, never silent edits.
-- [ ] Every final decision and override records reasoning, evidence, policy version, actor, timestamp, and audit history.
+- [x] Consensus remains the normal decision path; administrator overrides are explicit exceptions, never silent edits.
+- [x] Every final decision and override records reasoning, evidence, policy version, actor, timestamp, and audit history.
 - [ ] Agent credentials are hashed, scoped, revocable, rate-limited, and attached to a real accountable user identity.
 - [ ] Agent contributions start pending and receive no automatic screening or verdict privileges.
-- [ ] Do not deploy to production or modify VPS, proxy, DNS, or production process state.
-- [ ] Keep legacy rendering and React Native explicitly deferred.
-- [ ] Keep source files within the repository size rule wherever practical.
+- [x] Do not deploy to production or modify VPS, proxy, DNS, or production process state.
+- [x] Keep legacy rendering and React Native explicitly deferred.
+- [x] Keep source files within the repository size rule wherever practical.
 
 ## 1. Canonical Contracts and Architecture
 
@@ -26,23 +26,23 @@ auditable contributions through the same moderation lifecycle as people.
 
 ## 2. Verdict Consensus and Final Say
 
-- [ ] Extend verdict votes with channel, channel status, evidence, confidence, expertise, conflict declaration, and policy version.
-- [ ] Replace the fixed threshold with versioned configurable quorum and supermajority rules.
-- [ ] Compute factual and ethical summaries independently, including abstentions and conflict exclusions.
-- [ ] Allow reviewers to submit channel votes without directly mutating the final verdict.
-- [ ] Automatically publish a final verdict when valid consensus is reached and the issue-first gate passes.
-- [ ] Allow administrators to publish, replace, or clear a final verdict through a required reasoned override.
-- [ ] Persist final-decision provenance, including consensus summary or override metadata.
-- [ ] Expose decision history and override state in API and moderation UI.
-- [ ] Add server and client regression coverage for voting, consensus, overrides, and legacy compatibility.
+- [x] Extend verdict votes with channel, channel status, evidence, confidence, expertise, conflict declaration, and policy version.
+- [x] Replace the fixed threshold with versioned configurable quorum and supermajority rules.
+- [x] Compute factual and ethical summaries independently, including abstentions and conflict exclusions.
+- [x] Allow reviewers to submit channel votes without directly mutating the final verdict.
+- [x] Automatically publish a final verdict when valid consensus is reached and the issue-first gate passes.
+- [x] Allow administrators to publish, replace, or clear a final verdict through a required reasoned override.
+- [x] Persist final-decision provenance, including consensus summary or override metadata.
+- [x] Expose decision history and override state in API and moderation UI.
+- [x] Add server and client regression coverage for voting, consensus, overrides, and legacy compatibility.
 
 ## 3. Durable Reputation and Trusted Ranking
 
-- [ ] Credit only reviewed contributions and decisions that remain valid after the durability window.
-- [ ] Stop granting quality credit for raw privileged activity or unvalidated vote volume.
-- [ ] Track upheld and overturned review outcomes explicitly.
-- [ ] Make trusted ranking evidence-first, with reputation as a bounded secondary input.
-- [ ] Version the new formula and explain every dimension in API/UI output.
+- [x] Credit only reviewed contributions and decisions that remain valid after the durability window.
+- [x] Stop granting quality credit for raw privileged activity or unvalidated vote volume.
+- [x] Track upheld and overturned review outcomes explicitly.
+- [x] Make trusted ranking evidence-first, with reputation as a bounded secondary input.
+- [x] Version the new formula and explain every dimension in API/UI output.
 
 ## 4. Governed Knowledge Graph
 

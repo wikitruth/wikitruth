@@ -168,6 +168,8 @@ export type ModerationStatusBodyContract = {
   verdictStatus?: unknown;
   reasoning?: unknown;
   verdictReasoning?: unknown;
+  overrideReason?: unknown;
+  acknowledgeOverride?: unknown;
   rationale?: unknown;
   signalType?: unknown;
   note?: unknown;
