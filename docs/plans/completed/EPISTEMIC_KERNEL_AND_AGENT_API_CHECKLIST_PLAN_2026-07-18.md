@@ -97,10 +97,18 @@ auditable contributions through the same moderation lifecycle as people.
 ## 9. Verification and Closure
 
 - [x] Run focused server/client suites after each implementation group.
-- [ ] Run full server and client suites, lint, type checks, source guardrails, and production builds.
-- [ ] Run OpenAPI, accessibility, SEO, load, audit-chain, policy-pilot, and flagship-pilot checks.
-- [ ] Restart and verify only the local PM2 Wikitruth process if runtime verification requires it.
-- [ ] Browser-test public, reviewer, administrator, agent-management, and civic flows at desktop and mobile widths.
-- [ ] Record final QA evidence and reconcile canonical implementation status.
-- [ ] Complete a separate verification pass with no pending or deferred items in this plan.
-- [ ] Move this plan to `docs/plans/completed/` only after that separate pass succeeds.
+- [x] Run full server and client suites, lint, type checks, source guardrails, and production builds.
+- [x] Run OpenAPI, accessibility, SEO, load, audit-chain, policy-pilot, and flagship-pilot checks.
+- [x] Restart and verify only the local PM2 Wikitruth process if runtime verification requires it.
+- [x] Browser-test public, reviewer, administrator, agent-management, and civic flows at desktop and mobile widths.
+- [x] Record final QA evidence and reconcile canonical implementation status.
+- [x] Complete a separate verification pass with no pending or deferred items in this plan.
+- [x] Move this plan to `docs/plans/completed/` only after that separate pass succeeds.
+
+## Verification Evidence
+
+The separate closure pass completed on 2026-07-18. See
+`docs/qa/EPISTEMIC_AGENT_MODERNIZATION_SIGNOFF_2026-07-18.md` for test counts,
+runtime evidence, browser coverage, performance measurements, audit verification,
+and the explicit boundary between implemented behavior and real-world content
+operations.

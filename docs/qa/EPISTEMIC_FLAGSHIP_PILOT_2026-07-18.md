@@ -19,7 +19,7 @@ contacted.
 | History | 4 immutable claim revisions covering both consensus decisions and both administrator decisions |
 | Public challenge | Reader signal and verdict appeal created through standard APIs |
 | Civic reuse | FixPH tenant record linked to a Wikitruth artifact as `evidence` |
-| Audit integrity | Valid before and after; chain advanced from 59 to 67 verified events |
+| Audit integrity | Valid before and after; final verification reached 143 chained events |
 | Cleanup | 0 records remained across all 19 mutable fixture categories; no credentials retained |
 
 The final factual result intentionally retains `decisionMode=admin_override` so

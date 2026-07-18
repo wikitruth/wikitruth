@@ -5,7 +5,6 @@ Active and historical planning documents are organized under this folder.
 ## Pending Snapshot (2026-07-18)
 
 - Active checklist backlog:
-  - `docs/plans/EPISTEMIC_KERNEL_AND_AGENT_API_CHECKLIST_PLAN_2026-07-18.md`: active end-to-end governance, agent API, tenant validation, discovery, and pilot work.
   - `docs/plans/LEGACY_MODERN_FEATURE_COMPLETENESS_AUDIT_PLAN_2026-07-11.md` open `[ ]`: **0** (all non-deferred implementation and verification work is complete; retained here because it records explicit deferred product decisions)
 - Deferred checklist backlog:
   - `docs/plans/deferred/**` open `[ ]`: **190** total
@@ -16,7 +15,6 @@ Active and historical planning documents are organized under this folder.
 
 ## Active Plans
 
-- `docs/plans/EPISTEMIC_KERNEL_AND_AGENT_API_CHECKLIST_PLAN_2026-07-18.md`
 - `docs/plans/LEGACY_MODERN_FEATURE_COMPLETENESS_AUDIT_PLAN_2026-07-11.md`
 
 ## Completed Plans
@@ -25,6 +23,7 @@ Active and historical planning documents are organized under this folder.
 - `docs/plans/completed/CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-22.md`
 - `docs/plans/completed/CODE_HEALTH_SOURCE_FILE_CHECKLIST_PLAN_2026-04-22.md`
 - `docs/plans/completed/CIVIC_CORE_MULTI_TENANCY_CHECKLIST_PLAN_2026-07-13.md`
+- `docs/plans/completed/EPISTEMIC_KERNEL_AND_AGENT_API_CHECKLIST_PLAN_2026-07-18.md`
 - `docs/plans/completed/LEGACY_MODERN_URL_FORMAT_DRIFT_CHECKLIST_PLAN_2026-04-22.md`
 - `docs/plans/completed/LEGACY_COMPATIBILITY_ISOLATION_CHECKLIST_PLAN_2026-04-18.md`
 - `docs/plans/completed/LEGACY_CODE_HEALTH_OPTIMIZATION_CHECKLIST_PLAN_2026-04-24.md`

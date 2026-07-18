@@ -1,10 +1,10 @@
 {
   "result": "PASS",
-  "generatedAt": "2026-07-18T09:08:07.810Z",
+  "generatedAt": "2026-07-18T09:33:40.470Z",
   "baseUrl": "https://127.0.0.1:9443",
   "policyVersion": "2026-07-v2",
   "fixture": {
-    "token": "mrq595fqe81145",
+    "token": "mrq663qr883036",
     "identities": 5,
     "topic": 1,
     "claim": 1,
@@ -94,26 +94,26 @@
     },
     "unresolvedIssues": 0,
     "feedback": {
-      "signalId": "6a5b4276f017a765ae19fa0f",
-      "appealId": "6a5b4276f017a765ae19fa16"
+      "signalId": "6a5b48733139cd7aa79080bd",
+      "appealId": "6a5b48743139cd7aa79080c4"
     },
-    "civicEvidenceLinkId": "6a5b4276a09753ceec21dee8",
+    "civicEvidenceLinkId": "6a5b4874a09753ceec21df1d",
     "audit": {
       "before": {
         "valid": true,
-        "verifiedEvents": 59,
+        "verifiedEvents": 135,
         "legacyEvents": 0,
-        "headSequence": 59,
-        "headHash": "fe56d0b880db22e52ac69504890d40175fbd0c5b016ac36fdeb02e6de80df982",
+        "headSequence": 135,
+        "headHash": "7e459db993306299f82ecdfb074b07635313a23996aca506202119ae9ae4d140",
         "brokenAtSequence": null,
         "reason": null
       },
       "after": {
         "valid": true,
-        "verifiedEvents": 67,
+        "verifiedEvents": 143,
         "legacyEvents": 0,
-        "headSequence": 67,
-        "headHash": "b0e640d78622840275ef35aca08d68df9e4026efa62945e300fce3f39218e2e9",
+        "headSequence": 143,
+        "headHash": "311453f0002a6a4b3252ace4bcf97adf0bb425868faae8222f17250b80ad9040",
         "brokenAtSequence": null,
         "reason": null
       }
