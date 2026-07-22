@@ -1,9 +1,13 @@
 # Passkey Authentication Local Signoff
 
-Date: 2026-07-22  
-Environment: local Wikitruth checkout and local development database  
-Local origin: `https://wikitruth.example.com:9443`  
-Production contract: RP ID `wikitruth.net`, canonical origin `https://wikitruth.net`  
+Date: 2026-07-22
+
+Environment: local Wikitruth checkout and local development database
+
+Local origin: `https://wikitruth.example.com:9443`
+
+Production contract: RP ID `wikitruth.net`, canonical origin `https://wikitruth.net`
+
 Production deployment: not performed
 
 ## Scope
