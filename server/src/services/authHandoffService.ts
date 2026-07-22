@@ -114,7 +114,7 @@ export async function consumeAuthHandoff(req: WikitruthRequest, rawCode: unknown
       expiresAt: { $gt: new Date() },
     },
     { $set: { consumedAt: new Date() } },
-    { new: false }
+    { returnDocument: 'before' }
   ).lean();
   if (!handoff)
     throw new Error(

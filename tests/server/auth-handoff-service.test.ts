@@ -117,7 +117,7 @@ describe('cross-domain authentication handoffs', () => {
     expect(handoffFindOneAndUpdate).toHaveBeenCalledWith(
       expect.objectContaining({ targetOrigin: 'https://fixthephilippines.org', consumedAt: null }),
       expect.objectContaining({ $set: { consumedAt: expect.any(Date) } }),
-      { new: false }
+      { returnDocument: 'before' }
     );
     expect(req.login).toHaveBeenCalledWith(user, expect.any(Function));
     expect(result.returnPath).toBe('/civic');

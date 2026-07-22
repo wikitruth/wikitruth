@@ -103,7 +103,7 @@ async function consumeCeremony(id: unknown, purpose: WebAuthnPurpose): Promise<S
       expiresAt: { $gt: new Date() },
     },
     { $set: { consumedAt: new Date() } },
-    { new: false }
+    { returnDocument: 'before' }
   ).lean();
   if (!ceremony) throw new Error('Authentication ceremony is invalid, expired, or already used');
   return ceremony as StoredCeremony;
@@ -473,7 +473,7 @@ export async function renamePasskey(user: PasskeyUser, credentialId: string, nam
   const credential = await db.PasskeyCredential.findOneAndUpdate(
     { _id: credentialId, userId: userIdOf(user), status: 'active' },
     { $set: { name: normalized, editDate: new Date() } },
-    { new: true }
+    { returnDocument: 'after' }
   ).lean();
   if (!credential) throw new Error('Passkey not found');
   await auditPasskey('auth.passkey.renamed', user, 'Renamed a passkey', {
@@ -487,7 +487,7 @@ export async function revokePasskey(user: PasskeyUser, credentialId: string) {
   const credential = await db.PasskeyCredential.findOneAndUpdate(
     { _id: credentialId, userId: userIdOf(user), status: 'active' },
     { $set: { status: 'revoked', revokedAt: now, revokedByUserId: userIdOf(user), editDate: now } },
-    { new: true }
+    { returnDocument: 'after' }
   ).lean();
   if (!credential) throw new Error('Passkey not found');
   await auditPasskey('auth.passkey.revoked', user, 'Revoked a passkey', {

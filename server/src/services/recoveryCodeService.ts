@@ -37,7 +37,7 @@ export async function replaceRecoveryCodes(userId: string, count: number): Promi
       },
       $setOnInsert: { createDate: now },
     },
-    { upsert: true, new: true }
+    { upsert: true, returnDocument: 'after' }
   );
   return codes;
 }
@@ -62,7 +62,7 @@ export async function consumeRecoveryCode(userId: string, code: unknown): Promis
   const used = await db.RecoveryCodeSet.findOneAndUpdate(
     { userId, codes: { $elemMatch: { hash, usedAt: null } } },
     { $set: { 'codes.$.usedAt': new Date(), editDate: new Date() } },
-    { new: true }
+    { returnDocument: 'after' }
   ).lean();
   return Boolean(used);
 }
