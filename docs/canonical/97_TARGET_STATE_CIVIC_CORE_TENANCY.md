@@ -36,6 +36,8 @@ Define the reusable civic-accountability platform contract that powers FixPH and
 - Canonical APIs are versioned and explicitly tenant-addressable under `/api/v1/tenants/:tenantId/civic/*`.
 - Host-scoped `/api/civic/*` remains a compatibility alias for the resolved tenant.
 - A branded tenant may run in the shared Wikitruth application, in a dedicated deployment of the same build, or through an independent frontend consuming the same APIs.
+- Platform identity remains global while application sessions remain origin-scoped.
+- Unrelated tenant domains use single-use authentication handoffs through `https://wikitruth.net`; they do not widen the Wikitruth WebAuthn relying-party scope or share cookies.
 
 ## Target State Status
 

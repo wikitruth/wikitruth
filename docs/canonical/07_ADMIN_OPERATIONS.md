@@ -44,3 +44,10 @@ Define core administrative control surfaces.
 ## Permission Invariant
 
 Admin endpoints are explicitly role-gated server-side; operational actions must remain inaccessible to non-admin users even if UI routes are discovered.
+
+## Authentication Assurance
+
+- Role authorization and recent passkey assurance are separate requirements.
+- When privileged step-up enforcement is enabled, high-impact mutations fail closed unless the administrator has completed user-verified WebAuthn authentication within the configured window.
+- Agent bearer credentials cannot satisfy or perform a human passkey step-up and cannot manage agent credentials.
+- Break-glass suspension of step-up is an explicit runtime configuration operation, not an application-level administrator bypass, and must be treated as a security incident or controlled maintenance event.
