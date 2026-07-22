@@ -1,4 +1,5 @@
 import 'express-session';
+import type { AuthenticationAssurance } from '../services/authAssuranceService';
 
 declare module 'express-session' {
   interface SessionData {
@@ -6,5 +7,6 @@ declare module 'express-session' {
     preferences?: Record<string, unknown>;
     diaryCategories?: unknown[];
     myGroups?: unknown[];
+    authentication?: AuthenticationAssurance;
   }
 }

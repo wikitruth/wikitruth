@@ -16,10 +16,10 @@ Production deployment is excluded from this plan and requires a separate explici
 
 ### Server Foundation
 
-- [ ] Add maintained WebAuthn server/browser dependencies.
-- [ ] Add passkey credential, ceremony, recovery-code, and authentication-handoff models and backup coverage.
-- [ ] Add strict RP/origin configuration and trusted tenant-origin resolution.
-- [ ] Add session rotation and authentication-assurance helpers.
+- [x] Add maintained WebAuthn server/browser dependencies.
+- [x] Add passkey credential, ceremony, recovery-code, and authentication-handoff models and backup coverage.
+- [x] Add strict RP/origin configuration and trusted tenant-origin resolution.
+- [x] Add session rotation and authentication-assurance helpers.
 - [ ] Add privileged audit events for passkey, recovery, and handoff lifecycle changes.
 
 ### Authentication API

@@ -95,6 +95,20 @@ exports.session = {
     maxAgeMs: Number(process.env.SESSION_COOKIE_MAX_AGE_MS || 1209600000)
   }
 };
+exports.webAuthn = {
+  enabled: process.env.WEBAUTHN_ENABLED !== 'false',
+  rpId: process.env.WEBAUTHN_RP_ID || 'localhost',
+  rpName: process.env.WEBAUTHN_RP_NAME || 'Wikitruth',
+  origins: (process.env.WEBAUTHN_ORIGINS || 'http://localhost:8000').split(',').map(function (value) { return value.trim(); }).filter(Boolean),
+  canonicalOrigin: process.env.AUTH_CANONICAL_ORIGIN || 'http://localhost:8000',
+  trustedTenantOrigins: (process.env.AUTH_TRUSTED_TENANT_ORIGINS || '').split(',').map(function (value) { return value.trim(); }).filter(Boolean),
+  challengeTtlSeconds: Number(process.env.WEBAUTHN_CHALLENGE_TTL_SECONDS || 300),
+  handoffTtlSeconds: Number(process.env.AUTH_HANDOFF_TTL_SECONDS || 120),
+  stepUpMaxAgeSeconds: Number(process.env.WEBAUTHN_STEP_UP_MAX_AGE_SECONDS || 600),
+  recoveryCodeCount: Number(process.env.WEBAUTHN_RECOVERY_CODE_COUNT || 10),
+  adminStepUpRequired: process.env.WEBAUTHN_ADMIN_STEP_UP_REQUIRED === 'true',
+  passwordlessEnabled: process.env.WEBAUTHN_PASSWORDLESS_ENABLED !== 'false'
+};
 exports.csrf = {
   ignoreMethods: process.env.CSRF_IGNORE_METHODS
     ? process.env.CSRF_IGNORE_METHODS.split(',').map(function (item) {

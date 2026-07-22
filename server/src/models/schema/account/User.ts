@@ -6,6 +6,7 @@ const factory: SchemaFactory = function (app, mongoose) {
   const userSchema = new mongoose.Schema({
     username: { type: String, unique: true },
     password: String,
+    passwordLoginDisabled: { type: Boolean, default: false },
     email: { type: String, unique: true },
     roles: {
       admin: { type: mongoose.Schema.Types.ObjectId, ref: 'Admin' },

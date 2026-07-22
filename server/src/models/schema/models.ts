@@ -16,6 +16,10 @@ export = function (app: Application, mongoose: Mongoose) {
   require('./account/AdminGroup')(app, mongoose);
   require('./account/Account')(app, mongoose);
   require('./account/LoginAttempt')(app, mongoose);
+  require('./account/PasskeyCredential')(app, mongoose);
+  require('./account/AuthCeremony')(app, mongoose);
+  require('./account/RecoveryCodeSet')(app, mongoose);
+  require('./account/AuthHandoff')(app, mongoose);
 
   // core
   require('./core/EntryRevisionCounter')(app, mongoose);

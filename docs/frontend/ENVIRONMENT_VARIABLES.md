@@ -77,6 +77,25 @@ In production, startup validation requires:
 | `CSRF_COOKIE_SECURE` | Secure CSRF cookie | `true` in production |
 | `CSRF_COOKIE_SAMESITE` | CSRF cookie SameSite | `lax` |
 
+### Passkeys and Cross-Domain Authentication
+
+| Variable | Purpose | Default |
+|---|---|---|
+| `WEBAUTHN_ENABLED` | Enable passkey APIs and UI | `true` |
+| `WEBAUTHN_RP_ID` | WebAuthn relying-party domain | `wikitruth.net` in production; canonical local hostname otherwise |
+| `WEBAUTHN_RP_NAME` | Authenticator-visible service name | `Wikitruth` |
+| `WEBAUTHN_ORIGINS` | Comma-separated exact ceremony origins | `https://wikitruth.net` in production |
+| `AUTH_CANONICAL_ORIGIN` | Central human-authentication origin | `https://wikitruth.net` in production |
+| `AUTH_TRUSTED_TENANT_ORIGINS` | Additional exact handoff destinations | empty; active civic-tenant domains are also resolved |
+| `WEBAUTHN_CHALLENGE_TTL_SECONDS` | Registration/authentication ceremony lifetime | `300` |
+| `AUTH_HANDOFF_TTL_SECONDS` | Single-use tenant handoff lifetime | `120` |
+| `WEBAUTHN_STEP_UP_MAX_AGE_SECONDS` | Privileged passkey assurance window | `600` |
+| `WEBAUTHN_RECOVERY_CODE_COUNT` | Codes generated in a recovery batch | `10` |
+| `WEBAUTHN_ADMIN_STEP_UP_REQUIRED` | Enforce passkey assurance for protected admin mutations | `true` in production |
+| `WEBAUTHN_PASSWORDLESS_ENABLED` | Allow recovery-ready accounts to disable password login | `true` |
+
+`WEBAUTHN_RP_ID` must be chosen before production enrollment. Local credentials are test-only and do not migrate to `wikitruth.net`.
+
 ### Security, Limits, and Runtime Controls
 
 | Variable | Purpose | Default |

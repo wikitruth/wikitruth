@@ -4,12 +4,14 @@ import type { AuthUser } from './auth';
 import type { ApiErrorCode } from './errors';
 import type { CivicTenantDefinition } from './civicTenancy';
 import type { ApiClientIdentity } from '../services/apiClientService';
+import type { AuthenticationAssurance } from '../services/authAssuranceService';
 
 export interface WikitruthSessionData extends SessionData {
   returnUrl?: string;
   preferences?: Record<string, unknown>;
   diaryCategories?: unknown[];
   myGroups?: unknown[];
+  authentication?: AuthenticationAssurance;
 }
 
 export type WikitruthSession = Session & Partial<WikitruthSessionData>;

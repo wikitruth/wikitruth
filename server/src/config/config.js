@@ -51,6 +51,18 @@ function envSameSite(names, defaultValue) {
   return defaultValue;
 }
 
+function normalizeOrigin(value) {
+  try {
+    const url = new URL(String(value || '').trim());
+    if (url.protocol !== 'https:' && !(url.protocol === 'http:' && url.hostname === 'localhost')) {
+      return '';
+    }
+    return url.origin;
+  } catch (_error) {
+    return '';
+  }
+}
+
 function requiredFromEnv(names, requiredLabel, devDefault) {
   const value = firstDefinedEnv(names);
   if (value) {
@@ -118,6 +130,8 @@ exports.mongodb = {
       'words',
     ],
     privateBackupList: [
+      'authceremonies',
+      'authhandoffs',
       'answers',
       'artifacts',
       'arguments',
@@ -133,6 +147,8 @@ exports.mongodb = {
       'jurisdictions',
       'tenantmemberships',
       'civicentrylinks',
+      'passkeycredentials',
+      'recoverycodesets',
     ],
     modelMapping: {
       answers: 'Answer',
@@ -152,6 +168,8 @@ exports.mongodb = {
       changerequests: 'ChangeRequest',
       reputationsnapshots: 'ReputationSnapshot',
       anonymouscontributions: 'AnonymousContribution',
+      authceremonies: 'AuthCeremony',
+      authhandoffs: 'AuthHandoff',
       civicrecords: 'CivicRecord',
       civictenants: 'CivicTenant',
       jurisdictions: 'Jurisdiction',
@@ -160,7 +178,9 @@ exports.mongodb = {
       opinions: 'Opinion',
       artifacts: 'Artifact',
       pages: 'Page',
+      passkeycredentials: 'PasskeyCredential',
       questions: 'Question',
+      recoverycodesets: 'RecoveryCodeSet',
       status: 'Status',
       topics: 'Topic',
       topiclinks: 'TopicLink',
@@ -217,6 +237,25 @@ exports.session = {
     sameSite: envSameSite(['SESSION_COOKIE_SAMESITE'], 'lax'),
     maxAgeMs: Number(envWithDefault(['SESSION_COOKIE_MAX_AGE_MS'], '1209600000')),
   },
+};
+const defaultAuthOrigin = normalizeOrigin(envWithDefault(
+  ['AUTH_CANONICAL_ORIGIN'],
+  isProduction ? 'https://wikitruth.net' : envWithDefault(['WT_BASE_URL'], 'http://localhost:8000')
+));
+const defaultAuthHost = defaultAuthOrigin ? new URL(defaultAuthOrigin).hostname : 'localhost';
+exports.webAuthn = {
+  enabled: envBoolean(['WEBAUTHN_ENABLED'], true),
+  rpId: envWithDefault(['WEBAUTHN_RP_ID'], isProduction ? 'wikitruth.net' : defaultAuthHost),
+  rpName: envWithDefault(['WEBAUTHN_RP_NAME'], exports.projectName),
+  origins: envList(['WEBAUTHN_ORIGINS'], [defaultAuthOrigin]).map(normalizeOrigin).filter(Boolean),
+  canonicalOrigin: defaultAuthOrigin,
+  trustedTenantOrigins: envList(['AUTH_TRUSTED_TENANT_ORIGINS'], []).map(normalizeOrigin).filter(Boolean),
+  challengeTtlSeconds: Number(envWithDefault(['WEBAUTHN_CHALLENGE_TTL_SECONDS'], '300')),
+  handoffTtlSeconds: Number(envWithDefault(['AUTH_HANDOFF_TTL_SECONDS'], '120')),
+  stepUpMaxAgeSeconds: Number(envWithDefault(['WEBAUTHN_STEP_UP_MAX_AGE_SECONDS'], '600')),
+  recoveryCodeCount: Number(envWithDefault(['WEBAUTHN_RECOVERY_CODE_COUNT'], '10')),
+  adminStepUpRequired: envBoolean(['WEBAUTHN_ADMIN_STEP_UP_REQUIRED'], isProduction),
+  passwordlessEnabled: envBoolean(['WEBAUTHN_PASSWORDLESS_ENABLED'], true),
 };
 exports.csrf = {
   ignoreMethods: envList(['CSRF_IGNORE_METHODS'], ['GET', 'HEAD', 'OPTIONS']),
