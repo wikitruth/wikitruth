@@ -15,6 +15,7 @@ import {
   parseModerationTarget,
 } from './moderationShared';
 import { writeVerdictDecision } from './verdictDecisionWriter';
+import { requirePrivilegedPasskeyAssurance } from '../../services/privilegedAuthService';
 
 type ParsedChannel = {
   channel: VerdictChannel;
@@ -112,6 +113,7 @@ async function applyOverrides(
 export function registerModerationVerdictChannelRoutes(router: Router): void {
   router.put('/verdict-channel', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAdmin(req, res)) return;
+    if (!(await requirePrivilegedPasskeyAssurance(req, res))) return;
     const channel = String(req.body?.channel || '').trim().toLowerCase();
     if (channel !== 'factual' && channel !== 'ethical') {
       res.status(400).json({ success: false, message: 'Channel must be factual or ethical' });
@@ -128,6 +130,7 @@ export function registerModerationVerdictChannelRoutes(router: Router): void {
 
   router.put('/verdict-channels', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAdmin(req, res)) return;
+    if (!(await requirePrivilegedPasskeyAssurance(req, res))) return;
     const factual = parseChannelPayload('factual', req.body?.factual);
     const ethical = parseChannelPayload('ethical', req.body?.ethical);
     const override = parseOverride(req);

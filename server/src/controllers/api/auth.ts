@@ -47,11 +47,18 @@ import {
   revokeRefreshToken,
 } from './authTokenHelpers';
 import { registerAuthOnboardingRoutes } from './authOnboardingRoutes';
+import { registerAuthPasskeyRoutes } from './authPasskeyRoutes';
+import {
+  establishAuthenticatedSession,
+  getAuthenticationAssurance,
+  saveSession,
+} from '../../services/authAssuranceService';
 
 const jwt = jwtMod as unknown as typeof import('jsonwebtoken');
 
 export = function (router: Router) {
   registerAuthOnboardingRoutes(router);
+  registerAuthPasskeyRoutes(router);
   router.get('/me', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!req.user) {
       // Keep this endpoint non-failing for anonymous page loads in modern UI.
@@ -61,7 +68,12 @@ export = function (router: Router) {
 
     const activeRole = getSessionActiveRole(req) || getDefaultActiveRole(req.user as unknown as AuthUserDocument);
     setSessionActiveRole(req, activeRole);
-    res.json({ success: true, user: sanitizeUser(req.user), activeRole: activeRole });
+    res.json({
+      success: true,
+      user: sanitizeUser(req.user),
+      activeRole: activeRole,
+      assurance: getAuthenticationAssurance(req),
+    });
   });
 
   router.get('/providers', async function (req: WikitruthRequest, res: WikitruthResponse) {
@@ -150,13 +162,10 @@ export = function (router: Router) {
       user.roles.account = account._id;
       await user.save();
 
-      req.login(user as never, function (err?: unknown) {
-        if (err) {
-          return next(err);
-        }
-        setSessionActiveRole(req, 'reader');
-        res.status(201).json({ success: true, user: sanitizeUser(user), activeRole: 'reader' });
-      });
+      await establishAuthenticatedSession(req, user, 'password');
+      setSessionActiveRole(req, 'reader');
+      await saveSession(req);
+      res.status(201).json({ success: true, user: sanitizeUser(user), activeRole: 'reader' });
     } catch (error) {
       next(error);
     }
@@ -192,6 +201,11 @@ export = function (router: Router) {
         return;
       }
 
+      if (user.passwordLoginDisabled) {
+        res.status(403).json({ success: false, message: 'Password sign-in is disabled. Use a passkey or recovery code.' });
+        return;
+      }
+
       const isValid = await db.User.validatePassword(password, user.password || '');
       if (!isValid) {
         await recordFailedLoginAttempt(req, normalizedLoginIdentity);
@@ -199,14 +213,11 @@ export = function (router: Router) {
         return;
       }
 
-      req.login(user as never, function (err?: unknown) {
-        if (err) {
-          return next(err);
-        }
-        const activeRole = getSessionActiveRole(req) || getDefaultActiveRole(user);
-        setSessionActiveRole(req, activeRole);
-        res.json({ success: true, user: sanitizeUser(user), activeRole: activeRole });
-      });
+      await establishAuthenticatedSession(req, user, 'password');
+      const activeRole = getSessionActiveRole(req) || getDefaultActiveRole(user);
+      setSessionActiveRole(req, activeRole);
+      await saveSession(req);
+      res.json({ success: true, user: sanitizeUser(user), activeRole: activeRole });
     } catch (error) {
       next(error);
     }
@@ -275,14 +286,11 @@ export = function (router: Router) {
         return;
       }
 
-      req.login(user as never, function (err?: unknown) {
-        if (err) {
-          return next(err);
-        }
-        const activeRole = getSessionActiveRole(req) || getDefaultActiveRole(user);
-        setSessionActiveRole(req, activeRole);
-        res.json({ success: true, user: sanitizeUser(user), activeRole: activeRole });
-      });
+      await establishAuthenticatedSession(req, user, 'fast_switch');
+      const activeRole = getSessionActiveRole(req) || getDefaultActiveRole(user);
+      setSessionActiveRole(req, activeRole);
+      await saveSession(req);
+      res.json({ success: true, user: sanitizeUser(user), activeRole: activeRole });
     } catch (error) {
       next(error);
     }
@@ -530,6 +538,11 @@ export = function (router: Router) {
 
         if (!user) {
           res.status(401).json({ success: false, message: 'Invalid credentials' });
+          return;
+        }
+
+        if (user.passwordLoginDisabled) {
+          res.status(403).json({ success: false, message: 'Password token issuance is disabled for this account' });
           return;
         }
 

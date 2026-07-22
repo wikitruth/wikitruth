@@ -61,6 +61,8 @@ function createApp(options?: {
 
   app.use((req: { session?: Record<string, unknown> }, _res, next) => {
     req.session = req.session || {};
+    req.session.regenerate = (done: (error?: unknown) => void) => done();
+    req.session.save = (done: (error?: unknown) => void) => done();
     req.session.preferences = req.session.preferences || {};
     req.user = options?.user || null;
     req.login = (user: unknown, done?: (err?: unknown) => void) => {

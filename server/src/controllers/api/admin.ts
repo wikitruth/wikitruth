@@ -1,7 +1,7 @@
 'use strict';
 
 import type { Router } from 'express';
-import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
+import type { WikitruthNext, WikitruthRequest, WikitruthResponse } from '../../types/http';
 import {
   bodyOf,
   type AdminAccountNoteBodyContract,
@@ -19,6 +19,7 @@ const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).d
 import { registerAdminBackupRoutes } from './adminBackupRoutes';
 import { logEntryEvent } from '../../services/entryEventsService';
 import { registerAdminApiClientRoutes } from './adminApiClientRoutes';
+import { requirePrivilegedPasskeyAssurance } from '../../services/privilegedAuthService';
 
 function ensureAdmin(req: WikitruthRequest, res: WikitruthResponse): boolean {
   if (!req.user || !req.user.canPlayRoleOf || !req.user.canPlayRoleOf('admin')) {
@@ -124,6 +125,14 @@ function encryptPassword(password: string): Promise<string> {
 }
 
 export = function (router: Router) {
+  router.use(async function (req: WikitruthRequest, res: WikitruthResponse, next: WikitruthNext) {
+    if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+      next();
+      return;
+    }
+    if (!ensureAdmin(req, res) || !(await requirePrivilegedPasskeyAssurance(req, res))) return;
+    next();
+  });
   registerAdminApiClientRoutes(router, ensureAdmin);
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAdmin(req, res)) {

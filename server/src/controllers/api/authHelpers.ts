@@ -11,6 +11,7 @@ type AuthUserLike = {
   email?: string;
   roles?: unknown;
   onboarding?: unknown;
+  passwordLoginDisabled?: boolean;
 };
 
 type AuthUserDocument = {
@@ -24,6 +25,7 @@ type AuthUserDocument = {
   defaultReturnUrl?: () => string;
   isAdmin?: () => boolean;
   password?: string;
+  passwordLoginDisabled?: boolean;
   search?: string[];
   resetPasswordToken?: string;
   resetPasswordExpires?: number;
@@ -165,6 +167,7 @@ function sanitizeUser(user: AuthUserLike | null | undefined) {
     email: user.email,
     roles: user.roles,
     onboarding: user.onboarding,
+    passwordLoginDisabled: Boolean(user.passwordLoginDisabled),
   };
 }
 

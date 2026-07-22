@@ -183,6 +183,137 @@ export async function createPasskeyRegistrationOptions(req: WikitruthRequest, us
   return { ceremonyId, options };
 }
 
+export async function createPasswordlessSignupOptions(
+  req: WikitruthRequest,
+  identity: { username: string; email: string }
+) {
+  const config = requireCanonicalAuthOrigin(req);
+  if (!config.passwordlessEnabled) throw new Error('Passwordless signup is disabled');
+  const userHandle = randomBytes(32).toString('base64url');
+  const options = await generateRegistrationOptions({
+    rpName: config.rpName,
+    rpID: config.rpId,
+    userID: Buffer.from(userHandle, 'base64url'),
+    userName: identity.username,
+    userDisplayName: identity.username,
+    attestationType: 'none',
+    timeout: config.challengeTtlSeconds * 1000,
+    authenticatorSelection: {
+      residentKey: 'required',
+      requireResidentKey: true,
+      userVerification: 'required',
+    },
+  });
+  const ceremonyId = await createCeremony({
+    purpose: 'passwordless_signup',
+    challenge: options.challenge,
+    userHandle,
+    rpId: config.rpId,
+    expectedOrigin: getRequestOrigin(req),
+    ttlSeconds: config.challengeTtlSeconds,
+    metadata: identity,
+  });
+  return { ceremonyId, options };
+}
+
+export async function verifyPasswordlessSignup(input: {
+  req: WikitruthRequest;
+  ceremonyId: unknown;
+  response: RegistrationResponseJSON;
+  name?: unknown;
+}) {
+  const config = requireCanonicalAuthOrigin(input.req);
+  if (!config.passwordlessEnabled) throw new Error('Passwordless signup is disabled');
+  const ceremony = await consumeCeremony(input.ceremonyId, 'passwordless_signup');
+  const username = String(ceremony.metadata?.username || '').trim();
+  const email = String(ceremony.metadata?.email || '')
+    .trim()
+    .toLowerCase();
+  if (!username || !email || ceremony.rpId !== config.rpId)
+    throw new Error('Passwordless signup ceremony is invalid');
+  const duplicate = await db.User.findOne({ $or: [{ username }, { email }] }).lean();
+  if (duplicate) throw new Error('Username or email is already registered');
+  const verification = await verifyRegistrationResponse({
+    response: input.response,
+    expectedChallenge: challengeMatches(ceremony.challengeHash),
+    expectedOrigin: ceremony.expectedOrigin,
+    expectedRPID: ceremony.rpId,
+    requireUserVerification: true,
+  });
+  if (!verification.verified || !verification.registrationInfo?.userVerified) {
+    throw new Error('Passkey signup could not be verified');
+  }
+  const requireVerification = Boolean(
+    (input.req.app as unknown as { config?: { requireAccountVerification?: boolean } }).config
+      ?.requireAccountVerification
+  );
+  let user: Record<string, any> | null = null;
+  let account: Record<string, any> | null = null;
+  try {
+    const createdUser = await db.User.create({
+      isActive: 'yes',
+      username,
+      email,
+      passwordLoginDisabled: true,
+      search: [username, email],
+      onboarding: {
+        contributor: { completed: false },
+        reviewer: { completed: false },
+      },
+    });
+    user = createdUser;
+    const createdAccount = await db.Account.create({
+      isVerified: requireVerification ? 'no' : 'yes',
+      'name.full': username,
+      user: { id: createdUser._id, name: username },
+      search: [username],
+    });
+    account = createdAccount;
+    createdUser.roles ||= {};
+    createdUser.roles.account = createdAccount._id;
+    await createdUser.save();
+    const info = verification.registrationInfo;
+    const now = new Date();
+    const credential = await db.PasskeyCredential.create({
+      userId: createdUser._id,
+      credentialId: info.credential.id,
+      publicKey: Buffer.from(info.credential.publicKey),
+      userHandle: ceremony.userHandle,
+      rpId: ceremony.rpId,
+      counter: info.credential.counter,
+      transports: input.response.response.transports || info.credential.transports || [],
+      deviceType: info.credentialDeviceType,
+      backedUp: info.credentialBackedUp,
+      aaguid: info.aaguid,
+      name:
+        String(input.name || '')
+          .trim()
+          .slice(0, 80) || 'Passkey',
+      status: 'active',
+      createDate: now,
+      editDate: now,
+    });
+    await auditPasskey(
+      'auth.passkey.passwordless-signup',
+      user as PasskeyUser,
+      'Created an account with a passkey',
+      {
+        passkeyCredentialId: String(credential._id),
+        rpId: ceremony.rpId,
+      }
+    );
+    return {
+      user,
+      credential: publicCredential(credential.toObject ? credential.toObject() : credential),
+      verifiedAt: new Date().toISOString(),
+    };
+  } catch (error) {
+    if (account?._id) await db.Account.findByIdAndDelete(account._id).catch(() => undefined);
+    if (user?._id) await db.User.findByIdAndDelete(user._id).catch(() => undefined);
+    throw error;
+  }
+}
+
 export async function verifyPasskeyRegistration(input: {
   req: WikitruthRequest;
   user: PasskeyUser;

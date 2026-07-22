@@ -44,6 +44,7 @@ import { registerModerationVerdictChannelRoutes } from './moderationVerdictChann
 import { registerModerationIssueRoutes } from './moderationIssueRoutes';
 import { computeChannelConsensus, DEFAULT_VERDICT_CONSENSUS_POLICY } from '../../services/verdictConsensusService';
 import { writeVerdictDecision } from './verdictDecisionWriter';
+import { requirePrivilegedPasskeyAssurance } from '../../services/privilegedAuthService';
 
 export = function (router: Router) {
   registerModerationDuplicateRoutes(router);
@@ -522,6 +523,7 @@ export = function (router: Router) {
     if (!ensureAdmin(req, res)) {
       return;
     }
+    if (!(await requirePrivilegedPasskeyAssurance(req, res))) return;
 
     const body = bodyOf<ModerationStatusBodyContract>(req);
     const updates = Array.isArray(body.updates) ? body.updates : [];
@@ -587,6 +589,7 @@ export = function (router: Router) {
     if (!ensureAdmin(req, res)) {
       return;
     }
+    if (!(await requirePrivilegedPasskeyAssurance(req, res))) return;
 
     const target = parseModerationTarget(req);
     if (!target) {
@@ -633,6 +636,7 @@ export = function (router: Router) {
     if (!ensureAdmin(req, res)) {
       return;
     }
+    if (!(await requirePrivilegedPasskeyAssurance(req, res))) return;
 
     const target = parseModerationTarget(req);
     if (!target) {
@@ -682,6 +686,7 @@ export = function (router: Router) {
     if (!ensureAdmin(req, res)) {
       return;
     }
+    if (!(await requirePrivilegedPasskeyAssurance(req, res))) return;
 
     const migration = parseOwnershipMigrationRequest(req);
     if (!migration.topicId) {

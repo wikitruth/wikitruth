@@ -11,7 +11,7 @@ const groups = [
   ['/topics', ['topics.ts']], ['/arguments', ['arguments.ts']], ['/questions', ['questions.ts']],
   ['/answers', ['answers.ts']], ['/artifacts', ['artifacts.ts']], ['/issues', ['issues.ts']],
   ['/opinions', ['opinions.ts']], ['/search', ['search.ts']], ['/groups', ['groups.ts']],
-  ['/members', ['members.ts']], ['/auth', ['auth.ts', 'authOnboardingRoutes.ts']], ['/contact', ['contact.ts']],
+  ['/members', ['members.ts']], ['/auth', ['auth.ts', 'authOnboardingRoutes.ts', 'authPasskeyRoutes.ts']], ['/contact', ['contact.ts']],
   ['/admin', ['admin.ts', 'adminBackupRoutes.ts', 'adminApiClientRoutes.ts']],
   ['/moderation', ['moderation.ts', 'moderationArtifactRoutes.ts', 'moderationDuplicateRoutes.ts', 'moderationIssueRoutes.ts', 'moderationRevisionRoutes.ts', 'moderationSignalsRoutes.ts', 'moderationVerdictChannelRoutes.ts']],
   ['/outline', ['outline.ts']], ['/monitoring', ['monitoring.ts']], ['/realtime', ['realtime.ts']],

@@ -15,6 +15,7 @@ import {
   parseModerationTarget,
   toNumber,
 } from './moderationShared';
+import { requirePrivilegedPasskeyAssurance } from '../../services/privilegedAuthService';
 
 function actor(req: WikitruthRequest): { actorId: string; actorUsername: string } {
   return {
@@ -94,6 +95,7 @@ export function registerModerationRevisionRoutes(router: Router): void {
     if (!ensureReviewerOrAdmin(req, res)) {
       return;
     }
+    if (!(await requirePrivilegedPasskeyAssurance(req, res))) return;
     const objectType = toNumber(req.body?.objectType ?? req.body?.type);
     const objectId = String(req.body?.objectId || req.body?.id || '').trim();
     const revisionId = String(req.body?.revisionId || '').trim();
@@ -118,4 +120,3 @@ export function registerModerationRevisionRoutes(router: Router): void {
     }
   });
 }
-

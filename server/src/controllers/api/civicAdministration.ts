@@ -10,6 +10,7 @@ import { BUILT_IN_CIVIC_TENANTS } from '../../config/civicTenants';
 import { ensureCivicTenantRole } from '../../services/civicAuthorizationService';
 import { bootstrapBuiltInCivicTenants, publicCivicTenant } from '../../services/civicTenantService';
 import { logEntryEvent } from '../../services/entryEventsService';
+import { requirePrivilegedPasskeyAssurance } from '../../services/privilegedAuthService';
 import { civicExtensionSchemasInput } from '../../services/civicExtensionService';
 import { CIVIC_RECORD_KINDS } from '../../types/civic';
 import {
@@ -168,12 +169,14 @@ export function registerCivicAdministrationRoutes(router: Router): void {
 
   router.post('/platform/tenants/bootstrap', async (req: WikitruthRequest, res: WikitruthResponse) => {
     if (!ensurePlatformAdmin(req, res)) return;
+    if (!(await requirePrivilegedPasskeyAssurance(req, res))) return;
     const count = await bootstrapBuiltInCivicTenants(actorId(req));
     res.json({ success: true, count });
   });
 
   router.post('/platform/tenants', async (req: WikitruthRequest, res: WikitruthResponse) => {
     if (!ensurePlatformAdmin(req, res)) return;
+    if (!(await requirePrivilegedPasskeyAssurance(req, res))) return;
     const parsed = tenantSchema.safeParse(req.body || {});
     if (!parsed.success) {
       res.status(400).json({ success: false, message: 'Invalid civic tenant configuration', details: parsed.error.issues });
@@ -193,6 +196,7 @@ export function registerCivicAdministrationRoutes(router: Router): void {
 
   router.put('/platform/tenants/:managedTenantId', async (req: WikitruthRequest, res: WikitruthResponse) => {
     if (!ensurePlatformAdmin(req, res)) return;
+    if (!(await requirePrivilegedPasskeyAssurance(req, res))) return;
     const parsed = tenantUpdateSchema.safeParse(req.body || {});
     if (!parsed.success) {
       res.status(400).json({ success: false, message: 'Invalid civic tenant configuration', details: parsed.error.issues });
@@ -215,6 +219,7 @@ export function registerCivicAdministrationRoutes(router: Router): void {
 
   router.put('/platform/tenants/:managedTenantId/memberships/:userId', async (req: WikitruthRequest, res: WikitruthResponse) => {
     if (!ensurePlatformAdmin(req, res)) return;
+    if (!(await requirePrivilegedPasskeyAssurance(req, res))) return;
     const managedTenantId = tenantIdSchema.safeParse(req.params.managedTenantId);
     const parsed = membershipSchema.safeParse({ ...req.body, userId: req.params.userId });
     if (!managedTenantId.success || !parsed.success) {

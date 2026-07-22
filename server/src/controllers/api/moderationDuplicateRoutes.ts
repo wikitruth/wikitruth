@@ -13,6 +13,7 @@ import {
   parseModerationTarget,
   toNumber,
 } from './moderationShared';
+import { requirePrivilegedPasskeyAssurance } from '../../services/privilegedAuthService';
 
 export function registerModerationDuplicateRoutes(router: Router): void {
   router.get('/duplicates', async function (req: WikitruthRequest, res: WikitruthResponse) {
@@ -32,6 +33,7 @@ export function registerModerationDuplicateRoutes(router: Router): void {
     if (!ensureModerator(req, res)) {
       return;
     }
+    if (!(await requirePrivilegedPasskeyAssurance(req, res))) return;
     const body = (req.body || {}) as Record<string, unknown>;
     const objectType = toNumber(body.objectType ?? body.type);
     const sourceId = String(body.sourceId || '').trim();
