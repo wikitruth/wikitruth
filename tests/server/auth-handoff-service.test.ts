@@ -122,4 +122,28 @@ describe('cross-domain authentication handoffs', () => {
     expect(req.login).toHaveBeenCalledWith(user, expect.any(Function));
     expect(result.returnPath).toBe('/civic');
   });
+
+  it('rejects replay after the atomic consumer no longer returns the handoff', async () => {
+    const req = requestFixture('https://fixthephilippines.org');
+    const handoff = {
+      userId: 'user-1',
+      sourceOrigin: 'https://wikitruth.net',
+      targetOrigin: 'https://fixthephilippines.org',
+      returnPath: '/',
+      authenticationMethod: 'passkey',
+      authenticatedAt: new Date(),
+      passkeyVerifiedAt: new Date(),
+    };
+    handoffFindOneAndUpdate
+      .mockReturnValueOnce({ lean: async () => handoff })
+      .mockReturnValueOnce({ lean: async () => null });
+    userFindById.mockResolvedValue({ _id: 'user-1', username: 'alice', isActive: 'yes' });
+
+    await expect(consumeAuthHandoff(req, 'B'.repeat(43))).resolves.toEqual(
+      expect.objectContaining({ returnPath: '/' })
+    );
+    await expect(consumeAuthHandoff(req, 'B'.repeat(43))).rejects.toThrow(
+      /invalid, expired, already used/i
+    );
+  });
 });

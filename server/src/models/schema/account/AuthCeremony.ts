@@ -17,7 +17,7 @@ const factory: SchemaFactory = function (app, mongoose) {
     expectedOrigin: { type: String, required: true },
     metadata: { type: mongoose.Schema.Types.Mixed, default: {} },
     createDate: { type: Date, default: Date.now },
-    expiresAt: { type: Date, required: true, index: true },
+    expiresAt: { type: Date, required: true },
     consumedAt: { type: Date, default: null },
   });
 

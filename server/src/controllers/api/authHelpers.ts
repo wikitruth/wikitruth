@@ -282,7 +282,24 @@ function encryptPassword(password: string): Promise<string> {
   });
 }
 
-function getAccountIdFromUser(user: { roles?: unknown } | null | undefined): unknown {
+function normalizeReferencedId(value: unknown): string | null {
+  if (!value) return null;
+  if (typeof value === 'string') return value;
+  if (Buffer.isBuffer(value)) return value.toString('hex');
+  if (typeof value !== 'object') return null;
+
+  const objectId = value as {
+    _id?: unknown;
+    id?: unknown;
+    toHexString?: () => string;
+  };
+  if (typeof objectId.toHexString === 'function') return objectId.toHexString();
+  if (objectId._id && objectId._id !== value) return normalizeReferencedId(objectId._id);
+  if (objectId.id && objectId.id !== value) return normalizeReferencedId(objectId.id);
+  return null;
+}
+
+function getAccountIdFromUser(user: { roles?: unknown } | null | undefined): string | null {
   if (!user?.roles) {
     return null;
   }
@@ -292,16 +309,7 @@ function getAccountIdFromUser(user: { roles?: unknown } | null | undefined): unk
     return null;
   }
 
-  if (typeof accountRole === 'string') {
-    return accountRole;
-  }
-
-  if (typeof accountRole === 'object') {
-    const accountRecord = accountRole as { id?: unknown; _id?: unknown };
-    return accountRecord.id || accountRecord._id || null;
-  }
-
-  return null;
+  return normalizeReferencedId(accountRole);
 }
 
 function parseFastSwitchCookies(rawValue: unknown): FastSwitchCookie[] {
