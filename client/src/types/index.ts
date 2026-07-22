@@ -32,6 +32,7 @@ export interface User {
   };
   createdDate?: Date;
   isActive?: string;
+  passwordLoginDisabled?: boolean;
   reputation?: ReputationSnapshot | null;
 }
 

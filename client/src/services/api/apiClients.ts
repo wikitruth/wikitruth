@@ -1,5 +1,6 @@
 import API_BASE_URL from './baseUrl';
 import type { AdminRecord } from './admin';
+import fetchWithPasskeyStepUp from './passkeyFetch';
 
 export type ApiClientScope = 'entries:read' | 'contributions:write' | 'graph:write' | 'civic:write' | 'moderation:write';
 
@@ -29,14 +30,12 @@ const csrfToken = (): string | null => {
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const method = init?.method?.toUpperCase() || 'GET';
   const token = ['GET', 'HEAD'].includes(method) ? null : csrfToken();
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetchWithPasskeyStepUp(`${API_BASE_URL}${path}`, {
     credentials: 'include',
     headers: { 'Content-Type': 'application/json', ...(token ? { 'x-csrf-token': token } : {}), ...init?.headers },
     ...init,
   });
-  const payload = await response.json().catch(() => ({})) as { message?: string };
-  if (!response.ok) throw new Error(payload.message || `API client request failed: ${response.status}`);
-  return payload as T;
+  return response.json() as Promise<T>;
 }
 
 export const apiClientsApi = {

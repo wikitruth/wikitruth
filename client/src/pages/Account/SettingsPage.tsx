@@ -4,6 +4,7 @@ import Button from '../../components/common/Button';
 import Input from '../../components/Form/Input';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import authApi from '../../services/api/auth';
+import PasskeySecurityPanel from '../../components/Auth/PasskeySecurityPanel';
 
 interface ContactFormState {
   first: string;
@@ -133,13 +134,15 @@ const SettingsPage: React.FC = () => {
   return (
     <div className="container">
       <h2>Account Settings</h2>
-      <p className="text-muted">Manage contact info, identity, password, and social connections.</p>
+      <p className="text-muted">Manage identity, passkeys, recovery, password fallback, and social connections.</p>
 
       {error && <Alert type="danger">{error}</Alert>}
       {success && <Alert type="success">{success}</Alert>}
 
       <div className="row">
         <div className="col-sm-9">
+          <PasskeySecurityPanel />
+
           <div className="panel panel-default">
             <div className="panel-heading">
               <h3 className="panel-title">Contact Info</h3>

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import Input from '../../components/Form/Input';
 import Checkbox from '../../components/Form/Checkbox';
 import Button from '../../components/common/Button';
@@ -11,6 +11,7 @@ import PageMeta from '../../components/common/PageMeta';
 import useRecaptcha from '../../hooks/useRecaptcha';
 import authApi from '../../services/api/auth';
 import { trackEvent } from '../../utils/analytics';
+import passkeyApi, { type PasskeyRuntimeConfig } from '../../services/api/passkeys';
 
 interface SignupFormValues {
   username: string;
@@ -22,14 +23,18 @@ interface SignupFormValues {
 
 const SignupPage: React.FC = () => {
   const navigate = useNavigate();
-  const { signup, isAuthenticated } = useAuth();
+  const [searchParams] = useSearchParams();
+  const { signup, isAuthenticated, refreshAuth } = useAuth();
   const { execute: executeRecaptcha } = useRecaptcha();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [providersReady, setProvidersReady] = useState(false);
   const [enabledProviders, setEnabledProviders] = useState<Record<string, boolean>>({});
+  const [passkeyConfig, setPasskeyConfig] = useState<PasskeyRuntimeConfig | null>(null);
+  const [passkeyBusy, setPasskeyBusy] = useState(false);
+  const passkeyDestinationPending = useRef(false);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && !passkeyDestinationPending.current) {
       navigate('/');
     }
   }, [isAuthenticated, navigate]);
@@ -54,6 +59,20 @@ const SignupPage: React.FC = () => {
     };
 
     void loadProviders();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    void passkeyApi.config()
+      .then(config => {
+        if (active) setPasskeyConfig(config);
+      })
+      .catch(() => {
+        if (active) setPasskeyConfig(null);
+      });
     return () => {
       active = false;
     };
@@ -125,6 +144,54 @@ const SignupPage: React.FC = () => {
     validate,
     onSubmit: handleSubmit,
   });
+
+  const handlePasskeySignup = async () => {
+    setSubmitError(null);
+    const username = values.username.trim();
+    const email = values.email.trim();
+    if (!username || !/^[a-zA-Z0-9\-_]+$/.test(username)) {
+      setSubmitError('Enter a valid username using letters, numbers, dash, or underscore.');
+      return;
+    }
+    if (!email || !/^[a-zA-Z0-9\-_.+]+@[a-zA-Z0-9\-_.]+\.[a-zA-Z0-9\-_]+$/.test(email)) {
+      setSubmitError('Enter a valid email address.');
+      return;
+    }
+    if (!values.agreeToTerms) {
+      setSubmitError('You must agree to the terms and responsible participation rules.');
+      return;
+    }
+    setPasskeyBusy(true);
+    try {
+      const recaptchaToken = await executeRecaptcha('signup_passkey');
+      await passkeyApi.passwordlessSignup({
+        username,
+        email,
+        recaptchaResponse: recaptchaToken || undefined,
+      });
+      passkeyDestinationPending.current = true;
+      await refreshAuth?.();
+      trackEvent('signup', 'auth', 'passkey');
+      const tenantOrigin = String(searchParams.get('tenantOrigin') || '').trim();
+      if (tenantOrigin && tenantOrigin !== window.location.origin) {
+        const handoff = await passkeyApi.createHandoff(tenantOrigin, '/account/settings#passkeys');
+        window.location.assign(handoff.callbackUrl);
+      } else {
+        navigate('/account/settings#passkeys');
+      }
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : 'Passkey signup failed. Please try again.');
+    } finally {
+      setPasskeyBusy(false);
+    }
+  };
+
+  const tenantSignupUrl = (() => {
+    if (!passkeyConfig?.canonicalOrigin || typeof window === 'undefined') return '';
+    const url = new URL('/signup', passkeyConfig.canonicalOrigin);
+    url.searchParams.set('tenantOrigin', window.location.origin);
+    return url.toString();
+  })();
 
   return (
     <div className="container" style={{ maxWidth: '520px', marginTop: '60px' }}>
@@ -201,6 +268,31 @@ const SignupPage: React.FC = () => {
               onChange={handleChange}
               error={touched.agreeToTerms ? errors.agreeToTerms : undefined}
             />
+
+            {passkeyConfig?.enabled && passkeyConfig.passwordlessEnabled ? (
+              <div className="well well-sm">
+                <strong>Recommended: create a passwordless account</strong>
+                <p className="text-muted" style={{ marginTop: '6px' }}>
+                  A passkey uses your device unlock and is resistant to phishing. Add a second passkey and recovery codes after signup.
+                </p>
+                {passkeyConfig.isCanonicalOrigin ? (
+                  <Button
+                    type="button"
+                    variant="success"
+                    className="btn-block"
+                    icon={passkeyBusy ? 'spinner fa-spin' : 'key'}
+                    disabled={passkeyBusy || !passkeyApi.supported()}
+                    onClick={() => void handlePasskeySignup()}
+                  >
+                    {passkeyBusy ? 'Waiting for your device...' : 'Create account with a passkey'}
+                  </Button>
+                ) : (
+                  <a className="btn btn-success btn-block" href={tenantSignupUrl}>
+                    <i className="fa fa-key" /> Create passkey account on Wikitruth
+                  </a>
+                )}
+              </div>
+            ) : null}
 
             <div className="form-group" style={{ marginTop: '20px' }}>
               <Button

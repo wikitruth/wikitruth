@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { browserSupportsWebAuthnAutofill } from '@simplewebauthn/browser';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import Input from '../components/Form/Input';
 import Button from '../components/common/Button';
@@ -9,6 +10,7 @@ import { useAuth } from '../context/AuthContext';
 import authApi from '../services/api/auth';
 import PageMeta from '../components/common/PageMeta';
 import { trackEvent } from '../utils/analytics';
+import passkeyApi, { type PasskeyRuntimeConfig } from '../services/api/passkeys';
 
 interface LoginFormValues {
   username: string;
@@ -24,10 +26,16 @@ const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const returnUrl = safeReturnUrl(searchParams.get('returnUrl'));
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, refreshAuth } = useAuth();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [providersReady, setProvidersReady] = useState(false);
   const [enabledProviders, setEnabledProviders] = useState<Record<string, boolean>>({});
+  const [passkeyConfig, setPasskeyConfig] = useState<PasskeyRuntimeConfig | null>(null);
+  const [passkeyBusy, setPasskeyBusy] = useState(false);
+  const [showRecovery, setShowRecovery] = useState(false);
+  const [recoveryIdentity, setRecoveryIdentity] = useState('');
+  const [recoveryCode, setRecoveryCode] = useState('');
+  const conditionalStarted = useRef(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -59,6 +67,87 @@ const LoginPage: React.FC = () => {
       active = false;
     };
   }, []);
+
+  useEffect(() => {
+    let active = true;
+    void passkeyApi.config()
+      .then(config => {
+        if (active) setPasskeyConfig(config);
+      })
+      .catch(() => {
+        if (active) setPasskeyConfig(null);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (
+      conditionalStarted.current ||
+      isAuthenticated ||
+      !passkeyConfig?.enabled ||
+      !passkeyConfig.isCanonicalOrigin ||
+      !passkeyApi.supported()
+    ) return;
+    conditionalStarted.current = true;
+    let active = true;
+    void browserSupportsWebAuthnAutofill()
+      .then(available => available
+        ? passkeyApi.authenticate('authentication', true)
+        : null)
+      .then(async result => {
+        if (!active || !result) return;
+        await refreshAuth?.();
+        trackEvent('login', 'auth', 'passkey-autofill');
+        navigate(returnUrl, { replace: true });
+      })
+      .catch(() => {
+        // Conditional mediation is optional; the explicit passkey button remains available.
+      });
+    return () => {
+      active = false;
+    };
+  }, [isAuthenticated, navigate, passkeyConfig, refreshAuth, returnUrl]);
+
+  const tenantPasskeyUrl = (() => {
+    if (!passkeyConfig?.canonicalOrigin || typeof window === 'undefined') return '';
+    const url = new URL('/auth/continue', passkeyConfig.canonicalOrigin);
+    url.searchParams.set('targetOrigin', window.location.origin);
+    url.searchParams.set('returnUrl', returnUrl);
+    return url.toString();
+  })();
+
+  const handlePasskeySignIn = async () => {
+    setPasskeyBusy(true);
+    setSubmitError(null);
+    try {
+      await passkeyApi.authenticate('authentication');
+      await refreshAuth?.();
+      trackEvent('login', 'auth', 'passkey');
+      navigate(returnUrl, { replace: true });
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : 'Passkey sign-in failed.');
+    } finally {
+      setPasskeyBusy(false);
+    }
+  };
+
+  const handleRecoveryLogin = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setPasskeyBusy(true);
+    setSubmitError(null);
+    try {
+      await passkeyApi.recoveryLogin(recoveryIdentity.trim(), recoveryCode.trim());
+      await refreshAuth?.();
+      trackEvent('login', 'auth', 'recovery-code');
+      navigate('/account/settings#passkeys', { replace: true });
+    } catch (error) {
+      setSubmitError(error instanceof Error ? error.message : 'Recovery sign-in failed.');
+    } finally {
+      setPasskeyBusy(false);
+    }
+  };
 
   const validate = (values: LoginFormValues) => {
     const errors: Partial<Record<keyof LoginFormValues, string>> = {};
@@ -143,7 +232,8 @@ const LoginPage: React.FC = () => {
               placeholder="Enter your username or email"
               required
               error={touched.username ? errors.username : undefined}
-              autoComplete="username"
+              autoComplete="username webauthn"
+              className="webauthn-username"
             />
 
             <Input
@@ -174,6 +264,59 @@ const LoginPage: React.FC = () => {
               </Link>
             </div>
           </form>
+
+          {passkeyConfig?.enabled ? (
+            <div style={{ marginTop: '18px' }}>
+              <div className="text-center text-muted" style={{ marginBottom: '12px' }}>or</div>
+              {passkeyConfig.isCanonicalOrigin ? (
+                <Button
+                  type="button"
+                  variant="success"
+                  className="btn-block"
+                  icon={passkeyBusy ? 'spinner fa-spin' : 'key'}
+                  disabled={passkeyBusy || !passkeyApi.supported()}
+                  onClick={() => void handlePasskeySignIn()}
+                >
+                  {passkeyBusy ? 'Waiting for your device...' : 'Sign in with a passkey'}
+                </Button>
+              ) : (
+                <a className="btn btn-success btn-block" href={tenantPasskeyUrl}>
+                  <i className="fa fa-key" /> Continue with passkey on Wikitruth
+                </a>
+              )}
+              {!passkeyApi.supported() && passkeyConfig.isCanonicalOrigin ? (
+                <p className="help-block">This browser or device does not support passkeys.</p>
+              ) : null}
+              <button
+                type="button"
+                className="btn btn-link btn-block"
+                onClick={() => setShowRecovery(current => !current)}
+              >
+                Use a recovery code
+              </button>
+              {showRecovery ? (
+                <form onSubmit={handleRecoveryLogin} className="well well-sm">
+                  <Input
+                    name="recoveryIdentity"
+                    label="Username or Email"
+                    value={recoveryIdentity}
+                    onChange={event => setRecoveryIdentity(event.target.value)}
+                    autoComplete="username"
+                    required
+                  />
+                  <Input
+                    name="recoveryCode"
+                    label="Recovery code"
+                    value={recoveryCode}
+                    onChange={event => setRecoveryCode(event.target.value)}
+                    autoComplete="one-time-code"
+                    required
+                  />
+                  <Button type="submit" disabled={passkeyBusy} icon="life-ring">Recover account</Button>
+                </form>
+              ) : null}
+            </div>
+          ) : null}
         </div>
 
         <div className="col-sm-6">

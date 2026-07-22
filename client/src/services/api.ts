@@ -35,18 +35,9 @@ import type {
   AnonymousEntryType,
   OutlineTreeResponse,
 } from '../types/api';
+import fetchWithPasskeyStepUp from './api/passkeyFetch';
 
-export class ApiRequestError extends Error {
-  readonly status: number;
-  readonly code?: string;
-
-  constructor(status: number, message: string, code?: string) {
-    super(message);
-    this.name = 'ApiRequestError';
-    this.status = status;
-    this.code = code;
-  }
-}
+export { ApiRequestError } from './api/apiError';
 
 export type ArtifactFileUpload = File;
 
@@ -124,47 +115,11 @@ class ApiService {
       }
     }
 
-    const response = await fetch(`${this.baseUrl}${url}`, {
+    const response = await fetchWithPasskeyStepUp(`${this.baseUrl}${url}`, {
       ...options,
       credentials: 'same-origin',
-      headers: headers,
+      headers,
     });
-
-    if (!response.ok) {
-      let errorMessage = `API request failed (${response.status}): ${response.statusText}`;
-      let errorCode: string | undefined;
-      try {
-        const errorPayload = (await response.json()) as {
-          error?: string | { code?: string; message?: string };
-          message?: string;
-          code?: string;
-        };
-
-        if (typeof errorPayload?.message === 'string' && errorPayload.message.trim()) {
-          errorMessage = errorPayload.message.trim();
-        }
-
-        if (typeof errorPayload?.code === 'string' && errorPayload.code.trim()) {
-          errorCode = errorPayload.code.trim();
-        }
-
-        if (typeof errorPayload?.error === 'string' && errorPayload.error.trim()) {
-          errorMessage = errorPayload.error.trim();
-        } else if (errorPayload?.error && typeof errorPayload.error === 'object') {
-          const nestedMessage = String(errorPayload.error.message || '').trim();
-          const nestedCode = String(errorPayload.error.code || '').trim();
-          if (nestedMessage) {
-            errorMessage = nestedMessage;
-          }
-          if (nestedCode) {
-            errorCode = nestedCode;
-          }
-        }
-      } catch (_err) {
-        // Keep default status message when the response has no JSON payload.
-      }
-      throw new ApiRequestError(response.status, errorMessage, errorCode);
-    }
 
     const payload = (await response.json()) as T;
 

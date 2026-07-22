@@ -8,6 +8,8 @@ describe('routeConfig', () => {
     const paths = appRoutes.map((route) => route.path);
     expect(paths).toContain('/');
     expect(paths).toContain('/login');
+    expect(paths).toContain('/auth/continue');
+    expect(paths).toContain('/auth/handoff');
     expect(paths).toContain('/topics');
     expect(paths).toContain('/questions/create');
     expect(paths).toContain('/answers/create');

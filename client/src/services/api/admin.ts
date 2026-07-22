@@ -1,4 +1,5 @@
 import API_BASE_URL from './baseUrl';
+import fetchWithPasskeyStepUp from './passkeyFetch';
 
 export type AdminRecord = Record<string, unknown> & {
   _id?: string;
@@ -33,7 +34,7 @@ const getCsrfToken = (): string | null => {
 const request = async <T>(url: string, init?: RequestInit): Promise<T> => {
   const method = init?.method?.toUpperCase() ?? 'GET';
   const csrfToken = method === 'GET' || method === 'HEAD' ? null : getCsrfToken();
-  const response = await fetch(url, {
+  const response = await fetchWithPasskeyStepUp(url, {
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
@@ -42,10 +43,6 @@ const request = async <T>(url: string, init?: RequestInit): Promise<T> => {
     },
     ...init,
   });
-
-  if (!response.ok) {
-    throw new Error(`Admin request failed: ${response.status}`);
-  }
 
   return response.json();
 };

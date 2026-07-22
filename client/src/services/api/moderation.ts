@@ -1,4 +1,5 @@
 import API_BASE_URL from './baseUrl';
+import fetchWithPasskeyStepUp from './passkeyFetch';
 import type {
   ModerationEntry,
   ModerationEntryResponse,
@@ -158,7 +159,7 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
   const method = init?.method?.toUpperCase() ?? 'GET';
   const csrfToken = method === 'GET' || method === 'HEAD' ? null : getCsrfToken();
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetchWithPasskeyStepUp(`${API_BASE_URL}${path}`, {
     credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
@@ -167,11 +168,6 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
     },
     ...init,
   });
-
-  if (!response.ok) {
-    const errorPayload = await response.json().catch(() => null) as { message?: unknown } | null;
-    throw new Error(String(errorPayload?.message || `Moderation request failed: ${response.status}`));
-  }
 
   return response.json();
 };

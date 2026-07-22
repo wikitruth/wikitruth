@@ -1,4 +1,5 @@
 import API_BASE_URL from './baseUrl';
+import fetchWithPasskeyStepUp from './passkeyFetch';
 
 export interface ApiClientOptions {
   baseUrl?: string;
@@ -18,7 +19,7 @@ export const createApiClient = (options: ApiClientOptions = {}) => {
   return async <T>(path: string, init?: RequestInit): Promise<T> => {
     const method = String(init?.method || 'GET').toUpperCase();
     const csrfToken = method === 'GET' || method === 'HEAD' ? null : getCsrfToken();
-    const response = await fetch(`${baseUrl}${path}`, {
+    const response = await fetchWithPasskeyStepUp(`${baseUrl}${path}`, {
       ...init,
       headers: {
         ...defaultHeaders,
@@ -27,20 +28,6 @@ export const createApiClient = (options: ApiClientOptions = {}) => {
       },
       credentials: 'include',
     });
-
-    if (!response.ok) {
-      let message = `API request failed: ${response.status}`;
-      try {
-        const payload = await response.json() as { message?: string; error?: string | { message?: string } };
-        if (typeof payload.message === 'string') message = payload.message;
-        if (typeof payload.error === 'string') message = payload.error;
-        if (payload.error && typeof payload.error === 'object' && payload.error.message) message = payload.error.message;
-      } catch {
-        // Preserve the status fallback for non-JSON responses.
-      }
-      throw new Error(message);
-    }
-
     return response.json() as Promise<T>;
   };
 };

@@ -14,6 +14,7 @@ interface AuthContextType {
   signup: (username: string, email: string, password: string, recaptchaResponse?: string) => Promise<void>;
   login: (username: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  refreshAuth?: () => Promise<void>;
   updateUser: (userData: Partial<User>) => void;
 }
 
@@ -155,8 +156,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signup,
     login,
     logout,
+    refreshAuth: checkAuthStatus,
     updateUser,
-  }), [user, isLoading, activeRole, setActiveRole, availableRoles, signup, login, logout, updateUser]);
+  }), [user, isLoading, activeRole, setActiveRole, availableRoles, signup, login, logout, checkAuthStatus, updateUser]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
