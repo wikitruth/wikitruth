@@ -54,9 +54,8 @@ Use cases:
 ### Low-confidence political claim material
 
 - `The truth about US politics`
-- `gloria-complaints`
-- `marcos`
-- `some-issues`
+- A separate restricted legacy corpus is retained outside Wikitruth for
+  provenance only; it is not an admitted source or product seed.
 
 Use cases:
 
@@ -84,4 +83,3 @@ For claim intake only:
 - Do not auto-promote external references into truth status.
 - Preserve source attribution for every imported claim.
 - Prefer primary records and reproducible evidence over secondary commentary.
-

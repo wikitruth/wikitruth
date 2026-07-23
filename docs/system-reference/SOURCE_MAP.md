@@ -91,11 +91,10 @@ Primary sources:
 - `markdown/Wikitruth Tasks.docx.md` (FixPH sections)
 - `original/Design/fixtheph.smmx`
 
-Contextual-only claim intake sources:
-
-- `markdown/fixthephilippines.org/gloria-complaints.docx.md`
-- `markdown/fixthephilippines.org/marcos.docx.md`
-- `markdown/fixthephilippines.org/some-issues.docx.md`
+The raw political-allegation corpus formerly catalogued here was relocated to a
+separately governed restricted archive outside this repository on 2026-07-23.
+It is not a Wikitruth product input and must not be used as published or seed
+content.
 
 ## Reference Library and Evidence Policy
 
@@ -126,4 +125,3 @@ Primary sources:
 - `markdown/Research Features.docx.md`
 - `markdown/Development Phases.docx.md`
 - `markdown/Topics to create.docx.md`
-

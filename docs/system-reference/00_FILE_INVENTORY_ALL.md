@@ -50,9 +50,6 @@ Signal levels:
 | `markdown/fixthephilippines.org/FixthePH Notes.docx.md` | Converted FixPH product doc | `high` | High-signal FixPH IA/features/system-structure requirements. |
 | `markdown/fixthephilippines.org/Letter from Prime Minister Lee Hsien Loong to PAP MPs on Rules of Prudence _ Prime Ministerâs Office Singapore.pdf.md` | Converted governance reference | `medium` | Reference governance/integrity material; useful for policy inspiration, not direct requirements. |
 | `markdown/fixthephilippines.org/fixthephilippines.org.md` | Converted FixPH product doc | `high` | High-signal FixPH IA/features/system-structure requirements. |
-| `markdown/fixthephilippines.org/gloria-complaints.docx.md` | Converted civic allegation list | `medium` | Raw claim corpus for issue seeding; requires strict verification and source-backed moderation. |
-| `markdown/fixthephilippines.org/marcos.docx.md` | Converted civic allegation list | `medium` | Raw claim corpus for issue seeding; requires strict verification and source-backed moderation. |
-| `markdown/fixthephilippines.org/some-issues.docx.md` | Converted civic allegation list | `medium` | Raw claim corpus for issue seeding; requires strict verification and source-backed moderation. |
 | `original/About/Knowing and Discerning Truth.docx` | Original docx source | `medium` | Primary source backing converted markdown; used for fidelity validation and fallback extraction. |
 | `original/About/Reader Warning.docx` | Original docx source | `medium` | Primary source backing converted markdown; used for fidelity validation and fallback extraction. |
 | `original/About/What is Wikitruth.docx` | Original docx source | `medium` | Primary source backing converted markdown; used for fidelity validation and fallback extraction. |
@@ -137,9 +134,6 @@ Signal levels:
 | `original/fixthephilippines.org/fixtheph-logo-red.psd` | Design source file | `low` | Branding asset source; no direct product behavior requirements. |
 | `original/fixthephilippines.org/fixtheph-logo.psd` | Design source file | `low` | Branding asset source; no direct product behavior requirements. |
 | `original/fixthephilippines.org/fixthephilippines.org` | Original doc container | `medium` | Google Docs-exported binary source paired with converted markdown. |
-| `original/fixthephilippines.org/gloria-complaints.docx` | Original docx source | `medium` | Primary source backing converted markdown; used for fidelity validation and fallback extraction. |
 | `original/fixthephilippines.org/logo-1024x1024.png` | Visual/branding/screenshot asset | `low` | Useful for UX/branding inspiration; contains limited extractable structured requirements. |
 | `original/fixthephilippines.org/logo.jpg` | Visual/branding/screenshot asset | `low` | Useful for UX/branding inspiration; contains limited extractable structured requirements. |
 | `original/fixthephilippines.org/logo.png` | Visual/branding/screenshot asset | `low` | Useful for UX/branding inspiration; contains limited extractable structured requirements. |
-| `original/fixthephilippines.org/marcos.docx` | Original docx source | `medium` | Primary source backing converted markdown; used for fidelity validation and fallback extraction. |
-| `original/fixthephilippines.org/some-issues.docx` | Original docx source | `medium` | Primary source backing converted markdown; used for fidelity validation and fallback extraction. |

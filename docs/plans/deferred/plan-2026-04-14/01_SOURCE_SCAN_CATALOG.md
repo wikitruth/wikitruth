@@ -510,12 +510,10 @@
   - Accountability model (budget/official/timeline/status per project)
   - Citizen uploads + concerns + suggestions workflows
 
-### `fixthephilippines.org/gloria-complaints.docx`
-- Classification: FixPH content seed/reference
-- Parse status: Text parsed
-- Implementable signals:
-  - 7. Use of Road User's Tax for Campaigning
-  - 45.- "Vote Buying" by giving away Philhealth cards
+### Restricted political-allegation corpus
+- Classification: Relocated legacy material; not a Wikitruth product input
+- Relocation date: 2026-07-23
+- Implementable signals: none; the material must not be used as seed content
 
 ### `fixthephilippines.org/logo-1024x1024.png`
 - Classification: FixPH content seed/reference
@@ -531,13 +529,3 @@
 - Classification: FixPH content seed/reference
 - Parse status: Binary/visual (manual interpretation only)
 - Implementable signals: none machine-extracted (asset/reference only).
-
-### `fixthephilippines.org/marcos.docx`
-- Classification: FixPH content seed/reference
-- Parse status: Text parsed
-- Implementable signals: none explicit; treated as context/reference.
-
-### `fixthephilippines.org/some-issues.docx`
-- Classification: FixPH content seed/reference
-- Parse status: Text parsed
-- Implementable signals: none explicit; treated as context/reference.
