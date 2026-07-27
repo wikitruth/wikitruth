@@ -13,6 +13,7 @@ import * as flowUtilsNs from '../../utils/flowUtils';
 import constantsMod from '../../models/constants';
 import { attachAuthorReputation } from '../../services/reputationService';
 import { resolveActiveApplication, visibleApplications } from '../../services/applicationContextService';
+import { loadHomeRankings } from '../../services/homeRankingService';
 const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
 const constants = constantsMod as unknown as ConstantsModule;
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
@@ -45,6 +46,7 @@ interface HomeModel {
   appCategories?: unknown;
   diaryCategories?: unknown[];
   myGroups?: unknown[];
+  rankings?: unknown;
   [key: string]: unknown;
 }
 
@@ -68,7 +70,8 @@ async function GET_home(req: WikitruthRequest, res: WikitruthResponse) {
   };
   const hasTenantKnowledge = !application || Boolean(knowledgeRootTopicId);
 
-  const MAX_RESULT = 5;
+  const MAX_RESULT = 20;
+  const DISPLAY_RESULT = 5;
   const model: HomeModel = {};
 
   const result = await db.Topic.findOne({});
@@ -225,6 +228,18 @@ async function GET_home(req: WikitruthRequest, res: WikitruthResponse) {
   });
 
   await attachAuthorReputation(db, model);
+
+  const rankingCandidates = ([] as unknown[]).concat(
+    model.topics || [], model.arguments || [], model.questions || [], model.answers || [],
+    model.issues || [], model.opinions || [], model.artifacts || [],
+  ) as Array<Record<string, unknown>>;
+  model.rankings = await loadHomeRankings(db, rankingCandidates);
+
+  // Keep the legacy per-type payload compact; discovery buckets retain ranked candidates.
+  ['topics', 'arguments', 'questions', 'answers', 'issues', 'opinions', 'artifacts'].forEach((key) => {
+    const entries = model[key];
+    if (Array.isArray(entries)) model[key] = entries.slice(0, DISPLAY_RESULT);
+  });
 
   // Keep parity with legacy homepage mixed "Latest Posts" columns.
   flowUtils.createEntrySet(model);

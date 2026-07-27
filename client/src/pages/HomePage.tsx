@@ -17,6 +17,7 @@ import { useNotification } from '../context/NotificationContext';
 import { useApplicationContext } from '../context/ApplicationContext';
 import { toModernAppSectionUrl } from '../utils/paths';
 import { buildFeatureHeaderStyle, FALLBACK_FEATURE_SECTION_TITLES } from './Home/featureHeaders';
+import HomeRankingBuckets, { type HomeRankings } from './Home/HomeRankingBuckets';
 
 type HomeEntrySetColumn = {
   entries?: LegacyEntity[];
@@ -39,6 +40,7 @@ interface HomeData {
   issuesMore?: boolean;
   opinionsMore?: boolean;
   artifactsMore?: boolean;
+  rankings?: HomeRankings;
 }
 
 const HomePage: React.FC = () => {
@@ -283,11 +285,13 @@ const HomePage: React.FC = () => {
         </div>
       )}
 
-      <h1 className="page-header wt-header">
-        <i className="fa fa-globe"></i> Latest Posts
-      </h1>
-
-      {entrySetColumns.length > 0 ? (
+      {data.rankings ? (
+        <HomeRankingBuckets rankings={data.rankings} renderEntry={renderMixedEntry} />
+      ) : entrySetColumns.length > 0 ? (
+        <>
+        <h1 className="page-header wt-header">
+          <i className="fa fa-globe"></i> Latest Posts
+        </h1>
         <div className="row">
           {entrySetColumns.map((column, index) => (
             <div key={`entry-set-${index}`} className="col-md-6 col-sm-12">
@@ -304,6 +308,7 @@ const HomePage: React.FC = () => {
             </div>
           ))}
         </div>
+        </>
       ) : (
         <>
       <div className="row">

@@ -119,6 +119,12 @@ export interface HomeDataResponse extends ApiBaseResponse, EntityBuckets {
   entrySet?: Array<{
     entries?: LegacyEntity[];
   }>;
+  rankings?: {
+    formulas: { latest: string; trending: string; top: string; disclaimer: string };
+    candidateCount: number;
+    candidateWindow: string;
+    buckets: { latest: LegacyEntity[]; trending: LegacyEntity[]; top: LegacyEntity[] };
+  };
   topicsMore?: boolean;
   argumentsMore?: boolean;
   questionsMore?: boolean;
