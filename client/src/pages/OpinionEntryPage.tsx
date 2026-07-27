@@ -23,6 +23,7 @@ import {
   EntryMetaBlock,
   buildLegacyEntryBreadcrumb,
 } from '../components/Entry/EntryLegacyParity';
+import OpinionClassificationLabel from '../components/Entry/OpinionClassificationLabel';
 
 const OpinionEntryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -96,6 +97,9 @@ const OpinionEntryPage: React.FC = () => {
         iconColor="text-info"
       />
       <EntryContextLine entry={opinion} objectName="opinion" />
+      <p style={{ marginTop: 8 }}>
+        <OpinionClassificationLabel value={(opinion.extras as { classification?: unknown } | undefined)?.classification} />
+      </p>
 
       <EntryQuickActions
         entry={opinion}

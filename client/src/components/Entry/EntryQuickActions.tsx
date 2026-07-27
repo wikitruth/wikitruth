@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import apiService from '../../services/api';
 import type { EntryReactionCounts, EntryReactionState, ReactionChannel, ReactionValue } from '../../types/api';
 import type { LegacyEntity } from '../../types/legacy';
+import ContextualContributionDrawer from './ContextualContributionDrawer';
 
 type SupportedObjectName = 'topic' | 'argument' | 'question' | 'answer' | 'issue' | 'opinion' | 'artifact';
 
@@ -169,6 +170,7 @@ const EntryQuickActions: React.FC<EntryQuickActionsProps> = ({
   const [pendingKey, setPendingKey] = useState<string | null>(null);
   const [showReplyMenu, setShowReplyMenu] = useState(false);
   const [showQuickEdit, setShowQuickEdit] = useState(false);
+  const [showContributionDrawer, setShowContributionDrawer] = useState(false);
   const [editTitle, setEditTitle] = useState(String(entry.title || ''));
   const [editContent, setEditContent] = useState(String(entry.content || ''));
   const [isSubmittingInlineAction, setIsSubmittingInlineAction] = useState(false);
@@ -458,6 +460,7 @@ const EntryQuickActions: React.FC<EntryQuickActionsProps> = ({
               event.preventDefault();
               setShowReplyMenu((value) => !value);
               setShowQuickEdit(false);
+              setShowContributionDrawer(false);
             }}
             onBlur={() => {
               window.setTimeout(() => setShowReplyMenu(false), 120);
@@ -468,6 +471,17 @@ const EntryQuickActions: React.FC<EntryQuickActionsProps> = ({
           {showReplyMenu ? (
             <ul className="dropdown-menu dropdown-menu-right-x">
               <li className="dropdown-header">Reply With...</li>
+              <li>
+                <button
+                  type="button"
+                  className="btn btn-link"
+                  style={{ width: '100%', textAlign: 'left', color: '#333', padding: '3px 20px' }}
+                  onClick={() => { setShowReplyMenu(false); setShowContributionDrawer(true); }}
+                >
+                  <i className="fa fa-bolt" aria-hidden="true"></i> Quick Contribution
+                </button>
+              </li>
+              <li role="separator" className="divider"></li>
               {replyMenuItems.map((item) => (
                 <React.Fragment key={item.key}>
                   {item.dividerBefore ? <li role="separator" className="divider"></li> : null}
@@ -507,6 +521,7 @@ const EntryQuickActions: React.FC<EntryQuickActionsProps> = ({
               onClick={() => {
                 setShowQuickEdit((value) => !value);
                 setShowReplyMenu(false);
+                setShowContributionDrawer(false);
               }}
             >
               <i className="fa fa-pencil" aria-hidden="true"></i> <span>Quick Edit</span>
@@ -514,6 +529,15 @@ const EntryQuickActions: React.FC<EntryQuickActionsProps> = ({
           </div>
         ) : null}
       </div>
+      {showContributionDrawer ? (
+        <ContextualContributionDrawer
+          entry={entry}
+          objectName={objectName}
+          topicId={topicIdForReply}
+          onClose={() => setShowContributionDrawer(false)}
+          onSubmitted={(message) => addToast('success', message)}
+        />
+      ) : null}
       {showQuickEdit ? (
         <div className="panel panel-default">
           <div className="panel-heading">

@@ -501,10 +501,11 @@ class ApiService {
   }
 
   // Opinions
-  async getOpinions(topicId?: string, view?: string): Promise<LegacyApiResponse> {
+  async getOpinions(topicId?: string, view?: string, classification?: string): Promise<LegacyApiResponse> {
     const params = new URLSearchParams();
     if (topicId) params.set('topic', topicId);
     if (view && view !== 'all') params.set('view', view);
+    if (classification && classification !== 'all') params.set('classification', classification);
     const qs = params.toString();
     const url = qs ? `/opinions?${qs}` : '/opinions';
     return this.request<LegacyApiResponse>(url);
@@ -521,6 +522,7 @@ class ApiService {
     parentId?: string;
     parentType?: string;
     private?: boolean;
+    classification?: 'general' | 'supplement' | 'objection' | 'question';
   }): Promise<LegacyApiResponse> {
     return this.request<LegacyApiResponse>('/opinions', {
       method: 'POST',
@@ -535,6 +537,7 @@ class ApiService {
       description?: string;
       topicId?: string;
       private?: boolean;
+      classification?: 'general' | 'supplement' | 'objection' | 'question';
     }
   ): Promise<LegacyApiResponse> {
     return this.request<LegacyApiResponse>(`/opinions/entry/${id}`, {

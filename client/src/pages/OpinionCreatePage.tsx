@@ -13,11 +13,13 @@ import apiService from '../services/api';
 import { trackEvent } from '../utils/analytics';
 import { useNotification } from '../context/NotificationContext';
 import useAnonymousContributionPrefill from '../hooks/useAnonymousContributionPrefill';
+import type { OpinionClassification } from '../components/Entry/OpinionClassificationLabel';
 
 interface OpinionFormValues {
   title: string;
   description: string;
   topicId: string;
+  classification: OpinionClassification;
   private: boolean;
 }
 
@@ -62,6 +64,7 @@ const OpinionCreatePage: React.FC = () => {
         parentId: parentIdFromQuery || undefined,
         parentType: parentTypeFromQuery || undefined,
         private: values.private,
+        classification: values.classification,
       });
       const createdOpinion = response?.opinion as { _id?: unknown; friendlyUrl?: unknown } | undefined;
       if (anonymousPrefill.submissionId && createdOpinion?._id) {
@@ -90,6 +93,7 @@ const OpinionCreatePage: React.FC = () => {
       title: '',
       description: '',
       topicId: topicIdFromQuery,
+      classification: 'general',
       private: false,
     },
     validate,
@@ -159,6 +163,23 @@ const OpinionCreatePage: React.FC = () => {
               onBlur={handleBlur}
               placeholder="Attach this opinion to a topic"
             />
+
+            <div className="form-group">
+              <label htmlFor="opinion-classification">Contribution purpose</label>
+              <select
+                id="opinion-classification"
+                name="classification"
+                className="form-control"
+                value={values.classification}
+                onChange={handleChange}
+              >
+                <option value="general">General comment</option>
+                <option value="supplement">Supplement with context or evidence</option>
+                <option value="objection">Objection or counterpoint</option>
+                <option value="question">Clarifying question</option>
+              </select>
+              <p className="help-block">This label explains intent; it does not affect screening or verdicts.</p>
+            </div>
 
             <Checkbox
               name="private"

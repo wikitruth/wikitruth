@@ -16,6 +16,7 @@ import { useAuth } from '../context/AuthContext';
 import type { LegacyEntity } from '../types/legacy';
 import type { Opinion } from '../types';
 import { useNotification } from '../context/NotificationContext';
+import { normalizeOpinionClassification, type OpinionClassification } from '../components/Entry/OpinionClassificationLabel';
 
 const OpinionsPage: React.FC = () => {
   const [opinions, setOpinions] = useState<LegacyEntity[]>([]);
@@ -23,6 +24,7 @@ const OpinionsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('editDate');
+  const [classification, setClassification] = useState<'all' | OpinionClassification>('all');
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     const saved = localStorage.getItem('wt_view_mode');
     return (saved === 'wiki' || saved === 'original' || saved === 'archived') ? saved : 'all';
@@ -40,7 +42,7 @@ const OpinionsPage: React.FC = () => {
   const fetchOpinions = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await apiService.getOpinions(undefined, viewMode);
+      const data = await apiService.getOpinions(undefined, viewMode, classification);
       setOpinions(data.opinions || []);
     } catch {
       setError('Failed to load opinions');
@@ -48,7 +50,7 @@ const OpinionsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [addToast, viewMode]);
+  }, [addToast, viewMode, classification]);
 
   useEffect(() => {
     void fetchOpinions();
@@ -67,6 +69,11 @@ const OpinionsPage: React.FC = () => {
           opinion.description?.toLowerCase().includes(query)
       );
     }
+    if (classification !== 'all') {
+      filtered = filtered.filter((opinion) => normalizeOpinionClassification(
+        (opinion.extras as { classification?: unknown } | undefined)?.classification,
+      ) === classification);
+    }
 
     // Apply sorting
     const sorted = [...filtered].sort((a, b) => {
@@ -83,7 +90,7 @@ const OpinionsPage: React.FC = () => {
     });
 
     return sorted;
-  }, [opinions, searchQuery, sortBy]);
+  }, [opinions, searchQuery, sortBy, classification]);
 
   // Pagination
   const totalPages = Math.ceil(filteredAndSortedOpinions.length / itemsPerPage);
@@ -133,7 +140,7 @@ const OpinionsPage: React.FC = () => {
       <div className="panel panel-default" style={{ marginBottom: '20px' }}>
         <div className="panel-body">
           <div className="row">
-            <div className="col-md-8">
+            <div className="col-md-5">
               <Input
                 name="search"
                 type="search"
@@ -146,7 +153,7 @@ const OpinionsPage: React.FC = () => {
                 className="input-lg"
               />
             </div>
-            <div className="col-md-4">
+            <div className="col-md-3">
               <Select
                 name="sortBy"
                 value={sortBy}
@@ -158,6 +165,21 @@ const OpinionsPage: React.FC = () => {
                 ]}
                 label="Sort by"
               />
+            </div>
+            <div className="col-md-4">
+              <label htmlFor="opinion-classification-filter">Purpose</label>
+              <select
+                id="opinion-classification-filter"
+                className="form-control"
+                value={classification}
+                onChange={(event) => { setClassification(event.target.value as 'all' | OpinionClassification); setCurrentPage(1); }}
+              >
+                <option value="all">All purposes</option>
+                <option value="general">General comments</option>
+                <option value="supplement">Supplements</option>
+                <option value="objection">Objections</option>
+                <option value="question">Clarifying questions</option>
+              </select>
             </div>
           </div>
           <div className="row" style={{ marginTop: '10px' }}>

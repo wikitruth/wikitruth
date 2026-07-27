@@ -2,6 +2,7 @@ import React from 'react';
 import { Opinion } from '../../types';
 import type { LegacyEntity } from '../../types/legacy';
 import EntryRowDetails from './EntryRowDetails';
+import OpinionClassificationLabel from '../Entry/OpinionClassificationLabel';
 
 interface OpinionEntryRowProps {
   opinion: Opinion;
@@ -36,11 +37,14 @@ const OpinionEntryRow: React.FC<OpinionEntryRowProps> = ({
         subtitle={subtitle}
         hideAcceptedStatus={hideAcceptedStatus}
         extraLabels={
-          opinion.discussionContext?.status === 'potentially_obsolete' ? (
+          <>
+          <OpinionClassificationLabel value={opinion.extras?.classification} />{' '}
+          {opinion.discussionContext?.status === 'potentially_obsolete' ? (
             <span className="label label-warning">older revision</span>
           ) : opinion.discussionContext?.status === 'obsolete' ? (
             <span className="label label-default">obsolete</span>
-          ) : null
+          ) : null}
+          </>
         }
       />
     </li>

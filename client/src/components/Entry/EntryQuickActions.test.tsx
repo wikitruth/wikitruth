@@ -19,6 +19,7 @@ jest.mock('../../services/api', () => ({
   default: {
     getEntryReactions: jest.fn(),
     setEntryReaction: jest.fn(),
+    createOpinion: jest.fn(),
   },
 }));
 
@@ -67,6 +68,7 @@ describe('EntryQuickActions reactions', () => {
     addToast.mockReset();
     mockedApiService.getEntryReactions.mockReset();
     mockedApiService.setEntryReaction.mockReset();
+    mockedApiService.createOpinion.mockReset();
 
     mockUseNotification.mockReturnValue({
       addToast,
@@ -118,6 +120,7 @@ describe('EntryQuickActions reactions', () => {
         value: 'good',
       },
     });
+    mockedApiService.createOpinion.mockResolvedValue({ success: true, opinion: { _id: 'opinion-1' } });
   });
 
   it('loads and submits reactions through the API service', async () => {
@@ -177,5 +180,22 @@ describe('EntryQuickActions reactions', () => {
     rerender(<EntryQuickActions entry={makeEntry()} objectName="topic" hasValue={true} />);
     expect(await screen.findByRole('link', { name: /Good/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Bad/i })).toBeInTheDocument();
+  });
+
+  it('submits an inline classified comment through the screened opinion API', async () => {
+    render(<EntryQuickActions entry={makeEntry()} objectName="topic" />);
+    await waitFor(() => expect(mockedApiService.getEntryReactions).toHaveBeenCalled());
+
+    fireEvent.click(screen.getByRole('link', { name: /^Reply$/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Quick Contribution/i }));
+    fireEvent.change(screen.getByLabelText('Purpose'), { target: { value: 'objection' } });
+    fireEvent.change(screen.getByLabelText('Title'), { target: { value: 'Counterpoint' } });
+    fireEvent.change(screen.getByLabelText('Details'), { target: { value: 'The evidence supports a different interpretation.' } });
+    fireEvent.click(screen.getByRole('button', { name: /Submit for screening/i }));
+
+    await waitFor(() => expect(mockedApiService.createOpinion).toHaveBeenCalledWith(expect.objectContaining({
+      parentId: 'entry-1', parentType: 'topic', classification: 'objection',
+    })));
+    expect(addToast).toHaveBeenCalledWith('success', expect.stringMatching(/submitted for screening/i));
   });
 });

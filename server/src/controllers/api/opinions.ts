@@ -1,8 +1,8 @@
 'use strict';
-import type { FlowUtilsModule, ConstantsModule, UtilsModule } from '../../types/legacyModules';
+import type { FlowUtilsModule, ConstantsModule } from '../../types/legacyModules';
 
 import type { Router } from 'express';
-import type { WikitruthRequest, WikitruthResponse, WikitruthNext } from '../../types/http';
+import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 import * as flowUtilsNs from '../../utils/flowUtils';
 import appModForDb from '../../app';
 import constantsMod from '../../models/constants';
@@ -63,7 +63,7 @@ export = function (router: Router) {
 };
 
 async function GET_opinions(req: WikitruthRequest, res: WikitruthResponse) {
-  let model: Record<string, unknown> = {};
+  const model: Record<string, unknown> = {};
   flowUtils.setScreeningModel(req, model);
   
   const query: Record<string, unknown> = {
@@ -74,6 +74,12 @@ async function GET_opinions(req: WikitruthRequest, res: WikitruthResponse) {
   
   if (req.query.topic) {
     query.ownerId = req.query.topic;
+  }
+  const classification = String(req.query.classification || '').trim().toLowerCase();
+  if (['supplement', 'objection', 'question'].includes(classification)) {
+    query['extras.classification'] = classification;
+  } else if (classification === 'general') {
+    query.$or = [{ 'extras.classification': 'general' }, { 'extras.classification': { $exists: false } }];
   }
   
   const results = await opinionsService.getOpinionsList(query, { limit: 50 });

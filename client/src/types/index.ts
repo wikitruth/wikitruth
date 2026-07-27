@@ -219,6 +219,9 @@ export interface Opinion {
   createDate?: Date;
   editorId?: string;
   editorUsername?: string;
+  extras?: {
+    classification?: 'general' | 'supplement' | 'objection' | 'question';
+  };
   discussionContext?: {
     revisionId?: string;
     revisionNumber?: number;

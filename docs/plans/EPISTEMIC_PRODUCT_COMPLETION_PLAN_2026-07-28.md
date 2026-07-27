@@ -58,9 +58,9 @@ agent-safe, and operationally maintainable truth-validation system.
 
 ### 6. Product Workflow Completion
 
-- [ ] Add an inline contribution drawer for contextual replies and common
+- [x] Add an inline contribution drawer for contextual replies and common
   child-entry creation while retaining full editors.
-- [ ] Complete opinion classification authoring, editing, reading, and filters.
+- [x] Complete opinion classification authoring, editing, reading, and filters.
 - [ ] Add explicit `Latest`, `Trending`, and `Top` Home buckets with published
   formulas that do not affect verdicts.
 - [ ] Add configurable in-app, email-digest, and web-push preferences with a
