@@ -231,6 +231,22 @@ export interface CivicRecordInput {
   private?: boolean;
 }
 
+export interface CivicResponseRequest {
+  _id: string;
+  civicRecordId: string;
+  requestType: 'subject_response' | 'correction_request';
+  claimedRelationship?: string;
+  title: string;
+  content: string;
+  evidenceUrls?: string[];
+  status: 'pending' | 'published' | 'rejected' | 'resolved';
+  createUsername?: string;
+  reviewUsername?: string;
+  reviewReason?: string;
+  createDate?: string;
+  history?: Array<{ _id?: string; action: string; reason?: string; actorUsername?: string; date: string }>;
+}
+
 export interface CivicOverview {
   counts: Record<CivicRecordKind, number>;
   recent: CivicRecord[];

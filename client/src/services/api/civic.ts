@@ -13,6 +13,7 @@ import type {
   CivicTenant,
   CivicTenantMembership,
   CivicTenantRole,
+  CivicResponseRequest,
 } from '../../types/civic';
 
 const request = createApiClient();
@@ -47,6 +48,11 @@ export const civicApi = {
     return request<RecordsResponse>(`/civic/records${suffix ? `?${suffix}` : ''}`);
   },
   entry: (id: string) => request<RecordResponse>(`/civic/records/${encodeURIComponent(id)}`),
+  responses: (id: string) => request<{ responses: CivicResponseRequest[]; count: number }>(`/civic/records/${encodeURIComponent(id)}/responses`),
+  submitResponse: (id: string, payload: {
+    requestType: CivicResponseRequest['requestType']; title: string; content: string; claimedRelationship?: string; evidenceUrls?: string[];
+  }) => request<{ response: CivicResponseRequest }>(`/civic/records/${encodeURIComponent(id)}/responses`, { method: 'POST', body: JSON.stringify(payload) }),
+  reviewResponse: (id: string, action: 'publish' | 'reject' | 'resolve', reason: string) => request<{ response: CivicResponseRequest }>(`/civic/responses/${encodeURIComponent(id)}/review`, { method: 'POST', body: JSON.stringify({ action, reason }) }),
   create: (payload: CivicRecordInput) => request<RecordResponse>('/civic/records', {
     method: 'POST',
     body: JSON.stringify(payload),

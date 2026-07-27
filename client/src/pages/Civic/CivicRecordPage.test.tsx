@@ -6,7 +6,7 @@ import type { CivicRecord, CivicTenantRole } from '../../types/civic';
 import CivicRecordPage from './CivicRecordPage';
 
 jest.mock('../../context/CivicTenantContext', () => ({ useCivicTenant: jest.fn() }));
-jest.mock('../../services/api/civic', () => ({ __esModule: true, default: { entry: jest.fn(), transition: jest.fn(), addLink: jest.fn(), links: jest.fn(), removeLink: jest.fn(), update: jest.fn() } }));
+jest.mock('../../services/api/civic', () => ({ __esModule: true, default: { entry: jest.fn(), transition: jest.fn(), addLink: jest.fn(), links: jest.fn(), removeLink: jest.fn(), update: jest.fn(), responses: jest.fn(), submitResponse: jest.fn(), reviewResponse: jest.fn() } }));
 jest.mock('../../components/common/PageMeta', () => ({ __esModule: true, default: () => null }));
 
 const mockedContext = useCivicTenant as jest.MockedFunction<typeof useCivicTenant>;
@@ -32,6 +32,7 @@ describe('CivicRecordPage tenant capabilities', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockedApi.entry.mockResolvedValue({ record, links: [], children: [], related: [] });
+    mockedApi.responses.mockResolvedValue({ responses: [], count: 0 });
   });
 
   it('shows edit and knowledge controls to the tenant contributor who owns the record', async () => {

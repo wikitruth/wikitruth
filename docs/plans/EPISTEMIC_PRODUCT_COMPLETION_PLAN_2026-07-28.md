@@ -69,7 +69,7 @@ agent-safe, and operationally maintainable truth-validation system.
 ### 7. Global, Civic, and Interoperability Expansion
 
 - [x] Add revision-linked multilingual entry variants and reviewed publication.
-- [ ] Add civic subject-response and correction-request workflows with history.
+- [x] Add civic subject-response and correction-request workflows with history.
 - [ ] Add graph-aware search filters and public evidence-bundle/JSON-LD exports.
 - [ ] Add tenant-launch readiness validation, configuration preview, and
   portable tenant configuration export.

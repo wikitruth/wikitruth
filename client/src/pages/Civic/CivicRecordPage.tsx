@@ -8,6 +8,7 @@ import type { CivicEntryLink, CivicEntryRelationship, CivicRecord, CivicRecordSt
 import CivicRecordForm from './CivicRecordForm';
 import { CivicExtensionDetails } from './CivicExtensionFields';
 import { civicSectionsForTenant } from './civicSections';
+import CivicResponsesPanel from './CivicResponsesPanel';
 
 const LINK_LABELS: Record<CivicEntryRelationship, string> = {
   subject: 'Topic / subject', claim: 'Claim / argument', question: 'Question', answer: 'Answer', evidence: 'Artifact / evidence',
@@ -132,6 +133,7 @@ const CivicRecordPage: React.FC = () => {
           <CivicExtensionDetails tenant={tenant} kind={record.kind} values={record.extensions} />
           {links.length > 0 && <section className="wt-civic-detail-panel"><h2>Wikitruth knowledge and evidence</h2><ul className="wt-civic-knowledge-links">{links.map((item) => <li key={item.linkId || `${item.objectName}-${item.objectId}`}><div><span className="wt-civic-link-type">{LINK_LABELS[item.relationship]}</span><Link to={item.url}>{item.title}</Link>{item.contentPreview && <p>{item.contentPreview}</p>}{item.legacy && <small>Legacy civic reference</small>}</div>{canLink && item.linkId && <button className="btn btn-link btn-xs" type="button" onClick={() => void removeKnowledgeLink(item)}>Remove</button>}</li>)}</ul></section>}
           {record.outcome?.summary && <section className="wt-civic-detail-panel wt-civic-outcome"><span className="wt-civic-kicker">Documented outcome</span><h2>{record.outcome.summary}</h2>{record.outcome.happenedAt && <time>{formatDate(record.outcome.happenedAt)}</time>}</section>}
+          <CivicResponsesPanel recordId={record._id} />
           <section className="wt-civic-detail-panel"><h2>Accountability history</h2>{record.history?.length ? <ol className="wt-civic-history">{[...record.history].reverse().map((item, index) => <li key={item._id || `${item.date}-${index}`}><time>{formatDate(item.date)}</time><strong>{item.summary}</strong>{item.reason && <p>{item.reason}</p>}<small>{item.actorUsername ? `Recorded by ${item.actorUsername}` : 'System record'}</small></li>)}</ol> : <p>No lifecycle history is available.</p>}</section>
         </main>
         <aside className="col-md-4">

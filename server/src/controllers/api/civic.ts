@@ -23,6 +23,7 @@ import { civicRecordInput, civicRecordUpdate, civicTransitionInput } from './civ
 import { CIVIC_TENANT_ROLES } from '../../types/civicTenancy';
 import { validateCivicExtensions } from '../../services/civicExtensionService';
 import { normalizeCivicLocation, sendCivicValidationError, sendExtensionValidationError } from './civicRecordRequestValidation';
+import { registerCivicResponseRoutes } from './civicResponses';
 
 interface CivicRecordShape {
   _id: mongoose.Types.ObjectId;
@@ -492,5 +493,6 @@ export = function attachCivic(router: Router) {
   router.post('/records/:id/transition', transitionRecord);
   router.get('/candidates/compare', compareCandidates);
   registerCivicEntryLinkRoutes(router);
+  registerCivicResponseRoutes(router);
   registerCivicAdministrationRoutes(router);
 };
