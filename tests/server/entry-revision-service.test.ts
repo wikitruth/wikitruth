@@ -9,6 +9,7 @@ const mockCurrentEntry: Record<string, unknown> = {
 let mockSequence = 0;
 const mockLogEntryEvent = jest.fn();
 const mockOpinionUpdateMany = jest.fn();
+const mockPublishRealtimeEvent = jest.fn();
 
 function matches(record: Record<string, unknown>, query: Record<string, unknown>): boolean {
   return Object.entries(query).every(([key, value]) => String(record[key] ?? '') === String(value ?? ''));
@@ -92,6 +93,9 @@ jest.mock('../../server/src/app', () => ({
 
 jest.mock('../../server/src/services/entryEventsService', () => ({
   logEntryEvent: (...args: unknown[]) => mockLogEntryEvent(...args),
+}));
+jest.mock('../../server/src/services/realtimeEvents', () => ({
+  publishRealtimeEvent: (...args: unknown[]) => mockPublishRealtimeEvent(...args),
 }));
 
 import {
@@ -193,16 +197,24 @@ describe('entry revision and change-request service', () => {
       actorUsername: 'accountable-user',
       apiClientId: '507f1f77bcf86cd799439011',
       apiClientName: 'Research agent',
+      agentRunId: 'run-001',
+      agentModel: 'research-model-v2',
+      agentProvider: 'local',
+      agentPurpose: 'Import reviewed material',
+      sourceManifest: [{ artifactId: 'artifact-1', checksum: 'sha256:abc' }],
     });
     expect(mockRevisions[0]).toEqual(expect.objectContaining({
-      apiClientId: '507f1f77bcf86cd799439011', apiClientName: 'Research agent',
+      apiClientId: '507f1f77bcf86cd799439011', apiClientName: 'Research agent', agentRunId: 'run-001',
     }));
     expect(mockLogEntryEvent).toHaveBeenCalledWith(expect.objectContaining({
       eventType: 'agent.contribution.revision',
-      payload: expect.objectContaining({ apiClientName: 'Research agent', revisionNumber: 1 }),
+      payload: expect.objectContaining({ apiClientName: 'Research agent', agentRunId: 'run-001', revisionNumber: 1 }),
+    }));
+    expect(mockPublishRealtimeEvent).toHaveBeenCalledWith(expect.objectContaining({
+      type: 'agent.contribution.revision', data: expect.objectContaining({ agentRunId: 'run-001' }),
     }));
     const history = await listEntryRevisions({ objectType: 1, objectId: 'topic-1' });
-    expect(history.revisions[0]).toEqual(expect.objectContaining({ apiClientName: 'Research agent' }));
+    expect(history.revisions[0]).toEqual(expect.objectContaining({ apiClientName: 'Research agent', agentRunId: 'run-001' }));
   });
 
   it('marks a request stale when a newer revision exists', async () => {

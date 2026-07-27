@@ -40,6 +40,7 @@ import { enforceApiClientScope } from '../../middlewares/apiClientScopes';
 import attachAgent from './agent';
 import attachEpistemic from './epistemic';
 import { apiVersionPolicy } from '../../middlewares/apiVersionPolicy';
+import { enforceAgentMutationReliability } from '../../middlewares/agentMutationReliability';
 
 export = function (router: Router) {
   router.use(apiVersionPolicy);
@@ -47,6 +48,7 @@ export = function (router: Router) {
   router.use(mobileContracts.mobileApiContractMiddleware);
   router.use(sanitizeContentMiddleware);
   router.use(enforceApiClientScope);
+  router.use(enforceAgentMutationReliability);
 
   const homeRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const applicationContextRouter = apiError.wrapAsyncRouter(express.Router()) as Router;

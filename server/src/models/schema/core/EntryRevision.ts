@@ -23,11 +23,17 @@ const factory: SchemaFactory = function (app, mongoose) {
     createUsername: { type: String, default: '', immutable: true },
     apiClientId: { type: mongoose.Schema.ObjectId, ref: 'ApiClient', default: null, immutable: true },
     apiClientName: { type: String, default: '', immutable: true },
+    agentRunId: { type: String, default: '', index: true, immutable: true },
+    agentModel: { type: String, default: '', immutable: true },
+    agentProvider: { type: String, default: '', immutable: true },
+    agentPurpose: { type: String, default: '', immutable: true },
+    sourceManifest: { type: mongoose.Schema.Types.Mixed, default: [], immutable: true },
   });
 
   schema.index({ objectType: 1, objectId: 1, revisionNumber: 1 }, { unique: true });
   schema.index({ objectType: 1, objectId: 1, snapshotHash: 1 }, { unique: true });
   schema.index({ objectType: 1, objectId: 1, createDate: -1 });
+  schema.index({ apiClientId: 1, agentRunId: 1, createDate: -1 });
   schema.set('autoIndex', true);
   app.db.model('EntryRevision', schema);
 };

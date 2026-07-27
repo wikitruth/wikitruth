@@ -26,5 +26,10 @@ export async function recordEntryRevision(options: {
     actorUsername: String(options.req.user?.username || ''),
     apiClientId: options.req.apiClient?.id || null,
     apiClientName: options.req.apiClient?.name || '',
+    agentRunId: options.req.agentRun?.runId || '',
+    agentModel: options.req.agentRun?.model || '',
+    agentProvider: options.req.agentRun?.provider || '',
+    agentPurpose: options.req.agentRun?.purpose || '',
+    sourceManifest: options.req.agentRun?.sourceManifest || [],
   });
 }

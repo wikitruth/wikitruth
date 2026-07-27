@@ -134,10 +134,23 @@ describe('scoped API client authentication', () => {
       .set('Authorization', `Bearer ${fixture.credential.token}`)
       .expect(200);
     expect(response.body.contributionContract).toEqual(expect.objectContaining({
-      screening: 'pending', automaticVerdict: false, attribution: 'api_client_and_accountable_user',
+      screening: 'pending', automaticVerdict: false, attribution: 'api_client_accountable_user_and_agent_run',
     }));
     expect(JSON.stringify(response.body)).not.toContain('secretHash');
     expect(response.body.endpoints.contribute).toContain('/api/v1/artifacts');
+  });
+
+  it('validates graph contributions without mutation or final-decision authority', async () => {
+    const fixture = credentialFixture(['graph:write']);
+    const response = await request(createApp(fixture).app)
+      .post('/api/v1/agent/validate')
+      .set('Authorization', `Bearer ${fixture.credential.token}`)
+      .set('X-Agent-Run-Id', 'dry-run-001')
+      .send({ operation: 'graph_link', payload: { parentId: 'topic-1', targetId: 'artifact-1', relationship: 'supports' } })
+      .expect(200);
+    expect(response.body).toEqual(expect.objectContaining({
+      dryRun: true, valid: true, operation: 'graph_link', automaticFinalDecision: false,
+    }));
   });
 
   it('does not let moderation-scoped agents publish a final verdict', async () => {

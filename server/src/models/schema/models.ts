@@ -51,6 +51,7 @@ export = function (app: Application, mongoose: Mongoose) {
   require('./core/AnonymousContribution')(app, mongoose);
   require('./core/ReputationSnapshot')(app, mongoose);
   require('./core/ApiClient')(app, mongoose);
+  require('./core/IdempotencyRecord')(app, mongoose);
   require('./core/CivicTenant')(app, mongoose);
   require('./core/Jurisdiction')(app, mongoose);
   require('./core/TenantMembership')(app, mongoose);

@@ -43,11 +43,11 @@ agent-safe, and operationally maintainable truth-validation system.
 
 ### 4. Agent Reliability
 
-- [ ] Add replay-safe idempotency keys for agent mutations.
-- [ ] Add validation/dry-run contribution endpoints.
-- [ ] Capture agent run/model/provider/purpose/source-manifest attribution.
-- [ ] Add scoped agent activity/status endpoints and realtime event filtering.
-- [ ] Preserve pending screening and prohibit automatic final decisions.
+- [x] Add replay-safe idempotency keys for agent mutations.
+- [x] Add validation/dry-run contribution endpoints.
+- [x] Capture agent run/model/provider/purpose/source-manifest attribution.
+- [x] Add scoped agent activity/status endpoints and realtime event filtering.
+- [x] Preserve pending screening and prohibit automatic final decisions.
 
 ### 5. Knowledge Operations
 

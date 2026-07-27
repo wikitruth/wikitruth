@@ -4,6 +4,7 @@ import { sha256IntegrityHash } from '../utils/integrityHash';
 import { logEntryEvent } from './entryEventsService';
 import * as utils from '../utils/utils';
 import { markCommentsPotentiallyObsolete } from './discussionRevisionService';
+import { publishRealtimeEvent } from './realtimeEvents';
 import {
   EDITABLE_FIELDS,
   changeRequestModel,
@@ -30,6 +31,11 @@ export async function captureEntryRevision(options: {
   actorUsername?: string | null;
   apiClientId?: string | null;
   apiClientName?: string | null;
+  agentRunId?: string | null;
+  agentModel?: string | null;
+  agentProvider?: string | null;
+  agentPurpose?: string | null;
+  sourceManifest?: Array<Record<string, string>>;
 }): Promise<RevisionRecord> {
   const snapshot = toSnapshot(options.entry);
   const snapshotHash = sha256IntegrityHash(snapshot);
@@ -62,6 +68,11 @@ export async function captureEntryRevision(options: {
       createUsername: options.actorUsername || '',
       apiClientId: options.apiClientId || null,
       apiClientName: options.apiClientName || '',
+      agentRunId: options.agentRunId || '',
+      agentModel: options.agentModel || '',
+      agentProvider: options.agentProvider || '',
+      agentPurpose: options.agentPurpose || '',
+      sourceManifest: options.sourceManifest || [],
     });
     if (!['bootstrap', 'create'].includes(options.source)) {
       await markCommentsPotentiallyObsolete({
@@ -80,7 +91,20 @@ export async function captureEntryRevision(options: {
         actorUserId: options.actorId || null,
         actorUsername: options.actorUsername || '',
         message: `${options.apiClientName || 'Agent'} created revision ${revisionNumber}`,
-        payload: { apiClientId: options.apiClientId, apiClientName: options.apiClientName || '', revisionNumber, source: options.source },
+        payload: {
+          apiClientId: options.apiClientId, apiClientName: options.apiClientName || '',
+          agentRunId: options.agentRunId || '', agentModel: options.agentModel || '',
+          agentProvider: options.agentProvider || '', agentPurpose: options.agentPurpose || '',
+          sourceManifest: options.sourceManifest || [], revisionNumber, source: options.source,
+        },
+      });
+      publishRealtimeEvent({
+        type: 'agent.contribution.revision',
+        data: {
+          apiClientId: options.apiClientId, agentRunId: options.agentRunId || '',
+          objectType: options.objectType, objectId: options.objectId, revisionNumber,
+          source: options.source, status: 'pending_screening',
+        },
       });
     }
     return revision;
@@ -151,6 +175,11 @@ export async function listEntryRevisions(options: {
       createUsername: record.createUsername || '',
       apiClientId: record.apiClientId || null,
       apiClientName: record.apiClientName || '',
+      agentRunId: record.agentRunId || '',
+      agentModel: record.agentModel || '',
+      agentProvider: record.agentProvider || '',
+      agentPurpose: record.agentPurpose || '',
+      sourceManifest: record.sourceManifest || [],
     })),
   };
 }

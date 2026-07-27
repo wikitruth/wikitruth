@@ -22,6 +22,13 @@ export interface WikitruthRequest extends Request {
   requestId?: string;
   civicTenant?: CivicTenantDefinition;
   apiClient?: ApiClientIdentity;
+  agentRun?: {
+    runId: string;
+    model: string;
+    provider: string;
+    purpose: string;
+    sourceManifest: Array<Record<string, string>>;
+  };
   clientTelemetry?: {
     platform: string | null;
     version: string | null;

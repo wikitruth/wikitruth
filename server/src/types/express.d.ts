@@ -11,6 +11,13 @@ declare global {
       requestId?: string;
       civicTenant?: CivicTenantDefinition;
       apiClient?: ApiClientIdentity;
+      agentRun?: {
+        runId: string;
+        model: string;
+        provider: string;
+        purpose: string;
+        sourceManifest: Array<Record<string, string>>;
+      };
       user?: RequestContextUser;
       csrfToken(): string;
       session: import('express-session').Session &
