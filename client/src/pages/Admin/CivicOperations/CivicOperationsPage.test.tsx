@@ -64,4 +64,18 @@ describe('CivicOperationsPage', () => {
     })));
     expect(refreshJurisdictions).toHaveBeenCalledTimes(1);
   });
+
+  it('keeps the page heading when tenant administrator access is denied', () => {
+    mockedContext.mockReturnValue({
+      ...mockedContext(),
+      actor: { authenticated: true, tenantId: tenant.tenantId, userId: 'contributor-1', roles: ['contributor'] },
+      hasRole: () => false,
+    });
+
+    render(<CivicOperationsPage />);
+
+    expect(screen.getByRole('heading', { name: /fix example operations/i })).toBeInTheDocument();
+    expect(screen.getByText(/tenant administrator privileges are required/i)).toBeInTheDocument();
+    expect(mockedApi.adminMemberships).not.toHaveBeenCalled();
+  });
 });

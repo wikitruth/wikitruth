@@ -44,6 +44,16 @@ const CivicOperationsPage: React.FC = () => {
   const [savingMember, setSavingMember] = useState(false);
   const [jurisdiction, setJurisdiction] = useState<JurisdictionForm>(() => emptyJurisdiction(tenant.geography.levels[0]?.key || 'country'));
   const [savingJurisdiction, setSavingJurisdiction] = useState(false);
+  const pageTitle = `${tenant.navTitle || tenant.title} operations`;
+
+  const operationsHeader = <>
+    <PageMeta title={pageTitle} description="Manage tenant membership and jurisdiction hierarchy." />
+    <div className="page-header wt-header">
+      <span className="wt-civic-kicker">Tenant administration</span>
+      <h1>{tenant.title} operations</h1>
+      <p className="text-muted">Manage tenant-scoped access and the geography hierarchy for <code>{tenant.tenantId}</code>.</p>
+    </div>
+  </>;
 
   const loadMemberships = useCallback(async () => {
     const result = await civicApi.adminMemberships();
@@ -162,17 +172,12 @@ const CivicOperationsPage: React.FC = () => {
     }
   };
 
-  if (!actor.authenticated) return <div className="alert alert-warning">Sign in to administer this civic tenant.</div>;
-  if (!hasRole('admin')) return <div className="alert alert-danger">Tenant administrator privileges are required.</div>;
+  if (!actor.authenticated) return <div className="wt-civic-operations">{operationsHeader}<div className="alert alert-warning">Sign in to administer this civic tenant.</div></div>;
+  if (!hasRole('admin')) return <div className="wt-civic-operations">{operationsHeader}<div className="alert alert-danger">Tenant administrator privileges are required.</div></div>;
   if (loading) return <LoadingSpinner message="Loading civic tenant operations..." />;
 
   return <div className="wt-civic-operations">
-    <PageMeta title={`${tenant.navTitle || tenant.title} operations`} description="Manage tenant membership and jurisdiction hierarchy." />
-    <div className="page-header wt-header">
-      <span className="wt-civic-kicker">Tenant administration</span>
-      <h1>{tenant.title} operations</h1>
-      <p className="text-muted">Manage tenant-scoped access and the geography hierarchy for <code>{tenant.tenantId}</code>.</p>
-    </div>
+    {operationsHeader}
     {message && <div className="alert alert-info" role="status">{message}</div>}
     <div className="row">
       <section className="col-lg-6">

@@ -201,6 +201,8 @@ button:focus-visible,
 .page-header.wt-header.wt-profile-header {
   background-image: linear-gradient(-110deg, #48227d 0%, #2f569c 100%);
   color: #fff;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 /* Tighten entry-page spacing between geo-pattern bar and main header. */
@@ -226,6 +228,10 @@ button:focus-visible,
     z-index: 1;
   }
 
+}
+
+/* Match the legacy xxs utility: retain the wordmark on larger phones/tablets. */
+@media (max-width: 479px) {
   .navbar-brand-label .hidden-xxs {
     display: none !important;
   }

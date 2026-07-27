@@ -18,7 +18,16 @@ describe('mobile off-canvas layout', () => {
     );
 
     expect(css).toMatch(/@media \(max-width: 767px\)[\s\S]*?body\s*{[^}]*padding-top:\s*50px/s);
-    expect(css).toMatch(/\.navbar-brand-label \.hidden-xxs\s*{[^}]*display:\s*none\s*!important/s);
+    expect(css).toMatch(/@media \(max-width: 479px\)[\s\S]*?\.navbar-brand-label \.hidden-xxs\s*{[^}]*display:\s*none\s*!important/s);
+  });
+
+  it('allows long profile names to wrap instead of overflowing mobile screens', () => {
+    const css = fs.readFileSync(
+      path.resolve(__dirname, '../../styles/global.css'),
+      'utf8'
+    );
+
+    expect(css).toMatch(/\.page-header\.wt-header\.wt-profile-header\s*{[^}]*overflow-wrap:\s*anywhere[^}]*word-break:\s*break-word/s);
   });
 
   it('keeps all Explore content tabs on one mobile row', () => {

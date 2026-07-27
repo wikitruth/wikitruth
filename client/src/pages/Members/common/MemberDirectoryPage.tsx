@@ -83,6 +83,8 @@ const MemberDirectoryPage: React.FC<MemberDirectoryPageProps> = ({ title, subtit
             const displayName = typeof member.name === 'string'
               ? member.name
               : member.name?.full || member.username;
+            const hasDistinctDisplayName = displayName.trim().toLocaleLowerCase()
+              !== member.username.trim().toLocaleLowerCase();
 
             return (
               <div key={member._id} className="col-lg-4 col-md-6 col-sm-6">
@@ -95,11 +97,13 @@ const MemberDirectoryPage: React.FC<MemberDirectoryPageProps> = ({ title, subtit
                   <div className="media-body">
                     <h4 className="media-heading">
                       <Link to={`/members/${member.username}`}>{displayName}</Link>
-                      <div>
-                        <span style={{ fontSize: '16px' }} className="text-muted">
-                          {member.username}
-                        </span>
-                      </div>
+                      {hasDistinctDisplayName ? (
+                        <div>
+                          <span style={{ fontSize: '16px' }} className="text-muted">
+                            {member.username}
+                          </span>
+                        </div>
+                      ) : null}
                       {member.reputation ? (
                         <div style={{ marginTop: 4 }}>
                           <span className="label label-info" title={member.reputation.level}>
