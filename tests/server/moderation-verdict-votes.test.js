@@ -7,6 +7,7 @@ const voteFindOneAndUpdate = jest.fn();
 const voteFind = jest.fn();
 const writeVerdictDecision = jest.fn();
 const logEntryEvent = jest.fn();
+const queueKnowledgeReviewTask = jest.fn();
 
 jest.mock('../../server/src/app', () => ({
   db: {
@@ -33,6 +34,9 @@ jest.mock('../../server/src/services/entryEventsService', () => ({
 }));
 jest.mock('../../server/src/services/notificationsService', () => ({
   createNotification: jest.fn(),
+}));
+jest.mock('../../server/src/services/knowledgeReviewTaskService', () => ({
+  queueKnowledgeReviewTask: (...args) => queueKnowledgeReviewTask(...args),
 }));
 
 function queryResult(value) {
@@ -68,6 +72,7 @@ describe('channel-specific verdict votes', () => {
     voteFindOneAndUpdate.mockReturnValue({ lean: async () => ({ _id: 'vote-1' }) });
     voteFind.mockReturnValue(queryResult([]));
     writeVerdictDecision.mockResolvedValue({ published: true, entry: { _id: 'topic-1' } });
+    queueKnowledgeReviewTask.mockResolvedValue({ _id: 'task-1' });
   });
 
   it('requires reviewer access and substantive rationale', async () => {
@@ -109,6 +114,9 @@ describe('channel-specific verdict votes', () => {
       }),
       expect.objectContaining({ upsert: true }),
     );
+    expect(queueKnowledgeReviewTask).toHaveBeenCalledWith(expect.objectContaining({
+      taskType: 'quorum_gap', channel: 'ethical', objectId: 'topic-1',
+    }));
   });
 
   it('publishes only after an eligible channel reaches policy consensus', async () => {

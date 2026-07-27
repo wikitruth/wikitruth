@@ -29,6 +29,7 @@ import {
   type VerdictChannel,
 } from '../../services/verdictConsensusService';
 import { writeVerdictDecision } from './verdictDecisionWriter';
+import { queueKnowledgeReviewTask } from '../../services/knowledgeReviewTaskService';
 
 function validObjectIds(value: unknown): string[] {
   return Array.isArray(value)
@@ -172,6 +173,18 @@ export function registerModerationSignalsRoutes(router: Router): void {
           policyVersion: consensus.policyVersion,
           consensusSnapshot: consensus,
         });
+        await db.KnowledgeReviewTask?.updateOne?.(
+          { taskType: 'quorum_gap', objectType: target.objectType, objectId: target.id, channel },
+          { $set: { status: 'completed', completedDate: new Date(), editDate: new Date() } },
+        );
+      } else {
+        await queueKnowledgeReviewTask({
+          taskType: 'quorum_gap', objectType: target.objectType, objectName: target.objectName,
+          objectId: target.id, channel, dueAt: new Date(),
+          priority: policy.sensitivity === 'standard' ? 'normal' : policy.sensitivity,
+          reason: `${channel} review has ${consensus.eligibleVotes} eligible vote(s) and has not reached quorum`,
+          metadata: { summary: consensus },
+        });
       }
   
       res.json({
@@ -236,7 +249,7 @@ export function registerModerationSignalsRoutes(router: Router): void {
   
       const body = bodyOf<ModerationStatusBodyContract>(req);
       const signalType = String(body.signalType || '').trim();
-      const supportedSignalTypes = ['controversial', 'incorrect_verdict', 'needs_reevaluation', 'wrong_category'];
+      const supportedSignalTypes = ['controversial', 'incorrect_verdict', 'needs_reevaluation', 'wrong_category', 'duplicate'];
       if (!supportedSignalTypes.includes(signalType)) {
         res.status(400).json({ success: false, message: 'Unsupported signalType' });
         return;

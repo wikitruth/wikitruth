@@ -230,7 +230,7 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
       return;
     }
     const signalType = window.prompt(
-      'Signal type: controversial | incorrect_verdict | needs_reevaluation | wrong_category',
+      'Signal type: controversial | incorrect_verdict | needs_reevaluation | wrong_category | duplicate',
       'needs_reevaluation',
     );
     if (!signalType) {

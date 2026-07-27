@@ -6,6 +6,7 @@ import { buildPublicTruthSummary } from '../../services/truthSummaryService';
 import appModForDb from '../../app';
 import { completeKnowledgeReviewTask } from '../../services/knowledgeReviewTaskService';
 import { logEntryEvent } from '../../services/entryEventsService';
+import { buildKnowledgeHealth } from '../../services/knowledgeHealthService';
 
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 
@@ -40,6 +41,19 @@ export = function (router: Router) {
     const limit = Math.min(Math.max(Number(req.query.limit) || 50, 1), 100);
     const tasks = await db.KnowledgeReviewTask.find(query).sort({ priority: -1, dueAt: 1 }).limit(limit).lean();
     res.json({ success: true, tasks, count: tasks.length });
+  });
+
+  router.get('/health', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!canReview(req)) {
+      res.status(403).json({ success: false, message: 'Reviewer access required' });
+      return;
+    }
+    const health = await buildKnowledgeHealth(Number(req.query.limit) || 25);
+    const selected = String(req.query.queue || '').trim();
+    res.json({
+      success: true,
+      health: selected ? { ...health, queues: health.queues.filter((queue) => queue.key === selected) } : health,
+    });
   });
 
   router.patch('/review-tasks/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {

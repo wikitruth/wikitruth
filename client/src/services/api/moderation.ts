@@ -408,7 +408,7 @@ export const moderationApi = {
   submitReaderSignal: (
     target: ModerationTarget,
     payload: {
-      signalType: 'controversial' | 'incorrect_verdict' | 'needs_reevaluation' | 'wrong_category';
+      signalType: 'controversial' | 'incorrect_verdict' | 'needs_reevaluation' | 'wrong_category' | 'duplicate';
       note?: string;
     },
   ) =>

@@ -45,6 +45,7 @@ describe('routeConfig', () => {
     expect(paths).toContain('/civic/records/:id');
     expect(paths).toContain('/admin/civic-tenants');
     expect(paths).toContain('/admin/civic-operations');
+    expect(paths).toContain('/admin/knowledge-health');
     expect(paths).toContain('/policies');
   });
 
@@ -98,6 +99,7 @@ describe('routeConfig', () => {
       '/admin/anonymous-contributions',
       '/admin/civic-operations',
       '/admin/verdicts',
+      '/admin/knowledge-health',
     ];
 
     protectedPaths.forEach((routePath) => {

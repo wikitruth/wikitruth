@@ -9,7 +9,7 @@ const factory: SchemaFactory = function (app, mongoose) {
     objectId: { type: mongoose.Schema.ObjectId, required: true, index: true },
     signalType: {
       type: String,
-      enum: ['controversial', 'incorrect_verdict', 'needs_reevaluation', 'wrong_category'],
+      enum: ['controversial', 'incorrect_verdict', 'needs_reevaluation', 'wrong_category', 'duplicate'],
       required: true,
       index: true,
     },

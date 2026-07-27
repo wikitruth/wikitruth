@@ -51,10 +51,10 @@ agent-safe, and operationally maintainable truth-validation system.
 
 ### 5. Knowledge Operations
 
-- [ ] Add a unified knowledge-health API and administrator dashboard.
-- [ ] Cover evidence gaps, unresolved critical issues, quorum gaps,
+- [x] Add a unified knowledge-health API and administrator dashboard.
+- [x] Cover evidence gaps, unresolved critical issues, quorum gaps,
   revalidation, stale/broken sources, duplicates, and unanswered questions.
-- [ ] Add safe filters, counts, queue links, and tests.
+- [x] Add safe filters, counts, queue links, and tests.
 
 ### 6. Product Workflow Completion
 

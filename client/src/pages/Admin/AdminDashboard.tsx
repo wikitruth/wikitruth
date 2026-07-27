@@ -210,6 +210,19 @@ const AdminDashboard: React.FC = () => {
             </div>
           </div>
           <div className="col-sm-3">
+            <div className="panel panel-danger">
+              <div className="panel-heading">Knowledge Health</div>
+              <div className="panel-body">
+                <p className="text-muted" style={{ marginBottom: 10 }}>
+                  Resolve evidence, consensus, freshness, and coverage gaps.
+                </p>
+                <Link to="/admin/knowledge-health" className="btn btn-danger btn-xs">
+                  Open Health Queues
+                </Link>
+              </div>
+            </div>
+          </div>
+          <div className="col-sm-3">
             <div className="panel panel-warning">
               <div className="panel-heading">Verdict Queue</div>
               <div className="panel-body">
