@@ -11,7 +11,7 @@ import apiService from '../services/api';
 type OutlineSearchItem = {
   _id: string;
   title: string;
-  objectName: 'topic' | 'argument';
+  objectName: 'topic' | 'argument' | 'artifact';
   friendlyUrl?: string;
 };
 
@@ -23,7 +23,7 @@ type TopicTreeNode = {
   children?: TopicTreeNode[];
 };
 
-type GraphRelationship = 'child' | 'support' | 'oppose' | 'related' | 'evidence' | 'source' | 'dependency';
+type GraphRelationship = 'child' | 'support' | 'oppose' | 'related' | 'evidence' | 'source' | 'dependency' | 'supports' | 'refutes' | 'qualifies' | 'background';
 
 const RELATIONSHIPS: Array<{ value: GraphRelationship; label: string }> = [
   { value: 'child', label: 'Child: belongs under the parent' },
@@ -32,6 +32,10 @@ const RELATIONSHIPS: Array<{ value: GraphRelationship; label: string }> = [
   { value: 'related', label: 'Related: useful contextual connection' },
   { value: 'evidence', label: 'Evidence: artifact substantiates the parent' },
   { value: 'source', label: 'Source: artifact is a source for the parent' },
+  { value: 'supports', label: 'Supports: artifact supports the claim' },
+  { value: 'refutes', label: 'Refutes: artifact contradicts the claim' },
+  { value: 'qualifies', label: 'Qualifies: artifact narrows or conditions the claim' },
+  { value: 'background', label: 'Background: artifact provides context only' },
   { value: 'dependency', label: 'Dependency: parent depends on the target' },
 ];
 
@@ -51,6 +55,10 @@ const OutlineLinkPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [locatorType, setLocatorType] = useState('page');
+  const [locator, setLocator] = useState('');
+  const [citationQuote, setCitationQuote] = useState('');
+  const [citationNote, setCitationNote] = useState('');
 
   useEffect(() => {
     let mounted = true;
@@ -94,7 +102,7 @@ const OutlineLinkPage: React.FC = () => {
       try {
         setSearchLoading(true);
         const result = await apiService.searchOutlineTargets(searchTerm.trim(), {
-          types: 'topic,argument',
+          types: 'topic,argument,artifact',
           limit: 25,
         });
         if (!cancelled) {
@@ -133,6 +141,9 @@ const OutlineLinkPage: React.FC = () => {
         parentId,
         targetId: selectedTargetId,
         relationship,
+        citation: ['evidence', 'source', 'supports', 'refutes', 'qualifies', 'background'].includes(relationship)
+          ? { locatorType, locator: locator.trim(), quote: citationQuote.trim(), note: citationNote.trim() }
+          : undefined,
       });
       setSuccess(true);
       setTimeout(() => navigate(-1), 1200);
@@ -202,7 +213,7 @@ const OutlineLinkPage: React.FC = () => {
             <div className="panel-body">
               <Input
                 name="searchTarget"
-                label="Search Topics or Arguments"
+                label="Search Topics, Arguments, or Artifacts"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Type at least 2 characters..."
@@ -280,8 +291,28 @@ const OutlineLinkPage: React.FC = () => {
               >
                 {RELATIONSHIPS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
               </select>
-              <p className="help-block">Evidence and source relationships require an artifact target; support and oppose require an argument.</p>
+              <p className="help-block">Evidence relationships require an artifact target; support and oppose require an argument.</p>
             </div>
+            {['evidence', 'source', 'supports', 'refutes', 'qualifies', 'background'].includes(relationship) ? (
+              <fieldset>
+                <legend style={{ fontSize: 16 }}>Citation locator</legend>
+                <div className="row">
+                  <div className="col-sm-4 form-group">
+                    <label htmlFor="citation-locator-type">Locator type</label>
+                    <select id="citation-locator-type" className="form-control" value={locatorType} onChange={(event) => setLocatorType(event.target.value)}>
+                      <option value="page">Page</option><option value="section">Section</option><option value="timestamp">Timestamp</option>
+                      <option value="paragraph">Paragraph</option><option value="dataset_row">Dataset row</option><option value="quote">Quote</option><option value="other">Other</option>
+                    </select>
+                  </div>
+                  <div className="col-sm-8 form-group">
+                    <label htmlFor="citation-locator">Exact location</label>
+                    <input id="citation-locator" className="form-control" maxLength={500} value={locator} onChange={(event) => setLocator(event.target.value)} placeholder="Page 14, section 2.1, 00:03:20, or row identifier" />
+                  </div>
+                </div>
+                <div className="form-group"><label htmlFor="citation-quote">Short excerpt</label><textarea id="citation-quote" className="form-control" maxLength={500} rows={2} value={citationQuote} onChange={(event) => setCitationQuote(event.target.value)} /></div>
+                <div className="form-group"><label htmlFor="citation-note">How this evidence relates</label><textarea id="citation-note" className="form-control" maxLength={1000} rows={2} value={citationNote} onChange={(event) => setCitationNote(event.target.value)} /></div>
+              </fieldset>
+            ) : null}
             {selectedTarget ? (
               <p className="text-muted">
                 Selected target: <strong>{selectedTarget.title}</strong> ({selectedTarget.objectName})

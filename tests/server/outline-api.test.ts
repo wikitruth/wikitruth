@@ -221,21 +221,26 @@ describe('outline api endpoints', () => {
     expect(mockRecordEntryRevision).not.toHaveBeenCalled();
   });
 
-  it('creates typed evidence links to accessible artifacts', async () => {
+  it('creates claim-level evidence links with bounded citation locators', async () => {
     mockDb.Topic.findById
       .mockResolvedValueOnce({ _id: 'topic-parent', private: false })
       .mockResolvedValueOnce(null);
     mockDb.Argument.findById.mockResolvedValueOnce(null);
     mockDb.Artifact.findById.mockResolvedValueOnce({ _id: 'artifact-target', private: false, 'screening.status': 1 });
-    mockDb.ObjectLink.findOneAndUpdate.mockReturnValueOnce(leanDoc({ _id: 'object-link-1', relationship: 'evidence' }));
+    mockDb.ObjectLink.findOneAndUpdate.mockReturnValueOnce(leanDoc({ _id: 'object-link-1', relationship: 'supports' }));
     const response = await request(createApp({
       id: 'user-1', _id: 'user-1', username: 'contributor', onboarding: { contributor: { completed: true } },
-    })).post('/outline/link').send({ parentId: 'topic-parent', targetId: 'artifact-target', relationship: 'evidence' });
+    })).post('/outline/link').send({
+      parentId: 'topic-parent', targetId: 'artifact-target', relationship: 'supports',
+      citation: { locatorType: 'page', locator: '14', quote: 'A short excerpt', note: 'Direct support' },
+    });
     expect(response.status).toBe(201);
-    expect(response.body.link).toEqual(expect.objectContaining({ objectName: 'objectLink', relationship: 'evidence' }));
+    expect(response.body.link).toEqual(expect.objectContaining({
+      objectName: 'objectLink', relationship: 'supports', citation: expect.objectContaining({ locator: '14' }),
+    }));
     expect(mockDb.ObjectLink.findOneAndUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({ leftType: 1, rightType: 6, relationship: 'evidence' }),
-      expect.objectContaining({ relationship: 'evidence' }),
+      expect.objectContaining({ leftType: 1, rightType: 6, relationship: 'supports' }),
+      expect.objectContaining({ relationship: 'supports', extras: { citation: expect.objectContaining({ locator: '14' }) } }),
       expect.objectContaining({ upsert: true }),
     );
   });

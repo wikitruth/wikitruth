@@ -20,7 +20,7 @@ const flowUtils = flowUtilsNs as unknown as {
   updateChildrenCount: (entryId: unknown, entryType: unknown, specificEntryType?: unknown) => Promise<void>;
 };
 
-const GRAPH_RELATIONSHIPS = ['child', 'support', 'oppose', 'related', 'evidence', 'source', 'dependency'] as const;
+const GRAPH_RELATIONSHIPS = ['child', 'support', 'oppose', 'related', 'evidence', 'source', 'dependency', 'supports', 'refutes', 'qualifies', 'background'] as const;
 type GraphRelationship = (typeof GRAPH_RELATIONSHIPS)[number];
 type EntryKind = 'topic' | 'argument' | 'artifact' | 'question' | 'answer' | 'issue' | 'opinion';
 type OutlineEntry = { _id: unknown; private?: unknown; createUserId?: unknown; screening?: { status?: unknown }; [key: string]: unknown };
@@ -117,6 +117,18 @@ function relationshipIsCompatible(relationship: GraphRelationship, target: Resol
   return target.kind === 'artifact';
 }
 
+function parseCitation(value: unknown): Record<string, string> | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  const input = value as Record<string, unknown>;
+  const locatorType = String(input.locatorType || 'other').trim().toLowerCase();
+  if (!['page', 'section', 'timestamp', 'paragraph', 'dataset_row', 'quote', 'other'].includes(locatorType)) return null;
+  const locator = String(input.locator || '').trim().slice(0, 500);
+  const quote = String(input.quote || '').trim().slice(0, 500);
+  const note = String(input.note || '').trim().slice(0, 1000);
+  if (!locator && !quote && !note) return null;
+  return { locatorType, locator, quote, note };
+}
+
 async function finalizeLink(
   req: WikitruthRequest,
   parent: ResolvedEntry,
@@ -190,12 +202,13 @@ export = function (router: Router) {
     const parentId = String(req.body?.parentId || '').trim();
     const targetId = String(req.body?.targetId || '').trim();
     const relationship = parseRelationship(req.body?.relationship);
+    const citation = parseCitation(req.body?.citation);
     if (!parentId || !targetId || !relationship) {
       res.status(400).json({ success: false, message: 'parentId, targetId, and a valid relationship are required' });
       return;
     }
     if (parentId === targetId) { res.status(400).json({ success: false, message: 'Cannot link an entry to itself' }); return; }
-    const parent = await resolveEntry(parentId, ['topic', 'argument']);
+    const parent = await resolveEntry(parentId, ['topic', 'argument', 'answer']);
     const target = await resolveEntry(targetId, Object.keys(TARGET_MODEL_NAMES) as EntryKind[]);
     if (!parent || !target) { res.status(404).json({ success: false, message: !parent ? 'Parent entry not found' : 'Target entry not found' }); return; }
     if (!canAccess(req, parent) || !canAccess(req, target)) {
@@ -253,13 +266,14 @@ export = function (router: Router) {
       if (existing) { res.json({ success: true, created: false, conflict: 'already_linked', link: existing }); return; }
       link = await db.ObjectLink.findOneAndUpdate(query, {
         ...common, ...query, private: Boolean(parent.entry.private || target.entry.private),
+        extras: citation ? { citation } : {},
       }, { upsert: true, new: true, setDefaultsOnInsert: true }).lean();
       objectName = 'objectLink';
     }
     await finalizeLink(req, parent, target, relationship, link, objectName);
     res.status(201).json({
       success: true, created: true,
-      link: { _id: String(link._id || ''), objectName, parentId, targetId, relationship },
+      link: { _id: String(link._id || ''), objectName, parentId, targetId, relationship, citation },
     });
   });
 };

@@ -11,6 +11,8 @@ import {
   parseModerationTarget,
 } from './moderationShared';
 import { recordEntryRevision } from './revisionWriteRecorder';
+import { inspectRemoteSource } from '../../services/sourceIntegrityService';
+import { queueKnowledgeReviewTask } from '../../services/knowledgeReviewTaskService';
 
 const SCORE_FIELDS = ['identity', 'proximity', 'integrity', 'recency', 'reproducibility'] as const;
 
@@ -31,6 +33,54 @@ function parseScores(value: unknown): Record<(typeof SCORE_FIELDS)[number], numb
 }
 
 export function registerModerationArtifactRoutes(router: Router): void {
+  router.post('/artifact-source-check', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureReviewerOrAdmin(req, res)) return;
+    const target = parseModerationTarget(req);
+    if (!target || target.objectType !== constants.OBJECT_TYPES.artifact) {
+      res.status(400).json({ success: false, message: 'An artifact target is required' });
+      return;
+    }
+    const artifact = await db.Artifact.findById(target.id);
+    if (!artifact) {
+      res.status(404).json({ success: false, message: 'Artifact not found' });
+      return;
+    }
+    const sourceUrl = String(artifact.source || artifact.provenance?.archiveUrl || '').trim();
+    if (!sourceUrl) {
+      res.status(400).json({ success: false, message: 'Artifact has no source URL to verify' });
+      return;
+    }
+    const integrity = await inspectRemoteSource({
+      sourceUrl,
+      expectedHash: String(artifact.provenance?.checksum || ''),
+    });
+    artifact.provenance = artifact.provenance || {};
+    artifact.provenance.sourceIntegrity = integrity;
+    artifact.markModified?.('provenance.sourceIntegrity');
+    artifact.editDate = new Date();
+    artifact.editUserId = req.user?.id || req.user?._id;
+    await artifact.save();
+    await queueKnowledgeReviewTask({
+      taskType: 'source_check', objectType: constants.OBJECT_TYPES.artifact, objectName: 'artifact', objectId: target.id,
+      dueAt: integrity.status === 'healthy' ? integrity.nextCheckAt : new Date(),
+      priority: integrity.status === 'healthy' ? 'normal' : 'elevated',
+      reason: integrity.status === 'healthy' ? 'Scheduled source integrity recheck' : `Source integrity requires review: ${integrity.status}`,
+      metadata: { status: integrity.status, nextCheckAt: integrity.nextCheckAt, error: integrity.error },
+    });
+    await recordEntryRevision({
+      req, objectType: constants.OBJECT_TYPES.artifact, entry: artifact, source: 'update',
+      summary: `Artifact source integrity checked: ${integrity.status}`,
+    });
+    await logEntryEvent({
+      scope: 'privileged', eventType: 'artifact.source-integrity.checked',
+      objectType: constants.OBJECT_TYPES.artifact, objectName: 'artifact', objectId: target.id,
+      actorUserId: String(req.user?.id || req.user?._id || ''), actorUsername: String(req.user?.username || ''),
+      message: `Artifact source integrity is ${integrity.status}`,
+      payload: { ...integrity },
+    });
+    res.json({ success: true, sourceIntegrity: integrity });
+  });
+
   router.put('/artifact-quality', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureReviewerOrAdmin(req, res)) {
       return;

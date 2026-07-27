@@ -255,6 +255,20 @@ export interface Artifact {
     captureDate?: Date | string;
     archiveUrl?: string;
     checksum?: string;
+    sourceIntegrity?: {
+      status?: 'unchecked' | 'healthy' | 'changed' | 'broken' | 'blocked';
+      checkedAt?: Date | string | null;
+      nextCheckAt?: Date | string | null;
+      httpStatus?: number | null;
+      finalUrl?: string;
+      redirectCount?: number;
+      contentHash?: string;
+      expectedHash?: string;
+      hashMatches?: boolean | null;
+      contentType?: string;
+      contentLength?: number | null;
+      error?: string;
+    };
     accessLimitations?: string;
     verifiabilityNotes?: string;
     sourceQuality?: {

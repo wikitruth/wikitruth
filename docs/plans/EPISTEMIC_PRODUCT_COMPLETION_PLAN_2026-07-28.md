@@ -34,12 +34,12 @@ agent-safe, and operationally maintainable truth-validation system.
 
 ### 3. Evidence Integrity and Freshness
 
-- [ ] Extend governed graph relationships with `supports`, `refutes`,
+- [x] Extend governed graph relationships with `supports`, `refutes`,
   `qualifies`, and `background` evidence semantics plus citation locators.
-- [ ] Add source snapshot/hash verification and link-health state without
+- [x] Add source snapshot/hash verification and link-health state without
   copying restricted source bodies by default.
-- [ ] Add non-destructive freshness/re-review policy and notification queues.
-- [ ] Expose claim evidence maps in entry APIs and modern reading UI.
+- [x] Add non-destructive freshness/re-review policy and notification queues.
+- [x] Expose claim evidence maps in entry APIs and modern reading UI.
 
 ### 4. Agent Reliability
 

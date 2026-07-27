@@ -8,7 +8,7 @@ const factory: SchemaFactory = function (app, mongoose) {
     leftType: { type: Number },
     rightId: { type: mongoose.Schema.ObjectId },
     rightType: { type: Number },
-    relationship: { type: String, enum: ['child', 'support', 'oppose', 'related', 'evidence', 'source', 'dependency'], required: true, index: true },
+    relationship: { type: String, enum: ['child', 'support', 'oppose', 'related', 'evidence', 'source', 'dependency', 'supports', 'refutes', 'qualifies', 'background'], required: true, index: true },
     private: { type: Boolean, default: false },
     createDate: { type: Date, default: Date.now },
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User' },

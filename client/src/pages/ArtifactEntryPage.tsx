@@ -26,6 +26,7 @@ import {
   buildLegacyEntryBreadcrumb,
 } from '../components/Entry/EntryLegacyParity';
 import ArtifactQualityPanel from '../components/Artifacts/ArtifactQualityPanel';
+import ArtifactSourceIntegrityPanel from '../components/Artifacts/ArtifactSourceIntegrityPanel';
 import { ARTIFACT_TYPE_OPTIONS, ORIGIN_TYPE_OPTIONS } from '../constants/artifactOptions';
 
 function formatFileSize(bytes?: number): string {
@@ -284,6 +285,11 @@ const ArtifactEntryPage: React.FC = () => {
           </dl>
         </div>
       </section>
+      <ArtifactSourceIntegrityPanel
+        artifactId={artifact._id}
+        sourceUrl={String(artifact.source || provenance.archiveUrl || '')}
+        initialIntegrity={provenance.sourceIntegrity ? { status: provenance.sourceIntegrity.status || 'unchecked', ...provenance.sourceIntegrity } : undefined}
+      />
       <ArtifactQualityPanel artifactId={artifact._id} initialQuality={provenance.sourceQuality} />
       <EntryRelatedTopics entry={artifact} topicLinks={topicLinks} />
 

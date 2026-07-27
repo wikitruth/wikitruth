@@ -7,6 +7,7 @@ import { notifySubscribers } from '../../services/notificationsService';
 import { countBlockingIssues } from '../../services/issueGateService';
 import type { VerdictChannel, VerdictConsensusSummary } from '../../services/verdictConsensusService';
 import { recordEntryRevision } from './revisionWriteRecorder';
+import { queueKnowledgeReviewTask } from '../../services/knowledgeReviewTaskService';
 import { db, getDbModelByObjectType, mapFactualVerdictToLegacy, toModerationEntry } from './moderationShared';
 
 type DecisionMode = 'consensus' | 'admin_override';
@@ -82,6 +83,13 @@ export async function writeVerdictDecision(input: VerdictDecisionInput): Promise
   entry.editDate = now;
   entry.editUserId = actorUserId;
   await entry.save();
+  await queueKnowledgeReviewTask({
+    taskType: 'revalidation', objectType: input.target.objectType, objectName: input.target.objectName,
+    objectId: input.target.id, channel: input.channel, dueAt: revalidateAt,
+    priority: input.consensusSnapshot.sensitivity === 'standard' ? 'normal' : input.consensusSnapshot.sensitivity,
+    reason: `${input.channel} verdict requires scheduled revalidation`,
+    metadata: { policyVersion: input.policyVersion, decisionMode: input.decisionMode, status: input.status },
+  });
 
   const voteOutcome = input.status === 'pending' ? 'superseded' : 'upheld';
   await db.VerdictVote.updateMany(

@@ -6,6 +6,8 @@ const request = require('supertest');
 const findArtifactById = jest.fn();
 const recordEntryRevision = jest.fn();
 const logEntryEvent = jest.fn();
+const inspectRemoteSource = jest.fn();
+const queueKnowledgeReviewTask = jest.fn();
 
 jest.mock('../../server/src/controllers/api/moderationShared', () => ({
   db: {
@@ -32,6 +34,12 @@ jest.mock('../../server/src/controllers/api/revisionWriteRecorder', () => ({
 jest.mock('../../server/src/services/entryEventsService', () => ({
   logEntryEvent: (...args) => logEntryEvent(...args),
 }));
+jest.mock('../../server/src/services/sourceIntegrityService', () => ({
+  inspectRemoteSource: (...args) => inspectRemoteSource(...args),
+}));
+jest.mock('../../server/src/services/knowledgeReviewTaskService', () => ({
+  queueKnowledgeReviewTask: (...args) => queueKnowledgeReviewTask(...args),
+}));
 
 function createApp(user) {
   const app = express();
@@ -51,6 +59,12 @@ describe('Artifact source-quality moderation', () => {
     jest.clearAllMocks();
     recordEntryRevision.mockResolvedValue(undefined);
     logEntryEvent.mockResolvedValue(undefined);
+    queueKnowledgeReviewTask.mockResolvedValue({});
+    inspectRemoteSource.mockResolvedValue({
+      status: 'healthy', checkedAt: new Date('2026-07-28T00:00:00.000Z'), nextCheckAt: new Date('2026-08-27T00:00:00.000Z'),
+      httpStatus: 200, finalUrl: 'https://example.org/source', redirectCount: 0,
+      contentHash: 'sha256:abc', expectedHash: '', hashMatches: null, contentType: 'text/html', contentLength: 120, error: '',
+    });
   });
 
   it('requires reviewer or admin privileges', async () => {
@@ -109,5 +123,21 @@ describe('Artifact source-quality moderation', () => {
       scope: 'privileged',
       eventType: 'artifact.source-quality.reviewed',
     }));
+  });
+
+  it('records a safe source check and schedules the next human review', async () => {
+    const artifact = {
+      _id: 'artifact-1', source: 'https://example.org/source', provenance: {},
+      markModified: jest.fn(), save: jest.fn().mockResolvedValue(undefined),
+    };
+    findArtifactById.mockResolvedValue(artifact);
+    const response = await request(createApp({
+      id: 'reviewer-1', username: 'reviewer', canPlayRoleOf: (role) => role === 'reviewer',
+    })).post('/api/moderation/artifact-source-check?artifact=artifact-1').send({}).expect(200);
+    expect(response.body.sourceIntegrity.status).toBe('healthy');
+    expect(inspectRemoteSource).toHaveBeenCalledWith(expect.objectContaining({ sourceUrl: 'https://example.org/source' }));
+    expect(artifact.provenance.sourceIntegrity).toEqual(expect.objectContaining({ contentHash: 'sha256:abc' }));
+    expect(queueKnowledgeReviewTask).toHaveBeenCalledWith(expect.objectContaining({ taskType: 'source_check' }));
+    expect(recordEntryRevision).toHaveBeenCalledWith(expect.objectContaining({ summary: expect.stringContaining('healthy') }));
   });
 });

@@ -63,10 +63,10 @@ describe('OutlineLinkPage', () => {
 
     await waitFor(() => expect(mockedApi.getOutlineTree).toHaveBeenCalledWith('topic-1', 2));
 
-    await user.type(screen.getByLabelText(/search topics or arguments/i), 'Argument');
+    await user.type(screen.getByLabelText(/search topics, arguments, or artifacts/i), 'Argument');
     await waitFor(() =>
       expect(mockedApi.searchOutlineTargets).toHaveBeenLastCalledWith('Argument', {
-        types: 'topic,argument',
+        types: 'topic,argument,artifact',
         limit: 25,
       }),
     );
@@ -80,6 +80,7 @@ describe('OutlineLinkPage', () => {
         parentId: 'topic-1',
         targetId: 'arg-1',
         relationship: 'support',
+        citation: undefined,
       }),
     );
     expect(await screen.findByText(/link created successfully/i)).toBeInTheDocument();

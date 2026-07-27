@@ -846,7 +846,8 @@ class ApiService {
   async createOutlineLink(payload: {
     parentId: string;
     targetId: string;
-    relationship: 'child' | 'support' | 'oppose' | 'related' | 'evidence' | 'source' | 'dependency';
+    relationship: 'child' | 'support' | 'oppose' | 'related' | 'evidence' | 'source' | 'dependency' | 'supports' | 'refutes' | 'qualifies' | 'background';
+    citation?: { locatorType: string; locator?: string; quote?: string; note?: string };
   }): Promise<LegacyApiResponse> {
     return this.request<LegacyApiResponse>('/outline/link', {
       method: 'POST',
@@ -866,7 +867,7 @@ class ApiService {
   async searchOutlineTargets(
     query: string,
     options?: {
-      types?: 'topic' | 'argument' | 'topic,argument';
+      types?: string;
       limit?: number;
     },
   ): Promise<{
@@ -875,7 +876,7 @@ class ApiService {
       _id: string;
       title: string;
       friendlyUrl?: string;
-      objectName: 'topic' | 'argument';
+      objectName: 'topic' | 'argument' | 'artifact';
     }>;
   }> {
     const params = new URLSearchParams();

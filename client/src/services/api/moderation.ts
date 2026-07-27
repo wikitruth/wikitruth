@@ -146,6 +146,21 @@ export interface ArtifactSourceQuality {
   reviewUsername?: string;
 }
 
+export interface ArtifactSourceIntegrity {
+  status: 'unchecked' | 'healthy' | 'changed' | 'broken' | 'blocked';
+  checkedAt?: string | Date | null;
+  nextCheckAt?: string | Date | null;
+  httpStatus?: number | null;
+  finalUrl?: string;
+  redirectCount?: number;
+  contentHash?: string;
+  expectedHash?: string;
+  hashMatches?: boolean | null;
+  contentType?: string;
+  contentLength?: number | null;
+  error?: string;
+}
+
 const getCsrfToken = (): string | null => {
   if (typeof document === 'undefined') {
     return null;
@@ -241,6 +256,11 @@ export const moderationApi = {
     request<{ success: boolean; sourceQuality: ArtifactSourceQuality }>(`/moderation/artifact-quality?${toQuery(target)}`, {
       method: 'PUT',
       body: JSON.stringify(payload),
+    }),
+  checkArtifactSource: (target: ModerationTarget) =>
+    request<{ success: boolean; sourceIntegrity: ArtifactSourceIntegrity }>(`/moderation/artifact-source-check?${toQuery(target)}`, {
+      method: 'POST',
+      body: JSON.stringify({}),
     }),
   resolveIssue: (issueId: string, payload: { status: 'resolved' | 'dismissed'; reason: string }) =>
     request<{ success: boolean; resolution: Record<string, unknown> }>(
