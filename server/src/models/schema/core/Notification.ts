@@ -13,6 +13,7 @@ const factory: SchemaFactory = function (app, mongoose) {
     objectName: { type: String, default: '' },
     objectId: { type: mongoose.Schema.ObjectId, default: null, index: true },
     payload: { type: mongoose.Schema.Types.Mixed, default: {} },
+    inAppVisible: { type: Boolean, default: true, index: true },
     readAt: { type: Date, default: null, index: true },
     createDate: { type: Date, default: Date.now, index: true },
   });

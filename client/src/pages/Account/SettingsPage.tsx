@@ -5,6 +5,7 @@ import Input from '../../components/Form/Input';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import authApi from '../../services/api/auth';
 import PasskeySecurityPanel from '../../components/Auth/PasskeySecurityPanel';
+import notificationsApi, { type NotificationPreferences } from '../../services/api/notifications';
 
 interface ContactFormState {
   first: string;
@@ -39,6 +40,10 @@ const SettingsPage: React.FC = () => {
   const [savingContact, setSavingContact] = useState(false);
   const [savingIdentity, setSavingIdentity] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
+  const [savingNotifications, setSavingNotifications] = useState(false);
+  const [notificationPreferences, setNotificationPreferences] = useState<NotificationPreferences>({
+    inApp: { enabled: true }, emailDigest: { enabled: false, frequency: 'daily' }, webPush: { enabled: false },
+  });
   const [contact, setContact] = useState<ContactFormState>({
     first: '',
     middle: '',
@@ -57,7 +62,7 @@ const SettingsPage: React.FC = () => {
   const loadSettings = async () => {
     try {
       setLoading(true);
-      const result = await authApi.accountSettings();
+      const [result, notificationResult] = await Promise.all([authApi.accountSettings(), notificationsApi.preferences()]);
       setContact({
         first: result.account?.first || '',
         middle: result.account?.middle || '',
@@ -72,6 +77,7 @@ const SettingsPage: React.FC = () => {
       });
       setProviders(result.providers || {});
       setSocial(result.social || {});
+      setNotificationPreferences(notificationResult.preferences);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load account settings');
     } finally {
@@ -127,6 +133,21 @@ const SettingsPage: React.FC = () => {
     }
   };
 
+  const handleSaveNotifications = async () => {
+    setError(null);
+    setSuccess(null);
+    try {
+      setSavingNotifications(true);
+      const result = await notificationsApi.updatePreferences(notificationPreferences);
+      setNotificationPreferences(result.preferences);
+      setSuccess('Notification delivery preferences updated.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update notification preferences');
+    } finally {
+      setSavingNotifications(false);
+    }
+  };
+
   if (loading) {
     return <LoadingSpinner message="Loading account settings..." />;
   }
@@ -142,6 +163,25 @@ const SettingsPage: React.FC = () => {
       <div className="row">
         <div className="col-sm-9">
           <PasskeySecurityPanel />
+
+          <div className="panel panel-info">
+            <div className="panel-heading"><h3 className="panel-title">Notification Delivery</h3></div>
+            <div className="panel-body">
+              <p className="text-muted">Choose how followed-entry and moderation events reach you. External channels remain queued until a configured delivery adapter confirms delivery.</p>
+              <div className="checkbox"><label><input type="checkbox" checked={notificationPreferences.inApp.enabled} onChange={(event) => setNotificationPreferences((previous) => ({ ...previous, inApp: { enabled: event.target.checked } }))} /> In-app inbox</label></div>
+              <div className="checkbox"><label><input type="checkbox" checked={notificationPreferences.emailDigest.enabled} onChange={(event) => setNotificationPreferences((previous) => ({ ...previous, emailDigest: { ...previous.emailDigest, enabled: event.target.checked } }))} /> Email digest</label></div>
+              <div className="form-group" style={{ maxWidth: 240 }}>
+                <label htmlFor="notification-digest-frequency">Digest frequency</label>
+                <select id="notification-digest-frequency" className="form-control" value={notificationPreferences.emailDigest.frequency} disabled={!notificationPreferences.emailDigest.enabled} onChange={(event) => setNotificationPreferences((previous) => ({ ...previous, emailDigest: { ...previous.emailDigest, frequency: event.target.value as 'daily' | 'weekly' } }))}>
+                  <option value="daily">Daily</option><option value="weekly">Weekly</option>
+                </select>
+              </div>
+              <div className="checkbox"><label><input type="checkbox" checked={notificationPreferences.webPush.enabled} onChange={(event) => setNotificationPreferences((previous) => ({ ...previous, webPush: { enabled: event.target.checked } }))} /> Web push</label></div>
+              <Button type="button" variant="info" onClick={handleSaveNotifications} disabled={savingNotifications} icon={savingNotifications ? 'spinner fa-spin' : 'bell'}>
+                {savingNotifications ? 'Saving...' : 'Save Notification Preferences'}
+              </Button>
+            </div>
+          </div>
 
           <div className="panel panel-default">
             <div className="panel-heading">

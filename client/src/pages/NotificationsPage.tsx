@@ -2,21 +2,25 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Alert from '../components/common/Alert';
 import PageMeta from '../components/common/PageMeta';
-import notificationsApi, { type NotificationRecord } from '../services/api/notifications';
+import notificationsApi, { type NotificationDelivery, type NotificationRecord } from '../services/api/notifications';
 
 const NotificationsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<NotificationRecord[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [deliveries, setDeliveries] = useState<NotificationDelivery[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const load = async () => {
     try {
       setLoading(true);
       setError(null);
-      const result = await notificationsApi.list({ limit: 100 });
+      const [result, deliveryResult] = await Promise.all([
+        notificationsApi.list({ limit: 100 }), notificationsApi.outbox({ limit: 20 }),
+      ]);
       setItems(Array.isArray(result.notifications) ? result.notifications : []);
       setUnreadCount(Number(result.unreadCount || 0));
+      setDeliveries(deliveryResult.deliveries || []);
     } catch (loadError) {
       setError(loadError instanceof Error ? loadError.message : 'Unable to load notifications');
     } finally {
@@ -57,11 +61,21 @@ const NotificationsPage: React.FC = () => {
     }
   };
 
+  const handleRetryDelivery = async (deliveryId: string) => {
+    try {
+      const result = await notificationsApi.retryDelivery(deliveryId);
+      setDeliveries((previous) => previous.map((delivery) => delivery._id === deliveryId ? result.delivery : delivery));
+    } catch (_error) {
+      setError('Unable to retry notification delivery.');
+    }
+  };
+
   return (
     <div className="container">
       <PageMeta title="Notifications" description="Your follow and moderation notifications." />
       <h2>Notifications</h2>
       <p className="text-muted">Unread: {unreadCount}</p>
+      <p><Link to="/account/settings"><i className="fa fa-cog" aria-hidden="true"></i> Delivery preferences</Link></p>
 
       {error ? <Alert type="danger">{error}</Alert> : null}
       {loading ? <p className="text-muted">Loading notifications...</p> : null}
@@ -120,6 +134,30 @@ const NotificationsPage: React.FC = () => {
           })}
         </div>
       ) : null}
+
+      <div className="panel panel-default">
+        <div className="panel-heading"><strong>Recent Delivery Status</strong></div>
+        <div className="panel-body">
+          <p className="text-muted">In-app delivery is immediate. Email digest and web push remain queued until their configured adapter confirms delivery.</p>
+          {deliveries.length === 0 ? <p>No delivery records yet.</p> : (
+            <div className="table-responsive">
+              <table className="table table-condensed">
+                <thead><tr><th>Channel</th><th>Status</th><th>Created</th><th></th></tr></thead>
+                <tbody>
+                  {deliveries.map((delivery) => (
+                    <tr key={delivery._id}>
+                      <td>{delivery.channel.replace('_', ' ')}</td>
+                      <td><span className={`label label-${delivery.status === 'delivered' ? 'success' : delivery.status === 'failed' ? 'danger' : delivery.status === 'queued' ? 'warning' : 'default'}`}>{delivery.status}</span></td>
+                      <td>{delivery.createDate ? new Date(delivery.createDate).toLocaleString() : ''}</td>
+                      <td className="text-right">{delivery.status === 'failed' ? <button type="button" className="btn btn-default btn-xs" onClick={() => void handleRetryDelivery(delivery._id)}>Retry</button> : null}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

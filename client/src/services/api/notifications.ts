@@ -43,7 +43,36 @@ export type NotificationRecord = {
   payload?: Record<string, unknown>;
 };
 
+export type NotificationPreferences = {
+  inApp: { enabled: boolean };
+  emailDigest: { enabled: boolean; frequency: 'daily' | 'weekly' };
+  webPush: { enabled: boolean };
+};
+
+export type NotificationDelivery = {
+  _id: string;
+  channel: 'in_app' | 'email_digest' | 'web_push';
+  status: 'queued' | 'processing' | 'delivered' | 'failed' | 'skipped';
+  attempts?: number;
+  lastError?: string;
+  createDate?: string;
+};
+
 export const notificationsApi = {
+  preferences: () => request<{ success: boolean; preferences: NotificationPreferences }>('/notifications/preferences'),
+  updatePreferences: (preferences: NotificationPreferences) => request<{ success: boolean; preferences: NotificationPreferences }>(
+    '/notifications/preferences', { method: 'PUT', body: JSON.stringify({ preferences }) },
+  ),
+  outbox: (params?: { channel?: string; status?: string; limit?: number }) => {
+    const query = new URLSearchParams();
+    if (params?.channel) query.set('channel', params.channel);
+    if (params?.status) query.set('status', params.status);
+    if (params?.limit) query.set('limit', String(params.limit));
+    return request<{ success: boolean; deliveries: NotificationDelivery[] }>(`/notifications/outbox${query.size ? `?${query}` : ''}`);
+  },
+  retryDelivery: (id: string) => request<{ success: boolean; delivery: NotificationDelivery }>(
+    `/notifications/outbox/${encodeURIComponent(id)}/retry`, { method: 'POST', body: JSON.stringify({}) },
+  ),
   list: (params?: { page?: number; limit?: number; unreadOnly?: boolean }) => {
     const query = new URLSearchParams();
     if (typeof params?.page === 'number') {

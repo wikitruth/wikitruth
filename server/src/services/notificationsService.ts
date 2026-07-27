@@ -2,6 +2,7 @@
 import constants from '../models/constants';
 
 import appModForDb from '../app';
+import { getNotificationPreferences, queueNotificationDeliveries } from './notificationDeliveryService';
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 type EntryTarget = {
   objectType: number;
@@ -126,7 +127,8 @@ async function createNotification(options: {
   payload?: Record<string, unknown>;
 }): Promise<void> {
   const target = normalizeTarget(options.target || {});
-  await db.Notification.create({
+  const preferences = await getNotificationPreferences(options.userId);
+  const notification = await db.Notification.create({
     userId: options.userId,
     type: options.type,
     title: options.title,
@@ -136,8 +138,15 @@ async function createNotification(options: {
     objectName: target?.objectName || '',
     objectId: target?.objectId || null,
     payload: options.payload || {},
+    inAppVisible: preferences.inApp.enabled,
     readAt: null,
     createDate: new Date(),
+  });
+  await queueNotificationDeliveries({
+    userId: options.userId,
+    notificationId: notification._id,
+    preferences,
+    payload: { type: options.type, title: options.title, body: options.body || '', link: options.link || '' },
   });
 }
 
@@ -182,7 +191,12 @@ async function notifySubscribers(options: {
     return 0;
   }
 
-  await db.Notification.insertMany(
+  const preferenceRows = await Promise.all(candidates.map(async (subscription: { userId?: unknown }) => ({
+    userId: String(subscription.userId || ''),
+    preferences: await getNotificationPreferences(String(subscription.userId || '')),
+  })));
+  const preferencesByUserId = new Map(preferenceRows.map((row) => [row.userId, row.preferences]));
+  const notifications = await db.Notification.insertMany(
     candidates.map((subscription: { userId?: unknown }) => ({
       userId: subscription.userId,
       type: options.type,
@@ -193,10 +207,20 @@ async function notifySubscribers(options: {
       objectName: target.objectName,
       objectId: target.objectId,
       payload: options.payload || {},
+      inAppVisible: preferencesByUserId.get(String(subscription.userId || ''))?.inApp.enabled !== false,
       readAt: null,
       createDate: new Date(),
     }))
   );
+  await Promise.all(notifications.map((notification: { _id?: unknown; userId?: unknown }) => {
+    const userId = String(notification.userId || '');
+    return queueNotificationDeliveries({
+      userId,
+      notificationId: notification._id,
+      preferences: preferencesByUserId.get(userId)!,
+      payload: { type: options.type, title: options.title, body: options.body || '', link: options.link || '' },
+    });
+  }));
 
   return candidates.length;
 }
@@ -211,6 +235,7 @@ async function listNotifications(options: {
   const limit = Math.min(Math.max(Number(options.limit || 20), 1), 100);
   const query: Record<string, unknown> = {
     userId: options.userId,
+    inAppVisible: { $ne: false },
   };
   if (options.unreadOnly) {
     query.readAt = null;
@@ -218,7 +243,7 @@ async function listNotifications(options: {
 
   const [total, unreadCount, items] = await Promise.all([
     db.Notification.countDocuments(query),
-    db.Notification.countDocuments({ userId: options.userId, readAt: null }),
+    db.Notification.countDocuments({ userId: options.userId, inAppVisible: { $ne: false }, readAt: null }),
     db.Notification
       .find(query)
       .sort({ createDate: -1 })
@@ -238,7 +263,7 @@ async function listNotifications(options: {
 
 async function markNotificationRead(options: { userId: string; notificationId: string }): Promise<boolean> {
   const result = await db.Notification.updateOne(
-    { _id: options.notificationId, userId: options.userId, readAt: null },
+    { _id: options.notificationId, userId: options.userId, inAppVisible: { $ne: false }, readAt: null },
     { $set: { readAt: new Date() } }
   );
   return Boolean(result?.modifiedCount);
@@ -246,7 +271,7 @@ async function markNotificationRead(options: { userId: string; notificationId: s
 
 async function markAllNotificationsRead(options: { userId: string }): Promise<number> {
   const result = await db.Notification.updateMany(
-    { userId: options.userId, readAt: null },
+    { userId: options.userId, inAppVisible: { $ne: false }, readAt: null },
     { $set: { readAt: new Date() } }
   );
   return Number(result?.modifiedCount || 0);
@@ -255,6 +280,7 @@ async function markAllNotificationsRead(options: { userId: string }): Promise<nu
 async function getUnreadCount(options: { userId: string }): Promise<number> {
   return db.Notification.countDocuments({
     userId: options.userId,
+    inAppVisible: { $ne: false },
     readAt: null,
   });
 }

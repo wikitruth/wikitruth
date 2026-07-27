@@ -11,6 +11,12 @@ import {
   markAllNotificationsRead,
   getUnreadCount,
 } from '../../services/notificationsService';
+import {
+  getNotificationPreferences,
+  listNotificationOutbox,
+  retryNotificationDelivery,
+  setNotificationPreferences,
+} from '../../services/notificationDeliveryService';
 import constants from '../../models/constants';
 
 function ensureAuthenticated(req: WikitruthRequest, res: WikitruthResponse): boolean {
@@ -39,6 +45,37 @@ function resolveObjectType(objectName: string | undefined, objectType: unknown):
 }
 
 export = function (router: Router) {
+  router.get('/preferences', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureAuthenticated(req, res)) return;
+    const preferences = await getNotificationPreferences(String(req.user?._id || req.user?.id || ''));
+    res.json({ success: true, preferences });
+  });
+
+  router.put('/preferences', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureAuthenticated(req, res)) return;
+    const preferences = await setNotificationPreferences(
+      String(req.user?._id || req.user?.id || ''), req.body?.preferences || req.body,
+    );
+    res.json({ success: true, preferences });
+  });
+
+  router.get('/outbox', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureAuthenticated(req, res)) return;
+    const deliveries = await listNotificationOutbox(String(req.user?._id || req.user?.id || ''), {
+      channel: String(req.query.channel || ''), status: String(req.query.status || ''), limit: toPositiveInt(req.query.limit, 50),
+    });
+    res.json({ success: true, deliveries });
+  });
+
+  router.post('/outbox/:id/retry', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureAuthenticated(req, res)) return;
+    const delivery = await retryNotificationDelivery(
+      String(req.user?._id || req.user?.id || ''), String(req.params.id || ''),
+    );
+    if (!delivery) { res.status(404).json({ success: false, message: 'Failed delivery not found' }); return; }
+    res.json({ success: true, delivery });
+  });
+
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAuthenticated(req, res)) {
       return;

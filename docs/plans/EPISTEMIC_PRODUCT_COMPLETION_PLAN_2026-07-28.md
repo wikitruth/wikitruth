@@ -63,7 +63,7 @@ agent-safe, and operationally maintainable truth-validation system.
 - [x] Complete opinion classification authoring, editing, reading, and filters.
 - [x] Add explicit `Latest`, `Trending`, and `Top` Home buckets with published
   formulas that do not affect verdicts.
-- [ ] Add configurable in-app, email-digest, and web-push preferences with a
+- [x] Add configurable in-app, email-digest, and web-push preferences with a
   delivery outbox abstraction.
 
 ### 7. Global, Civic, and Interoperability Expansion

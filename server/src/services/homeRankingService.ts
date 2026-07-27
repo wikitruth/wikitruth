@@ -103,10 +103,11 @@ export function rankHomeEntries(entries: HomeEntry[], reactions: ReactionRow[], 
   };
 }
 
-export async function loadHomeRankings(db: RankingDb, entries: HomeEntry[]): Promise<ReturnType<typeof rankHomeEntries>> {
+export async function loadHomeRankings(dbModels: Record<string, unknown>, entries: HomeEntry[]): Promise<ReturnType<typeof rankHomeEntries>> {
+  const reactionModel = dbModels.Reaction as RankingDb['Reaction'];
   const entryIds = entries.map((entry) => entry._id).filter(Boolean);
   const reactions = entryIds.length
-    ? await db.Reaction.find({ entryId: { $in: entryIds } }).select('entryId objectType channel value').lean()
+    ? await reactionModel.find({ entryId: { $in: entryIds } }).select('entryId objectType channel value').lean()
     : [];
   return rankHomeEntries(entries, reactions);
 }
