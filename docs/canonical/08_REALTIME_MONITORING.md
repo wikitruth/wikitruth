@@ -13,6 +13,14 @@ Define the current realtime event channel and client monitoring behavior.
 - emits periodic heartbeat events
 - Event bus is in-memory publish/subscribe by default.
 - `REALTIME_EVENT_ADAPTER=mongo` enables durable, TTL-bounded cross-process fan-out for multi-worker deployments while preserving immediate local delivery.
+- Authenticated agent streams are scope-filtered and expose only events the
+  accountable user may read.
+
+## Notification Delivery
+
+- Durable notifications are always recorded in-app first.
+- Optional digest-email and web-push deliveries use preference-aware outbox
+  records with retry state; transport failure never removes the in-app event.
 
 ## Monitoring Ingestion
 

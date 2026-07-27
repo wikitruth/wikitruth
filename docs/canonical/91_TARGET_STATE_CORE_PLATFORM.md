@@ -14,6 +14,13 @@ Define the high-priority governance and integrity contract for the core platform
 - Reader signal intake queue (for example incorrect verdict, re-evaluate, wrong category).
 - Issue-first governance gates for unresolved critical issues.
 - Tamper-evident hash-chained audit timeline for privileged actions (moderation/verdict/role changes). Public-key signing requires a separate approved threat model.
+- Sensitivity-aware consensus policies with eligible reviewer expertise,
+  conflict disclosure, affiliation independence, material dissent, and
+  non-destructive revalidation.
+- Claim-level evidence semantics, citation locators, source integrity status,
+  and public evidence bundles.
+- Replay-safe agent mutations, dry-run validation, attributable agent runs, and
+  scoped activity delivery.
 
 ## Reliability and Operations Targets
 
@@ -23,6 +30,7 @@ Define the high-priority governance and integrity contract for the core platform
 
 ## Target State Status
 
-- Overall: scoped core-platform baseline `implemented`.
+- Overall: foundational baseline `implemented`; the approved epistemic product
+  completion wave is `in progress`.
 - Automatic unresolved-content expiry remains explicitly `deferred`; human resolution and audited administrator override remain canonical.
 - Source baseline: `docs/plans/deferred/plan-2026-04-14/09_GAP_CHECKLIST_PLAN.md` and `docs/plans/deferred/plan-2026-04-14/06_VALIDATED_CHECKLIST_CORE_PLATFORM.md`.

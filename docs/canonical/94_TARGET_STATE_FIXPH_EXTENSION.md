@@ -21,6 +21,9 @@ Define the intended civic-product extension targets for the FixPH domain.
 
 - Candidate comparison workspace for election decision support.
 - Long-term historical memory linking incidents to follow-up actions and outcomes.
+- Attributed subject responses and correction requests for people,
+  institutions, offices, and organizations, with reviewer disposition and
+  immutable lifecycle history.
 
 ## Target State Status
 

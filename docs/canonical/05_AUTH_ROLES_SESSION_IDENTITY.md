@@ -76,6 +76,9 @@ Define the current authentication and role model.
 - Agent-authored contributions use normal pending screening, duplicate checks, revisions, and audit attribution.
 - Valid bearer credentials are CSRF-exempt; invalid bearer values never bypass CSRF.
 - Passkeys authenticate people, not unattended agents. A human administrator must satisfy recent passkey step-up before issuing, rotating, or revoking an agent credential.
+- Agent mutations accept bounded idempotency keys and attributable run metadata;
+  retries return the original result rather than creating duplicate content.
+- Agent dry runs execute validation and duplicate checks without mutation.
 
 ## Identity Invariant
 

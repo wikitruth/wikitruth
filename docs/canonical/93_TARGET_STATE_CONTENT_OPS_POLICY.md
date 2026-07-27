@@ -19,6 +19,11 @@ Define target governance and content-operations assets required for quality at s
 - Stale discussion cleanup and archive SOP.
 - Concise-writing standard with enforceable checklist.
 - Quality-linked incentives and attribution metrics model.
+- Unified knowledge-health queues for evidence gaps, unresolved critical
+  issues, quorum gaps, revalidation, source failures, duplicates, and important
+  unanswered questions.
+- Non-destructive freshness policies that schedule review and notify owners or
+  followers without expiring content automatically.
 
 ## Seed and Curation Targets
 

@@ -18,6 +18,8 @@ Define how users discover and navigate knowledge graph content.
 - content scope (`all`, `wiki`, `journal`)
 - optional cursor/limit pagination controls
 - Private entry visibility in search depends on current user ownership.
+- Graph-aware filters may constrain relationship, verdict, evidence health,
+  freshness, and tenant context while preserving moderation and privacy rules.
 
 ## Outline Behavior
 
@@ -46,3 +48,6 @@ Discovery surfaces must remain moderation-aware and privacy-aware, so accepted/p
 - `/sitemap.xml` and `/robots.txt` are generated for the active request host and never publish the retired `/app` prefix.
 - Root, core entry, and active civic-tenant URLs are included; private records are excluded.
 - The initial HTML for public entry and civic detail routes contains record-specific title, description, canonical URL, OpenGraph metadata, and structured data before React loads.
+- Public evidence bundles expose canonical entry data, claim relationships,
+  artifact provenance, verdict policy/consensus/dissent, and revision identity
+  without private content or secret audit payloads.

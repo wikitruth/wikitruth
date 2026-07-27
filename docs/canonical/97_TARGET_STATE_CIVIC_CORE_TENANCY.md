@@ -38,6 +38,11 @@ Define the reusable civic-accountability platform contract that powers FixPH and
 - A branded tenant may run in the shared Wikitruth application, in a dedicated deployment of the same build, or through an independent frontend consuming the same APIs.
 - Platform identity remains global while application sessions remain origin-scoped.
 - Unrelated tenant domains use single-use authentication handoffs through `https://wikitruth.net`; they do not widen the Wikitruth WebAuthn relying-party scope or share cookies.
+- Tenant launch requires a fail-closed readiness report covering domain
+  ownership inputs, localization, navigation, policy, extension schemas,
+  jurisdiction hierarchy, administrator membership, and deployment profile.
+- Active tenant configuration can be previewed and exported as a portable,
+  secret-free data contract.
 
 ## Target State Status
 
