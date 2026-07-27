@@ -10,7 +10,7 @@ import type {
   CivicActorContext,
   CivicJurisdiction,
   CivicMembershipUser,
-  CivicTenant,
+  CivicTenant, CivicTenantPreview, CivicTenantReadiness, PortableCivicTenantConfiguration,
   CivicTenantMembership,
   CivicTenantRole,
   CivicResponseRequest,
@@ -89,6 +89,11 @@ export const civicApi = {
   updateTenant: (tenantId: string, payload: Partial<CivicTenant>) => request<{ tenant: CivicTenant }>(`/civic/platform/tenants/${encodeURIComponent(tenantId)}`, {
     method: 'PUT', body: JSON.stringify(payload),
   }),
+  previewTenant: (payload: CivicTenant) => request<{ success: boolean; preview: CivicTenantPreview }>('/civic/platform/tenants/preview', {
+    method: 'POST', body: JSON.stringify(payload),
+  }),
+  tenantReadiness: (tenantId: string) => request<{ success: boolean; readiness: CivicTenantReadiness }>(`/civic/platform/tenants/${encodeURIComponent(tenantId)}/readiness`),
+  exportTenant: (tenantId: string) => request<PortableCivicTenantConfiguration>(`/civic/platform/tenants/${encodeURIComponent(tenantId)}/export`),
   provisionTenantMembership: (tenantId: string, userId: string, payload: { roles: CivicTenantRole[]; active: boolean }) => request<{ membership: CivicTenantMembership }>(`/civic/platform/tenants/${encodeURIComponent(tenantId)}/memberships/${encodeURIComponent(userId)}`, {
     method: 'PUT', body: JSON.stringify(payload),
   }),

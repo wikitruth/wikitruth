@@ -89,6 +89,24 @@ describe('civicApi', () => {
     }));
   });
 
+  it('previews, validates, and exports portable tenant configuration', async () => {
+    document.cookie = '_csrfToken=platform-token; path=/';
+    const tenant = { tenantId: 'fix-example' } as Parameters<typeof civicApi.previewTenant>[0];
+    fetchMock.mockResolvedValue({ ok: true, json: async () => ({ success: true, preview: { tenant } }) } as Response);
+    await civicApi.previewTenant(tenant);
+    expect(fetchMock).toHaveBeenLastCalledWith('/api/civic/platform/tenants/preview', expect.objectContaining({
+      method: 'POST', headers: expect.objectContaining({ 'x-csrf-token': 'platform-token' }),
+    }));
+
+    fetchMock.mockResolvedValue({ ok: true, json: async () => ({ success: true, readiness: { ready: false } }) } as Response);
+    await civicApi.tenantReadiness('fix-example');
+    expect(fetchMock).toHaveBeenLastCalledWith('/api/civic/platform/tenants/fix-example/readiness', expect.any(Object));
+
+    fetchMock.mockResolvedValue({ ok: true, json: async () => ({ format: 'wikitruth.civic-tenant' }) } as Response);
+    await civicApi.exportTenant('fix-example');
+    expect(fetchMock).toHaveBeenLastCalledWith('/api/civic/platform/tenants/fix-example/export', expect.any(Object));
+  });
+
   it('creates a typed Wikitruth knowledge link with CSRF protection', async () => {
     document.cookie = '_csrfToken=link-token; path=/';
     fetchMock.mockResolvedValue({ ok: true, json: async () => ({ link: { _id: 'link-1' } }) } as Response);

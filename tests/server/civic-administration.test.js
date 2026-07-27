@@ -13,6 +13,7 @@ const jurisdictionUpdate = jest.fn();
 const jurisdictionCount = jest.fn();
 const logEntryEvent = jest.fn();
 const tenantFindOne = jest.fn();
+const membershipCount = jest.fn();
 
 function queryResult(value) {
   const chain = {
@@ -32,6 +33,7 @@ jest.mock('../../server/src/app', () => ({
         find: (...args) => membershipFind(...args),
         findOne: jest.fn(),
         findOneAndUpdate: (...args) => membershipUpdate(...args),
+        countDocuments: (...args) => membershipCount(...args),
       },
       User: {
         find: (...args) => userFind(...args),
@@ -87,6 +89,7 @@ describe('civic tenant administration', () => {
     jurisdictionCount.mockResolvedValue(0);
     logEntryEvent.mockResolvedValue(undefined);
     tenantFindOne.mockReturnValue(queryResult(null));
+    membershipCount.mockResolvedValue(1);
   });
 
   it('enriches memberships with a privacy-limited user identity', async () => {
@@ -163,5 +166,48 @@ describe('civic tenant administration', () => {
       eventType: 'civic.membership.platform_provisioned',
       payload: expect.objectContaining({ tenantId: 'fix-example', userId: '66f000000000000000000010' }),
     }));
+  });
+
+  it('previews normalized tenant branding without persisting it', async () => {
+    const { FIXPH_TENANT } = require('../../server/src/config/civicTenants');
+    const response = await request(createApp())
+      .post('/api/civic/platform/tenants/preview')
+      .send(FIXPH_TENANT)
+      .expect(200);
+    expect(response.body.preview).toEqual(expect.objectContaining({
+      tenant: expect.objectContaining({ tenantId: 'fixtheph' }),
+      presentation: expect.objectContaining({ cssVariables: expect.objectContaining({ '--civic-primary': '#2f6b4f' }) }),
+    }));
+  });
+
+  it('returns fail-closed launch readiness for a persisted tenant', async () => {
+    const { FIXPH_TENANT } = require('../../server/src/config/civicTenants');
+    tenantFindOne
+      .mockReturnValueOnce(queryResult(FIXPH_TENANT))
+      .mockReturnValueOnce(queryResult(null));
+    jurisdictionCount.mockResolvedValue(0);
+    const response = await request(createApp())
+      .get('/api/civic/platform/tenants/fixtheph/readiness')
+      .expect(200);
+    expect(response.body.readiness).toEqual(expect.objectContaining({ ready: false, scope: 'launch' }));
+    expect(response.body.readiness.checks).toEqual(expect.arrayContaining([
+      expect.objectContaining({ key: 'jurisdictions', status: 'fail' }),
+    ]));
+  });
+
+  it('exports a portable tenant contract without persistence metadata', async () => {
+    const { FIXPH_TENANT } = require('../../server/src/config/civicTenants');
+    tenantFindOne
+      .mockReturnValueOnce(queryResult({ ...FIXPH_TENANT, _id: 'database-id', createUserId: 'private-user' }))
+      .mockReturnValueOnce(queryResult(null));
+    jurisdictionCount.mockResolvedValue(1);
+    const response = await request(createApp())
+      .get('/api/civic/platform/tenants/fixtheph/export')
+      .expect(200);
+    expect(response.body).toEqual(expect.objectContaining({
+      format: 'wikitruth.civic-tenant', version: '1.0', tenant: expect.objectContaining({ tenantId: 'fixtheph' }),
+    }));
+    expect(response.body.tenant).not.toHaveProperty('_id');
+    expect(response.body.tenant).not.toHaveProperty('createUserId');
   });
 });

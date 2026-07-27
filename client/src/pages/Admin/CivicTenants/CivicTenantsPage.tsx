@@ -2,7 +2,9 @@ import React, { useCallback, useEffect, useState } from 'react';
 import PageMeta from '../../../components/common/PageMeta';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import civicApi from '../../../services/api/civic';
-import type { CivicTenant, CivicTenantSection } from '../../../types/civic';
+import type {
+  CivicTenant, CivicTenantPreview, CivicTenantReadiness, CivicTenantSection,
+} from '../../../types/civic';
 
 const DEFAULT_SECTIONS: CivicTenantSection[] = [
   { slug: 'people', title: 'People', description: 'Public officials and civic actors.', icon: 'users', kinds: ['person'], createKinds: ['person'], enabled: true },
@@ -51,6 +53,56 @@ function formFromTenant(tenant: CivicTenant): FormState {
   };
 }
 
+function payloadFromForm(form: FormState): CivicTenant {
+  return {
+    tenantId: form.tenantId.trim().toLowerCase(), status: form.status, countryCode: form.countryCode.trim().toUpperCase(),
+    title: form.title.trim(), navTitle: form.navTitle.trim(), slogan: form.slogan.trim(),
+    site: {
+      homeTitle: form.homeTitle.trim(), homeDescription: form.homeDescription.trim(),
+      aboutUrl: form.aboutUrl.trim(), exploreUrl: form.exploreUrl.trim(),
+      knowledgeRootTopicId: form.knowledgeRootTopicId.trim(),
+    },
+    domains: form.domains.split(',').map((value) => value.trim().toLowerCase()).filter(Boolean),
+    branding: {
+      logoIcon: form.logoIcon.trim(), favicon: form.favicon.trim(), primaryColor: form.primaryColor,
+      accentColor: form.accentColor, surfaceColor: form.surfaceColor, fontFamily: form.fontFamily.trim(),
+    },
+    localization: {
+      defaultLocale: form.locale, supportedLocales: form.supportedLocales.split(',').map((value) => value.trim()).filter(Boolean),
+      timezone: form.timezone, currency: form.currency.toUpperCase(),
+    },
+    geography: {
+      levels: JSON.parse(form.levels) as CivicTenant['geography']['levels'],
+      addressFields: JSON.parse(form.addressFields) as string[],
+    },
+    sections: JSON.parse(form.sections) as CivicTenantSection[],
+    featureFlags: JSON.parse(form.featureFlags) as Record<string, boolean>,
+    extensionSchemas: JSON.parse(form.extensionSchemas) as CivicTenant['extensionSchemas'],
+    moderationPolicyVersion: form.moderationPolicyVersion,
+    electionSystem: form.electionSystem,
+    deploymentMode: form.deploymentMode,
+  };
+}
+
+const ReadinessReport: React.FC<{ report: CivicTenantReadiness }> = ({ report }) => (
+  <div className={`panel ${report.ready ? 'panel-success' : 'panel-warning'}`}>
+    <div className="panel-heading">
+      <strong>{report.scope === 'launch' ? 'Launch readiness' : 'Configuration readiness'}</strong>
+      <span className={`label ${report.ready ? 'label-success' : 'label-danger'} pull-right`}>
+        {report.ready ? 'Ready' : `${report.summary.failed} blockers`}
+      </span>
+    </div>
+    <ul className="list-group">
+      {report.checks.map((item) => (
+        <li className="list-group-item" key={item.key}>
+          <i className={`fa ${item.status === 'pass' ? 'fa-check-circle text-success' : item.status === 'warning' ? 'fa-exclamation-circle text-warning' : 'fa-times-circle text-danger'}`} aria-hidden="true" />{' '}
+          <strong>{item.label}</strong><small className="text-muted" style={{ display: 'block', marginLeft: 18 }}>{item.message}</small>
+        </li>
+      ))}
+    </ul>
+  </div>
+);
+
 const CivicTenantsPage: React.FC = () => {
   const [tenants, setTenants] = useState<CivicTenant[]>([]);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
@@ -61,6 +113,9 @@ const CivicTenantsPage: React.FC = () => {
   const [provisionUserId, setProvisionUserId] = useState('');
   const [provisioning, setProvisioning] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [preview, setPreview] = useState<CivicTenantPreview | null>(null);
+  const [readiness, setReadiness] = useState<CivicTenantReadiness | null>(null);
+  const [checking, setChecking] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -82,36 +137,54 @@ const CivicTenantsPage: React.FC = () => {
     setSaving(true);
     setMessage(null);
     try {
-      const levels = JSON.parse(form.levels) as CivicTenant['geography']['levels'];
-      const addressFields = JSON.parse(form.addressFields) as string[];
-      const sections = JSON.parse(form.sections) as CivicTenantSection[];
-      const featureFlags = JSON.parse(form.featureFlags) as Record<string, boolean>;
-      const extensionSchemas = JSON.parse(form.extensionSchemas) as CivicTenant['extensionSchemas'];
-      const payload: CivicTenant = {
-        tenantId: form.tenantId.trim().toLowerCase(), status: form.status, countryCode: form.countryCode.trim().toUpperCase(),
-        title: form.title.trim(), navTitle: form.navTitle.trim(), slogan: form.slogan.trim(),
-        site: {
-          homeTitle: form.homeTitle.trim(), homeDescription: form.homeDescription.trim(),
-          aboutUrl: form.aboutUrl.trim(), exploreUrl: form.exploreUrl.trim(),
-          knowledgeRootTopicId: form.knowledgeRootTopicId.trim(),
-        },
-        domains: form.domains.split(',').map((value) => value.trim().toLowerCase()).filter(Boolean),
-        branding: { logoIcon: form.logoIcon.trim(), favicon: form.favicon.trim(), primaryColor: form.primaryColor, accentColor: form.accentColor, surfaceColor: form.surfaceColor, fontFamily: form.fontFamily.trim() },
-        localization: { defaultLocale: form.locale, supportedLocales: form.supportedLocales.split(',').map((value) => value.trim()).filter(Boolean), timezone: form.timezone, currency: form.currency.toUpperCase() },
-        geography: { levels, addressFields }, sections, featureFlags, extensionSchemas,
-        moderationPolicyVersion: form.moderationPolicyVersion, electionSystem: form.electionSystem, deploymentMode: form.deploymentMode,
-      };
+      const payload = payloadFromForm(form);
       if (editing) await civicApi.updateTenant(payload.tenantId, payload);
       else await civicApi.createTenant(payload);
       setMessage(editing ? 'Tenant configuration updated.' : 'Civic tenant created.');
       setForm(EMPTY_FORM);
       setEditing(false);
+      setPreview(null);
+      setReadiness(null);
       await load();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Unable to save civic tenant configuration.');
     } finally {
       setSaving(false);
     }
+  };
+
+  const previewConfiguration = async () => {
+    setChecking(true); setMessage(null);
+    try {
+      const result = await civicApi.previewTenant(payloadFromForm(form));
+      setPreview(result.preview); setReadiness(null);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Unable to preview tenant configuration.');
+    } finally { setChecking(false); }
+  };
+
+  const validateLaunch = async () => {
+    if (!form.tenantId) return;
+    setChecking(true); setMessage(null);
+    try {
+      const result = await civicApi.tenantReadiness(form.tenantId);
+      setReadiness(result.readiness); setPreview(null);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Unable to validate tenant launch readiness.');
+    } finally { setChecking(false); }
+  };
+
+  const exportConfiguration = async () => {
+    if (!form.tenantId) return;
+    setChecking(true); setMessage(null);
+    try {
+      const result = await civicApi.exportTenant(form.tenantId);
+      const url = URL.createObjectURL(new Blob([JSON.stringify(result, null, 2)], { type: 'application/json' }));
+      const anchor = document.createElement('a');
+      anchor.href = url; anchor.download = `${form.tenantId}-civic-tenant.json`; anchor.click(); URL.revokeObjectURL(url);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Unable to export tenant configuration.');
+    } finally { setChecking(false); }
   };
 
   const bootstrap = async () => {
@@ -147,8 +220,17 @@ const CivicTenantsPage: React.FC = () => {
     <div className="row">
       <div className="col-md-5">
         <div className="panel panel-default"><div className="panel-heading"><strong>Configured tenants</strong><button type="button" className="btn btn-default btn-xs pull-right" onClick={() => void bootstrap()}>Bootstrap built-ins</button></div><div className="panel-body">
-          {loading ? <LoadingSpinner message="Loading civic tenants..." /> : tenants.length ? <div className="list-group">{tenants.map((tenant) => <button type="button" className="list-group-item" key={tenant.tenantId} onClick={() => { setForm(formFromTenant(tenant)); setEditing(true); }}><strong>{tenant.title}</strong><span className="label label-default pull-right">{tenant.countryCode}</span><small className="text-muted" style={{ display: 'block' }}>{tenant.tenantId} · {tenant.domains.join(', ')}</small></button>)}</div> : <p>No civic tenants configured.</p>}
+          {loading ? <LoadingSpinner message="Loading civic tenants..." /> : tenants.length ? <div className="list-group">{tenants.map((tenant) => <button type="button" className="list-group-item" key={tenant.tenantId} onClick={() => { setForm(formFromTenant(tenant)); setEditing(true); setPreview(null); setReadiness(null); }}><strong>{tenant.title}</strong><span className="label label-default pull-right">{tenant.countryCode}</span><small className="text-muted" style={{ display: 'block' }}>{tenant.tenantId} · {tenant.domains.join(', ')}</small></button>)}</div> : <p>No civic tenants configured.</p>}
         </div></div>
+        {preview && <div className="panel panel-default"><div className="panel-heading"><strong>Tenant preview</strong></div><div className="panel-body" style={preview.presentation.cssVariables as React.CSSProperties}>
+          <div style={{ background: 'var(--civic-surface)', borderLeft: '5px solid var(--civic-accent)', padding: 14 }}>
+            <h3 style={{ color: 'var(--civic-primary)', marginTop: 0 }}>{preview.presentation.home.title || preview.tenant.title}</h3>
+            <p>{preview.presentation.home.description || preview.presentation.home.slogan}</p>
+            <p className="small">{preview.presentation.navigation.map((item) => item.title).join(' · ')}</p>
+          </div>
+        </div></div>}
+        {preview && <ReadinessReport report={preview.readiness} />}
+        {readiness && <ReadinessReport report={readiness} />}
         <form className="panel panel-default" onSubmit={provisionTenantAdmin}><div className="panel-heading"><strong>Explicit tenant admin bootstrap</strong></div><div className="panel-body"><p className="text-muted">Platform authority does not imply country authority. This audited action grants a selected user administration of one tenant.</p><div className="form-group"><label htmlFor="provision-tenant">Tenant</label><select id="provision-tenant" className="form-control" value={provisionTenantId} onChange={(event) => setProvisionTenantId(event.target.value)}>{tenants.map((tenant) => <option key={tenant.tenantId} value={tenant.tenantId}>{tenant.title}</option>)}</select></div><div className="form-group"><label htmlFor="provision-user">User ID</label><input id="provision-user" className="form-control" required pattern="[a-fA-F0-9]{24}" value={provisionUserId} onChange={(event) => setProvisionUserId(event.target.value)} /></div></div><div className="panel-footer"><button type="submit" className="btn btn-default" disabled={provisioning || !tenants.length}>{provisioning ? 'Provisioning...' : 'Provision tenant admin'}</button></div></form>
       </div>
       <div className="col-md-7"><form className="panel panel-default" onSubmit={submit}><div className="panel-heading"><strong>{editing ? `Edit ${form.tenantId}` : 'Create tenant'}</strong></div><div className="panel-body">
@@ -170,7 +252,7 @@ const CivicTenantsPage: React.FC = () => {
         <div className="form-group"><label htmlFor="tenant-sections">Sections and arrangement (JSON)</label><textarea id="tenant-sections" className="form-control" rows={12} required value={form.sections} onChange={(event) => setField('sections', event.target.value)} /></div>
         <div className="row"><div className="col-sm-6 form-group"><label htmlFor="tenant-flags">Feature flags (JSON)</label><textarea id="tenant-flags" className="form-control" rows={7} required value={form.featureFlags} onChange={(event) => setField('featureFlags', event.target.value)} /></div><div className="col-sm-6 form-group"><label htmlFor="tenant-extensions">Extension schemas (JSON)</label><textarea id="tenant-extensions" className="form-control" rows={7} required value={form.extensionSchemas} onChange={(event) => setField('extensionSchemas', event.target.value)} aria-describedby="tenant-extensions-help" /><small id="tenant-extensions-help" className="help-block">Use * or a record kind as the schema key. Fields support text, textarea, number, boolean, date, URL, and select controls.</small></div></div>
         <div className="row"><div className="col-sm-6 form-group"><label htmlFor="tenant-policy">Moderation policy version</label><input id="tenant-policy" className="form-control" required value={form.moderationPolicyVersion} onChange={(event) => setField('moderationPolicyVersion', event.target.value)} /></div><div className="col-sm-6 form-group"><label htmlFor="tenant-election">Election system</label><input id="tenant-election" className="form-control" value={form.electionSystem} onChange={(event) => setField('electionSystem', event.target.value)} /></div></div>
-      </div><div className="panel-footer"><button className="btn btn-primary" disabled={saving} type="submit">{saving ? 'Saving...' : editing ? 'Update tenant' : 'Create tenant'}</button>{editing && <button className="btn btn-link" type="button" onClick={() => { setEditing(false); setForm(EMPTY_FORM); }}>Cancel</button>}</div></form></div>
+      </div><div className="panel-footer"><button className="btn btn-primary" disabled={saving || checking} type="submit">{saving ? 'Saving...' : editing ? 'Update tenant' : 'Create tenant'}</button>{' '}<button className="btn btn-default" disabled={checking} type="button" onClick={() => void previewConfiguration()}>Preview configuration</button>{editing && <>{' '}<button className="btn btn-default" disabled={checking} type="button" onClick={() => void validateLaunch()}>Validate launch</button>{' '}<button className="btn btn-default" disabled={checking} type="button" onClick={() => void exportConfiguration()}>Export JSON</button><button className="btn btn-link" type="button" onClick={() => { setEditing(false); setForm(EMPTY_FORM); setPreview(null); setReadiness(null); }}>Cancel</button></>}</div></form></div>
     </div>
   </div>;
 };

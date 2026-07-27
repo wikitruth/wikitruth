@@ -7,7 +7,10 @@ import CivicTenantsPage from './CivicTenantsPage';
 
 jest.mock('../../../services/api/civic', () => ({
   __esModule: true,
-  default: { platformTenants: jest.fn(), bootstrapTenants: jest.fn(), createTenant: jest.fn(), updateTenant: jest.fn() },
+  default: {
+    platformTenants: jest.fn(), bootstrapTenants: jest.fn(), createTenant: jest.fn(), updateTenant: jest.fn(),
+    previewTenant: jest.fn(), tenantReadiness: jest.fn(), exportTenant: jest.fn(), provisionTenantMembership: jest.fn(),
+  },
 }));
 jest.mock('../../../components/common/PageMeta', () => ({ __esModule: true, default: () => null }));
 
@@ -43,5 +46,23 @@ describe('CivicTenantsPage', () => {
     await user.click(await screen.findByRole('button', { name: /bootstrap built-ins/i }));
     await waitFor(() => expect(mockedApi.bootstrapTenants).toHaveBeenCalledTimes(1));
     expect(await screen.findByRole('status')).toHaveTextContent('Bootstrapped 1');
+  });
+
+  it('previews unsaved branding and reports configuration readiness', async () => {
+    mockedApi.previewTenant.mockResolvedValue({
+      success: true,
+      preview: {
+        tenant,
+        readiness: { tenantId: tenant.tenantId, scope: 'configuration', ready: true, generatedAt: '', summary: { passed: 1, warnings: 0, failed: 0 }, checks: [{ key: 'identity', label: 'Tenant identity', status: 'pass', message: 'Configured.' }] },
+        presentation: { cssVariables: { '--civic-primary': '#123456' }, navigation: [], home: { title: 'Fix Example', description: '', slogan: '' } },
+      },
+    });
+    const user = userEvent.setup();
+    render(<CivicTenantsPage />);
+    await user.click(await screen.findByRole('button', { name: /fix example/i }));
+    await user.click(screen.getByRole('button', { name: /preview configuration/i }));
+    await waitFor(() => expect(mockedApi.previewTenant).toHaveBeenCalled());
+    expect(screen.getByText(/configuration readiness/i)).toBeInTheDocument();
+    expect(screen.getByText(/tenant preview/i)).toBeInTheDocument();
   });
 });

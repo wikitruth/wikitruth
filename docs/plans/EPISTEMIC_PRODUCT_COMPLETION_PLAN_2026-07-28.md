@@ -71,7 +71,7 @@ agent-safe, and operationally maintainable truth-validation system.
 - [x] Add revision-linked multilingual entry variants and reviewed publication.
 - [x] Add civic subject-response and correction-request workflows with history.
 - [x] Add graph-aware search filters and public evidence-bundle/JSON-LD exports.
-- [ ] Add tenant-launch readiness validation, configuration preview, and
+- [x] Add tenant-launch readiness validation, configuration preview, and
   portable tenant configuration export.
 
 ### 8. Verification and Closure

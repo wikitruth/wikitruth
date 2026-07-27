@@ -20,6 +20,11 @@ import {
 } from '../../types/civicTenancy';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 import * as utils from '../../utils/utils';
+import {
+  buildTenantConfigurationPreview,
+  buildTenantLaunchReadiness,
+  portableTenantConfiguration,
+} from '../../services/civicTenantReadinessService';
 
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 const tenantIdSchema = z.string().trim().toLowerCase().regex(/^[a-z0-9][a-z0-9-]{1,62}$/);
@@ -120,6 +125,13 @@ async function ensureUniqueDomains(tenantId: string, domains: string[]): Promise
   if (existing) throw new Error(`Domain is already assigned to tenant ${existing.tenantId}`);
 }
 
+async function managedTenant(tenantId: string) {
+  const persisted = await db.CivicTenant.findOne({ tenantId }).lean();
+  if (persisted) return publicCivicTenant(persisted as never);
+  const builtIn = BUILT_IN_CIVIC_TENANTS.find((tenant) => tenant.tenantId === tenantId);
+  return builtIn ? publicCivicTenant(builtIn) : null;
+}
+
 async function auditTenantChange(req: WikitruthRequest, tenant: Record<string, any>, eventType: string, message: string): Promise<void> {
   await logEntryEvent({
     scope: 'privileged',
@@ -192,6 +204,49 @@ export function registerCivicAdministrationRoutes(router: Router): void {
     });
     await auditTenantChange(req, tenant, 'civic.tenant.created', 'Civic tenant created');
     res.status(201).json({ tenant });
+  });
+
+  router.post('/platform/tenants/preview', async (req: WikitruthRequest, res: WikitruthResponse) => {
+    if (!ensurePlatformAdmin(req, res)) return;
+    const parsed = tenantSchema.safeParse(req.body || {});
+    if (!parsed.success) {
+      res.status(400).json({ success: false, message: 'Invalid civic tenant configuration', details: parsed.error.issues });
+      return;
+    }
+    const tenant = publicCivicTenant(parsed.data as never);
+    res.json({ success: true, preview: buildTenantConfigurationPreview(tenant) });
+  });
+
+  router.get('/platform/tenants/:managedTenantId/readiness', async (req: WikitruthRequest, res: WikitruthResponse) => {
+    if (!ensurePlatformAdmin(req, res)) return;
+    const parsed = tenantIdSchema.safeParse(req.params.managedTenantId);
+    if (!parsed.success) {
+      res.status(400).json({ success: false, message: 'Invalid civic tenant id' });
+      return;
+    }
+    const tenant = await managedTenant(parsed.data);
+    if (!tenant) {
+      res.status(404).json({ success: false, message: 'Civic tenant not found' });
+      return;
+    }
+    res.json({ success: true, readiness: await buildTenantLaunchReadiness(tenant) });
+  });
+
+  router.get('/platform/tenants/:managedTenantId/export', async (req: WikitruthRequest, res: WikitruthResponse) => {
+    if (!ensurePlatformAdmin(req, res)) return;
+    const parsed = tenantIdSchema.safeParse(req.params.managedTenantId);
+    if (!parsed.success) {
+      res.status(400).json({ success: false, message: 'Invalid civic tenant id' });
+      return;
+    }
+    const tenant = await managedTenant(parsed.data);
+    if (!tenant) {
+      res.status(404).json({ success: false, message: 'Civic tenant not found' });
+      return;
+    }
+    const readiness = await buildTenantLaunchReadiness(tenant);
+    if (String(req.query.download || '') === 'true') res.attachment(`${tenant.tenantId}-civic-tenant.json`);
+    res.json(portableTenantConfiguration(tenant, readiness));
   });
 
   router.put('/platform/tenants/:managedTenantId', async (req: WikitruthRequest, res: WikitruthResponse) => {

@@ -89,6 +89,40 @@ export interface CivicTenant {
   deploymentMode: 'shared' | 'dedicated' | 'headless';
 }
 
+export interface CivicTenantReadinessCheck {
+  key: string;
+  label: string;
+  status: 'pass' | 'warning' | 'fail';
+  message: string;
+}
+
+export interface CivicTenantReadiness {
+  tenantId: string;
+  scope: 'configuration' | 'launch';
+  ready: boolean;
+  generatedAt: string;
+  checks: CivicTenantReadinessCheck[];
+  summary: { passed: number; warnings: number; failed: number };
+}
+
+export interface CivicTenantPreview {
+  tenant: CivicTenant;
+  readiness: CivicTenantReadiness;
+  presentation: {
+    cssVariables: Record<string, string>;
+    navigation: Array<{ slug: string; title: string; icon: string; href: string }>;
+    home: { title: string; description: string; slogan: string };
+  };
+}
+
+export interface PortableCivicTenantConfiguration {
+  format: 'wikitruth.civic-tenant';
+  version: '1.0';
+  exportedAt: string;
+  tenant: CivicTenant;
+  readiness: CivicTenantReadiness;
+}
+
 export interface CivicJurisdiction {
   _id: string;
   tenantId: string;
