@@ -120,7 +120,7 @@ describe('EntryQuickActions reactions', () => {
         value: 'good',
       },
     });
-    mockedApiService.createOpinion.mockResolvedValue({ success: true, opinion: { _id: 'opinion-1' } });
+    mockedApiService.createOpinion.mockResolvedValue({ success: true, opinion: makeEntry({ _id: 'opinion-1' }) });
   });
 
   it('loads and submits reactions through the API service', async () => {

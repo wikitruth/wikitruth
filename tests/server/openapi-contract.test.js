@@ -109,6 +109,24 @@ describe('OpenAPI contract', function () {
       '/civic/platform/tenants/{managedTenantId}/memberships/{userId}',
       '/agent/identity',
       '/agent/capabilities',
+      '/agent/validate',
+      '/agent/activity',
+      '/agent/runs/{runId}',
+      '/agent/events',
+      '/notifications/preferences',
+      '/notifications/outbox',
+      '/notifications/outbox/{id}/retry',
+      '/epistemic/{objectName}/{id}/truth-summary',
+      '/epistemic/{objectName}/{id}/evidence-bundle',
+      '/epistemic/{objectName}/{id}/evidence-bundle.jsonld',
+      '/epistemic/health',
+      '/translations/{objectName}/{id}',
+      '/translations/moderation/review/{id}',
+      '/civic/records/{id}/responses',
+      '/civic/responses/{id}/review',
+      '/civic/platform/tenants/preview',
+      '/civic/platform/tenants/{managedTenantId}/readiness',
+      '/civic/platform/tenants/{managedTenantId}/export',
       '/admin/api-clients',
       '/admin/api-clients/{id}/rotate',
       '/admin/api-clients/{id}',
@@ -177,6 +195,15 @@ describe('OpenAPI contract', function () {
       'AdminFinalSayRequest',
       'CivicExtensionField',
       'CivicExtensionSchema',
+      'CivicTenantReadiness',
+      'CivicTenantPreview',
+      'PortableCivicTenantConfiguration',
+      'PublicTruthSummary',
+      'PublicEvidenceBundle',
+      'PublicEvidenceJsonLd',
+      'EntryTranslationRequest',
+      'NotificationPreferences',
+      'AgentValidationRequest',
     ].forEach((schemaName) => expect(schemas[schemaName]).toBeDefined());
   });
 
@@ -201,5 +228,20 @@ describe('OpenAPI contract', function () {
     expect(spec.paths['/outline/link'].post['x-required-agent-scope']).toBe('graph:write');
     expect(spec.paths['/moderation/verdict-votes'].post['x-required-agent-scope']).toBe('moderation:write');
     expect(spec.paths['/moderation/verdict-channel'].put.description).toMatch(/unavailable to API clients/i);
+  });
+
+  it('documents graph discovery and portable public evidence contracts', function () {
+    const spec = readOpenApi();
+    const searchParameters = spec.paths['/search'].get.parameters;
+    expect(searchParameters).toEqual(expect.arrayContaining([
+      expect.objectContaining({ name: 'relationship' }),
+      expect.objectContaining({ name: 'evidence' }),
+    ]));
+    expect(spec.paths['/epistemic/{objectName}/{id}/evidence-bundle'].get.responses['200'].content['application/json'].schema.$ref)
+      .toBe('#/components/schemas/PublicEvidenceBundle');
+    expect(spec.paths['/epistemic/{objectName}/{id}/evidence-bundle.jsonld'].get.responses['200'].content['application/ld+json'].schema.$ref)
+      .toBe('#/components/schemas/PublicEvidenceJsonLd');
+    expect(spec.paths['/civic/platform/tenants/{managedTenantId}/export'].get.responses['200'].content['application/json'].schema.$ref)
+      .toBe('#/components/schemas/PortableCivicTenantConfiguration');
   });
 });

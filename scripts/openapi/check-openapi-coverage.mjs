@@ -18,8 +18,9 @@ const groups = [
   ['/reactions', ['reactions.ts']], ['/notifications', ['notifications.ts']], ['/timeline', ['timeline.ts']],
   ['/install', ['install.ts']], ['/pages', ['pages.ts']], ['/anonymous-contributions', ['anonymousContributions.ts']],
   ['/agent', ['agent.ts']],
-  ['/civic', ['civic.ts', 'civicAdministration.ts', 'civicEntryLinks.ts']],
-  ['/tenants/{tenantId}/civic', ['civic.ts', 'civicAdministration.ts', 'civicEntryLinks.ts']],
+  ['/civic', ['civic.ts', 'civicAdministration.ts', 'civicEntryLinks.ts', 'civicResponses.ts']],
+  ['/tenants/{tenantId}/civic', ['civic.ts', 'civicAdministration.ts', 'civicEntryLinks.ts', 'civicResponses.ts']],
+  ['/epistemic', ['epistemic.ts']], ['/translations', ['translations.ts']],
 ];
 
 function joinRoute(prefix, route) {
@@ -99,6 +100,19 @@ function addComponents(spec) {
   schemas.CivicExtensionValue = { oneOf: [{ type: 'string' }, { type: 'number' }, { type: 'boolean' }] };
   schemas.CivicExtensionField = { type: 'object', required: ['key', 'label', 'type'], properties: { key: { type: 'string', pattern: '^[a-z][a-z0-9_]{0,39}$' }, label: { type: 'string' }, type: { type: 'string', enum: ['text', 'textarea', 'number', 'boolean', 'date', 'url', 'select'] }, required: { type: 'boolean' }, options: { type: 'array', items: { type: 'object', properties: { value: { type: 'string' }, label: { type: 'string' } } } } } };
   schemas.CivicExtensionSchema = { type: 'object', required: ['fields'], properties: { title: { type: 'string' }, description: { type: 'string' }, fields: { type: 'array', maxItems: 30, items: { $ref: '#/components/schemas/CivicExtensionField' } } } };
+  schemas.CivicTenantReadinessCheck = { type: 'object', required: ['key', 'label', 'status', 'message'], properties: { key: { type: 'string' }, label: { type: 'string' }, status: { type: 'string', enum: ['pass', 'warning', 'fail'] }, message: { type: 'string' } } };
+  schemas.CivicTenantReadiness = { type: 'object', required: ['tenantId', 'scope', 'ready', 'generatedAt', 'checks', 'summary'], properties: { tenantId: { type: 'string' }, scope: { type: 'string', enum: ['configuration', 'launch'] }, ready: { type: 'boolean' }, generatedAt: { type: 'string', format: 'date-time' }, checks: { type: 'array', items: { $ref: '#/components/schemas/CivicTenantReadinessCheck' } }, summary: { type: 'object', properties: { passed: { type: 'integer' }, warnings: { type: 'integer' }, failed: { type: 'integer' } } } } };
+  schemas.CivicTenantPreview = { type: 'object', required: ['tenant', 'readiness', 'presentation'], properties: { tenant: { $ref: '#/components/schemas/CivicTenant' }, readiness: { $ref: '#/components/schemas/CivicTenantReadiness' }, presentation: { type: 'object', properties: { cssVariables: { type: 'object', additionalProperties: { type: 'string' } }, navigation: { type: 'array', items: { type: 'object' } }, home: { type: 'object' } } } } };
+  schemas.CivicTenantPreviewResponse = { type: 'object', required: ['success', 'preview'], properties: { success: { type: 'boolean', enum: [true] }, preview: { $ref: '#/components/schemas/CivicTenantPreview' } } };
+  schemas.CivicTenantReadinessResponse = { type: 'object', required: ['success', 'readiness'], properties: { success: { type: 'boolean', enum: [true] }, readiness: { $ref: '#/components/schemas/CivicTenantReadiness' } } };
+  schemas.PortableCivicTenantConfiguration = { type: 'object', required: ['format', 'version', 'exportedAt', 'tenant', 'readiness'], properties: { format: { type: 'string', enum: ['wikitruth.civic-tenant'] }, version: { type: 'string', enum: ['1.0'] }, exportedAt: { type: 'string', format: 'date-time' }, tenant: { $ref: '#/components/schemas/CivicTenant' }, readiness: { $ref: '#/components/schemas/CivicTenantReadiness' } } };
+  schemas.PublicTruthSummary = { type: 'object', required: ['entry', 'channels', 'evidenceMap', 'unresolvedIssues', 'generatedAt'], properties: { entry: { type: 'object' }, channels: { type: 'array', items: { type: 'object' } }, evidenceMap: { type: 'array', items: { type: 'object' } }, unresolvedIssues: { type: 'array', items: { type: 'object' } }, generatedAt: { type: 'string', format: 'date-time' } } };
+  schemas.PublicTruthSummaryResponse = { type: 'object', required: ['success', 'summary'], properties: { success: { type: 'boolean', enum: [true] }, summary: { $ref: '#/components/schemas/PublicTruthSummary' } } };
+  schemas.PublicEvidenceBundle = { type: 'object', required: ['schemaVersion', 'generatedAt', 'canonicalUrl', 'entry', 'relationships', 'translations'], properties: { schemaVersion: { type: 'string', enum: ['1.0'] }, generatedAt: { type: 'string', format: 'date-time' }, canonicalUrl: { type: 'string', format: 'uri' }, entry: { type: 'object' }, revision: { type: 'object', nullable: true }, truthSummary: { allOf: [{ $ref: '#/components/schemas/PublicTruthSummary' }], nullable: true }, relationships: { type: 'array', items: { type: 'object' } }, translations: { type: 'array', items: { type: 'object' } } } };
+  schemas.PublicEvidenceJsonLd = { type: 'object', required: ['@context', '@id', '@type', 'identifier'], properties: { '@context': { type: 'object' }, '@id': { type: 'string', format: 'uri' }, '@type': { type: 'string' }, identifier: { type: 'string' }, citation: { type: 'array', items: { type: 'object' } } }, additionalProperties: true };
+  schemas.EntryTranslationRequest = { type: 'object', required: ['locale', 'title', 'content'], properties: { locale: { type: 'string' }, title: { type: 'string', minLength: 3 }, content: { type: 'string', minLength: 10 } } };
+  schemas.NotificationPreferences = { type: 'object', properties: { inApp: { type: 'boolean' }, emailDigest: { type: 'string', enum: ['off', 'daily', 'weekly'] }, webPush: { type: 'boolean' } } };
+  schemas.AgentValidationRequest = { type: 'object', required: ['method', 'path'], properties: { method: { type: 'string' }, path: { type: 'string' }, body: { type: 'object' }, idempotencyKey: { type: 'string' }, run: { type: 'object' } } };
   if (schemas.CivicRecord?.properties) schemas.CivicRecord.properties.extensions = { type: 'object', additionalProperties: { $ref: '#/components/schemas/CivicExtensionValue' } };
   if (schemas.CivicRecordMutationRequest?.properties) schemas.CivicRecordMutationRequest.properties.extensions = { type: 'object', additionalProperties: { $ref: '#/components/schemas/CivicExtensionValue' } };
   if (schemas.CivicTenant?.properties) schemas.CivicTenant.properties.extensionSchemas = { type: 'object', additionalProperties: { $ref: '#/components/schemas/CivicExtensionSchema' } };
@@ -129,6 +143,33 @@ function specialize(spec) {
   });
   ['/civic/records', '/tenants/{tenantId}/civic/records'].forEach((route) => {
     if (paths[route]?.post) Object.assign(paths[route].post, { 'x-required-agent-scope': 'civic:write', security: [{ AgentBearerAuth: [] }, { BearerAuth: [] }] });
+  });
+  if (paths['/search']?.get) paths['/search'].get.parameters = [
+    { name: 'q', in: 'query', required: true, schema: { type: 'string' } },
+    { name: 'tab', in: 'query', schema: { type: 'string', enum: ['all', 'topics', 'arguments', 'questions', 'answers', 'artifacts', 'issues', 'opinions'] } },
+    { name: 'content', in: 'query', schema: { type: 'string', enum: ['all', 'wiki', 'journal'] } },
+    { name: 'relationship', in: 'query', schema: { type: 'string', enum: ['any', 'supports', 'refutes', 'qualifies', 'background', 'evidence', 'source'] } },
+    { name: 'evidence', in: 'query', schema: { type: 'string', enum: ['all', 'linked', 'missing'] } },
+  ];
+  ['/epistemic/{objectName}/{id}/evidence-bundle', '/epistemic/{objectName}/{id}/evidence-bundle.jsonld'].forEach((route) => {
+    if (!paths[route]?.get) return;
+    Object.assign(paths[route].get, {
+      summary: route.endsWith('.jsonld') ? 'Export a public evidence bundle as JSON-LD' : 'Export a public evidence bundle',
+      responses: { '200': { description: 'Accepted public entry evidence and revision bundle', content: { [route.endsWith('.jsonld') ? 'application/ld+json' : 'application/json']: { schema: { $ref: route.endsWith('.jsonld') ? '#/components/schemas/PublicEvidenceJsonLd' : '#/components/schemas/PublicEvidenceBundle' } } } }, '404': { $ref: '#/components/responses/NotFound' } },
+    });
+  });
+  if (paths['/epistemic/{objectName}/{id}/truth-summary']?.get) Object.assign(paths['/epistemic/{objectName}/{id}/truth-summary'].get, { summary: 'Explain a public verdict and its evidence', responses: response('PublicTruthSummaryResponse') });
+  if (paths['/translations/{objectName}/{id}']?.post) Object.assign(paths['/translations/{objectName}/{id}'].post, { summary: 'Submit a revision-linked entry translation', requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/EntryTranslationRequest' } } } } });
+  if (paths['/notifications/preferences']?.put) Object.assign(paths['/notifications/preferences'].put, { summary: 'Update notification delivery preferences', requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/NotificationPreferences' } } } } });
+  if (paths['/agent/validate']?.post) Object.assign(paths['/agent/validate'].post, { summary: 'Dry-run and validate an accountable agent mutation', security: [{ AgentBearerAuth: [] }], requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/AgentValidationRequest' } } } } });
+  ['/civic/platform/tenants/preview', '/tenants/{tenantId}/civic/platform/tenants/preview'].forEach((route) => {
+    if (paths[route]?.post) Object.assign(paths[route].post, { summary: 'Preview normalized tenant configuration without saving', requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/CivicTenant' } } } }, responses: response('CivicTenantPreviewResponse') });
+  });
+  ['/civic/platform/tenants/{managedTenantId}/readiness', '/tenants/{tenantId}/civic/platform/tenants/{managedTenantId}/readiness'].forEach((route) => {
+    if (paths[route]?.get) Object.assign(paths[route].get, { summary: 'Validate fail-closed tenant launch readiness', responses: response('CivicTenantReadinessResponse') });
+  });
+  ['/civic/platform/tenants/{managedTenantId}/export', '/tenants/{tenantId}/civic/platform/tenants/{managedTenantId}/export'].forEach((route) => {
+    if (paths[route]?.get) Object.assign(paths[route].get, { summary: 'Export a portable secret-free tenant configuration', responses: response('PortableCivicTenantConfiguration') });
   });
 }
 
