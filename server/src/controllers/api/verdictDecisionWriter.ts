@@ -52,6 +52,7 @@ export async function writeVerdictDecision(input: VerdictDecisionInput): Promise
   if (!entry) return { published: false };
 
   const now = new Date();
+  const revalidateAt = new Date(now.getTime() + input.consensusSnapshot.revalidationIntervalDays * 24 * 60 * 60 * 1000);
   const actorUserId = input.req.user?.id || input.req.user?._id;
   entry.verdicts = entry.verdicts || {};
   entry.verdicts[input.channel] = {
@@ -62,6 +63,8 @@ export async function writeVerdictDecision(input: VerdictDecisionInput): Promise
     evidenceRefs: input.evidenceRefs || [],
     decisionMode: input.decisionMode,
     policyVersion: input.policyVersion,
+    sensitivity: input.consensusSnapshot.sensitivity,
+    revalidateAt,
     overrideReason: input.decisionMode === 'admin_override' ? input.overrideReason || '' : '',
     consensusSnapshot: input.consensusSnapshot,
     editDate: now,

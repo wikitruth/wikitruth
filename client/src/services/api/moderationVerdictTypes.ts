@@ -28,6 +28,8 @@ export interface VerdictChannelValue {
   evidenceRefs?: string[];
   decisionMode?: 'none' | 'consensus' | 'admin_override';
   policyVersion?: string;
+  sensitivity?: 'standard' | 'elevated' | 'critical';
+  revalidateAt?: string | null;
   overrideReason?: string;
   consensusSnapshot?: VerdictConsensusSummary | null;
   editDate?: string | null;
@@ -40,14 +42,26 @@ export interface VerdictConsensusSummary {
   totalVotes: number;
   eligibleVotes: number;
   excludedConflictVotes: number;
+  excludedIneligibleVotes: number;
+  excludedIndependenceVotes: number;
   abstentions: number;
   threshold: number;
+  sensitivity: 'standard' | 'elevated' | 'critical';
+  minimumDistinctAffiliations: number;
+  distinctAffiliations: number;
   leadingStatus: string | null;
   leadingCount: number;
   leadingRatio: number;
   leadingAverageConfidence: number;
   reached: boolean;
   counts: Array<{ status: string; count: number }>;
+  dissent: {
+    totalVotes: number;
+    statuses: Array<{ status: string; count: number }>;
+    rationales: string[];
+    evidenceRefs: string[];
+  };
+  revalidationIntervalDays: number;
 }
 
 export interface ModerationEntry {

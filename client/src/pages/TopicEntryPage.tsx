@@ -25,6 +25,7 @@ import type { LegacyEntity } from '../types/legacy';
 import type { Argument, Artifact, Issue, Opinion, Question, Topic } from '../types';
 import { EntryMetaBlock, buildLegacyEntryBreadcrumb } from '../components/Entry/EntryLegacyParity';
 import TopicEntrySummary from '../components/Entry/TopicEntrySummary';
+import TruthSummaryPanel from '../components/Entry/TruthSummaryPanel';
 const CONTENT_COLLAPSE_THRESHOLD = 1200;
 function getCount(value: unknown): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : 0;
@@ -282,6 +283,8 @@ const TopicEntryPage: React.FC = () => {
         linkCount={data?.linkCount}
         isMainTopic={isMainTopic}
       />
+
+      <TruthSummaryPanel objectName="topic" objectId={String(topic._id || '')} />
 
       <EntryQuickActions
         entry={entry}

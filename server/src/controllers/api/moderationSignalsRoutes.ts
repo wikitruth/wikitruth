@@ -14,6 +14,7 @@ import { createNotification } from '../../services/notificationsService';
 import {
   db,
   ensureReviewerOrAdmin,
+  getDbModelByObjectType,
   parseModerationTarget,
   toNumber,
   mapLegacyVerdictToFactual,
@@ -21,9 +22,10 @@ import {
 import {
   computeChannelConsensus,
   consensusDecisionDetails,
-  DEFAULT_VERDICT_CONSENSUS_POLICY,
   isVerdictChannel,
   isVoteStatusForChannel,
+  verdictPolicyForSensitivity,
+  type VerdictConsensusPolicy,
   type VerdictChannel,
 } from '../../services/verdictConsensusService';
 import { writeVerdictDecision } from './verdictDecisionWriter';
@@ -34,7 +36,10 @@ function validObjectIds(value: unknown): string[] {
     : [];
 }
 
-function parseVote(req: WikitruthRequest): { value?: Record<string, unknown>; error?: string } {
+function parseVote(
+  req: WikitruthRequest,
+  policy: VerdictConsensusPolicy,
+): { value?: Record<string, unknown>; error?: string } {
   const body = req.body || {};
   const numericLegacyStatus = toNumber(body.status ?? body.verdictStatus);
   const channel: VerdictChannel = isVerdictChannel(body.channel) ? body.channel : 'factual';
@@ -48,12 +53,18 @@ function parseVote(req: WikitruthRequest): { value?: Record<string, unknown>; er
   const conflictDeclared = body.conflictDeclared === true;
   const conflictDetails = String(body.conflictDetails || '').trim();
   const confidence = Number(body.confidence ?? 50);
+  const expertise = String(body.expertise || '').trim();
+  const affiliation = String(body.affiliation || '').trim();
   if (channelStatus !== 'abstain' && rationale.length < 10) return { error: 'Vote rationale must be at least 10 characters' };
   if (channel === 'ethical' && !['abstain', 'not_applicable'].includes(channelStatus) && framework.length < 3) {
     return { error: 'An ethical framework or principle is required' };
   }
   if (!Number.isFinite(confidence) || confidence < 0 || confidence > 100) return { error: 'Confidence must be from 0 to 100' };
   if (conflictDeclared && conflictDetails.length < 5) return { error: 'Describe the declared conflict' };
+  const eligibilityReasons = [
+    ...(policy.requireExpertise && expertise.length < 3 ? ['Relevant expertise is required for this sensitivity'] : []),
+    ...(policy.requireAffiliation && affiliation.length < 2 ? ['Reviewer affiliation is required for this sensitivity'] : []),
+  ];
   return {
     value: {
       channel,
@@ -63,14 +74,24 @@ function parseVote(req: WikitruthRequest): { value?: Record<string, unknown>; er
       framework,
       evidenceRefs: validObjectIds(body.evidenceRefs),
       confidence,
-      expertise: String(body.expertise || '').trim(),
-            conflictDeclared,
-            conflictDetails,
-            policyVersion: DEFAULT_VERDICT_CONSENSUS_POLICY.version,
-            outcomeStatus: 'active',
-            outcomeDate: null,
+      expertise,
+      affiliation,
+      eligibilityStatus: eligibilityReasons.length ? 'ineligible' : 'eligible',
+      eligibilityReason: eligibilityReasons.join('; '),
+      conflictDeclared,
+      conflictDetails,
+      policyVersion: policy.version,
+      outcomeStatus: 'active',
+      outcomeDate: null,
     },
   };
+}
+
+async function policyForTarget(target: { objectType: number; id: string }): Promise<VerdictConsensusPolicy> {
+  const model = getDbModelByObjectType(target.objectType);
+  if (!model?.findById) return verdictPolicyForSensitivity('standard');
+  const entry = await model.findById(target.id).select('extras.verdictSensitivity').lean();
+  return verdictPolicyForSensitivity(entry?.extras?.verdictSensitivity);
 }
 
 export function registerModerationSignalsRoutes(router: Router): void {
@@ -85,7 +106,8 @@ export function registerModerationSignalsRoutes(router: Router): void {
         return;
       }
   
-      const parsed = parseVote(req);
+      const policy = await policyForTarget(target);
+      const parsed = parseVote(req, policy);
       if (!parsed.value) {
         res.status(400).json({ success: false, message: parsed.error });
         return;
@@ -134,10 +156,10 @@ export function registerModerationSignalsRoutes(router: Router): void {
         objectId: target.id,
       }).lean();
       const channel = voteInput.channel as VerdictChannel;
-      const consensus = computeChannelConsensus(channel, votes);
+      const consensus = computeChannelConsensus(channel, votes, policy);
       let decision = { published: false } as Awaited<ReturnType<typeof writeVerdictDecision>>;
       if (consensus.reached && consensus.leadingStatus) {
-        const details = consensusDecisionDetails(consensus, votes);
+        const details = consensusDecisionDetails(consensus, votes, policy);
         decision = await writeVerdictDecision({
           req,
           target,
@@ -183,8 +205,9 @@ export function registerModerationSignalsRoutes(router: Router): void {
       const votes = await db.VerdictVote.find(voteQuery)
         .sort({ createDate: 1 })
         .lean();
-      const factual = computeChannelConsensus('factual', votes);
-      const ethical = computeChannelConsensus('ethical', votes);
+      const policy = await policyForTarget(target);
+      const factual = computeChannelConsensus('factual', votes, policy);
+      const ethical = computeChannelConsensus('ethical', votes, policy);
       const selected = req.query.channel === 'ethical' ? ethical : factual;
   
       res.json({

@@ -2,6 +2,7 @@ import {
   computeChannelConsensus,
   consensusDecisionDetails,
   DEFAULT_VERDICT_CONSENSUS_POLICY,
+  VERDICT_CONSENSUS_POLICIES,
 } from '../../server/src/services/verdictConsensusService';
 
 function vote(status: string, confidence = 80, extras: Record<string, unknown> = {}) {
@@ -77,5 +78,38 @@ describe('channel-specific verdict consensus', () => {
       reasoning: expect.stringContaining('Consensus reached with 2 of 3 eligible votes'),
     }));
   });
-});
 
+  it('prevents one affiliation from manufacturing quorum', () => {
+    const summary = computeChannelConsensus('factual', [
+      vote('supported', 90, { voterUserId: 'r1', affiliation: 'Example Institute' }),
+      vote('supported', 80, { voterUserId: 'r2', affiliation: 'Example Institute' }),
+      vote('supported', 70, { voterUserId: 'r3', affiliation: 'Independent' }),
+    ]);
+    expect(summary).toEqual(expect.objectContaining({
+      eligibleVotes: 2,
+      distinctAffiliations: 2,
+      excludedIndependenceVotes: 1,
+      reached: false,
+    }));
+  });
+
+  it('requires expertise and affiliation for critical reviews and preserves dissent', () => {
+    const policy = VERDICT_CONSENSUS_POLICIES.critical;
+    const summary = computeChannelConsensus('factual', [
+      vote('supported', 90, { voterUserId: 'r1', expertise: 'law', affiliation: 'Org A' }),
+      vote('supported', 90, { voterUserId: 'r2', expertise: 'science', affiliation: 'Org B' }),
+      vote('supported', 90, { voterUserId: 'r3', expertise: 'policy', affiliation: 'Org C' }),
+      vote('supported', 90, { voterUserId: 'r4', expertise: 'history', affiliation: 'Org D' }),
+      vote('refuted', 90, { voterUserId: 'r5', expertise: 'medicine', affiliation: 'Org E', rationale: 'A material source contradicts the conclusion.' }),
+      vote('supported', 100, { voterUserId: 'r6', expertise: '', affiliation: '' }),
+    ], policy);
+    expect(summary).toEqual(expect.objectContaining({
+      sensitivity: 'critical',
+      eligibleVotes: 5,
+      excludedIneligibleVotes: 1,
+      reached: true,
+      revalidationIntervalDays: 90,
+      dissent: expect.objectContaining({ totalVotes: 1 }),
+    }));
+  });
+});

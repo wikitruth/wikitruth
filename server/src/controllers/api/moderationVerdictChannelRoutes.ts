@@ -5,12 +5,14 @@ import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 import constants from '../../models/constants';
 import {
   computeChannelConsensus,
-  DEFAULT_VERDICT_CONSENSUS_POLICY,
+  normalizeVerdictSensitivity,
+  verdictPolicyForSensitivity,
   type VerdictChannel,
 } from '../../services/verdictConsensusService';
 import {
   db,
   ensureAdmin,
+  getDbModelByObjectType,
   getVerdictChannelStatuses,
   parseModerationTarget,
 } from './moderationShared';
@@ -80,6 +82,11 @@ async function applyOverrides(
 ): Promise<void> {
   const target = getSupportedTarget(req, res);
   if (!target) return;
+  const model = getDbModelByObjectType(target.objectType);
+  const policyEntry = model?.findById
+    ? await model.findById(target.id).select('extras.verdictSensitivity').lean()
+    : null;
+  const policy = verdictPolicyForSensitivity(policyEntry?.extras?.verdictSensitivity);
   const results = [];
   for (const parsed of parsedChannels) {
     const votes = await db.VerdictVote.find({
@@ -87,7 +94,7 @@ async function applyOverrides(
       objectId: target.id,
       channel: parsed.channel,
     }).lean();
-    const consensus = computeChannelConsensus(parsed.channel, votes);
+    const consensus = computeChannelConsensus(parsed.channel, votes, policy);
     const result = await writeVerdictDecision({
       req,
       target,
@@ -97,7 +104,7 @@ async function applyOverrides(
       framework: parsed.framework,
       evidenceRefs: parsed.evidenceRefs,
       decisionMode: 'admin_override',
-      policyVersion: DEFAULT_VERDICT_CONSENSUS_POLICY.version,
+      policyVersion: policy.version,
       overrideReason,
       consensusSnapshot: consensus,
     });
@@ -111,6 +118,31 @@ async function applyOverrides(
 }
 
 export function registerModerationVerdictChannelRoutes(router: Router): void {
+  router.put('/verdict-policy', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureAdmin(req, res)) return;
+    if (!(await requirePrivilegedPasskeyAssurance(req, res))) return;
+    const target = getSupportedTarget(req, res);
+    if (!target) return;
+    const rawSensitivity = String(req.body?.sensitivity || '').trim().toLowerCase();
+    if (!['standard', 'elevated', 'critical'].includes(rawSensitivity)) {
+      res.status(400).json({ success: false, message: 'Sensitivity must be standard, elevated, or critical' });
+      return;
+    }
+    const model = getDbModelByObjectType(target.objectType);
+    const entry = model ? await model.findById(target.id) : null;
+    if (!entry) {
+      res.status(404).json({ success: false, message: 'Entry not found' });
+      return;
+    }
+    entry.extras = { ...(entry.extras || {}), verdictSensitivity: normalizeVerdictSensitivity(rawSensitivity) };
+    entry.markModified?.('extras');
+    entry.editDate = new Date();
+    entry.editUserId = req.user?.id || req.user?._id;
+    await entry.save();
+    const policy = verdictPolicyForSensitivity(rawSensitivity);
+    res.json({ success: true, target, sensitivity: policy.sensitivity, policy });
+  });
+
   router.put('/verdict-channel', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAdmin(req, res)) return;
     if (!(await requirePrivilegedPasskeyAssurance(req, res))) return;

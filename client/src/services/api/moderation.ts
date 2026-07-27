@@ -367,6 +367,7 @@ export const moderationApi = {
       evidenceRefs?: string[];
       confidence: number;
       expertise?: string;
+      affiliation?: string;
       conflictDeclared?: boolean;
       conflictDetails?: string;
     },
@@ -375,6 +376,13 @@ export const moderationApi = {
       method: 'POST',
       body: JSON.stringify(payload),
     }),
+  updateVerdictPolicy: (
+    target: ModerationTarget,
+    sensitivity: 'standard' | 'elevated' | 'critical',
+  ) => request<{ success: boolean; sensitivity: string; policy: VerdictConsensusSummary }>(
+    `/moderation/verdict-policy?${toQuery(target)}`,
+    { method: 'PUT', body: JSON.stringify({ sensitivity }) },
+  ),
   listVerdictVotes: (target: ModerationTarget, channel?: VerdictChannel) =>
     request<VerdictVotesListResponse>(`/moderation/verdict-votes?${toQuery(target)}${channel ? `&channel=${channel}` : ''}`),
   submitReaderSignal: (

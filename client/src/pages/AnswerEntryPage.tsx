@@ -22,6 +22,7 @@ import {
   EntryMetaBlock,
   buildLegacyEntryBreadcrumb,
 } from '../components/Entry/EntryLegacyParity';
+import TruthSummaryPanel from '../components/Entry/TruthSummaryPanel';
 
 const AnswerEntryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -102,6 +103,8 @@ const AnswerEntryPage: React.FC = () => {
         iconColor="text-primary"
       />
       <EntryContextLine entry={answer} objectName="answer" />
+
+      <TruthSummaryPanel objectName="answer" objectId={String(answer._id || '')} />
 
       <EntryQuickActions
         entry={answer}

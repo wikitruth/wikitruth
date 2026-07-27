@@ -20,6 +20,7 @@ jest.mock('../../../services/api/moderation', () => ({
     listVerdictVotes: jest.fn(),
     submitVerdictVote: jest.fn(),
     updateVerdictChannel: jest.fn(),
+    updateVerdictPolicy: jest.fn(),
   },
 }));
 jest.mock('../../../context/AuthContext', () => ({ useAuth: jest.fn() }));
@@ -35,18 +36,25 @@ const api = moderationApi as jest.Mocked<typeof moderationApi>;
 const auth = useAuth as jest.MockedFunction<typeof useAuth>;
 const summary = {
   channel: 'factual' as const,
-  policyVersion: '2026-07-v2',
+  policyVersion: '2026-07-v3-standard',
   totalVotes: 1,
   eligibleVotes: 1,
   excludedConflictVotes: 0,
+  excludedIneligibleVotes: 0,
+  excludedIndependenceVotes: 0,
   abstentions: 0,
   threshold: 2,
+  sensitivity: 'standard' as const,
+  minimumDistinctAffiliations: 2,
+  distinctAffiliations: 1,
   leadingStatus: 'supported',
   leadingCount: 1,
   leadingRatio: 1,
   leadingAverageConfidence: 75,
   reached: false,
   counts: [{ status: 'supported', count: 1 }],
+  dissent: { totalVotes: 0, statuses: [], rationales: [], evidenceRefs: [] },
+  revalidationIntervalDays: 365,
 };
 
 function authValue(roles: Record<string, unknown>) {
@@ -100,6 +108,7 @@ describe('VerdictUpdatePage', () => {
       decision: { published: false },
     });
     api.updateVerdictChannel.mockResolvedValue({ success: true });
+    api.updateVerdictPolicy.mockResolvedValue({ success: true, sensitivity: 'standard', policy: summary });
   });
 
   it('lets a reviewer vote without exposing administrator final say', async () => {

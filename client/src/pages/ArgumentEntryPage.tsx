@@ -24,6 +24,7 @@ import {
   EntryRelatedTopics,
   buildLegacyEntryBreadcrumb,
 } from '../components/Entry/EntryLegacyParity';
+import TruthSummaryPanel from '../components/Entry/TruthSummaryPanel';
 
 const ArgumentEntryPage: React.FC = () => {
   const { id } = useParams();
@@ -202,6 +203,8 @@ const ArgumentEntryPage: React.FC = () => {
         iconColor="text-primary"
       />
       <EntryContextLine entry={argument} objectName="argument" />
+
+      <TruthSummaryPanel objectName="argument" objectId={String(argument._id || '')} />
 
       <EntryQuickActions
         entry={entry}

@@ -25,12 +25,12 @@ agent-safe, and operationally maintainable truth-validation system.
 
 ### 2. Consensus and Reader Comprehension
 
-- [ ] Add versioned verdict policies with sensitivity-dependent quorum.
-- [ ] Enforce reviewer eligibility, expertise declarations, conflict details,
+- [x] Add versioned verdict policies with sensitivity-dependent quorum.
+- [x] Enforce reviewer eligibility, expertise declarations, conflict details,
   and independence/affiliation limits.
-- [ ] Preserve material dissent and expose revalidation due dates.
-- [ ] Add a shared public `Why this verdict?` summary for verdict-bearing entries.
-- [ ] Preserve and visibly label audited administrator overrides.
+- [x] Preserve material dissent and expose revalidation due dates.
+- [x] Add a shared public `Why this verdict?` summary for verdict-bearing entries.
+- [x] Preserve and visibly label audited administrator overrides.
 
 ### 3. Evidence Integrity and Freshness
 

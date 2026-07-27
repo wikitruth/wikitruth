@@ -59,9 +59,11 @@ const VerdictUpdatePage: React.FC = () => {
   const [evidenceRefs, setEvidenceRefs] = useState('');
   const [confidence, setConfidence] = useState(75);
   const [expertise, setExpertise] = useState('');
+  const [affiliation, setAffiliation] = useState('');
   const [conflictDeclared, setConflictDeclared] = useState(false);
   const [conflictDetails, setConflictDetails] = useState('');
   const [summary, setSummary] = useState<VerdictConsensusSummary | null>(null);
+  const [sensitivity, setSensitivity] = useState<'standard' | 'elevated' | 'critical'>('standard');
   const [overrideStatus, setOverrideStatus] = useState('pending');
   const [overrideReasoning, setOverrideReasoning] = useState('');
   const [overrideReason, setOverrideReason] = useState('');
@@ -85,6 +87,7 @@ const VerdictUpdatePage: React.FC = () => {
       setDecisionHistory(entryResult.decisionHistory || []);
       setChannelStatuses(entryResult.verdictChannelStatuses || { factual: [], ethical: [] });
       setSummary(votesResult.summary);
+      setSensitivity(votesResult.summary?.sensitivity || 'standard');
       const current = entryResult.entry?.verdictChannels?.[channel];
       setOverrideStatus(current?.status || 'pending');
       setOverrideReasoning(String(current?.reasoning || ''));
@@ -131,6 +134,7 @@ const VerdictUpdatePage: React.FC = () => {
         evidenceRefs: evidenceIds(evidenceRefs),
         confidence,
         expertise: expertise.trim() || undefined,
+        affiliation: affiliation.trim() || undefined,
         conflictDeclared,
         conflictDetails: conflictDeclared ? conflictDetails.trim() : undefined,
       });
@@ -143,6 +147,21 @@ const VerdictUpdatePage: React.FC = () => {
       if (response.decision.published) await load();
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : 'Failed to record vote');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const updateSensitivity = async () => {
+    if (!canOverride) return;
+    try {
+      setSaving(true);
+      setError(null);
+      await moderationApi.updateVerdictPolicy(target, sensitivity);
+      setMessage(`Verdict sensitivity updated to ${sensitivity}. Existing votes will be re-evaluated against the selected policy.`);
+      await load();
+    } catch (saveError) {
+      setError(saveError instanceof Error ? saveError.message : 'Failed to update verdict sensitivity');
     } finally {
       setSaving(false);
     }
@@ -237,11 +256,39 @@ const VerdictUpdatePage: React.FC = () => {
       <div className="panel panel-default">
         <div className="panel-heading"><strong>Reviewer consensus</strong></div>
         <div className="panel-body">
+          {canOverride ? (
+            <div className="form-inline" style={{ marginBottom: 12 }}>
+              <label htmlFor="verdict-sensitivity">Review sensitivity&nbsp;</label>
+              <select
+                id="verdict-sensitivity"
+                className="form-control input-sm"
+                value={sensitivity}
+                onChange={(event) => setSensitivity(event.target.value as 'standard' | 'elevated' | 'critical')}
+              >
+                <option value="standard">Standard</option>
+                <option value="elevated">Elevated</option>
+                <option value="critical">Critical</option>
+              </select>{' '}
+              <Button type="button" variant="default" size="sm" disabled={saving} onClick={updateSensitivity}>Apply policy</Button>
+            </div>
+          ) : null}
           <p>
             Eligible votes: <strong>{summary?.eligibleVotes || 0}</strong> · Required leading votes: <strong>{summary?.threshold || 2}</strong> ·
             Leading result: <strong>{summary?.leadingStatus ? LABELS[summary.leadingStatus] || summary.leadingStatus : 'None'}</strong> ·
-            Average confidence: <strong>{Math.round(summary?.leadingAverageConfidence || 0)}%</strong>
+            Average confidence: <strong>{Math.round(summary?.leadingAverageConfidence || 0)}%</strong> ·
+            Independent affiliations: <strong>{summary?.distinctAffiliations || 0}/{summary?.minimumDistinctAffiliations || 2}</strong>
           </p>
+          {(summary?.excludedConflictVotes || summary?.excludedIneligibleVotes || summary?.excludedIndependenceVotes) ? (
+            <p className="text-muted small">
+              Excluded: {summary?.excludedConflictVotes || 0} conflict · {summary?.excludedIneligibleVotes || 0} ineligible · {summary?.excludedIndependenceVotes || 0} affiliation overlap
+            </p>
+          ) : null}
+          {summary?.dissent?.totalVotes ? (
+            <div className="alert alert-warning small">
+              <strong>Material dissent ({summary.dissent.totalVotes}):</strong>{' '}
+              {summary.dissent.statuses.map((item) => `${LABELS[item.status] || item.status} (${item.count})`).join(', ')}
+            </div>
+          ) : null}
           <p className={summary?.reached ? 'text-success' : 'text-muted'}>
             {summary?.reached ? 'Consensus threshold reached.' : 'Consensus threshold not yet reached.'}
           </p>
@@ -263,9 +310,13 @@ const VerdictUpdatePage: React.FC = () => {
                 <label htmlFor="vote-confidence">Confidence: {confidence}%</label>
                 <input id="vote-confidence" type="range" min="0" max="100" className="form-control" value={confidence} onChange={(event) => setConfidence(Number(event.target.value))} />
               </div>
-              <div className="col-sm-8 form-group">
+              <div className="col-sm-4 form-group">
                 <label htmlFor="vote-expertise">Relevant expertise</label>
-                <input id="vote-expertise" className="form-control" value={expertise} onChange={(event) => setExpertise(event.target.value)} placeholder="Optional qualifications or relevant experience" />
+                <input id="vote-expertise" className="form-control" value={expertise} onChange={(event) => setExpertise(event.target.value)} placeholder="Qualifications or experience" required={sensitivity !== 'standard'} />
+              </div>
+              <div className="col-sm-4 form-group">
+                <label htmlFor="vote-affiliation">Affiliation</label>
+                <input id="vote-affiliation" className="form-control" value={affiliation} onChange={(event) => setAffiliation(event.target.value)} placeholder="Organization or independent" required={sensitivity !== 'standard'} />
               </div>
             </div>
             <div className="checkbox">
