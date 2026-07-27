@@ -24,6 +24,7 @@ export = function (app: Application, mongoose: Mongoose) {
   // core
   require('./core/EntryRevisionCounter')(app, mongoose);
   require('./core/EntryRevision')(app, mongoose);
+  require('./core/EntryTranslation')(app, mongoose);
   require('./core/ChangeRequest')(app, mongoose);
   require('./core/Topic')(app, mongoose);
   require('./core/TopicLink')(app, mongoose);

@@ -39,6 +39,7 @@ import { requireContributorOnboarding } from '../../middlewares/onboarding';
 import { enforceApiClientScope } from '../../middlewares/apiClientScopes';
 import attachAgent from './agent';
 import attachEpistemic from './epistemic';
+import attachTranslations from './translations';
 import { apiVersionPolicy } from '../../middlewares/apiVersionPolicy';
 import { enforceAgentMutationReliability } from '../../middlewares/agentMutationReliability';
 
@@ -79,6 +80,7 @@ export = function (router: Router) {
   const explicitCivicRouter = apiError.wrapAsyncRouter(express.Router({ mergeParams: true })) as Router;
   const agentRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const epistemicRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
+  const translationsRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
 
   [topicsRouter, argumentsRouter, questionsRouter, answersRouter, issuesRouter, opinionsRouter, artifactsRouter]
     .forEach((entryRouter) => entryRouter.use(requireContributorOnboarding));
@@ -119,6 +121,7 @@ export = function (router: Router) {
   [civicRouter, explicitCivicRouter].forEach(attachCivic);
   attachAgent(agentRouter);
   attachEpistemic(epistemicRouter);
+  attachTranslations(translationsRouter);
 
   router.use('/home', homeRouter);
   router.use('/application-context', applicationContextRouter);
@@ -149,4 +152,5 @@ export = function (router: Router) {
   router.use('/tenants/:tenantId/civic', explicitCivicRouter);
   router.use('/agent', agentRouter);
   router.use('/epistemic', epistemicRouter);
+  router.use('/translations', translationsRouter);
 };

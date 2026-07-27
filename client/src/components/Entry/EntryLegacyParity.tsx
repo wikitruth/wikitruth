@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import type { LegacyEntity } from '../../types/legacy';
 import { formatRelativeTime } from '../../utils/dateFormat';
 import DeterministicAvatar from '../common/DeterministicAvatar';
+import EntryTranslationsPanel from './EntryTranslationsPanel';
 
 export type EntryObjectName = 'topic' | 'argument' | 'question' | 'answer' | 'artifact' | 'issue' | 'opinion';
 export interface EntryBreadcrumbItem {
@@ -345,6 +346,13 @@ export const EntryMetaBlock: React.FC<{ entry: LegacyEntity }> = ({ entry }) => 
   const isArchived = Number(entry.screening?.status) === 3;
 
   return (
+    <>
+    <EntryTranslationsPanel
+      objectName={String(entry.objectName || '')}
+      objectId={String(entry._id || '')}
+      originalTitle={String(entry.title || '')}
+      originalContent={String(entry.content || entry.description || '')}
+    />
     <div style={{ marginTop: '26px', paddingTop: '14px', borderTop: '1px solid #eee' }}>
       {isArchived && (
         <div className="alert alert-warning wt-entry-lifecycle-notice" role="status">
@@ -396,5 +404,6 @@ export const EntryMetaBlock: React.FC<{ entry: LegacyEntity }> = ({ entry }) => 
         </div>
       </div>
     </div>
+    </>
   );
 };
