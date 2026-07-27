@@ -158,6 +158,10 @@ export interface SearchResponse extends ApiBaseResponse, EntityBuckets {
   tab?: string;
   content?: string;
   results?: boolean;
+  graphFilters?: {
+    relationship: string;
+    evidence: string;
+  };
   topicsMore?: boolean;
   argumentsMore?: boolean;
   questionsMore?: boolean;

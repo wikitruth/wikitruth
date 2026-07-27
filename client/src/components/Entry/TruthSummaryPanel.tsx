@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getTruthSummary, type TruthSummary } from '../../services/api/epistemic';
+import { evidenceBundleUrl, getTruthSummary, type TruthSummary } from '../../services/api/epistemic';
 import { sanitizeHtml } from '../../utils/sanitizeHtml';
 
 interface TruthSummaryPanelProps {
@@ -134,10 +134,16 @@ const TruthSummaryPanel: React.FC<TruthSummaryPanelProps> = ({ objectName, objec
             </ul>
           </div>
         ) : null}
+        <div className="small" style={{ marginTop: 12 }}>
+          <i className="fa fa-download" aria-hidden="true" />{' '}
+          <a href={evidenceBundleUrl(objectName, objectId)}>Evidence bundle</a>
+          {' · '}
+          <a href={evidenceBundleUrl(objectName, objectId, 'jsonld')}>JSON-LD</a>
+          <span className="text-muted"> for independent verification and reuse</span>
+        </div>
       </div>
     </section>
   );
 };
 
 export default TruthSummaryPanel;
-

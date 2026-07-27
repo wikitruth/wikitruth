@@ -94,6 +94,15 @@ export async function getTruthSummary(
   return body.summary as TruthSummary;
 }
 
+export function evidenceBundleUrl(
+  objectName: 'topic' | 'argument' | 'answer',
+  objectId: string,
+  format: 'json' | 'jsonld' = 'json',
+): string {
+  const suffix = format === 'jsonld' ? 'evidence-bundle.jsonld' : 'evidence-bundle';
+  return `${API_BASE_URL}/epistemic/${encodeURIComponent(objectName)}/${encodeURIComponent(objectId)}/${suffix}?download=true`;
+}
+
 export async function getKnowledgeHealth(
   queue?: KnowledgeHealthQueueKey,
   limit = 25,

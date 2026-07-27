@@ -10,6 +10,7 @@ const answerFind = jest.fn();
 const artifactFind = jest.fn();
 const issueFind = jest.fn();
 const opinionFind = jest.fn();
+const objectLinkFind = jest.fn();
 const allFinds = [topicFind, argumentFind, questionFind, answerFind, artifactFind, issueFind, opinionFind];
 
 jest.mock('../../server/src/app', () => ({
@@ -22,6 +23,7 @@ jest.mock('../../server/src/app', () => ({
       Artifact: { find: (...args) => artifactFind(...args) },
       Issue: { find: (...args) => issueFind(...args) },
       Opinion: { find: (...args) => opinionFind(...args) },
+      ObjectLink: { find: (...args) => objectLinkFind(...args) },
     },
   },
 }));
@@ -37,6 +39,7 @@ jest.mock('../../server/src/utils/flowUtils', () => ({
 
 function queryChain(records) {
   const chain = {
+    select: jest.fn(() => chain),
     sort: jest.fn(() => chain),
     limit: jest.fn(() => chain),
     lean: jest.fn(async () => records),
@@ -61,6 +64,7 @@ describe('search ordering and cursor pagination contract', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     allFinds.forEach((find) => find.mockReturnValue(queryChain([])));
+    objectLinkFind.mockReturnValue(queryChain([]));
   });
 
   it('uses deterministic relevance, recency, and id ordering with a bounded cursor page', async () => {
@@ -114,5 +118,26 @@ describe('search ordering and cursor pagination contract', () => {
       .expect(200);
 
     expect(chain.limit).toHaveBeenCalledWith(100);
+  });
+
+  it('filters text results by governed evidence relationships', async () => {
+    objectLinkFind.mockReturnValue(queryChain([{
+      leftType: 1, leftId: '507f1f77bcf86cd799439011',
+      rightType: 6, rightId: '507f1f77bcf86cd799439012', relationship: 'supports',
+    }]));
+    topicFind.mockReturnValue(queryChain([]));
+
+    const response = await request(createApp())
+      .get('/api/search?q=claim&tab=topics&relationship=supports&evidence=linked')
+      .expect(200);
+
+    expect(objectLinkFind).toHaveBeenCalledWith(expect.objectContaining({
+      relationship: { $in: ['supports'] },
+      private: { $ne: true },
+    }));
+    expect(topicFind).toHaveBeenCalledWith(expect.objectContaining({
+      _id: { $in: ['507f1f77bcf86cd799439011'] },
+    }), { score: { $meta: 'textScore' } });
+    expect(response.body.graphFilters).toEqual({ relationship: 'supports', evidence: 'linked' });
   });
 });

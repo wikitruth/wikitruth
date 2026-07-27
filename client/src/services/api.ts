@@ -691,6 +691,8 @@ class ApiService {
       tab?: string;
       content?: string;
       limit?: number;
+      relationship?: string;
+      evidence?: string;
     }
   ): Promise<SearchResponse> {
     const params = new URLSearchParams();
@@ -703,6 +705,12 @@ class ApiService {
     }
     if (typeof options?.limit === 'number') {
       params.set('limit', String(options.limit));
+    }
+    if (options?.relationship && options.relationship !== 'any') {
+      params.set('relationship', options.relationship);
+    }
+    if (options?.evidence && options.evidence !== 'all') {
+      params.set('evidence', options.evidence);
     }
     return this.request<SearchResponse>(`/search?${params.toString()}`);
   }

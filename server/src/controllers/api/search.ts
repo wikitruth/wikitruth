@@ -18,6 +18,8 @@ type SearchModel = {
 
 type SearchTab = 'all' | 'topics' | 'arguments' | 'questions' | 'answers' | 'artifacts' | 'issues' | 'opinions';
 type SearchContent = 'all' | 'wiki' | 'journal';
+type SearchRelationship = 'any' | 'supports' | 'refutes' | 'qualifies' | 'background' | 'evidence' | 'source';
+type SearchEvidence = 'all' | 'linked' | 'missing';
 type SearchQueryChain = {
   sort: (sort: Record<string, unknown>) => SearchQueryChain;
   limit: (limit: number) => SearchQueryChain;
@@ -76,6 +78,43 @@ function normalizeContent(value: string): SearchContent {
     return 'journal';
   }
   return content === 'wiki' || content === 'journal' ? (content as SearchContent) : 'all';
+}
+
+const EVIDENCE_RELATIONSHIPS: Exclude<SearchRelationship, 'any'>[] = [
+  'supports', 'refutes', 'qualifies', 'background', 'evidence', 'source',
+];
+
+function normalizeRelationship(value: string): SearchRelationship {
+  const relationship = value.trim().toLowerCase() as SearchRelationship;
+  return relationship === 'any' || EVIDENCE_RELATIONSHIPS.includes(relationship as Exclude<SearchRelationship, 'any'>)
+    ? relationship
+    : 'any';
+}
+
+function normalizeEvidence(value: string): SearchEvidence {
+  const evidence = value.trim().toLowerCase();
+  return evidence === 'linked' || evidence === 'missing' ? evidence : 'all';
+}
+
+async function buildGraphConstraint(
+  objectType: number,
+  relationship: SearchRelationship,
+  evidence: SearchEvidence,
+): Promise<Record<string, unknown>> {
+  if ((relationship === 'any' && evidence === 'all') || !db.ObjectLink?.find) return {};
+  const relationships = relationship === 'any' ? EVIDENCE_RELATIONSHIPS : [relationship];
+  const links = await db.ObjectLink.find({
+    $or: [{ leftType: objectType }, { rightType: objectType }],
+    relationship: { $in: relationships },
+    private: { $ne: true },
+  }).select('leftId leftType rightId rightType').lean();
+  const linkedIds = Array.from(new Set(links.flatMap((link: Record<string, unknown>) => {
+    const ids: string[] = [];
+    if (Number(link.leftType) === objectType && link.leftId) ids.push(String(link.leftId));
+    if (Number(link.rightType) === objectType && link.rightId) ids.push(String(link.rightId));
+    return ids;
+  })));
+  return { _id: evidence === 'missing' ? { $nin: linkedIds } : { $in: linkedIds } };
 }
 
 function buildBaseQuery(screeningStatus: number | undefined, cursor: Date | null): Record<string, unknown> {
@@ -145,6 +184,9 @@ async function GET_search(req: WikitruthRequest, res: WikitruthResponse) {
   const keyword = String(req.query.q || '').trim();
   const tab = normalizeTab(String(req.query.tab || 'all'));
   const content = normalizeContent(String(req.query.content || 'all'));
+  const evidence = normalizeEvidence(String(req.query.evidence || 'all'));
+  const requestedRelationship = normalizeRelationship(String(req.query.relationship || 'any'));
+  const relationship = evidence === 'missing' ? 'any' : requestedRelationship;
   const allTabs = tab === 'all';
   const maxResult = 15;
   const limit = parseLimit(req, allTabs ? maxResult : 0);
@@ -154,6 +196,7 @@ async function GET_search(req: WikitruthRequest, res: WikitruthResponse) {
     return res.json({
       tab: tab,
       content: content,
+      graphFilters: { relationship, evidence },
       results: false,
       topics: [],
       arguments: [],
@@ -173,6 +216,22 @@ async function GET_search(req: WikitruthRequest, res: WikitruthResponse) {
     return allTabs || tab === section;
   };
 
+  const objectTypes: Record<Exclude<SearchTab, 'all'>, number> = {
+    topics: constants.OBJECT_TYPES.topic,
+    arguments: constants.OBJECT_TYPES.argument,
+    questions: constants.OBJECT_TYPES.question,
+    answers: constants.OBJECT_TYPES.answer,
+    artifacts: constants.OBJECT_TYPES.artifact,
+    issues: constants.OBJECT_TYPES.issue,
+    opinions: constants.OBJECT_TYPES.opinion,
+  };
+  const graphConstraints = Object.fromEntries(await Promise.all(
+    Object.entries(objectTypes).map(async ([section, objectType]) => [
+      section,
+      shouldLoad(section as SearchTab) ? await buildGraphConstraint(objectType, relationship, evidence) : {},
+    ]),
+  )) as Record<Exclude<SearchTab, 'all'>, Record<string, unknown>>;
+
   const [
     topicResults,
     argumentResults,
@@ -183,25 +242,25 @@ async function GET_search(req: WikitruthRequest, res: WikitruthResponse) {
     opinionResults,
   ] = await Promise.all([
     shouldLoad('topics')
-      ? findByRelevance(db.Topic, buildSectionQuery(baseQuery, keyword, privacyFilter), limit)
+      ? findByRelevance(db.Topic, buildSectionQuery(baseQuery, keyword, privacyFilter, graphConstraints.topics), limit)
       : [],
     shouldLoad('arguments')
-      ? findByRelevance(db.Argument, buildSectionQuery(baseQuery, keyword, privacyFilter), limit)
+      ? findByRelevance(db.Argument, buildSectionQuery(baseQuery, keyword, privacyFilter, graphConstraints.arguments), limit)
       : [],
     shouldLoad('questions')
-      ? findByRelevance(db.Question, buildSectionQuery(baseQuery, keyword, privacyFilter), limit)
+      ? findByRelevance(db.Question, buildSectionQuery(baseQuery, keyword, privacyFilter, graphConstraints.questions), limit)
       : [],
     shouldLoad('answers')
-      ? findByRelevance(db.Answer, buildSectionQuery(baseQuery, keyword, privacyFilter), limit)
+      ? findByRelevance(db.Answer, buildSectionQuery(baseQuery, keyword, privacyFilter, graphConstraints.answers), limit)
       : [],
     shouldLoad('artifacts')
-      ? findByRelevance(db.Artifact, buildSectionQuery(baseQuery, keyword, privacyFilter), limit)
+      ? findByRelevance(db.Artifact, buildSectionQuery(baseQuery, keyword, privacyFilter, graphConstraints.artifacts), limit)
       : [],
     shouldLoad('issues')
-      ? findByRelevance(db.Issue, buildSectionQuery(baseQuery, keyword, privacyFilter), limit)
+      ? findByRelevance(db.Issue, buildSectionQuery(baseQuery, keyword, privacyFilter, graphConstraints.issues), limit)
       : [],
     shouldLoad('opinions')
-      ? findByRelevance(db.Opinion, buildSectionQuery(baseQuery, keyword, privacyFilter), limit)
+      ? findByRelevance(db.Opinion, buildSectionQuery(baseQuery, keyword, privacyFilter, graphConstraints.opinions), limit)
       : [],
   ]);
 
@@ -261,6 +320,7 @@ async function GET_search(req: WikitruthRequest, res: WikitruthResponse) {
   res.json({
     tab: tab,
     content: content,
+    graphFilters: { relationship, evidence },
     results: allTabs ? anyResults : true,
     topics: topicResults,
     arguments: argumentResults,

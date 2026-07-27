@@ -20,6 +20,8 @@ import type { LegacyEntity } from '../types/legacy';
 
 type SearchTab = 'all' | 'topics' | 'arguments' | 'questions' | 'answers' | 'artifacts' | 'issues' | 'opinions';
 type SearchContent = 'all' | 'wiki' | 'journal';
+type SearchRelationship = 'any' | 'supports' | 'refutes' | 'qualifies' | 'background' | 'evidence' | 'source';
+type SearchEvidence = 'all' | 'linked' | 'missing';
 
 type SectionConfig = {
   key: Exclude<SearchTab, 'all'>;
@@ -68,6 +70,17 @@ function normalizeContent(value: string | null): SearchContent {
   return normalized === 'wiki' || normalized === 'journal' ? (normalized as SearchContent) : 'all';
 }
 
+function normalizeRelationship(value: string | null): SearchRelationship {
+  const normalized = String(value || 'any').trim().toLowerCase();
+  const valid: SearchRelationship[] = ['any', 'supports', 'refutes', 'qualifies', 'background', 'evidence', 'source'];
+  return valid.includes(normalized as SearchRelationship) ? normalized as SearchRelationship : 'any';
+}
+
+function normalizeEvidence(value: string | null): SearchEvidence {
+  const normalized = String(value || 'all').trim().toLowerCase();
+  return normalized === 'linked' || normalized === 'missing' ? normalized : 'all';
+}
+
 const SearchPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
@@ -75,6 +88,8 @@ const SearchPage: React.FC = () => {
   const query = searchParams.get('q') || '';
   const tab = normalizeTab(searchParams.get('tab'));
   const content = normalizeContent(searchParams.get('content'));
+  const relationship = normalizeRelationship(searchParams.get('relationship'));
+  const evidence = normalizeEvidence(searchParams.get('evidence'));
 
   const [searchQuery, setSearchQuery] = useState(query);
   const [results, setResults] = useState<SearchResponse>(emptyResults);
@@ -98,10 +113,12 @@ const SearchPage: React.FC = () => {
       params.set('q', trimmed);
       if (tab !== 'all') params.set('tab', tab);
       if (content !== 'all') params.set('content', content);
+      if (relationship !== 'any') params.set('relationship', relationship);
+      if (evidence !== 'all') params.set('evidence', evidence);
       setSearchParams(params);
     }, 333);
     return () => clearTimeout(timer);
-  }, [content, query, searchQuery, setSearchParams, tab]);
+  }, [content, evidence, query, relationship, searchQuery, setSearchParams, tab]);
 
   // Reset focused index when results change
   useEffect(() => {
@@ -119,7 +136,7 @@ const SearchPage: React.FC = () => {
       try {
         setLoading(true);
         setSearched(true);
-        const response = await apiService.search(query, { tab: tab, content: content });
+        const response = await apiService.search(query, { tab, content, relationship, evidence });
         trackEvent('search', 'engagement', query);
         setResults(response);
       } catch {
@@ -131,7 +148,7 @@ const SearchPage: React.FC = () => {
     };
 
     void run();
-  }, [addToast, query, tab, content]);
+  }, [addToast, query, tab, content, relationship, evidence]);
 
   const buildSearchLink = (next: { q?: string; tab?: SearchTab; content?: SearchContent }) => {
     const params = new URLSearchParams();
@@ -148,6 +165,8 @@ const SearchPage: React.FC = () => {
     if (nextContent !== 'all') {
       params.set('content', nextContent);
     }
+    if (relationship !== 'any') params.set('relationship', relationship);
+    if (evidence !== 'all') params.set('evidence', evidence);
 
     const queryString = params.toString();
     return queryString ? `/search?${queryString}` : '/search';
@@ -168,6 +187,8 @@ const SearchPage: React.FC = () => {
     if (content !== 'all') {
       params.set('content', content);
     }
+    if (relationship !== 'any') params.set('relationship', relationship);
+    if (evidence !== 'all') params.set('evidence', evidence);
     setSearchParams(params);
   };
 
@@ -183,6 +204,18 @@ const SearchPage: React.FC = () => {
     if (nextContent !== 'all') {
       params.set('content', nextContent);
     }
+    if (relationship !== 'any') params.set('relationship', relationship);
+    if (evidence !== 'all') params.set('evidence', evidence);
+    setSearchParams(params);
+  };
+
+  const handleGraphFilterChange = (nextRelationship: SearchRelationship, nextEvidence: SearchEvidence) => {
+    const params = new URLSearchParams();
+    if (query.trim()) params.set('q', query.trim());
+    if (tab !== 'all') params.set('tab', tab);
+    if (content !== 'all') params.set('content', content);
+    if (nextRelationship !== 'any') params.set('relationship', nextRelationship);
+    if (nextEvidence !== 'all') params.set('evidence', nextEvidence);
     setSearchParams(params);
   };
 
@@ -341,6 +374,47 @@ const SearchPage: React.FC = () => {
                   My Journal
                 </label>
               </div>
+            )}
+            <div className="row" style={{ marginTop: 10 }}>
+              <div className="col-sm-6 form-group">
+                <label htmlFor="search-relationship" className="control-label">Evidence relationship</label>
+                <select
+                  id="search-relationship"
+                  className="form-control"
+                  value={relationship}
+                  disabled={evidence === 'missing'}
+                  onChange={(event) => handleGraphFilterChange(event.target.value as SearchRelationship, evidence)}
+                >
+                  <option value="any">Any relationship</option>
+                  <option value="supports">Supports</option>
+                  <option value="refutes">Refutes</option>
+                  <option value="qualifies">Qualifies</option>
+                  <option value="background">Background</option>
+                  <option value="evidence">Evidence</option>
+                  <option value="source">Source</option>
+                </select>
+              </div>
+              <div className="col-sm-6 form-group">
+                <label htmlFor="search-evidence" className="control-label">Evidence state</label>
+                <select
+                  id="search-evidence"
+                  className="form-control"
+                  value={evidence}
+                  onChange={(event) => {
+                    const next = event.target.value as SearchEvidence;
+                    handleGraphFilterChange(next === 'missing' ? 'any' : relationship, next);
+                  }}
+                >
+                  <option value="all">All entries</option>
+                  <option value="linked">Has linked evidence</option>
+                  <option value="missing">Missing linked evidence</option>
+                </select>
+              </div>
+            </div>
+            {(relationship !== 'any' || evidence !== 'all') && (
+              <p className="help-block">
+                Graph filter active. Search ranking remains based on text relevance and recency.
+              </p>
             )}
           </div>
         </div>

@@ -53,7 +53,9 @@ describe('SearchPage', () => {
     render(<SearchPage />, { route: '/search?q=truth' });
 
     await waitFor(() => {
-      expect(mockSearch).toHaveBeenCalledWith('truth', { tab: 'all', content: 'all' });
+      expect(mockSearch).toHaveBeenCalledWith('truth', {
+        tab: 'all', content: 'all', relationship: 'any', evidence: 'all',
+      });
     });
 
     expect(screen.getByRole('tab', { name: /all/i })).toBeInTheDocument();
@@ -83,7 +85,9 @@ describe('SearchPage', () => {
     render(<SearchPage />, { route: '/search?q=journal&tab=topics&content=diary' });
 
     await waitFor(() => {
-      expect(mockSearch).toHaveBeenCalledWith('journal', { tab: 'topics', content: 'journal' });
+      expect(mockSearch).toHaveBeenCalledWith('journal', {
+        tab: 'topics', content: 'journal', relationship: 'any', evidence: 'all',
+      });
     });
 
     expect(screen.getByLabelText(/all content/i)).toBeInTheDocument();
@@ -91,4 +95,24 @@ describe('SearchPage', () => {
     expect(screen.getByLabelText(/my journal/i)).toBeInTheDocument();
     expect(screen.getByText(/journal topic/i)).toBeInTheDocument();
   });
+
+  it('restores graph filters from the URL and keeps them shareable', async () => {
+    mockSearch.mockResolvedValue({ ...emptySearchResponse(), tab: 'topics', results: false });
+
+    render(<SearchPage />, { route: '/search?q=records&tab=topics&relationship=refutes&evidence=linked' });
+
+    await waitFor(() => expect(mockSearch).toHaveBeenCalledWith('records', {
+      tab: 'topics', content: 'all', relationship: 'refutes', evidence: 'linked',
+    }));
+    expect(screen.getByLabelText(/evidence relationship/i)).toHaveValue('refutes');
+    expect(screen.getByLabelText(/evidence state/i)).toHaveValue('linked');
+    expect(screen.getByText(/graph filter active/i)).toBeInTheDocument();
+  });
 });
+
+function emptySearchResponse() {
+  return {
+    tab: 'all', content: 'all', results: false, topics: [], arguments: [], questions: [],
+    answers: [], artifacts: [], issues: [], opinions: [],
+  };
+}

@@ -7,6 +7,7 @@ import appModForDb from '../../app';
 import { completeKnowledgeReviewTask } from '../../services/knowledgeReviewTaskService';
 import { logEntryEvent } from '../../services/entryEventsService';
 import { buildKnowledgeHealth } from '../../services/knowledgeHealthService';
+import { buildPublicEvidenceBundle, evidenceBundleJsonLd } from '../../services/evidenceBundleService';
 
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 
@@ -15,6 +16,30 @@ function canReview(req: WikitruthRequest): boolean {
 }
 
 export = function (router: Router) {
+  async function sendEvidenceBundle(req: WikitruthRequest, res: WikitruthResponse, jsonLd: boolean) {
+    const bundle = await buildPublicEvidenceBundle({
+      objectName: String(req.params.objectName || ''),
+      objectId: String(req.params.id || ''),
+      origin: `${req.protocol}://${String(req.get('host') || 'localhost')}`,
+    });
+    if (!bundle) {
+      res.status(404).json({ success: false, message: 'Public evidence bundle not found' });
+      return;
+    }
+    const filename = `${bundle.entry.objectName}-${bundle.entry.id}-evidence${jsonLd ? '.jsonld' : '.json'}`;
+    res.type(jsonLd ? 'application/ld+json' : 'application/json');
+    if (String(req.query.download || '') === 'true') res.attachment(filename);
+    res.send(jsonLd ? evidenceBundleJsonLd(bundle) : bundle);
+  }
+
+  router.get('/:objectName/:id/evidence-bundle.jsonld', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    await sendEvidenceBundle(req, res, true);
+  });
+
+  router.get('/:objectName/:id/evidence-bundle', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    await sendEvidenceBundle(req, res, false);
+  });
+
   router.get('/:objectName/:id/truth-summary', async function (req: WikitruthRequest, res: WikitruthResponse) {
     const includePending = Boolean(req.user?.canPlayRoleOf?.('reviewer') || req.user?.roles?.admin);
     const summary = await buildPublicTruthSummary({
