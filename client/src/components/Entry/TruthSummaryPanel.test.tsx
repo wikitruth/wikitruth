@@ -4,7 +4,12 @@ import userEvent from '@testing-library/user-event';
 import TruthSummaryPanel from './TruthSummaryPanel';
 import { getTruthSummary } from '../../services/api/epistemic';
 
-jest.mock('../../services/api/epistemic', () => ({ getTruthSummary: jest.fn() }));
+jest.mock('../../services/api/epistemic', () => ({
+  getTruthSummary: jest.fn(),
+  evidenceBundleUrl: (objectName: string, objectId: string, format = 'json') => (
+    `/api/epistemic/${objectName}/${objectId}/evidence-bundle${format === 'jsonld' ? '.jsonld' : ''}?download=true`
+  ),
+}));
 const mockedGetTruthSummary = getTruthSummary as jest.MockedFunction<typeof getTruthSummary>;
 
 describe('TruthSummaryPanel', () => {
@@ -29,6 +34,7 @@ describe('TruthSummaryPanel', () => {
     await user.click(screen.getByRole('button', { name: /why this verdict/i }));
     expect(screen.getByText(/Material dissent/)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Primary record' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Evidence bundle' })).toHaveAttribute('href', expect.stringContaining('evidence-bundle?download=true'));
+    expect(screen.getByRole('link', { name: 'JSON-LD' })).toHaveAttribute('href', expect.stringContaining('evidence-bundle.jsonld'));
   });
 });
-
