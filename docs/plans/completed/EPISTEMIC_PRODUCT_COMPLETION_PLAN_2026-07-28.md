@@ -76,12 +76,12 @@ agent-safe, and operationally maintainable truth-validation system.
 
 ### 8. Verification and Closure
 
-- [ ] Add server/client/OpenAPI regression coverage for every new contract.
-- [ ] Run lint, modern/legacy type checks, source guardrails, and production builds.
-- [ ] Run disposable agent, civic, role, and desktop/mobile browser verification.
-- [ ] Restart and verify the local PM2 process only.
-- [ ] Update canonical statuses and publish a local engineering signoff.
-- [ ] Commit each major capability group semantically.
+- [x] Add server/client/OpenAPI regression coverage for every new contract.
+- [x] Run lint, modern/legacy type checks, source guardrails, and production builds.
+- [x] Run disposable agent, civic, role, and desktop/mobile browser verification.
+- [x] Restart and verify the local PM2 process only.
+- [x] Update canonical statuses and publish a local engineering signoff.
+- [x] Commit each major capability group semantically.
 
 ## Completion Rule
 

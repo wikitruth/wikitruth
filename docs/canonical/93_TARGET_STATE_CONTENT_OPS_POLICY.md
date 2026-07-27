@@ -35,5 +35,7 @@ Define target governance and content-operations assets required for quality at s
 
 - Policy and enablement assets: `implemented` and exposed through the in-app policy center.
 - Operational handbooks and the seed-curation playbook: `implemented`.
+- Unified knowledge-health and non-destructive freshness queues: `implemented`
+  and locally verified.
 - Real-world flagship seeding, reviewer calibration, and sustained curation remain content operations, not missing software implementation.
 - Source baseline: `docs/plans/deferred/plan-2026-04-14/08_VALIDATED_CHECKLIST_CONTENT_FIXPH.md` and `docs/system-reference/07_REFERENCE_LIBRARY_AND_EVIDENCE_POLICY.md`.

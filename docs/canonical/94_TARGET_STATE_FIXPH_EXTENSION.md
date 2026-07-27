@@ -29,6 +29,9 @@ Define the intended civic-product extension targets for the FixPH domain.
 
 - Civic software baseline: `implemented` through the `CivicRecord` domain, governed `/api/civic` contract, and `/civic` workspace.
 - FixPH is the first tenant of the reusable Civic Core, not a country-specific backend fork; the canonical tenant contract is defined in `docs/canonical/97_TARGET_STATE_CIVIC_CORE_TENANCY.md`.
-- Implemented scope includes complete IA, responsibility hierarchy, projects, citizen observations, location filters, incident progression, actions, candidate comparison, and durable outcome history.
+- Implemented scope includes complete IA, responsibility hierarchy, projects,
+  citizen observations, location filters, incident progression, actions,
+  candidate comparison, durable outcome history, and reviewed subject response
+  and correction rights.
 - Real-world record seeding and operating adoption remain content operations.
 - Source baseline: `docs/system-reference/06_FIXPH_CIVIC_EXTENSION.md` and `docs/plans/deferred/plan-2026-04-14/08_VALIDATED_CHECKLIST_CONTENT_FIXPH.md`.

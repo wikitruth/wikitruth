@@ -2,6 +2,7 @@
 
 ## Active QA and Parity Artifacts
 
+- Epistemic product completion signoff: `docs/qa/EPISTEMIC_PRODUCT_COMPLETION_SIGNOFF_2026-07-28.md`
 - Epistemic and agent modernization signoff: `docs/qa/EPISTEMIC_AGENT_MODERNIZATION_SIGNOFF_2026-07-18.md`
 - Epistemic governance flagship pilot: `docs/qa/EPISTEMIC_FLAGSHIP_PILOT_2026-07-18.md`
 - Current deep visual/feature audit: `docs/qa/LEGACY_MODERN_LIVE_VISUAL_AUDIT_2026-07-15.md`

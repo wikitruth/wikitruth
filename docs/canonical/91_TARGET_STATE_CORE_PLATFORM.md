@@ -30,7 +30,7 @@ Define the high-priority governance and integrity contract for the core platform
 
 ## Target State Status
 
-- Overall: foundational baseline `implemented`; the approved epistemic product
-  completion wave is `in progress`.
+- Overall: foundational baseline and the approved epistemic product completion
+  wave are `implemented` and locally verified.
 - Automatic unresolved-content expiry remains explicitly `deferred`; human resolution and audited administrator override remain canonical.
 - Source baseline: `docs/plans/deferred/plan-2026-04-14/09_GAP_CHECKLIST_PLAN.md` and `docs/plans/deferred/plan-2026-04-14/06_VALIDATED_CHECKLIST_CORE_PLATFORM.md`.

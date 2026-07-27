@@ -47,6 +47,8 @@ Define the reusable civic-accountability platform contract that powers FixPH and
 ## Target State Status
 
 - Core tenancy, validated tenant record extensions, country-neutral persistence defaults, and explicit platform-to-tenant administrator provisioning are `implemented`.
+- Fail-closed launch readiness, unsaved configuration preview, and portable
+  secret-free tenant export are `implemented` and locally verified.
 - FixPH is the first persisted compatibility tenant; shared, dedicated, and headless profiles use the same models and APIs.
 - A fictional second tenant verified country, currency, geography, branding, navigation, isolation, and responsive rendering.
 - Detailed architecture: `docs/architecture/CIVIC_CORE_MULTI_TENANCY_ARCHITECTURE.md`.
