@@ -248,3 +248,31 @@ The 2026-07-15 revalidation checklist is implemented and has passed its separate
 verification stage. This plan remains active rather than moving to `completed/`
 because the explicit legacy-retirement, automatic-expiry, strict-debate, and
 React Native product decisions remain deferred.
+
+## Functional and Visual Revalidation (2026-07-28)
+
+The current detailed report is
+`docs/qa/LEGACY_MODERN_FUNCTIONAL_VISUAL_AUDIT_2026-07-28.md`. This pass is
+strictly about functionality and implementation; live content migration and
+production deployment are excluded until separately authorized.
+
+- [x] Re-inspect the live public and signed-in legacy shell, Home, Explore,
+  Search, Visualize, semantic families, editors, groups, and members.
+- [x] Stop the live traversal when `/members/contributors` reproduced the known
+  legacy process crash; confirm production recovered without making a change.
+- [x] Re-run seven-family semantic parity on the current local build.
+- [x] Re-run disposable reader, contributor, screener, reviewer, and
+  administrator action parity with verified identity cleanup.
+- [x] Render 109 representative local routes at desktop and `390x844` mobile
+  sizes, covering public, account, authoring, member, moderation, admin, civic,
+  error, entry, discussion, and edit surfaces (218 renders).
+- [x] Restore the legacy `479px` wordmark breakpoint.
+- [x] Suppress duplicated usernames in member directories.
+- [x] Make long profile names wrap without mobile document overflow.
+- [x] Preserve the civic tenant-operations heading in access-denied states.
+- [ ] Review, rather than silently change, Explore density, exact GeoPattern
+  palettes, legacy Move/Swap Link terminology, and title-tagline policy.
+
+The unchecked line is a product-review queue, not a missing core implementation.
+This plan remains active because it already contains explicitly deferred product
+programs; it must not be moved to `completed/` while those deferrals remain.
