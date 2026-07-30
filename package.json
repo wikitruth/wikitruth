@@ -45,6 +45,7 @@
     "test:agent:authenticated:disposable": "node --env-file-if-exists=.env scripts/qa/run-disposable-agent-browser.mjs",
     "test:public:browser": "node --env-file-if-exists=.env scripts/qa/run-public-modern-browser.mjs",
     "test:civic:authenticated:disposable": "node --env-file-if-exists=.env scripts/qa/run-disposable-civic-browser.mjs",
+    "test:acceptance:routes": "node --env-file-if-exists=.env scripts/qa/run-full-route-visual-audit.mjs",
     "test:parity": "npm-run-all test:parity:server test:parity:client",
     "test:upgrade:regression": "bash scripts/qa/upgrade-regression-batch.sh all",
     "test:upgrade:regression:tooling": "bash scripts/qa/upgrade-regression-batch.sh tooling",

@@ -1,7 +1,8 @@
 {
   "defaults": {
     "connections": 10,
-    "durationSeconds": 5
+    "durationSeconds": 5,
+    "maxRequests": 50
   },
   "endpoints": [
     {

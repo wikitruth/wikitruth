@@ -1,12 +1,14 @@
 #!/usr/bin/env node
 
 import fs from 'node:fs/promises';
+import http from 'node:http';
+import https from 'node:https';
 import path from 'node:path';
 import process from 'node:process';
 import { performance } from 'node:perf_hooks';
 
 const rootDir = process.cwd();
-const baseUrl = process.env.PERF_BASE_URL || 'http://127.0.0.1:8000';
+const baseUrl = process.env.PERF_BASE_URL || 'https://127.0.0.1:9443';
 const configPath =
   process.env.PERF_BUDGET_CONFIG ||
   path.join(rootDir, 'docs/qa/perf-budgets-2026-04-24.json');
@@ -18,23 +20,46 @@ function percentile(values, percentileValue) {
   return sorted[index] || 0;
 }
 
-async function runLoad({ url, connections, durationSeconds }) {
+const httpAgent = new http.Agent({ keepAlive: true });
+const httpsAgent = new https.Agent({ keepAlive: true });
+const localHttpsAgent = new https.Agent({ keepAlive: true, rejectUnauthorized: false });
+
+function requestOnce(url, timeoutMs) {
+  const target = new URL(url);
+  const isHttps = target.protocol === 'https:';
+  const isLoopback = ['127.0.0.1', '::1', 'localhost'].includes(target.hostname);
+  const transport = isHttps ? https : http;
+  const agent = isHttps ? (isLoopback ? localHttpsAgent : httpsAgent) : httpAgent;
+
+  return new Promise((resolve, reject) => {
+    const request = transport.get(target, { agent }, (response) => {
+      response.on('error', reject);
+      response.resume();
+      response.on('end', () => resolve(response.statusCode || 0));
+    });
+    request.setTimeout(timeoutMs, () => request.destroy(new Error(`Load request timed out: ${url}`)));
+    request.on('error', reject);
+  });
+}
+
+async function runLoad({ url, connections, durationSeconds, maxRequests }) {
   const durationMs = Math.max(1, durationSeconds * 1000);
   const startedAt = performance.now();
   const deadline = startedAt + durationMs;
   const latencies = [];
+  let started = 0;
   let completed = 0;
 
   async function worker() {
     while (performance.now() < deadline) {
+      if (started >= maxRequests) {
+        return;
+      }
+      started += 1;
       const requestStartedAt = performance.now();
-      const response = await fetch(url, {
-        redirect: 'manual',
-        signal: AbortSignal.timeout(Math.max(5_000, durationMs)),
-      });
-      await response.arrayBuffer();
-      if (response.status >= 500) {
-        throw new Error(`Load request failed with HTTP ${response.status}: ${url}`);
+      const status = await requestOnce(url, Math.max(5_000, durationMs));
+      if (status < 200 || status >= 300) {
+        throw new Error(`Load request failed with HTTP ${status}: ${url}`);
       }
       latencies.push(performance.now() - requestStartedAt);
       completed += 1;
@@ -46,6 +71,7 @@ async function runLoad({ url, connections, durationSeconds }) {
   return {
     p95: percentile(latencies, 95),
     averageRequestsPerSecond: completed / elapsedSeconds,
+    completed,
   };
 }
 
@@ -77,6 +103,7 @@ async function main() {
     const url = new URL(requestPath, baseUrl).toString();
     const connections = toNumber(endpoint.connections, toNumber(defaults.connections, 10));
     const duration = toNumber(endpoint.durationSeconds, toNumber(defaults.durationSeconds, 5));
+    const maxRequests = Math.max(1, toNumber(endpoint.maxRequests, toNumber(defaults.maxRequests, 50)));
     const p95MsMax = toNumber(endpoint.p95MsMax, 0);
     const avgReqPerSecMin = toNumber(endpoint.avgReqPerSecMin, 0);
 
@@ -84,6 +111,7 @@ async function main() {
       url,
       connections,
       durationSeconds: duration,
+      maxRequests,
     });
 
     const p95 = toNumber(result.p95, 0);
@@ -103,6 +131,7 @@ async function main() {
       p95MsMax,
       avgReqPerSec,
       avgReqPerSecMin,
+      samples: result.completed,
       pass: p95Pass && rpsPass,
     });
   }
@@ -114,8 +143,9 @@ async function main() {
       [
         `[${status}]`,
         row.name,
+        `samples=${row.samples}`,
         `p95=${row.p95.toFixed(1)}ms (max ${row.p95MsMax || 'n/a'})`,
-        `avgRPS=${row.avgReqPerSec.toFixed(1)} (min ${row.avgReqPerSecMin || 'n/a'})`,
+        `burstRPS=${row.avgReqPerSec.toFixed(1)} (min ${row.avgReqPerSecMin || 'n/a'})`,
       ].join(' | ')
     );
   }
