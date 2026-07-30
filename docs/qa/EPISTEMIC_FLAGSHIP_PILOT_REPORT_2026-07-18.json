@@ -1,10 +1,10 @@
 {
   "result": "PASS",
-  "generatedAt": "2026-07-18T09:33:40.470Z",
+  "generatedAt": "2026-07-30T11:40:53.249Z",
   "baseUrl": "https://127.0.0.1:9443",
   "policyVersion": "2026-07-v2",
   "fixture": {
-    "token": "mrq663qr883036",
+    "token": "ms7fzyf3829748",
     "identities": 5,
     "topic": 1,
     "claim": 1,
@@ -29,12 +29,17 @@
     "agreement": {
       "factual": {
         "channel": "factual",
-        "policyVersion": "2026-07-v2",
+        "policyVersion": "2026-07-v3-standard",
+        "sensitivity": "standard",
         "totalVotes": 3,
         "eligibleVotes": 3,
         "excludedConflictVotes": 0,
+        "excludedIneligibleVotes": 0,
+        "excludedIndependenceVotes": 0,
         "abstentions": 0,
         "threshold": 2,
+        "minimumDistinctAffiliations": 2,
+        "distinctAffiliations": 3,
         "leadingStatus": "supported",
         "leadingCount": 3,
         "leadingRatio": 1,
@@ -46,17 +51,29 @@
             "count": 3
           }
         ],
+        "dissent": {
+          "totalVotes": 0,
+          "statuses": [],
+          "rationales": [],
+          "evidenceRefs": []
+        },
+        "revalidationIntervalDays": 365,
         "consensusReached": true,
         "consensusStatus": "supported"
       },
       "ethical": {
         "channel": "ethical",
-        "policyVersion": "2026-07-v2",
+        "policyVersion": "2026-07-v3-standard",
+        "sensitivity": "standard",
         "totalVotes": 3,
         "eligibleVotes": 3,
         "excludedConflictVotes": 0,
+        "excludedIneligibleVotes": 0,
+        "excludedIndependenceVotes": 0,
         "abstentions": 0,
         "threshold": 2,
+        "minimumDistinctAffiliations": 2,
+        "distinctAffiliations": 3,
         "leadingStatus": "permissible",
         "leadingCount": 3,
         "leadingRatio": 1,
@@ -68,6 +85,13 @@
             "count": 3
           }
         ],
+        "dissent": {
+          "totalVotes": 0,
+          "statuses": [],
+          "rationales": [],
+          "evidenceRefs": []
+        },
+        "revalidationIntervalDays": 365,
         "consensusReached": true,
         "consensusStatus": "permissible"
       }
@@ -94,26 +118,26 @@
     },
     "unresolvedIssues": 0,
     "feedback": {
-      "signalId": "6a5b48733139cd7aa79080bd",
-      "appealId": "6a5b48743139cd7aa79080c4"
+      "signalId": "6a6b3844006006f592c3cf72",
+      "appealId": "6a6b3844006006f592c3cf88"
     },
-    "civicEvidenceLinkId": "6a5b4874a09753ceec21df1d",
+    "civicEvidenceLinkId": "6a6b38452e5d9cd23107b922",
     "audit": {
       "before": {
         "valid": true,
-        "verifiedEvents": 135,
+        "verifiedEvents": 204,
         "legacyEvents": 0,
-        "headSequence": 135,
-        "headHash": "7e459db993306299f82ecdfb074b07635313a23996aca506202119ae9ae4d140",
+        "headSequence": 204,
+        "headHash": "95336ee36259b233c0306e0d8154764fd37d32f24f58f63e63ddc1dfdc0c667a",
         "brokenAtSequence": null,
         "reason": null
       },
       "after": {
         "valid": true,
-        "verifiedEvents": 143,
+        "verifiedEvents": 212,
         "legacyEvents": 0,
-        "headSequence": 143,
-        "headHash": "311453f0002a6a4b3252ace4bcf97adf0bb425868faae8222f17250b80ad9040",
+        "headSequence": 212,
+        "headHash": "73187a8c8530336be84f4324dd290425cc57d4f74218b014782619a834470a73",
         "brokenAtSequence": null,
         "reason": null
       }
