@@ -20,6 +20,7 @@ jest.mock('../services/api/auth', () => ({
   __esModule: true,
   default: {
     providers: jest.fn(),
+    emailCodeConfig: jest.fn(),
   },
 }));
 
@@ -38,6 +39,14 @@ describe('LoginPage', () => {
     login.mockReset();
     login.mockResolvedValue(undefined);
     mockedAuthApi.providers.mockResolvedValue({ success: true, providers: {} });
+    mockedAuthApi.emailCodeConfig.mockResolvedValue({
+      enabled: false,
+      codeLength: 6,
+      expiresInSeconds: 600,
+      resendDelaySeconds: 60,
+      canonicalOrigin: 'http://localhost',
+      isCanonicalOrigin: true,
+    });
     mockedUseAuth.mockReturnValue({
       user: null,
       isAuthenticated: false,
@@ -52,16 +61,16 @@ describe('LoginPage', () => {
     });
   });
 
-  it('removes the nonfunctional remember option and returns to the protected page', async () => {
+  it('remembers the device and returns to the protected page', async () => {
     const user = userEvent.setup();
     render(<LoginPage />, { route: '/login?returnUrl=%2Fnotifications%3Fview%3Dunread' });
 
-    expect(screen.queryByText(/remember me/i)).not.toBeInTheDocument();
+    expect(screen.getByRole('checkbox', { name: /keep me signed in/i })).toBeChecked();
     await user.type(screen.getByLabelText(/username or email/i), 'demo');
     await user.type(screen.getByLabelText(/^password/i), 'secret12');
     await user.click(screen.getByRole('button', { name: /^sign in$/i }));
 
-    await waitFor(() => expect(login).toHaveBeenCalledWith('demo', 'secret12'));
+    await waitFor(() => expect(login).toHaveBeenCalledWith('demo', 'secret12', true));
     expect(navigate).toHaveBeenCalledWith('/notifications?view=unread', { replace: true });
   });
 

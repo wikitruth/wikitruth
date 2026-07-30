@@ -2,25 +2,20 @@ import React from 'react';
 import { fireEvent, render, screen } from '../../test-utils/render';
 import Header from './Header';
 
-const mockMe = jest.fn();
 const mockUseApplicationContext = jest.fn();
-
-jest.mock('../../services/api/auth', () => ({
-  __esModule: true,
-  default: {
-    me: (...args: unknown[]) => mockMe(...args),
-  },
-}));
+const mockNotificationSummary = jest.fn();
+let mockUser: { _id: string; username: string; email: string; roles: Record<string, unknown> } | null = null;
 
 jest.mock('../../services/api/notifications', () => ({
   __esModule: true,
   default: {
-    summary: jest.fn(),
+    summary: (...args: unknown[]) => mockNotificationSummary(...args),
   },
 }));
 
 jest.mock('../../context/AuthContext', () => ({
   useAuth: () => ({
+    user: mockUser,
     activeRole: 'reader',
     setActiveRole: jest.fn(),
     availableRoles: ['reader'],
@@ -33,7 +28,8 @@ jest.mock('../../context/ApplicationContext', () => ({
 
 describe('Header parity navigation', () => {
   beforeEach(() => {
-    mockMe.mockResolvedValue({ user: null });
+    mockUser = null;
+    mockNotificationSummary.mockResolvedValue({ unreadCount: 0 });
     mockUseApplicationContext.mockReturnValue({
       application: null,
       applicationPath: (path: string) => path,
@@ -107,5 +103,18 @@ describe('Header parity navigation', () => {
     fireEvent.click(screen.getByRole('button', { name: /more navigation options/i }));
     const mobileContribution = container.querySelector('#header-more-menu > li.visible-xs a[href="/contribute"]');
     expect(mobileContribution).toHaveTextContent('Contribute anonymously');
+  });
+
+  it('updates account navigation when shared authentication state changes', () => {
+    const { rerender } = render(<Header />);
+    expect(screen.getByRole('link', { name: /sign in/i })).toBeInTheDocument();
+
+    mockUser = { _id: 'user-1', username: 'email_user', email: 'email@example.test', roles: {} };
+    rerender(<Header />);
+    expect(screen.getByRole('button', { name: 'Account menu for email_user' })).toBeInTheDocument();
+
+    mockUser = null;
+    rerender(<Header />);
+    expect(screen.getByRole('link', { name: /sign in/i })).toBeInTheDocument();
   });
 });

@@ -2,14 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import OptimizedImage from '../common/OptimizedImage';
 import ApplicationLink from '../common/ApplicationLink';
-import type { User } from '../../types';
 import { useAuth } from '../../context/AuthContext';
 import { useApplicationContext } from '../../context/ApplicationContext';
-import authApi from '../../services/api/auth';
 import notificationsApi from '../../services/api/notifications';
 import { toModernAppSectionUrl } from '../../utils/paths';
 
-type HeaderUser = Pick<User, '_id' | 'username' | 'email' | 'roles'>;
 interface HeaderSection {
   title: string;
   description?: string;
@@ -50,9 +47,8 @@ const DEFAULT_SECTIONS: HeaderSection[] = [
 
 const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false }) => {
   const location = useLocation();
-  const { activeRole, setActiveRole, availableRoles } = useAuth();
+  const { user, activeRole, setActiveRole, availableRoles } = useAuth();
   const { application, applicationPath } = useApplicationContext();
-  const [user, setUser] = useState<HeaderUser | null>(null);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
@@ -64,49 +60,22 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
   useEffect(() => {
     let isMounted = true;
 
-    const loadHeaderData = async () => {
-      const userResult = await Promise.resolve(authApi.me()).then(
-        (value) => ({ status: 'fulfilled' as const, value }),
-        (reason) => ({ status: 'rejected' as const, reason }),
-      );
-
-      if (!isMounted) {
-        return;
-      }
-
-      if (userResult.status === 'fulfilled' && userResult.value.user) {
-        setUser({
-          _id: userResult.value.user._id,
-          username: userResult.value.user.username,
-          email: userResult.value.user.email,
-          roles: userResult.value.user.roles,
+    if (!user) {
+      setUnreadNotifications(0);
+    } else {
+      void notificationsApi.summary()
+        .then((summary) => {
+          if (isMounted) setUnreadNotifications(Number(summary.unreadCount || 0));
+        })
+        .catch(() => {
+          if (isMounted) setUnreadNotifications(0);
         });
-      } else {
-        setUser(null);
-      }
-
-      if (userResult.status === 'fulfilled' && userResult.value.user) {
-        try {
-          const summary = await notificationsApi.summary();
-          if (isMounted) {
-            setUnreadNotifications(Number(summary.unreadCount || 0));
-          }
-        } catch (_error) {
-          if (isMounted) {
-            setUnreadNotifications(0);
-          }
-        }
-      } else if (isMounted) {
-        setUnreadNotifications(0);
-      }
-    };
-
-    void loadHeaderData();
+    }
 
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     setIsMoreOpen(false);
