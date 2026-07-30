@@ -224,11 +224,11 @@ test('search page renders all parity result buckets', async ({ page }) => {
 
   await page.goto('/app/search?q=truth');
   await expect(page.getByText(/topics \(1\)/i)).toBeVisible();
-  await expect(page.getByText(/arguments \(1\)/i)).toBeVisible();
+  await expect(page.getByRole('tab', { name: 'Facts (1)', exact: true })).toBeVisible();
   await expect(page.getByText(/questions \(1\)/i)).toBeVisible();
   await expect(page.getByText(/answers \(1\)/i)).toBeVisible();
   await expect(page.getByText(/issues \(1\)/i)).toBeVisible();
-  await expect(page.getByText(/opinions \(1\)/i)).toBeVisible();
+  await expect(page.getByRole('tab', { name: 'Comments (1)', exact: true })).toBeVisible();
   await expect(page.getByText(/artifacts \(1\)/i)).toBeVisible();
 });
 
@@ -328,7 +328,7 @@ test('create topic requires authentication', async ({ page }) => {
   });
 
   await page.goto('/app/topics/create');
-  await expect(page.getByLabel(/title/i)).toBeVisible();
+  await expect(page.getByRole('textbox', { name: /^title\s*\*?$/i })).toBeVisible();
 });
 
 test('search flow from shortcut to result', async ({ page }) => {
@@ -363,10 +363,11 @@ test('mobile sidebar toggle', async ({ page }) => {
     await page.setViewportSize({ width, height: 667 });
     await page.goto('/app');
 
-    const sidebarToggle = page.locator('[data-testid="sidebar-toggle"], button[aria-label="Toggle sidebar"], .navbar-toggle');
-    if (await sidebarToggle.count() > 0) {
-      await sidebarToggle.first().click();
-      await expect(page.locator('.wt-sidebar, .sidebar, [role="navigation"], #sidebar').first()).toBeVisible();
+    const sidebarToggle = page.getByRole('button', { name: 'Open sidebar' });
+    if (await sidebarToggle.isVisible()) {
+      await sidebarToggle.click();
+      await expect(page.locator('#sidebar')).toBeVisible();
+      await expect(page.locator('button[aria-controls="sidebar"][aria-expanded="true"]')).toBeVisible();
     }
   }
 });

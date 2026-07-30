@@ -2,7 +2,7 @@ import express from 'express';
 import request from 'supertest';
 import { enforceAgentMutationReliability } from '../../server/src/middlewares/agentMutationReliability';
 
-type StoredRecord = Record<string, any>;
+type StoredRecord = Record<string, unknown>;
 
 function createApp() {
   const records: StoredRecord[] = [];
@@ -79,4 +79,3 @@ describe('agent mutation reliability', () => {
       .expect(({ body: responseBody }) => expect(responseBody.error.code).toBe('IDEMPOTENCY_KEY_REUSED'));
   });
 });
-

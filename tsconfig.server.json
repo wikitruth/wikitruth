@@ -9,6 +9,7 @@
     "noImplicitAny": true,
     "strictNullChecks": true,
     "noUncheckedIndexedAccess": true,
+    "isolatedModules": true,
     "allowJs": false,
     "checkJs": false,
     "declaration": true,

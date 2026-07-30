@@ -5,7 +5,7 @@ module.exports = {
   testTimeout: 30000,
   collectCoverage: false,
   transform: {
-    '^.+\\.ts$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.server.json', isolatedModules: true }],
+    '^.+\\.ts$': ['ts-jest', { tsconfig: '<rootDir>/tsconfig.server.json' }],
   },
   moduleFileExtensions: ['js', 'json', 'ts'],
   modulePathIgnorePatterns: ['<rootDir>/.build/', '<rootDir>/public/components/', '<rootDir>/react-tutorial/'],
