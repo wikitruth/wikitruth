@@ -155,6 +155,13 @@ function findUser(users, spec) {
   );
 }
 
+function collectionItems(payload) {
+  if (Array.isArray(payload)) {
+    return payload;
+  }
+  return Array.isArray(payload?.items) ? payload.items : [];
+}
+
 function redactPassword(value) {
   if (!value) {
     return '';
@@ -163,8 +170,8 @@ function redactPassword(value) {
 }
 
 async function upsertUser(apiContext, spec) {
-  const users = await apiRequest(apiContext, 'GET', '/api/admin/users');
-  let user = findUser(Array.isArray(users) ? users : [], spec);
+  const users = await apiRequest(apiContext, 'GET', `/api/admin/users?q=${encodeURIComponent(spec.username)}&limit=100`);
+  let user = findUser(collectionItems(users), spec);
   let created = false;
 
   if (!user) {
@@ -179,8 +186,8 @@ async function upsertUser(apiContext, spec) {
   }
 
   if (!user?._id) {
-    const refreshedUsers = await apiRequest(apiContext, 'GET', '/api/admin/users');
-    user = findUser(Array.isArray(refreshedUsers) ? refreshedUsers : [], spec);
+    const refreshedUsers = await apiRequest(apiContext, 'GET', `/api/admin/users?q=${encodeURIComponent(spec.username)}&limit=100`);
+    user = findUser(collectionItems(refreshedUsers), spec);
   }
 
   if (!user?._id) {
@@ -195,8 +202,8 @@ async function upsertUser(apiContext, spec) {
     reviewer: Boolean(spec.roles?.reviewer),
   });
 
-  const refreshed = await apiRequest(apiContext, 'GET', '/api/admin/users');
-  const persisted = findUser(Array.isArray(refreshed) ? refreshed : [], spec) || user;
+  const refreshed = await apiRequest(apiContext, 'GET', `/api/admin/users?q=${encodeURIComponent(spec.username)}&limit=100`);
+  const persisted = findUser(collectionItems(refreshed), spec) || user;
 
   return {
     created,
@@ -217,8 +224,8 @@ function findUnlinkedAdminId(administrators) {
 async function ensurePrivilegedAdminRole(apiContext, privilegedUserId) {
   const requestedAdminId = String(process.env.WT_PARITY_ADMIN_RECORD_ID || '').trim();
   const requireAdminRole = asBool(process.env.WT_PARITY_REQUIRE_ADMIN_ROLE, false);
-  const administrators = await apiRequest(apiContext, 'GET', '/api/admin/administrators');
-  const rows = Array.isArray(administrators) ? administrators : [];
+  const administrators = await apiRequest(apiContext, 'GET', '/api/admin/administrators?limit=100');
+  const rows = collectionItems(administrators);
   let selectedAdminId = requestedAdminId;
 
   if (selectedAdminId) {

@@ -19,6 +19,7 @@ const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).d
 import { registerAdminBackupRoutes } from './adminBackupRoutes';
 import { logEntryEvent } from '../../services/entryEventsService';
 import { registerAdminApiClientRoutes } from './adminApiClientRoutes';
+import { registerAdminCollectionRoutes, type AdminCollectionModels } from './adminCollectionRoutes';
 import { requirePrivilegedPasskeyAssurance } from '../../services/privilegedAuthService';
 
 function ensureAdmin(req: WikitruthRequest, res: WikitruthResponse): boolean {
@@ -182,15 +183,7 @@ export = function (router: Router) {
       counts: { users, accounts, categories, statuses, administrators, groups },
     });
   });
-
-  router.get('/users', async function (req: WikitruthRequest, res: WikitruthResponse) {
-    if (!ensureAdmin(req, res)) {
-      return;
-    }
-
-    const users = await db.User.find().limit(100).lean();
-    res.json(users.map(sanitizeAdminUser).filter(Boolean));
-  });
+  registerAdminCollectionRoutes(router, ensureAdmin, db as unknown as AdminCollectionModels, sanitizeAdminUser);
 
   router.post('/users', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAdmin(req, res)) {
@@ -478,15 +471,6 @@ export = function (router: Router) {
     res.json({ success: true, user: sanitizeAdminUser(await db.User.findById(user._id).lean()) });
   });
 
-  router.get('/accounts', async function (req: WikitruthRequest, res: WikitruthResponse) {
-    if (!ensureAdmin(req, res)) {
-      return;
-    }
-
-    const accounts = await db.Account.find().limit(100).lean();
-    res.json(accounts);
-  });
-
   router.put('/accounts/:id/user', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAdmin(req, res)) {
       return;
@@ -631,15 +615,6 @@ export = function (router: Router) {
     res.status(201).json({ success: true, account: await db.Account.findById(account._id).lean() });
   });
 
-  router.get('/administrators', async function (req: WikitruthRequest, res: WikitruthResponse) {
-    if (!ensureAdmin(req, res)) {
-      return;
-    }
-
-    const admins = await db.Admin.find().limit(100).lean();
-    res.json(admins);
-  });
-
   router.put('/administrators/:id/permissions', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAdmin(req, res)) {
       return;
@@ -739,15 +714,6 @@ export = function (router: Router) {
     res.json({ success: true, admin: await db.Admin.findById(admin._id).lean() });
   });
 
-  router.get('/groups', async function (req: WikitruthRequest, res: WikitruthResponse) {
-    if (!ensureAdmin(req, res)) {
-      return;
-    }
-
-    const groups = await db.AdminGroup.find().limit(100).lean();
-    res.json(groups);
-  });
-
   router.post('/groups', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAdmin(req, res)) {
       return;
@@ -782,15 +748,6 @@ export = function (router: Router) {
     res.json({ success: true });
   });
 
-  router.get('/categories', async function (req: WikitruthRequest, res: WikitruthResponse) {
-    if (!ensureAdmin(req, res)) {
-      return;
-    }
-
-    const categories = await db.Category.find().limit(100).lean();
-    res.json(categories);
-  });
-
   router.post('/categories', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAdmin(req, res)) {
       return;
@@ -823,15 +780,6 @@ export = function (router: Router) {
 
     await db.Category.findByIdAndDelete(req.params.id);
     res.json({ success: true });
-  });
-
-  router.get('/statuses', async function (req: WikitruthRequest, res: WikitruthResponse) {
-    if (!ensureAdmin(req, res)) {
-      return;
-    }
-
-    const statuses = await db.Status.find().limit(100).lean();
-    res.json(statuses);
   });
 
   router.post('/statuses', async function (req: WikitruthRequest, res: WikitruthResponse) {

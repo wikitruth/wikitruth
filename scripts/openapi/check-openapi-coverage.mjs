@@ -12,7 +12,7 @@ const groups = [
   ['/answers', ['answers.ts']], ['/artifacts', ['artifacts.ts']], ['/issues', ['issues.ts']],
   ['/opinions', ['opinions.ts']], ['/search', ['search.ts']], ['/groups', ['groups.ts']],
   ['/members', ['members.ts']], ['/auth', ['auth.ts', 'authOnboardingRoutes.ts', 'authPasskeyRoutes.ts']], ['/contact', ['contact.ts']],
-  ['/admin', ['admin.ts', 'adminBackupRoutes.ts', 'adminApiClientRoutes.ts']],
+  ['/admin', ['admin.ts', 'adminCollectionRoutes.ts', 'adminBackupRoutes.ts', 'adminApiClientRoutes.ts']],
   ['/moderation', ['moderation.ts', 'moderationArtifactRoutes.ts', 'moderationDuplicateRoutes.ts', 'moderationIssueRoutes.ts', 'moderationRevisionRoutes.ts', 'moderationSignalsRoutes.ts', 'moderationVerdictChannelRoutes.ts']],
   ['/outline', ['outline.ts']], ['/monitoring', ['monitoring.ts']], ['/realtime', ['realtime.ts']],
   ['/reactions', ['reactions.ts']], ['/notifications', ['notifications.ts']], ['/timeline', ['timeline.ts']],
@@ -37,6 +37,13 @@ function mountedRoutes() {
     let match;
     while ((match = pattern.exec(source))) {
       routes.push({ method: match[1], path: joinRoute(prefix, match[2]), source: file });
+    }
+    if (file === 'adminCollectionRoutes.ts') {
+      const collectionPattern = /path:\s*['"]([^'"]+)['"]/g;
+      while ((match = collectionPattern.exec(source))) {
+        routes.push({ method: 'get', path: joinRoute(prefix, match[1]), source: file });
+        routes.push({ method: 'get', path: joinRoute(prefix, `${match[1]}/:id`), source: file });
+      }
     }
   }));
   return [...new Map(routes.map((route) => [`${route.method} ${route.path}`, route])).values()];
@@ -113,6 +120,17 @@ function addComponents(spec) {
   schemas.EntryTranslationRequest = { type: 'object', required: ['locale', 'title', 'content'], properties: { locale: { type: 'string' }, title: { type: 'string', minLength: 3 }, content: { type: 'string', minLength: 10 } } };
   schemas.NotificationPreferences = { type: 'object', properties: { inApp: { type: 'boolean' }, emailDigest: { type: 'string', enum: ['off', 'daily', 'weekly'] }, webPush: { type: 'boolean' } } };
   schemas.AgentValidationRequest = { type: 'object', required: ['method', 'path'], properties: { method: { type: 'string' }, path: { type: 'string' }, body: { type: 'object' }, idempotencyKey: { type: 'string' }, run: { type: 'object' } } };
+  schemas.AdminCollectionResponse = {
+    type: 'object', required: ['success', 'items', 'total', 'page', 'limit', 'pages', 'query'],
+    properties: {
+      success: { type: 'boolean', enum: [true] },
+      items: { type: 'array', items: { type: 'object', additionalProperties: true } },
+      total: { type: 'integer', minimum: 0 }, page: { type: 'integer', minimum: 1 },
+      limit: { type: 'integer', minimum: 1, maximum: 100 }, pages: { type: 'integer', minimum: 1 },
+      query: { type: 'string', maxLength: 100 },
+    },
+  };
+  schemas.AdminDetailResponse = { type: 'object', required: ['success', 'item'], properties: { success: { type: 'boolean', enum: [true] }, item: { type: 'object', additionalProperties: true } } };
   if (schemas.CivicRecord?.properties) schemas.CivicRecord.properties.extensions = { type: 'object', additionalProperties: { $ref: '#/components/schemas/CivicExtensionValue' } };
   if (schemas.CivicRecordMutationRequest?.properties) schemas.CivicRecordMutationRequest.properties.extensions = { type: 'object', additionalProperties: { $ref: '#/components/schemas/CivicExtensionValue' } };
   if (schemas.CivicTenant?.properties) schemas.CivicTenant.properties.extensionSchemas = { type: 'object', additionalProperties: { $ref: '#/components/schemas/CivicExtensionSchema' } };
@@ -162,6 +180,23 @@ function specialize(spec) {
   if (paths['/translations/{objectName}/{id}']?.post) Object.assign(paths['/translations/{objectName}/{id}'].post, { summary: 'Submit a revision-linked entry translation', requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/EntryTranslationRequest' } } } } });
   if (paths['/notifications/preferences']?.put) Object.assign(paths['/notifications/preferences'].put, { summary: 'Update notification delivery preferences', requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/NotificationPreferences' } } } } });
   if (paths['/agent/validate']?.post) Object.assign(paths['/agent/validate'].post, { summary: 'Dry-run and validate an accountable agent mutation', security: [{ AgentBearerAuth: [] }], requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/AgentValidationRequest' } } } } });
+  ['users', 'accounts', 'administrators', 'groups', 'categories', 'statuses'].forEach((collection) => {
+    const listOperation = paths[`/admin/${collection}`]?.get;
+    if (listOperation) Object.assign(listOperation, {
+      summary: `Search and page administrator ${collection}`,
+      parameters: [
+        { name: 'page', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 1000000, default: 1 } },
+        { name: 'limit', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 100, default: 25 } },
+        { name: 'q', in: 'query', schema: { type: 'string', maxLength: 100 } },
+      ],
+      responses: response('AdminCollectionResponse'),
+    });
+    const detailOperation = paths[`/admin/${collection}/{id}`]?.get;
+    if (detailOperation) Object.assign(detailOperation, {
+      summary: `Get one administrator ${collection} record`,
+      responses: { ...response('AdminDetailResponse'), '404': { $ref: '#/components/responses/NotFound' } },
+    });
+  });
   ['/civic/platform/tenants/preview', '/tenants/{tenantId}/civic/platform/tenants/preview'].forEach((route) => {
     if (paths[route]?.post) Object.assign(paths[route].post, { summary: 'Preview normalized tenant configuration without saving', requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/CivicTenant' } } } }, responses: response('CivicTenantPreviewResponse') });
   });

@@ -51,9 +51,9 @@ function formatValue(value: unknown): string {
     return String(value);
   }
 
-  return JSON.stringify(value, (key, nestedValue) => (
+  return JSON.stringify(value, (key, nestedValue) =>
     key && isSensitiveField(key) ? '[redacted]' : nestedValue
-  ));
+  );
 }
 
 function getValueAtPath(source: AdminRecord, path: string): unknown {
@@ -99,12 +99,14 @@ const AdminDetailsPage: React.FC<AdminDetailsPageProps> = ({
   const [mutationSuccess, setMutationSuccess] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [retryVersion, setRetryVersion] = useState(0);
 
   useEffect(() => {
     let isMounted = true;
 
     const fetchItem = async () => {
       try {
+        setError(null);
         const result = await loadItem(id);
         if (!isMounted) {
           return;
@@ -118,19 +120,22 @@ const AdminDetailsPage: React.FC<AdminDetailsPageProps> = ({
         setItem(result);
         if (updateAction) {
           const initialValues: Record<string, string | boolean> = {};
-          updateAction.fields.forEach((field) => {
+          updateAction.fields.forEach(field => {
             const fieldValue = getValueAtPath(result, field.path);
             if (field.type === 'checkbox') {
               initialValues[field.path] = Boolean(fieldValue);
               return;
             }
-            initialValues[field.path] = typeof fieldValue === 'string' ? fieldValue : String(fieldValue || '');
+            initialValues[field.path] =
+              typeof fieldValue === 'string' ? fieldValue : String(fieldValue || '');
           });
           setFormValues(initialValues);
         }
       } catch (loadError) {
         if (isMounted) {
-          setError(loadError instanceof Error ? loadError.message : `Failed to load ${title.toLowerCase()}`);
+          setError(
+            loadError instanceof Error ? loadError.message : `Failed to load ${title.toLowerCase()}`
+          );
         }
       } finally {
         if (isMounted) {
@@ -149,10 +154,10 @@ const AdminDetailsPage: React.FC<AdminDetailsPageProps> = ({
     return () => {
       isMounted = false;
     };
-  }, [id, loadItem, title, updateAction]);
+  }, [id, loadItem, retryVersion, title, updateAction]);
 
   const handleFieldChange = (path: string, value: string | boolean) => {
-    setFormValues((previous) => ({ ...previous, [path]: value }));
+    setFormValues(previous => ({ ...previous, [path]: value }));
   };
 
   const handleUpdateSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -187,7 +192,11 @@ const AdminDetailsPage: React.FC<AdminDetailsPageProps> = ({
       }
       setMutationSuccess('Saved successfully.');
     } catch (updateError) {
-      setMutationError(updateError instanceof Error ? updateError.message : `Failed to update ${title.toLowerCase()}`);
+      setMutationError(
+        updateError instanceof Error
+          ? updateError.message
+          : `Failed to update ${title.toLowerCase()}`
+      );
     } finally {
       setIsSaving(false);
     }
@@ -209,7 +218,11 @@ const AdminDetailsPage: React.FC<AdminDetailsPageProps> = ({
       await deleteAction.onDelete(id);
       navigate(backPath);
     } catch (deleteError) {
-      setMutationError(deleteError instanceof Error ? deleteError.message : `Failed to delete ${title.toLowerCase()}`);
+      setMutationError(
+        deleteError instanceof Error
+          ? deleteError.message
+          : `Failed to delete ${title.toLowerCase()}`
+      );
     } finally {
       setIsDeleting(false);
     }
@@ -225,7 +238,23 @@ const AdminDetailsPage: React.FC<AdminDetailsPageProps> = ({
       </p>
 
       {isLoading ? <p className="text-muted">Loading...</p> : null}
-      {error ? <div className="alert alert-danger">{error}</div> : null}
+      {error ? (
+        <div className="alert alert-danger">
+          {error}{' '}
+          {id ? (
+            <button
+              type="button"
+              className="btn btn-link btn-xs"
+              onClick={() => {
+                setIsLoading(true);
+                setRetryVersion(current => current + 1);
+              }}
+            >
+              Retry
+            </button>
+          ) : null}
+        </div>
+      ) : null}
 
       {!isLoading && !error && item ? (
         <div>
@@ -236,14 +265,19 @@ const AdminDetailsPage: React.FC<AdminDetailsPageProps> = ({
               </div>
               <div className="panel-body">
                 <div className="row">
-                  {updateAction.fields.map((field) => (
-                    <div className={field.type === 'checkbox' ? 'col-sm-12 form-group' : 'col-sm-6 form-group'} key={field.path}>
+                  {updateAction.fields.map(field => (
+                    <div
+                      className={
+                        field.type === 'checkbox' ? 'col-sm-12 form-group' : 'col-sm-6 form-group'
+                      }
+                      key={field.path}
+                    >
                       {field.type === 'checkbox' ? (
                         <label style={{ fontWeight: 400 }}>
                           <input
                             type="checkbox"
                             checked={Boolean(formValues[field.path])}
-                            onChange={(event) => handleFieldChange(field.path, event.target.checked)}
+                            onChange={event => handleFieldChange(field.path, event.target.checked)}
                           />{' '}
                           {field.label}
                         </label>
@@ -256,7 +290,7 @@ const AdminDetailsPage: React.FC<AdminDetailsPageProps> = ({
                             className="form-control"
                             value={String(formValues[field.path] || '')}
                             placeholder={field.placeholder}
-                            onChange={(event) => handleFieldChange(field.path, event.target.value)}
+                            onChange={event => handleFieldChange(field.path, event.target.value)}
                           />
                         </>
                       )}
@@ -264,7 +298,9 @@ const AdminDetailsPage: React.FC<AdminDetailsPageProps> = ({
                   ))}
                 </div>
                 {mutationError ? <div className="alert alert-danger">{mutationError}</div> : null}
-                {mutationSuccess ? <div className="alert alert-success">{mutationSuccess}</div> : null}
+                {mutationSuccess ? (
+                  <div className="alert alert-success">{mutationSuccess}</div>
+                ) : null}
                 <button className="btn btn-primary" type="submit" disabled={isSaving}>
                   {isSaving ? 'Saving...' : 'Save changes'}
                 </button>

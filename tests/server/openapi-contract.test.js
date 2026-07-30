@@ -193,6 +193,8 @@ describe('OpenAPI contract', function () {
       'GraphLinkRequest',
       'VerdictVoteRequest',
       'AdminFinalSayRequest',
+      'AdminCollectionResponse',
+      'AdminDetailResponse',
       'CivicExtensionField',
       'CivicExtensionSchema',
       'CivicTenantReadiness',
@@ -228,6 +230,19 @@ describe('OpenAPI contract', function () {
     expect(spec.paths['/outline/link'].post['x-required-agent-scope']).toBe('graph:write');
     expect(spec.paths['/moderation/verdict-votes'].post['x-required-agent-scope']).toBe('moderation:write');
     expect(spec.paths['/moderation/verdict-channel'].put.description).toMatch(/unavailable to API clients/i);
+  });
+
+  it('documents searchable paginated admin collections and direct details', function () {
+    const spec = readOpenApi();
+    ['users', 'accounts', 'administrators', 'groups', 'categories', 'statuses'].forEach((collection) => {
+      const list = spec.paths[`/admin/${collection}`].get;
+      const detail = spec.paths[`/admin/${collection}/{id}`].get;
+      expect(list.parameters.map((parameter) => parameter.name)).toEqual(['page', 'limit', 'q']);
+      expect(list.responses['200'].content['application/json'].schema.$ref)
+        .toBe('#/components/schemas/AdminCollectionResponse');
+      expect(detail.responses['200'].content['application/json'].schema.$ref)
+        .toBe('#/components/schemas/AdminDetailResponse');
+    });
   });
 
   it('documents graph discovery and portable public evidence contracts', function () {

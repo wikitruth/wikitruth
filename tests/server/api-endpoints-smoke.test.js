@@ -58,11 +58,11 @@ describe('API endpoint smoke coverage', function () {
 
   it('exposes admin API handlers required by client admin services', function () {
     const adminApi = read('server/src/controllers/api/admin.ts');
+    const adminCollections = read('server/src/controllers/api/adminCollectionRoutes.ts');
     const adminBackupRoutes = read('server/src/controllers/api/adminBackupRoutes.ts');
 
     [
       "router.get('/'",
-      "router.get('/users'",
       "router.post('/users'",
       "router.put('/users/:id'",
       "router.delete('/users/:id'",
@@ -72,30 +72,30 @@ describe('API endpoint smoke coverage', function () {
       "router.put('/users/:id/role-account'",
       "router.delete('/users/:id/role-account'",
       "router.put('/users/:id/roles'",
-      "router.get('/accounts'",
       "router.put('/accounts/:id/user'",
       "router.delete('/accounts/:id/user'",
       "router.post('/accounts/:id/notes'",
       "router.post('/accounts/:id/status'",
-      "router.get('/administrators'",
       "router.put('/administrators/:id/permissions'",
       "router.put('/administrators/:id/groups'",
       "router.put('/administrators/:id/user'",
       "router.delete('/administrators/:id/user'",
-      "router.get('/groups'",
       "router.post('/groups'",
       "router.put('/groups/:id'",
       "router.delete('/groups/:id'",
-      "router.get('/categories'",
       "router.post('/categories'",
       "router.put('/categories/:id'",
       "router.delete('/categories/:id'",
-      "router.get('/statuses'",
       "router.post('/statuses'",
       "router.put('/statuses/:id'",
       "router.delete('/statuses/:id'",
       'registerAdminBackupRoutes(router, ensureAdmin)',
     ].forEach((contract) => expect(adminApi).toContain(contract));
+
+    ['/users', '/accounts', '/administrators', '/groups', '/categories', '/statuses']
+      .forEach((path) => expect(adminCollections).toContain(`path: '${path}'`));
+    expect(adminCollections).toContain('router.get(collection.path');
+    expect(adminCollections).toContain('`${collection.path}/:id`');
 
     [
       "router.get('/db-backup'",
