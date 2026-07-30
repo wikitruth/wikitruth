@@ -1,7 +1,7 @@
 # Modern Application Hardening Checklist Plan
 
 Date: 2026-07-30
-Status: In progress
+Status: Complete
 
 ## Objective
 
@@ -74,17 +74,42 @@ coverage reached 69.83% statements, 57.77% branches, 54.18% functions, and
 ## Final Verification
 
 - [x] Run targeted server/client tests after each completed group.
-- [ ] Run lint, TypeScript checks, source guardrails, full server/client tests,
+- [x] Run lint, TypeScript checks, source guardrails, full server/client tests,
       production builds, and OpenAPI coverage.
-- [ ] Run the committed visual-regression comparison at desktop and mobile.
-- [ ] Exercise the changed administrator flow in a rendered local browser and
+- [x] Run the committed visual-regression comparison at desktop and mobile.
+- [x] Exercise the changed administrator flow in a rendered local browser and
       verify page identity, meaningful content, console health, responsive layout,
       search, pagination, and direct detail loading.
-- [ ] Confirm the worktree contains only intended changes and no secrets or
+- [x] Confirm the worktree contains only intended changes and no secrets or
       generated transient artifacts.
-- [ ] Commit each completed group separately with concise semantic messages.
-- [ ] Publish completion evidence and perform a separate final verification
+- [x] Commit each completed group separately with concise semantic messages.
+- [x] Publish completion evidence and perform a separate final verification
       pass before moving this plan to `docs/plans/completed/`.
+
+## Completion Evidence
+
+- `npm run test:ci` passed lint, compatibility and import guardrails, 90 server
+  suites with 371 tests, parity suites, 104 client suites with 279 tests,
+  coverage thresholds, and production client/server builds.
+- Modern and legacy TypeScript checks, suppression/`any`/CommonJS/file-size
+  guardrails, and OpenAPI coverage passed; the OpenAPI scanner found all 285
+  mounted operations documented.
+- The committed visual suite passed all ten desktop/mobile comparisons without
+  updating snapshots after every implementation group was complete.
+- A disposable local administrator verified a real 30-record user collection,
+  page 1/2 navigation, server search, a linked direct-detail navigation, and a
+  fresh direct-detail URL with no application console errors. Desktop layout
+  did not overlap the sidebar; the 390-pixel view had no horizontal overflow
+  and correctly hid the closed sidebar.
+- The disposable administrator, account, and all 15 pagination records were
+  removed. Exact-record and `wt_browser_` prefix residue checks both returned
+  zero; the credential file and ignored helper were deleted.
+- Local PM2 process `35` remained online in this checkout, and local root and
+  authentication-provider probes returned HTTP 200. No push, production/VPS
+  deployment, production restart, proxy/DNS change, or content migration was
+  performed.
+- Grouped implementation commits: `7f43efc4`, `560c3fef`, `16e8bf4f`, and
+  `a3cb7ee6`.
 
 ## Completion Gate
 
