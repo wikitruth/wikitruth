@@ -1,6 +1,9 @@
 import React from 'react';
+import { Route, Routes } from 'react-router-dom';
 import AdminDashboard from './AdminDashboard';
+import AccountsList from './Accounts/AccountsList';
 import AccountDetails from './Accounts/AccountDetails';
+import AdminsList from './Administrators/AdminsList';
 import AdminDetails from './Administrators/AdminDetails';
 import UsersList from './Users/UsersList';
 import UserDetails from './Users/UserDetails';
@@ -63,14 +66,62 @@ describe('Admin pages', () => {
 
   it('renders users list page', async () => {
     render(<UsersList />);
-    expect(await screen.findByRole('heading', { name: /users/i })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name: /users/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /create/i })).toBeInTheDocument();
   });
 
+  it('formats structured names in account and administrator lists', async () => {
+    mockedAdminApi.accounts.mockResolvedValue([
+      { _id: 'account-1', name: { full: 'Ada Lovelace' } },
+    ]);
+    mockedAdminApi.administrators.mockResolvedValue([
+      { _id: 'admin-1', name: { first: 'Grace', last: 'Hopper' } },
+    ]);
+
+    const accountView = render(<AccountsList />);
+    expect(await screen.findByText('Ada Lovelace')).toBeInTheDocument();
+    expect(screen.queryByText('[object Object]')).not.toBeInTheDocument();
+    accountView.unmount();
+
+    render(<AdminsList />);
+    expect(await screen.findByText('Grace Hopper')).toBeInTheDocument();
+    expect(screen.queryByText('[object Object]')).not.toBeInTheDocument();
+  });
+
   it('renders user details action panel', async () => {
-    render(<UserDetails />);
-    expect(await screen.findByRole('heading', { name: /user details/i })).toBeInTheDocument();
+    render(
+      <Routes>
+        <Route path="/admin/users/:id" element={<UserDetails />} />
+      </Routes>,
+      { route: '/admin/users/user-1' },
+    );
+    expect(await screen.findByRole('heading', { level: 1, name: /user details/i })).toBeInTheDocument();
     expect(screen.getByText(/role and password actions/i)).toBeInTheDocument();
+  });
+
+  it('does not expose stored credentials in user details', async () => {
+    mockedAdminApi.user.mockResolvedValue({
+      _id: 'user-1',
+      username: 'example-user',
+      password: 'stored-password-hash',
+      security: {
+        clientSecret: 'stored-client-secret',
+        assurance: 'verified',
+      },
+    });
+
+    render(
+      <Routes>
+        <Route path="/admin/users/:id" element={<UserDetails />} />
+      </Routes>,
+      { route: '/admin/users/user-1' },
+    );
+
+    expect(await screen.findByText('example-user')).toBeInTheDocument();
+    expect(screen.queryByText('stored-password-hash')).not.toBeInTheDocument();
+    expect(screen.queryByText(/stored-client-secret/)).not.toBeInTheDocument();
+    expect(screen.getByText(/\[redacted\]/)).toBeInTheDocument();
+    expect(screen.getByText(/verified/)).toBeInTheDocument();
   });
 
   it('renders account details action panel', async () => {

@@ -32,10 +32,37 @@ interface AdminListPageProps {
 }
 
 function getDisplayName(item: AdminRecord): string {
-  return (
-    String(item.name || item.title || item.username || item.email || '').trim() ||
-    String(item._id || item.id || 'Unnamed item')
-  );
+  const objectName = (value: unknown): string => {
+    if (!value || typeof value !== 'object') {
+      return '';
+    }
+    const record = value as Record<string, unknown>;
+    const direct = [record.full, record.display, record.name]
+      .find((candidate) => typeof candidate === 'string' && candidate.trim());
+    if (typeof direct === 'string') {
+      return direct.trim();
+    }
+    return [record.first, record.middle, record.last]
+      .filter((candidate) => typeof candidate === 'string' && candidate.trim())
+      .join(' ')
+      .trim();
+  };
+
+  const user = item.user && typeof item.user === 'object'
+    ? item.user as Record<string, unknown>
+    : null;
+  const candidates = [item.name, item.title, item.username, item.email, user?.name];
+  for (const candidate of candidates) {
+    if (typeof candidate === 'string' && candidate.trim()) {
+      return candidate.trim();
+    }
+    const structuredName = objectName(candidate);
+    if (structuredName) {
+      return structuredName;
+    }
+  }
+
+  return String(item._id || item.id || 'Unnamed item');
 }
 
 const AdminListPage: React.FC<AdminListPageProps> = ({
@@ -203,7 +230,7 @@ const AdminListPage: React.FC<AdminListPageProps> = ({
 
   return (
     <div className="container">
-      <h3>{title}</h3>
+      <h1 className="h3">{title}</h1>
       <p className="text-muted">{subtitle}</p>
 
       {createAction ? (

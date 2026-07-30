@@ -36,6 +36,8 @@ describe('Signup flow integration', () => {
 
     render(<SignupPage />, { route: '/signup' });
 
+    expect(screen.getByRole('heading', { level: 1, name: /create your wikitruth account/i })).toBeVisible();
+
     await user.type(screen.getByLabelText(/username/i), 'newuser');
     await user.type(screen.getByLabelText(/^email/i), 'newuser@example.com');
     await user.type(screen.getByLabelText(/^password/i), 'secret12');

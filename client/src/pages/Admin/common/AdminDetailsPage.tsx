@@ -22,6 +22,26 @@ interface AdminDetailsPageProps {
   };
 }
 
+const SENSITIVE_FIELD_NAMES = new Set([
+  'accesstoken',
+  'clientsecret',
+  'clientsecrethash',
+  'credential',
+  'credentials',
+  'hashedpassword',
+  'password',
+  'passwordhash',
+  'recoverycode',
+  'recoverycodes',
+  'refreshtoken',
+  'secret',
+  'token',
+]);
+
+function isSensitiveField(key: string): boolean {
+  return SENSITIVE_FIELD_NAMES.has(key.replace(/[^a-z0-9]/gi, '').toLowerCase());
+}
+
 function formatValue(value: unknown): string {
   if (value === null || typeof value === 'undefined') {
     return '-';
@@ -31,7 +51,9 @@ function formatValue(value: unknown): string {
     return String(value);
   }
 
-  return JSON.stringify(value);
+  return JSON.stringify(value, (key, nestedValue) => (
+    key && isSensitiveField(key) ? '[redacted]' : nestedValue
+  ));
 }
 
 function getValueAtPath(source: AdminRecord, path: string): unknown {
@@ -195,7 +217,7 @@ const AdminDetailsPage: React.FC<AdminDetailsPageProps> = ({
 
   return (
     <div className="container">
-      <h3>{title}</h3>
+      <h1 className="h3">{title}</h1>
       <p>
         <Link to={backPath} className="btn btn-default btn-sm">
           Back to list
@@ -265,7 +287,7 @@ const AdminDetailsPage: React.FC<AdminDetailsPageProps> = ({
             <table className="table table-bordered">
               <tbody>
                 {Object.entries(item)
-                  .filter(([key]) => key !== '__v')
+                  .filter(([key]) => key !== '__v' && !isSensitiveField(key))
                   .map(([key, value]) => (
                     <tr key={key}>
                       <th style={{ width: '30%' }}>{key}</th>

@@ -35,7 +35,36 @@ function sanitizeMutationPayload(payload: Record<string, unknown>): Record<strin
   delete nextPayload._id;
   delete nextPayload.id;
   delete nextPayload.__v;
+  delete nextPayload.password;
+  delete nextPayload.resetPasswordToken;
+  delete nextPayload.resetPasswordExpires;
+  delete nextPayload.mobileTokens;
   return nextPayload;
+}
+
+const ADMIN_USER_RESPONSE_FIELDS = [
+  '_id',
+  'username',
+  'email',
+  'roles',
+  'onboarding',
+  'isActive',
+  'timeCreated',
+  'passwordLoginDisabled',
+  'preferences',
+] as const;
+
+function sanitizeAdminUser(user: unknown): Record<string, unknown> | null {
+  if (!user || typeof user !== 'object') {
+    return null;
+  }
+
+  const source = user as Record<string, unknown>;
+  return Object.fromEntries(
+    ADMIN_USER_RESPONSE_FIELDS
+      .filter((field) => typeof source[field] !== 'undefined')
+      .map((field) => [field, source[field]]),
+  );
 }
 
 function toBoolean(value: unknown): boolean {
@@ -160,7 +189,7 @@ export = function (router: Router) {
     }
 
     const users = await db.User.find().limit(100).lean();
-    res.json(users);
+    res.json(users.map(sanitizeAdminUser).filter(Boolean));
   });
 
   router.post('/users', async function (req: WikitruthRequest, res: WikitruthResponse) {
@@ -210,7 +239,7 @@ export = function (router: Router) {
 
     res.status(201).json({
       success: true,
-      user: await db.User.findById(user._id).lean(),
+      user: sanitizeAdminUser(await db.User.findById(user._id).lean()),
     });
   });
 
@@ -226,7 +255,7 @@ export = function (router: Router) {
       return;
     }
 
-    res.json({ success: true, user });
+    res.json({ success: true, user: sanitizeAdminUser(user) });
   });
 
   router.delete('/users/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
@@ -257,7 +286,7 @@ export = function (router: Router) {
       return;
     }
 
-    res.json({ success: true, user });
+    res.json({ success: true, user: sanitizeAdminUser(user) });
   });
 
   router.put('/users/:id/role-admin', async function (req: WikitruthRequest, res: WikitruthResponse) {
@@ -297,7 +326,7 @@ export = function (router: Router) {
     };
     await admin.save();
 
-    res.json({ success: true, user: await db.User.findById(user._id).lean() });
+    res.json({ success: true, user: sanitizeAdminUser(await db.User.findById(user._id).lean()) });
   });
 
   router.delete('/users/:id/role-admin', async function (req: WikitruthRequest, res: WikitruthResponse) {
@@ -326,7 +355,7 @@ export = function (router: Router) {
     user.roles.admin = null;
     await user.save();
 
-    res.json({ success: true, user: await db.User.findById(user._id).lean() });
+    res.json({ success: true, user: sanitizeAdminUser(await db.User.findById(user._id).lean()) });
   });
 
   router.put('/users/:id/role-account', async function (req: WikitruthRequest, res: WikitruthResponse) {
@@ -366,7 +395,7 @@ export = function (router: Router) {
     };
     await account.save();
 
-    res.json({ success: true, user: await db.User.findById(user._id).lean() });
+    res.json({ success: true, user: sanitizeAdminUser(await db.User.findById(user._id).lean()) });
   });
 
   router.delete('/users/:id/role-account', async function (req: WikitruthRequest, res: WikitruthResponse) {
@@ -395,7 +424,7 @@ export = function (router: Router) {
     user.roles.account = null;
     await user.save();
 
-    res.json({ success: true, user: await db.User.findById(user._id).lean() });
+    res.json({ success: true, user: sanitizeAdminUser(await db.User.findById(user._id).lean()) });
   });
 
   router.put('/users/:id/roles', async function (req: WikitruthRequest, res: WikitruthResponse) {
@@ -446,7 +475,7 @@ export = function (router: Router) {
       },
     });
 
-    res.json({ success: true, user: await db.User.findById(user._id).lean() });
+    res.json({ success: true, user: sanitizeAdminUser(await db.User.findById(user._id).lean()) });
   });
 
   router.get('/accounts', async function (req: WikitruthRequest, res: WikitruthResponse) {

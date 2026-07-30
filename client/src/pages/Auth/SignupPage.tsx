@@ -198,9 +198,9 @@ const SignupPage: React.FC = () => {
       <PageMeta title="Sign Up" description="Create your Wikitruth account" />
       <div className="panel panel-default">
         <div className="panel-heading">
-          <h3 className="panel-title text-center">
+          <h1 className="panel-title text-center">
             <i className="fa fa-user-plus"></i> Create your Wikitruth account
-          </h3>
+          </h1>
         </div>
         <div className="panel-body">
           {submitError ? (

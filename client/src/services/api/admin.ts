@@ -4,7 +4,7 @@ import fetchWithPasskeyStepUp from './passkeyFetch';
 export type AdminRecord = Record<string, unknown> & {
   _id?: string;
   id?: string;
-  name?: string;
+  name?: unknown;
   title?: string;
   username?: string;
   email?: string;
