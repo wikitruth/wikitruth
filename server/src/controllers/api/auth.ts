@@ -48,17 +48,26 @@ import {
 } from './authTokenHelpers';
 import { registerAuthOnboardingRoutes } from './authOnboardingRoutes';
 import { registerAuthPasskeyRoutes } from './authPasskeyRoutes';
+import { registerAuthSessionRoutes } from './authSessionRoutes';
+import { registerAuthEmailCodeRoutes } from './authEmailCodeRoutes';
 import {
   establishAuthenticatedSession,
   getAuthenticationAssurance,
   saveSession,
 } from '../../services/authAssuranceService';
+import {
+  revokeAllWebSessions,
+  revokeCurrentWebSession,
+  revokeOtherWebSessions,
+} from '../../services/webSessionService';
 
 const jwt = jwtMod as unknown as typeof import('jsonwebtoken');
 
 export = function (router: Router) {
   registerAuthOnboardingRoutes(router);
   registerAuthPasskeyRoutes(router);
+  registerAuthSessionRoutes(router);
+  registerAuthEmailCodeRoutes(router);
   router.get('/me', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!req.user) {
       // Keep this endpoint non-failing for anonymous page loads in modern UI.
@@ -162,7 +171,9 @@ export = function (router: Router) {
       user.roles.account = account._id;
       await user.save();
 
-      await establishAuthenticatedSession(req, user, 'password');
+      await establishAuthenticatedSession(req, user, 'password', {
+        rememberMe: Boolean(body.rememberMe),
+      });
       setSessionActiveRole(req, 'reader');
       await saveSession(req);
       res.status(201).json({ success: true, user: sanitizeUser(user), activeRole: 'reader' });
@@ -202,7 +213,7 @@ export = function (router: Router) {
       }
 
       if (user.passwordLoginDisabled) {
-        res.status(403).json({ success: false, message: 'Password sign-in is disabled. Use a passkey or recovery code.' });
+        res.status(403).json({ success: false, message: 'Password sign-in is disabled. Use an email code, passkey, or recovery code.' });
         return;
       }
 
@@ -213,7 +224,9 @@ export = function (router: Router) {
         return;
       }
 
-      await establishAuthenticatedSession(req, user, 'password');
+      await establishAuthenticatedSession(req, user, 'password', {
+        rememberMe: Boolean(body.rememberMe),
+      });
       const activeRole = getSessionActiveRole(req) || getDefaultActiveRole(user);
       setSessionActiveRole(req, activeRole);
       await saveSession(req);
@@ -286,7 +299,9 @@ export = function (router: Router) {
         return;
       }
 
-      await establishAuthenticatedSession(req, user, 'fast_switch');
+      await establishAuthenticatedSession(req, user, 'fast_switch', {
+        rememberMe: Boolean(body.rememberMe),
+      });
       const activeRole = getSessionActiveRole(req) || getDefaultActiveRole(user);
       setSessionActiveRole(req, activeRole);
       await saveSession(req);
@@ -516,7 +531,13 @@ export = function (router: Router) {
       }
 
       user.password = await encryptPassword(newPassword);
+      user.passwordLoginDisabled = false;
       await user.save();
+      await revokeOtherWebSessions(
+        req,
+        String(req.user._id || req.user.id || ''),
+        'password_changed'
+      );
 
       res.json({ success: true, message: 'Password updated successfully' });
     } catch (error) {
@@ -627,14 +648,18 @@ export = function (router: Router) {
     }
   });
 
-  router.post('/logout', function (req: WikitruthRequest, res: WikitruthResponse, next: WikitruthNext) {
+  router.post('/logout', async function (req: WikitruthRequest, res: WikitruthResponse, next: WikitruthNext) {
+    await revokeCurrentWebSession(req, 'signed_out');
     req.logout(function (err?: unknown) {
       if (err) {
         return next(err);
       }
 
       req.session.destroy(function () {
-        res.clearCookie('sid');
+        const sessionName = String(
+          (req.app as unknown as { config?: { session?: { name?: string } } }).config?.session?.name || 'sid'
+        );
+        res.clearCookie(sessionName);
         res.json({ success: true });
       });
     });
@@ -732,9 +757,11 @@ export = function (router: Router) {
       }
 
       user.password = await encryptPassword(password);
+      user.passwordLoginDisabled = false;
       user.resetPasswordToken = '';
       user.resetPasswordExpires = 0;
       await user.save();
+      await revokeAllWebSessions(req, String(user._id || user.id || ''), 'password_reset');
 
       res.json({ success: true, message: 'Password updated successfully' });
     } catch (error) {

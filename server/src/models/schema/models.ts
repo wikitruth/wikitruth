@@ -20,6 +20,8 @@ export = function (app: Application, mongoose: Mongoose) {
   require('./account/AuthCeremony')(app, mongoose);
   require('./account/RecoveryCodeSet')(app, mongoose);
   require('./account/AuthHandoff')(app, mongoose);
+  require('./account/EmailAuthChallenge')(app, mongoose);
+  require('./account/WebSession')(app, mongoose);
 
   // core
   require('./core/EntryRevisionCounter')(app, mongoose);

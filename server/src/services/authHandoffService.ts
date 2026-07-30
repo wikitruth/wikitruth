@@ -75,6 +75,7 @@ export async function createAuthHandoff(
     targetOrigin,
     returnPath: normalizedReturnPath,
     authenticationMethod: assurance?.method || 'password',
+    remembered: Boolean(req.session.webSession?.remembered),
     authenticatedAt: assurance?.authenticatedAt ? new Date(assurance.authenticatedAt) : now,
     passkeyVerifiedAt: assurance?.passkeyVerifiedAt ? new Date(assurance.passkeyVerifiedAt) : null,
     createDate: now,
@@ -124,6 +125,7 @@ export async function consumeAuthHandoff(req: WikitruthRequest, rawCode: unknown
   if (!user || (user.isActive && user.isActive !== 'yes')) throw new Error('Account is not active');
   await establishAuthenticatedSession(req, user, 'handoff', {
     authenticatedAt: new Date(handoff.authenticatedAt).toISOString(),
+    rememberMe: Boolean(handoff.remembered),
     ...(handoff.passkeyVerifiedAt
       ? { passkeyVerifiedAt: new Date(handoff.passkeyVerifiedAt).toISOString() }
       : {}),

@@ -11,6 +11,7 @@ import { apiErrorHandler } from './middlewares/apiError';
 import { createCsrfProtection } from './middlewares/csrfProtection';
 import { civicCors } from './middlewares/civicCors';
 import { authenticateApiClient } from './middlewares/apiClientAuthentication';
+import { enforceAuthenticatedWebSession } from './services/webSessionService';
 
 import contents from './models/contents';
 import templates from './models/templates';
@@ -160,6 +161,7 @@ app.use(session({
 
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(enforceAuthenticatedWebSession);
 app.use(authenticateApiClient);
 const csrfConfig = config.csrf || {};
 const csrfCookie = csrfConfig.cookie || {};

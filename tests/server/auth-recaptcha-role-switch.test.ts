@@ -52,6 +52,13 @@ function createApp(options?: {
   app.use(express.json());
 
   (app as unknown as { config?: Record<string, unknown> }).config = {
+    cryptoKey: 'auth-route-session-secret',
+    session: {
+      authenticated: {
+        standardMaxAgeMs: 86400000,
+        rememberedMaxAgeMs: 2592000000,
+      },
+    },
     grecaptcha: {
       secret: options?.recaptchaSecret || '',
     },
@@ -59,8 +66,10 @@ function createApp(options?: {
     jwtSecret: 'test-jwt-secret',
   };
 
-  app.use((req: { session?: Record<string, unknown> }, _res, next) => {
+  app.use((req: { session?: Record<string, unknown>; sessionID?: string }, _res, next) => {
     req.session = req.session || {};
+    req.sessionID = 'auth-route-session-id';
+    req.session.cookie = req.session.cookie || {};
     req.session.regenerate = (done: (error?: unknown) => void) => done();
     req.session.save = (done: (error?: unknown) => void) => done();
     req.session.preferences = req.session.preferences || {};

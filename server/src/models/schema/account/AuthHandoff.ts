@@ -10,6 +10,7 @@ const factory: SchemaFactory = function (app, mongoose) {
     targetOrigin: { type: String, required: true, index: true },
     returnPath: { type: String, required: true, default: '/' },
     authenticationMethod: { type: String, required: true },
+    remembered: { type: Boolean, default: false },
     authenticatedAt: { type: Date, required: true },
     passkeyVerifiedAt: { type: Date, default: null },
     createDate: { type: Date, default: Date.now },

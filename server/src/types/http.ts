@@ -12,6 +12,13 @@ export interface WikitruthSessionData extends SessionData {
   diaryCategories?: unknown[];
   myGroups?: unknown[];
   authentication?: AuthenticationAssurance;
+  pendingRememberMe?: boolean;
+  webSession?: {
+    registryId: string;
+    sessionKeyHash: string;
+    remembered: boolean;
+    absoluteExpiresAt: string;
+  };
 }
 
 export type WikitruthSession = Session & Partial<WikitruthSessionData>;

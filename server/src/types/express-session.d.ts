@@ -8,5 +8,12 @@ declare module 'express-session' {
     diaryCategories?: unknown[];
     myGroups?: unknown[];
     authentication?: AuthenticationAssurance;
+    pendingRememberMe?: boolean;
+    webSession?: {
+      registryId: string;
+      sessionKeyHash: string;
+      remembered: boolean;
+      absoluteExpiresAt: string;
+    };
   }
 }

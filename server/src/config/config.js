@@ -133,6 +133,8 @@ exports.mongodb = {
     privateBackupList: [
       'authceremonies',
       'authhandoffs',
+      'emailauthchallenges',
+      'websessions',
       'answers',
       'artifacts',
       'arguments',
@@ -176,6 +178,8 @@ exports.mongodb = {
       anonymouscontributions: 'AnonymousContribution',
       authceremonies: 'AuthCeremony',
       authhandoffs: 'AuthHandoff',
+      emailauthchallenges: 'EmailAuthChallenge',
+      websessions: 'WebSession',
       civicrecords: 'CivicRecord',
       civictenants: 'CivicTenant',
       jurisdictions: 'Jurisdiction',
@@ -245,6 +249,19 @@ exports.session = {
     sameSite: envSameSite(['SESSION_COOKIE_SAMESITE'], 'lax'),
     maxAgeMs: Number(envWithDefault(['SESSION_COOKIE_MAX_AGE_MS'], '1209600000')),
   },
+  authenticated: {
+    standardMaxAgeMs: Number(envWithDefault(['AUTH_SESSION_STANDARD_MAX_AGE_MS'], '86400000')),
+    rememberedMaxAgeMs: Number(envWithDefault(['AUTH_SESSION_REMEMBERED_MAX_AGE_MS'], '2592000000')),
+    activityUpdateIntervalMs: Number(envWithDefault(['AUTH_SESSION_ACTIVITY_UPDATE_INTERVAL_MS'], '300000')),
+  },
+};
+exports.emailAuth = {
+  enabled: envBoolean(['EMAIL_AUTH_ENABLED'], true),
+  codeTtlSeconds: Number(envWithDefault(['EMAIL_AUTH_CODE_TTL_SECONDS'], '600')),
+  maximumAttempts: Number(envWithDefault(['EMAIL_AUTH_MAXIMUM_ATTEMPTS'], '5')),
+  resendDelaySeconds: Number(envWithDefault(['EMAIL_AUTH_RESEND_DELAY_SECONDS'], '60')),
+  maximumRequestsPerEmailPerHour: Number(envWithDefault(['EMAIL_AUTH_MAX_REQUESTS_PER_EMAIL_PER_HOUR'], '5')),
+  maximumRequestsPerIpPerHour: Number(envWithDefault(['EMAIL_AUTH_MAX_REQUESTS_PER_IP_PER_HOUR'], '20')),
 };
 const defaultAuthOrigin = normalizeOrigin(envWithDefault(
   ['AUTH_CANONICAL_ORIGIN'],

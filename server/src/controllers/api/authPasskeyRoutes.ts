@@ -34,6 +34,7 @@ import {
   verifyPasskeyRegistration,
   verifyPasswordlessSignup,
 } from '../../services/webAuthnService';
+import { revokeOtherWebSessions } from '../../services/webSessionService';
 import {
   getAccountIdFromUser,
   getDefaultActiveRole,
@@ -146,6 +147,7 @@ export function registerAuthPasskeyRoutes(router: Router): void {
         await establishAuthenticatedSession(req, result.user, 'passkey', {
           passkeyVerifiedAt: result.verifiedAt,
           passkeyCredentialId: result.credential.id,
+          rememberMe: Boolean(req.body?.rememberMe),
         });
         setSessionActiveRole(req, 'reader');
         await saveSession(req);
@@ -266,6 +268,7 @@ export function registerAuthPasskeyRoutes(router: Router): void {
           await establishAuthenticatedSession(req, result.user, 'passkey', {
             passkeyVerifiedAt: result.verifiedAt,
             passkeyCredentialId: result.credential.id,
+            rememberMe: Boolean(req.body?.rememberMe),
           });
         } else {
           setAuthenticationAssurance(req, 'passkey', {
@@ -383,10 +386,13 @@ export function registerAuthPasskeyRoutes(router: Router): void {
         res.status(401).json({ success: false, message: 'Invalid recovery credentials' });
         return;
       }
-      await establishAuthenticatedSession(req, user, 'recovery_code');
+      await establishAuthenticatedSession(req, user, 'recovery_code', {
+        rememberMe: Boolean(req.body?.rememberMe),
+      });
       const activeRole = getDefaultActiveRole(user);
       setSessionActiveRole(req, activeRole);
       await saveSession(req);
+      await revokeOtherWebSessions(req, String(user._id), 'account_recovery');
       await auditUserEvent(
         req,
         'auth.recovery-code.consumed',

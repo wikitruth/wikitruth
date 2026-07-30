@@ -103,7 +103,20 @@ exports.session = {
     secure: process.env.SESSION_COOKIE_SECURE === 'true',
     sameSite: process.env.SESSION_COOKIE_SAMESITE || 'lax',
     maxAgeMs: Number(process.env.SESSION_COOKIE_MAX_AGE_MS || 1209600000)
+  },
+  authenticated: {
+    standardMaxAgeMs: Number(process.env.AUTH_SESSION_STANDARD_MAX_AGE_MS || 86400000),
+    rememberedMaxAgeMs: Number(process.env.AUTH_SESSION_REMEMBERED_MAX_AGE_MS || 2592000000),
+    activityUpdateIntervalMs: Number(process.env.AUTH_SESSION_ACTIVITY_UPDATE_INTERVAL_MS || 300000)
   }
+};
+exports.emailAuth = {
+  enabled: process.env.EMAIL_AUTH_ENABLED !== 'false',
+  codeTtlSeconds: Number(process.env.EMAIL_AUTH_CODE_TTL_SECONDS || 600),
+  maximumAttempts: Number(process.env.EMAIL_AUTH_MAXIMUM_ATTEMPTS || 5),
+  resendDelaySeconds: Number(process.env.EMAIL_AUTH_RESEND_DELAY_SECONDS || 60),
+  maximumRequestsPerEmailPerHour: Number(process.env.EMAIL_AUTH_MAX_REQUESTS_PER_EMAIL_PER_HOUR || 5),
+  maximumRequestsPerIpPerHour: Number(process.env.EMAIL_AUTH_MAX_REQUESTS_PER_IP_PER_HOUR || 20)
 };
 exports.webAuthn = {
   enabled: process.env.WEBAUTHN_ENABLED !== 'false',

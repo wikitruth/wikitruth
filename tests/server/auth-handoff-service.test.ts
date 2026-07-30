@@ -41,17 +41,19 @@ const config = {
 function requestFixture(origin = 'https://wikitruth.net'): WikitruthRequest {
   const parsed = new URL(origin);
   const session = {
+    cookie: {},
     regenerate: (callback: (error?: unknown) => void) => callback(),
     save: (callback: (error?: unknown) => void) => callback(),
   };
   const req = {
+    sessionID: 'handoff-session-id',
     protocol: parsed.protocol.replace(':', ''),
     get: (name: string) => {
       if (name.toLowerCase() === 'host') return parsed.host;
       if (name.toLowerCase() === 'origin') return origin;
       return undefined;
     },
-    app: { config: { webAuthn: config } },
+    app: { config: { webAuthn: config, cryptoKey: 'handoff-session-secret' } },
     session,
     user: { _id: 'user-1', username: 'alice' },
     login: jest.fn((_user: unknown, callback: (error?: unknown) => void) => callback()),

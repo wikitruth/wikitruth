@@ -30,11 +30,13 @@ export type SignupBodyContract = {
   email?: unknown;
   password?: unknown;
   recaptchaResponse?: unknown;
+  rememberMe?: unknown;
 };
 
 export type LoginBodyContract = {
   username?: unknown;
   password?: unknown;
+  rememberMe?: unknown;
 };
 
 export type RoleSwitchBodyContract = {
@@ -43,6 +45,7 @@ export type RoleSwitchBodyContract = {
 
 export type FastSwitchBodyContract = {
   pin?: unknown;
+  rememberMe?: unknown;
 };
 
 export type AccountSettingsContactBodyContract = {

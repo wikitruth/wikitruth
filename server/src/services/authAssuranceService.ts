@@ -2,9 +2,13 @@
 
 import type { WikitruthRequest, WikitruthResponse } from '../types/http';
 import { getWebAuthnConfig } from './webAuthnConfigService';
+import {
+  registerAuthenticatedWebSession,
+  revokeCurrentWebSession,
+} from './webSessionService';
 
 export type AuthenticationMethod =
-  'password' | 'oauth' | 'passkey' | 'recovery_code' | 'fast_switch' | 'handoff';
+  'password' | 'oauth' | 'passkey' | 'email_code' | 'recovery_code' | 'fast_switch' | 'handoff';
 
 export interface AuthenticationAssurance {
   method: AuthenticationMethod;
@@ -12,6 +16,10 @@ export interface AuthenticationAssurance {
   passkeyVerifiedAt?: string;
   passkeyCredentialId?: string;
   recoveredAt?: string;
+}
+
+export interface SessionEstablishmentOptions extends Partial<AuthenticationAssurance> {
+  rememberMe?: boolean;
 }
 
 export function getAuthenticationAssurance(req: WikitruthRequest): AuthenticationAssurance | null {
@@ -62,9 +70,11 @@ export async function establishAuthenticatedSession(
   req: WikitruthRequest,
   user: unknown,
   method: AuthenticationMethod,
-  options: Partial<AuthenticationAssurance> = {}
+  options: SessionEstablishmentOptions = {}
 ): Promise<void> {
   const preferences = req.session.preferences;
+  const rememberMe = options.rememberMe ?? req.session.pendingRememberMe ?? false;
+  await revokeCurrentWebSession(req, 'reauthenticated');
   await new Promise<void>((resolve, reject) => {
     req.session.regenerate(error => (error ? reject(error) : resolve()));
   });
@@ -73,6 +83,7 @@ export async function establishAuthenticatedSession(
   });
   if (preferences) req.session.preferences = preferences;
   setAuthenticationAssurance(req, method, options);
+  await registerAuthenticatedWebSession(req, method, rememberMe);
   await saveSession(req);
 }
 
