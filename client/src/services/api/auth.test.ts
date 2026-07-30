@@ -42,4 +42,19 @@ describe('authApi', () => {
       expect.objectContaining({ credentials: 'include' })
     );
   });
+
+  it('calls passwordless email and session-security endpoints', async () => {
+    const fetchMock = jest.fn().mockResolvedValue({ ok: true, json: async () => ({ success: true, sessions: [] }) });
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+    await authApi.requestEmailCode({ email: 'person@example.com', rememberMe: true });
+    await authApi.verifyEmailCode({ challengeId: 'challenge', code: '123456' });
+    await authApi.sessions();
+    await authApi.revokeSession('session-1');
+
+    expect(fetchMock).toHaveBeenCalledWith('/api/auth/email-code/request', expect.objectContaining({ method: 'POST' }));
+    expect(fetchMock).toHaveBeenCalledWith('/api/auth/email-code/verify', expect.objectContaining({ method: 'POST' }));
+    expect(fetchMock).toHaveBeenCalledWith('/api/auth/sessions', expect.objectContaining({ credentials: 'include' }));
+    expect(fetchMock).toHaveBeenCalledWith('/api/auth/sessions/session-1', expect.objectContaining({ method: 'DELETE' }));
+  });
 });

@@ -15,6 +15,8 @@ interface InputProps {
   maxLength?: number;
   error?: string;
   label?: string;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode'];
+  pattern?: string;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -32,6 +34,8 @@ const Input: React.FC<InputProps> = ({
   maxLength,
   error,
   label,
+  inputMode,
+  pattern,
 }) => {
   const inputId = id || name;
   const inputClassName = `form-control ${error ? 'error' : ''} ${className}`.trim();
@@ -57,6 +61,8 @@ const Input: React.FC<InputProps> = ({
         className={inputClassName}
         autoComplete={autoComplete}
         maxLength={maxLength}
+        inputMode={inputMode}
+        pattern={pattern}
       />
       {error && <span className="help-block text-danger">{error}</span>}
     </div>

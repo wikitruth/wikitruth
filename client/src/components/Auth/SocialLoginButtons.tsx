@@ -6,6 +6,7 @@ interface SocialLoginButtonsProps {
   mode?: 'login' | 'signup';
   onProviderClick?: (provider: SocialProvider) => void;
   enabledProviders?: Record<string, boolean> | null;
+  rememberMe?: boolean;
 }
 
 const providerCatalog: Array<{ key: SocialProvider; label: string; icon: string }> = [
@@ -17,7 +18,7 @@ const providerCatalog: Array<{ key: SocialProvider; label: string; icon: string 
   { key: 'microsoft', label: 'Microsoft', icon: 'windows' },
 ];
 
-const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({ mode = 'login', onProviderClick, enabledProviders }) => {
+const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({ mode = 'login', onProviderClick, enabledProviders, rememberMe }) => {
   const providers = providerCatalog
     .filter((provider) => {
       if (!enabledProviders) {
@@ -27,7 +28,7 @@ const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({ mode = 'login',
     })
     .map((provider) => ({
       ...provider,
-      href: `/${mode}/${provider.key}/`,
+      href: `/${mode}/${provider.key}/${typeof rememberMe === 'boolean' ? `?rememberMe=${rememberMe ? 'true' : 'false'}` : ''}`,
     }));
 
   if (providers.length === 0) {

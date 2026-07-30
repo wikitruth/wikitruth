@@ -4,6 +4,7 @@ import type { User } from '../../types';
 interface LoginRequest {
   username: string;
   password: string;
+  rememberMe?: boolean;
 }
 
 interface SignupRequest {
@@ -11,12 +12,44 @@ interface SignupRequest {
   email: string;
   password: string;
   recaptchaResponse?: string;
+  rememberMe?: boolean;
 }
 
 interface UserResponse {
   success?: boolean;
   user: User | null;
   activeRole?: string;
+}
+
+export interface EmailCodeRuntimeConfig {
+  enabled: boolean;
+  codeLength: number;
+  expiresInSeconds: number;
+  resendDelaySeconds: number;
+  canonicalOrigin: string;
+  isCanonicalOrigin: boolean;
+}
+
+export interface EmailCodeAuthResponse extends UserResponse {
+  success: boolean;
+  created?: boolean;
+  requiresUsername?: boolean;
+  challengeId?: string;
+  completionToken?: string;
+  handoff?: { callbackUrl: string; expiresIn: number } | null;
+}
+
+export interface WebSessionSummary {
+  id: string;
+  current: boolean;
+  remembered: boolean;
+  authenticationMethod: string;
+  device: string;
+  userAgent: string;
+  ipAddress: string;
+  createdAt: string;
+  lastActivityAt: string;
+  expiresAt: string;
 }
 
 interface VerificationStatusResponse {
@@ -161,6 +194,43 @@ export const authApi = {
       },
     ),
   providers: () => request<AuthProvidersResponse>(`${API_BASE_URL}/auth/providers`),
+  emailCodeConfig: async () => {
+    const result = await request<{ success: boolean; emailCode: EmailCodeRuntimeConfig }>(
+      `${API_BASE_URL}/auth/email-code/config`,
+    );
+    return result.emailCode;
+  },
+  requestEmailCode: (payload: {
+    email: string;
+    rememberMe: boolean;
+    recaptchaResponse?: string;
+    targetOrigin?: string;
+    returnPath?: string;
+  }) => request<{
+    success: boolean;
+    message: string;
+    challengeId: string;
+    retryAfterSeconds: number;
+    expiresInSeconds: number;
+    debug?: { code: string; signInLink: string; emailSent: boolean };
+  }>(`${API_BASE_URL}/auth/email-code/request`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  }),
+  verifyEmailCode: (payload: { challengeId: string; code?: string; linkToken?: string }) =>
+    request<EmailCodeAuthResponse>(`${API_BASE_URL}/auth/email-code/verify`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+  completeEmailCodeSignup: (payload: {
+    challengeId: string;
+    completionToken: string;
+    username: string;
+    agreeToTerms: boolean;
+  }) => request<EmailCodeAuthResponse>(`${API_BASE_URL}/auth/email-code/complete`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  }),
   forgotPassword: (email: string) =>
     request<{ success: boolean; message: string; debug?: { email: string; token: string } }>(
       `${API_BASE_URL}/auth/forgot-password`,
@@ -217,6 +287,17 @@ export const authApi = {
       method: 'PUT',
       body: JSON.stringify(payload),
     }),
+  sessions: () => request<{ success: boolean; sessions: WebSessionSummary[] }>(
+    `${API_BASE_URL}/auth/sessions`,
+  ),
+  revokeSession: (id: string) => request<{ success: boolean; message: string }>(
+    `${API_BASE_URL}/auth/sessions/${encodeURIComponent(id)}`,
+    { method: 'DELETE' },
+  ),
+  revokeOtherSessions: () => request<{ success: boolean; revoked: number }>(
+    `${API_BASE_URL}/auth/sessions/revoke-others`,
+    { method: 'POST', body: '{}' },
+  ),
 };
 
 export default authApi;

@@ -12,6 +12,7 @@ import useRecaptcha from '../../hooks/useRecaptcha';
 import authApi from '../../services/api/auth';
 import { trackEvent } from '../../utils/analytics';
 import passkeyApi, { type PasskeyRuntimeConfig } from '../../services/api/passkeys';
+import PasswordlessEmailPanel from '../../components/Auth/PasswordlessEmailPanel';
 
 interface SignupFormValues {
   username: string;
@@ -32,6 +33,11 @@ const SignupPage: React.FC = () => {
   const [passkeyConfig, setPasskeyConfig] = useState<PasskeyRuntimeConfig | null>(null);
   const [passkeyBusy, setPasskeyBusy] = useState(false);
   const passkeyDestinationPending = useRef(false);
+  const [rememberMe, setRememberMe] = useState(true);
+  const returnUrlCandidate = String(searchParams.get('returnUrl') || '').trim();
+  const returnUrl = returnUrlCandidate.startsWith('/') && !returnUrlCandidate.startsWith('//')
+    ? returnUrlCandidate
+    : '/';
 
   useEffect(() => {
     if (isAuthenticated && !passkeyDestinationPending.current) {
@@ -117,9 +123,22 @@ const SignupPage: React.FC = () => {
 
     try {
       const recaptchaToken = await executeRecaptcha('signup');
-      await signup(values.username.trim(), values.email.trim(), values.password, recaptchaToken || undefined);
+      const tenantOrigin = String(searchParams.get('tenantOrigin') || '').trim();
+      passkeyDestinationPending.current = Boolean(tenantOrigin && tenantOrigin !== window.location.origin);
+      await signup(
+        values.username.trim(),
+        values.email.trim(),
+        values.password,
+        recaptchaToken || undefined,
+        rememberMe,
+      );
       trackEvent('signup', 'auth', 'credentials');
-      navigate('/');
+      if (passkeyDestinationPending.current) {
+        const handoff = await passkeyApi.createHandoff(tenantOrigin, returnUrl);
+        window.location.assign(handoff.callbackUrl);
+      } else {
+        navigate(returnUrl);
+      }
     } catch (error) {
       setSubmitError(error instanceof Error ? error.message : 'Signup failed. Please try again.');
     }
@@ -168,6 +187,7 @@ const SignupPage: React.FC = () => {
         username,
         email,
         recaptchaResponse: recaptchaToken || undefined,
+        rememberMe,
       });
       passkeyDestinationPending.current = true;
       await refreshAuth?.();
@@ -190,6 +210,7 @@ const SignupPage: React.FC = () => {
     if (!passkeyConfig?.canonicalOrigin || typeof window === 'undefined') return '';
     const url = new URL('/signup', passkeyConfig.canonicalOrigin);
     url.searchParams.set('tenantOrigin', window.location.origin);
+    url.searchParams.set('returnUrl', returnUrl);
     return url.toString();
   })();
 
@@ -208,6 +229,21 @@ const SignupPage: React.FC = () => {
               {submitError}
             </Alert>
           ) : null}
+
+          <div className="checkbox">
+            <label>
+              <input type="checkbox" checked={rememberMe} onChange={event => setRememberMe(event.target.checked)} />{' '}
+              Keep me signed in on this device for 30 days
+            </label>
+            <p className="help-block" style={{ marginLeft: 20 }}>Uncheck this on a shared device for a 24-hour session.</p>
+          </div>
+
+          <PasswordlessEmailPanel
+            rememberMe={rememberMe}
+            returnUrl={returnUrl}
+            mode="signup"
+            onAuthenticated={() => navigate(returnUrl, { replace: true })}
+          />
 
           <form onSubmit={onSubmit}>
             <Input
@@ -310,7 +346,7 @@ const SignupPage: React.FC = () => {
 
           <hr />
           {providersReady ? (
-            <SocialLoginButtons mode="signup" enabledProviders={enabledProviders} />
+            <SocialLoginButtons mode="signup" enabledProviders={enabledProviders} rememberMe={rememberMe} />
           ) : (
             <p className="text-muted">Loading providers...</p>
           )}

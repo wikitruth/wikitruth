@@ -11,8 +11,8 @@ interface AuthContextType {
   activeRole: ActiveRole;
   setActiveRole: (role: ActiveRole) => void;
   availableRoles: ActiveRole[];
-  signup: (username: string, email: string, password: string, recaptchaResponse?: string) => Promise<void>;
-  login: (username: string, password: string) => Promise<void>;
+  signup: (username: string, email: string, password: string, recaptchaResponse?: string, rememberMe?: boolean) => Promise<void>;
+  login: (username: string, password: string, rememberMe?: boolean) => Promise<void>;
   logout: () => Promise<void>;
   refreshAuth?: () => Promise<void>;
   updateUser: (userData: Partial<User>) => void;
@@ -100,9 +100,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     void checkAuthStatus();
   }, [checkAuthStatus]);
 
-  const login = useCallback(async (username: string, password: string) => {
+  const login = useCallback(async (username: string, password: string, rememberMe?: boolean) => {
     try {
-      const data = await authApi.login({ username, password });
+      const data = await authApi.login({
+        username,
+        password,
+        ...(typeof rememberMe === 'boolean' ? { rememberMe } : {}),
+      });
       const resolvedUser = data.user || null;
       setUser(resolvedUser);
       const allowedRoles = getAvailableRolesForUser(resolvedUser);
@@ -116,9 +120,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, []);
 
-  const signup = useCallback(async (username: string, email: string, password: string, recaptchaResponse?: string) => {
+  const signup = useCallback(async (username: string, email: string, password: string, recaptchaResponse?: string, rememberMe?: boolean) => {
     try {
-      const data = await authApi.signup({ username, email, password, recaptchaResponse });
+      const data = await authApi.signup({
+        username,
+        email,
+        password,
+        recaptchaResponse,
+        ...(typeof rememberMe === 'boolean' ? { rememberMe } : {}),
+      });
       const resolvedUser = data.user || null;
       setUser(resolvedUser);
       const allowedRoles = getAvailableRolesForUser(resolvedUser);

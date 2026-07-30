@@ -6,6 +6,7 @@ import LoadingSpinner from '../../components/LoadingSpinner';
 import authApi from '../../services/api/auth';
 import PasskeySecurityPanel from '../../components/Auth/PasskeySecurityPanel';
 import notificationsApi, { type NotificationPreferences } from '../../services/api/notifications';
+import SessionSecurityPanel from '../../components/Auth/SessionSecurityPanel';
 
 interface ContactFormState {
   first: string;
@@ -163,6 +164,7 @@ const SettingsPage: React.FC = () => {
       <div className="row">
         <div className="col-sm-9">
           <PasskeySecurityPanel />
+          <SessionSecurityPanel />
 
           <div className="panel panel-info">
             <div className="panel-heading"><h3 className="panel-title">Notification Delivery</h3></div>

@@ -40,7 +40,7 @@ describe('Login flow integration', () => {
     await user.type(screen.getByLabelText(/^password/i), 'secret12');
     await user.click(screen.getByRole('button', { name: /sign in/i }));
 
-    expect(mockLogin).toHaveBeenCalledWith('demo-user', 'secret12');
+    expect(mockLogin).toHaveBeenCalledWith('demo-user', 'secret12', true);
     expect(mockNavigate).toHaveBeenCalledWith('/', { replace: true });
   });
 });

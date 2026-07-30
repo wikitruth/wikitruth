@@ -11,6 +11,7 @@ import authApi from '../services/api/auth';
 import PageMeta from '../components/common/PageMeta';
 import { trackEvent } from '../utils/analytics';
 import passkeyApi, { type PasskeyRuntimeConfig } from '../services/api/passkeys';
+import PasswordlessEmailPanel from '../components/Auth/PasswordlessEmailPanel';
 
 interface LoginFormValues {
   username: string;
@@ -35,6 +36,7 @@ const LoginPage: React.FC = () => {
   const [showRecovery, setShowRecovery] = useState(false);
   const [recoveryIdentity, setRecoveryIdentity] = useState('');
   const [recoveryCode, setRecoveryCode] = useState('');
+  const [rememberMe, setRememberMe] = useState(true);
   const conditionalStarted = useRef(false);
 
   useEffect(() => {
@@ -94,7 +96,7 @@ const LoginPage: React.FC = () => {
     let active = true;
     void browserSupportsWebAuthnAutofill()
       .then(available => available
-        ? passkeyApi.authenticate('authentication', true)
+        ? passkeyApi.authenticate('authentication', true, rememberMe)
         : null)
       .then(async result => {
         if (!active || !result) return;
@@ -108,7 +110,7 @@ const LoginPage: React.FC = () => {
     return () => {
       active = false;
     };
-  }, [isAuthenticated, navigate, passkeyConfig, refreshAuth, returnUrl]);
+  }, [isAuthenticated, navigate, passkeyConfig, refreshAuth, rememberMe, returnUrl]);
 
   const tenantPasskeyUrl = (() => {
     if (!passkeyConfig?.canonicalOrigin || typeof window === 'undefined') return '';
@@ -122,7 +124,7 @@ const LoginPage: React.FC = () => {
     setPasskeyBusy(true);
     setSubmitError(null);
     try {
-      await passkeyApi.authenticate('authentication');
+      await passkeyApi.authenticate('authentication', false, rememberMe);
       await refreshAuth?.();
       trackEvent('login', 'auth', 'passkey');
       navigate(returnUrl, { replace: true });
@@ -138,7 +140,7 @@ const LoginPage: React.FC = () => {
     setPasskeyBusy(true);
     setSubmitError(null);
     try {
-      await passkeyApi.recoveryLogin(recoveryIdentity.trim(), recoveryCode.trim());
+      await passkeyApi.recoveryLogin(recoveryIdentity.trim(), recoveryCode.trim(), rememberMe);
       await refreshAuth?.();
       trackEvent('login', 'auth', 'recovery-code');
       navigate('/account/settings#passkeys', { replace: true });
@@ -169,7 +171,7 @@ const LoginPage: React.FC = () => {
     setSubmitError(null);
 
     try {
-      await login(values.username, values.password);
+      await login(values.username, values.password, rememberMe);
       trackEvent('login', 'auth', 'credentials');
       navigate(returnUrl, { replace: true });
     } catch (error) {
@@ -222,6 +224,50 @@ const LoginPage: React.FC = () => {
             </Alert>
           )}
 
+          <div className="checkbox">
+            <label>
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={event => setRememberMe(event.target.checked)}
+              />{' '}
+              Keep me signed in on this device for 30 days
+            </label>
+            <p className="help-block" style={{ marginLeft: 20 }}>Uncheck this on a shared device for a 24-hour session.</p>
+          </div>
+
+          {passkeyConfig?.enabled ? (
+            <div style={{ marginBottom: '18px' }}>
+              {passkeyConfig.isCanonicalOrigin ? (
+                <Button
+                  type="button"
+                  variant="success"
+                  className="btn-block"
+                  icon={passkeyBusy ? 'spinner fa-spin' : 'key'}
+                  disabled={passkeyBusy || !passkeyApi.supported()}
+                  onClick={() => void handlePasskeySignIn()}
+                >
+                  {passkeyBusy ? 'Waiting for your device...' : 'Sign in with a passkey'}
+                </Button>
+              ) : (
+                <a className="btn btn-success btn-block" href={tenantPasskeyUrl}>
+                  <i className="fa fa-key" /> Continue with passkey on Wikitruth
+                </a>
+              )}
+              {!passkeyApi.supported() && passkeyConfig.isCanonicalOrigin ? (
+                <p className="help-block">This browser or device does not support passkeys.</p>
+              ) : null}
+            </div>
+          ) : null}
+
+          <PasswordlessEmailPanel
+            rememberMe={rememberMe}
+            returnUrl={returnUrl}
+            onAuthenticated={() => navigate(returnUrl, { replace: true })}
+          />
+
+          <div className="text-center text-muted" style={{ margin: '18px 0' }}>or use another sign-in method</div>
+
           <form onSubmit={onSubmit}>
             <Input
               name="username"
@@ -267,26 +313,6 @@ const LoginPage: React.FC = () => {
 
           {passkeyConfig?.enabled ? (
             <div style={{ marginTop: '18px' }}>
-              <div className="text-center text-muted" style={{ marginBottom: '12px' }}>or</div>
-              {passkeyConfig.isCanonicalOrigin ? (
-                <Button
-                  type="button"
-                  variant="success"
-                  className="btn-block"
-                  icon={passkeyBusy ? 'spinner fa-spin' : 'key'}
-                  disabled={passkeyBusy || !passkeyApi.supported()}
-                  onClick={() => void handlePasskeySignIn()}
-                >
-                  {passkeyBusy ? 'Waiting for your device...' : 'Sign in with a passkey'}
-                </Button>
-              ) : (
-                <a className="btn btn-success btn-block" href={tenantPasskeyUrl}>
-                  <i className="fa fa-key" /> Continue with passkey on Wikitruth
-                </a>
-              )}
-              {!passkeyApi.supported() && passkeyConfig.isCanonicalOrigin ? (
-                <p className="help-block">This browser or device does not support passkeys.</p>
-              ) : null}
               <button
                 type="button"
                 className="btn btn-link btn-block"
@@ -323,7 +349,7 @@ const LoginPage: React.FC = () => {
           <div style={{ marginTop: '40px' }}>
             <h3>Or sign in using...</h3>
             {providersReady ? (
-              <SocialLoginButtons mode="login" enabledProviders={enabledProviders} />
+              <SocialLoginButtons mode="login" enabledProviders={enabledProviders} rememberMe={rememberMe} />
             ) : (
               <p className="text-muted">Loading providers...</p>
             )}

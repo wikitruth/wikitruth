@@ -75,7 +75,8 @@ function ensureSupported(): void {
 
 async function getAuthenticationResponse(
   purpose: 'authentication' | 'step_up',
-  useBrowserAutofill = false
+  useBrowserAutofill = false,
+  rememberMe?: boolean
 ): Promise<AuthenticatedResponse> {
   ensureSupported();
   const ceremony = await request<CeremonyResponse<PublicKeyCredentialRequestOptionsJSON>>(
@@ -89,7 +90,12 @@ async function getAuthenticationResponse(
   });
   return request<AuthenticatedResponse>('/auth/passkeys/authentication/verify', {
     method: 'POST',
-    body: JSON.stringify({ ceremonyId: ceremony.ceremonyId, purpose, response }),
+    body: JSON.stringify({
+      ceremonyId: ceremony.ceremonyId,
+      purpose,
+      response,
+      ...(purpose === 'authentication' && typeof rememberMe === 'boolean' ? { rememberMe } : {}),
+    }),
   });
 }
 
@@ -130,6 +136,7 @@ export const passkeyApi = {
     email: string;
     name?: string;
     recaptchaResponse?: string;
+    rememberMe?: boolean;
   }): Promise<AuthenticatedResponse> => {
     ensureSupported();
     const ceremony = await request<CeremonyResponse<PublicKeyCredentialCreationOptionsJSON>>(
@@ -150,6 +157,7 @@ export const passkeyApi = {
         ceremonyId: ceremony.ceremonyId,
         response,
         name: input.name || 'Primary passkey',
+        ...(typeof input.rememberMe === 'boolean' ? { rememberMe: input.rememberMe } : {}),
       }),
     });
   },
@@ -176,10 +184,17 @@ export const passkeyApi = {
       { method: 'POST', body: '{}' }
     ),
 
-  recoveryLogin: (username: string, code: string) =>
+  recoveryLogin: (username: string, code: string, rememberMe?: boolean) =>
     request<AuthenticatedResponse & { recoveryRequired: boolean }>(
       '/auth/recovery-codes/login',
-      { method: 'POST', body: JSON.stringify({ username, code }) }
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          username,
+          code,
+          ...(typeof rememberMe === 'boolean' ? { rememberMe } : {}),
+        }),
+      }
     ),
 
   setPasswordLogin: (enabled: boolean) =>
