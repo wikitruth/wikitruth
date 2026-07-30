@@ -10,6 +10,8 @@ try {
 
 module.exports = (env, argv) => {
   const isProduction = argv.mode === 'production';
+  const devServerProxyTarget = process.env.DEV_SERVER_PROXY_TARGET || 'https://127.0.0.1:9443';
+  const allowInsecureDevProxy = /^https:\/\/(127\.0\.0\.1|localhost)(?::|\/|$)/.test(devServerProxyTarget);
   const assetPrefixRaw = process.env.CDN_ASSET_PREFIX || '/dist/';
   const assetPrefix = assetPrefixRaw.endsWith('/') ? assetPrefixRaw : `${assetPrefixRaw}/`;
   const shouldAnalyzeBundle = process.env.ANALYZE_BUNDLE === 'true';
@@ -111,13 +113,15 @@ module.exports = (env, argv) => {
       proxy: [
         {
           context: ['/api'],
-          target: 'http://localhost:8000',
+          target: devServerProxyTarget,
           changeOrigin: true,
+          secure: !allowInsecureDevProxy,
         },
         {
           context: ['/login', '/signup', '/logout', '/account', '/fast-switch'],
-          target: 'http://localhost:8000',
+          target: devServerProxyTarget,
           changeOrigin: true,
+          secure: !allowInsecureDevProxy,
         },
       ],
     },
