@@ -31,11 +31,11 @@ deployment, production restart, DNS/proxy change, or content migration.
 
 ## Rate-Limit Identity
 
-- [ ] Remove client-version and client-platform headers from rate-limit keys.
-- [ ] Key authenticated sessions by stable server-established principal and
+- [x] Remove client-version and client-platform headers from rate-limit keys.
+- [x] Key authenticated sessions by stable server-established principal and
       anonymous requests by trusted request IP.
-- [ ] Preserve the existing bounded rate response contract and cleanup logic.
-- [ ] Add regression tests proving spoofed client headers cannot create fresh
+- [x] Preserve the existing bounded rate response contract and cleanup logic.
+- [x] Add regression tests proving spoofed client headers cannot create fresh
       buckets and distinct authenticated principals remain isolated.
 
 ## Visual Regression

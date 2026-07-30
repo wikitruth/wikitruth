@@ -73,10 +73,18 @@ function cleanupExpiredBuckets(now: number) {
 }
 
 function buildRateLimitKey(req: Request): string {
+  if (req.apiClient?.id) {
+    return `api-client:${req.apiClient.id}`;
+  }
+
+  const user = req.user as { _id?: unknown; id?: unknown } | undefined;
+  const userId = String(user?._id || user?.id || '').trim();
+  if (userId) {
+    return `user:${userId}`;
+  }
+
   const ip = req.ip || req.socket.remoteAddress || 'unknown';
-  const clientVersion = String(req.header('x-client-version') || '');
-  const clientPlatform = String(req.header('x-client-platform') || '');
-  return `${ip}:${clientPlatform}:${clientVersion}`;
+  return `ip:${ip}`;
 }
 
 function applyPaginationContract(req: Request, payload: unknown) {
@@ -188,7 +196,12 @@ function createMobileApiContractMiddleware(options?: Partial<MobileApiContractOp
 
 const mobileApiContractMiddleware = createMobileApiContractMiddleware();
 
+function resetMobileApiRateLimitsForTests(): void {
+  rateLimitState.clear();
+}
+
 export {
   createMobileApiContractMiddleware,
   mobileApiContractMiddleware,
+  resetMobileApiRateLimitsForTests,
 };

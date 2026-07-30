@@ -6,13 +6,23 @@ const express = require('express');
 const request = require('supertest');
 const requestContext = require('../../server/src/middlewares/requestContext').default;
 const { apiEnvelopeMiddleware } = require('../../server/src/middlewares/apiError');
-const { createMobileApiContractMiddleware } = require('../../server/src/middlewares/mobileApiContracts');
+const {
+  createMobileApiContractMiddleware,
+  resetMobileApiRateLimitsForTests,
+} = require('../../server/src/middlewares/mobileApiContracts');
 
 describe('Mobile API contract middleware', function () {
-  function createApp(options = {}) {
+  beforeEach(function () {
+    resetMobileApiRateLimitsForTests();
+  });
+
+  function createApp(options = {}, identifyRequest = null) {
     const app = express();
     app.use(express.json());
     app.use(requestContext);
+    if (identifyRequest) {
+      app.use(identifyRequest);
+    }
 
     const router = express.Router();
     router.use(apiEnvelopeMiddleware);
@@ -75,5 +85,48 @@ describe('Mobile API contract middleware', function () {
 
     expect(limited.body.success).toBe(false);
     expect(limited.body.error.code).toBe('RATE_LIMITED');
+  });
+
+  it('does not let anonymous clients mint buckets with version or platform headers', async function () {
+    const app = createApp();
+
+    await request(app).get('/api/home').set('X-Client-Version', '1.0.0').expect(200);
+    await request(app).get('/api/home').set('X-Client-Version', '2.0.0').set('X-Client-Platform', 'ios').expect(200);
+    const limited = await request(app)
+      .get('/api/home')
+      .set('X-Client-Version', '999.0.0')
+      .set('X-Client-Platform', 'android')
+      .expect(429);
+
+    expect(limited.body.error.code).toBe('RATE_LIMITED');
+  });
+
+  it('isolates server-established signed-in principals sharing an IP', async function () {
+    const app = createApp({ rateLimitPerMinute: 1 }, function (req, _res, next) {
+      const userId = String(req.header('x-test-user-id') || '');
+      if (userId) {
+        req.user = { _id: userId, id: userId };
+      }
+      next();
+    });
+
+    await request(app).get('/api/home').set('X-Test-User-Id', 'user-a').expect(200);
+    await request(app).get('/api/home').set('X-Test-User-Id', 'user-a').expect(429);
+    await request(app).get('/api/home').set('X-Test-User-Id', 'user-b').expect(200);
+  });
+
+  it('isolates authenticated API clients even when they share an owner', async function () {
+    const app = createApp({ rateLimitPerMinute: 1 }, function (req, _res, next) {
+      const clientId = String(req.header('x-test-api-client-id') || '');
+      if (clientId) {
+        req.apiClient = { id: clientId };
+        req.user = { _id: 'shared-owner', id: 'shared-owner' };
+      }
+      next();
+    });
+
+    await request(app).get('/api/home').set('X-Test-Api-Client-Id', 'client-a').expect(200);
+    await request(app).get('/api/home').set('X-Test-Api-Client-Id', 'client-a').expect(429);
+    await request(app).get('/api/home').set('X-Test-Api-Client-Id', 'client-b').expect(200);
   });
 });
