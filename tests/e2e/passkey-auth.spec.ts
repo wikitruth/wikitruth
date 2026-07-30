@@ -29,7 +29,7 @@ test.describe('passkey authentication', () => {
     });
 
     const suffix = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-    const username = `passkey-e2e-${suffix}`;
+    const username = process.env.PASSKEY_E2E_USERNAME || `passkey-e2e-${suffix}`;
     const email = `${username}@example.test`;
 
     await page.goto('/signup');

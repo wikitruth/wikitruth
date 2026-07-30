@@ -25,7 +25,7 @@
     "test:client:watch": "jest --config jest.config.client.js --watch",
     "test:coverage": "jest --config jest.config.client.js --coverage",
     "test:e2e": "playwright test",
-    "test:e2e:passkeys": "PASSKEY_E2E=1 playwright test tests/e2e/passkey-auth.spec.ts --project=chromium",
+    "test:e2e:passkeys": "node --env-file-if-exists=.env scripts/qa/run-disposable-passkey-e2e.mjs",
     "test:perf:budgets": "node scripts/perf/check-perf-budgets.mjs",
     "test:load:api-db": "node --env-file-if-exists=.env scripts/perf/api-database-load.mjs",
     "openapi:sync": "node scripts/openapi/check-openapi-coverage.mjs --write",
