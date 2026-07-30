@@ -13,7 +13,17 @@ Define the current authentication and role model.
 - session user introspection (`/me`)
 - available provider introspection (`/providers`)
 - WebAuthn passkey registration, authentication, step-up, listing, naming, and revocation
+- passwordless email-code request, verification, account creation, and sign-in
 - one-time recovery-code generation and consumption
+
+## Passwordless Email Codes
+
+- Email codes are a low-friction authentication and email-ownership method; passkeys remain the preferred phishing-resistant method.
+- A generic request response must not disclose whether an email address is registered.
+- Codes are cryptographically generated, stored only as hashes, short-lived, single-use, attempt-limited, resend-limited, and superseded by newer codes.
+- Existing verified-email accounts sign in after a valid code. New accounts are created only after the code verifies email ownership and a valid available username is supplied.
+- Email-code authentication does not satisfy privileged passkey step-up.
+- Agent and machine identities never authenticate with human email codes.
 
 ## Passkeys and Recovery
 
@@ -36,6 +46,7 @@ Define the current authentication and role model.
 
 - Unrelated civic-tenant domains do not dynamically join the WebAuthn relying party.
 - Tenant applications redirect to the current canonical origin, `https://wikitruth.net`, for passkey authentication and receive a short-lived, single-use authorization handoff.
+- Passwordless email-code authentication uses the same canonical-origin and one-time tenant-handoff boundary.
 - Handoff destinations come only from configured or persisted active tenant domains, bind to an exact target origin and relative return path, expire quickly, and cannot be replayed.
 - Each target domain establishes its own session after consuming the handoff; session cookies are never shared across unrelated registrable domains.
 
@@ -53,6 +64,12 @@ Define the current authentication and role model.
 - Server sessions are persisted in MongoDB via `connect-mongo`.
 - Session cookie behavior (secure/samesite/httpOnly/maxAge) is config-driven.
 - Passport session auth is used for web flows.
+- A standard sign-in uses a short fixed lifetime. "Keep me signed in on this device" uses a longer fixed lifetime selected at authentication time.
+- Every authenticated browser session has a server-side registry record with creation, last-activity, absolute-expiry, authentication-method, user-agent, IP metadata, and revocation state.
+- Session identifiers rotate on authentication. Expired, revoked, or user-mismatched registry records fail closed and destroy the corresponding web session.
+- Users can list their active sessions, revoke another session, or revoke all other sessions. The current session is clearly identified.
+- Password changes and account-recovery security events revoke other browser sessions.
+- Administrator sessions may remain authenticated under normal policy, but configured privileged operations still require recent passkey step-up.
 
 ## Fast-Switch Identity Flow
 
