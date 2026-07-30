@@ -53,14 +53,23 @@ deployment, production restart, DNS/proxy change, or content migration.
 
 ## Focused Coverage
 
-- [ ] Cover timeline list, visualization, revision, query serialization, and
+- [x] Cover timeline list, visualization, revision, query serialization, and
       error behavior.
-- [ ] Cover notification service preference/delivery and failure behavior.
-- [ ] Cover passkey-management recovery, last-credential, assurance, and
+- [x] Cover notification service preference/delivery and failure behavior.
+- [x] Cover passkey-management recovery, last-credential, assurance, and
       request-failure edge states required by the canonical identity contract.
-- [ ] Cover administrator list/detail load, retry, mutation, and not-found
+- [x] Cover administrator list/detail load, retry, mutation, and not-found
       failures.
-- [ ] Record focused and aggregate coverage evidence.
+- [x] Record focused and aggregate coverage evidence.
+
+Focused evidence: 34 tests passed across the four target suites. The selected
+hardening surface reached 81.55% statements, 76.77% branches, 66.66% functions,
+and 82.99% lines. Timeline and notification services each exceeded 97%
+statement coverage.
+
+Aggregate evidence: 104 client suites and 279 tests passed. Repository client
+coverage reached 69.83% statements, 57.77% branches, 54.18% functions, and
+70.55% lines, above the configured global thresholds.
 
 ## Final Verification
 

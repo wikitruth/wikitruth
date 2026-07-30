@@ -23,7 +23,14 @@ const request = async <T>(path: string, init?: RequestInit): Promise<T> => {
   });
 
   if (!response.ok) {
-    throw new Error(`Notification request failed: ${response.status}`);
+    let message = '';
+    try {
+      const payload = await response.json() as { message?: unknown };
+      message = typeof payload?.message === 'string' ? payload.message.trim() : '';
+    } catch (_error) {
+      // Preserve the status fallback when the server did not return JSON.
+    }
+    throw new Error(message || `Notification request failed: ${response.status}`);
   }
 
   return response.json();
@@ -67,7 +74,7 @@ export const notificationsApi = {
     const query = new URLSearchParams();
     if (params?.channel) query.set('channel', params.channel);
     if (params?.status) query.set('status', params.status);
-    if (params?.limit) query.set('limit', String(params.limit));
+    if (typeof params?.limit === 'number') query.set('limit', String(params.limit));
     return request<{ success: boolean; deliveries: NotificationDelivery[] }>(`/notifications/outbox${query.size ? `?${query}` : ''}`);
   },
   retryDelivery: (id: string) => request<{ success: boolean; delivery: NotificationDelivery }>(

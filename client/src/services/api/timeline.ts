@@ -7,7 +7,14 @@ const request = async <T>(path: string): Promise<T> => {
   });
 
   if (!response.ok) {
-    throw new Error(`Timeline request failed: ${response.status}`);
+    let message = '';
+    try {
+      const payload = await response.json() as { message?: unknown };
+      message = typeof payload?.message === 'string' ? payload.message.trim() : '';
+    } catch (_error) {
+      // Preserve the status fallback when the server did not return JSON.
+    }
+    throw new Error(message || `Timeline request failed: ${response.status}`);
   }
 
   return response.json();

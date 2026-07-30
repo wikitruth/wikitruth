@@ -19,6 +19,14 @@ jest.mock('../../services/api/admin', () => ({
     users: jest.fn(),
     accounts: jest.fn(),
     administrators: jest.fn(),
+    createUser: jest.fn(),
+    updateUser: jest.fn(),
+    updateUserRoles: jest.fn(),
+    resetUserPassword: jest.fn(),
+    linkUserAdminRole: jest.fn(),
+    unlinkUserAdminRole: jest.fn(),
+    linkUserAccountRole: jest.fn(),
+    unlinkUserAccountRole: jest.fn(),
     deleteUser: jest.fn(),
     deleteAccount: jest.fn(),
     deleteAdministrator: jest.fn(),
@@ -45,6 +53,7 @@ const mockedCreateRealtimeChannel = createRealtimeChannel as jest.MockedFunction
 >;
 
 beforeEach(() => {
+  jest.clearAllMocks();
   mockedCreateRealtimeChannel.mockClear();
   mockedAdminApi.dashboard.mockResolvedValue({
     counts: { users: 2, accounts: 1, categories: 3, statuses: 1, administrators: 1, groups: 4 },
@@ -56,6 +65,14 @@ beforeEach(() => {
   mockedAdminApi.user.mockResolvedValue(null);
   mockedAdminApi.account.mockResolvedValue(null);
   mockedAdminApi.administrator.mockResolvedValue(null);
+  mockedAdminApi.createUser.mockResolvedValue({} as never);
+  mockedAdminApi.updateUser.mockResolvedValue({} as never);
+  mockedAdminApi.updateUserRoles.mockResolvedValue({} as never);
+  mockedAdminApi.deleteUser.mockResolvedValue({ success: true });
+});
+
+afterEach(() => {
+  jest.restoreAllMocks();
 });
 
 describe('Admin pages', () => {
@@ -169,6 +186,63 @@ describe('Admin pages', () => {
     expect(await screen.findByText('Recovered user')).toBeInTheDocument();
   });
 
+  it('keeps the list intact when user creation fails', async () => {
+    const user = userEvent.setup();
+    mockedAdminApi.createUser.mockRejectedValueOnce(new Error('Username already exists'));
+
+    render(<UsersList />);
+    await screen.findByText(/no users found/i);
+    const listCallsBeforeCreate = mockedAdminApi.users.mock.calls.length;
+    await user.type(screen.getByLabelText(/^username$/i), 'duplicate');
+    await user.type(screen.getByLabelText(/^email$/i), 'duplicate@example.test');
+    await user.type(screen.getByLabelText(/^password$/i), 'safe-password');
+    await user.click(screen.getByRole('button', { name: /^create$/i }));
+
+    expect(await screen.findByText('Username already exists')).toBeInTheDocument();
+    expect(mockedAdminApi.users).toHaveBeenCalledTimes(listCallsBeforeCreate);
+    expect(screen.getByLabelText(/^username$/i)).toHaveValue('duplicate');
+  });
+
+  it('reports partial bulk-delete failures and retains the failed selection', async () => {
+    const user = userEvent.setup();
+    jest.spyOn(window, 'confirm').mockReturnValue(true);
+    mockedAdminApi.users
+      .mockResolvedValueOnce({
+        success: true,
+        items: [
+          { _id: 'user-1', username: 'Ada' },
+          { _id: 'user-2', username: 'Grace' },
+        ],
+        total: 2,
+        page: 1,
+        limit: 25,
+        pages: 1,
+        query: '',
+      })
+      .mockResolvedValueOnce({
+        success: true,
+        items: [{ _id: 'user-2', username: 'Grace' }],
+        total: 1,
+        page: 1,
+        limit: 25,
+        pages: 1,
+        query: '',
+      });
+    mockedAdminApi.deleteUser
+      .mockResolvedValueOnce({ success: true })
+      .mockRejectedValueOnce(new Error('Protected administrator account'));
+
+    render(<UsersList />);
+    await user.click(await screen.findByRole('checkbox', { name: /select ada/i }));
+    await user.click(screen.getByRole('checkbox', { name: /select grace/i }));
+    await user.click(screen.getByRole('button', { name: /delete selected users \(2\)/i }));
+
+    expect(await screen.findByText(/deleted 1 record/i)).toBeInTheDocument();
+    expect(screen.getByText(/failed to delete 1 record/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /delete selected users \(1\)/i })).toBeEnabled();
+    expect(screen.getByRole('checkbox', { name: /select grace/i })).toBeChecked();
+  });
+
   it('renders user details action panel', async () => {
     render(
       <Routes>
@@ -225,6 +299,64 @@ describe('Admin pages', () => {
     await user.click(screen.getByRole('button', { name: /retry/i }));
     expect(await screen.findByText('Recovered detail')).toBeInTheDocument();
     expect(mockedAdminApi.user.mock.calls.length).toBeGreaterThan(callsBeforeRetry);
+  });
+
+  it('renders a direct not-found detail response without scanning the list', async () => {
+    render(
+      <Routes>
+        <Route path="/admin/users/:id" element={<UserDetails />} />
+      </Routes>,
+      { route: '/admin/users/missing-user' }
+    );
+
+    expect(await screen.findByText('Entry not found')).toBeInTheDocument();
+    expect(mockedAdminApi.user).toHaveBeenCalledWith('missing-user');
+    expect(mockedAdminApi.users).not.toHaveBeenCalled();
+  });
+
+  it('shows update failures without replacing the loaded user', async () => {
+    const user = userEvent.setup();
+    mockedAdminApi.user.mockResolvedValue({
+      _id: 'user-1',
+      username: 'Ada',
+      email: 'ada@example.test',
+      roles: { screener: false, reviewer: true },
+    });
+    mockedAdminApi.updateUser.mockRejectedValueOnce(new Error('Concurrent update detected'));
+
+    render(
+      <Routes>
+        <Route path="/admin/users/:id" element={<UserDetails />} />
+      </Routes>,
+      { route: '/admin/users/user-1' }
+    );
+
+    await screen.findByDisplayValue('Ada');
+    await user.click(screen.getByRole('button', { name: /save changes/i }));
+
+    expect(await screen.findByText('Concurrent update detected')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Ada')).toBeInTheDocument();
+    expect(mockedAdminApi.updateUserRoles).not.toHaveBeenCalled();
+  });
+
+  it('keeps the detail page available when deletion fails', async () => {
+    const user = userEvent.setup();
+    jest.spyOn(window, 'confirm').mockReturnValue(true);
+    mockedAdminApi.user.mockResolvedValue({ _id: 'user-1', username: 'Root user' });
+    mockedAdminApi.deleteUser.mockRejectedValueOnce(new Error('The root user cannot be deleted'));
+
+    render(
+      <Routes>
+        <Route path="/admin/users/:id" element={<UserDetails />} />
+      </Routes>,
+      { route: '/admin/users/user-1' }
+    );
+
+    await screen.findByDisplayValue('Root user');
+    await user.click(screen.getByRole('button', { name: /^delete$/i }));
+
+    expect(await screen.findByText('The root user cannot be deleted')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /user details/i })).toBeInTheDocument();
   });
 
   it('renders account details action panel', async () => {
