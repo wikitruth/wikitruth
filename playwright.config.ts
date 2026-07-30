@@ -2,6 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:3001';
 const useLocalDevServer = !process.env.PLAYWRIGHT_BASE_URL;
+const localTenantHostQa = process.env.WT_LOCAL_TENANT_HOST_QA === '1';
 
 export default defineConfig({
   testDir: './tests/e2e',
@@ -15,6 +16,11 @@ export default defineConfig({
   use: {
     baseURL: baseURL,
     trace: 'retain-on-failure',
+    ...(localTenantHostQa ? {
+      launchOptions: {
+        args: ['--host-resolver-rules=MAP fixthephilippines.org 127.0.0.1'],
+      },
+    } : {}),
   },
   webServer: useLocalDevServer
     ? {

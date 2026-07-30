@@ -27,6 +27,7 @@
     "test:e2e": "playwright test",
     "test:visual:critical": "playwright test --config playwright.visual.config.ts",
     "test:visual:critical:update": "playwright test --config playwright.visual.config.ts --update-snapshots",
+    "test:e2e:email-auth": "node --env-file-if-exists=.env scripts/qa/run-disposable-email-auth-e2e.mjs",
     "test:e2e:passkeys": "node --env-file-if-exists=.env scripts/qa/run-disposable-passkey-e2e.mjs",
     "test:perf:budgets": "node scripts/perf/check-perf-budgets.mjs",
     "test:load:api-db": "node --env-file-if-exists=.env scripts/perf/api-database-load.mjs",

@@ -128,6 +128,38 @@ describe('email authentication challenge service', () => {
     expect(challengeCreate).not.toHaveBeenCalled();
   });
 
+  it('accepts throttled requests generically without creating or delivering a challenge', async () => {
+    challengeCount.mockResolvedValue(20);
+
+    const result = await createEmailAuthChallenge(requestFixture(), {
+      email: 'person@example.com',
+      rememberMe: false,
+    });
+
+    expect(result).toEqual(expect.objectContaining({
+      accepted: true,
+      challengeId: '',
+      deliveryRequired: false,
+    }));
+    expect(challengeCreate).not.toHaveBeenCalled();
+  });
+
+  it('rejects challenges excluded by the active expiry query with the generic failure', async () => {
+    challengeFindOne.mockReturnValue(challengeQuery(null));
+
+    await expect(verifyEmailAuthChallenge(requestFixture(), {
+      challengeId: 'expired-challenge',
+      code: '123456',
+    })).rejects.toMatchObject({
+      message: 'The email code or secure link is invalid or expired',
+      code: 'EMAIL_CODE_INVALID',
+    } as Partial<EmailAuthError>);
+    expect(challengeFindOne).toHaveBeenCalledWith(expect.objectContaining({
+      challengeId: 'expired-challenge',
+      expiresAt: { $gt: expect.any(Date) },
+    }));
+  });
+
   it('consumes a valid code exactly once for an existing account', async () => {
     const req = requestFixture();
     const created = await createEmailAuthChallenge(req, {
@@ -144,7 +176,9 @@ describe('email authentication challenge service', () => {
     };
     challengeFindOne.mockReturnValue(challengeQuery(challenge));
     userFindById.mockResolvedValue({ _id: 'user-1', username: 'person', isActive: 'yes' });
-    challengeFindOneAndUpdate.mockReturnValue(challengeQuery(challenge));
+    challengeFindOneAndUpdate
+      .mockReturnValueOnce(challengeQuery(challenge))
+      .mockReturnValueOnce(challengeQuery(null));
 
     const result = await verifyEmailAuthChallenge(req, {
       challengeId: created.challengeId,
@@ -157,6 +191,12 @@ describe('email authentication challenge service', () => {
       expect.objectContaining({ $set: expect.objectContaining({ consumedAt: expect.any(Date) }) }),
       { returnDocument: 'before' }
     );
+    await expect(verifyEmailAuthChallenge(req, {
+      challengeId: created.challengeId,
+      code: created.code,
+    })).rejects.toMatchObject({
+      code: 'EMAIL_CODE_INVALID',
+    } as Partial<EmailAuthError>);
   });
 
   it('counts invalid attempts and returns the same generic failure', async () => {
