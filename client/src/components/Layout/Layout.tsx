@@ -41,7 +41,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           />
         ) : null}
         <div className={`row row-offcanvas row-offcanvas-right${sidebarOpen ? ' active' : ''}`}>
-          <div className="col-sm-12 col-md-9 col-lg-9-x">
+          <div className="col-sm-12 col-md-9 col-lg-9-x wt-main-column">
             {children}
           </div>
 

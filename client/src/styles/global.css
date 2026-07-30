@@ -1,3 +1,7 @@
+.wt-main-column > .container {
+  width: auto;
+}
+
 .wt-context-sidebar {
   position: sticky;
   top: 84px;

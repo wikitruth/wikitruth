@@ -40,4 +40,18 @@ describe('mobile off-canvas layout', () => {
     expect(css).toMatch(/\.wt-explore-tabs\s*>\s*li\s*{[^}]*width:\s*12\.5%/s);
     expect(css).toMatch(/\.wt-explore-tabs\s*>\s*li\s*>\s*a\s*{[^}]*margin-right:\s*0/s);
   });
+
+  it('constrains fixed-width route containers to the main content column', () => {
+    const layoutSource = fs.readFileSync(
+      path.resolve(__dirname, 'Layout.tsx'),
+      'utf8'
+    );
+    const globalCss = fs.readFileSync(
+      path.resolve(__dirname, '../../styles/global.css'),
+      'utf8'
+    );
+
+    expect(layoutSource).toContain('wt-main-column');
+    expect(globalCss).toMatch(/\.wt-main-column\s*>\s*\.container\s*{[^}]*width:\s*auto/s);
+  });
 });

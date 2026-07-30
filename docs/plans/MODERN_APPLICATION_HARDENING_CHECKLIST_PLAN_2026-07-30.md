@@ -40,14 +40,16 @@ deployment, production restart, DNS/proxy change, or content migration.
 
 ## Visual Regression
 
-- [ ] Add a deterministic Playwright configuration for critical desktop and
+- [x] Add a deterministic Playwright configuration for critical desktop and
       mobile routes with fixed locale, timezone, motion, viewport, and mocked data.
-- [ ] Cover the global shell, Home, Explore, an entry page, authentication, and
+- [x] Cover the global shell, Home, Explore, an entry page, authentication, and
       a representative administrator surface.
-- [ ] Generate and visually review committed baseline images.
-- [ ] Prove a second comparison run passes without updating snapshots.
-- [ ] Add documented commands for reviewing and intentionally updating the
+- [x] Generate and visually review committed baseline images.
+- [x] Prove a second comparison run passes without updating snapshots.
+- [x] Add documented commands for reviewing and intentionally updating the
       baselines.
+- [x] Refuse non-loopback visual targets by default and correct fixed-width
+      route containers that could overlap the desktop context sidebar.
 
 ## Focused Coverage
 
@@ -62,7 +64,7 @@ deployment, production restart, DNS/proxy change, or content migration.
 
 ## Final Verification
 
-- [ ] Run targeted server/client tests after each group.
+- [x] Run targeted server/client tests after each completed group.
 - [ ] Run lint, TypeScript checks, source guardrails, full server/client tests,
       production builds, and OpenAPI coverage.
 - [ ] Run the committed visual-regression comparison at desktop and mobile.
