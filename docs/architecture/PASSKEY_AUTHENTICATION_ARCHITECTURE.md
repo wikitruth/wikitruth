@@ -108,12 +108,14 @@ WEBAUTHN_STEP_UP_MAX_AGE_SECONDS=600
 WEBAUTHN_ADMIN_STEP_UP_REQUIRED=true
 ```
 
-Local configuration uses the existing development host:
+Local configuration should use a developer-controlled hostname. This reserved
+test-domain example keeps workstation-specific infrastructure out of the
+repository:
 
 ```text
-WEBAUTHN_RP_ID=wikitruth.example.com
-WEBAUTHN_ORIGINS=https://wikitruth.example.com:9443
-AUTH_CANONICAL_ORIGIN=https://wikitruth.example.com:9443
+WEBAUTHN_RP_ID=wikitruth.test
+WEBAUTHN_ORIGINS=https://wikitruth.test:9443
+AUTH_CANONICAL_ORIGIN=https://wikitruth.test:9443
 ```
 
 ## Verification Requirements

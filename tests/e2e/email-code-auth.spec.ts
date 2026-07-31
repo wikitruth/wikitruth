@@ -36,7 +36,9 @@ test.describe('email-code authentication', () => {
     const continueLink = page.getByRole('link', { name: 'Continue with email on Wikitruth' });
     await expect(continueLink).toBeVisible();
     const destination = new URL(String(await continueLink.getAttribute('href')));
-    expect(destination.origin).toBe('https://wikitruth.example.com:9443');
+    const canonicalAuthOrigin = String(process.env.EMAIL_AUTH_CANONICAL_ORIGIN || '');
+    expect(canonicalAuthOrigin).toBeTruthy();
+    expect(destination.origin).toBe(canonicalAuthOrigin);
     expect(destination.pathname).toBe('/login');
     expect(destination.searchParams.get('targetOrigin')).toBe('https://fixthephilippines.org:9443');
     expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(1);

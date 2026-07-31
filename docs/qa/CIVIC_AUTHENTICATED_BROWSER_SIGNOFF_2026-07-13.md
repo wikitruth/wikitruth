@@ -6,12 +6,12 @@
 
 ## Environment
 
-- Application: `https://wikitruth.example.com:9443` on local PM2 process `35` (`wikitruth`).
+- Application: private local HTTPS origin on port `9443` (hostname redacted), on local PM2 process `35` (`wikitruth`).
 - Browser: Google Chrome `150.0.7871.115`, launched through the Playwright `chrome` channel.
 - Desktop viewport: `1280x800`.
 - Mobile viewport: `390x844`.
 - Tenant under test: `fixtheph`, plus a disposable tenant used to verify platform tenant create/update/inactivate behavior.
-- Runner: `npm run test:civic:authenticated:disposable -- https://wikitruth.example.com:9443`.
+- Runner: `npm run test:civic:authenticated:disposable -- "$WIKITRUTH_LOCAL_ORIGIN"`.
 
 ## Flow Under Test
 

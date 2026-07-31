@@ -116,7 +116,7 @@ Unauthorized journals now render an explicit private state without an avoidable
 
 | ID | Finding | Classification |
 | --- | --- | --- |
-| `BASELINE-01` | Local legacy returns `404` for `/legacy/members/dsalunga/topics`, `/legacy/about`, `/legacy/help-us`, `/legacy/http/500`, `/legacy/errors/503`, and six legacy admin collection routes. | The old matrix lists these as aligned, but the currently mounted legacy baseline cannot render them. This is tracker drift, not a modern defect. |
+| `BASELINE-01` | Local legacy returns `404` for `/legacy/members/contributor/topics`, `/legacy/about`, `/legacy/help-us`, `/legacy/http/500`, `/legacy/errors/503`, and six legacy admin collection routes. | The old matrix lists these as aligned, but the currently mounted legacy baseline cannot render them. This is tracker drift, not a modern defect. |
 | `BASELINE-02` | Local legacy Sign Up and Contact raise `Missing required parameters: sitekey`. | Local legacy reCAPTCHA configuration gap. Modern should still be tested with a configured provider before rollout. |
 | `BASELINE-03` | The original audit found no declared answer discussion route. | Resolved by implementing the focused route; desktop/mobile render `200` with no console or request errors. |
 | `BASELINE-04` | The local legacy admin dashboard and backup page are reachable anonymously and expose operational controls and local filesystem paths. | Legacy security hazard. Modern routes and APIs guard anonymous access before operational UI mounts. |

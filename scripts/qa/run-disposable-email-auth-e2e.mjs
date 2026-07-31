@@ -43,6 +43,7 @@ function runPlaywright(identity) {
         EMAIL_AUTH_E2E: '1',
         EMAIL_AUTH_E2E_USERNAME: identity.username,
         EMAIL_AUTH_E2E_EMAIL: identity.email,
+        EMAIL_AUTH_CANONICAL_ORIGIN: new URL(config.webAuthn.canonicalOrigin).origin,
         PLAYWRIGHT_BASE_URL: baseUrl,
         WT_LOCAL_TENANT_HOST_QA: '1',
       },

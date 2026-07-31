@@ -240,7 +240,7 @@ Use this matrix to complete runtime parity sign-off after code-level review:
 - `[x]` Pair 06: `/legacy/groups/<friendly>/<id>` vs `/groups/<friendly>/<id>` (deterministic fixture screenshot run PASS; HTTP `200/200`)
 - `[x]` Pair 07: `/legacy/groups/<friendly>/<id>/posts` vs `/groups/<friendly>/<id>/posts` (deterministic fixture screenshot run PASS; HTTP `200/200`)
 - `[x]` Pair 08: `/legacy/groups/<friendly>/<id>/members` vs `/groups/<friendly>/<id>/members` (deterministic fixture screenshot run PASS; HTTP `200/200`)
-- `[x]` Pair 09: `/legacy/members/<username>` vs `/members/<username>` (route-level PASS with `dsalunga`)
+- `[x]` Pair 09: `/legacy/members/<username>` vs `/members/<username>` (route-level PASS with the synthetic `contributor` fixture)
 - `[x]` Pair 10: `/legacy/admin` legacy alias verified (intentional divergence): redirects to `/legacy/admin/db-backup` while modern admin remains `/admin`
 
 ## Exit Criteria for “Parity Complete”

@@ -4,7 +4,7 @@ Date: 2026-07-22
 
 Environment: local Wikitruth checkout and local development database
 
-Local origin: `https://wikitruth.example.com:9443`
+Local origin: private development hostname on HTTPS port `9443` (hostname redacted)
 
 Production contract: RP ID `wikitruth.net`, canonical origin `https://wikitruth.net`
 
@@ -34,7 +34,7 @@ The repository's pre-existing file-size warnings remain confined to files alread
 Command:
 
 ```bash
-PLAYWRIGHT_BASE_URL=https://wikitruth.example.com:9443 npm run test:e2e:passkeys
+PLAYWRIGHT_BASE_URL=https://wikitruth.test:9443 npm run test:e2e:passkeys
 ```
 
 Result: Pass in Chromium using CDP virtual authenticators.
