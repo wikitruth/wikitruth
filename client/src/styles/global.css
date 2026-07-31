@@ -2,6 +2,113 @@
   width: auto;
 }
 
+.wt-app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 50px);
+  min-height: calc(100dvh - 50px);
+}
+
+.wt-app-main {
+  flex: 1 0 auto;
+  width: 100%;
+}
+
+.wt-app-shell > .footer {
+  flex: 0 0 auto;
+}
+
+.wt-login-flow-notice {
+  margin: 0 0 20px;
+  padding: 18px 20px;
+  border-left-width: 4px;
+}
+
+.wt-login-flow-notice h2 {
+  margin: 0 0 8px;
+  font-size: 21px;
+  letter-spacing: -0.2px;
+}
+
+.wt-login-flow-notice p:last-child {
+  margin-bottom: 0;
+}
+
+.wt-login-flow-continuation {
+  color: #245269;
+  font-weight: 600;
+}
+
+.wt-access-message {
+  max-width: 540px;
+  margin: 32px auto;
+  text-align: center;
+}
+
+.wt-access-message .panel-body {
+  padding: 28px 24px;
+}
+
+.wt-access-message h2 {
+  margin: 8px 0 10px;
+  font-size: 26px;
+}
+
+.wt-access-message p {
+  margin-bottom: 18px;
+}
+
+.wt-access-message-icon {
+  color: #8a6d3b;
+  font-size: 28px;
+}
+
+.wt-auth-prompt-modal .modal-dialog {
+  margin-top: 80px;
+}
+
+.wt-auth-prompt-modal .modal-content {
+  overflow: hidden;
+  border: 0;
+  border-radius: 8px;
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.28);
+}
+
+.wt-auth-prompt-modal .modal-header {
+  padding: 20px 20px 12px;
+  border-bottom: 0;
+}
+
+.wt-auth-prompt-modal .modal-title {
+  padding-right: 28px;
+  color: #245269;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.wt-auth-prompt-modal .modal-body {
+  padding: 4px 20px 10px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.wt-auth-prompt-modal .modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 20px 20px;
+  border-top: 0;
+}
+
+.wt-auth-prompt-modal .modal-footer::before,
+.wt-auth-prompt-modal .modal-footer::after {
+  display: none;
+}
+
+.wt-auth-prompt-copy p:last-child {
+  margin-bottom: 0;
+}
+
 .wt-context-sidebar {
   position: sticky;
   top: 84px;
@@ -241,12 +348,58 @@ button:focus-visible,
     z-index: 1;
   }
 
+  .wt-access-message {
+    margin: 20px 5px;
+  }
+
+  .wt-login-flow-notice {
+    padding: 16px;
+  }
+
+  .wt-auth-prompt-modal .modal-dialog {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: auto;
+    margin: 0;
+    transform: none !important;
+  }
+
+  .wt-auth-prompt-modal .modal-content {
+    padding-bottom: env(safe-area-inset-bottom);
+    border-radius: 14px 14px 0 0;
+  }
+
+  .wt-auth-prompt-modal .modal-header {
+    padding-top: 22px;
+  }
+
+  .wt-auth-prompt-modal .modal-footer {
+    padding-bottom: 18px;
+  }
+
+  .wt-auth-prompt-modal .modal-footer .btn {
+    min-height: 44px;
+  }
+
 }
 
 /* Match the legacy xxs utility: retain the wordmark on larger phones/tablets. */
 @media (max-width: 479px) {
   .navbar-brand-label .hidden-xxs {
     display: none !important;
+  }
+
+  .footer .copyright {
+    display: block;
+    float: none !important;
+    margin-top: 12px;
+    text-align: center;
+  }
+
+  .footer .links {
+    text-align: center;
   }
 }
 

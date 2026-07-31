@@ -14,6 +14,21 @@ const getReturnUrl = function (req) {
   return returnUrl;
 };
 
+const captureReturnUrl = function (req) {
+  const candidate = String(req.query && req.query.returnUrl || '').trim();
+  if (
+    candidate.startsWith('/') &&
+    !candidate.startsWith('//') &&
+    !candidate.includes('\\') &&
+    !Array.from(candidate).some(function (character) {
+      const code = character.charCodeAt(0);
+      return code <= 31 || code === 127;
+    })
+  ) {
+    req.session.returnUrl = candidate;
+  }
+};
+
 const oauthViewModel = function (req, oauthMessage) {
   return {
     oauthMessage: oauthMessage || '',
@@ -103,6 +118,7 @@ exports.login = function(req, res){
 };
 
 exports.loginTwitter = function(req, res, next){
+  captureReturnUrl(req);
   const db = req.app.db.models;
 
   req._passport.instance.authenticate('twitter', async function(err, user, info) {
@@ -125,6 +141,7 @@ exports.loginTwitter = function(req, res, next){
 };
 
 exports.loginGitHub = function(req, res, next){
+  captureReturnUrl(req);
   const db = req.app.db.models;
 
   req._passport.instance.authenticate('github', async function(err, user, info) {
@@ -147,6 +164,7 @@ exports.loginGitHub = function(req, res, next){
 };
 
 exports.loginFacebook = function(req, res, next){
+  captureReturnUrl(req);
   const db = req.app.db.models;
 
   req._passport.instance.authenticate('facebook', { callbackURL: '/legacy/login/facebook/callback/' }, async function(err, user, info) {
@@ -174,6 +192,7 @@ exports.loginFacebook = function(req, res, next){
 };
 
 exports.loginGoogle = function(req, res, next){
+  captureReturnUrl(req);
   const models = req.app.db.models;
 
   req._passport.instance.authenticate('google', { callbackURL: '/legacy/login/google/callback/' }, async function(err, user, info) {
@@ -197,6 +216,7 @@ exports.loginGoogle = function(req, res, next){
 };
 
 exports.loginApple = function(req, res, next){
+  captureReturnUrl(req);
   const models = req.app.db.models;
 
   req._passport.instance.authenticate('apple', { callbackURL: '/legacy/login/apple/callback/' }, async function(err, user, info) {
@@ -220,6 +240,7 @@ exports.loginApple = function(req, res, next){
 };
 
 exports.loginMicrosoft = function(req, res, next){
+  captureReturnUrl(req);
   const models = req.app.db.models;
 
   req._passport.instance.authenticate('microsoft', { callbackURL: '/legacy/login/microsoft/callback/' }, async function(err, user, info) {

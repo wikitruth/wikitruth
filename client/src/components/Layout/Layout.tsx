@@ -29,30 +29,32 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }, [location.pathname, location.search, closeSidebar]);
 
   return (
-    <div>
+    <div className="wt-app-shell">
       <Header onToggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
-      <div className="container-fluid">
-        {sidebarOpen ? (
-          <button
-            type="button"
-            className="sidebar-backdrop visible-xs visible-sm"
-            aria-label="Close sidebar"
-            onClick={closeSidebar}
-          />
-        ) : null}
-        <div className={`row row-offcanvas row-offcanvas-right${sidebarOpen ? ' active' : ''}`}>
-          <div className="col-sm-12 col-md-9 col-lg-9-x wt-main-column">
-            {children}
-          </div>
+      <main className="wt-app-main">
+        <div className="container-fluid">
+          {sidebarOpen ? (
+            <button
+              type="button"
+              className="sidebar-backdrop visible-xs visible-sm"
+              aria-label="Close sidebar"
+              onClick={closeSidebar}
+            />
+          ) : null}
+          <div className={`row row-offcanvas row-offcanvas-right${sidebarOpen ? ' active' : ''}`}>
+            <div className="col-sm-12 col-md-9 col-lg-9-x wt-main-column">
+              {children}
+            </div>
 
-          <div
-            className="col-xs-7-x col-sm-4 col-md-3 col-lg-3-x sidebar-offcanvas"
-            id="sidebar"
-          >
-            <ContextSidebar />
+            <div
+              className="col-xs-7-x col-sm-4 col-md-3 col-lg-3-x sidebar-offcanvas"
+              id="sidebar"
+            >
+              <ContextSidebar />
+            </div>
           </div>
         </div>
-      </div>
+      </main>
       <Footer />
     </div>
   );

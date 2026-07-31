@@ -7,6 +7,7 @@ interface SocialLoginButtonsProps {
   onProviderClick?: (provider: SocialProvider) => void;
   enabledProviders?: Record<string, boolean> | null;
   rememberMe?: boolean;
+  returnUrl?: string;
 }
 
 const providerCatalog: Array<{ key: SocialProvider; label: string; icon: string }> = [
@@ -18,7 +19,13 @@ const providerCatalog: Array<{ key: SocialProvider; label: string; icon: string 
   { key: 'microsoft', label: 'Microsoft', icon: 'windows' },
 ];
 
-const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({ mode = 'login', onProviderClick, enabledProviders, rememberMe }) => {
+const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
+  mode = 'login',
+  onProviderClick,
+  enabledProviders,
+  rememberMe,
+  returnUrl,
+}) => {
   const providers = providerCatalog
     .filter((provider) => {
       if (!enabledProviders) {
@@ -26,10 +33,20 @@ const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({ mode = 'login',
       }
       return Boolean(enabledProviders[provider.key]);
     })
-    .map((provider) => ({
-      ...provider,
-      href: `/${mode}/${provider.key}/${typeof rememberMe === 'boolean' ? `?rememberMe=${rememberMe ? 'true' : 'false'}` : ''}`,
-    }));
+    .map((provider) => {
+      const search = new URLSearchParams();
+      if (typeof rememberMe === 'boolean') {
+        search.set('rememberMe', rememberMe ? 'true' : 'false');
+      }
+      if (returnUrl) {
+        search.set('returnUrl', returnUrl);
+      }
+      const query = search.toString();
+      return {
+        ...provider,
+        href: `/${mode}/${provider.key}/${query ? `?${query}` : ''}`,
+      };
+    });
 
   if (providers.length === 0) {
     return (

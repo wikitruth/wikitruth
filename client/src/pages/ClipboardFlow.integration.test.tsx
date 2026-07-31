@@ -25,6 +25,10 @@ jest.mock('../context/NotificationContext', () => ({
   useNotification: jest.fn(),
 }));
 
+jest.mock('../context/AuthPromptContext', () => ({
+  useAuthPrompt: () => ({ requestSignIn: jest.fn() }),
+}));
+
 jest.mock('../components/common/PageMeta', () => ({
   __esModule: true,
   default: () => null,

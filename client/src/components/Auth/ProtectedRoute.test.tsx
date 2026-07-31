@@ -2,12 +2,18 @@ import React from 'react';
 import { render, screen } from '../../test-utils/render';
 import { useAuth } from '../../context/AuthContext';
 import ProtectedRoute from './ProtectedRoute';
+import { Route, Routes, useLocation } from 'react-router-dom';
 
 jest.mock('../../context/AuthContext', () => ({
   useAuth: jest.fn(),
 }));
 
 const mockedUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
+
+const LocationDisplay: React.FC = () => {
+  const location = useLocation();
+  return <output data-testid="location">{location.pathname}{location.search}</output>;
+};
 
 function authState(
   overrides: Partial<ReturnType<typeof useAuth>> = {}
@@ -28,20 +34,27 @@ function authState(
 }
 
 describe('ProtectedRoute', () => {
-  it('offers a sign-in return path without mounting protected content', () => {
+  it('redirects directly to sign in without mounting protected content', () => {
     mockedUseAuth.mockReturnValue(authState());
 
     render(
-      <ProtectedRoute>
-        <div>Secret form</div>
-      </ProtectedRoute>,
+      <Routes>
+        <Route
+          path="/notifications"
+          element={(
+            <ProtectedRoute>
+              <div>Secret form</div>
+            </ProtectedRoute>
+          )}
+        />
+        <Route path="/login" element={<LocationDisplay />} />
+      </Routes>,
       { route: '/notifications?view=unread' }
     );
 
     expect(screen.queryByText('Secret form')).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /sign in/i })).toHaveAttribute(
-      'href',
-      '/login?returnUrl=%2Fnotifications%3Fview%3Dunread'
+    expect(screen.getByTestId('location')).toHaveTextContent(
+      '/login?returnUrl=%2Fnotifications%3Fview%3Dunread&intent=protected',
     );
   });
 

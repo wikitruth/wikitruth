@@ -6,6 +6,7 @@ import moderationApi from '../../services/api/moderation';
 import notificationsApi from '../../services/api/notifications';
 import * as clipboardPage from '../../pages/ClipboardPage';
 import type { LegacyEntity } from '../../types/legacy';
+import { useAuthPrompt } from '../../context/AuthPromptContext';
 
 const mockNavigate = jest.fn();
 
@@ -19,6 +20,10 @@ jest.mock('react-router-dom', () => {
 
 jest.mock('../../context/AuthContext', () => ({
   useAuth: jest.fn(),
+}));
+
+jest.mock('../../context/AuthPromptContext', () => ({
+  useAuthPrompt: jest.fn(),
 }));
 
 jest.mock('../../services/api/moderation', () => ({
@@ -50,6 +55,8 @@ jest.mock('../../pages/ClipboardPage', () => ({
 }));
 
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
+const mockUseAuthPrompt = useAuthPrompt as jest.MockedFunction<typeof useAuthPrompt>;
+const mockRequestSignIn = jest.fn();
 const mockedModerationApi = moderationApi as jest.Mocked<typeof moderationApi>;
 const mockedNotificationsApi = notificationsApi as jest.Mocked<typeof notificationsApi>;
 const mockedClipboard = clipboardPage as jest.Mocked<typeof clipboardPage>;
@@ -88,6 +95,8 @@ describe('EntryActionsMenu moderation actions', () => {
 
   beforeEach(() => {
     mockNavigate.mockReset();
+    mockRequestSignIn.mockReset();
+    mockUseAuthPrompt.mockReturnValue({ requestSignIn: mockRequestSignIn });
     mockUseAuth.mockReturnValue({
       user: {
         _id: 'user-1',
@@ -181,6 +190,35 @@ describe('EntryActionsMenu moderation actions', () => {
     openMenu();
     fireEvent.click(screen.getByRole('button', { name: /copy to clipboard/i }));
     expect(mockedClipboard.addToClipboard).toHaveBeenCalled();
+  });
+
+  it('prompts in context for signed-out follow and report actions', async () => {
+    mockUseAuth.mockReturnValue({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+      activeRole: 'reader',
+      setActiveRole: jest.fn(),
+      availableRoles: ['reader'],
+      login: jest.fn(),
+      signup: jest.fn(),
+      logout: jest.fn(),
+      updateUser: jest.fn(),
+    });
+
+    await renderMenu({ objectName: 'topic', _id: 'topic-1' });
+    openMenu();
+    fireEvent.click(screen.getByRole('button', { name: /^follow$/i }));
+    expect(mockRequestSignIn).toHaveBeenCalledWith({ intent: 'follow' });
+
+    openMenu();
+    fireEvent.click(screen.getByRole('button', { name: /report/i }));
+    expect(mockRequestSignIn).toHaveBeenCalledWith({
+      intent: 'report',
+      returnUrl: '/issues/create?topic=topic-1',
+    });
+    expect(mockNavigate).not.toHaveBeenCalled();
+    expect(mockedNotificationsApi.setSubscription).not.toHaveBeenCalled();
   });
 
   it('handles admin delete action', async () => {

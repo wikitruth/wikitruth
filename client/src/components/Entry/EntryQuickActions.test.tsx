@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useNotification } from '../../context/NotificationContext';
 import apiService from '../../services/api';
 import type { LegacyEntity } from '../../types/legacy';
+import { useAuthPrompt } from '../../context/AuthPromptContext';
 
 jest.mock('../../context/AuthContext', () => ({
   useAuth: jest.fn(),
@@ -12,6 +13,10 @@ jest.mock('../../context/AuthContext', () => ({
 
 jest.mock('../../context/NotificationContext', () => ({
   useNotification: jest.fn(),
+}));
+
+jest.mock('../../context/AuthPromptContext', () => ({
+  useAuthPrompt: jest.fn(),
 }));
 
 jest.mock('../../services/api', () => ({
@@ -25,7 +30,9 @@ jest.mock('../../services/api', () => ({
 
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 const mockUseNotification = useNotification as jest.MockedFunction<typeof useNotification>;
+const mockUseAuthPrompt = useAuthPrompt as jest.MockedFunction<typeof useAuthPrompt>;
 const mockedApiService = apiService as jest.Mocked<typeof apiService>;
+const requestSignIn = jest.fn();
 
 function makeEntry(overrides: Partial<LegacyEntity> = {}): LegacyEntity {
   return {
@@ -66,6 +73,7 @@ describe('EntryQuickActions reactions', () => {
 
   beforeEach(() => {
     addToast.mockReset();
+    requestSignIn.mockReset();
     mockedApiService.getEntryReactions.mockReset();
     mockedApiService.setEntryReaction.mockReset();
     mockedApiService.createOpinion.mockReset();
@@ -75,6 +83,7 @@ describe('EntryQuickActions reactions', () => {
       removeToast: jest.fn(),
       toasts: [],
     });
+    mockUseAuthPrompt.mockReturnValue({ requestSignIn });
 
     mockUseAuth.mockReturnValue({
       user: {
@@ -167,7 +176,35 @@ describe('EntryQuickActions reactions', () => {
     fireEvent.click(screen.getByRole('link', { name: /Bury/i }));
 
     expect(mockedApiService.setEntryReaction).not.toHaveBeenCalled();
-    expect(addToast).toHaveBeenCalledWith('warning', expect.stringMatching(/sign in/i));
+    expect(requestSignIn).toHaveBeenCalledWith({ intent: 'react' });
+    expect(addToast).not.toHaveBeenCalledWith('warning', expect.stringMatching(/sign in/i));
+  });
+
+  it('sends signed-out quick contributions to the full form after contextual sign in', async () => {
+    mockUseAuth.mockReturnValue({
+      user: null,
+      isAuthenticated: false,
+      isLoading: false,
+      activeRole: 'reader',
+      setActiveRole: jest.fn(),
+      availableRoles: ['reader'],
+      login: jest.fn(),
+      signup: jest.fn(),
+      logout: jest.fn(),
+      updateUser: jest.fn(),
+    });
+
+    render(<EntryQuickActions entry={makeEntry()} objectName="topic" />);
+    await waitFor(() => expect(mockedApiService.getEntryReactions).toHaveBeenCalled());
+
+    fireEvent.click(screen.getByRole('link', { name: /^Reply$/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Quick Contribution/i }));
+
+    expect(requestSignIn).toHaveBeenCalledWith({
+      intent: 'contribute',
+      returnUrl: '/opinions/create?parentId=entry-1&parentType=topic',
+    });
+    expect(screen.queryByLabelText('Purpose')).not.toBeInTheDocument();
   });
 
   it('shows good and bad controls only for value entries', async () => {

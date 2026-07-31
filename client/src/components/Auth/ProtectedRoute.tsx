@@ -1,6 +1,7 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { buildSignInPath } from '../../utils/authFlow';
 import LoadingSpinner from '../LoadingSpinner';
 
 export type ProtectedRole = 'admin' | 'reviewer' | 'screener';
@@ -27,26 +28,23 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, allowedRoles 
 
   if (!isAuthenticated) {
     const returnUrl = `${location.pathname}${location.search}`;
-    return (
-      <div className="alert alert-info wt-protected-route-message" role="status">
-        <h3>Sign in required</h3>
-        <p>This page requires an authenticated account.</p>
-        <Link className="btn btn-primary" to={`/login?returnUrl=${encodeURIComponent(returnUrl)}`}>
-          <i className="fa fa-sign-in" aria-hidden="true"></i> Sign In
-        </Link>
-      </div>
-    );
+    return <Navigate replace to={buildSignInPath(returnUrl, 'protected')} />;
   }
 
   if (allowedRoles.length > 0 && !hasAllowedRole(user?.roles, allowedRoles)) {
     return (
-      <div className="alert alert-warning wt-protected-route-message" role="alert">
-        <h3>Access restricted</h3>
-        <p>Your account does not have the role required to use this page.</p>
-        <Link className="btn btn-default" to="/">
-          Return Home
-        </Link>
-      </div>
+      <section className="panel panel-warning wt-access-message" role="alert">
+        <div className="panel-body">
+          <div className="wt-access-message-icon" aria-hidden="true">
+            <i className="fa fa-lock"></i>
+          </div>
+          <h2>Access restricted</h2>
+          <p>Your account does not have the role required to use this page.</p>
+          <Link className="btn btn-default" to="/">
+            Return Home
+          </Link>
+        </div>
+      </section>
     );
   }
 

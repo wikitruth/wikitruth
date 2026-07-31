@@ -6,6 +6,7 @@ import apiService from '../../services/api';
 import type { EntryReactionCounts, EntryReactionState, ReactionChannel, ReactionValue } from '../../types/api';
 import type { LegacyEntity } from '../../types/legacy';
 import ContextualContributionDrawer from './ContextualContributionDrawer';
+import { useAuthPrompt } from '../../context/AuthPromptContext';
 
 type SupportedObjectName = 'topic' | 'argument' | 'question' | 'answer' | 'issue' | 'opinion' | 'artifact';
 
@@ -161,6 +162,7 @@ const EntryQuickActions: React.FC<EntryQuickActionsProps> = ({
 }) => {
   const { addToast } = useNotification();
   const { user } = useAuth();
+  const { requestSignIn } = useAuthPrompt();
   const objectName = normalizeObjectName(providedObjectName || entry.objectName);
   const entryId = String(entry._id || '');
   const topicIdForReply = getTopicIdForReply(entry, objectName);
@@ -332,7 +334,7 @@ const EntryQuickActions: React.FC<EntryQuickActionsProps> = ({
     }
 
     if (!user) {
-      addToast('warning', 'Please sign in to react.');
+      requestSignIn({ intent: 'react' });
       return;
     }
 
@@ -476,7 +478,17 @@ const EntryQuickActions: React.FC<EntryQuickActionsProps> = ({
                   type="button"
                   className="btn btn-link"
                   style={{ width: '100%', textAlign: 'left', color: '#333', padding: '3px 20px' }}
-                  onClick={() => { setShowReplyMenu(false); setShowContributionDrawer(true); }}
+                  onClick={() => {
+                    setShowReplyMenu(false);
+                    if (!user) {
+                      requestSignIn({
+                        intent: 'contribute',
+                        returnUrl: `/opinions/create?parentId=${encodeURIComponent(entryId)}&parentType=${encodeURIComponent(objectName)}`,
+                      });
+                      return;
+                    }
+                    setShowContributionDrawer(true);
+                  }}
                 >
                   <i className="fa fa-bolt" aria-hidden="true"></i> Quick Contribution
                 </button>
@@ -488,8 +500,15 @@ const EntryQuickActions: React.FC<EntryQuickActionsProps> = ({
                   <li>
                     <Link
                       to={item.to}
-                      onClick={() => {
+                      onClick={(event) => {
                         setShowReplyMenu(false);
+                        if (!user) {
+                          event.preventDefault();
+                          requestSignIn({
+                            intent: item.key === 'new-comment' ? 'reply' : 'contribute',
+                            returnUrl: item.to,
+                          });
+                        }
                       }}
                     >
                       <span className={item.iconClass} aria-hidden="true"></span> {item.label}

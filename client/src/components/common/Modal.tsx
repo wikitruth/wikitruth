@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useId, useRef } from 'react';
 
 interface ModalProps {
   isOpen: boolean;
@@ -8,6 +8,7 @@ interface ModalProps {
   footer?: React.ReactNode;
   size?: 'sm' | 'md' | 'lg';
   closeButton?: boolean;
+  className?: string;
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -18,17 +19,37 @@ const Modal: React.FC<ModalProps> = ({
   footer,
   size = 'md',
   closeButton = true,
+  className = '',
 }) => {
+  const titleId = useId();
+  const dialogRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    if (isOpen) {
-      document.body.classList.add('modal-open');
-    } else {
+    if (!isOpen) {
       document.body.classList.remove('modal-open');
+      return undefined;
     }
-    return () => {
-      document.body.classList.remove('modal-open');
+
+    const previouslyFocused = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null;
+    document.body.classList.add('modal-open');
+    const focusFrame = window.requestAnimationFrame(() => {
+      const preferredTarget = dialogRef.current?.querySelector<HTMLElement>('[data-autofocus]');
+      (preferredTarget || dialogRef.current)?.focus();
+    });
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
     };
-  }, [isOpen]);
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.classList.remove('modal-open');
+      previouslyFocused?.focus();
+    };
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -36,8 +57,21 @@ const Modal: React.FC<ModalProps> = ({
 
   return (
     <>
-      <div className="modal fade in" style={{ display: 'block' }} onClick={onClose}>
-        <div className={`modal-dialog ${sizeClass}`.trim()} onClick={(e) => e.stopPropagation()}>
+      <div
+        className={`modal fade in ${className}`.trim()}
+        style={{ display: 'block' }}
+        onClick={onClose}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={title ? titleId : undefined}
+        aria-label={title ? undefined : 'Dialog'}
+      >
+        <div
+          ref={dialogRef}
+          className={`modal-dialog ${sizeClass}`.trim()}
+          onClick={(e) => e.stopPropagation()}
+          tabIndex={-1}
+        >
           <div className="modal-content">
             {title && (
               <div className="modal-header">
@@ -51,7 +85,7 @@ const Modal: React.FC<ModalProps> = ({
                     <span aria-hidden="true">&times;</span>
                   </button>
                 )}
-                <h4 className="modal-title">{title}</h4>
+                <h4 className="modal-title" id={titleId}>{title}</h4>
               </div>
             )}
             <div className="modal-body">{children}</div>

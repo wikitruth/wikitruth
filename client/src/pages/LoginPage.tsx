@@ -12,21 +12,27 @@ import PageMeta from '../components/common/PageMeta';
 import { trackEvent } from '../utils/analytics';
 import passkeyApi, { type PasskeyRuntimeConfig } from '../services/api/passkeys';
 import PasswordlessEmailPanel from '../components/Auth/PasswordlessEmailPanel';
+import {
+  getAuthFlowContent,
+  isSafeInternalReturnUrl,
+  parseAuthIntent,
+  safeReturnUrl,
+} from '../utils/authFlow';
 
 interface LoginFormValues {
   username: string;
   password: string;
 }
 
-function safeReturnUrl(value: string | null): string {
-  const candidate = String(value || '').trim();
-  return candidate.startsWith('/') && !candidate.startsWith('//') ? candidate : '/';
-}
-
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const returnUrl = safeReturnUrl(searchParams.get('returnUrl'));
+  const requestedReturnUrl = searchParams.get('returnUrl');
+  const returnUrl = safeReturnUrl(requestedReturnUrl);
+  const intent = parseAuthIntent(searchParams.get('intent'));
+  const flowContent = intent && isSafeInternalReturnUrl(requestedReturnUrl)
+    ? getAuthFlowContent(intent, returnUrl)
+    : null;
   const { login, isAuthenticated, refreshAuth } = useAuth();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [providersReady, setProvidersReady] = useState(false);
@@ -204,6 +210,16 @@ const LoginPage: React.FC = () => {
           <div className="page-header1" style={{ marginTop: '40px', marginBottom: '20px' }}>
             <h1>Sign In</h1>
           </div>
+          {flowContent ? (
+            <div className="alert alert-info wt-login-flow-notice" role="status">
+              <h2>{flowContent.title}</h2>
+              <p>{flowContent.message}</p>
+              <p className="wt-login-flow-continuation">
+                <i className="fa fa-arrow-circle-right" aria-hidden="true"></i>{' '}
+                {flowContent.continuation}
+              </p>
+            </div>
+          ) : null}
           <ul className="nav nav-tabs wt-tabs" role="tablist">
             <li role="presentation" className="active">
               <Link to="/login" role="tab">
@@ -349,13 +365,23 @@ const LoginPage: React.FC = () => {
           <div style={{ marginTop: '40px' }}>
             <h3>Or sign in using...</h3>
             {providersReady ? (
-              <SocialLoginButtons mode="login" enabledProviders={enabledProviders} rememberMe={rememberMe} />
+              <SocialLoginButtons
+                mode="login"
+                enabledProviders={enabledProviders}
+                rememberMe={rememberMe}
+                returnUrl={returnUrl}
+              />
             ) : (
               <p className="text-muted">Loading providers...</p>
             )}
             <hr />
             <p>Don&apos;t have an account?</p>
-            <Link to="/signup" className="btn btn-primary btn-block">
+            <Link
+              to={isSafeInternalReturnUrl(requestedReturnUrl)
+                ? `/signup?returnUrl=${encodeURIComponent(returnUrl)}`
+                : '/signup'}
+              className="btn btn-primary btn-block"
+            >
               <i className="fa fa-user"></i> Sign Up
             </Link>
           </div>

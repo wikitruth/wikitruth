@@ -74,6 +74,15 @@ describe('LoginPage', () => {
     expect(navigate).toHaveBeenCalledWith('/notifications?view=unread', { replace: true });
   });
 
+  it('explains why sign in is needed and confirms the return flow', () => {
+    render(<LoginPage />, {
+      route: '/login?returnUrl=%2Fnotifications%3Fview%3Dunread&intent=protected',
+    });
+
+    expect(screen.getByRole('heading', { name: 'Sign in to view your notifications' })).toBeInTheDocument();
+    expect(screen.getByText(/return to the page you requested/i)).toBeInTheDocument();
+  });
+
   it('rejects an external return URL', async () => {
     const user = userEvent.setup();
     render(<LoginPage />, { route: '/login?returnUrl=https%3A%2F%2Fevil.example' });
@@ -83,5 +92,6 @@ describe('LoginPage', () => {
     await user.click(screen.getByRole('button', { name: /^sign in$/i }));
 
     await waitFor(() => expect(navigate).toHaveBeenCalledWith('/', { replace: true }));
+    expect(screen.queryByText(/after signing in/i)).not.toBeInTheDocument();
   });
 });

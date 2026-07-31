@@ -54,4 +54,20 @@ describe('mobile off-canvas layout', () => {
     expect(layoutSource).toContain('wt-main-column');
     expect(globalCss).toMatch(/\.wt-main-column\s*>\s*\.container\s*{[^}]*width:\s*auto/s);
   });
+
+  it('uses a flex shell to keep the footer at the bottom of short pages', () => {
+    const layoutSource = fs.readFileSync(
+      path.resolve(__dirname, 'Layout.tsx'),
+      'utf8'
+    );
+    const globalCss = fs.readFileSync(
+      path.resolve(__dirname, '../../styles/global.css'),
+      'utf8'
+    );
+
+    expect(layoutSource).toContain('className="wt-app-shell"');
+    expect(layoutSource).toContain('<main className="wt-app-main">');
+    expect(globalCss).toMatch(/\.wt-app-shell\s*{[^}]*display:\s*flex[^}]*flex-direction:\s*column[^}]*min-height:/s);
+    expect(globalCss).toMatch(/\.wt-app-main\s*{[^}]*flex:\s*1 0 auto/s);
+  });
 });

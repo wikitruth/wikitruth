@@ -5,6 +5,7 @@ import moderationApi, { type ModerationTargetKey } from '../../services/api/mode
 import notificationsApi from '../../services/api/notifications';
 import { addToClipboard } from '../../pages/ClipboardPage';
 import type { LegacyEntity } from '../../types/legacy';
+import { useAuthPrompt } from '../../context/AuthPromptContext';
 
 type ReaderSignalType = 'controversial' | 'incorrect_verdict' | 'needs_reevaluation' | 'wrong_category';
 
@@ -71,6 +72,7 @@ function resolveEntryDetailsPath(entry: LegacyEntity, objectName: string): strin
 
 const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) => {
   const { user, activeRole } = useAuth();
+  const { requestSignIn } = useAuthPrompt();
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [followed, setFollowed] = useState(false);
@@ -170,7 +172,8 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
       return;
     }
     if (!isAuthenticated) {
-      setStatusMessage('Please sign in to follow this entry.');
+      setIsOpen(false);
+      requestSignIn({ intent: 'follow' });
       return;
     }
     void (async () => {
@@ -211,13 +214,14 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
   };
 
   const handleReport = () => {
+    const reportPath = `/issues/create?${encodeURIComponent(objectName)}=${encodeURIComponent(entry._id)}`;
     if (!isAuthenticated) {
-      setStatusMessage('Please sign in to report this entry.');
       setIsOpen(false);
+      requestSignIn({ intent: 'report', returnUrl: reportPath });
       return;
     }
     setIsOpen(false);
-    void navigate(`/issues/create?${encodeURIComponent(objectName)}=${encodeURIComponent(entry._id)}`);
+    void navigate(reportPath);
   };
 
   const handleViewDetails = () => {
@@ -286,8 +290,13 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
   };
 
   const handleReply = () => {
+    const replyPath = `/opinions/create?parentId=${encodeURIComponent(entry._id)}&parentType=${encodeURIComponent(objectName)}`;
     setIsOpen(false);
-    void navigate(`/opinions/create?parentId=${encodeURIComponent(entry._id)}&parentType=${encodeURIComponent(objectName)}`);
+    if (!isAuthenticated) {
+      requestSignIn({ intent: 'reply', returnUrl: replyPath });
+      return;
+    }
+    void navigate(replyPath);
   };
 
   const handleScreening = () => {

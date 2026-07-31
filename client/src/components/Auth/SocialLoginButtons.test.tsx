@@ -31,6 +31,15 @@ describe('SocialLoginButtons', () => {
     expect(screen.getByRole('link', { name: /microsoft/i })).toHaveAttribute('href', '/signup/microsoft/');
   });
 
+  it('preserves a safe return path through a social sign-in round trip', () => {
+    render(<SocialLoginButtons rememberMe returnUrl="/issues/create?topic=entry-1" />);
+
+    expect(screen.getByRole('link', { name: /google/i })).toHaveAttribute(
+      'href',
+      '/login/google/?rememberMe=true&returnUrl=%2Fissues%2Fcreate%3Ftopic%3Dentry-1',
+    );
+  });
+
   it('renders only enabled providers when availability is provided', () => {
     render(
       <SocialLoginButtons
