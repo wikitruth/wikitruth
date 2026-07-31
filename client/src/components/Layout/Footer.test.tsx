@@ -26,5 +26,13 @@ describe('Footer application navigation', () => {
     expect(screen.getByRole('link', { name: /home/i })).toHaveAttribute('href', '/civic');
     expect(screen.getByRole('link', { name: /about/i })).toHaveAttribute('href', '/civic');
     expect(screen.getByRole('link', { name: /contact/i })).toHaveAttribute('href', '/contact?civic=1');
+    expect(screen.getByRole('link', { name: /source/i })).toHaveAttribute(
+      'href',
+      'https://github.com/wikitruth/wikitruth',
+    );
+    expect(screen.getByRole('link', { name: /license/i })).toHaveAttribute(
+      'href',
+      'https://github.com/wikitruth/wikitruth/blob/develop/LICENSE',
+    );
   });
 });

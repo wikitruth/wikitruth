@@ -33,7 +33,18 @@ const Footer: React.FC = () => {
           <li>
             <a href="https://github.com/wikitruth/wikitruth" target="_blank" rel="noreferrer" className="no-underline">
               <i className="fa fa-github"></i>
-              <span className="hidden-xxs"> Github</span>
+              <span className="hidden-xxs"> Source</span>
+            </a>
+          </li>
+          <li>
+            <a
+              href="https://github.com/wikitruth/wikitruth/blob/develop/LICENSE"
+              target="_blank"
+              rel="noreferrer"
+              className="no-underline"
+            >
+              <i className="fa fa-balance-scale"></i>
+              <span className="hidden-xs"> License</span>
             </a>
           </li>
           <li>

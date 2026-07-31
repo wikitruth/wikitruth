@@ -17,7 +17,8 @@
             <li><a href="{legacyBaseUrl}/" class="no-underline"><i class="fa fa-home"></i><span class="hidden-xxs"> Home</span></a></li>
             <li><a href="https://www.facebook.com/wikitruth.project" class="no-underline"><i class="fa fa-facebook-official"></i><span class="hidden-xxs"> Facebook</span></a></li>
             {!<li><a href="//blog.wikitruth.co">Blog</a></li>!}
-            <li><a href="https://github.com/wikitruth/wikitruth" target="_blank" class="no-underline"><i class="fa fa-github"></i><span class="hidden-xxs"> Github</span></a></li>
+            <li><a href="https://github.com/wikitruth/wikitruth" target="_blank" rel="noreferrer" class="no-underline"><i class="fa fa-github"></i><span class="hidden-xxs"> Source</span></a></li>
+            <li><a href="https://github.com/wikitruth/wikitruth/blob/develop/LICENSE" target="_blank" rel="noreferrer" class="no-underline"><i class="fa fa-balance-scale"></i><span class="hidden-xs"> License</span></a></li>
             <li><a href="{paths.about}" class="no-underline"><i class="fa fa-info-circle"></i><span class="hidden-xs"> About</span></a></li>
             <li><a href="{paths.contact}" class="no-underline"><i class="fa fa-comment"></i><span class="hidden-xs"> Contact</span></a></li>
         </ul>
