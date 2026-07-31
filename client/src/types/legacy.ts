@@ -27,6 +27,12 @@ export interface LegacyEntity {
   username: string;
   email: string;
   points?: number;
+  discoveryRanking?: {
+    positive?: number;
+    negative?: number;
+    total?: number;
+    acceptedResponses?: number;
+  };
   reputation?: import('./index').ReputationSnapshot | null;
   authorReputationScore?: number;
   authorReputationLevel?: string;

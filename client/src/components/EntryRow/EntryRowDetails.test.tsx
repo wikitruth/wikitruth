@@ -101,6 +101,25 @@ describe('EntryRowDetails', () => {
     expect(screen.queryByText('reply')).not.toBeInTheDocument();
   });
 
+  it('uses persisted opinion and positive-reaction totals when legacy counters are absent', () => {
+    render(
+      <EntryRowDetails
+        entry={entry({
+          childrenCount: { opinions: { total: 4 } },
+          discoveryRanking: { positive: 3, negative: 1, total: 4 },
+        })}
+        kind="question"
+        entryPath="/questions/entry/sample-question/question-1"
+      />
+    );
+
+    expect(screen.getByText('4').closest('a')).toHaveAttribute(
+      'href',
+      '/questions/entry/sample-question/question-1/discussion'
+    );
+    expect(screen.getByText('3').closest('span')).toBeInTheDocument();
+  });
+
   it('uses a compact accessible icon for accepted screening status', () => {
     render(
       <EntryRowDetails

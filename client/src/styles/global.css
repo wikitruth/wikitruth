@@ -227,6 +227,15 @@ button:focus-visible,
     padding-top: 50px;
   }
 
+  .wt-primary-navigation .wt-header-more-menu {
+    position: fixed;
+    top: 50px;
+    right: 8px;
+    left: 8px;
+    max-height: calc(100vh - 58px);
+    overflow-y: auto;
+  }
+
   .breadcrumb.wt-bc {
     position: relative;
     z-index: 1;

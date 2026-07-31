@@ -40,7 +40,6 @@ type EntryExtrasDeps = {
   utils: {
     urlify: (value: unknown) => string;
     getShortText: (text: unknown, length: number) => string;
-    randomInt: (min: number, max: number) => number;
     timeSince: (value: unknown, short?: boolean) => string;
   };
   dateFns: {
@@ -103,8 +102,6 @@ export function appendEntryExtrasCore(
   }
 
   appendListExtrasCore(item, objectType, shortTitleLength, deps);
-  item.comments = deps.utils.randomInt(0, 999);
-  item.points = deps.utils.randomInt(0, 9999);
   item.editDateString = deps.utils.timeSince(item.editDate, true) + ' ago';
   item.createDateString = deps.utils.timeSince(item.createDate, true) + ' ago';
   item.sameEditor = item.createUserId?.toString() === item.editUserId?.toString();

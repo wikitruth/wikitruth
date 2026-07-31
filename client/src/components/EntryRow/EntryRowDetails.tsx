@@ -79,8 +79,8 @@ const EntryRowDetails: React.FC<EntryRowDetailsProps> = ({
     rawDate && !Number.isNaN(new Date(rawDate).getTime())
       ? new Date(rawDate).toString()
       : undefined;
-  const comments = Number(entry.comments || entry.childrenCount?.opinions?.total || 0);
-  const points = Number(entry.points || 0);
+  const comments = Number(entry.comments ?? entry.childrenCount?.opinions?.total ?? 0);
+  const positiveReactions = Number(entry.points ?? entry.discoveryRanking?.positive ?? 0);
   const discussPath = discussionPath(kind, path);
   const thumbnailPath = String(entry.thumbnailPath || '').trim();
   const filePath = String(entry.filePath || thumbnailPath).trim();
@@ -130,7 +130,7 @@ const EntryRowDetails: React.FC<EntryRowDetailsProps> = ({
           </a>
         </div>
       ) : null}
-      {subtitle || editor || dateLabel || comments > 0 || points !== 0 ? (
+      {subtitle || editor || dateLabel || comments > 0 || positiveReactions > 0 ? (
         <div className="wt-entry-row-footer text-muted">
           {editor ? (
             <span>
@@ -169,9 +169,9 @@ const EntryRowDetails: React.FC<EntryRowDetailsProps> = ({
               <i className="fa fa-comment-o" aria-hidden="true"></i> {comments}
             </span>
           ) : null}
-          {points !== 0 ? (
+          {positiveReactions > 0 ? (
             <span>
-              <i className="fa fa-thumbs-o-up" aria-hidden="true"></i> {points}
+              <i className="fa fa-thumbs-o-up" aria-hidden="true"></i> {positiveReactions}
             </span>
           ) : null}
         </div>
