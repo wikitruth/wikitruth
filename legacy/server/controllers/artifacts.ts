@@ -7,10 +7,10 @@ import path from 'path';
 import mongoose from 'mongoose';
 import async from 'async';
 import imagemagick from 'imagemagick';
-import mv from 'mv';
 
 import utils from '../utils/utils';
 import flowUtils from '../utils/flowUtils';
+import { moveFile } from '../utils/moveFile';
 import paths from '../models/paths';
 import templates from '../models/templates';
 import constants from '../models/constants';
@@ -202,8 +202,7 @@ async function POST_create(req, res) {
         }
 
         let newPathAbs = resolvePublicPath(filePath);
-        // INFO: replaced fs.rename() due to error "EXDEV: cross-device link not permitted"
-        await mv(inlineFile.path, newPathAbs);
+        await moveFile(inlineFile.path, newPathAbs);
         if (updatedEntity.isImage()) {
           // Identify image properties
           const features = await imagemagick.identify(newPathAbs);
