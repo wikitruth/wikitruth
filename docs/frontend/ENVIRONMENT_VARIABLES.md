@@ -42,8 +42,11 @@ In production, startup validation requires:
 |---|---|---|
 | `MONGODB_URI` | Primary Mongo connection URI | `mongodb://127.0.0.1:27017/wikitruth` |
 | `MONGODB_DBNAME` | Logical DB name | `wikitruth` |
-| `MONGODB_BACKUP_ROOT` | Backup output root | `~/config/mongodb` |
-| `MONGODB_PRIVATE_BACKUP_ROOT` | Private-data backup root | `~/config/mongodb` |
+| `MONGODB_BACKUP_ROOT` | Public backup output root | `~/.wikitruth/backups/public` |
+| `MONGODB_PRIVATE_BACKUP_ROOT` | Private-data backup root | `~/.wikitruth/backups/private` |
+
+Both roots must remain outside the tracked `config/mongodb` fixture directory.
+The runtime refuses backup or restore operations that resolve inside that tree.
 
 ### Project Identity and Secrets
 

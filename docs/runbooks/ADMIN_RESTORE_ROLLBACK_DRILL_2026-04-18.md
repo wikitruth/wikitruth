@@ -8,6 +8,8 @@ Purpose: validate modern restore workflow safety (`CORE-030`) and provide a repe
 - Backup artifacts exist in both backup roots:
   - public: `flowUtils.getBackupDir()`
   - private: `path.join(flowUtils.getBackupDir(true), 'users')`
+- Both resolved roots are outside the tracked `config/mongodb` fixture tree;
+  the runtime rejects paths inside it.
 - Collection mapping is configured in `config.mongodb.collections.modelMapping`.
 
 ## Restore Safety Checklist

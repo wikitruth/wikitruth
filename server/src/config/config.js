@@ -108,9 +108,8 @@ exports.legacyCompatibility = {
 exports.mongodb = {
   uri: envWithDefault(['MONGOLAB_URI', 'MONGOHQ_URL', 'MONGODB_URI'], 'mongodb://127.0.0.1:27017/wikitruth'),
   dbname: envWithDefault(['MONGODB_DBNAME'], 'wikitruth'),
-  // backupRoot: '~/../wikitruth-mongodb',
-  backupRoot: envWithDefault(['MONGODB_BACKUP_ROOT'], '~/config/mongodb'),
-  privateBackupRootX: envWithDefault(['MONGODB_PRIVATE_BACKUP_ROOT'], '~/config/mongodb'), // private data will still be persisted to disk if this is not present
+  backupRoot: envWithDefault(['MONGODB_BACKUP_ROOT'], '~/.wikitruth/backups/public'),
+  privateBackupRoot: envWithDefault(['MONGODB_PRIVATE_BACKUP_ROOT'], '~/.wikitruth/backups/private'),
   collections: {
     backupList: [
       'users',

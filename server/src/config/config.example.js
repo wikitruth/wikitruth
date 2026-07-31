@@ -11,8 +11,8 @@ exports.https = {
 exports.mongodb = {
   uri: process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || process.env.MONGODB_URI || 'mongodb://localhost:27017/wikitruth',
   dbname: process.env.MONGODB_DBNAME || 'wikitruth',
-  backupRoot: process.env.MONGODB_BACKUP_ROOT || '~/config/mongodb',
-  privateBackupRoot: process.env.MONGODB_PRIVATE_BACKUP_ROOT || '~/config/mongodb/users',
+  backupRoot: process.env.MONGODB_BACKUP_ROOT || '~/.wikitruth/backups/public',
+  privateBackupRoot: process.env.MONGODB_PRIVATE_BACKUP_ROOT || '~/.wikitruth/backups/private',
   collections: {
     backupList: [
       'users',

@@ -17,6 +17,7 @@ import {
   appendListExtrasCore,
   type EntryExtras,
 } from './flow/entryExtras';
+import { resolveBackupDir } from './backupPaths';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires, security/detect-non-literal-require
 import config from '../config/config';
@@ -59,14 +60,11 @@ const dateFns = dateFnsMod as unknown as Record<string, any>;
 const htmlToText = htmlToTextMod as unknown as Record<string, any>;
 
 function getBackupDir(isPrivate?: boolean): string {
-  let backupRoot = isPrivate && config.mongodb.privateBackupRoot ? config.mongodb.privateBackupRoot : config.mongodb.backupRoot;
-  if (backupRoot) {
-    if (backupRoot.startsWith('~')) {
-      return process.cwd() + backupRoot.substring(1);
-    }
-    return backupRoot;
-  }
-  return process.cwd() + '/config/mongodb' + (isPrivate ? '/users' : '');
+  const scope = isPrivate ? 'private' : 'public';
+  const configuredRoot = isPrivate
+    ? config.mongodb.privateBackupRoot
+    : config.mongodb.backupRoot;
+  return resolveBackupDir({ configuredRoot, scope });
 }
 
 function isEntryOwner(req?: { user?: { id?: unknown } }, item?: { createUserId?: { equals(id: unknown): boolean } }) {
