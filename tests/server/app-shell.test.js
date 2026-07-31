@@ -32,6 +32,7 @@ describe('React shell routes', function () {
 
     expect(res.text).toContain('<!DOCTYPE html>');
     expect(res.text).toContain('Wikitruth, the truth in totality of human knowledge');
+    expect(res.text).toContain('<link rel="manifest" href="/img/favicons/manifest.json">');
   });
 
   it('serves the React shell for nested app routes', async function () {
@@ -73,6 +74,7 @@ describe('React shell routes', function () {
     expect(res.text).toContain('class="wt-tenant-app app-fixtheph"');
     expect(res.text).toContain('content="FixPH"');
     expect(res.text).toContain('/img/fixtheph/favicons/favicon.ico');
+    expect(res.text).toContain('/img/fixtheph/favicons/manifest.json');
     expect(res.text).toContain('content="http://fixthephilippines.org/civic/projects"');
     expect(res.text).not.toContain('__WT_');
   });

@@ -1,11 +1,13 @@
-const CACHE_NAME = 'wikitruth-app-shell-v3';
+const CACHE_NAME = 'wikitruth-app-shell-v4';
 const APP_SHELL_ASSETS = [
   '/app',
   '/react-app.html',
-  '/dist/bundle.js?v=navbar-20260426-entryparity-1',
-  '/css/app.min.css',
-  '/layouts/core.min.css',
-  '/manifest.webmanifest',
+  '/dist/css/app.min.css?v=icon-assets-20260801-1',
+  '/dist/css/core.min.css?v=icon-assets-20260801-1',
+  '/dist/fonts/glyphicons-halflings-regular.woff2',
+  '/dist/fonts/fontawesome-webfont.woff2?v=4.7.0',
+  '/dist/bundle.js?v=icon-assets-20260801-1',
+  '/img/favicons/manifest.json',
 ];
 const NETWORK_FIRST_ASSETS = new Set(['/app', '/react-app.html', '/dist/bundle.js']);
 
@@ -46,8 +48,6 @@ self.addEventListener('fetch', (event) => {
 
   const isAssetRequest =
     requestUrl.pathname.startsWith('/dist/') ||
-    requestUrl.pathname.startsWith('/css/') ||
-    requestUrl.pathname.startsWith('/layouts/') ||
     requestUrl.pathname.startsWith('/img/') ||
     requestUrl.pathname === '/app' ||
     requestUrl.pathname === '/react-app.html';

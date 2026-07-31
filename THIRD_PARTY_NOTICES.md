@@ -34,3 +34,10 @@ SOFTWARE.
 
 License files distributed with the vendored compatibility components remain
 next to those components under `legacy/static/components/`.
+
+The modern frontend bundles styles and the Glyphicon font from Bootstrap 3.4.1
+under the MIT License, Font Awesome 4.7.0 CSS under the MIT License, and the
+Bootstrap Pincode Input 1.7.0 CSS under the Apache License 2.0. The Font Awesome
+font is distributed under the SIL Open Font License 1.1. The production build
+emits the Bootstrap and Pincode Input licenses and Font Awesome's package license
+notice alongside those assets.

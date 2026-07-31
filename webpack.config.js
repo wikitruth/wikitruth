@@ -46,6 +46,7 @@ module.exports = (env, argv) => {
       filename: '[name].js',
       chunkFilename: '[name].chunk.js',
       publicPath: assetPrefix,
+      clean: true,
     },
     module: {
       rules: [

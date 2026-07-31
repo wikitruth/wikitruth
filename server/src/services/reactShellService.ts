@@ -88,7 +88,7 @@ function faviconLinks(favicon: string | undefined): string {
   const base = favicon && favicon.includes('/')
     ? favicon.slice(0, favicon.lastIndexOf('/'))
     : '/img/favicons';
-  const manifest = favicon ? `${base}/manifest.json` : '/manifest.webmanifest';
+  const manifest = `${base}/manifest.json`;
   return [
     [57, 'apple-touch-icon', `${base}/apple-icon-57x57.png`],
     [60, 'apple-touch-icon', `${base}/apple-icon-60x60.png`],
