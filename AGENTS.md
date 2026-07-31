@@ -5,6 +5,8 @@ This file is the repository-level instruction source for coding agents in this r
 ## Core Workflow
 
 - Never commit secrets, credentials, or private keys.
+- Read `docs/AGENT_WORKFLOW.md` before substantive implementation, publication, or deployment work.
+- Maintainer changes may be pushed directly to `develop` only when the repository owner explicitly requests direct delivery. Public contributors use pull requests targeting `develop`.
 
 ## Production Deployment Safety
 
@@ -14,6 +16,8 @@ This file is the repository-level instruction source for coding agents in this r
 - A deployment runbook, an existing production checkout, or a prior deployment does not imply authorization for another deployment.
 - Read-only production inspection is allowed when needed to answer a status or topology question, but ask for explicit confirmation before making any production change.
 - Distinguish local runtime restarts from remote production restarts in both execution and reporting.
+- Before an authorized production deployment, follow `docs/runbooks/PRODUCTION_RELEASE.md` and a populated private operator inventory based on `docs/runbooks/PRIVATE_OPERATOR_INVENTORY_TEMPLATE.md`.
+- Never commit the populated operator inventory or other host-specific credentials, addresses, private paths, or database connection details.
 
 ## Planning and Delivery
 

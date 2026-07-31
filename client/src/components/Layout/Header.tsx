@@ -112,7 +112,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
           </button>
         </div>
         <div id="header-main-collapse" className={`navbar-collapse my-navbar-collapse collapse${isMobileNavOpen ? ' in' : ''}`}>
-          <nav aria-label="Primary navigation">
+          <nav className="wt-primary-navigation" aria-label="Primary navigation">
             <ul className="nav navbar-nav">
               <li>
                 <ApplicationLink
@@ -154,7 +154,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
                 >
                   <span className="glyphicon glyphicon-option-horizontal" aria-hidden="true"></span>
                 </button>
-                <ul id="header-more-menu" className="dropdown-menu dropdown-menu-right">
+                <ul id="header-more-menu" className="dropdown-menu dropdown-menu-right wt-header-more-menu">
                   <li className="dropdown-header">more</li>
                   {!user ? (
                     <li className="visible-xs">

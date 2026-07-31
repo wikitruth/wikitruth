@@ -103,6 +103,7 @@ describe('Header parity navigation', () => {
     fireEvent.click(screen.getByRole('button', { name: /more navigation options/i }));
     const mobileContribution = container.querySelector('#header-more-menu > li.visible-xs a[href="/contribute"]');
     expect(mobileContribution).toHaveTextContent('Contribute anonymously');
+    expect(container.querySelector('#header-more-menu')).toHaveClass('wt-header-more-menu');
   });
 
   it('updates account navigation when shared authentication state changes', () => {

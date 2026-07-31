@@ -4,6 +4,7 @@ This folder contains active engineering documentation, planning docs, and histor
 
 ## Start Here
 
+- Agent implementation and delivery workflow: `docs/AGENT_WORKFLOW.md`
 - Client development setup: `docs/CLIENT_DEVELOPMENT_SETUP.md`
 - Google Drive system reference hub: `docs/system-reference/README.md`
 - Active plans index: `docs/plans/README.md`
@@ -13,7 +14,9 @@ This folder contains active engineering documentation, planning docs, and histor
 - Deferred deprecation replacement plan: `docs/plans/deferred/DEPRECATION_REPLACEMENT_PLAN.md`
 - Deferred React Native plan: `docs/plans/deferred/REACT_NATIVE_MONOREPO_CHECKLIST_PLAN_2026-04-19.md`
 - Mobile app strategy: `docs/strategy/MOBILE_APP_STRATEGY_2026-02-24.md`
-- Rollback runbook: `docs/runbooks/ROLLBACK_PLAN.md`
+- Host-neutral production release and rollback runbook: `docs/runbooks/PRODUCTION_RELEASE.md`
+- Private operator inventory template: `docs/runbooks/PRIVATE_OPERATOR_INVENTORY_TEMPLATE.md`
+- Historical React migration rollback plan: `docs/runbooks/ROLLBACK_PLAN.md`
 - Dependency upgrade classification: `docs/dependencies/dep-upgrade-classification-2026-04-22.md`
 
 ## Architecture Decisions

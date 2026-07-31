@@ -1,9 +1,13 @@
 # Frontend Deployment Guide
 
+This guide covers frontend build and acceptance concerns. Production activation,
+data protection, service management, and rollback follow
+`docs/runbooks/PRODUCTION_RELEASE.md` and a populated private operator inventory.
+
 ## 1. Build
 
 ```bash
-npm install
+npm ci
 npm run build:client
 ```
 
@@ -55,9 +59,7 @@ Monitor during and after rollout:
 - Client runtime telemetry via `POST /api/monitoring/errors`.
 - User feedback triage in release notes/issues.
 
-## 7. Runtime
-
-## Static SEO Assets
+## 7. Static SEO Assets
 
 - `public/react-app.html`
 - `public/sitemap.xml`
@@ -66,4 +68,5 @@ Monitor during and after rollout:
 ## 8. Rollback
 
 - Keep previous deployment artifact for `public/dist/`.
-- Revert to previous commit and redeploy server + static assets.
+- Follow `docs/runbooks/PRODUCTION_RELEASE.md`; do not restore data as part of a
+  frontend rollback without separate authorization.
