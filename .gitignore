@@ -75,3 +75,9 @@ dist/
 # Local tutorial/build artifacts kept out of root hygiene
 react-tutorial/
 storybook-static/
+
+# Private source-import metadata and unreviewed reference material
+docs/ideas-docs/manifest.json
+docs/ideas-docs/original/Materials/
+docs/ideas-docs/markdown/Materials/
+docs/ideas-docs/private-source-materials/
