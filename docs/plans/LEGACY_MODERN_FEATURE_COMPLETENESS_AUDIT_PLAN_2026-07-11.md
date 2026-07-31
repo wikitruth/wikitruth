@@ -270,9 +270,14 @@ production deployment are excluded until separately authorized.
 - [x] Suppress duplicated usernames in member directories.
 - [x] Make long profile names wrap without mobile document overflow.
 - [x] Preserve the civic tenant-operations heading in access-denied states.
-- [ ] Review, rather than silently change, Explore density, exact GeoPattern
-  palettes, legacy Move/Swap Link terminology, and title-tagline policy.
+- [x] Record Explore density, exact GeoPattern palettes, legacy Move/Swap Link
+  terminology, and title-tagline policy for future consideration while
+  retaining the current modern behavior.
 
-The unchecked line is a product-review queue, not a missing core implementation.
-This plan remains active because it already contains explicitly deferred product
-programs; it must not be moved to `completed/` while those deferrals remain.
+The 2026-07-31 product decision retains the responsive modern Explore density,
+deterministic modern GeoPattern palette, governed relationship actions rather
+than cosmetic Move/Swap duplication, and concise browser titles. Those choices
+may be reconsidered only under a separately approved UX,
+relationship-semantics, branding, or SEO scope. This plan remains active because
+it contains explicitly deferred product programs; it must not be moved to
+`completed/` while those deferrals remain.

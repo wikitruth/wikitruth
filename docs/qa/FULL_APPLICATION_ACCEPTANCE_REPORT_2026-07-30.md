@@ -105,11 +105,14 @@ authorization was given.
 
 ## Residual Risks
 
-- `npm audit --omit=dev` reports `25` production-tree advisories: `1` low, `6`
-  moderate, `12` high, and `6` critical. Critical direct findings remain in the
-  explicitly deferred Jade/Dust/Kraken legacy renderer dependencies. Retiring
-  that renderer remains deferred by product decision.
-- React Router `7.18.1` is flagged for an RSC-mode CSRF advisory. This application
+- The 2026-07-31 safe dependency pass reduced the production tree from `16` to
+  `13` unique advisory identifiers. `npm audit --omit=dev` reports `30` affected
+  package nodes (`1` low, `6` moderate, `17` high, and `6` critical); this node
+  count is higher than the earlier `25` because the newer brace-expansion
+  advisory propagates through additional retained legacy parents after lockfile
+  deduplication. Critical direct findings remain in the explicitly deferred
+  Jade/Dust/Kraken legacy renderer dependencies.
+- React Router `7.18.2` is flagged for an RSC-mode CSRF advisory. This application
   uses browser routing and does not configure React Server Components, so the
   affected mode is not active. The latest `react-router-dom` 7 release remains
   in the scanner range; a major router migration should be isolated rather than
@@ -120,25 +123,37 @@ authorization was given.
 - Storybook preview bundles produce size warnings. The production client build
   succeeds and is route-split; Storybook bundle warnings are not production
   bundle regressions.
-- Existing admin list endpoints return at most 100 records, and detail pages find
-  records through those lists. Large installations need server-side pagination,
-  search, and direct detail endpoints before this becomes an operational limit.
-- The general API rate-limit key includes client-supplied platform/version
-  headers. Changing this affects shared-network fairness and mobile behavior, so
-  a hardened identity strategy should be designed rather than changed silently.
 
-## Recommendations Requiring Approval
+## Completed Hardening Follow-Up
 
-1. Add paginated/searchable admin collections and direct record-detail APIs so
-   management remains reliable above 100 records.
-2. Harden general API rate-limit identity using an authenticated principal when
-   available and an abuse-resistant anonymous key, without trusting mutable
-   version headers as a security boundary.
-3. Add reviewed visual baselines for a smaller critical-route set in CI. Keep the
-   full 294-render audit as an on-demand acceptance gate to avoid noisy snapshots.
-4. Add focused coverage for currently under-tested client modules, especially
-   timeline, notification delivery/preferences, passkey management edge cases,
-   and administrative mutation failures.
+All four recommendations from the original acceptance pass were subsequently
+approved, implemented, independently verified, and committed:
+
+1. Paginated/searchable administrator collections and direct detail APIs:
+   `7f43efc4`.
+2. Trusted-principal and trusted-network rate-limit identity:
+   `560c3fef`.
+3. Reviewed deterministic critical-route visual baselines:
+   `16e8bf4f`.
+4. Focused timeline, notification, passkey, and administrator failure coverage:
+   `a3cb7ee6`.
+
+The completion checklist and evidence are in
+`docs/plans/completed/MODERN_APPLICATION_HARDENING_CHECKLIST_PLAN_2026-07-30.md`.
+
+## Future Considerations
+
+The 2026-07-31 product decision keeps the current responsive Explore density,
+deterministic modern GeoPattern palette, governed relationship actions instead
+of cosmetic Move/Swap duplication, and concise browser titles. Reconsider these
+only under a separately approved UX, relationship-semantics, branding, or SEO
+scope.
+
+Legacy-renderer retirement, React Native delivery, automatic content expiry,
+broad strict-debate enforcement, root-folder hygiene, and real-world content
+operations remain deferred. A future production release must separately verify
+supported Node 22/24, real SMTP delivery, physical-device passkeys, content
+migration, and explicitly authorized deployment.
 
 ## Final Verdict
 

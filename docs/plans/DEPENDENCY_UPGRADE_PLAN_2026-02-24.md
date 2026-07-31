@@ -2,7 +2,13 @@
 
 ## Status
 
-Independent dependency upgrades in Waves A through C are complete. Wave D, which retires the retained Jade/Dust/Kraken legacy renderer and its constrained dependencies, was explicitly deferred on 2026-07-13. This document remains at its canonical reference path as the historical upgrade record; deferred retirement execution is tracked by `docs/plans/deferred/LEGACY_TOOLCHAIN_RETIREMENT_DEFERRED_CHECKLIST_2026-04-08.md`.
+Independent dependency upgrades in Waves A through C and the 2026-07-31 safe
+advisory refresh are complete. Wave D, which retires the retained
+Jade/Dust/Kraken legacy renderer and its constrained dependencies, was
+explicitly deferred on 2026-07-13. This document remains at its canonical
+reference path as the historical upgrade record; deferred retirement execution
+is tracked by
+`docs/plans/deferred/LEGACY_TOOLCHAIN_RETIREMENT_DEFERRED_CHECKLIST_2026-04-08.md`.
 
 ## Objectives
 
@@ -129,3 +135,28 @@ Do not upgrade blindly while Dust/Jade comparison mode remains active.
 - Commit `6a612ef9` upgraded Jest to `30.4.2` with aligned Jest 30 types while retaining ts-jest compatibility. All `47` server suites / `205` tests, `65` client suites / `156` tests, and both production builds passed.
 - Commit `dc6a0d55` upgraded ESLint to `9.39.5` and migrated `.eslintrc` / `.eslintignore` into a native flat configuration with current hooks and Prettier integrations. The prior rule contract and `66`-warning baseline were preserved exactly; smoke/type guardrails and both full test suites passed. ESLint 10 remains unavailable until `eslint-plugin-react` publishes a compatible peer range.
 - Production verification exposed Kraken's implicit MemoryStore and cookie-parser defaults running ahead of the application-owned middleware. Commit `d7cf056d` disables both duplicate defaults in the two runtime config copies; `47` server suites / `206` tests, smoke/type guardrails, local Node 24 startup, and FixPH Node 22 startup passed without a new MemoryStore warning.
+
+## Implementation Progress (2026-07-31)
+
+- Commit `b521cea5` upgraded React Router to `7.18.2`, Storybook to `10.5.5`,
+  PostCSS to `8.5.25`, fast-uri to `3.1.4`, minimatch to `10.2.6`, and compatible
+  brace-expansion release lines to the latest lockfile-resolvable patches.
+- The obsolete runtime `mv` package and its old rimraf/glob chain were replaced
+  with an application-owned file mover that uses atomic rename and a
+  destination-side temporary file for cross-device moves. Script-only
+  `npm-run-all` and rimraf are now development dependencies.
+- The production audit decreased from `16` to `13` unique advisory identifiers.
+  The affected-package-node total changed from `25` to `30` because the newer
+  brace-expansion advisory now propagates through more retained legacy parents
+  after lockfile deduplication; this is not five new advisories. Both PostCSS
+  advisories and the prior brace-expansion advisory are removed.
+- The remaining production findings are constrained to the explicitly deferred
+  legacy renderer/toolchain, plus React Router's RSC-mode advisory. Wikitruth
+  uses browser routing and does not enable React Server Components; the latest
+  compatible 7.x release remains in the scanner range, so it is monitored
+  rather than hidden through an unsafe downgrade.
+- Validation passed 95 server suites / 391 tests, 106 client suites / 287 tests,
+  modern and legacy TypeScript checks, lint and source guardrails, production
+  server/client builds, and the Storybook build. The current machine's Node
+  `25.9.0` remains outside the supported Node 22/24 matrix and is not production
+  release evidence.
