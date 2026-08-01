@@ -15,7 +15,9 @@ jest.mock('./Header', () => ({
 
 jest.mock('./Footer', () => ({
   __esModule: true,
-  default: () => <footer data-testid="layout-footer" />,
+  default: ({ compact = false }: { compact?: boolean }) => (
+    <footer data-testid="layout-footer" data-compact={compact} />
+  ),
 }));
 
 jest.mock('./ContextSidebar', () => ({
@@ -30,7 +32,7 @@ describe('Layout', () => {
     expect(screen.queryByTestId('context-sidebar')).not.toBeInTheDocument();
     expect(screen.getByTestId('layout-header')).toHaveAttribute('data-has-sidebar-toggle', 'false');
     expect(screen.getByTestId('layout-header')).toHaveAttribute('data-focused', 'true');
-    expect(screen.queryByTestId('layout-footer')).not.toBeInTheDocument();
+    expect(screen.getByTestId('layout-footer')).toHaveAttribute('data-compact', 'true');
     expect(screen.getByTestId('page-content').parentElement).toHaveClass('col-xs-12');
   });
 
@@ -39,7 +41,7 @@ describe('Layout', () => {
 
     expect(screen.queryByTestId('context-sidebar')).not.toBeInTheDocument();
     expect(screen.getByTestId('layout-header')).toHaveAttribute('data-focused', 'true');
-    expect(screen.queryByTestId('layout-footer')).not.toBeInTheDocument();
+    expect(screen.getByTestId('layout-footer')).toHaveAttribute('data-compact', 'true');
     expect(screen.getByTestId('page-content').parentElement).toHaveClass('col-xs-12');
   });
 
@@ -50,6 +52,7 @@ describe('Layout', () => {
     expect(screen.getByTestId('layout-header')).toHaveAttribute('data-has-sidebar-toggle', 'true');
     expect(screen.getByTestId('layout-header')).toHaveAttribute('data-focused', 'false');
     expect(screen.getByTestId('layout-footer')).toBeInTheDocument();
+    expect(screen.getByTestId('layout-footer')).toHaveAttribute('data-compact', 'false');
     expect(screen.getByTestId('page-content').parentElement).toHaveClass('col-md-9');
   });
 });

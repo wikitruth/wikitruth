@@ -26,6 +26,13 @@ jest.mock('../../context/ApplicationContext', () => ({
   useApplicationContext: () => mockUseApplicationContext(),
 }));
 
+jest.mock('./ThemeToggle', () => ({
+  __esModule: true,
+  default: ({ focused = false }: { focused?: boolean }) => (
+    <button type="button" data-focused={focused}>Theme toggle</button>
+  ),
+}));
+
 describe('Header parity navigation', () => {
   beforeEach(() => {
     mockUser = null;
@@ -129,7 +136,14 @@ describe('Header parity navigation', () => {
     render(<Header focused />, { route: '/login' });
 
     expect(screen.getByRole('link', { name: /wikitruth/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /theme toggle/i })).toHaveAttribute('data-focused', 'true');
     expect(screen.queryByRole('button', { name: /toggle navigation/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+  });
+
+  it('includes the theme control in standard account navigation', () => {
+    render(<Header />);
+
+    expect(screen.getByRole('button', { name: /theme toggle/i })).toHaveAttribute('data-focused', 'false');
   });
 });

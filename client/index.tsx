@@ -2,10 +2,13 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './src/App';
 import AppProviders from './src/providers/AppProviders';
+import { applyThemeToDocument } from './src/context/ThemeContext';
 import { initializeErrorTracking } from './src/utils/monitoring';
 import { startPerformanceMonitoring } from './src/utils/performance';
 import { registerPwa } from './src/utils/pwa';
 import './src/styles/index.css';
+
+applyThemeToDocument();
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement

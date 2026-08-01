@@ -5,6 +5,7 @@
 }
 
 .wt-auth-header .container-fluid {
+  position: relative;
   max-width: 1180px;
   padding-right: 24px;
   padding-left: 24px;
@@ -33,6 +34,21 @@
 
 .wt-auth-header .navbar-brand-label {
   margin-left: 42px;
+}
+
+.wt-auth-header-tools {
+  position: absolute;
+  top: 0;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  height: 58px;
+}
+
+.wt-auth-header .wt-theme-toggle {
+  min-height: 40px;
+  padding: 10px 12px;
+  border-radius: 8px;
 }
 
 .wt-auth-container {
@@ -403,10 +419,153 @@
   margin: 26px 0;
 }
 
+.wt-auth-footer {
+  margin-top: 0;
+  padding: 22px 20px;
+  color: #728092;
+  background: #f7f9fb;
+  border-top: 1px solid #e3e9ef;
+  font-size: 13px;
+}
+
+.wt-auth-footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  max-width: 620px;
+  padding: 0;
+  margin: 0 auto;
+}
+
+.wt-auth-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+}
+
+.wt-auth-footer a {
+  color: #526376;
+}
+
+.wt-auth-footer .copyright {
+  flex: 0 0 auto;
+}
+
+[data-theme='dark'] .wt-auth-header.navbar-default {
+  background: #111820;
+  border-color: #2d3945;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+}
+
+[data-theme='dark'] .wt-auth-container {
+  --wt-auth-ink: #edf3f8;
+  --wt-auth-muted: #a8b5c3;
+  --wt-auth-blue: #56a8ed;
+  --wt-auth-blue-dark: #8ac7f4;
+  --wt-auth-teal: #6ac7c8;
+  --wt-auth-pale: #192c3b;
+  --wt-auth-border: #364553;
+}
+
+[data-theme='dark'] .wt-auth-card {
+  background: #171e26;
+  box-shadow: 0 20px 58px rgba(0, 0, 0, 0.32);
+}
+
+[data-theme='dark'] .wt-auth-card .form-control {
+  color: var(--wt-auth-ink);
+  background: #10171f;
+  border-color: #455565;
+}
+
+[data-theme='dark'] .wt-auth-card .form-control::placeholder {
+  color: #82909f;
+}
+
+[data-theme='dark'] .wt-auth-secondary-action.btn-default,
+[data-theme='dark'] .wt-auth-page .wt-social-login .btn {
+  color: var(--wt-auth-blue-dark);
+  background: #171e26;
+  border-color: #4b6174;
+}
+
+[data-theme='dark'] .wt-auth-secondary-action.btn-default:hover,
+[data-theme='dark'] .wt-auth-secondary-action.btn-default:focus,
+[data-theme='dark'] .wt-auth-page .wt-social-login .btn:hover,
+[data-theme='dark'] .wt-auth-page .wt-social-login .btn:focus,
+[data-theme='dark'] .wt-auth-tertiary-action:hover,
+[data-theme='dark'] .wt-auth-tertiary-action:focus {
+  color: #b9dcf8;
+  background: #202c37;
+}
+
+[data-theme='dark'] .wt-auth-tertiary-action,
+[data-theme='dark'] .wt-auth-session-option {
+  border-color: #33414e;
+}
+
+[data-theme='dark'] .wt-auth-card .checkbox label {
+  color: #dce5ed;
+}
+
+[data-theme='dark'] .wt-auth-progress::before,
+[data-theme='dark'] .wt-auth-progress::after,
+[data-theme='dark'] .wt-auth-divider::before,
+[data-theme='dark'] .wt-auth-divider::after {
+  background: #3a4957;
+}
+
+[data-theme='dark'] .wt-auth-divider {
+  color: var(--wt-auth-muted);
+}
+
+[data-theme='dark'] .wt-auth-card .wt-login-flow-notice {
+  color: #d9eefb;
+  background: #173244;
+  border-color: #3f829e;
+}
+
+[data-theme='dark'] .wt-auth-card .wt-recovery-signin-panel {
+  background: #131b23;
+}
+
+[data-theme='dark'] .wt-auth-footer {
+  color: #94a3b2;
+  background: #111820;
+  border-color: #2d3945;
+}
+
+[data-theme='dark'] .wt-auth-footer a {
+  color: #9cccf2;
+}
+
 @media (max-width: 767px) {
   .wt-auth-header .container-fluid {
     padding-right: 20px;
     padding-left: 20px;
+  }
+
+  .wt-auth-header-tools {
+    right: 14px;
+    height: 50px;
+  }
+
+  .wt-auth-header .wt-theme-toggle {
+    min-width: 40px;
+    padding: 10px;
+  }
+
+  .wt-auth-header .wt-theme-toggle-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
   }
 
   .wt-auth-header .navbar-brand {
@@ -463,6 +622,17 @@
 
   .wt-auth-method-header h2 {
     font-size: 23px;
+  }
+
+  .wt-auth-footer-inner {
+    align-items: center;
+    flex-direction: column;
+    gap: 12px;
+    text-align: center;
+  }
+
+  .wt-auth-footer-links {
+    justify-content: center;
   }
 }
 

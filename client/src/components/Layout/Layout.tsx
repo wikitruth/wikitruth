@@ -64,7 +64,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         </div>
       </main>
-      {!focusedAuthLayout ? <Footer /> : null}
+      <Footer compact={focusedAuthLayout} />
     </div>
   );
 };

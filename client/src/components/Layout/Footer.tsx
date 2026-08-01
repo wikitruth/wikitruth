@@ -4,12 +4,36 @@ import { useApplicationContext } from '../../context/ApplicationContext';
 import ApplicationLink from '../common/ApplicationLink';
 import { toModernAppSectionUrl } from '../../utils/paths';
 
-const Footer: React.FC = () => {
+interface FooterProps {
+  compact?: boolean;
+}
+
+const Footer: React.FC<FooterProps> = ({ compact = false }) => {
   const year = new Date().getFullYear();
   const { application, applicationPath } = useApplicationContext();
 
+  if (compact) {
+    return (
+      <footer className="footer wt-auth-footer">
+        <div className="container-fluid wt-auth-footer-inner">
+          <nav className="wt-auth-footer-links" aria-label="Wikitruth information">
+            <ApplicationLink href={applicationPath(toModernAppSectionUrl(application?.aboutUrl || '/about'))}>
+              About
+            </ApplicationLink>
+            <Link to={applicationPath('/contact')}>Contact</Link>
+            <Link to={applicationPath('/policies')}>Policies</Link>
+            <a href="https://github.com/wikitruth/wikitruth" target="_blank" rel="noreferrer">
+              GitHub
+            </a>
+          </nav>
+          <span className="copyright">&copy; {year} Wikitruth</span>
+        </div>
+      </footer>
+    );
+  }
+
   return (
-    <div className="footer">
+    <footer className="footer">
       <div className="container-fluid">
         <span className="copyright pull-right">
           &copy; {year}&nbsp;
@@ -65,7 +89,7 @@ const Footer: React.FC = () => {
         </ul>
         <div className="clearfix"></div>
       </div>
-    </div>
+    </footer>
   );
 };
 

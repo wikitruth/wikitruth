@@ -6,6 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useApplicationContext } from '../../context/ApplicationContext';
 import notificationsApi from '../../services/api/notifications';
 import { toModernAppSectionUrl } from '../../utils/paths';
+import ThemeToggle from './ThemeToggle';
 
 interface HeaderSection {
   title: string;
@@ -118,6 +119,11 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false, f
             </button>
           ) : null}
         </div>
+        {focused ? (
+          <div className="wt-auth-header-tools">
+            <ThemeToggle focused />
+          </div>
+        ) : null}
         {!focused ? (
           <div id="header-main-collapse" className={`navbar-collapse my-navbar-collapse collapse${isMobileNavOpen ? ' in' : ''}`}>
           <nav className="wt-primary-navigation" aria-label="Primary navigation">
@@ -249,6 +255,9 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false, f
           </nav>
           <nav aria-label="Account navigation">
             <ul className="nav navbar-nav navbar-right wt-account-nav">
+              <li className="wt-theme-toggle-item">
+                <ThemeToggle />
+              </li>
             {user ? (
               <>
                 <li>

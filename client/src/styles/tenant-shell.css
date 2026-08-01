@@ -32,3 +32,19 @@ body.wt-tenant-app .wt-btn-explore:focus {
 body.wt-tenant-app .footer {
   border-top-color: var(--tenant-accent, #ddd);
 }
+
+[data-theme='dark'] body.wt-tenant-app {
+  background: color-mix(in srgb, var(--tenant-primary, #337ab7) 8%, var(--wt-page));
+}
+
+[data-theme='dark'] body.wt-tenant-app .navbar-default {
+  background-color: var(--wt-navbar);
+}
+
+[data-theme='dark'] body.wt-tenant-app .jumbotron {
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--tenant-primary, #337ab7) 12%, var(--wt-surface-muted)),
+    var(--wt-surface) 72%
+  );
+}
