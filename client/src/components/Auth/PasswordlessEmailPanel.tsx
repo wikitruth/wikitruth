@@ -15,9 +15,15 @@ interface PasswordlessEmailPanelProps {
   onAuthenticated: () => void;
   runtimeConfig?: EmailCodeRuntimeConfig | null;
   runtimeConfigLoading?: boolean;
+  presentation?: 'panel' | 'plain';
+  requestLabel?: string;
+  description?: React.ReactNode;
+  emailValue?: string;
+  onEmailValueChange?: (value: string) => void;
+  onStageChange?: (stage: PasswordlessEmailStage) => void;
 }
 
-type Stage = 'request' | 'code' | 'link' | 'username';
+export type PasswordlessEmailStage = 'request' | 'code' | 'link' | 'username';
 
 function normalizedEmail(value: string): string {
   return value.trim().toLowerCase();
@@ -34,6 +40,12 @@ const PasswordlessEmailPanel: React.FC<PasswordlessEmailPanelProps> = ({
   onAuthenticated,
   runtimeConfig,
   runtimeConfigLoading = false,
+  presentation = 'panel',
+  requestLabel = 'Email me a sign-in code',
+  description,
+  emailValue,
+  onEmailValueChange,
+  onStageChange,
 }) => {
   const [searchParams] = useSearchParams();
   const { refreshAuth } = useAuth();
@@ -45,8 +57,9 @@ const PasswordlessEmailPanel: React.FC<PasswordlessEmailPanelProps> = ({
   ).trim();
   const [loadedConfig, setLoadedConfig] = useState<EmailCodeRuntimeConfig | null>(null);
   const config = runtimeConfig === undefined ? loadedConfig : runtimeConfig;
-  const [stage, setStage] = useState<Stage>(magicChallenge && magicToken ? 'link' : 'request');
-  const [email, setEmail] = useState('');
+  const [stage, setStage] = useState<PasswordlessEmailStage>(magicChallenge && magicToken ? 'link' : 'request');
+  const [internalEmail, setInternalEmail] = useState('');
+  const email = emailValue === undefined ? internalEmail : emailValue;
   const [challengeId, setChallengeId] = useState(magicChallenge);
   const [code, setCode] = useState('');
   const [username, setUsername] = useState('');
@@ -71,6 +84,10 @@ const PasswordlessEmailPanel: React.FC<PasswordlessEmailPanelProps> = ({
       });
     return () => { active = false; };
   }, [runtimeConfig, runtimeConfigLoading]);
+
+  useEffect(() => {
+    onStageChange?.(stage);
+  }, [onStageChange, stage]);
 
   useEffect(() => {
     if (!magicToken || typeof window === 'undefined') return;
@@ -226,13 +243,28 @@ const PasswordlessEmailPanel: React.FC<PasswordlessEmailPanelProps> = ({
     );
   }
 
+  const panelTitleId = `wt-email-auth-${mode}-title`;
+  const resolvedDescription = description === undefined
+    ? 'No password required. We will sign you in or help create your account after verifying your email.'
+    : description;
+  const isPlain = presentation === 'plain';
+
   return (
-    <div className="panel panel-info wt-email-auth-panel">
-      <div className="panel-heading">
-        <h2 className="panel-title"><i className="fa fa-envelope" aria-hidden="true" /> Continue with email</h2>
-      </div>
-      <div className="panel-body">
-        <p className="text-muted">No password required. We will sign you in or help create your account after verifying your email.</p>
+    <section
+      className={isPlain ? 'wt-email-auth-panel wt-email-auth-panel-plain' : 'panel panel-info wt-email-auth-panel'}
+      aria-labelledby={panelTitleId}
+    >
+      {isPlain ? (
+        <h2 id={panelTitleId} className="sr-only">Continue with email</h2>
+      ) : (
+        <div className="panel-heading">
+          <h2 id={panelTitleId} className="panel-title"><i className="fa fa-envelope" aria-hidden="true" /> Continue with email</h2>
+        </div>
+      )}
+      <div className={isPlain ? 'wt-email-auth-body' : 'panel-body'}>
+        {resolvedDescription ? (
+          <p className={isPlain ? 'wt-auth-method-copy' : 'text-muted'}>{resolvedDescription}</p>
+        ) : null}
         {error ? <Alert type="danger" dismissible onDismiss={() => setError(null)}>{error}</Alert> : null}
         {message ? <Alert type="info">{message}</Alert> : null}
 
@@ -243,13 +275,16 @@ const PasswordlessEmailPanel: React.FC<PasswordlessEmailPanelProps> = ({
               type="email"
               label="Email"
               value={email}
-              onChange={event => setEmail(event.target.value)}
+              onChange={event => {
+                if (emailValue === undefined) setInternalEmail(event.target.value);
+                onEmailValueChange?.(event.target.value);
+              }}
               autoComplete="email"
               placeholder="you@example.com"
               required
             />
             <Button type="submit" variant="info" className="btn-block" disabled={busy} icon={busy ? 'spinner fa-spin' : 'paper-plane'}>
-              {busy ? 'Sending...' : 'Email me a sign-in code'}
+              {busy ? 'Sending...' : requestLabel}
             </Button>
           </form>
         ) : null}
@@ -309,7 +344,7 @@ const PasswordlessEmailPanel: React.FC<PasswordlessEmailPanelProps> = ({
           </form>
         ) : null}
       </div>
-    </div>
+    </section>
   );
 };
 

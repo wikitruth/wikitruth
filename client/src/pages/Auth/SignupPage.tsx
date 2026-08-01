@@ -12,7 +12,9 @@ import useRecaptcha from '../../hooks/useRecaptcha';
 import authApi from '../../services/api/auth';
 import { trackEvent } from '../../utils/analytics';
 import passkeyApi, { type PasskeyRuntimeConfig } from '../../services/api/passkeys';
-import PasswordlessEmailPanel from '../../components/Auth/PasswordlessEmailPanel';
+import PasswordlessEmailPanel, {
+  type PasswordlessEmailStage,
+} from '../../components/Auth/PasswordlessEmailPanel';
 
 interface SignupFormValues {
   username: string;
@@ -21,6 +23,8 @@ interface SignupFormValues {
   confirmPassword: string;
   agreeToTerms: boolean;
 }
+
+type SignupMethod = 'email' | 'passkey' | 'password';
 
 const SignupPage: React.FC = () => {
   const navigate = useNavigate();
@@ -34,6 +38,8 @@ const SignupPage: React.FC = () => {
   const [passkeyBusy, setPasskeyBusy] = useState(false);
   const passkeyDestinationPending = useRef(false);
   const [rememberMe, setRememberMe] = useState(true);
+  const [signupMethod, setSignupMethod] = useState<SignupMethod>('email');
+  const [emailStage, setEmailStage] = useState<PasswordlessEmailStage>('request');
   const returnUrlCandidate = String(searchParams.get('returnUrl') || '').trim();
   const returnUrl = returnUrlCandidate.startsWith('/') && !returnUrlCandidate.startsWith('//')
     ? returnUrlCandidate
@@ -152,6 +158,7 @@ const SignupPage: React.FC = () => {
     handleChange,
     handleBlur,
     handleSubmit: onSubmit,
+    setFieldValue,
   } = useForm<SignupFormValues>({
     initialValues: {
       username: '',
@@ -164,7 +171,8 @@ const SignupPage: React.FC = () => {
     onSubmit: handleSubmit,
   });
 
-  const handlePasskeySignup = async () => {
+  const handlePasskeySignup = async (event?: React.FormEvent) => {
+    event?.preventDefault();
     setSubmitError(null);
     const username = values.username.trim();
     const email = values.email.trim();
@@ -214,149 +222,277 @@ const SignupPage: React.FC = () => {
     return url.toString();
   })();
 
+  const selectSignupMethod = (method: SignupMethod) => {
+    setSubmitError(null);
+    setSignupMethod(method);
+  };
+  const hasSocialProviders = providersReady && Object.values(enabledProviders).some(Boolean);
+
   return (
-    <div className="container" style={{ maxWidth: '520px', marginTop: '60px' }}>
+    <div className="container wt-auth-container">
       <PageMeta title="Sign Up" description="Create your Wikitruth account" />
-      <div className="panel panel-default">
-        <div className="panel-heading">
-          <h1 className="panel-title text-center">
-            <i className="fa fa-user-plus"></i> Create your Wikitruth account
-          </h1>
-        </div>
-        <div className="panel-body">
+      <section className="wt-auth-page" aria-labelledby="wt-signup-title">
+        <div className="wt-auth-card">
+          <header className="wt-auth-card-header">
+            <span className="wt-auth-card-icon" aria-hidden="true">
+              <i className="fa fa-user-plus"></i>
+            </span>
+            <h1 id="wt-signup-title">Create your Wikitruth account</h1>
+            <p className="wt-auth-card-subtitle">
+              {signupMethod === 'email'
+                ? 'Start with your email. You’ll choose a username next.'
+                : 'Complete your account details using the sign-up method you selected.'}
+            </p>
+          </header>
+
+          {signupMethod === 'email' ? (
+            <div className="wt-auth-progress">
+              Step {emailStage === 'username' ? '2' : '1'} of 2
+            </div>
+          ) : null}
+
           {submitError ? (
             <Alert type="danger" dismissible onDismiss={() => setSubmitError(null)}>
               {submitError}
             </Alert>
           ) : null}
 
-          <div className="checkbox">
-            <label>
-              <input type="checkbox" checked={rememberMe} onChange={event => setRememberMe(event.target.checked)} />{' '}
-              Keep me signed in on this device for 30 days
-            </label>
-            <p className="help-block" style={{ marginLeft: 20 }}>Uncheck this on a shared device for a 24-hour session.</p>
-          </div>
+          {signupMethod === 'email' ? (
+            <>
+              <PasswordlessEmailPanel
+                rememberMe={rememberMe}
+                returnUrl={returnUrl}
+                mode="signup"
+                presentation="plain"
+                requestLabel="Continue with email"
+                description={null}
+                emailValue={values.email}
+                onEmailValueChange={value => setFieldValue('email', value)}
+                onStageChange={setEmailStage}
+                onAuthenticated={() => navigate(returnUrl, { replace: true })}
+              />
 
-          <PasswordlessEmailPanel
-            rememberMe={rememberMe}
-            returnUrl={returnUrl}
-            mode="signup"
-            onAuthenticated={() => navigate(returnUrl, { replace: true })}
-          />
+              <div className="wt-auth-method-stack">
+                {passkeyConfig?.enabled && passkeyConfig.passwordlessEnabled ? (
+                  passkeyConfig.isCanonicalOrigin ? (
+                    <Button
+                      type="button"
+                      variant="default"
+                      className="btn-block wt-auth-secondary-action"
+                      icon="key"
+                      disabled={!passkeyApi.supported()}
+                      onClick={() => selectSignupMethod('passkey')}
+                    >
+                      Create account with a passkey
+                    </Button>
+                  ) : (
+                    <a className="btn btn-default btn-block wt-auth-secondary-action" href={tenantSignupUrl}>
+                      <i className="fa fa-key" /> Create passkey account on Wikitruth
+                    </a>
+                  )
+                ) : null}
 
-          <form onSubmit={onSubmit}>
-            <Input
-              name="username"
-              label="Username"
-              value={values.username}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              placeholder="Choose a username"
-              required
-              error={touched.username ? errors.username : undefined}
-              autoComplete="username"
-            />
-
-            <Input
-              name="email"
-              type="email"
-              label="Email"
-              value={values.email}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              placeholder="you@example.com"
-              required
-              error={touched.email ? errors.email : undefined}
-              autoComplete="email"
-            />
-
-            <Input
-              name="password"
-              type="password"
-              label="Password"
-              value={values.password}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              placeholder="Create a password"
-              required
-              error={touched.password ? errors.password : undefined}
-              autoComplete="new-password"
-            />
-
-            <Input
-              name="confirmPassword"
-              type="password"
-              label="Confirm Password"
-              value={values.confirmPassword}
-              onChange={handleChange}
-              onBlur={handleBlur}
-              placeholder="Re-enter your password"
-              required
-              error={touched.confirmPassword ? errors.confirmPassword : undefined}
-              autoComplete="new-password"
-            />
-
-            <Checkbox
-              name="agreeToTerms"
-              label="I agree to the terms and responsible participation rules"
-              checked={values.agreeToTerms}
-              onChange={handleChange}
-              error={touched.agreeToTerms ? errors.agreeToTerms : undefined}
-            />
-
-            {passkeyConfig?.enabled && passkeyConfig.passwordlessEnabled ? (
-              <div className="well well-sm">
-                <strong>Recommended: create a passwordless account</strong>
-                <p className="text-muted" style={{ marginTop: '6px' }}>
-                  A passkey uses your device unlock and is resistant to phishing. Add a second passkey and recovery codes after signup.
-                </p>
-                {passkeyConfig.isCanonicalOrigin ? (
-                  <Button
-                    type="button"
-                    variant="success"
-                    className="btn-block"
-                    icon={passkeyBusy ? 'spinner fa-spin' : 'key'}
-                    disabled={passkeyBusy || !passkeyApi.supported()}
-                    onClick={() => void handlePasskeySignup()}
-                  >
-                    {passkeyBusy ? 'Waiting for your device...' : 'Create account with a passkey'}
-                  </Button>
-                ) : (
-                  <a className="btn btn-success btn-block" href={tenantSignupUrl}>
-                    <i className="fa fa-key" /> Create passkey account on Wikitruth
-                  </a>
-                )}
+                <button
+                  type="button"
+                  className="btn btn-link btn-block wt-auth-tertiary-action"
+                  onClick={() => selectSignupMethod('password')}
+                >
+                  <i className="fa fa-lock" aria-hidden="true"></i>{' '}
+                  Use password instead
+                </button>
               </div>
-            ) : null}
 
-            <div className="form-group" style={{ marginTop: '20px' }}>
-              <Button
-                type="submit"
-                variant="primary"
-                size="lg"
-                disabled={isSubmitting}
-                icon={isSubmitting ? 'spinner fa-spin' : 'user-plus'}
-                className="btn-block"
+              <div className="wt-auth-session-option">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={event => setRememberMe(event.target.checked)}
+                  />{' '}
+                  Keep me signed in
+                </label>
+                <span>{rememberMe ? '30 days on this device' : '24-hour session'}</span>
+              </div>
+            </>
+          ) : null}
+
+          {signupMethod === 'passkey' ? (
+            <div aria-labelledby="wt-passkey-signup-title">
+              <button
+                type="button"
+                className="wt-auth-method-back"
+                onClick={() => selectSignupMethod('email')}
               >
-                {isSubmitting ? 'Creating account...' : 'Create account'}
-              </Button>
+                <i className="fa fa-arrow-left" aria-hidden="true"></i> Back to account options
+              </button>
+              <div className="wt-auth-method-header">
+                <h2 id="wt-passkey-signup-title">Create account with a passkey</h2>
+                <p>Use your device unlock for phishing-resistant sign-in. You can add recovery options after signup.</p>
+              </div>
+              <form onSubmit={handlePasskeySignup}>
+                <Input
+                  name="username"
+                  label="Username"
+                  value={values.username}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  placeholder="Choose a username"
+                  required
+                  error={touched.username ? errors.username : undefined}
+                  autoComplete="username"
+                />
+                <Input
+                  name="email"
+                  type="email"
+                  label="Email"
+                  value={values.email}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  placeholder="you@example.com"
+                  required
+                  error={touched.email ? errors.email : undefined}
+                  autoComplete="email"
+                />
+                <Checkbox
+                  name="agreeToTerms"
+                  label="I agree to the terms and responsible participation rules"
+                  checked={values.agreeToTerms}
+                  onChange={handleChange}
+                  error={touched.agreeToTerms ? errors.agreeToTerms : undefined}
+                />
+                <div className="wt-auth-session-option">
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={rememberMe}
+                      onChange={event => setRememberMe(event.target.checked)}
+                    />{' '}
+                    Keep me signed in
+                  </label>
+                  <span>{rememberMe ? '30 days on this device' : '24-hour session'}</span>
+                </div>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  className="btn-block"
+                  icon={passkeyBusy ? 'spinner fa-spin' : 'key'}
+                  disabled={passkeyBusy || !passkeyApi.supported()}
+                >
+                  {passkeyBusy ? 'Waiting for your device...' : 'Create account with a passkey'}
+                </Button>
+              </form>
             </div>
-          </form>
+          ) : null}
 
-          <hr />
-          {providersReady ? (
-            <SocialLoginButtons mode="signup" enabledProviders={enabledProviders} rememberMe={rememberMe} />
-          ) : (
-            <p className="text-muted">Loading providers...</p>
-          )}
-
-          <hr />
-          <p className="text-center text-muted">
-            Already registered? <Link to="/login">Sign in</Link>
-          </p>
+          {signupMethod === 'password' ? (
+            <div aria-labelledby="wt-password-signup-title">
+              <button
+                type="button"
+                className="wt-auth-method-back"
+                onClick={() => selectSignupMethod('email')}
+              >
+                <i className="fa fa-arrow-left" aria-hidden="true"></i> Back to account options
+              </button>
+              <div className="wt-auth-method-header">
+                <h2 id="wt-password-signup-title">Create account with a password</h2>
+                <p>Choose your public username and a password you do not use on another site.</p>
+              </div>
+              <form onSubmit={onSubmit}>
+                <Input
+                  name="username"
+                  label="Username"
+                  value={values.username}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  placeholder="Choose a username"
+                  required
+                  error={touched.username ? errors.username : undefined}
+                  autoComplete="username"
+                />
+                <Input
+                  name="email"
+                  type="email"
+                  label="Email"
+                  value={values.email}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  placeholder="you@example.com"
+                  required
+                  error={touched.email ? errors.email : undefined}
+                  autoComplete="email"
+                />
+                <Input
+                  name="password"
+                  type="password"
+                  label="Password"
+                  value={values.password}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  placeholder="Create a password"
+                  required
+                  error={touched.password ? errors.password : undefined}
+                  autoComplete="new-password"
+                />
+                <Input
+                  name="confirmPassword"
+                  type="password"
+                  label="Confirm Password"
+                  value={values.confirmPassword}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  placeholder="Re-enter your password"
+                  required
+                  error={touched.confirmPassword ? errors.confirmPassword : undefined}
+                  autoComplete="new-password"
+                />
+                <Checkbox
+                  name="agreeToTerms"
+                  label="I agree to the terms and responsible participation rules"
+                  checked={values.agreeToTerms}
+                  onChange={handleChange}
+                  error={touched.agreeToTerms ? errors.agreeToTerms : undefined}
+                />
+                <div className="wt-auth-session-option">
+                  <label>
+                    <input
+                      type="checkbox"
+                      checked={rememberMe}
+                      onChange={event => setRememberMe(event.target.checked)}
+                    />{' '}
+                    Keep me signed in
+                  </label>
+                  <span>{rememberMe ? '30 days on this device' : '24-hour session'}</span>
+                </div>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  disabled={isSubmitting}
+                  icon={isSubmitting ? 'spinner fa-spin' : 'user-plus'}
+                  className="btn-block"
+                >
+                  {isSubmitting ? 'Creating account...' : 'Create account'}
+                </Button>
+              </form>
+            </div>
+          ) : null}
         </div>
-      </div>
+
+        <p className="wt-auth-account-switch">
+          Already have an account? <Link to="/login">Sign in</Link>
+        </p>
+
+        {hasSocialProviders ? (
+          <>
+            <div className="wt-auth-divider" aria-hidden="true">or</div>
+            <SocialLoginButtons
+              mode="signup"
+              enabledProviders={enabledProviders}
+              rememberMe={rememberMe}
+              continueLabel
+            />
+          </>
+        ) : null}
+      </section>
     </div>
   );
 };

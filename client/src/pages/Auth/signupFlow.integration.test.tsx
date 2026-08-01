@@ -20,9 +20,34 @@ jest.mock('../../context/AuthContext', () => {
     ...actual,
     useAuth: () => ({
       signup: mockSignup,
+      isAuthenticated: false,
+      refreshAuth: jest.fn(),
     }),
   };
 });
+
+jest.mock('../../services/api/auth', () => ({
+  __esModule: true,
+  default: {
+    providers: jest.fn().mockResolvedValue({ providers: {} }),
+    emailCodeConfig: jest.fn().mockResolvedValue({
+      enabled: true,
+      codeLength: 6,
+      expiresInSeconds: 600,
+      resendDelaySeconds: 60,
+      canonicalOrigin: 'http://localhost',
+      isCanonicalOrigin: true,
+    }),
+  },
+}));
+
+jest.mock('../../services/api/passkeys', () => ({
+  __esModule: true,
+  default: {
+    config: jest.fn().mockResolvedValue({ enabled: false, passwordlessEnabled: false }),
+    supported: jest.fn().mockReturnValue(false),
+  },
+}));
 
 describe('Signup flow integration', () => {
   beforeEach(() => {
@@ -37,9 +62,16 @@ describe('Signup flow integration', () => {
     render(<SignupPage />, { route: '/signup' });
 
     expect(screen.getByRole('heading', { level: 1, name: /create your wikitruth account/i })).toBeVisible();
+    const firstEmailInput = await screen.findByLabelText(/^email/i);
+    expect(screen.queryByLabelText(/^username$/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/^password$/i)).not.toBeInTheDocument();
+    expect(screen.getAllByLabelText(/^email/i)).toHaveLength(1);
+
+    await user.type(firstEmailInput, 'newuser@example.com');
+    await user.click(screen.getByRole('button', { name: /use password instead/i }));
 
     await user.type(screen.getByLabelText(/username/i), 'newuser');
-    await user.type(screen.getByLabelText(/^email/i), 'newuser@example.com');
+    expect(screen.getByLabelText(/^email/i)).toHaveValue('newuser@example.com');
     await user.type(screen.getByLabelText(/^password/i), 'secret12');
     await user.type(screen.getByLabelText(/confirm password/i), 'secret12');
     await user.click(screen.getByLabelText(/i agree to the terms/i));

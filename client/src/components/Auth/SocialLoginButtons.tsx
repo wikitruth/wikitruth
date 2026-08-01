@@ -8,6 +8,7 @@ interface SocialLoginButtonsProps {
   enabledProviders?: Record<string, boolean> | null;
   rememberMe?: boolean;
   returnUrl?: string;
+  continueLabel?: boolean;
 }
 
 const providerCatalog: Array<{ key: SocialProvider; label: string; icon: string }> = [
@@ -25,6 +26,7 @@ const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
   enabledProviders,
   rememberMe,
   returnUrl,
+  continueLabel = false,
 }) => {
   const providers = providerCatalog
     .filter((provider) => {
@@ -53,7 +55,7 @@ const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
   }
 
   return (
-    <div className="wt-social-login" aria-label="Social login providers">
+    <div className={`wt-social-login${continueLabel ? ' wt-social-login-continuation' : ''}`} aria-label="Social login providers">
       <p className="text-muted">{mode === 'signup' ? 'Sign up with:' : 'Sign in with:'}</p>
       <div className="btn-group" role="group" aria-label="Social login options">
         {providers.map((provider) => (
@@ -68,7 +70,8 @@ const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
               onProviderClick?.(provider.key);
             }}
           >
-            <i className={`fa fa-${provider.icon}`} aria-hidden="true" /> {provider.label}
+            <i className={`fa fa-${provider.icon}`} aria-hidden="true" />{' '}
+            {continueLabel ? `Continue with ${provider.label}` : provider.label}
           </a>
         ))}
       </div>

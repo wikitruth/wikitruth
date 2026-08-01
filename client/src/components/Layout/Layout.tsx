@@ -11,7 +11,7 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
-  const focusedAuthLayout = /\/login\/?$/.test(location.pathname);
+  const focusedAuthLayout = /\/(login|signup)\/?$/.test(location.pathname);
 
   const closeSidebar = useCallback(() => setSidebarOpen(false), []);
   const toggleSidebar = useCallback(() => setSidebarOpen((value) => !value), []);
@@ -34,6 +34,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <Header
         onToggleSidebar={focusedAuthLayout ? undefined : toggleSidebar}
         sidebarOpen={focusedAuthLayout ? false : sidebarOpen}
+        focused={focusedAuthLayout}
       />
       <main className="wt-app-main">
         <div className="container-fluid">
@@ -63,7 +64,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         </div>
       </main>
-      <Footer />
+      {!focusedAuthLayout ? <Footer /> : null}
     </div>
   );
 };

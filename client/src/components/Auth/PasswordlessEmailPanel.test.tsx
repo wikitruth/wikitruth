@@ -153,4 +153,41 @@ describe('PasswordlessEmailPanel', () => {
     expect(link).toHaveAttribute('href', expect.stringContaining('https://wikitruth.net/login'));
     expect(link).toHaveAttribute('href', expect.stringContaining('returnUrl=%2Fcivic%2Fprojects'));
   });
+
+  it('supports a plain, controlled presentation for focused auth screens', async () => {
+    const user = userEvent.setup();
+    const onEmailValueChange = jest.fn();
+    const onStageChange = jest.fn();
+    const { container } = render(
+      <PasswordlessEmailPanel
+        rememberMe
+        returnUrl="/"
+        onAuthenticated={jest.fn()}
+        runtimeConfig={{
+          enabled: true,
+          codeLength: 6,
+          expiresInSeconds: 600,
+          resendDelaySeconds: 60,
+          canonicalOrigin: 'http://localhost',
+          isCanonicalOrigin: true,
+        }}
+        presentation="plain"
+        requestLabel="Continue with email"
+        description={null}
+        emailValue="person@example.com"
+        onEmailValueChange={onEmailValueChange}
+        onStageChange={onStageChange}
+      />,
+      { route: '/login' },
+    );
+
+    const emailInput = screen.getByLabelText(/^email/i);
+    expect(emailInput).toHaveValue('person@example.com');
+    expect(screen.getByRole('button', { name: /continue with email/i })).toBeVisible();
+    expect(container.querySelector('.wt-email-auth-panel-plain')).toBeInTheDocument();
+    expect(container.querySelector('.panel-heading')).not.toBeInTheDocument();
+    await user.type(emailInput, 'x');
+    expect(onEmailValueChange).toHaveBeenCalledWith('person@example.comx');
+    await waitFor(() => expect(onStageChange).toHaveBeenCalledWith('request'));
+  });
 });

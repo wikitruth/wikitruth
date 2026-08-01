@@ -76,4 +76,16 @@ describe('SocialLoginButtons', () => {
 
     expect(container).toBeEmptyDOMElement();
   });
+
+  it('uses continuation copy in the focused auth presentation', () => {
+    render(
+      <SocialLoginButtons
+        continueLabel
+        enabledProviders={{ facebook: true }}
+      />
+    );
+
+    expect(screen.getByRole('link', { name: /continue with facebook/i })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /^facebook$/i })).not.toBeInTheDocument();
+  });
 });

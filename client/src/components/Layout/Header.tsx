@@ -17,6 +17,7 @@ interface HeaderSection {
 interface HeaderProps {
   onToggleSidebar?: () => void;
   sidebarOpen?: boolean;
+  focused?: boolean;
 }
 
 const ROLE_LABELS: Record<string, string> = {
@@ -45,7 +46,7 @@ const DEFAULT_SECTIONS: HeaderSection[] = [
   },
 ];
 
-const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false }) => {
+const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false, focused = false }) => {
   const location = useLocation();
   const { user, activeRole, setActiveRole, availableRoles } = useAuth();
   const { application, applicationPath } = useApplicationContext();
@@ -84,7 +85,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
   }, [location.pathname]);
 
   return (
-    <div className="navbar navbar-default navbar-fixed-top">
+    <div className={`navbar navbar-default navbar-fixed-top${focused ? ' wt-auth-header' : ''}`}>
       <div className="container-fluid">
         <div className="navbar-header">
           <ApplicationLink href={application?.homeUrl || '/'} className="navbar-brand">
@@ -96,22 +97,29 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
               className="navbar-logo"
             />
             <span className="navbar-brand-label">
-              <span className="hidden-xxs">{application?.navTitle || application?.name || application?.title || 'Wikitruth'}</span>
+              {focused ? (
+                application?.navTitle || application?.name || application?.title || 'Wikitruth'
+              ) : (
+                <span className="hidden-xxs">{application?.navTitle || application?.name || application?.title || 'Wikitruth'}</span>
+              )}
             </span>
           </ApplicationLink>
-          <button
-            type="button"
-            className="navbar-toggle collapsed"
-            aria-label="Toggle navigation"
-            aria-expanded={isMobileNavOpen}
-            aria-controls="header-main-collapse"
-            onClick={() => setIsMobileNavOpen((value) => !value)}
-          >
-            <span className="sr-only">Toggle navigation</span>
-            <i className="fa fa-navicon" aria-hidden="true"></i>
-          </button>
+          {!focused ? (
+            <button
+              type="button"
+              className="navbar-toggle collapsed"
+              aria-label="Toggle navigation"
+              aria-expanded={isMobileNavOpen}
+              aria-controls="header-main-collapse"
+              onClick={() => setIsMobileNavOpen((value) => !value)}
+            >
+              <span className="sr-only">Toggle navigation</span>
+              <i className="fa fa-navicon" aria-hidden="true"></i>
+            </button>
+          ) : null}
         </div>
-        <div id="header-main-collapse" className={`navbar-collapse my-navbar-collapse collapse${isMobileNavOpen ? ' in' : ''}`}>
+        {!focused ? (
+          <div id="header-main-collapse" className={`navbar-collapse my-navbar-collapse collapse${isMobileNavOpen ? ' in' : ''}`}>
           <nav className="wt-primary-navigation" aria-label="Primary navigation">
             <ul className="nav navbar-nav">
               <li>
@@ -376,7 +384,8 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
               ) : null}
             </ul>
           </nav>
-        </div>
+          </div>
+        ) : null}
       </div>
     </div>
   );

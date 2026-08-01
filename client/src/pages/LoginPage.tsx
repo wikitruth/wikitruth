@@ -206,213 +206,220 @@ const LoginPage: React.FC = () => {
     : '/signup';
 
   return (
-    <div className="container wt-login-container">
+    <div className="container wt-auth-container">
       <PageMeta title="Sign In" />
-      <section className="wt-login-page" aria-labelledby="wt-login-title">
-        <header className="wt-login-header">
-          <h1 id="wt-login-title">Sign In</h1>
-        </header>
+      <section className="wt-auth-page" aria-labelledby="wt-login-title">
+        <div className="wt-auth-card">
+          <header className="wt-auth-card-header">
+            <h1 id="wt-login-title">Welcome back</h1>
+            <p className="wt-auth-card-subtitle">Sign in to continue to Wikitruth</p>
+          </header>
 
-        {flowContent ? (
-          <div className="alert alert-info wt-login-flow-notice" role="status">
-            <h2>{flowContent.title}</h2>
-            <p>{flowContent.message}</p>
-            <p className="wt-login-flow-continuation">
-              <i className="fa fa-arrow-circle-right" aria-hidden="true"></i>{' '}
-              {flowContent.continuation}
+          {flowContent ? (
+            <div className="alert alert-info wt-login-flow-notice" role="status">
+              <h2>{flowContent.title}</h2>
+              <p>{flowContent.message}</p>
+              <p className="wt-login-flow-continuation">
+                <i className="fa fa-arrow-circle-right" aria-hidden="true"></i>{' '}
+                {flowContent.continuation}
+              </p>
+            </div>
+          ) : null}
+
+          {submitError ? (
+            <Alert type="danger" dismissible onDismiss={() => setSubmitError(null)}>
+              {submitError}
+            </Alert>
+          ) : null}
+
+          {authConfig === undefined ? (
+            <p className="wt-auth-options-loading text-muted" role="status">
+              <i className="fa fa-spinner fa-spin" aria-hidden="true"></i>{' '}
+              Loading sign-in options…
             </p>
-          </div>
-        ) : null}
+          ) : null}
 
-        {submitError ? (
-          <Alert type="danger" dismissible onDismiss={() => setSubmitError(null)}>
-            {submitError}
-          </Alert>
-        ) : null}
-
-        <div className="wt-login-session-option">
-          <label>
-            <input
-              type="checkbox"
-              checked={rememberMe}
-              onChange={event => setRememberMe(event.target.checked)}
-            />{' '}
-            Keep me signed in
-          </label>
-          <span>{rememberMe ? '30 days on this device' : '24-hour session'}</span>
-        </div>
-
-        {authConfig === undefined ? (
-          <p className="wt-auth-options-loading text-muted" role="status">
-            <i className="fa fa-spinner fa-spin" aria-hidden="true"></i>{' '}
-            Loading sign-in options…
-          </p>
-        ) : null}
-
-        {authConfigError ? (
-          <Alert type="warning">
-            <p>Some sign-in options could not be loaded. You can use your password or try again.</p>
-            <Button
-              type="button"
-              variant="default"
-              className="btn-sm"
-              icon="refresh"
-              onClick={() => setAuthConfigRequest(request => request + 1)}
-            >
-              Retry sign-in options
-            </Button>
-          </Alert>
-        ) : null}
-
-        <PasswordlessEmailPanel
-          rememberMe={rememberMe}
-          returnUrl={returnUrl}
-          runtimeConfig={emailCodeConfig ?? null}
-          runtimeConfigLoading={authConfig === undefined}
-          onAuthenticated={() => navigate(returnUrl, { replace: true })}
-        />
-
-        {passkeyConfig?.enabled ? (
-          <div className="wt-passkey-option">
-            {passkeyConfig.isCanonicalOrigin ? (
+          {authConfigError ? (
+            <Alert type="warning">
+              <p>Some sign-in options could not be loaded. You can use your password or try again.</p>
               <Button
                 type="button"
                 variant="default"
-                className="btn-block"
-                icon={passkeyBusy ? 'spinner fa-spin' : 'key'}
-                disabled={passkeyBusy || !passkeyApi.supported()}
-                onClick={() => void handlePasskeySignIn()}
+                className="btn-sm"
+                icon="refresh"
+                onClick={() => setAuthConfigRequest(request => request + 1)}
               >
-                {passkeyBusy ? 'Waiting for your device...' : 'Use a passkey'}
+                Retry sign-in options
               </Button>
-            ) : (
-              <a className="btn btn-default btn-block" href={tenantPasskeyUrl}>
-                <i className="fa fa-key" /> Continue with passkey on Wikitruth
-              </a>
-            )}
-            {!passkeyApi.supported() && passkeyConfig.isCanonicalOrigin ? (
-              <p className="help-block">Passkeys are not supported by this browser or device.</p>
+            </Alert>
+          ) : null}
+
+          <PasswordlessEmailPanel
+            rememberMe={rememberMe}
+            returnUrl={returnUrl}
+            runtimeConfig={emailCodeConfig ?? null}
+            runtimeConfigLoading={authConfig === undefined}
+            presentation="plain"
+            requestLabel="Continue with email"
+            description={null}
+            onAuthenticated={() => navigate(returnUrl, { replace: true })}
+          />
+
+          <div className="wt-auth-method-stack">
+            {passkeyConfig?.enabled ? (
+              <div className="wt-passkey-option">
+                {passkeyConfig.isCanonicalOrigin ? (
+                  <Button
+                    type="button"
+                    variant="default"
+                    className="btn-block wt-auth-secondary-action"
+                    icon={passkeyBusy ? 'spinner fa-spin' : 'key'}
+                    disabled={passkeyBusy || !passkeyApi.supported()}
+                    onClick={() => void handlePasskeySignIn()}
+                  >
+                    {passkeyBusy ? 'Waiting for your device...' : 'Use a passkey'}
+                  </Button>
+                ) : (
+                  <a className="btn btn-default btn-block wt-auth-secondary-action" href={tenantPasskeyUrl}>
+                    <i className="fa fa-key" /> Continue with passkey on Wikitruth
+                  </a>
+                )}
+                {!passkeyApi.supported() && passkeyConfig.isCanonicalOrigin ? (
+                  <p className="help-block">Passkeys are not supported by this browser or device.</p>
+                ) : null}
+              </div>
+            ) : null}
+
+            {hasPrimaryPasswordlessMethod ? (
+              <button
+                type="button"
+                className="btn btn-link btn-block wt-auth-tertiary-action"
+                aria-expanded={showPassword}
+                aria-controls="password-signin-panel"
+                onClick={() => setShowPassword(current => !current)}
+              >
+                <i className={`fa ${showPassword ? 'fa-chevron-up' : 'fa-lock'}`} aria-hidden="true"></i>{' '}
+                {showPassword ? 'Hide password sign-in' : 'Use password instead'}
+              </button>
             ) : null}
           </div>
-        ) : null}
 
-        {hasPrimaryPasswordlessMethod ? (
-          <button
-            type="button"
-            className="btn btn-link btn-block wt-password-toggle"
-            aria-expanded={showPassword}
-            aria-controls="password-signin-panel"
-            onClick={() => setShowPassword(current => !current)}
-          >
-            <i className={`fa ${showPassword ? 'fa-chevron-up' : 'fa-lock'}`} aria-hidden="true"></i>{' '}
-            {showPassword ? 'Hide password sign-in' : 'Use password instead'}
-          </button>
-        ) : null}
+          <div className="wt-auth-session-option">
+            <label>
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={event => setRememberMe(event.target.checked)}
+              />{' '}
+              Keep me signed in
+            </label>
+            <span>{rememberMe ? '30 days on this device' : '24-hour session'}</span>
+          </div>
 
-        {showPassword ? (
-          <section id="password-signin-panel" className="wt-password-signin-panel" aria-label="Password sign-in">
-            <form onSubmit={onSubmit}>
-              <Input
-                name="username"
-                label="Username or Email"
-                value={values.username}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                placeholder="Enter your username or email"
-                required
-                error={touched.username ? errors.username : undefined}
-                autoComplete="username webauthn"
-                className="webauthn-username"
-              />
-
-              <Input
-                name="password"
-                type="password"
-                label="Password"
-                value={values.password}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                placeholder="Enter your password"
-                required
-                error={touched.password ? errors.password : undefined}
-                autoComplete="current-password"
-              />
-
-              <Button
-                type="submit"
-                variant="primary"
-                className="btn-block"
-                disabled={isSubmitting}
-                icon={isSubmitting ? 'spinner fa-spin' : 'sign-in'}
-              >
-                {isSubmitting ? 'Signing In...' : 'Sign In'}
-              </Button>
-            </form>
-
-            <div className="wt-login-help-links">
-              <Link to="/forgot-password">Forgot your password?</Link>
-              {passkeyConfig?.enabled ? (
-                <button
-                  type="button"
-                  className="btn btn-link"
-                  aria-expanded={showRecovery}
-                  aria-controls="recovery-signin-panel"
-                  onClick={() => setShowRecovery(current => !current)}
-                >
-                  Use a recovery code
-                </button>
-              ) : null}
-            </div>
-
-            {showRecovery ? (
-              <form id="recovery-signin-panel" onSubmit={handleRecoveryLogin} className="well well-sm wt-recovery-signin-panel">
+          {showPassword ? (
+            <section id="password-signin-panel" className="wt-password-signin-panel" aria-label="Password sign-in">
+              <form onSubmit={onSubmit}>
                 <Input
-                  name="recoveryIdentity"
+                  name="username"
                   label="Username or Email"
-                  value={recoveryIdentity}
-                  onChange={event => setRecoveryIdentity(event.target.value)}
-                  autoComplete="username"
+                  value={values.username}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  placeholder="Enter your username or email"
                   required
+                  error={touched.username ? errors.username : undefined}
+                  autoComplete="username webauthn"
+                  className="webauthn-username"
                 />
+
                 <Input
-                  name="recoveryCode"
-                  label="Recovery code"
-                  value={recoveryCode}
-                  onChange={event => setRecoveryCode(event.target.value)}
-                  autoComplete="one-time-code"
+                  name="password"
+                  type="password"
+                  label="Password"
+                  value={values.password}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  placeholder="Enter your password"
                   required
+                  error={touched.password ? errors.password : undefined}
+                  autoComplete="current-password"
                 />
-                <Button type="submit" className="btn-block" disabled={passkeyBusy} icon="life-ring">
-                  Recover account
+
+                <Button
+                  type="submit"
+                  variant="primary"
+                  className="btn-block"
+                  disabled={isSubmitting}
+                  icon={isSubmitting ? 'spinner fa-spin' : 'sign-in'}
+                >
+                  {isSubmitting ? 'Signing In...' : 'Sign In'}
                 </Button>
               </form>
-            ) : null}
-          </section>
-        ) : null}
+
+              <div className="wt-login-help-links">
+                <Link to="/forgot-password">Forgot your password?</Link>
+                {passkeyConfig?.enabled ? (
+                  <button
+                    type="button"
+                    className="btn btn-link"
+                    aria-expanded={showRecovery}
+                    aria-controls="recovery-signin-panel"
+                    onClick={() => setShowRecovery(current => !current)}
+                  >
+                    Use a recovery code
+                  </button>
+                ) : null}
+              </div>
+
+              {showRecovery ? (
+                <form id="recovery-signin-panel" onSubmit={handleRecoveryLogin} className="well well-sm wt-recovery-signin-panel">
+                  <Input
+                    name="recoveryIdentity"
+                    label="Username or Email"
+                    value={recoveryIdentity}
+                    onChange={event => setRecoveryIdentity(event.target.value)}
+                    autoComplete="username"
+                    required
+                  />
+                  <Input
+                    name="recoveryCode"
+                    label="Recovery code"
+                    value={recoveryCode}
+                    onChange={event => setRecoveryCode(event.target.value)}
+                    autoComplete="one-time-code"
+                    required
+                  />
+                  <Button type="submit" className="btn-block" disabled={passkeyBusy} icon="life-ring">
+                    Recover account
+                  </Button>
+                </form>
+              ) : null}
+            </section>
+          ) : null}
+        </div>
 
         {hasSocialProviders ? (
-          <div className="wt-social-signin-section">
+          <>
+            <div className="wt-auth-divider" aria-hidden="true">or</div>
             <SocialLoginButtons
               mode="login"
               enabledProviders={enabledProviders}
               rememberMe={rememberMe}
               returnUrl={returnUrl}
+              continueLabel
             />
-          </div>
+          </>
         ) : null}
 
-        {authConfig?.fastSwitchAvailable || (authConfig !== undefined && !emailCodeConfig?.enabled) ? (
-          <div className="wt-login-utilities">
-            {authConfig?.fastSwitchAvailable ? (
-              <Link to="/fast-switch">
-                <i className="fa fa-undo" aria-hidden="true"></i> Use Fast Switch on this device
-              </Link>
-            ) : null}
-            {authConfig !== undefined && !emailCodeConfig?.enabled ? (
-              <span>
-                New to Wikitruth? <Link to={signupPath}>Create an account</Link>
-              </span>
-            ) : null}
+        <p className="wt-auth-account-switch">
+          New to Wikitruth? <Link to={signupPath}>Create an account</Link>
+        </p>
+
+        {authConfig?.fastSwitchAvailable ? (
+          <div className="wt-auth-utility-links">
+            <Link to="/fast-switch">
+              <i className="fa fa-undo" aria-hidden="true"></i> Use Fast Switch on this device
+            </Link>
           </div>
         ) : null}
       </section>

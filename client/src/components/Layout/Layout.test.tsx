@@ -4,8 +4,12 @@ import Layout from './Layout';
 
 jest.mock('./Header', () => ({
   __esModule: true,
-  default: ({ onToggleSidebar }: { onToggleSidebar?: () => void }) => (
-    <header data-testid="layout-header" data-has-sidebar-toggle={Boolean(onToggleSidebar)} />
+  default: ({ onToggleSidebar, focused }: { onToggleSidebar?: () => void; focused?: boolean }) => (
+    <header
+      data-testid="layout-header"
+      data-has-sidebar-toggle={Boolean(onToggleSidebar)}
+      data-focused={Boolean(focused)}
+    />
   ),
 }));
 
@@ -25,6 +29,17 @@ describe('Layout', () => {
 
     expect(screen.queryByTestId('context-sidebar')).not.toBeInTheDocument();
     expect(screen.getByTestId('layout-header')).toHaveAttribute('data-has-sidebar-toggle', 'false');
+    expect(screen.getByTestId('layout-header')).toHaveAttribute('data-focused', 'true');
+    expect(screen.queryByTestId('layout-footer')).not.toBeInTheDocument();
+    expect(screen.getByTestId('page-content').parentElement).toHaveClass('col-xs-12');
+  });
+
+  it('uses the same focused shell for account creation', () => {
+    render(<Layout><div data-testid="page-content" /></Layout>, { route: '/signup' });
+
+    expect(screen.queryByTestId('context-sidebar')).not.toBeInTheDocument();
+    expect(screen.getByTestId('layout-header')).toHaveAttribute('data-focused', 'true');
+    expect(screen.queryByTestId('layout-footer')).not.toBeInTheDocument();
     expect(screen.getByTestId('page-content').parentElement).toHaveClass('col-xs-12');
   });
 
@@ -33,6 +48,8 @@ describe('Layout', () => {
 
     expect(screen.getByTestId('context-sidebar')).toBeInTheDocument();
     expect(screen.getByTestId('layout-header')).toHaveAttribute('data-has-sidebar-toggle', 'true');
+    expect(screen.getByTestId('layout-header')).toHaveAttribute('data-focused', 'false');
+    expect(screen.getByTestId('layout-footer')).toBeInTheDocument();
     expect(screen.getByTestId('page-content').parentElement).toHaveClass('col-md-9');
   });
 });

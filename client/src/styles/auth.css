@@ -1,0 +1,498 @@
+.wt-auth-header.navbar-default {
+  background: #fff;
+  border-color: #e4eaf0;
+  box-shadow: 0 1px 0 rgba(19, 45, 73, 0.06);
+}
+
+.wt-auth-header .container-fluid {
+  max-width: 1180px;
+  padding-right: 24px;
+  padding-left: 24px;
+}
+
+.wt-auth-header .navbar-header {
+  float: none;
+}
+
+.wt-auth-header .navbar-brand {
+  display: inline-flex;
+  align-items: center;
+  height: 58px;
+  padding-top: 0;
+  padding-bottom: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 24px;
+  letter-spacing: -0.35px;
+}
+
+.wt-auth-header .navbar-brand .navbar-logo {
+  top: 12px;
+  width: 34px;
+  height: 34px;
+}
+
+.wt-auth-header .navbar-brand-label {
+  margin-left: 42px;
+}
+
+.wt-auth-container {
+  --wt-auth-ink: #101d32;
+  --wt-auth-muted: #657184;
+  --wt-auth-blue: #0872ce;
+  --wt-auth-blue-dark: #075ca7;
+  --wt-auth-teal: #147f86;
+  --wt-auth-pale: #eef7fd;
+  --wt-auth-border: #d9e2ec;
+  width: 100%;
+  padding: 48px 20px 64px;
+}
+
+.wt-auth-page {
+  width: 100%;
+  max-width: 620px;
+  margin: 0 auto;
+  color: var(--wt-auth-ink);
+}
+
+.wt-auth-card {
+  padding: 38px 42px 36px;
+  background: #fff;
+  border: 1px solid var(--wt-auth-border);
+  border-radius: 16px;
+  box-shadow: 0 18px 52px rgba(36, 76, 119, 0.11);
+}
+
+.wt-auth-card-header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.wt-auth-card-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 66px;
+  height: 66px;
+  margin-bottom: 18px;
+  color: var(--wt-auth-blue);
+  background: var(--wt-auth-pale);
+  border-radius: 50%;
+  font-size: 28px;
+}
+
+.wt-auth-card-header h1 {
+  margin: 0;
+  color: var(--wt-auth-ink);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.9px;
+}
+
+.wt-auth-card-subtitle {
+  max-width: 470px;
+  margin: 12px auto 0;
+  color: var(--wt-auth-muted);
+  font-size: 17px;
+  line-height: 1.55;
+}
+
+.wt-auth-progress {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: -8px 0 24px;
+  color: var(--wt-auth-blue-dark);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.wt-auth-progress::before,
+.wt-auth-progress::after {
+  width: 42px;
+  height: 1px;
+  content: '';
+  background: #d9e7f3;
+}
+
+.wt-auth-card .form-group {
+  margin-bottom: 18px;
+}
+
+.wt-auth-card .control-label {
+  margin-bottom: 7px;
+  color: var(--wt-auth-ink);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.wt-auth-card .form-control {
+  height: 48px;
+  padding: 11px 14px;
+  color: var(--wt-auth-ink);
+  background: #fff;
+  border: 1px solid #cbd6e2;
+  border-radius: 8px;
+  box-shadow: none;
+  font-size: 16px;
+  line-height: 24px;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.wt-auth-card .form-control:focus {
+  border-color: var(--wt-auth-blue);
+  box-shadow: 0 0 0 3px rgba(8, 114, 206, 0.13);
+}
+
+.wt-auth-card .btn-block {
+  min-height: 48px;
+  padding: 12px 18px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 650;
+  line-height: 22px;
+  transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.wt-auth-card .btn-block:active {
+  transform: translateY(1px);
+}
+
+.wt-auth-card .btn-primary,
+.wt-auth-card .btn-info {
+  color: #fff;
+  background: var(--wt-auth-blue);
+  border-color: var(--wt-auth-blue);
+}
+
+.wt-auth-card .btn-primary:hover,
+.wt-auth-card .btn-primary:focus,
+.wt-auth-card .btn-info:hover,
+.wt-auth-card .btn-info:focus {
+  color: #fff;
+  background: var(--wt-auth-blue-dark);
+  border-color: var(--wt-auth-blue-dark);
+  box-shadow: 0 7px 18px rgba(7, 92, 167, 0.18);
+}
+
+.wt-auth-secondary-action.btn-default {
+  color: var(--wt-auth-blue-dark);
+  background: #fff;
+  border: 1px solid var(--wt-auth-blue);
+}
+
+.wt-auth-secondary-action.btn-default:hover,
+.wt-auth-secondary-action.btn-default:focus {
+  color: var(--wt-auth-blue-dark);
+  background: var(--wt-auth-pale);
+  border-color: var(--wt-auth-blue-dark);
+}
+
+.wt-email-auth-panel-plain {
+  margin: 0;
+}
+
+.wt-email-auth-panel-plain .wt-email-auth-body {
+  padding: 0;
+}
+
+.wt-email-auth-panel-plain .alert {
+  margin-bottom: 18px;
+}
+
+.wt-auth-method-copy {
+  margin: -6px 0 20px;
+  color: var(--wt-auth-muted);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.wt-auth-method-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.wt-auth-method-stack .wt-passkey-option {
+  margin: 0;
+}
+
+.wt-auth-tertiary-action {
+  min-height: 44px;
+  padding: 10px 12px;
+  color: var(--wt-auth-blue-dark);
+  background: transparent;
+  border: 0;
+  border-top: 1px solid #e4eaf0;
+  border-bottom: 1px solid #e4eaf0;
+  border-radius: 0;
+  font-size: 15px;
+}
+
+.wt-auth-tertiary-action:hover,
+.wt-auth-tertiary-action:focus {
+  color: var(--wt-auth-blue-dark);
+  background: #f7fbfe;
+  text-decoration: none;
+}
+
+.wt-auth-session-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 22px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid #e4eaf0;
+}
+
+.wt-auth-session-option label {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.wt-auth-session-option span {
+  color: var(--wt-auth-muted);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.wt-auth-method-header {
+  margin-bottom: 22px;
+}
+
+.wt-auth-method-header h2 {
+  margin: 0 0 7px;
+  color: var(--wt-auth-ink);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 25px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.4px;
+}
+
+.wt-auth-method-header p {
+  margin: 0;
+  color: var(--wt-auth-muted);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.wt-auth-method-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 18px;
+  padding: 0;
+  color: var(--wt-auth-blue-dark);
+  background: transparent;
+  border: 0;
+  font-size: 14px;
+}
+
+.wt-auth-card .checkbox {
+  margin: 18px 0;
+}
+
+.wt-auth-card .checkbox label {
+  color: #26364c;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.wt-auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin: 24px 0 18px;
+  color: #7b8797;
+  font-size: 14px;
+  text-transform: lowercase;
+}
+
+.wt-auth-divider::before,
+.wt-auth-divider::after {
+  flex: 1;
+  height: 1px;
+  content: '';
+  background: #d7e0e9;
+}
+
+.wt-auth-page .wt-social-login > p {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.wt-auth-page .wt-social-login .btn-group {
+  display: flex;
+  width: 100%;
+}
+
+.wt-auth-page .wt-social-login .btn {
+  flex: 1;
+  min-height: 46px;
+  padding: 11px 16px;
+  color: #24364f;
+  background: #fff;
+  border-color: #cbd6e2;
+  border-radius: 8px;
+  font-size: 15px;
+}
+
+.wt-auth-page .wt-social-login .btn:hover,
+.wt-auth-page .wt-social-login .btn:focus {
+  color: var(--wt-auth-blue-dark);
+  background: #f7fbfe;
+  border-color: #9fb9d2;
+}
+
+.wt-auth-account-switch,
+.wt-auth-utility-links {
+  margin: 20px 0 0;
+  color: var(--wt-auth-muted);
+  text-align: center;
+}
+
+.wt-auth-account-switch a,
+.wt-auth-utility-links a {
+  color: var(--wt-auth-teal);
+  font-weight: 600;
+}
+
+.wt-auth-utility-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.wt-auth-card .wt-login-flow-notice {
+  margin: -10px 0 24px;
+  background: #eef8fd;
+  border-color: #8ccce6;
+  border-radius: 8px;
+}
+
+.wt-auth-card .wt-password-signin-panel {
+  padding: 22px 0 0;
+}
+
+.wt-auth-card .wt-login-help-links {
+  font-size: 14px;
+}
+
+.wt-auth-card .wt-recovery-signin-panel {
+  padding: 18px;
+  background: #f6f9fc;
+  border-color: var(--wt-auth-border);
+  border-radius: 8px;
+}
+
+.wt-auth-options-loading {
+  margin: 26px 0;
+}
+
+@media (max-width: 767px) {
+  .wt-auth-header .container-fluid {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+
+  .wt-auth-header .navbar-brand {
+    height: 50px;
+    font-size: 21px;
+  }
+
+  .wt-auth-header .navbar-brand .navbar-logo {
+    top: 9px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .wt-auth-container {
+    padding: 30px 20px 44px;
+  }
+
+  .wt-auth-card {
+    padding: 30px 24px 28px;
+    border-radius: 13px;
+    box-shadow: 0 12px 34px rgba(36, 76, 119, 0.1);
+  }
+
+  .wt-auth-card-header {
+    margin-bottom: 26px;
+  }
+
+  .wt-auth-card-icon {
+    width: 58px;
+    height: 58px;
+    margin-bottom: 15px;
+    font-size: 25px;
+  }
+
+  .wt-auth-card-header h1 {
+    font-size: 34px;
+    letter-spacing: -0.7px;
+  }
+
+  .wt-auth-card-subtitle {
+    margin-top: 10px;
+    font-size: 16px;
+  }
+
+  .wt-auth-session-option {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .wt-auth-session-option span {
+    padding-left: 20px;
+  }
+
+  .wt-auth-method-header h2 {
+    font-size: 23px;
+  }
+}
+
+@media (max-width: 413px) {
+  .wt-auth-container {
+    padding-right: 14px;
+    padding-left: 14px;
+  }
+
+  .wt-auth-card {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+
+  .wt-auth-card-header h1 {
+    font-size: 31px;
+  }
+
+  .wt-auth-card-subtitle {
+    font-size: 15px;
+  }
+
+  .wt-auth-page .wt-social-login .btn {
+    font-size: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wt-auth-card .btn-block,
+  .wt-auth-card .form-control {
+    transition: none;
+  }
+}

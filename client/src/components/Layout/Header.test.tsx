@@ -124,4 +124,12 @@ describe('Header parity navigation', () => {
 
     expect(screen.queryByRole('link', { name: /^sign in$/i })).not.toBeInTheDocument();
   });
+
+  it('uses a minimal branded header for focused authentication screens', () => {
+    render(<Header focused />, { route: '/login' });
+
+    expect(screen.getByRole('link', { name: /wikitruth/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /toggle navigation/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
+  });
 });
