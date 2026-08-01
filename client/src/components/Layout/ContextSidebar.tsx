@@ -664,12 +664,15 @@ const ContextSidebar: React.FC = () => {
               return (
                 <li key={item.key} className={isActive ? 'active' : ''}>
                   {item.to ? (
-                    <Link to={applicationPath(item.to)} style={linkStyle}>
-                      <i className={`fa fa-${iconName}`} aria-hidden="true"></i> {item.label}
-                      {typeof item.badge === 'number' ? <span className="wt-label label label-default">{item.badge}</span> : null}
+                    <Link to={applicationPath(item.to)} style={linkStyle} className="wt-context-sidebar-link">
+                      <i className={`fa fa-${iconName}`} aria-hidden="true"></i>
+                      <span className="wt-context-sidebar-label">{item.label}</span>
+                      {typeof item.badge === 'number' ? (
+                        <span className="wt-context-sidebar-badge">{item.badge}</span>
+                      ) : null}
                     </Link>
                   ) : (
-                    <ApplicationLink href={item.href || '#'} style={linkStyle}>
+                    <ApplicationLink href={item.href || '#'} style={linkStyle} className="wt-context-sidebar-link">
                       {item.logoIcon ? (
                         <img
                           src={item.logoIcon}
@@ -679,8 +682,8 @@ const ContextSidebar: React.FC = () => {
                         />
                       ) : (
                         <i className={`fa fa-${iconName}`} aria-hidden="true"></i>
-                      )}{' '}
-                      {item.label}
+                      )}
+                      <span className="wt-context-sidebar-label">{item.label}</span>
                     </ApplicationLink>
                   )}
                 </li>

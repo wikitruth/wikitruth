@@ -137,4 +137,29 @@ describe('ContextSidebar', () => {
       '/topics/entry/ph-subtopic/ph-1?civic=1',
     );
   });
+
+  it('renders topic counts in a separately aligned badge column', async () => {
+    mockedApi.getHomeData.mockResolvedValue({});
+    mockUseApplicationContext.mockReturnValue({
+      application: null,
+      applications: [],
+      appCategories: [makeEntity({
+        _id: 'culture',
+        friendlyUrl: 'culture-society',
+        title: 'Culture & Society',
+        childrenCount: { topics: { accepted: 13 } },
+      })],
+      applicationPath: (path: string) => path,
+      localTenantContext: false,
+      platformHomeUrl: '/',
+    });
+
+    render(<ContextSidebar />, { route: '/visualize' });
+
+    const sidebar = await screen.findByRole('complementary', { name: /contextual navigation/i });
+    const link = sidebar.querySelector('a[href="/topics/entry/culture-society/culture"]');
+    expect(link).not.toBeNull();
+    expect(link?.querySelector('.wt-context-sidebar-label')).toHaveTextContent('Culture & Society');
+    expect(link?.querySelector('.wt-context-sidebar-badge')).toHaveTextContent('13');
+  });
 });

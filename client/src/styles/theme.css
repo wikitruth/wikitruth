@@ -250,6 +250,12 @@ body,
   background-color: var(--wt-border);
 }
 
+[data-theme='dark'] .wt-context-sidebar .wt-context-sidebar-badge {
+  color: #d6e2ee;
+  background-color: #2b3b4d;
+  border-color: #40566d;
+}
+
 [data-theme='dark'] .footer {
   color: var(--wt-text-muted);
   background-color: #121920;
