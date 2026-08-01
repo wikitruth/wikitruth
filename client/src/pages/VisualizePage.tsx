@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import Alert from '../components/common/Alert';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -29,8 +29,10 @@ const VisualizePage: React.FC = () => {
   const { theme } = useTheme();
   const [outline, setOutline] = useState<OutlineTreeResponse | null>(null);
   const [activeNode, setActiveNode] = useState<VisualizeGraphNode | null>(null);
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const helpRef = useRef<HTMLDivElement | null>(null);
 
   const selectedTopicId = useMemo(() => {
     const searchTopic = new URLSearchParams(location.search).get('topic') || '';
@@ -82,6 +84,28 @@ const VisualizePage: React.FC = () => {
     );
   }, [graphContext]);
 
+  useEffect(() => {
+    if (!isHelpOpen) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!helpRef.current?.contains(event.target as Node)) {
+        setIsHelpOpen(false);
+      }
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsHelpOpen(false);
+      }
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isHelpOpen]);
+
   const selectGraphNode = useCallback((node: VisualizeGraphNode) => {
     setActiveNode(node);
   }, []);
@@ -117,13 +141,22 @@ const VisualizePage: React.FC = () => {
     <div className="wt-visualize-page">
       <div className="wt-viz-heading-row">
         <h1 className="wt-viz-title"><i className="fa fa-snowflake-o" aria-hidden="true"></i> Visualize</h1>
-        <details className="wt-viz-help">
-          <summary aria-label="How to use the knowledge graph"><i className="fa fa-question-circle" aria-hidden="true"></i></summary>
-          <div>
+        <div ref={helpRef} className={`wt-viz-help${isHelpOpen ? ' is-open' : ''}`}>
+          <button
+            type="button"
+            className="wt-viz-help-trigger"
+            aria-label="How to use the knowledge graph"
+            aria-expanded={isHelpOpen}
+            aria-controls="wt-viz-help-panel"
+            onClick={() => setIsHelpOpen((open) => !open)}
+          >
+            <i className="fa fa-question-circle" aria-hidden="true"></i>
+          </button>
+          {isHelpOpen ? <div id="wt-viz-help-panel" role="dialog" aria-label="Knowledge graph help">
             Tap a node to inspect it. Choose <strong>Center here</strong> to navigate through the hierarchy,
             or drag and zoom the graph to explore the current view.
-          </div>
-        </details>
+          </div> : null}
+        </div>
       </div>
 
       <nav className="wt-viz-breadcrumb" aria-label="Graph path">
@@ -132,7 +165,7 @@ const VisualizePage: React.FC = () => {
             const isCurrent = index === graphContext.breadcrumbs.length - 1;
             return (
               <li key={`${crumb.id}-${index}`}>
-                {index === 0 ? <i className="fa fa-globe" aria-hidden="true"></i> : null}
+                {index === 0 ? <i className="fa fa-globe wt-viz-breadcrumb-icon" aria-hidden="true"></i> : null}
                 {isCurrent ? <span aria-current="page">{crumb.title}</span> : <Link to={crumb.visualizeUrl}>{crumb.title}</Link>}
               </li>
             );

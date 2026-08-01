@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 import VisualizePage from './VisualizePage';
-import { render, screen, waitFor } from '../test-utils/render';
+import { fireEvent, render, screen, waitFor } from '../test-utils/render';
 
 const mockGetOutlineTree = jest.fn();
 const mockSearchOutlineTargets = jest.fn();
@@ -65,6 +65,14 @@ describe('VisualizePage', () => {
     expect(screen.getByRole('region', { name: /knowledge graph/i })).toBeInTheDocument();
     expect(screen.queryByText('Knowledge Graph Explorer')).not.toBeInTheDocument();
     expect(screen.queryByText('Topics in Graph')).not.toBeInTheDocument();
+    expect(screen.queryByText(/^Up$/)).not.toBeInTheDocument();
+
+    const helpButton = screen.getByRole('button', { name: /how to use the knowledge graph/i });
+    fireEvent.click(helpButton);
+    expect(screen.getByRole('dialog', { name: /knowledge graph help/i })).toBeInTheDocument();
+    expect(helpButton).toHaveAttribute('aria-expanded', 'true');
+    fireEvent.pointerDown(document.body);
+    expect(screen.queryByRole('dialog', { name: /knowledge graph help/i })).not.toBeInTheDocument();
   });
 
   it('loads selected-topic descendants and exposes its parent as upward navigation', async () => {
@@ -112,6 +120,7 @@ describe('VisualizePage', () => {
       '/visualize/topic/health-medicine/health',
     );
     expect(screen.getByRole('button', { name: 'Up to Health & Medicine' })).toBeInTheDocument();
+    expect(screen.getByText(/^Up$/)).toBeInTheDocument();
     expect(screen.getByText('Current topic, ancestors + 2 levels below')).toBeInTheDocument();
     expect(screen.getByText('3 topics')).toBeInTheDocument();
     await waitFor(() => {

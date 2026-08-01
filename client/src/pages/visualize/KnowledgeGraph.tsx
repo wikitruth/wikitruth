@@ -129,6 +129,15 @@ function edgeColor(source: VisualizeGraphNode | undefined, theme: Theme): string
   return theme === 'dark' ? '#5799d4' : '#5c95cf';
 }
 
+function fitGraphWithPadding(network: VisNetwork, duration = 220): void {
+  network.fit({ animation: false });
+  const paddedScale = Math.max(0.25, network.getScale() * 0.86);
+  network.moveTo({
+    scale: paddedScale,
+    animation: { duration, easingFunction: 'easeInOutQuad' },
+  });
+}
+
 const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
   graph,
   theme,
@@ -237,7 +246,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
         });
         network.on('stabilizationIterationsDone', () => {
           if (networkRef.current !== network) return;
-          network.fit({ animation: { duration: 260, easingFunction: 'easeInOutQuad' } });
+          fitGraphWithPadding(network, 260);
           if (isContextualView && network.getScale() < 0.5) {
             network.focus(graph.focusNodeId, {
               scale: 0.5,
@@ -283,7 +292,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
   return (
     <section className={`wt-knowledge-graph${isFullscreen ? ' is-fullscreen' : ''}`} aria-label="Knowledge graph">
       <div className="wt-viz-legend" aria-label="Graph legend">
-        <span><i className="wt-viz-legend-dot is-up" aria-hidden="true"></i> Up</span>
+        {onNavigateUp ? <span><i className="wt-viz-legend-dot is-up" aria-hidden="true"></i> Up</span> : null}
         <span><i className="wt-viz-legend-dot is-current" aria-hidden="true"></i> Current</span>
         <span><i className="wt-viz-legend-dot is-child" aria-hidden="true"></i> Children</span>
         <span><i className="wt-viz-legend-dot is-descendant" aria-hidden="true"></i> 2nd level</span>
@@ -301,7 +310,9 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
           <button
             type="button"
             className="btn btn-default"
-            onClick={() => networkRef.current?.fit({ animation: { duration: 200 } })}
+            onClick={() => {
+              if (networkRef.current) fitGraphWithPadding(networkRef.current, 200);
+            }}
             title="Center graph"
           >
             <i className="fa fa-crosshairs" aria-hidden="true"></i><span className="sr-only">Center graph</span>
