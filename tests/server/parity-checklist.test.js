@@ -20,7 +20,8 @@ describe('Parity checklist guardrails', function () {
     expect(socialButtons).toContain('if (providers.length === 0)');
     expect(socialButtons).toContain('return null;');
     expect(authApiClient).toContain('providers: () => request<AuthProvidersResponse>');
-    expect(authApiClient).toContain('config: () => request<AuthRuntimeConfig>');
+    expect(authApiClient).toContain('config: loadAuthRuntimeConfig');
+    expect(authApiClient).toContain('loadLegacyAuthRuntimeConfig');
   });
 
   it('keeps journal parity routes and API handlers in place', function () {

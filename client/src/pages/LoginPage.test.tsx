@@ -144,6 +144,43 @@ describe('LoginPage', () => {
     expect(screen.getByPlaceholderText('Enter your password')).toBeInTheDocument();
   });
 
+  it('keeps password available and retries when capability loading fails', async () => {
+    mockedAuthApi.config
+      .mockRejectedValueOnce(new Error('Auth request failed: 404'))
+      .mockResolvedValueOnce({
+        success: true,
+        providers: {},
+        fastSwitchAvailable: false,
+        emailCode: {
+          enabled: true,
+          codeLength: 6,
+          expiresInSeconds: 600,
+          resendDelaySeconds: 60,
+          canonicalOrigin: 'http://localhost',
+          isCanonicalOrigin: true,
+        },
+        passkeys: {
+          enabled: false,
+          rpName: 'Wikitruth',
+          canonicalOrigin: 'http://localhost',
+          isCanonicalOrigin: true,
+          passwordlessEnabled: false,
+          adminStepUpRequired: false,
+          stepUpMaxAgeSeconds: 600,
+        },
+      });
+    const user = userEvent.setup();
+    render(<LoginPage />, { route: '/login' });
+
+    expect(await screen.findByText(/some sign-in options could not be loaded/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Enter your password')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /retry sign-in options/i }));
+
+    expect(await screen.findByLabelText(/^email/i)).toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText(/could not be loaded/i)).not.toBeInTheDocument());
+  });
+
   it('has no obvious accessibility violations in the primary sign-in state', async () => {
     const { container } = render(<LoginPage />, { route: '/login' });
 

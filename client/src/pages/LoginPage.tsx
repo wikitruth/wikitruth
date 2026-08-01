@@ -36,6 +36,8 @@ const LoginPage: React.FC = () => {
   const { login, isAuthenticated, refreshAuth } = useAuth();
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [authConfig, setAuthConfig] = useState<AuthRuntimeConfig | null | undefined>(undefined);
+  const [authConfigError, setAuthConfigError] = useState(false);
+  const [authConfigRequest, setAuthConfigRequest] = useState(0);
   const [passkeyBusy, setPasskeyBusy] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showRecovery, setShowRecovery] = useState(false);
@@ -52,6 +54,8 @@ const LoginPage: React.FC = () => {
 
   useEffect(() => {
     let active = true;
+    setAuthConfig(undefined);
+    setAuthConfigError(false);
     void authApi.config()
       .then(config => {
         if (!active) return;
@@ -67,12 +71,13 @@ const LoginPage: React.FC = () => {
       .catch(() => {
         if (!active) return;
         setAuthConfig(null);
+        setAuthConfigError(true);
         setShowPassword(true);
       });
     return () => {
       active = false;
     };
-  }, []);
+  }, [authConfigRequest]);
 
   const passkeyConfig = authConfig?.passkeys;
   const emailCodeConfig = authConfig?.emailCode;
@@ -242,6 +247,21 @@ const LoginPage: React.FC = () => {
             <i className="fa fa-spinner fa-spin" aria-hidden="true"></i>{' '}
             Loading sign-in options…
           </p>
+        ) : null}
+
+        {authConfigError ? (
+          <Alert type="warning">
+            <p>Some sign-in options could not be loaded. You can use your password or try again.</p>
+            <Button
+              type="button"
+              variant="default"
+              className="btn-sm"
+              icon="refresh"
+              onClick={() => setAuthConfigRequest(request => request + 1)}
+            >
+              Retry sign-in options
+            </Button>
+          </Alert>
         ) : null}
 
         <PasswordlessEmailPanel

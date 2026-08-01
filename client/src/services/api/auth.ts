@@ -115,6 +115,42 @@ export interface AuthRuntimeConfig extends AuthProvidersResponse {
   fastSwitchAvailable: boolean;
 }
 
+async function loadLegacyAuthRuntimeConfig(): Promise<AuthRuntimeConfig> {
+  const [providersResult, emailCodeResult, passkeysResult] = await Promise.allSettled([
+    request<AuthProvidersResponse>(`${API_BASE_URL}/auth/providers`),
+    request<{ success: boolean; emailCode: EmailCodeRuntimeConfig }>(
+      `${API_BASE_URL}/auth/email-code/config`,
+    ),
+    request<{ success: boolean; passkeys: PasskeyRuntimeConfig }>(
+      `${API_BASE_URL}/auth/passkeys/config`,
+    ),
+  ]);
+
+  if (emailCodeResult.status === 'rejected' || passkeysResult.status === 'rejected') {
+    throw new Error('Sign-in capability endpoints are unavailable');
+  }
+
+  return {
+    success: true,
+    providers: providersResult.status === 'fulfilled' ? providersResult.value.providers || {} : {},
+    emailCode: emailCodeResult.value.emailCode,
+    passkeys: passkeysResult.value.passkeys,
+    fastSwitchAvailable: false,
+  };
+}
+
+async function loadAuthRuntimeConfig(): Promise<AuthRuntimeConfig> {
+  try {
+    return await request<AuthRuntimeConfig>(`${API_BASE_URL}/auth/config`);
+  } catch (primaryError) {
+    try {
+      return await loadLegacyAuthRuntimeConfig();
+    } catch (_legacyError) {
+      throw primaryError;
+    }
+  }
+}
+
 const getCsrfToken = (): string | null => {
   if (typeof document === 'undefined') {
     return null;
@@ -202,7 +238,7 @@ export const authApi = {
       },
     ),
   providers: () => request<AuthProvidersResponse>(`${API_BASE_URL}/auth/providers`),
-  config: () => request<AuthRuntimeConfig>(`${API_BASE_URL}/auth/config`),
+  config: loadAuthRuntimeConfig,
   emailCodeConfig: async () => {
     const result = await request<{ success: boolean; emailCode: EmailCodeRuntimeConfig }>(
       `${API_BASE_URL}/auth/email-code/config`,

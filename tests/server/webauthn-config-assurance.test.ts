@@ -59,6 +59,52 @@ describe('WebAuthn configuration and session assurance', () => {
     expect(isCanonicalAuthOrigin(req)).toBe(false);
   });
 
+  it('uses forwarded origin data from the configured loopback proxy', () => {
+    const base = requestFixture();
+    const req = requestFixture({
+      protocol: 'http',
+      get: (name: string) => ({
+        host: '127.0.0.1:8082',
+        'x-forwarded-proto': 'https',
+        'x-forwarded-host': 'wikitruth.net',
+      })[name.toLowerCase()],
+      app: {
+        ...base.app,
+        config: {
+          ...(base.app as unknown as { config: Record<string, unknown> }).config,
+          trustProxy: true,
+        },
+      },
+      socket: { remoteAddress: '::ffff:127.0.0.1' },
+    });
+
+    expect(getRequestOrigin(req)).toBe('https://wikitruth.net');
+    expect(isCanonicalAuthOrigin(req)).toBe(true);
+  });
+
+  it('ignores spoofed forwarded origin data from a direct client', () => {
+    const base = requestFixture();
+    const req = requestFixture({
+      protocol: 'http',
+      get: (name: string) => ({
+        host: 'wikitruth.net',
+        'x-forwarded-proto': 'https',
+        'x-forwarded-host': 'wikitruth.net',
+      })[name.toLowerCase()],
+      app: {
+        ...base.app,
+        config: {
+          ...(base.app as unknown as { config: Record<string, unknown> }).config,
+          trustProxy: true,
+        },
+      },
+      socket: { remoteAddress: '203.0.113.10' },
+    });
+
+    expect(getRequestOrigin(req)).toBe('');
+    expect(isCanonicalAuthOrigin(req)).toBe(false);
+  });
+
   it('accepts only relative same-origin return paths', () => {
     expect(safeRelativeReturnPath('/civic/projects?status=open')).toBe(
       '/civic/projects?status=open'

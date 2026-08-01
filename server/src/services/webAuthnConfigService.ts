@@ -32,6 +32,24 @@ function normalizeOrigin(value: unknown): string {
   }
 }
 
+function firstForwardedValue(value: unknown): string {
+  return (String(value || '').split(',').at(0) || '').trim();
+}
+
+function isLoopbackAddress(value: unknown): boolean {
+  const address = String(value || '').trim().toLowerCase();
+  return address === '127.0.0.1' || address === '::1' || address === '::ffff:127.0.0.1';
+}
+
+function usesTrustedLocalProxy(req: WikitruthRequest): boolean {
+  const app = req.app as unknown as {
+    config?: { trustProxy?: boolean };
+    get?: (name: string) => unknown;
+  };
+  const proxyConfigured = app.config?.trustProxy === true || Boolean(app.get?.('trust proxy'));
+  return proxyConfigured && isLoopbackAddress(req.socket?.remoteAddress);
+}
+
 function positiveInt(value: unknown, fallback: number, maximum: number): number {
   const parsed = Number(value);
   return Number.isFinite(parsed) && parsed > 0 ? Math.min(Math.floor(parsed), maximum) : fallback;
@@ -70,7 +88,25 @@ export function getWebAuthnConfig(req: WikitruthRequest): WebAuthnRuntimeConfig 
 }
 
 export function getRequestOrigin(req: WikitruthRequest): string {
-  return normalizeOrigin(`${req.protocol}://${String(req.get('host') || '')}`);
+  let protocol = String(req.protocol || '').trim().toLowerCase();
+  let host = String(req.get('host') || '').trim();
+
+  // Kraken can reset Express' derived protocol after application settings are
+  // applied. Accept forwarded origin data only from the explicitly configured
+  // loopback proxy; direct requests must continue to use the socket-derived
+  // protocol and Host header.
+  if (usesTrustedLocalProxy(req)) {
+    const forwardedProtocol = firstForwardedValue(req.get('x-forwarded-proto')).toLowerCase();
+    const forwardedHost = firstForwardedValue(req.get('x-forwarded-host'));
+    if (forwardedProtocol === 'http' || forwardedProtocol === 'https') {
+      protocol = forwardedProtocol;
+    }
+    if (forwardedHost) {
+      host = forwardedHost;
+    }
+  }
+
+  return normalizeOrigin(`${protocol}://${host}`);
 }
 
 export function isCanonicalAuthOrigin(req: WikitruthRequest): boolean {
