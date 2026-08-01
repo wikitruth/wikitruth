@@ -1,5 +1,5 @@
 import type { OutlineTreeNode } from '../../types/api';
-import { buildVisualizeGraphContext, WIKITRUTH_ROOT_ID } from './graphModel';
+import { buildVisualizeGraphContext, EXPLORE_ROOT_ID, WIKITRUTH_ROOT_ID } from './graphModel';
 
 function topic(id: string, title: string, children: OutlineTreeNode[] = []): OutlineTreeNode {
   return { _id: id, title, friendlyUrl: id, objectName: 'topic', children };
@@ -13,10 +13,13 @@ describe('buildVisualizeGraphContext', () => {
     ], [], '');
 
     expect(context.graph.focusNodeId).toBe(WIKITRUTH_ROOT_ID);
+    expect(context.breadcrumbs).toEqual([
+      expect.objectContaining({ id: EXPLORE_ROOT_ID, title: 'Explore', visualizeUrl: '/explore' }),
+    ]);
     expect(context.topicCount).toBe(3);
     expect(context.graph.edges).toEqual(expect.arrayContaining([
       expect.objectContaining({ from: WIKITRUTH_ROOT_ID, to: 'health', direction: 'down' }),
-      expect.objectContaining({ from: 'health', to: 'medicine', direction: 'down' }),
+      expect.objectContaining({ from: 'medicine', to: 'health', direction: 'down' }),
     ]));
   });
 
@@ -35,7 +38,32 @@ describe('buildVisualizeGraphContext', () => {
       expect.objectContaining({ id: 'society', role: 'up', level: -2 }),
       expect.objectContaining({ id: 'recovery', role: 'child', level: 1 }),
     ]));
+    expect(context.graph.nodes.find((node) => node.id === 'health')?.label).toContain('(up level)');
+    expect(context.graph.nodes.find((node) => node.id === 'society')?.label).toContain('(up 2 levels)');
     expect(context.graph.nodes.some((node) => node.id === WIKITRUTH_ROOT_ID)).toBe(false);
+  });
+
+  it('uses the full ancestor chain for breadcrumbs but only the nearest two in the graph', () => {
+    const context = buildVisualizeGraphContext(
+      [topic('languages', 'Human Languages')],
+      [topic('knowledge', 'Knowledge'), topic('existence', 'Life & Existence'), topic('language', 'Language')],
+      'languages',
+    );
+
+    expect(context.breadcrumbs.map((crumb) => crumb.title)).toEqual([
+      'Explore',
+      'Knowledge',
+      'Life & Existence',
+      'Language',
+      'Human Languages',
+    ]);
+    expect(context.graph.nodes.map((node) => node.id)).toEqual(expect.arrayContaining([
+      'languages',
+      'existence',
+      'language',
+    ]));
+    expect(context.graph.nodes.some((node) => node.id === 'knowledge')).toBe(false);
+    expect(context.directParent?.id).toBe('language');
   });
 
   it('adds Wikitruth as the remaining upward level for a top-level selected topic', () => {
@@ -43,10 +71,33 @@ describe('buildVisualizeGraphContext', () => {
 
     expect(context.directParent?.id).toBe(WIKITRUTH_ROOT_ID);
     expect(context.graph.edges).toContainEqual({
-      from: 'science',
-      to: WIKITRUTH_ROOT_ID,
+      from: WIKITRUTH_ROOT_ID,
+      to: 'science',
       direction: 'up',
-      width: 3,
+      width: 4,
+    });
+  });
+
+  it('keeps direct and second-level descendants as distinct graph tiers', () => {
+    const context = buildVisualizeGraphContext([
+      topic('health', 'Health', [topic('medicine', 'Medicine', [topic('therapy', 'Therapy')])]),
+    ], [], 'health');
+
+    expect(context.graph.nodes).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: 'medicine', level: 1, role: 'child' }),
+      expect.objectContaining({ id: 'therapy', level: 2, role: 'child' }),
+    ]));
+    expect(context.graph.edges).toContainEqual({
+      from: 'health',
+      to: 'medicine',
+      direction: 'down',
+      width: 4,
+    });
+    expect(context.graph.edges).toContainEqual({
+      from: 'therapy',
+      to: 'medicine',
+      direction: 'down',
+      width: 1,
     });
   });
 });

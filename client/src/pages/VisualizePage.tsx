@@ -44,8 +44,8 @@ const VisualizePage: React.FC = () => {
       setError(null);
       try {
         const result = selectedTopicId
-          ? await apiService.getOutlineTree(selectedTopicId, 2, { ancestorDepth: 2, childLimit: 8 })
-          : await apiService.getOutlineTree(undefined, 1, { childLimit: 5, rootLimit: 20 });
+          ? await apiService.getOutlineTree(selectedTopicId, 2, { ancestorDepth: 20, childLimit: 11 })
+          : await apiService.getOutlineTree(undefined, 1, { childLimit: 11, rootLimit: 20 });
         if (selectedTopicId && (!result.tree || result.success === false)) {
           throw new Error(result.message || 'The requested public topic could not be loaded');
         }
@@ -109,7 +109,9 @@ const VisualizePage: React.FC = () => {
   }
 
   const directParent = graphContext.directParent;
-  const scopeDescription = selectedTopicId ? 'Current topic + 2 levels below' : 'Root topics + 1 level below';
+  const scopeDescription = selectedTopicId
+    ? 'Current topic, ancestors + 2 levels below'
+    : 'Root topics + 1 level below';
 
   return (
     <div className="wt-visualize-page">
@@ -130,6 +132,7 @@ const VisualizePage: React.FC = () => {
             const isCurrent = index === graphContext.breadcrumbs.length - 1;
             return (
               <li key={`${crumb.id}-${index}`}>
+                {index === 0 ? <i className="fa fa-globe" aria-hidden="true"></i> : null}
                 {isCurrent ? <span aria-current="page">{crumb.title}</span> : <Link to={crumb.visualizeUrl}>{crumb.title}</Link>}
               </li>
             );

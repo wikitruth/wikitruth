@@ -59,7 +59,7 @@ describe('VisualizePage', () => {
     render(<VisualizePage />, { route: '/visualize' });
 
     expect(await screen.findByRole('heading', { name: /visualize/i })).toBeInTheDocument();
-    expect(mockGetOutlineTree).toHaveBeenCalledWith(undefined, 1, { childLimit: 5, rootLimit: 20 });
+    expect(mockGetOutlineTree).toHaveBeenCalledWith(undefined, 1, { childLimit: 11, rootLimit: 20 });
     expect(screen.getByText('3 topics')).toBeInTheDocument();
     expect(screen.getByText('Root topics + 1 level below')).toBeInTheDocument();
     expect(screen.getByRole('region', { name: /knowledge graph/i })).toBeInTheDocument();
@@ -105,14 +105,14 @@ describe('VisualizePage', () => {
     );
 
     await waitFor(() => {
-      expect(mockGetOutlineTree).toHaveBeenCalledWith('addiction', 2, { ancestorDepth: 2, childLimit: 8 });
+      expect(mockGetOutlineTree).toHaveBeenCalledWith('addiction', 2, { ancestorDepth: 20, childLimit: 11 });
     });
     expect(screen.getByRole('link', { name: 'Health & Medicine' })).toHaveAttribute(
       'href',
       '/visualize/topic/health-medicine/health',
     );
     expect(screen.getByRole('button', { name: 'Up to Health & Medicine' })).toBeInTheDocument();
-    expect(screen.getByText('Current topic + 2 levels below')).toBeInTheDocument();
+    expect(screen.getByText('Current topic, ancestors + 2 levels below')).toBeInTheDocument();
     expect(screen.getByText('3 topics')).toBeInTheDocument();
     await waitFor(() => {
       expect(document.querySelector('.wt-viz-node-action strong')).toHaveTextContent('Addiction');

@@ -29,6 +29,7 @@ type OutlineTreeNode = { _id: string; objectName: 'topic'; title: string; friend
 type TreeBudget = { remaining: number; truncated: boolean };
 
 const MAX_TREE_NODES = 500;
+const MAX_ANCESTOR_DEPTH = 20;
 const TARGET_MODEL_NAMES: Record<EntryKind, string> = {
   topic: 'Topic', argument: 'Argument', artifact: 'Artifact', question: 'Question', answer: 'Answer', issue: 'Issue', opinion: 'Opinion',
 };
@@ -97,8 +98,11 @@ function isPublicTopic(topic: Record<string, unknown> | null | undefined): topic
 async function loadTopicAncestors(root: Record<string, unknown>, ancestorDepth: number): Promise<OutlineTreeNode[]> {
   const ancestors: OutlineTreeNode[] = [];
   let parentId = String(root.parentId || '').trim();
+  const seen = new Set([String(root._id || '')]);
 
   while (parentId && ancestors.length < ancestorDepth) {
+    if (seen.has(parentId)) break;
+    seen.add(parentId);
     const parent = await db.Topic.findById(parentId).lean();
     if (!isPublicTopic(parent)) break;
     ancestors.unshift(topicNode(parent));
@@ -189,7 +193,7 @@ export = function (router: Router) {
     const depth = sanitizeLimit(req.query.depth, 2, 4);
     const requestedAncestorDepth = Number(req.query.ancestorDepth);
     const ancestorDepth = Number.isFinite(requestedAncestorDepth) && requestedAncestorDepth >= 0
-      ? Math.min(Math.floor(requestedAncestorDepth), 2)
+      ? Math.min(Math.floor(requestedAncestorDepth), MAX_ANCESTOR_DEPTH)
       : 0;
     const childLimit = sanitizeLimit(req.query.childLimit, 30, 30);
     const rootLimit = sanitizeLimit(req.query.rootLimit, 20, 20);

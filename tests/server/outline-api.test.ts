@@ -118,7 +118,7 @@ describe('outline api endpoints', () => {
     expect(mockDb.Topic.find).toHaveBeenCalledTimes(1);
   });
 
-  it('returns bounded ancestors from the Wikitruth root toward the selected topic', async () => {
+  it('returns the requested public ancestor chain from the root toward the selected topic', async () => {
     mockDb.Topic.findById
       .mockReturnValueOnce(leanDoc({
         _id: 'topic-3', title: 'Addiction', friendlyUrl: 'addiction', parentId: 'topic-2', private: false,
@@ -129,18 +129,23 @@ describe('outline api endpoints', () => {
         screening: { status: 1 },
       }))
       .mockReturnValueOnce(leanDoc({
-        _id: 'topic-1', title: 'Knowledge', friendlyUrl: 'knowledge', parentId: null, private: false,
+        _id: 'topic-1', title: 'Knowledge', friendlyUrl: 'knowledge', parentId: 'topic-0', private: false,
+        screening: { status: 1 },
+      }))
+      .mockReturnValueOnce(leanDoc({
+        _id: 'topic-0', title: 'Foundation', friendlyUrl: 'foundation', parentId: null, private: false,
         screening: { status: 1 },
       }));
     mockDb.Topic.find.mockImplementationOnce(() => chain([]));
 
     const response = await request(createApp()).get(
-      '/outline/tree?rootId=topic-3&depth=2&ancestorDepth=2&childLimit=8',
+      '/outline/tree?rootId=topic-3&depth=2&ancestorDepth=20&childLimit=11',
     );
 
     expect(response.status).toBe(200);
     expect(response.body.tree.title).toBe('Addiction');
     expect(response.body.ancestors.map((topic: { title: string }) => topic.title)).toEqual([
+      'Foundation',
       'Knowledge',
       'Health & Medicine',
     ]);

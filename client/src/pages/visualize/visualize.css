@@ -258,6 +258,21 @@
   background: #f5a623;
 }
 
+.wt-viz-legend-dot.is-up {
+  border-color: #ff95c9;
+  background: #cc317c;
+}
+
+.wt-viz-legend-dot.is-child {
+  border-color: #ffc3c6;
+  background: #fb7e81;
+}
+
+.wt-viz-legend-dot.is-descendant {
+  border-color: #c5e3ff;
+  background: #80a6cd;
+}
+
 .wt-viz-legend-line {
   width: 24px;
   height: 0;
@@ -360,7 +375,7 @@
   height: 22px;
   border: 2px solid #a4dcf8;
   border-radius: 50%;
-  background: #3fa8df;
+  background: #fb7e81;
 }
 
 .wt-viz-node-marker.is-current {
@@ -369,10 +384,13 @@
 }
 
 .wt-viz-node-marker.is-up {
-  border-color: #d2b3f6;
-  border-radius: 4px;
-  background: #9864d8;
-  transform: rotate(45deg) scale(0.78);
+  border-color: #ff95c9;
+  background: #cc317c;
+}
+
+.wt-viz-node-marker.is-descendant {
+  border-color: #c5e3ff;
+  background: #80a6cd;
 }
 
 .wt-viz-renderer-error {

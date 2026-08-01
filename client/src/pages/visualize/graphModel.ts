@@ -34,6 +34,7 @@ export interface VisualizeGraphContext {
 }
 
 export const WIKITRUTH_ROOT_ID = 'wikitruth-root';
+export const EXPLORE_ROOT_ID = 'explore-root';
 
 export function topicEntryUrl(topic: Pick<OutlineTreeNode, '_id' | 'friendlyUrl'>): string {
   const id = encodeURIComponent(String(topic._id || ''));
@@ -85,9 +86,18 @@ function appendDescendants(
 ): void {
   for (const child of parent.children || []) {
     nodes.push(graphTopicNode(child, parentLevel + 1, 'child'));
-    edges.push({ from: String(parent._id), to: String(child._id), direction: 'down', width: 2 });
+    edges.push({
+      from: parentLevel === 0 ? String(parent._id) : String(child._id),
+      to: parentLevel === 0 ? String(child._id) : String(parent._id),
+      direction: 'down',
+      width: parentLevel === 0 ? 4 : 1,
+    });
     appendDescendants(child, parentLevel + 1, nodes, edges);
   }
+}
+
+function exploreBreadcrumb() {
+  return { id: EXPLORE_ROOT_ID, title: 'Explore', visualizeUrl: '/explore' };
 }
 
 export function buildVisualizeGraphContext(
@@ -103,12 +113,12 @@ export function buildVisualizeGraphContext(
     nodes.push(root);
     for (const tree of trees) {
       nodes.push(graphTopicNode(tree, 1, 'child'));
-      edges.push({ from: root.id, to: String(tree._id), direction: 'down', width: 3 });
+      edges.push({ from: root.id, to: String(tree._id), direction: 'down', width: 4 });
       appendDescendants(tree, 1, nodes, edges);
     }
     return {
       graph: { nodes, edges, focusNodeId: root.id },
-      breadcrumbs: [{ id: root.id, title: root.title, visualizeUrl: root.visualizeUrl }],
+      breadcrumbs: [exploreBreadcrumb()],
       directParent: null,
       topicCount: Math.max(0, nodes.length - 1),
     };
@@ -119,7 +129,7 @@ export function buildVisualizeGraphContext(
     const root = wikitruthRoot('current', 0);
     return {
       graph: { nodes: [root], edges: [], focusNodeId: root.id },
-      breadcrumbs: [{ id: root.id, title: root.title, visualizeUrl: root.visualizeUrl }],
+      breadcrumbs: [exploreBreadcrumb()],
       directParent: null,
       topicCount: 0,
     };
@@ -131,25 +141,30 @@ export function buildVisualizeGraphContext(
 
   let lowerNode: VisualizeGraphNode = currentNode;
   const ancestorNodes: VisualizeGraphNode[] = [];
-  [...ancestors].reverse().forEach((ancestor, reverseIndex) => {
-    const ancestorNode = graphTopicNode(ancestor, -(reverseIndex + 1), 'up');
+  const graphAncestors = ancestors.slice(-2);
+  [...graphAncestors].reverse().forEach((ancestor, reverseIndex) => {
+    const upDistance = reverseIndex + 1;
+    const ancestorNode = graphTopicNode(ancestor, -upDistance, 'up');
+    ancestorNode.label = `${ancestorNode.label}\n(${upDistance === 1 ? 'up level' : 'up 2 levels'})`;
     ancestorNodes.unshift(ancestorNode);
     nodes.push(ancestorNode);
-    edges.push({ from: lowerNode.id, to: ancestorNode.id, direction: 'up', width: 3 });
+    edges.push({ from: lowerNode.id, to: ancestorNode.id, direction: 'up', width: upDistance === 1 ? 4 : 1 });
     lowerNode = ancestorNode;
   });
 
-  if (ancestors.length < 2) {
-    const root = wikitruthRoot('up', -(ancestors.length + 1));
+  if (graphAncestors.length < 2) {
+    const upDistance = graphAncestors.length + 1;
+    const root = wikitruthRoot('up', -upDistance);
+    root.label = `${root.label}\n(${upDistance === 1 ? 'up level' : 'up 2 levels'})`;
     nodes.push(root);
-    edges.push({ from: lowerNode.id, to: root.id, direction: 'up', width: 3 });
+    edges.push({ from: root.id, to: lowerNode.id, direction: 'up', width: upDistance === 1 ? 4 : 1 });
     ancestorNodes.unshift(root);
   }
 
   return {
     graph: { nodes, edges, focusNodeId: currentNode.id },
     breadcrumbs: [
-      { id: WIKITRUTH_ROOT_ID, title: 'Wikitruth', visualizeUrl: '/visualize' },
+      exploreBreadcrumb(),
       ...ancestors.map((ancestor) => ({
         id: String(ancestor._id),
         title: ancestor.title,

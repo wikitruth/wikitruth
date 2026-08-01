@@ -98,16 +98,35 @@ function nodeColors(node: VisualizeGraphNode, theme: Theme) {
   }
   if (node.role === 'up') {
     return {
-      background: theme === 'dark' ? '#9864d8' : '#8057b7',
-      border: theme === 'dark' ? '#d2b3f6' : '#56327f',
-      highlight: { background: '#ad7de4', border: '#eee3fb' },
+      background: theme === 'dark' ? '#d33b88' : '#cc317c',
+      border: theme === 'dark' ? '#ff95c9' : '#8f1f55',
+      highlight: { background: '#e6539b', border: '#ffd9eb' },
+    };
+  }
+  if (node.level === 1) {
+    return {
+      background: theme === 'dark' ? '#ff747c' : '#fb7e81',
+      border: theme === 'dark' ? '#ffc3c6' : '#c7494f',
+      highlight: { background: '#ff9399', border: '#fff0f1' },
     };
   }
   return {
-    background: theme === 'dark' ? '#3fa8df' : '#5aaee6',
-    border: theme === 'dark' ? '#a4dcf8' : '#256f9e',
-    highlight: { background: '#70c8f4', border: '#e3f6ff' },
+    background: theme === 'dark' ? '#6faee8' : '#80a6cd',
+    border: theme === 'dark' ? '#c5e3ff' : '#3d7fbe',
+    highlight: { background: '#91c7f7', border: '#edf7ff' },
   };
+}
+
+function nodeValue(node: VisualizeGraphNode): number {
+  if (node.role === 'current') return 30;
+  return Math.abs(node.level) === 1 ? 20 : 11;
+}
+
+function edgeColor(source: VisualizeGraphNode | undefined, theme: Theme): string {
+  if (source?.role === 'current') return theme === 'dark' ? '#d89b32' : '#bb7410';
+  if (source?.role === 'up') return theme === 'dark' ? '#d84a91' : '#b92269';
+  if (source?.level === 1) return theme === 'dark' ? '#df656d' : '#d35d64';
+  return theme === 'dark' ? '#5799d4' : '#5c95cf';
 }
 
 const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
@@ -140,23 +159,22 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
         if (!vis) throw new Error('The graph renderer is unavailable');
 
         networkRef.current?.destroy();
-        const minimumLevel = Math.min(0, ...graph.nodes.map((node) => node.level));
         const canvasColor = theme === 'dark' ? '#111a24' : '#f3f6f8';
         const fontColor = theme === 'dark' ? '#e8edf2' : '#24313d';
         const focusNode = graph.nodes.find((node) => node.id === graph.focusNodeId);
         const isContextualView = focusNode?.type === 'topic';
+        const graphNodeById = new Map(graph.nodes.map((node) => [node.id, node]));
 
         const nodes = new vis.DataSet(graph.nodes.map((node) => ({
           id: node.id,
           label: node.label,
           title: node.title,
-          level: node.level - minimumLevel,
-          value: node.role === 'current' ? 30 : node.role === 'up' ? 21 : 17,
-          shape: node.role === 'up' ? (node.type === 'root' ? 'triangle' : 'diamond') : 'dot',
+          value: nodeValue(node),
+          shape: 'dot',
           color: nodeColors(node, theme),
           font: {
             color: fontColor,
-            size: node.role === 'current' ? 17 : 14,
+            size: node.role === 'current' ? 17 : Math.abs(node.level) === 1 ? 14 : 12,
             face: 'Arial',
             strokeWidth: 3,
             strokeColor: canvasColor,
@@ -168,45 +186,31 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
           from: edge.from,
           to: edge.to,
           width: edge.width,
-          arrows: { to: { enabled: true, scaleFactor: 0.65 } },
-          dashes: edge.direction === 'up' ? [8, 7] : false,
+          arrows: { to: { enabled: false } },
+          dashes: false,
           color: {
-            color: edge.direction === 'up'
-              ? (theme === 'dark' ? '#b484ea' : '#8057b7')
-              : (theme === 'dark' ? '#4baee8' : '#3c8dcc'),
+            color: edgeColor(graphNodeById.get(edge.from), theme),
             opacity: 0.92,
           },
-          smooth: { enabled: true, type: 'cubicBezier', roundness: 0.25 },
+          smooth: { enabled: true, type: 'dynamic', roundness: 0.25 },
         })));
 
         const network = new vis.Network(containerRef.current, { nodes, edges }, {
           autoResize: true,
-          layout: {
-            hierarchical: {
-              enabled: isContextualView,
-              direction: 'UD',
-              sortMethod: 'directed',
-              levelSeparation: 110,
-              nodeSpacing: 130,
-              treeSpacing: 170,
-              blockShifting: true,
-              edgeMinimization: true,
-              parentCentralization: true,
-            },
-          },
-          physics: isContextualView ? { enabled: false } : {
+          layout: { improvedLayout: true, randomSeed: 7 },
+          physics: {
             enabled: true,
             solver: 'barnesHut',
             barnesHut: {
               gravitationalConstant: -2600,
-              centralGravity: 0.24,
-              springLength: 105,
+              centralGravity: 0.22,
+              springLength: 120,
               springConstant: 0.035,
-              damping: 0.16,
-              avoidOverlap: 0.18,
+              damping: 0.14,
+              avoidOverlap: 0.2,
             },
-            stabilization: { enabled: true, iterations: 220, fit: true },
-            minVelocity: 0.3,
+            stabilization: { enabled: true, iterations: 240, fit: false },
+            minVelocity: 0.2,
           },
           interaction: {
             dragNodes: true,
@@ -216,7 +220,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
             navigationButtons: false,
             keyboard: true,
           },
-          nodes: { scaling: { min: 12, max: 34 } },
+          nodes: { scaling: { min: 12, max: 42 } },
         });
 
         networkRef.current = network;
@@ -231,22 +235,16 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
           const node = graph.nodes.find((candidate) => candidate.id === nodeId);
           if (node) onNodeRecenter(node);
         });
-        if (isContextualView) {
-          window.setTimeout(() => {
-            if (networkRef.current !== network) return;
-            network.fit({ animation: { duration: 300, easingFunction: 'easeInOutQuad' } });
+        network.on('stabilizationIterationsDone', () => {
+          if (networkRef.current !== network) return;
+          network.fit({ animation: { duration: 260, easingFunction: 'easeInOutQuad' } });
+          if (isContextualView && network.getScale() < 0.5) {
             network.focus(graph.focusNodeId, {
-              scale: Math.max(network.getScale(), 0.62),
+              scale: 0.5,
               animation: { duration: 300, easingFunction: 'easeInOutQuad' },
             });
-          }, 0);
-        } else {
-          network.on('stabilizationIterationsDone', () => {
-            if (networkRef.current === network) {
-              network.fit({ animation: { duration: 260, easingFunction: 'easeInOutQuad' } });
-            }
-          });
-        }
+          }
+        });
       } catch (error) {
         if (!cancelled) {
           setRendererError(error instanceof Error ? error.message : 'Failed to initialize the graph');
@@ -285,9 +283,10 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
   return (
     <section className={`wt-knowledge-graph${isFullscreen ? ' is-fullscreen' : ''}`} aria-label="Knowledge graph">
       <div className="wt-viz-legend" aria-label="Graph legend">
-        <span><i className="wt-viz-legend-line is-up" aria-hidden="true"></i> Up</span>
+        <span><i className="wt-viz-legend-dot is-up" aria-hidden="true"></i> Up</span>
         <span><i className="wt-viz-legend-dot is-current" aria-hidden="true"></i> Current</span>
-        <span><i className="wt-viz-legend-line is-child" aria-hidden="true"></i> Children</span>
+        <span><i className="wt-viz-legend-dot is-child" aria-hidden="true"></i> Children</span>
+        <span><i className="wt-viz-legend-dot is-descendant" aria-hidden="true"></i> 2nd level</span>
       </div>
 
       <div className="wt-viz-canvas-wrap">
@@ -330,8 +329,11 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
       {activeNode ? (
         <div className="wt-viz-node-action" aria-live="polite">
           <div className="wt-viz-node-action-copy">
-            <span className={`wt-viz-node-marker is-${activeNode.role}`} aria-hidden="true"></span>
-            <span><strong>{activeNode.title}</strong><small>{activeNode.type === 'root' ? 'Root view' : activeNode.role === 'current' ? 'Current topic' : activeNode.role === 'up' ? 'Up the hierarchy' : 'Child topic'}</small></span>
+            <span
+              className={`wt-viz-node-marker is-${activeNode.role === 'child' && activeNode.level > 1 ? 'descendant' : activeNode.role}`}
+              aria-hidden="true"
+            ></span>
+            <span><strong>{activeNode.title}</strong><small>{activeNode.type === 'root' ? 'Root view' : activeNode.role === 'current' ? 'Current topic' : activeNode.role === 'up' ? 'Up the hierarchy' : activeNode.level === 1 ? 'Child topic' : 'Second-level topic'}</small></span>
           </div>
           <div className="wt-viz-node-action-buttons">
             <button type="button" className="btn btn-default" onClick={() => onOpenNode(activeNode)}>
