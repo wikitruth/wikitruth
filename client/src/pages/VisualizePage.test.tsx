@@ -99,6 +99,7 @@ describe('VisualizePage', () => {
           title: 'Health & Medicine',
           friendlyUrl: 'health-medicine',
           objectName: 'topic',
+          archived: true,
           children: [],
         },
       ],
@@ -123,10 +124,9 @@ describe('VisualizePage', () => {
     expect(screen.getByText(/^Up$/)).toBeInTheDocument();
     expect(screen.getByText('Current topic, ancestors + 2 levels below')).toBeInTheDocument();
     expect(screen.getByText('3 topics')).toBeInTheDocument();
-    await waitFor(() => {
-      expect(document.querySelector('.wt-viz-node-action strong')).toHaveTextContent('Addiction');
-    });
-    expect(screen.getByRole('button', { name: /open topic/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /center here/i })).toBeInTheDocument();
+    expect(screen.getByLabelText('Health & Medicine is archived hierarchy context')).toBeInTheDocument();
+    expect(screen.getByText('Archived context')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /open topic/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /center here/i })).not.toBeInTheDocument();
   });
 });

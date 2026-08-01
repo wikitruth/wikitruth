@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { Theme } from '../../context/ThemeContext';
 import type { VisualizeGraphNode, VisualizeGraphPayload } from './graphModel';
+import NodeActionPopover from './NodeActionPopover';
 
 interface VisDataSet {
   add(items: unknown): void;
@@ -9,6 +10,7 @@ interface VisDataSet {
 
 interface VisNetworkClickParams {
   nodes?: Array<string | number>;
+  pointer?: { DOM?: { x: number; y: number } };
 }
 
 interface VisNetwork {
@@ -17,7 +19,10 @@ interface VisNetwork {
   fit(options?: Record<string, unknown>): void;
   focus(nodeId: string, options?: Record<string, unknown>): void;
   getScale(): number;
+  getPositions(nodeIds?: Array<string | number>): Record<string, { x: number; y: number }>;
+  canvasToDOM(position: { x: number; y: number }): { x: number; y: number };
   moveTo(options: Record<string, unknown>): void;
+  stopSimulation(): void;
 }
 
 interface VisLibrary {
@@ -89,6 +94,13 @@ function ensureVisAssetsLoaded(): Promise<void> {
 }
 
 function nodeColors(node: VisualizeGraphNode, theme: Theme) {
+  if (node.archived) {
+    return {
+      background: theme === 'dark' ? '#75818d' : '#8b959e',
+      border: theme === 'dark' ? '#c6cdd4' : '#56616b',
+      highlight: { background: '#919da8', border: '#eef1f4' },
+    };
+  }
   if (node.role === 'current') {
     return {
       background: theme === 'dark' ? '#f5a623' : '#f0ad4e',
@@ -123,6 +135,7 @@ function nodeValue(node: VisualizeGraphNode): number {
 }
 
 function edgeColor(source: VisualizeGraphNode | undefined, theme: Theme): string {
+  if (source?.archived) return theme === 'dark' ? '#84909b' : '#69747e';
   if (source?.role === 'current') return theme === 'dark' ? '#d89b32' : '#bb7410';
   if (source?.role === 'up') return theme === 'dark' ? '#d84a91' : '#b92269';
   if (source?.level === 1) return theme === 'dark' ? '#df656d' : '#d35d64';
@@ -150,11 +163,67 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const networkRef = useRef<VisNetwork | null>(null);
+  const popoverRef = useRef<HTMLDivElement | null>(null);
+  const selectedNodeIdRef = useRef<string | null>(null);
   const [rendererError, setRendererError] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [popoverAnchor, setPopoverAnchor] = useState<{ x: number; y: number } | null>(null);
+  const [popoverPosition, setPopoverPosition] = useState<{ left: number; top: number } | null>(null);
+
+  const syncPopoverToNode = useCallback((nodeId: string) => {
+    const network = networkRef.current;
+    if (!network) return;
+    const position = network.getPositions([nodeId])[nodeId];
+    if (position) setPopoverAnchor(network.canvasToDOM(position));
+  }, []);
+
+  const closePopover = useCallback(() => {
+    selectedNodeIdRef.current = null;
+    setPopoverAnchor(null);
+    setPopoverPosition(null);
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!activeNode || !popoverAnchor || !containerRef.current || !popoverRef.current) {
+      setPopoverPosition(null);
+      return;
+    }
+
+    const positionPopover = () => {
+      const canvas = containerRef.current;
+      const popover = popoverRef.current;
+      if (!canvas || !popover) return;
+      const edgeGap = 10;
+      const pointerGap = 14;
+      const maxLeft = Math.max(edgeGap, canvas.clientWidth - popover.offsetWidth - edgeGap);
+      const maxTop = Math.max(edgeGap, canvas.clientHeight - popover.offsetHeight - edgeGap);
+      const left = Math.min(maxLeft, Math.max(edgeGap, popoverAnchor.x - popover.offsetWidth / 2));
+      const above = popoverAnchor.y - popover.offsetHeight - pointerGap;
+      const preferredTop = above >= edgeGap ? above : popoverAnchor.y + pointerGap;
+      setPopoverPosition({ left, top: Math.min(maxTop, Math.max(edgeGap, preferredTop)) });
+    };
+
+    positionPopover();
+    window.addEventListener('resize', positionPopover);
+    return () => window.removeEventListener('resize', positionPopover);
+  }, [activeNode, popoverAnchor]);
+
+  useEffect(() => {
+    if (!popoverAnchor) return undefined;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') closePopover();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [closePopover, popoverAnchor]);
 
   useEffect(() => {
     let cancelled = false;
+    let settleTimer: number | null = null;
+
+    selectedNodeIdRef.current = null;
+    setPopoverAnchor(null);
+    setPopoverPosition(null);
 
     const mount = async () => {
       if (!containerRef.current) return;
@@ -177,7 +246,6 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
         const nodes = new vis.DataSet(graph.nodes.map((node) => ({
           id: node.id,
           label: node.label,
-          title: node.title,
           value: nodeValue(node),
           shape: 'dot',
           color: nodeColors(node, theme),
@@ -237,7 +305,15 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
         network.on('click', (params) => {
           const nodeId = String(params.nodes?.[0] || '');
           const node = graph.nodes.find((candidate) => candidate.id === nodeId);
-          if (node) onNodeSelected(node);
+          if (!node) {
+            closePopover();
+            return;
+          }
+          selectedNodeIdRef.current = nodeId;
+          setPopoverPosition(null);
+          setPopoverAnchor(params.pointer?.DOM || null);
+          onNodeSelected(node);
+          if (!params.pointer?.DOM) syncPopoverToNode(nodeId);
         });
         network.on('doubleClick', (params) => {
           const nodeId = String(params.nodes?.[0] || '');
@@ -246,13 +322,32 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
         });
         network.on('stabilizationIterationsDone', () => {
           if (networkRef.current !== network) return;
-          fitGraphWithPadding(network, 260);
-          if (isContextualView && network.getScale() < 0.5) {
-            network.focus(graph.focusNodeId, {
-              scale: 0.5,
-              animation: { duration: 300, easingFunction: 'easeInOutQuad' },
-            });
-          }
+          if (settleTimer !== null) window.clearTimeout(settleTimer);
+          settleTimer = window.setTimeout(() => {
+            if (networkRef.current !== network) return;
+            network.stopSimulation();
+            fitGraphWithPadding(network, 260);
+            if (isContextualView && network.getScale() < 0.5) {
+              network.focus(graph.focusNodeId, {
+                scale: 0.5,
+                animation: { duration: 300, easingFunction: 'easeInOutQuad' },
+              });
+            }
+          }, 0);
+        });
+        network.on('zoom', () => {
+          if (selectedNodeIdRef.current) syncPopoverToNode(selectedNodeIdRef.current);
+        });
+        network.on('dragging', () => {
+          if (selectedNodeIdRef.current) syncPopoverToNode(selectedNodeIdRef.current);
+        });
+        network.on('dragEnd', () => {
+          if (settleTimer !== null) window.clearTimeout(settleTimer);
+          settleTimer = window.setTimeout(() => {
+            if (networkRef.current !== network) return;
+            network.stopSimulation();
+            if (selectedNodeIdRef.current) syncPopoverToNode(selectedNodeIdRef.current);
+          }, 600);
         });
       } catch (error) {
         if (!cancelled) {
@@ -264,12 +359,13 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
     void mount();
     return () => {
       cancelled = true;
+      if (settleTimer !== null) window.clearTimeout(settleTimer);
       networkRef.current?.destroy();
       networkRef.current = null;
       const visWindow = getVisWindow();
       if (visWindow) delete visWindow.__wtNetwork;
     };
-  }, [graph, onNodeRecenter, onNodeSelected, theme]);
+  }, [closePopover, graph, onNodeRecenter, onNodeSelected, syncPopoverToNode, theme]);
 
   const changeZoom = (delta: number) => {
     const network = networkRef.current;
@@ -287,6 +383,7 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
       scale: Math.max(networkRef.current.getScale(), 0.78),
       animation: { duration: 220, easingFunction: 'easeInOutQuad' },
     });
+    window.setTimeout(() => syncPopoverToNode(node.id), 240);
   };
 
   return (
@@ -296,10 +393,23 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
         <span><i className="wt-viz-legend-dot is-current" aria-hidden="true"></i> Current</span>
         <span><i className="wt-viz-legend-dot is-child" aria-hidden="true"></i> Children</span>
         <span><i className="wt-viz-legend-dot is-descendant" aria-hidden="true"></i> 2nd level</span>
+        {graph.nodes.some((node) => node.archived) ? (
+          <span><i className="wt-viz-legend-dot is-archived" aria-hidden="true"></i> Archived context</span>
+        ) : null}
       </div>
 
       <div className="wt-viz-canvas-wrap">
         <div ref={containerRef} id="mynetwork" className="wt-viz-canvas" />
+        {activeNode && popoverAnchor ? (
+          <NodeActionPopover
+            ref={popoverRef}
+            node={activeNode}
+            position={popoverPosition}
+            onClose={closePopover}
+            onOpen={() => onOpenNode(activeNode)}
+            onCenter={() => centerNode(activeNode)}
+          />
+        ) : null}
         <div className="wt-viz-controls" aria-label="Graph controls">
           {onNavigateUp ? (
             <button type="button" className="btn btn-default" onClick={onNavigateUp} title={upLabel || 'Up one level'}>
@@ -336,26 +446,6 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
       </div>
 
       {rendererError ? <div className="alert alert-danger wt-viz-renderer-error">{rendererError}</div> : null}
-
-      {activeNode ? (
-        <div className="wt-viz-node-action" aria-live="polite">
-          <div className="wt-viz-node-action-copy">
-            <span
-              className={`wt-viz-node-marker is-${activeNode.role === 'child' && activeNode.level > 1 ? 'descendant' : activeNode.role}`}
-              aria-hidden="true"
-            ></span>
-            <span><strong>{activeNode.title}</strong><small>{activeNode.type === 'root' ? 'Root view' : activeNode.role === 'current' ? 'Current topic' : activeNode.role === 'up' ? 'Up the hierarchy' : activeNode.level === 1 ? 'Child topic' : 'Second-level topic'}</small></span>
-          </div>
-          <div className="wt-viz-node-action-buttons">
-            <button type="button" className="btn btn-default" onClick={() => onOpenNode(activeNode)}>
-              <i className="fa fa-external-link" aria-hidden="true"></i> Open topic
-            </button>
-            <button type="button" className="btn btn-primary" onClick={() => centerNode(activeNode)}>
-              <i className="fa fa-crosshairs" aria-hidden="true"></i> Center here
-            </button>
-          </div>
-        </div>
-      ) : null}
     </section>
   );
 };

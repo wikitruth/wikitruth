@@ -1,8 +1,13 @@
 import type { OutlineTreeNode } from '../../types/api';
 import { buildVisualizeGraphContext, EXPLORE_ROOT_ID, WIKITRUTH_ROOT_ID } from './graphModel';
 
-function topic(id: string, title: string, children: OutlineTreeNode[] = []): OutlineTreeNode {
-  return { _id: id, title, friendlyUrl: id, objectName: 'topic', children };
+function topic(
+  id: string,
+  title: string,
+  children: OutlineTreeNode[] = [],
+  archived = false,
+): OutlineTreeNode {
+  return { _id: id, title, friendlyUrl: id, objectName: 'topic', archived, children };
 }
 
 describe('buildVisualizeGraphContext', () => {
@@ -64,6 +69,24 @@ describe('buildVisualizeGraphContext', () => {
     ]));
     expect(context.graph.nodes.some((node) => node.id === 'knowledge')).toBe(false);
     expect(context.directParent?.id).toBe('language');
+  });
+
+  it('marks an archived public parent in both the graph and breadcrumb hierarchy', () => {
+    const context = buildVisualizeGraphContext(
+      [topic('msg', 'Monosodium glutamate (MSG)')],
+      [topic('health', 'Health', [], true)],
+      'msg',
+    );
+
+    expect(context.directParent).toEqual(expect.objectContaining({ id: 'health', archived: true }));
+    expect(context.graph.nodes.find((node) => node.id === 'health')).toEqual(expect.objectContaining({
+      archived: true,
+      label: expect.stringContaining('archived · up level'),
+    }));
+    expect(context.breadcrumbs.find((crumb) => crumb.id === 'health')).toEqual(expect.objectContaining({
+      archived: true,
+      title: 'Health',
+    }));
   });
 
   it('adds Wikitruth as the remaining upward level for a top-level selected topic', () => {

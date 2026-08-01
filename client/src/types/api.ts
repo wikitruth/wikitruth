@@ -145,6 +145,7 @@ export interface OutlineTreeNode {
   title: string;
   objectName: 'topic';
   friendlyUrl?: string;
+  archived?: boolean;
   children: OutlineTreeNode[];
 }
 

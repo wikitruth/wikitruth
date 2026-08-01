@@ -9,6 +9,7 @@ export interface VisualizeGraphNode {
   level: number;
   role: VisualizeNodeRole;
   type: 'root' | 'topic';
+  archived: boolean;
   exploreUrl: string;
   visualizeUrl: string;
 }
@@ -28,7 +29,7 @@ export interface VisualizeGraphPayload {
 
 export interface VisualizeGraphContext {
   graph: VisualizeGraphPayload;
-  breadcrumbs: Array<{ id: string; title: string; visualizeUrl: string }>;
+  breadcrumbs: Array<{ id: string; title: string; visualizeUrl: string; archived: boolean }>;
   directParent: VisualizeGraphNode | null;
   topicCount: number;
 }
@@ -60,6 +61,7 @@ function graphTopicNode(
     level,
     role,
     type: 'topic',
+    archived: Boolean(topic.archived),
     exploreUrl: topicEntryUrl(topic),
     visualizeUrl: topicVisualizeUrl(topic),
   };
@@ -73,6 +75,7 @@ function wikitruthRoot(role: VisualizeNodeRole, level: number): VisualizeGraphNo
     level,
     role,
     type: 'root',
+    archived: false,
     exploreUrl: '/topics',
     visualizeUrl: '/visualize',
   };
@@ -97,7 +100,7 @@ function appendDescendants(
 }
 
 function exploreBreadcrumb() {
-  return { id: EXPLORE_ROOT_ID, title: 'Explore', visualizeUrl: '/explore' };
+  return { id: EXPLORE_ROOT_ID, title: 'Explore', visualizeUrl: '/explore', archived: false };
 }
 
 export function buildVisualizeGraphContext(
@@ -145,7 +148,8 @@ export function buildVisualizeGraphContext(
   [...graphAncestors].reverse().forEach((ancestor, reverseIndex) => {
     const upDistance = reverseIndex + 1;
     const ancestorNode = graphTopicNode(ancestor, -upDistance, 'up');
-    ancestorNode.label = `${ancestorNode.label}\n(${upDistance === 1 ? 'up level' : 'up 2 levels'})`;
+    const upLabel = upDistance === 1 ? 'up level' : 'up 2 levels';
+    ancestorNode.label = `${ancestorNode.label}\n(${ancestorNode.archived ? 'archived · ' : ''}${upLabel})`;
     ancestorNodes.unshift(ancestorNode);
     nodes.push(ancestorNode);
     edges.push({ from: lowerNode.id, to: ancestorNode.id, direction: 'up', width: upDistance === 1 ? 4 : 1 });
@@ -169,11 +173,13 @@ export function buildVisualizeGraphContext(
         id: String(ancestor._id),
         title: ancestor.title,
         visualizeUrl: topicVisualizeUrl(ancestor),
+        archived: Boolean(ancestor.archived),
       })),
       {
         id: String(current._id),
         title: current.title,
         visualizeUrl: topicVisualizeUrl(current),
+        archived: Boolean(current.archived),
       },
     ],
     directParent: ancestorNodes.length > 0 ? ancestorNodes[ancestorNodes.length - 1] : null,

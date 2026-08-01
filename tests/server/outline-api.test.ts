@@ -151,6 +151,55 @@ describe('outline api endpoints', () => {
     ]);
   });
 
+  it('retains public archived ancestors as marked historical hierarchy context', async () => {
+    mockDb.Topic.findById
+      .mockReturnValueOnce(leanDoc({
+        _id: 'msg', title: 'Monosodium glutamate (MSG)', friendlyUrl: 'msg', parentId: 'health', private: false,
+        screening: { status: 1 },
+      }))
+      .mockReturnValueOnce(leanDoc({
+        _id: 'health', title: 'Health', friendlyUrl: 'health', parentId: 'knowledge', private: false,
+        screening: { status: 3 },
+      }))
+      .mockReturnValueOnce(leanDoc({
+        _id: 'knowledge', title: 'Knowledge', friendlyUrl: 'knowledge', parentId: null, private: false,
+        screening: { status: 1 },
+      }));
+    mockDb.Topic.find.mockImplementationOnce(() => chain([]));
+
+    const response = await request(createApp()).get(
+      '/outline/tree?rootId=msg&depth=2&ancestorDepth=20&childLimit=11',
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.ancestors).toEqual([
+      expect.objectContaining({ _id: 'knowledge', archived: false }),
+      expect.objectContaining({ _id: 'health', archived: true }),
+    ]);
+  });
+
+  it.each([
+    ['private', { private: true, screening: { status: 1 } }],
+    ['pending', { private: false, screening: { status: 0 } }],
+    ['rejected', { private: false, screening: { status: 2 } }],
+  ])('does not expose a %s ancestor as hierarchy context', async (_label, ancestorState) => {
+    mockDb.Topic.findById
+      .mockReturnValueOnce(leanDoc({
+        _id: 'child', title: 'Child', parentId: 'hidden-parent', private: false, screening: { status: 1 },
+      }))
+      .mockReturnValueOnce(leanDoc({
+        _id: 'hidden-parent', title: 'Hidden parent', parentId: null, ...ancestorState,
+      }));
+    mockDb.Topic.find.mockImplementationOnce(() => chain([]));
+
+    const response = await request(createApp()).get(
+      '/outline/tree?rootId=child&depth=2&ancestorDepth=20',
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.body.ancestors).toEqual([]);
+  });
+
   it('does not expose a private selected root', async () => {
     mockDb.Topic.findById.mockReturnValueOnce(leanDoc({
       _id: 'private-topic', title: 'Private topic', private: true,

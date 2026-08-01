@@ -13,7 +13,12 @@ import { recordEntryRevision } from './revisionWriteRecorder';
 const constants = constantsMod as unknown as {
   OBJECT_TYPES: Record<string, number>;
   LINK_TYPES: { child: number; reference: number };
-  SCREENING_STATUS: { status0: { code: number }; status1: { code: number } };
+  SCREENING_STATUS: {
+    status0: { code: number };
+    status1: { code: number };
+    status2: { code: number };
+    status3: { code: number };
+  };
 };
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 const flowUtils = flowUtilsNs as unknown as {
@@ -25,7 +30,14 @@ type GraphRelationship = (typeof GRAPH_RELATIONSHIPS)[number];
 type EntryKind = 'topic' | 'argument' | 'artifact' | 'question' | 'answer' | 'issue' | 'opinion';
 type OutlineEntry = { _id: unknown; private?: unknown; createUserId?: unknown; screening?: { status?: unknown }; [key: string]: unknown };
 type ResolvedEntry = { kind: EntryKind; entry: OutlineEntry };
-type OutlineTreeNode = { _id: string; objectName: 'topic'; title: string; friendlyUrl?: string; children: OutlineTreeNode[] };
+type OutlineTreeNode = {
+  _id: string;
+  objectName: 'topic';
+  title: string;
+  friendlyUrl?: string;
+  archived: boolean;
+  children: OutlineTreeNode[];
+};
 type TreeBudget = { remaining: number; truncated: boolean };
 
 const MAX_TREE_NODES = 500;
@@ -44,9 +56,12 @@ function sanitizeLimit(raw: unknown, fallback = 20, max = 100): number {
 }
 
 function topicNode(topic: Record<string, unknown>): OutlineTreeNode {
+  const screening = topic.screening as { status?: unknown } | undefined;
   return {
     _id: String(topic._id || ''), objectName: 'topic', title: String(topic.title || ''),
-    friendlyUrl: String(topic.friendlyUrl || ''), children: [],
+    friendlyUrl: String(topic.friendlyUrl || ''),
+    archived: Number(screening?.status) === constants.SCREENING_STATUS.status3.code,
+    children: [],
   };
 }
 
@@ -95,6 +110,17 @@ function isPublicTopic(topic: Record<string, unknown> | null | undefined): topic
     || Number(screening.status) === constants.SCREENING_STATUS.status1.code;
 }
 
+function isPublicHierarchyContextTopic(
+  topic: Record<string, unknown> | null | undefined,
+): topic is Record<string, unknown> {
+  if (!topic || topic.private === true) return false;
+  const screening = topic.screening as { status?: unknown } | undefined;
+  if (typeof screening?.status === 'undefined') return true;
+  const status = Number(screening.status);
+  return status === constants.SCREENING_STATUS.status1.code
+    || status === constants.SCREENING_STATUS.status3.code;
+}
+
 async function loadTopicAncestors(root: Record<string, unknown>, ancestorDepth: number): Promise<OutlineTreeNode[]> {
   const ancestors: OutlineTreeNode[] = [];
   let parentId = String(root.parentId || '').trim();
@@ -104,7 +130,7 @@ async function loadTopicAncestors(root: Record<string, unknown>, ancestorDepth: 
     if (seen.has(parentId)) break;
     seen.add(parentId);
     const parent = await db.Topic.findById(parentId).lean();
-    if (!isPublicTopic(parent)) break;
+    if (!isPublicHierarchyContextTopic(parent)) break;
     ancestors.unshift(topicNode(parent));
     parentId = String(parent.parentId || '').trim();
   }

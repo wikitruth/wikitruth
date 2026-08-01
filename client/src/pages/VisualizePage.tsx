@@ -79,9 +79,7 @@ const VisualizePage: React.FC = () => {
   );
 
   useEffect(() => {
-    setActiveNode(
-      graphContext.graph.nodes.find((node) => node.id === graphContext.graph.focusNodeId) || null,
-    );
+    setActiveNode(null);
   }, [graphContext]);
 
   useEffect(() => {
@@ -167,6 +165,15 @@ const VisualizePage: React.FC = () => {
               <li key={`${crumb.id}-${index}`}>
                 {index === 0 ? <i className="fa fa-globe wt-viz-breadcrumb-icon" aria-hidden="true"></i> : null}
                 {isCurrent ? <span aria-current="page">{crumb.title}</span> : <Link to={crumb.visualizeUrl}>{crumb.title}</Link>}
+                {crumb.archived ? (
+                  <span
+                    className="wt-viz-breadcrumb-archive"
+                    aria-label={`${crumb.title} is archived hierarchy context`}
+                    title="Archived hierarchy context"
+                  >
+                    <i className="fa fa-archive" aria-hidden="true"></i>
+                  </span>
+                ) : null}
               </li>
             );
           })}

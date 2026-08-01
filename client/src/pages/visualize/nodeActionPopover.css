@@ -1,0 +1,113 @@
+.wt-viz-node-popover {
+  position: absolute;
+  z-index: 20;
+  width: min(290px, calc(100% - 20px));
+  padding: 12px;
+  border: 1px solid var(--wt-border);
+  border-radius: 8px;
+  color: var(--wt-text);
+  background: color-mix(in srgb, var(--wt-surface) 97%, transparent);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.28);
+}
+
+.wt-viz-node-popover-close {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  color: var(--wt-text-muted);
+  background: transparent;
+}
+
+.wt-viz-node-popover-close:hover,
+.wt-viz-node-popover-close:focus {
+  color: var(--wt-text);
+  background: var(--wt-surface-muted);
+}
+
+.wt-viz-node-action-copy,
+.wt-viz-node-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+
+.wt-viz-node-action-copy {
+  padding-right: 28px;
+}
+
+.wt-viz-node-action-copy > span:last-child {
+  min-width: 0;
+}
+
+.wt-viz-node-action-copy strong,
+.wt-viz-node-action-copy small {
+  display: block;
+}
+
+.wt-viz-node-action-copy strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wt-viz-node-action-copy small {
+  margin-top: 2px;
+  color: var(--wt-text-muted);
+}
+
+.wt-viz-node-action-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-top: 11px;
+}
+
+.wt-viz-node-action-buttons .btn {
+  min-height: 38px;
+  padding: 7px 9px;
+  font-size: 13px;
+}
+
+.wt-viz-node-marker {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border: 2px solid #a4dcf8;
+  border-radius: 50%;
+  background: #fb7e81;
+}
+
+.wt-viz-node-marker.is-current {
+  border-color: #ffd27a;
+  background: #f5a623;
+}
+
+.wt-viz-node-marker.is-up {
+  border-color: #ff95c9;
+  background: #cc317c;
+}
+
+.wt-viz-node-marker.is-descendant {
+  border-color: #c5e3ff;
+  background: #80a6cd;
+}
+
+.wt-viz-node-marker.is-archived {
+  border-color: #c6cdd4;
+  background: #75818d;
+}
+
+@media (max-width: 430px) {
+  .wt-viz-node-popover {
+    padding: 11px;
+  }
+
+  .wt-viz-node-action-buttons .btn {
+    min-height: 40px;
+  }
+}
