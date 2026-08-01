@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import OptimizedImage from '../common/OptimizedImage';
 import ApplicationLink from '../common/ApplicationLink';
@@ -17,6 +17,7 @@ interface HeaderSection {
 
 interface HeaderProps {
   onToggleSidebar?: () => void;
+  onCloseSidebar?: () => void;
   sidebarOpen?: boolean;
   focused?: boolean;
 }
@@ -47,7 +48,12 @@ const DEFAULT_SECTIONS: HeaderSection[] = [
   },
 ];
 
-const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false, focused = false }) => {
+const Header: React.FC<HeaderProps> = ({
+  onToggleSidebar,
+  onCloseSidebar,
+  sidebarOpen = false,
+  focused = false,
+}) => {
   const location = useLocation();
   const { user, activeRole, setActiveRole, availableRoles } = useAuth();
   const { application, applicationPath } = useApplicationContext();
@@ -55,6 +61,8 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false, f
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
+  const moreMenuRef = useRef<HTMLLIElement>(null);
+  const userMenuRef = useRef<HTMLLIElement>(null);
   const headerSections: HeaderSection[] = application?.sections?.length
     ? application.sections
     : DEFAULT_SECTIONS;
@@ -85,6 +93,63 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false, f
     setIsMobileNavOpen(false);
   }, [location.pathname]);
 
+  useEffect(() => {
+    if (sidebarOpen) {
+      setIsMoreOpen(false);
+      setIsUserMenuOpen(false);
+      setIsMobileNavOpen(false);
+    }
+  }, [sidebarOpen]);
+
+  useEffect(() => {
+    if (!isMoreOpen && !isUserMenuOpen) {
+      return;
+    }
+
+    const handleOutsidePointer = (event: PointerEvent) => {
+      const target = event.target as Node;
+      if (isMoreOpen && !moreMenuRef.current?.contains(target)) {
+        setIsMoreOpen(false);
+      }
+      if (isUserMenuOpen && !userMenuRef.current?.contains(target)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('pointerdown', handleOutsidePointer);
+    return () => document.removeEventListener('pointerdown', handleOutsidePointer);
+  }, [isMoreOpen, isUserMenuOpen]);
+
+  const toggleMobileNavigation = () => {
+    const shouldOpen = !isMobileNavOpen;
+    setIsMobileNavOpen(shouldOpen);
+    if (shouldOpen) {
+      setIsMoreOpen(false);
+      setIsUserMenuOpen(false);
+      onCloseSidebar?.();
+    }
+  };
+
+  const toggleMoreMenu = () => {
+    const shouldOpen = !isMoreOpen;
+    setIsMoreOpen(shouldOpen);
+    if (shouldOpen) {
+      setIsUserMenuOpen(false);
+      setIsMobileNavOpen(false);
+      onCloseSidebar?.();
+    }
+  };
+
+  const toggleUserMenu = () => {
+    const shouldOpen = !isUserMenuOpen;
+    setIsUserMenuOpen(shouldOpen);
+    if (shouldOpen) {
+      setIsMoreOpen(false);
+      setIsMobileNavOpen(false);
+      onCloseSidebar?.();
+    }
+  };
+
   return (
     <div className={`navbar navbar-default navbar-fixed-top${focused ? ' wt-auth-header' : ''}`}>
       <div className="container-fluid">
@@ -112,7 +177,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false, f
               aria-label="Toggle navigation"
               aria-expanded={isMobileNavOpen}
               aria-controls="header-main-collapse"
-              onClick={() => setIsMobileNavOpen((value) => !value)}
+              onClick={toggleMobileNavigation}
             >
               <span className="sr-only">Toggle navigation</span>
               <i className="fa fa-navicon" aria-hidden="true"></i>
@@ -150,7 +215,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false, f
                   <span className="hidden-xs"> Search</span>
                 </Link>
               </li>
-              <li className={`dropdown ${isMoreOpen ? 'open' : ''}`}>
+              <li ref={moreMenuRef} className={`dropdown ${isMoreOpen ? 'open' : ''}`}>
                 <button
                   type="button"
                   title="more"
@@ -159,7 +224,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false, f
                   aria-haspopup="true"
                   aria-expanded={isMoreOpen}
                   aria-controls="header-more-menu"
-                  onClick={() => setIsMoreOpen((value) => !value)}
+                  onClick={toggleMoreMenu}
                   onKeyDown={(event) => {
                     if (event.key === 'Escape') {
                       setIsMoreOpen(false);
@@ -270,7 +335,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false, f
                     ) : null}
                   </Link>
                 </li>
-                <li className={`dropdown ${isUserMenuOpen ? 'open' : ''}`}>
+                <li ref={userMenuRef} className={`dropdown ${isUserMenuOpen ? 'open' : ''}`}>
                   <button
                     type="button"
                     className="dropdown-toggle wt-navbar-control"
@@ -278,7 +343,7 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false, f
                     aria-haspopup="true"
                     aria-expanded={isUserMenuOpen}
                     aria-controls="header-user-menu"
-                    onClick={() => setIsUserMenuOpen((value) => !value)}
+                    onClick={toggleUserMenu}
                     onKeyDown={(event) => {
                       if (event.key === 'Escape') {
                         setIsUserMenuOpen(false);
@@ -382,6 +447,8 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false, f
                     aria-controls="sidebar"
                     onClick={(event) => {
                       event.preventDefault();
+                      setIsMoreOpen(false);
+                      setIsUserMenuOpen(false);
                       setIsMobileNavOpen(false);
                       onToggleSidebar();
                     }}

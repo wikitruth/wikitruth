@@ -4,10 +4,11 @@ import Layout from './Layout';
 
 jest.mock('./Header', () => ({
   __esModule: true,
-  default: ({ onToggleSidebar, focused }: { onToggleSidebar?: () => void; focused?: boolean }) => (
+  default: ({ onToggleSidebar, onCloseSidebar, focused }: { onToggleSidebar?: () => void; onCloseSidebar?: () => void; focused?: boolean }) => (
     <header
       data-testid="layout-header"
       data-has-sidebar-toggle={Boolean(onToggleSidebar)}
+      data-has-sidebar-close={Boolean(onCloseSidebar)}
       data-focused={Boolean(focused)}
     />
   ),
@@ -31,6 +32,7 @@ describe('Layout', () => {
 
     expect(screen.queryByTestId('context-sidebar')).not.toBeInTheDocument();
     expect(screen.getByTestId('layout-header')).toHaveAttribute('data-has-sidebar-toggle', 'false');
+    expect(screen.getByTestId('layout-header')).toHaveAttribute('data-has-sidebar-close', 'false');
     expect(screen.getByTestId('layout-header')).toHaveAttribute('data-focused', 'true');
     expect(screen.getByTestId('layout-footer')).toHaveAttribute('data-compact', 'true');
     expect(screen.getByTestId('page-content').parentElement).toHaveClass('col-xs-12');
@@ -50,6 +52,7 @@ describe('Layout', () => {
 
     expect(screen.getByTestId('context-sidebar')).toBeInTheDocument();
     expect(screen.getByTestId('layout-header')).toHaveAttribute('data-has-sidebar-toggle', 'true');
+    expect(screen.getByTestId('layout-header')).toHaveAttribute('data-has-sidebar-close', 'true');
     expect(screen.getByTestId('layout-header')).toHaveAttribute('data-focused', 'false');
     expect(screen.getByTestId('layout-footer')).toBeInTheDocument();
     expect(screen.getByTestId('layout-footer')).toHaveAttribute('data-compact', 'false');

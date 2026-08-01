@@ -18,6 +18,18 @@
   flex: 0 0 auto;
 }
 
+.wt-standard-footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.wt-standard-footer-inner .links,
+.wt-standard-footer-inner .copyright {
+  flex: 0 0 auto;
+}
+
 .wt-login-container {
   padding-bottom: 40px;
 }
@@ -495,8 +507,10 @@ button:focus-visible,
     position: fixed;
     top: 50px;
     right: 8px;
-    left: 8px;
+    left: auto;
+    width: min(280px, calc(100vw - 24px));
     max-height: calc(100vh - 58px);
+    max-height: calc(100dvh - 58px);
     overflow-y: auto;
   }
 
@@ -582,12 +596,20 @@ button:focus-visible,
   .footer .copyright {
     display: block;
     float: none !important;
-    margin-top: 12px;
+    margin-top: 0;
     text-align: center;
   }
 
   .footer .links {
     text-align: center;
+  }
+
+  .wt-standard-footer-inner {
+    flex-direction: column;
+    justify-content: center;
+    gap: 12px;
+    padding-top: 14px;
+    padding-bottom: 14px;
   }
 }
 

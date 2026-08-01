@@ -33,6 +33,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className="wt-app-shell">
       <Header
         onToggleSidebar={focusedAuthLayout ? undefined : toggleSidebar}
+        onCloseSidebar={focusedAuthLayout ? undefined : closeSidebar}
         sidebarOpen={focusedAuthLayout ? false : sidebarOpen}
         focused={focusedAuthLayout}
       />

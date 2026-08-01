@@ -146,4 +146,33 @@ describe('Header parity navigation', () => {
 
     expect(screen.getByRole('button', { name: /theme toggle/i })).toHaveAttribute('data-focused', 'false');
   });
+
+  it('closes the contextual sidebar before opening the More menu', () => {
+    const onCloseSidebar = jest.fn();
+    render(<Header sidebarOpen onCloseSidebar={onCloseSidebar} onToggleSidebar={jest.fn()} />);
+
+    fireEvent.click(screen.getByRole('button', { name: /more navigation options/i }));
+
+    expect(onCloseSidebar).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps header menus mutually exclusive and closes them before opening the sidebar', () => {
+    mockUser = { _id: 'user-1', username: 'email_user', email: 'email@example.test', roles: {} };
+    const onToggleSidebar = jest.fn();
+    render(<Header onCloseSidebar={jest.fn()} onToggleSidebar={onToggleSidebar} />);
+
+    const moreButton = screen.getByRole('button', { name: /more navigation options/i });
+    const accountButton = screen.getByRole('button', { name: 'Account menu for email_user' });
+
+    fireEvent.click(moreButton);
+    expect(moreButton).toHaveAttribute('aria-expanded', 'true');
+
+    fireEvent.click(accountButton);
+    expect(moreButton).toHaveAttribute('aria-expanded', 'false');
+    expect(accountButton).toHaveAttribute('aria-expanded', 'true');
+
+    fireEvent.click(screen.getByRole('button', { name: /open sidebar/i }));
+    expect(accountButton).toHaveAttribute('aria-expanded', 'false');
+    expect(onToggleSidebar).toHaveBeenCalledTimes(1);
+  });
 });

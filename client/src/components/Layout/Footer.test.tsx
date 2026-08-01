@@ -34,6 +34,10 @@ describe('Footer application navigation', () => {
       'href',
       'https://github.com/wikitruth/wikitruth/blob/develop/LICENSE',
     );
+    expect(screen.getByRole('navigation', { name: /wikitruth links/i })).toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: /wikitruth links/i }).compareDocumentPosition(
+      screen.getByText(new RegExp(`${new Date().getFullYear()}`)),
+    ) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('renders a compact information footer for focused authentication screens', () => {
