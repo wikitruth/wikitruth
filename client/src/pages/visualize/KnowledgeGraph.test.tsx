@@ -115,6 +115,10 @@ describe('KnowledgeGraph', () => {
 
     render(<Harness />);
     await waitFor(() => expect(latestNetwork).not.toBeNull());
+    expect(screen.getByRole('region', { name: 'Knowledge graph' })).toHaveClass('is-compact');
+    expect(screen.getByText('Children')).toBeInTheDocument();
+    expect(screen.queryByText('2nd level')).not.toBeInTheDocument();
+    expect(screen.queryByText(/^Up$/)).not.toBeInTheDocument();
 
     act(() => latestNetwork?.emit('stabilizationIterationsDone'));
     await waitFor(() => expect(latestNetwork?.stopSimulation).toHaveBeenCalled());

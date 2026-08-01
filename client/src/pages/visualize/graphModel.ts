@@ -32,6 +32,11 @@ export interface VisualizeGraphContext {
   breadcrumbs: Array<{ id: string; title: string; visualizeUrl: string; archived: boolean }>;
   directParent: VisualizeGraphNode | null;
   topicCount: number;
+  hierarchyContextUnavailable: boolean;
+}
+
+interface VisualizeGraphOptions {
+  hierarchyContextUnavailable?: boolean;
 }
 
 export const WIKITRUTH_ROOT_ID = 'wikitruth-root';
@@ -107,6 +112,7 @@ export function buildVisualizeGraphContext(
   trees: OutlineTreeNode[],
   ancestors: OutlineTreeNode[],
   selectedTopicId?: string,
+  options: VisualizeGraphOptions = {},
 ): VisualizeGraphContext {
   const nodes: VisualizeGraphNode[] = [];
   const edges: VisualizeGraphEdge[] = [];
@@ -124,6 +130,7 @@ export function buildVisualizeGraphContext(
       breadcrumbs: [exploreBreadcrumb()],
       directParent: null,
       topicCount: Math.max(0, nodes.length - 1),
+      hierarchyContextUnavailable: false,
     };
   }
 
@@ -135,6 +142,7 @@ export function buildVisualizeGraphContext(
       breadcrumbs: [exploreBreadcrumb()],
       directParent: null,
       topicCount: 0,
+      hierarchyContextUnavailable: false,
     };
   }
 
@@ -156,7 +164,7 @@ export function buildVisualizeGraphContext(
     lowerNode = ancestorNode;
   });
 
-  if (graphAncestors.length < 2) {
+  if (graphAncestors.length < 2 && !options.hierarchyContextUnavailable) {
     const upDistance = graphAncestors.length + 1;
     const root = wikitruthRoot('up', -upDistance);
     root.label = `${root.label}\n(${upDistance === 1 ? 'up level' : 'up 2 levels'})`;
@@ -184,6 +192,7 @@ export function buildVisualizeGraphContext(
     ],
     directParent: ancestorNodes.length > 0 ? ancestorNodes[ancestorNodes.length - 1] : null,
     topicCount: nodes.filter((node) => node.type === 'topic').length,
+    hierarchyContextUnavailable: Boolean(options.hierarchyContextUnavailable),
   };
 }
 

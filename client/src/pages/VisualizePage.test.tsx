@@ -53,6 +53,7 @@ describe('VisualizePage', () => {
         },
       ],
       ancestors: [],
+      hierarchyContext: 'root',
       truncated: false,
     });
 
@@ -61,7 +62,7 @@ describe('VisualizePage', () => {
     expect(await screen.findByRole('heading', { name: /visualize/i })).toBeInTheDocument();
     expect(mockGetOutlineTree).toHaveBeenCalledWith(undefined, 1, { childLimit: 11, rootLimit: 20 });
     expect(screen.getByText('3 topics')).toBeInTheDocument();
-    expect(screen.getByText('Root topics + 1 level below')).toBeInTheDocument();
+    expect(screen.getByText('Root topics + 1 child level')).toBeInTheDocument();
     expect(screen.getByRole('region', { name: /knowledge graph/i })).toBeInTheDocument();
     expect(screen.queryByText('Knowledge Graph Explorer')).not.toBeInTheDocument();
     expect(screen.queryByText('Topics in Graph')).not.toBeInTheDocument();
@@ -103,6 +104,7 @@ describe('VisualizePage', () => {
           children: [],
         },
       ],
+      hierarchyContext: 'complete',
       truncated: false,
     });
 
@@ -120,13 +122,70 @@ describe('VisualizePage', () => {
       'href',
       '/visualize/topic/health-medicine/health',
     );
+    expect(screen.getByRole('link', { name: 'Up to Health & Medicine' })).toHaveAttribute(
+      'href',
+      '/visualize/topic/health-medicine/health',
+    );
     expect(screen.getByRole('button', { name: 'Up to Health & Medicine' })).toBeInTheDocument();
     expect(screen.getByText(/^Up$/)).toBeInTheDocument();
-    expect(screen.getByText('Current topic, ancestors + 2 levels below')).toBeInTheDocument();
+    expect(screen.getByText('Parents + 2 child levels')).toBeInTheDocument();
     expect(screen.getByText('3 topics')).toBeInTheDocument();
     expect(screen.getByLabelText('Health & Medicine is archived hierarchy context')).toBeInTheDocument();
     expect(screen.getByText('Archived context')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /open topic/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /center here/i })).not.toBeInTheDocument();
+  });
+
+  it('uses singular topic copy and omits Up navigation for a top-level topic', async () => {
+    mockGetOutlineTree.mockResolvedValue({
+      success: true,
+      tree: {
+        _id: 'science',
+        title: 'Science',
+        friendlyUrl: 'science',
+        objectName: 'topic',
+        children: [],
+      },
+      ancestors: [],
+      hierarchyContext: 'root',
+      truncated: false,
+    });
+
+    render(
+      <Routes>
+        <Route path="/visualize/topic/:friendlyUrl/:id" element={<VisualizePage />} />
+      </Routes>,
+      { route: '/visualize/topic/science/science' },
+    );
+
+    expect(await screen.findByText('1 topic')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Root view' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /^Up to/ })).not.toBeInTheDocument();
+    expect(screen.queryByText(/^Up$/)).not.toBeInTheDocument();
+  });
+
+  it('shows a bounded graph warning instead of inventing root ancestry for an older response', async () => {
+    mockGetOutlineTree.mockResolvedValue({
+      success: true,
+      tree: {
+        _id: 'cuba',
+        title: 'Cuba',
+        friendlyUrl: 'cuba',
+        objectName: 'topic',
+        children: [],
+      },
+      truncated: false,
+    });
+
+    render(
+      <Routes>
+        <Route path="/visualize/topic/:friendlyUrl/:id" element={<VisualizePage />} />
+      </Routes>,
+      { route: '/visualize/topic/cuba/cuba' },
+    );
+
+    expect(await screen.findByText('Parent context unavailable')).toBeInTheDocument();
+    expect(screen.getByText(/current topic and available children only/i)).toBeInTheDocument();
+    expect(screen.queryByText(/^Up$/)).not.toBeInTheDocument();
   });
 });

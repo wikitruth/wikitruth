@@ -39,6 +39,8 @@ type OutlineTreeNode = {
   children: OutlineTreeNode[];
 };
 type TreeBudget = { remaining: number; truncated: boolean };
+type HierarchyContextStatus = 'root' | 'complete' | 'unavailable';
+type AncestorLoadResult = { ancestors: OutlineTreeNode[]; complete: boolean };
 
 const MAX_TREE_NODES = 500;
 const MAX_ANCESTOR_DEPTH = 20;
@@ -121,21 +123,21 @@ function isPublicHierarchyContextTopic(
     || status === constants.SCREENING_STATUS.status3.code;
 }
 
-async function loadTopicAncestors(root: Record<string, unknown>, ancestorDepth: number): Promise<OutlineTreeNode[]> {
+async function loadTopicAncestors(root: Record<string, unknown>, ancestorDepth: number): Promise<AncestorLoadResult> {
   const ancestors: OutlineTreeNode[] = [];
   let parentId = String(root.parentId || '').trim();
   const seen = new Set([String(root._id || '')]);
 
   while (parentId && ancestors.length < ancestorDepth) {
-    if (seen.has(parentId)) break;
+    if (seen.has(parentId)) return { ancestors, complete: false };
     seen.add(parentId);
     const parent = await db.Topic.findById(parentId).lean();
-    if (!isPublicHierarchyContextTopic(parent)) break;
+    if (!isPublicHierarchyContextTopic(parent)) return { ancestors, complete: false };
     ancestors.unshift(topicNode(parent));
     parentId = String(parent.parentId || '').trim();
   }
 
-  return ancestors;
+  return { ancestors, complete: !parentId };
 }
 
 async function resolveEntry(id: string, kinds: EntryKind[]): Promise<ResolvedEntry | null> {
@@ -228,8 +230,17 @@ export = function (router: Router) {
       const root = await db.Topic.findById(rootId).lean();
       if (!isPublicTopic(root)) { res.status(404).json({ success: false, message: 'Root topic not found' }); return; }
       const [tree] = await buildTopicForest([root], depth, budget, childLimit);
-      const ancestors = await loadTopicAncestors(root, ancestorDepth);
-      res.json({ success: true, tree, ancestors, truncated: budget.truncated });
+      const ancestorResult = await loadTopicAncestors(root, ancestorDepth);
+      const hierarchyContext: HierarchyContextStatus = !String(root.parentId || '').trim()
+        ? 'root'
+        : ancestorResult.complete ? 'complete' : 'unavailable';
+      res.json({
+        success: true,
+        tree,
+        ancestors: ancestorResult.ancestors,
+        hierarchyContext,
+        truncated: budget.truncated,
+      });
       return;
     }
     const roots = await db.Topic.find({
@@ -239,6 +250,7 @@ export = function (router: Router) {
       success: true,
       trees: await buildTopicForest(roots, depth, budget, childLimit),
       ancestors: [],
+      hierarchyContext: 'root',
       truncated: budget.truncated,
     });
   });

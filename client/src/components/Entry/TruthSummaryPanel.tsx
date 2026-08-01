@@ -36,6 +36,7 @@ const TruthSummaryPanel: React.FC<TruthSummaryPanelProps> = ({ objectName, objec
   const [summary, setSummary] = useState<TruthSummary | null>(null);
   const [expanded, setExpanded] = useState(false);
   const [failed, setFailed] = useState(false);
+  const panelId = `truth-summary-panel-${objectId}`;
 
   useEffect(() => {
     let active = true;
@@ -58,17 +59,19 @@ const TruthSummaryPanel: React.FC<TruthSummaryPanelProps> = ({ objectName, objec
       <div className="panel-heading">
         <button
           type="button"
-          className="btn btn-link"
-          style={{ padding: 0, color: 'inherit', textDecoration: 'none', fontWeight: 700 }}
+          className="btn btn-link wt-truth-summary-toggle"
           onClick={() => setExpanded((value) => !value)}
           aria-expanded={expanded}
+          aria-controls={panelId}
         >
-          <i className="fa fa-balance-scale" aria-hidden="true" />{' '}
-          <span id={`truth-summary-${objectId}`}>Why this verdict?</span>{' '}
+          <span>
+            <i className="fa fa-balance-scale" aria-hidden="true" />{' '}
+            <span id={`truth-summary-${objectId}`}>Why this verdict?</span>
+          </span>
           <i className={`fa fa-chevron-${expanded ? 'up' : 'down'} small`} aria-hidden="true" />
         </button>
       </div>
-      <div className="panel-body">
+      {expanded ? <div id={panelId} className="panel-body">
         {decidedChannels.length ? decidedChannels.map((channel) => (
           <div key={channel.channel} style={{ marginBottom: 12 }}>
             <div>
@@ -86,28 +89,26 @@ const TruthSummaryPanel: React.FC<TruthSummaryPanelProps> = ({ objectName, objec
                 <strong>Override reason:</strong> {channel.overrideReason}
               </div>
             ) : null}
-            {expanded ? (
-              <div className="small" style={{ marginTop: 10 }}>
-                <p>
-                  Policy <strong>{channel.policyVersion || 'Not recorded'}</strong> · Sensitivity <strong>{channel.sensitivity}</strong> ·
-                  {' '}{channel.leadingVotes} of {channel.eligibleVotes} eligible reviewers · {Math.round(channel.averageConfidence)}% average confidence ·
-                  {' '}{channel.distinctAffiliations} independent affiliations
-                </p>
-                <p className={channel.revalidationDue ? 'text-danger' : 'text-muted'}>
-                  Revalidation: <strong>{formatDate(channel.revalidateAt)}</strong>
-                </p>
-                {channel.dissent.totalVotes ? (
-                  <div>
-                    <strong>Material dissent ({channel.dissent.totalVotes})</strong>
-                    <ul>{channel.dissent.rationales.map((rationale, index) => <li key={`${channel.channel}-dissent-${index}`}>{rationale}</li>)}</ul>
-                  </div>
-                ) : <p className="text-muted">No material dissent was recorded in eligible votes.</p>}
-              </div>
-            ) : null}
+            <div className="small" style={{ marginTop: 10 }}>
+              <p>
+                Policy <strong>{channel.policyVersion || 'Not recorded'}</strong> · Sensitivity <strong>{channel.sensitivity}</strong> ·
+                {' '}{channel.leadingVotes} of {channel.eligibleVotes} eligible reviewers · {Math.round(channel.averageConfidence)}% average confidence ·
+                {' '}{channel.distinctAffiliations} independent affiliations
+              </p>
+              <p className={channel.revalidationDue ? 'text-danger' : 'text-muted'}>
+                Revalidation: <strong>{formatDate(channel.revalidateAt)}</strong>
+              </p>
+              {channel.dissent.totalVotes ? (
+                <div>
+                  <strong>Material dissent ({channel.dissent.totalVotes})</strong>
+                  <ul>{channel.dissent.rationales.map((rationale, index) => <li key={`${channel.channel}-dissent-${index}`}>{rationale}</li>)}</ul>
+                </div>
+              ) : <p className="text-muted">No material dissent was recorded in eligible votes.</p>}
+            </div>
           </div>
         )) : <p className="text-muted">No final verdict has been published. Contributions remain open for review.</p>}
 
-        {expanded && summary.evidenceMap.length ? (
+        {summary.evidenceMap.length ? (
           <div>
             <strong>Evidence used</strong>
             <ul>
@@ -122,7 +123,7 @@ const TruthSummaryPanel: React.FC<TruthSummaryPanelProps> = ({ objectName, objec
             </ul>
           </div>
         ) : null}
-        {expanded && summary.unresolvedIssues.length ? (
+        {summary.unresolvedIssues.length ? (
           <div className="alert alert-warning" style={{ marginBottom: 0 }}>
             <strong>Unresolved critical issues ({summary.unresolvedIssues.length})</strong>
             <ul style={{ marginBottom: 0 }}>
@@ -141,7 +142,7 @@ const TruthSummaryPanel: React.FC<TruthSummaryPanelProps> = ({ objectName, objec
           <a href={evidenceBundleUrl(objectName, objectId, 'jsonld')}>JSON-LD</a>
           <span className="text-muted"> for independent verification and reuse</span>
         </div>
-      </div>
+      </div> : null}
     </section>
   );
 };

@@ -1,5 +1,6 @@
 @import './theme.css';
 @import './global.css';
+@import './entry.css';
 @import './auth.css';
 @import './civic.css';
 @import './tenant-shell.css';

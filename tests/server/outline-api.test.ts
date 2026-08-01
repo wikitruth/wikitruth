@@ -114,6 +114,7 @@ describe('outline api endpoints', () => {
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);
     expect(response.body.tree.title).toBe('Root Topic');
+    expect(response.body.hierarchyContext).toBe('root');
     expect(response.body.truncated).toBe(false);
     expect(mockDb.Topic.find).toHaveBeenCalledTimes(1);
   });
@@ -149,6 +150,7 @@ describe('outline api endpoints', () => {
       'Knowledge',
       'Health & Medicine',
     ]);
+    expect(response.body.hierarchyContext).toBe('complete');
   });
 
   it('retains public archived ancestors as marked historical hierarchy context', async () => {
@@ -176,6 +178,7 @@ describe('outline api endpoints', () => {
       expect.objectContaining({ _id: 'knowledge', archived: false }),
       expect.objectContaining({ _id: 'health', archived: true }),
     ]);
+    expect(response.body.hierarchyContext).toBe('complete');
   });
 
   it.each([
@@ -198,6 +201,7 @@ describe('outline api endpoints', () => {
 
     expect(response.status).toBe(200);
     expect(response.body.ancestors).toEqual([]);
+    expect(response.body.hierarchyContext).toBe('unavailable');
   });
 
   it('does not expose a private selected root', async () => {

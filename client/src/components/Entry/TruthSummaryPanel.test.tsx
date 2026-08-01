@@ -29,12 +29,22 @@ describe('TruthSummaryPanel', () => {
     });
     const user = userEvent.setup();
     render(<TruthSummaryPanel objectName="topic" objectId="topic-1" />);
-    expect(await screen.findByText('Administrator final say')).toBeInTheDocument();
+    const toggle = await screen.findByRole('button', { name: /why this verdict/i });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByText('Administrator final say')).not.toBeInTheDocument();
+
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByText('Administrator final say')).toBeInTheDocument();
     expect(screen.getByText(/A primary record required a correction/)).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: /why this verdict/i }));
     expect(screen.getByText(/Material dissent/)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Primary record' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Evidence bundle' })).toHaveAttribute('href', expect.stringContaining('evidence-bundle?download=true'));
     expect(screen.getByRole('link', { name: 'JSON-LD' })).toHaveAttribute('href', expect.stringContaining('evidence-bundle.jsonld'));
+
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByText('Administrator final say')).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Evidence bundle' })).not.toBeInTheDocument();
   });
 });

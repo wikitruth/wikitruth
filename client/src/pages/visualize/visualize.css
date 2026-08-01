@@ -194,15 +194,37 @@
 .wt-viz-scope {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 8px 12px;
+  justify-content: space-between;
+  gap: 10px 14px;
   margin-bottom: 10px;
+  padding: 7px;
+  border: 1px solid var(--wt-border);
+  border-radius: 7px;
   color: var(--wt-text-muted);
+  background: var(--wt-surface);
   font-size: 13px;
+}
+
+.wt-viz-scope-summary,
+.wt-viz-scope-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px 10px;
+  min-width: 0;
+}
+
+.wt-viz-scope-summary {
+  flex: 1 1 auto;
+}
+
+.wt-viz-scope-actions {
+  flex: 0 0 auto;
 }
 
 .wt-viz-scope-chip,
 .wt-viz-scope-warning,
+.wt-viz-up-link,
 .wt-viz-root-link {
   display: inline-flex;
   align-items: center;
@@ -219,10 +241,17 @@
   color: var(--wt-text-muted);
 }
 
+.wt-viz-up-link,
 .wt-viz-root-link {
-  margin-left: auto;
   color: var(--wt-brand-primary);
   background: var(--wt-surface);
+}
+
+.wt-viz-up-link {
+  max-width: min(280px, 45vw);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .wt-knowledge-graph {
@@ -316,6 +345,11 @@
   overflow: hidden;
 }
 
+.wt-knowledge-graph.is-compact .wt-viz-canvas {
+  height: clamp(390px, 52vh, 520px);
+  min-height: 390px;
+}
+
 [data-theme='dark'] .wt-viz-canvas {
   background: #111a24;
 }
@@ -379,17 +413,23 @@
     max-width: none;
   }
 
-  .wt-viz-scope-copy {
-    flex: 1 1 auto;
+  .wt-viz-scope {
+    align-items: stretch;
+    flex-direction: column;
   }
 
-  .wt-viz-root-link {
-    margin-left: 0;
+  .wt-viz-scope-actions {
+    justify-content: flex-end;
   }
 
   .wt-viz-canvas {
     height: 560px;
     min-height: 560px;
+  }
+
+  .wt-knowledge-graph.is-compact .wt-viz-canvas {
+    height: 440px;
+    min-height: 440px;
   }
 
   .wt-viz-legend {
@@ -399,9 +439,23 @@
 }
 
 @media (max-width: 430px) {
+  .wt-viz-scope-summary {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   .wt-viz-scope-copy {
-    order: 3;
-    flex-basis: 100%;
+    padding: 0 3px 2px;
+  }
+
+  .wt-viz-scope-actions {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .wt-viz-up-link {
+    flex: 1 1 auto;
+    max-width: calc(100% - 96px);
   }
 
   .wt-viz-controls {

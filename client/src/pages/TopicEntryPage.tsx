@@ -350,7 +350,12 @@ const TopicEntryPage: React.FC = () => {
         </div>
       )}
 
-      <PageTabs tabs={tabs} activeTab="details" />
+      <PageTabs
+        tabs={tabs}
+        activeTab="details"
+        variant="entry"
+        singleItemMode="heading"
+      />
 
       <TopicDetailsContent
         topic={topic}

@@ -386,13 +386,20 @@ const KnowledgeGraph: React.FC<KnowledgeGraphProps> = ({
     window.setTimeout(() => syncPopoverToNode(node.id), 240);
   };
 
+  const hasDirectChildren = graph.nodes.some((node) => node.role === 'child' && node.level === 1);
+  const hasSecondLevelChildren = graph.nodes.some((node) => node.role === 'child' && node.level > 1);
+  const isCompact = graph.nodes.length <= 5;
+
   return (
-    <section className={`wt-knowledge-graph${isFullscreen ? ' is-fullscreen' : ''}`} aria-label="Knowledge graph">
+    <section
+      className={`wt-knowledge-graph${isCompact ? ' is-compact' : ''}${isFullscreen ? ' is-fullscreen' : ''}`}
+      aria-label="Knowledge graph"
+    >
       <div className="wt-viz-legend" aria-label="Graph legend">
         {onNavigateUp ? <span><i className="wt-viz-legend-dot is-up" aria-hidden="true"></i> Up</span> : null}
         <span><i className="wt-viz-legend-dot is-current" aria-hidden="true"></i> Current</span>
-        <span><i className="wt-viz-legend-dot is-child" aria-hidden="true"></i> Children</span>
-        <span><i className="wt-viz-legend-dot is-descendant" aria-hidden="true"></i> 2nd level</span>
+        {hasDirectChildren ? <span><i className="wt-viz-legend-dot is-child" aria-hidden="true"></i> Children</span> : null}
+        {hasSecondLevelChildren ? <span><i className="wt-viz-legend-dot is-descendant" aria-hidden="true"></i> 2nd level</span> : null}
         {graph.nodes.some((node) => node.archived) ? (
           <span><i className="wt-viz-legend-dot is-archived" aria-hidden="true"></i> Archived context</span>
         ) : null}

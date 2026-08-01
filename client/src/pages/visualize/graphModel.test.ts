@@ -101,6 +101,20 @@ describe('buildVisualizeGraphContext', () => {
     });
   });
 
+  it('does not invent a Wikitruth relationship when parent context is unavailable', () => {
+    const context = buildVisualizeGraphContext(
+      [topic('cuba', 'Cuba', [topic('fidel-castro', 'Fidel Castro')])],
+      [],
+      'cuba',
+      { hierarchyContextUnavailable: true },
+    );
+
+    expect(context.graph.nodes.some((node) => node.id === WIKITRUTH_ROOT_ID)).toBe(false);
+    expect(context.directParent).toBeNull();
+    expect(context.hierarchyContextUnavailable).toBe(true);
+    expect(context.graph.nodes.map((node) => node.id)).toEqual(['cuba', 'fidel-castro']);
+  });
+
   it('keeps direct and second-level descendants as distinct graph tiers', () => {
     const context = buildVisualizeGraphContext([
       topic('health', 'Health', [topic('medicine', 'Medicine', [topic('therapy', 'Therapy')])]),

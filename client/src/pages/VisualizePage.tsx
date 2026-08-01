@@ -74,8 +74,13 @@ const VisualizePage: React.FC = () => {
   }, [outline]);
 
   const graphContext = useMemo(
-    () => buildVisualizeGraphContext(trees, outline?.ancestors || [], selectedTopicId),
-    [outline?.ancestors, selectedTopicId, trees],
+    () => buildVisualizeGraphContext(trees, outline?.ancestors || [], selectedTopicId, {
+      hierarchyContextUnavailable: Boolean(
+        selectedTopicId
+        && (outline?.hierarchyContext === 'unavailable' || !Array.isArray(outline?.ancestors)),
+      ),
+    }),
+    [outline?.ancestors, outline?.hierarchyContext, selectedTopicId, trees],
   );
 
   useEffect(() => {
@@ -130,10 +135,11 @@ const VisualizePage: React.FC = () => {
     );
   }
 
-  const directParent = graphContext.directParent;
+  const directParent = graphContext.directParent?.type === 'topic' ? graphContext.directParent : null;
   const scopeDescription = selectedTopicId
-    ? 'Current topic, ancestors + 2 levels below'
-    : 'Root topics + 1 level below';
+    ? 'Parents + 2 child levels'
+    : 'Root topics + 1 child level';
+  const topicCountLabel = `${graphContext.topicCount} ${graphContext.topicCount === 1 ? 'topic' : 'topics'}`;
 
   return (
     <div className="wt-visualize-page">
@@ -184,18 +190,31 @@ const VisualizePage: React.FC = () => {
         onSelect={(topic) => navigate(topicVisualizeUrl(topic))}
       />
 
-      <div className="wt-viz-scope" aria-label="Loaded graph scope">
-        <span className="wt-viz-scope-chip"><i className="fa fa-folder-open" aria-hidden="true"></i> {graphContext.topicCount} topics</span>
-        <span className="wt-viz-scope-copy">{scopeDescription}</span>
-        {outline?.truncated ? (
-          <span className="wt-viz-scope-warning" title="Some branches contain more topics than this view shows">
-            <i className="fa fa-info-circle" aria-hidden="true"></i> Bounded view
-          </span>
-        ) : null}
-        {selectedTopicId ? (
+      <div className="wt-viz-scope" role="group" aria-label="Loaded graph scope and navigation">
+        <div className="wt-viz-scope-summary">
+          <span className="wt-viz-scope-chip"><i className="fa fa-folder-open" aria-hidden="true"></i> {topicCountLabel}</span>
+          <span className="wt-viz-scope-copy">{scopeDescription}</span>
+          {outline?.truncated ? (
+            <span className="wt-viz-scope-warning" title="Some branches contain more topics than this view shows">
+              <i className="fa fa-info-circle" aria-hidden="true"></i> Bounded view
+            </span>
+          ) : null}
+        </div>
+        {selectedTopicId ? <div className="wt-viz-scope-actions">
+          {directParent ? (
+            <Link to={directParent.visualizeUrl} className="wt-viz-up-link" aria-label={`Up to ${directParent.title}`}>
+              <i className="fa fa-arrow-up" aria-hidden="true"></i> {directParent.title}
+            </Link>
+          ) : null}
           <Link to="/visualize" className="wt-viz-root-link"><i className="fa fa-home" aria-hidden="true"></i> Root view</Link>
-        ) : null}
+        </div> : null}
       </div>
+
+      {graphContext.hierarchyContextUnavailable ? (
+        <Alert type="warning">
+          <strong>Parent context unavailable</strong>. This graph shows the current topic and available children only.
+        </Alert>
+      ) : null}
 
       <KnowledgeGraph
         graph={graphContext.graph}
