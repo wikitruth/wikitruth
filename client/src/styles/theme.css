@@ -269,6 +269,14 @@ body,
   color: #ffffff;
 }
 
+[data-theme='dark'] .wt-explore-page .btn-default.active,
+[data-theme='dark'] .wt-explore-page .btn-default:active {
+  background-color: #465463;
+  border-color: #6b7d8f;
+  box-shadow: none;
+  color: #ffffff;
+}
+
 @media (max-width: 767px) {
   .wt-theme-toggle-item .wt-theme-toggle {
     min-width: 38px;

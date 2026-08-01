@@ -99,7 +99,7 @@ describe('ExplorePage parity controls', () => {
     localStorage.clear();
   });
 
-  it('restores Explore header actions and responsive tab labels', async () => {
+  it('restores Explore header actions and keeps compact category and tab labels readable', async () => {
     render(<ExplorePage />, { route: '/explore' });
 
     expect(await screen.findByRole('heading', { name: /explore/i })).toHaveClass('page-header');
@@ -108,7 +108,14 @@ describe('ExplorePage parity controls', () => {
       'href',
       '/visualize/topic/root-topic'
     );
-    expect(screen.getByRole('tab', { name: 'Questions' }).querySelector('span')).toHaveClass('hidden-xs');
+    const categoryLink = screen.getByRole('link', { name: 'View all 13 topics' });
+    expect(categoryLink).toHaveTextContent('All 13');
+    expect(categoryLink).not.toHaveTextContent('more');
+    expect(screen.getByRole('tab', { name: 'Questions' }).querySelector('span')).toHaveClass(
+      'wt-explore-tab-label'
+    );
+    expect(screen.getByRole('tab', { name: 'Questions' })).toHaveAttribute('aria-selected', 'false');
+    expect(screen.getByRole('button', { name: 'Latest' })).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('collapses advanced filters and applies content state filtering', async () => {

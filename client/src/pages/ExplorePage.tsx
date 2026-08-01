@@ -26,16 +26,15 @@ const EXPLORE_TABS: Array<{
   key: ExploreTab;
   icon: string;
   label: string;
-  mobileLabelClass?: string;
 }> = [
   { key: 'all', icon: 'globe', label: 'All' },
-  { key: 'topics', icon: 'folder-open', label: 'Topics', mobileLabelClass: 'hidden-xxs' },
-  { key: 'arguments', icon: 'flash', label: 'Facts', mobileLabelClass: 'hidden-xs' },
-  { key: 'questions', icon: 'question-circle', label: 'Questions', mobileLabelClass: 'hidden-xs' },
-  { key: 'answers', icon: 'check-circle', label: 'Answers', mobileLabelClass: 'hidden-xs' },
-  { key: 'artifacts', icon: 'puzzle-piece', label: 'Artifacts', mobileLabelClass: 'hidden-xs' },
-  { key: 'issues', icon: 'exclamation-circle', label: 'Issues', mobileLabelClass: 'hidden-xs' },
-  { key: 'opinions', icon: 'comments-o', label: 'Comments', mobileLabelClass: 'hidden-xs' },
+  { key: 'topics', icon: 'folder-open', label: 'Topics' },
+  { key: 'arguments', icon: 'flash', label: 'Facts' },
+  { key: 'questions', icon: 'question-circle', label: 'Questions' },
+  { key: 'answers', icon: 'check-circle', label: 'Answers' },
+  { key: 'artifacts', icon: 'puzzle-piece', label: 'Artifacts' },
+  { key: 'issues', icon: 'exclamation-circle', label: 'Issues' },
+  { key: 'opinions', icon: 'comments-o', label: 'Comments' },
 ];
 
 type ExploreCategory = LegacyEntity & {
@@ -339,7 +338,7 @@ const ExplorePage: React.FC = () => {
   }
 
   return (
-    <div>
+    <div className="wt-explore-page">
       <PageMeta title="Explore" description="Discover categories and latest posts" />
       <h1 className="page-header wt-header-2 wt-explore-page-header">
         <i className="fa fa-globe text-muted-x" aria-hidden="true"></i> Explore
@@ -360,10 +359,14 @@ const ExplorePage: React.FC = () => {
             const title = String(category.contextTitle || category.title || '(Untitled)');
             const subtopics = Array.isArray(category.subtopics) ? category.subtopics.slice(0, 5) : [];
             const subarguments = Array.isArray(category.subarguments) ? category.subarguments.slice(0, 5) : [];
-            const moreCount =
-              Number(category.childrenCount?.topics?.accepted || 0) ||
-              Number(category.childrenCount?.arguments?.accepted || 0) ||
-              0;
+            const acceptedTopicCount = Number(category.childrenCount?.topics?.accepted || 0);
+            const acceptedArgumentCount = Number(category.childrenCount?.arguments?.accepted || 0);
+            const moreCount = acceptedTopicCount || acceptedArgumentCount;
+            const childType = acceptedTopicCount > 0
+              ? 'topics'
+              : acceptedArgumentCount > 0
+                ? 'facts'
+                : 'items';
 
             return (
               <div key={category._id} className="col-lg-4 col-md-6 col-sm-6">
@@ -396,9 +399,13 @@ const ExplorePage: React.FC = () => {
                       ))}
                       {(subtopics.length > 0 || subarguments.length > 0 || moreCount > 0) && (
                         <div>
-                          <i className="fa fa-arrow-circle-right text-muted" aria-hidden="true"></i>{' '}
-                          <Link to={topicLink}>
-                            more{moreCount > 0 ? <span className="wt-label label label-default"> {moreCount}</span> : null}
+                          <Link
+                            to={topicLink}
+                            className="wt-category-all-link"
+                            aria-label={moreCount > 0 ? `View all ${moreCount} ${childType}` : 'View all items'}
+                          >
+                            <i className="fa fa-arrow-circle-right" aria-hidden="true"></i>{' '}
+                            {moreCount > 0 ? `All ${moreCount}` : 'View all'}
                           </Link>
                         </div>
                       )}
@@ -412,44 +419,34 @@ const ExplorePage: React.FC = () => {
       )}
 
       <h1 className="page-header wt-header" id="browse">Latest Posts</h1>
-      <div style={{ marginBottom: 15 }} className="wt-btn-group">
-        <div className="btn-group" role="group" aria-label="Latest or Popular Filter" style={{ marginBottom: 5 }}>
-          <a
-            href="#browse"
+      <div className="wt-btn-group wt-explore-controls">
+        <div className="btn-group wt-explore-sort-controls" role="group" aria-label="Sort posts">
+          <button
+            type="button"
             className={`btn btn-${sortMode === 'latest' ? 'info' : 'default'} btn-sm`}
-            role="button"
-            onClick={(event) => {
-              event.preventDefault();
-              updateFilter('sort', '');
-            }}
+            aria-pressed={sortMode === 'latest'}
+            onClick={() => updateFilter('sort', '')}
           >
             Latest
-          </a>
-          <a
-            href="#browse"
+          </button>
+          <button
+            type="button"
             className={`btn btn-${sortMode === 'popular' ? 'info' : 'default'} btn-sm`}
-            role="button"
-            onClick={(event) => {
-              event.preventDefault();
-              updateFilter('sort', 'popular');
-            }}
+            aria-pressed={sortMode === 'popular'}
+            onClick={() => updateFilter('sort', 'popular')}
           >
             Popular
-          </a>
-          <a
-            href="#browse"
+          </button>
+          <button
+            type="button"
             className={`btn btn-${sortMode === 'trusted' ? 'info' : 'default'} btn-sm`}
-            role="button"
             title="Rank accepted content using the contributor scorecard as one transparent input"
-            onClick={(event) => {
-              event.preventDefault();
-              updateFilter('sort', 'trusted');
-            }}
+            aria-pressed={sortMode === 'trusted'}
+            onClick={() => updateFilter('sort', 'trusted')}
           >
             Trusted
-          </a>
+          </button>
         </div>
-        &nbsp;&nbsp;
         <ContentViewFilter value={viewMode} onChange={handleViewModeChange} />
       </div>
       <button
@@ -546,13 +543,14 @@ const ExplorePage: React.FC = () => {
               href="#browse"
               role="tab"
               aria-label={tab.label}
+              aria-selected={activeTab === tab.key}
               onClick={(event) => {
                 event.preventDefault();
                 updateFilter('tab', tab.key === 'all' ? '' : tab.key);
               }}
             >
               <i className={`fa fa-${tab.icon}`} aria-hidden="true"></i>{' '}
-              <span className={tab.mobileLabelClass}>{tab.label}</span>
+              <span className="wt-explore-tab-label">{tab.label}</span>
             </a>
           </li>
         ))}
@@ -580,7 +578,7 @@ const ExplorePage: React.FC = () => {
         )}
       </ul>
 
-      <div>
+      <div className="wt-explore-results">
         {filteredSections
           .filter((section) => activeTab === 'all' || section.key === activeTab)
           .map((section) => {

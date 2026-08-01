@@ -30,15 +30,27 @@ describe('mobile off-canvas layout', () => {
     expect(css).toMatch(/\.page-header\.wt-header\.wt-profile-header\s*{[^}]*overflow-wrap:\s*anywhere[^}]*word-break:\s*break-word/s);
   });
 
-  it('keeps all Explore content tabs on one mobile row', () => {
+  it('keeps Explore content tabs labeled and horizontally scrollable on mobile', () => {
     const css = fs.readFileSync(
       path.resolve(__dirname, '../../styles/global.css'),
       'utf8'
     );
 
-    expect(css).toMatch(/\.wt-explore-tabs\s*{[^}]*display:\s*flex/s);
-    expect(css).toMatch(/\.wt-explore-tabs\s*>\s*li\s*{[^}]*width:\s*12\.5%/s);
-    expect(css).toMatch(/\.wt-explore-tabs\s*>\s*li\s*>\s*a\s*{[^}]*margin-right:\s*0/s);
+    expect(css).toMatch(/\.wt-explore-page \.nav\.nav-tabs\.wt-tabs\s*{[^}]*display:\s*flex/s);
+    expect(css).toMatch(/\.wt-explore-page \.nav\.nav-tabs\.wt-tabs\s*{[^}]*overflow-x:\s*auto/s);
+    expect(css).toMatch(/\.wt-explore-page \.nav\.nav-tabs\.wt-tabs\s*>\s*li\s*{[^}]*width:\s*auto/s);
+    expect(css).toMatch(/\.wt-explore-page \.nav\.nav-tabs\.wt-tabs\s*>\s*li\s*>\s*a[\s\S]*?white-space:\s*nowrap/s);
+  });
+
+  it('keeps Explore anchors and entry rows clear of the fixed mobile header and gutters', () => {
+    const css = fs.readFileSync(
+      path.resolve(__dirname, '../../styles/global.css'),
+      'utf8'
+    );
+
+    expect(css).toMatch(/\.wt-explore-page #browse\s*{[^}]*scroll-margin-top:\s*70px/s);
+    expect(css).toMatch(/\.wt-explore-results \.list-group\.wt-list \.list-group-item:not\(\.highlight\)\s*{[^}]*grid-template-columns:\s*22px minmax\(0, 1fr\)/s);
+    expect(css).toMatch(/\.wt-explore-results \.list-group\.wt-list \.list-group-item:not\(\.highlight\)\s*{[^}]*padding:\s*12px 14px/s);
   });
 
   it('constrains fixed-width route containers to the main content column', () => {
