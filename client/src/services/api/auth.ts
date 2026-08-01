@@ -1,5 +1,6 @@
 import API_BASE_URL from './baseUrl';
 import type { User } from '../../types';
+import type { PasskeyRuntimeConfig } from './passkeys';
 
 interface LoginRequest {
   username: string;
@@ -107,6 +108,13 @@ export interface AuthProvidersResponse {
   providers: Record<string, boolean>;
 }
 
+export interface AuthRuntimeConfig extends AuthProvidersResponse {
+  success: boolean;
+  emailCode: EmailCodeRuntimeConfig;
+  passkeys: PasskeyRuntimeConfig;
+  fastSwitchAvailable: boolean;
+}
+
 const getCsrfToken = (): string | null => {
   if (typeof document === 'undefined') {
     return null;
@@ -194,6 +202,7 @@ export const authApi = {
       },
     ),
   providers: () => request<AuthProvidersResponse>(`${API_BASE_URL}/auth/providers`),
+  config: () => request<AuthRuntimeConfig>(`${API_BASE_URL}/auth/config`),
   emailCodeConfig: async () => {
     const result = await request<{ success: boolean; emailCode: EmailCodeRuntimeConfig }>(
       `${API_BASE_URL}/auth/email-code/config`,

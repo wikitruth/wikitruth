@@ -35,6 +35,7 @@ import {
   verifyPasswordlessSignup,
 } from '../../services/webAuthnService';
 import { revokeOtherWebSessions } from '../../services/webSessionService';
+import { buildPasskeyRuntimeConfig } from '../../services/authRuntimeConfigService';
 import {
   getAccountIdFromUser,
   getDefaultActiveRole,
@@ -86,18 +87,9 @@ async function auditUserEvent(
 
 export function registerAuthPasskeyRoutes(router: Router): void {
   router.get('/passkeys/config', function (req: WikitruthRequest, res: WikitruthResponse) {
-    const config = getWebAuthnConfig(req);
     res.json({
       success: true,
-      passkeys: {
-        enabled: config.enabled,
-        rpName: config.rpName,
-        canonicalOrigin: config.canonicalOrigin,
-        isCanonicalOrigin: isCanonicalAuthOrigin(req),
-        passwordlessEnabled: config.passwordlessEnabled,
-        adminStepUpRequired: config.adminStepUpRequired,
-        stepUpMaxAgeSeconds: config.stepUpMaxAgeSeconds,
-      },
+      passkeys: buildPasskeyRuntimeConfig(req),
     });
   });
 

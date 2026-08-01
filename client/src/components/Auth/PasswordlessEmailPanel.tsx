@@ -13,6 +13,8 @@ interface PasswordlessEmailPanelProps {
   returnUrl: string;
   mode?: 'login' | 'signup';
   onAuthenticated: () => void;
+  runtimeConfig?: EmailCodeRuntimeConfig | null;
+  runtimeConfigLoading?: boolean;
 }
 
 type Stage = 'request' | 'code' | 'link' | 'username';
@@ -30,6 +32,8 @@ const PasswordlessEmailPanel: React.FC<PasswordlessEmailPanelProps> = ({
   returnUrl,
   mode = 'login',
   onAuthenticated,
+  runtimeConfig,
+  runtimeConfigLoading = false,
 }) => {
   const [searchParams] = useSearchParams();
   const { refreshAuth } = useAuth();
@@ -39,7 +43,8 @@ const PasswordlessEmailPanel: React.FC<PasswordlessEmailPanelProps> = ({
   const targetOrigin = String(
     searchParams.get('targetOrigin') || searchParams.get('tenantOrigin') || ''
   ).trim();
-  const [config, setConfig] = useState<EmailCodeRuntimeConfig | null>(null);
+  const [loadedConfig, setLoadedConfig] = useState<EmailCodeRuntimeConfig | null>(null);
+  const config = runtimeConfig === undefined ? loadedConfig : runtimeConfig;
   const [stage, setStage] = useState<Stage>(magicChallenge && magicToken ? 'link' : 'request');
   const [email, setEmail] = useState('');
   const [challengeId, setChallengeId] = useState(magicChallenge);
@@ -55,16 +60,17 @@ const PasswordlessEmailPanel: React.FC<PasswordlessEmailPanelProps> = ({
   const [remainingSeconds, setRemainingSeconds] = useState(0);
 
   useEffect(() => {
+    if (runtimeConfig !== undefined || runtimeConfigLoading) return;
     let active = true;
     void authApi.emailCodeConfig()
       .then(value => {
-        if (active) setConfig(value);
+        if (active) setLoadedConfig(value);
       })
       .catch(() => {
-        if (active) setConfig(null);
+        if (active) setLoadedConfig(null);
       });
     return () => { active = false; };
-  }, []);
+  }, [runtimeConfig, runtimeConfigLoading]);
 
   useEffect(() => {
     if (!magicToken || typeof window === 'undefined') return;

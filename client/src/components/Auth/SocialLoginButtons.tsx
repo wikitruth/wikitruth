@@ -49,13 +49,7 @@ const SocialLoginButtons: React.FC<SocialLoginButtonsProps> = ({
     });
 
   if (providers.length === 0) {
-    return (
-      <div className="wt-social-login" aria-label="Social login providers">
-        <p className="text-muted" style={{ marginBottom: 0 }}>
-          Social sign-in is currently unavailable.
-        </p>
-      </div>
-    );
+    return null;
   }
 
   return (

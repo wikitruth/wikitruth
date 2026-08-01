@@ -43,6 +43,43 @@ test.beforeEach(async ({ page }) => {
       }),
     });
   });
+
+  await page.route('**/api/auth/config**', async (route) => {
+    const origin = new URL(route.request().url()).origin;
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        success: true,
+        providers: {
+          google: true,
+          github: true,
+          facebook: true,
+          twitter: true,
+          apple: true,
+          microsoft: true,
+        },
+        fastSwitchAvailable: false,
+        emailCode: {
+          enabled: false,
+          codeLength: 6,
+          expiresInSeconds: 600,
+          resendDelaySeconds: 60,
+          canonicalOrigin: origin,
+          isCanonicalOrigin: true,
+        },
+        passkeys: {
+          enabled: false,
+          rpName: 'Wikitruth',
+          canonicalOrigin: origin,
+          isCanonicalOrigin: true,
+          passwordlessEnabled: false,
+          adminStepUpRequired: false,
+          stepUpMaxAgeSeconds: 600,
+        },
+      }),
+    });
+  });
 });
 
 test('loads about page', async ({ page }) => {

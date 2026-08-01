@@ -18,16 +18,40 @@
   flex: 0 0 auto;
 }
 
+.wt-login-container {
+  padding-bottom: 40px;
+}
+
+.wt-login-page {
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.wt-login-header {
+  margin: 34px 0 18px;
+}
+
+.wt-login-header h1 {
+  margin: 0;
+  font-size: 38px;
+  letter-spacing: -0.8px;
+}
+
 .wt-login-flow-notice {
-  margin: 0 0 20px;
-  padding: 18px 20px;
-  border-left-width: 4px;
+  margin: 0 0 16px;
+  padding: 14px 16px;
+  border-left-width: 3px;
 }
 
 .wt-login-flow-notice h2 {
-  margin: 0 0 8px;
-  font-size: 21px;
+  margin: 0 0 6px;
+  font-size: 18px;
   letter-spacing: -0.2px;
+}
+
+.wt-login-flow-notice p {
+  margin-bottom: 6px;
 }
 
 .wt-login-flow-notice p:last-child {
@@ -37,6 +61,106 @@
 .wt-login-flow-continuation {
   color: #245269;
   font-weight: 600;
+}
+
+.wt-login-session-option {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 14px;
+  padding: 0 2px;
+}
+
+.wt-login-session-option label {
+  margin: 0;
+  font-weight: 500;
+}
+
+.wt-login-session-option span {
+  color: #777;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.wt-auth-options-loading {
+  margin: 28px 0;
+  text-align: center;
+}
+
+.wt-email-auth-panel {
+  margin-bottom: 12px;
+}
+
+.wt-email-auth-panel .panel-body {
+  padding: 18px 20px 20px;
+}
+
+.wt-email-auth-panel .panel-body > .text-muted:first-child {
+  margin-bottom: 16px;
+}
+
+.wt-passkey-option {
+  margin: 12px 0;
+}
+
+.wt-passkey-option .help-block {
+  margin-bottom: 0;
+}
+
+.wt-password-toggle {
+  margin: 8px 0;
+  padding: 10px 12px;
+  border-top: 1px solid #e5e5e5;
+  border-bottom: 1px solid #e5e5e5;
+  border-radius: 0;
+}
+
+.wt-password-signin-panel {
+  padding: 14px 0 4px;
+}
+
+.wt-login-help-links {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 12px 0 0;
+}
+
+.wt-login-help-links .btn-link {
+  padding: 0;
+}
+
+.wt-recovery-signin-panel {
+  margin: 14px 0 0;
+}
+
+.wt-social-signin-section {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e5e5;
+}
+
+.wt-social-signin-section .btn-group {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.wt-social-signin-section .btn {
+  flex: 1 0 auto;
+}
+
+.wt-login-utilities {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid #e5e5e5;
+  color: #666;
+  text-align: center;
 }
 
 .wt-access-message {
@@ -353,7 +477,38 @@ button:focus-visible,
   }
 
   .wt-login-flow-notice {
+    padding: 13px 14px;
+  }
+
+  .wt-login-container {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+
+  .wt-login-header {
+    margin-top: 28px;
+  }
+
+  .wt-login-header h1 {
+    font-size: 34px;
+  }
+
+  .wt-login-session-option {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .wt-login-session-option span {
+    padding-left: 20px;
+  }
+
+  .wt-email-auth-panel .panel-body {
     padding: 16px;
+  }
+
+  .wt-login-page .btn-block {
+    min-height: 44px;
   }
 
   .wt-auth-prompt-modal .modal-dialog {

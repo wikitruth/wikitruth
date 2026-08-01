@@ -30,6 +30,7 @@ describe('OpenAPI contract', function () {
 
     expect(paths['/auth/me']).toBeDefined();
     expect(paths['/auth/providers']).toBeDefined();
+    expect(paths['/auth/config']).toBeDefined();
     expect(paths['/auth/login']).toBeDefined();
     expect(paths['/auth/signup']).toBeDefined();
     expect(paths['/auth/logout']).toBeDefined();

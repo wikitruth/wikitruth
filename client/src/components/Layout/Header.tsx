@@ -345,31 +345,35 @@ const Header: React.FC<HeaderProps> = ({ onToggleSidebar, sidebarOpen = false })
                     <span className="hidden-xs"> Contribute</span>
                   </Link>
                 </li>
-                <li>
-                  <Link to={applicationPath('/login')} className="nav-narrow" aria-label="Sign in">
-                    <i className="fa fa-user"></i>
-                    <span className="hidden-xxxxs"> Sign In</span>
-                  </Link>
-                </li>
+                {location.pathname !== applicationPath('/login') ? (
+                  <li>
+                    <Link to={applicationPath('/login')} className="nav-narrow" aria-label="Sign in">
+                      <i className="fa fa-user"></i>
+                      <span className="hidden-xxxxs"> Sign In</span>
+                    </Link>
+                  </li>
+                ) : null}
               </>
             )}
-              <li className="dropdown visible-sm visible-xs">
-                <button
-                  type="button"
-                  className="dropdown-toggle btn btn-link navbar-btn"
-                  aria-label={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
-                  aria-expanded={sidebarOpen}
-                  aria-controls="sidebar"
-                  onClick={(event) => {
-                    event.preventDefault();
-                    setIsMobileNavOpen(false);
-                    onToggleSidebar?.();
-                  }}
-                  style={{ color: '#777' }}
-                >
-                  <i className="fa fa-navicon" aria-hidden="true"></i>
-                </button>
-              </li>
+              {onToggleSidebar ? (
+                <li className="dropdown visible-sm visible-xs">
+                  <button
+                    type="button"
+                    className="dropdown-toggle btn btn-link navbar-btn"
+                    aria-label={sidebarOpen ? 'Close sidebar' : 'Open sidebar'}
+                    aria-expanded={sidebarOpen}
+                    aria-controls="sidebar"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      setIsMobileNavOpen(false);
+                      onToggleSidebar();
+                    }}
+                    style={{ color: '#777' }}
+                  >
+                    <i className="fa fa-navicon" aria-hidden="true"></i>
+                  </button>
+                </li>
+              ) : null}
             </ul>
           </nav>
         </div>

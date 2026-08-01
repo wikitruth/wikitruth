@@ -47,6 +47,8 @@ function createApp() {
         apple: { key: '' },
         microsoft: { key: 'microsoft-key' },
       },
+      webAuthn: { enabled: false },
+      emailAuth: { enabled: true },
     };
 
     if (req.get('x-test-auth') === '1') {
@@ -90,6 +92,23 @@ describe('auth social callback and session coverage', () => {
         microsoft: true,
       }),
     );
+  });
+
+  it('returns the consolidated sign-in runtime configuration', async () => {
+    const app = createApp();
+    const response = await request(app)
+      .get('/api/auth/config')
+      .set('Cookie', 'fast_switch=[]')
+      .expect(200);
+
+    expect(response.headers['cache-control']).toContain('private');
+    expect(response.body).toEqual(expect.objectContaining({
+      success: true,
+      providers: expect.objectContaining({ google: true, github: false }),
+      fastSwitchAvailable: false,
+      emailCode: expect.objectContaining({ enabled: true, codeLength: 6 }),
+      passkeys: expect.objectContaining({ enabled: false, rpName: 'Wikitruth' }),
+    }));
   });
 
   it('persists active role in session across me + role-switch cycle', async () => {

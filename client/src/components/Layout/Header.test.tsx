@@ -118,4 +118,10 @@ describe('Header parity navigation', () => {
     rerender(<Header />);
     expect(screen.getByRole('link', { name: /sign in/i })).toBeInTheDocument();
   });
+
+  it('does not repeat the sign-in link on the sign-in page', () => {
+    render(<Header />, { route: '/login' });
+
+    expect(screen.queryByRole('link', { name: /^sign in$/i })).not.toBeInTheDocument();
+  });
 });

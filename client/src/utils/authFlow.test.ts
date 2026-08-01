@@ -32,5 +32,8 @@ describe('authFlow', () => {
       'Sign in to view your notifications',
     );
     expect(getAuthFlowContent('contribute', '/topics/create').continuation).toMatch(/contribution form/i);
+    expect(getAuthFlowContent('protected', '/topics/create').continuation).toBe(
+      'After signing in, you will continue your contribution.',
+    );
   });
 });

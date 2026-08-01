@@ -43,6 +43,25 @@ describe('authApi', () => {
     );
   });
 
+  it('loads all public sign-in capabilities from one endpoint', async () => {
+    const payload = {
+      success: true,
+      providers: {},
+      emailCode: { enabled: true },
+      passkeys: { enabled: true },
+      fastSwitchAvailable: false,
+    };
+    const fetchMock = jest.fn().mockResolvedValue({ ok: true, json: async () => payload });
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+    await expect(authApi.config()).resolves.toBe(payload);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/auth/config',
+      expect.objectContaining({ credentials: 'include' })
+    );
+  });
+
   it('calls passwordless email and session-security endpoints', async () => {
     const fetchMock = jest.fn().mockResolvedValue({ ok: true, json: async () => ({ success: true, sessions: [] }) });
     globalThis.fetch = fetchMock as unknown as typeof fetch;

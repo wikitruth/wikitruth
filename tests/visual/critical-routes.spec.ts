@@ -126,6 +126,28 @@ async function installStableRoutes(page: Page): Promise<void> {
     success: true,
     providers: { google: true, github: true, facebook: false, twitter: false, apple: true, microsoft: true },
   }));
+  await page.route('**/api/auth/config**', (route) => fulfillJson(route, {
+    success: true,
+    providers: { google: true, github: true, facebook: false, twitter: false, apple: true, microsoft: true },
+    fastSwitchAvailable: false,
+    emailCode: {
+      enabled: true,
+      codeLength: 6,
+      expiresInSeconds: 600,
+      resendDelaySeconds: 60,
+      canonicalOrigin: new URL(route.request().url()).origin,
+      isCanonicalOrigin: true,
+    },
+    passkeys: {
+      enabled: true,
+      rpName: 'Wikitruth Local',
+      canonicalOrigin: new URL(route.request().url()).origin,
+      isCanonicalOrigin: true,
+      passwordlessEnabled: true,
+      adminStepUpRequired: false,
+      stepUpMaxAgeSeconds: 900,
+    },
+  }));
   await page.route('**/api/auth/passkeys/config**', (route) => fulfillJson(route, {
     success: true,
     passkeys: {

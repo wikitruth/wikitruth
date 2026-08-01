@@ -22,6 +22,7 @@ import {
   normalizeTrustedOrigin,
   safeRelativeReturnPath,
 } from '../../services/webAuthnConfigService';
+import { buildEmailCodeRuntimeConfig } from '../../services/authRuntimeConfigService';
 import {
   deliverEmail,
   getDefaultActiveRole,
@@ -106,18 +107,9 @@ async function finishAuthentication(
 
 export function registerAuthEmailCodeRoutes(router: Router): void {
   router.get('/email-code/config', (req: WikitruthRequest, res: WikitruthResponse) => {
-    const config = getEmailAuthConfig(req);
-    const webAuthn = getWebAuthnConfig(req);
     res.json({
       success: true,
-      emailCode: {
-        enabled: config.enabled,
-        codeLength: 6,
-        expiresInSeconds: config.codeTtlSeconds,
-        resendDelaySeconds: config.resendDelaySeconds,
-        canonicalOrigin: webAuthn.canonicalOrigin,
-        isCanonicalOrigin: isCanonicalAuthOrigin(req),
-      },
+      emailCode: buildEmailCodeRuntimeConfig(req),
     });
   });
 

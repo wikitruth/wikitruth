@@ -17,8 +17,10 @@ describe('Parity checklist guardrails', function () {
     expect(authApi).toContain("router.post('/signup'");
     expect(authApi).toContain("router.post('/logout'");
     expect(socialButtons).toContain('enabledProviders');
-    expect(socialButtons).toContain('Social sign-in is currently unavailable.');
+    expect(socialButtons).toContain('if (providers.length === 0)');
+    expect(socialButtons).toContain('return null;');
     expect(authApiClient).toContain('providers: () => request<AuthProvidersResponse>');
+    expect(authApiClient).toContain('config: () => request<AuthRuntimeConfig>');
   });
 
   it('keeps journal parity routes and API handlers in place', function () {

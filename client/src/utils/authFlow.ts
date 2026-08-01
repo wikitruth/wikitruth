@@ -72,6 +72,17 @@ function protectedDestination(returnUrl: string): string {
   return 'continue to this page';
 }
 
+function protectedContinuation(returnUrl: string): string {
+  const path = safeReturnUrl(returnUrl).split(/[?#]/, 1)[0];
+  if (/\/(topics|arguments|questions|answers|issues|opinions|artifacts|groups)\/create(?:\/|$)/.test(path)) {
+    return 'After signing in, you will continue your contribution.';
+  }
+  if (path.startsWith('/outline/link')) {
+    return 'After signing in, you will continue linking this entry.';
+  }
+  return 'After signing in, you will return to the page you requested.';
+}
+
 export function getAuthFlowContent(intent: AuthIntent, returnUrl: string): AuthFlowContent {
   switch (intent) {
     case 'react':
@@ -109,7 +120,7 @@ export function getAuthFlowContent(intent: AuthIntent, returnUrl: string): AuthF
       return {
         title: `Sign in to ${protectedDestination(returnUrl)}`,
         message: 'This part of Wikitruth is available to authenticated accounts.',
-        continuation: 'After signing in, you will return to the page you requested.',
+        continuation: protectedContinuation(returnUrl),
       };
   }
 }

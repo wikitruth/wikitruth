@@ -10449,6 +10449,35 @@
           }
         }
       }
+    },
+    "/auth/config": {
+      "get": {
+        "operationId": "getAuthConfig",
+        "summary": "GET /auth/config",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/StandardSuccess"
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "406": {
+            "$ref": "#/components/responses/UnsupportedVersion"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        }
+      }
     }
   },
   "components": {

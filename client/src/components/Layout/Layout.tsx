@@ -11,6 +11,7 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const focusedAuthLayout = /\/login\/?$/.test(location.pathname);
 
   const closeSidebar = useCallback(() => setSidebarOpen(false), []);
   const toggleSidebar = useCallback(() => setSidebarOpen((value) => !value), []);
@@ -30,7 +31,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <div className="wt-app-shell">
-      <Header onToggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
+      <Header
+        onToggleSidebar={focusedAuthLayout ? undefined : toggleSidebar}
+        sidebarOpen={focusedAuthLayout ? false : sidebarOpen}
+      />
       <main className="wt-app-main">
         <div className="container-fluid">
           {sidebarOpen ? (
@@ -42,16 +46,20 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             />
           ) : null}
           <div className={`row row-offcanvas row-offcanvas-right${sidebarOpen ? ' active' : ''}`}>
-            <div className="col-sm-12 col-md-9 col-lg-9-x wt-main-column">
+            <div className={focusedAuthLayout
+              ? 'col-xs-12 wt-main-column'
+              : 'col-sm-12 col-md-9 col-lg-9-x wt-main-column'}>
               {children}
             </div>
 
-            <div
-              className="col-xs-7-x col-sm-4 col-md-3 col-lg-3-x sidebar-offcanvas"
-              id="sidebar"
-            >
-              <ContextSidebar />
-            </div>
+            {!focusedAuthLayout ? (
+              <div
+                className="col-xs-7-x col-sm-4 col-md-3 col-lg-3-x sidebar-offcanvas"
+                id="sidebar"
+              >
+                <ContextSidebar />
+              </div>
+            ) : null}
           </div>
         </div>
       </main>

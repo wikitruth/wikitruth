@@ -60,6 +60,7 @@ import {
   revokeCurrentWebSession,
   revokeOtherWebSessions,
 } from '../../services/webSessionService';
+import { buildAuthRuntimeConfig } from '../../services/authRuntimeConfigService';
 
 const jwt = jwtMod as unknown as typeof import('jsonwebtoken');
 
@@ -89,6 +90,18 @@ export = function (router: Router) {
     res.json({
       success: true,
       providers: getOauthProviders(req),
+    });
+  });
+
+  router.get('/config', function (req: WikitruthRequest, res: WikitruthResponse) {
+    res.set('Cache-Control', 'private, max-age=60, must-revalidate');
+    res.json({
+      success: true,
+      ...buildAuthRuntimeConfig(
+        req,
+        getOauthProviders(req),
+        parseFastSwitchCookies(req.cookies?.fast_switch).length > 0
+      ),
     });
   });
 

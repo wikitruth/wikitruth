@@ -24,6 +24,34 @@ jest.mock('../../context/AuthContext', () => {
   };
 });
 
+jest.mock('../../services/api/auth', () => ({
+  __esModule: true,
+  default: {
+    config: jest.fn().mockResolvedValue({
+      success: true,
+      providers: {},
+      fastSwitchAvailable: false,
+      emailCode: {
+        enabled: false,
+        codeLength: 6,
+        expiresInSeconds: 600,
+        resendDelaySeconds: 60,
+        canonicalOrigin: 'http://localhost',
+        isCanonicalOrigin: true,
+      },
+      passkeys: {
+        enabled: false,
+        rpName: 'Wikitruth',
+        canonicalOrigin: 'http://localhost',
+        isCanonicalOrigin: true,
+        passwordlessEnabled: false,
+        adminStepUpRequired: false,
+        stepUpMaxAgeSeconds: 600,
+      },
+    }),
+  },
+}));
+
 describe('Login flow integration', () => {
   beforeEach(() => {
     mockNavigate.mockReset();
@@ -36,8 +64,8 @@ describe('Login flow integration', () => {
 
     render(<LoginPage />, { route: '/login' });
 
-    await user.type(screen.getByLabelText(/username or email/i), 'demo-user');
-    await user.type(screen.getByLabelText(/^password/i), 'secret12');
+    await user.type(await screen.findByLabelText(/username or email/i), 'demo-user');
+    await user.type(screen.getByPlaceholderText('Enter your password'), 'secret12');
     await user.click(screen.getByRole('button', { name: /sign in/i }));
 
     expect(mockLogin).toHaveBeenCalledWith('demo-user', 'secret12', true);

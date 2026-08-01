@@ -60,8 +60,8 @@ describe('SocialLoginButtons', () => {
     expect(screen.queryByRole('link', { name: /facebook/i })).not.toBeInTheDocument();
   });
 
-  it('renders unavailable message when no providers are enabled', () => {
-    render(
+  it('renders nothing when no providers are enabled', () => {
+    const { container } = render(
       <SocialLoginButtons
         enabledProviders={{
           google: false,
@@ -74,6 +74,6 @@ describe('SocialLoginButtons', () => {
       />
     );
 
-    expect(screen.getByText(/social sign-in is currently unavailable/i)).toBeInTheDocument();
+    expect(container).toBeEmptyDOMElement();
   });
 });
