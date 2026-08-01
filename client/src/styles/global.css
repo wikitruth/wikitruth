@@ -18,6 +18,14 @@
   flex: 0 0 auto;
 }
 
+.wt-entry-actions-menu {
+  z-index: 1060;
+  right: auto !important;
+  bottom: auto !important;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
 .wt-standard-footer-inner {
   display: flex;
   align-items: center;
@@ -517,6 +525,9 @@ button:focus-visible,
   .breadcrumb.wt-bc {
     position: relative;
     z-index: 1;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: thin;
   }
 
   .wt-access-message {
@@ -933,4 +944,12 @@ button:focus-visible,
 .wt-entry-lifecycle-notice {
   margin-bottom: 14px;
   border-left-width: 4px;
+}
+
+.wt-entry-lifecycle-stack {
+  margin: 12px 0 16px;
+}
+
+.wt-entry-lifecycle-stack .wt-entry-lifecycle-notice:last-child {
+  margin-bottom: 0;
 }

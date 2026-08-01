@@ -14,7 +14,7 @@ interface EntryQuickActionsProps {
   entry: LegacyEntity;
   objectName?: SupportedObjectName;
   hasValue?: boolean;
-  moreActions?: React.ReactNode;
+  moreActions?: React.ReactElement<{ onQuickEdit?: () => void }>;
 }
 
 function getTopicIdForReply(entry: LegacyEntity, objectName: string): string {
@@ -193,6 +193,18 @@ const EntryQuickActions: React.FC<EntryQuickActionsProps> = ({
     const actorId = String(actor._id || actor.id || '');
     return Boolean(actorId && actorId === String(entry.createUserId || ''));
   }, [entry.createUserId, user]);
+
+  const toggleQuickEdit = () => {
+    setShowQuickEdit((value) => !value);
+    setShowReplyMenu(false);
+    setShowContributionDrawer(false);
+  };
+
+  const resolvedMoreActions = moreActions
+    ? React.cloneElement(moreActions, {
+      onQuickEdit: canQuickEdit ? toggleQuickEdit : undefined,
+    })
+    : null;
 
   const replyMenuItems = useMemo(() => {
     const items: Array<{
@@ -530,23 +542,7 @@ const EntryQuickActions: React.FC<EntryQuickActionsProps> = ({
             </Link>
           </div>
         ) : null}
-        {moreActions || null}
-        {canQuickEdit ? (
-          <div className="pull-left entry-options">
-            <button
-              type="button"
-              className="btn btn-link text-muted no-underline"
-              style={{ padding: 0 }}
-              onClick={() => {
-                setShowQuickEdit((value) => !value);
-                setShowReplyMenu(false);
-                setShowContributionDrawer(false);
-              }}
-            >
-              <i className="fa fa-pencil" aria-hidden="true"></i> <span>Quick Edit</span>
-            </button>
-          </div>
-        ) : null}
+        {resolvedMoreActions}
       </div>
       {showContributionDrawer ? (
         <ContextualContributionDrawer

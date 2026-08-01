@@ -192,6 +192,7 @@ export interface TopicEntryResponse extends ApiBaseResponse {
   topicLinks?: LegacyEntity[];
   parentTopic?: LegacyEntity;
   grandParentTopic?: LegacyEntity;
+  topicAncestors?: LegacyEntity[];
   mainTopic?: boolean;
   arguments?: LegacyEntity[];
   keyArguments?: LegacyEntity[];

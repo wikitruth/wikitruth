@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '../../test-utils/render';
-import { EntryMetaBlock } from './EntryLegacyParity';
+import { buildLegacyEntryBreadcrumb, EntryMetaBlock } from './EntryLegacyParity';
 import type { LegacyEntity } from '../../types/legacy';
 
 function entry(overrides: Partial<LegacyEntity>): LegacyEntity {
@@ -46,5 +46,31 @@ describe('EntryMetaBlock lifecycle cues', () => {
     expect(screen.getByText('Time-sensitive information.')).toBeInTheDocument();
     expect(screen.getByText(/verify newer evidence/i)).toBeInTheDocument();
     expect(container.querySelector('time')).toHaveAttribute('title', expect.stringContaining('2024'));
+  });
+
+  it('can omit lifecycle cues when a page renders them near its heading', () => {
+    render(<EntryMetaBlock entry={entry({ screening: { status: 3 } })} showLifecycleNotices={false} />);
+    expect(screen.queryByText('Archived record.')).not.toBeInTheDocument();
+  });
+});
+
+describe('buildLegacyEntryBreadcrumb', () => {
+  it('preserves the complete topic hierarchy for deeply nested topics', () => {
+    const current = entry({ _id: 'msg-topic', title: 'msg topic', friendlyUrl: 'msg-topic' });
+    const breadcrumbs = buildLegacyEntryBreadcrumb(current, 'topic', {
+      ancestorTopics: [
+        entry({ _id: 'health', title: 'Health', friendlyUrl: 'health' }),
+        entry({ _id: 'msg', title: 'Monosodium glutamate (MSG)', friendlyUrl: 'msg' }),
+        entry({ _id: 'test', title: 'test', friendlyUrl: 'test' }),
+      ],
+    });
+
+    expect(breadcrumbs.map((item) => item.title)).toEqual([
+      'Explore',
+      'Health',
+      'Monosodium glutamate (MSG)',
+      'test',
+      'msg topic',
+    ]);
   });
 });

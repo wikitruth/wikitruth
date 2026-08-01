@@ -61,7 +61,7 @@ const mockedModerationApi = moderationApi as jest.Mocked<typeof moderationApi>;
 const mockedNotificationsApi = notificationsApi as jest.Mocked<typeof notificationsApi>;
 const mockedClipboard = clipboardPage as jest.Mocked<typeof clipboardPage>;
 
-async function renderMenu(entry: Partial<LegacyEntity>) {
+async function renderMenu(entry: Partial<LegacyEntity>, onQuickEdit?: () => void) {
   render(
     <EntryActionsMenu
       entry={
@@ -75,6 +75,7 @@ async function renderMenu(entry: Partial<LegacyEntity>) {
         } as LegacyEntity
       }
       editPath="/topics/create?id=entry-1"
+      onQuickEdit={onQuickEdit}
     />,
   );
   await act(async () => {
@@ -134,6 +135,30 @@ describe('EntryActionsMenu moderation actions', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/screening?topic=topic-1');
   });
 
+  it('keeps quick editing inside the More menu and distinguishes full editing', async () => {
+    const onQuickEdit = jest.fn();
+    await renderMenu({ objectName: 'topic', _id: 'topic-1' }, onQuickEdit);
+
+    openMenu();
+    expect(screen.getByRole('button', { name: /quick edit/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /edit full details/i })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /quick edit/i }));
+
+    expect(onQuickEdit).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole('button', { name: /quick edit/i })).not.toBeInTheDocument();
+  });
+
+  it('dismisses More options with Escape and returns focus to the trigger', async () => {
+    await renderMenu({ objectName: 'topic', _id: 'topic-1' });
+
+    openMenu();
+    const trigger = screen.getByRole('link', { name: /more/i });
+    fireEvent.keyDown(document, { key: 'Escape' });
+
+    expect(trigger).toHaveFocus();
+    expect(screen.queryByText('MORE OPTIONS')).not.toBeInTheDocument();
+  });
+
   it('routes convert action through modern convert route', async () => {
     await renderMenu({ objectName: 'argument', objectType: 2, _id: 'arg-1' });
 
@@ -184,7 +209,7 @@ describe('EntryActionsMenu moderation actions', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/issues/create?topic=topic-1');
 
     openMenu();
-    fireEvent.click(screen.getByRole('button', { name: /details/i }));
+    fireEvent.click(screen.getByRole('button', { name: /^details$/i }));
     expect(mockNavigate).toHaveBeenCalledWith('/topics/entry/topic-a/topic-1');
 
     openMenu();

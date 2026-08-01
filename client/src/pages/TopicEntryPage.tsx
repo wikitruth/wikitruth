@@ -23,7 +23,11 @@ import PageMeta from '../components/common/PageMeta';
 import type { TopicEntryResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';
 import type { Argument, Artifact, Issue, Opinion, Question, Topic } from '../types';
-import { EntryMetaBlock, buildLegacyEntryBreadcrumb } from '../components/Entry/EntryLegacyParity';
+import {
+  EntryLifecycleNotices,
+  EntryMetaBlock,
+  buildLegacyEntryBreadcrumb,
+} from '../components/Entry/EntryLegacyParity';
 import TopicEntrySummary from '../components/Entry/TopicEntrySummary';
 import TruthSummaryPanel from '../components/Entry/TruthSummaryPanel';
 const CONTENT_COLLAPSE_THRESHOLD = 1200;
@@ -144,6 +148,7 @@ const TopicEntryPage: React.FC = () => {
   const quickActionObjectName = 'topic' as const;
 
   const breadcrumbItems = buildLegacyEntryBreadcrumb(topic, 'topic', {
+    ancestorTopics: data?.topicAncestors,
     sectionTopic: (data?.parentTopic || null) as LegacyEntity | null,
     grandParentTopic: ((data as { grandParentTopic?: LegacyEntity } | null)?.grandParentTopic || null) as LegacyEntity | null,
   });
@@ -283,6 +288,8 @@ const TopicEntryPage: React.FC = () => {
         linkCount={data?.linkCount}
         isMainTopic={isMainTopic}
       />
+
+      <EntryLifecycleNotices entry={topic} />
 
       <TruthSummaryPanel objectName="topic" objectId={String(topic._id || '')} />
 
@@ -456,7 +463,7 @@ const TopicEntryPage: React.FC = () => {
         </EntryList>
       )}
 
-      <EntryMetaBlock entry={topic} />
+      <EntryMetaBlock entry={topic} showLifecycleNotices={false} />
 
       <div style={{ marginTop: '30px' }}>
         <Link to="/topics" className="btn btn-default">

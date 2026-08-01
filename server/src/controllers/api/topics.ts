@@ -8,6 +8,10 @@ import { parseNumericTags, parseOptionalDate } from './entryWriteHelpers';
 import { rejectBlockingDuplicate } from './duplicateWriteGuard';
 import { recordEntryRevision } from './revisionWriteRecorder';
 import { serializeHydratedEntry } from './entrySerialization';
+import {
+  loadTopicAncestors,
+  type TopicHierarchyModel,
+} from '../../services/topicHierarchyService';
 
 import * as flowUtilsNs from '../../utils/flowUtils';
 import appModForDb from '../../app';
@@ -22,6 +26,7 @@ type TopicScreeningModel = {
     status?: number;
   };
   topic?: Record<string, unknown>;
+  topicAncestors?: Record<string, unknown>[];
   topicLink?: Record<string, unknown>;
   topics?: Record<string, unknown>[];
   categories?: Record<string, unknown>[];
@@ -422,6 +427,11 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
   if (!model.topic) {
     return res.status(404).json({ error: 'Topic not found' });
   }
+
+  model.topicAncestors = await loadTopicAncestors(
+    db.Topic as TopicHierarchyModel,
+    model.topic.parentId,
+  );
 
   // Mongoose omits transient username properties from Topic JSON serialization.
   model.topic = serializeHydratedEntry(model.topic);

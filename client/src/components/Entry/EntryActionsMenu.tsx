@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import moderationApi, { type ModerationTargetKey } from '../../services/api/moderation';
@@ -6,71 +6,18 @@ import notificationsApi from '../../services/api/notifications';
 import { addToClipboard } from '../../pages/ClipboardPage';
 import type { LegacyEntity } from '../../types/legacy';
 import { useAuthPrompt } from '../../context/AuthPromptContext';
+import { resolveEntryDetailsPath } from './entryActionPaths';
+import { useViewportMenuPosition } from './useViewportMenuPosition';
 
 type ReaderSignalType = 'controversial' | 'incorrect_verdict' | 'needs_reevaluation' | 'wrong_category';
 
 interface EntryActionsMenuProps {
   entry: LegacyEntity;
   editPath?: string;
+  onQuickEdit?: () => void;
 }
 
-function encodePathSegment(value: unknown): string {
-  return encodeURIComponent(String(value || '').trim());
-}
-
-function extractNestedEntryTarget(entry: LegacyEntity, key: 'topic' | 'argument'): { id: string; friendly: string } | null {
-  const nested = entry[key] as { _id?: unknown; friendlyUrl?: unknown; title?: unknown } | undefined;
-  const id = String(nested?._id || '').trim();
-  if (!id) {
-    return null;
-  }
-  const friendly = String(nested?.friendlyUrl || nested?.title || id).trim();
-  return { id, friendly: friendly || id };
-}
-
-function resolveEntryDetailsPath(entry: LegacyEntity, objectName: string): string {
-  const defaultId = String(entry._id || '').trim();
-  const defaultFriendly = String(entry.friendlyUrl || entry.title || defaultId).trim() || defaultId;
-
-  const toFriendlyPath = (prefix: string, id: string, friendly: string): string => {
-    return `${prefix}/${encodePathSegment(friendly)}/${encodePathSegment(id)}`;
-  };
-
-  if (objectName === 'topicLink') {
-    const linkedTopic = extractNestedEntryTarget(entry, 'topic');
-    if (linkedTopic) {
-      return toFriendlyPath('/topics/entry', linkedTopic.id, linkedTopic.friendly);
-    }
-  }
-
-  if (objectName === 'argumentLink') {
-    const linkedArgument = extractNestedEntryTarget(entry, 'argument');
-    if (linkedArgument) {
-      return toFriendlyPath('/arguments/entry', linkedArgument.id, linkedArgument.friendly);
-    }
-  }
-
-  switch (objectName) {
-    case 'topic':
-      return toFriendlyPath('/topics/entry', defaultId, defaultFriendly);
-    case 'argument':
-      return toFriendlyPath('/arguments/entry', defaultId, defaultFriendly);
-    case 'question':
-      return toFriendlyPath('/questions/entry', defaultId, defaultFriendly);
-    case 'issue':
-      return toFriendlyPath('/issues/entry', defaultId, defaultFriendly);
-    case 'opinion':
-      return toFriendlyPath('/opinions/entry', defaultId, defaultFriendly);
-    case 'artifact':
-      return toFriendlyPath('/artifacts/entry', defaultId, defaultFriendly);
-    case 'answer':
-      return `/answers/entry/${encodePathSegment(defaultId)}`;
-    default:
-      return `/topics/entry/${encodePathSegment(defaultId)}`;
-  }
-}
-
-const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) => {
+const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath, onQuickEdit }) => {
   const { user, activeRole } = useAuth();
   const { requestSignIn } = useAuthPrompt();
   const navigate = useNavigate();
@@ -78,6 +25,10 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
   const [followed, setFollowed] = useState(false);
   const [loadingFollowState, setLoadingFollowState] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
+  const triggerRef = useRef<HTMLAnchorElement | null>(null);
+  const menuRef = useRef<HTMLUListElement | null>(null);
+  const menuPosition = useViewportMenuPosition({ isOpen, triggerRef, menuRef });
   const objectName = useMemo(() => {
     const normalized = String(entry.objectName || '').trim();
     return normalized || 'topic';
@@ -115,6 +66,29 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
     const timeout = window.setTimeout(() => setStatusMessage(null), 1800);
     return () => window.clearTimeout(timeout);
   }, [statusMessage]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleOutsidePointer = (event: PointerEvent) => {
+      if (!dropdownRef.current?.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsOpen(false);
+        triggerRef.current?.focus();
+      }
+    };
+
+    document.addEventListener('pointerdown', handleOutsidePointer);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', handleOutsidePointer);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen]);
 
   const hasAdminRole = Boolean(user?.roles?.admin);
   const hasScreenerRole = Boolean(user?.roles?.screener);
@@ -356,8 +330,9 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
   };
 
   return (
-    <div className={`dropdown pull-left entry-options ${isOpen ? 'open' : ''}`} style={{ textAlign: 'left' }}>
+    <div ref={dropdownRef} className={`dropdown pull-left entry-options ${isOpen ? 'open' : ''}`} style={{ textAlign: 'left' }}>
       <a
+        ref={triggerRef}
         href="#"
         className="text-muted no-underline dropdown-toggle"
         title="See more options"
@@ -367,19 +342,41 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath }) 
           event.preventDefault();
           setIsOpen((value) => !value);
         }}
-        onBlur={() => {
-          window.setTimeout(() => setIsOpen(false), 120);
-        }}
       >
         <i className="glyphicon glyphicon-option-horizontal" aria-hidden="true"></i><span> more</span>
       </a>
       {isOpen && (
-        <ul className="dropdown-menu dropdown-menu-right">
+        <ul
+          ref={menuRef}
+          className="dropdown-menu wt-entry-actions-menu"
+          style={{
+            position: 'fixed',
+            top: menuPosition?.top,
+            left: menuPosition?.left,
+            width: menuPosition?.width,
+            maxHeight: menuPosition?.maxHeight,
+            visibility: menuPosition ? 'visible' : 'hidden',
+          }}
+        >
             <li className="dropdown-header">MORE OPTIONS</li>
+            {onQuickEdit && (
+              <li>
+                <button
+                  type="button"
+                  className="btn btn-link"
+                  onClick={() => {
+                    setIsOpen(false);
+                    onQuickEdit();
+                  }}
+                >
+                  <i className="fa fa-pencil" aria-hidden="true"></i> Quick edit
+                </button>
+              </li>
+            )}
             {canEdit && (
               <li>
                 <button type="button" className="btn btn-link" onClick={handleEdit}>
-                  <i className="fa fa-pencil" aria-hidden="true"></i> Edit
+                  <i className="fa fa-external-link" aria-hidden="true"></i> Edit full details
                 </button>
               </li>
             )}

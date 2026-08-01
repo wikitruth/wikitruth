@@ -106,6 +106,7 @@ export function buildLegacyEntryBreadcrumb(
   entry: LegacyEntity,
   objectName: EntryObjectName,
   options?: {
+    ancestorTopics?: LegacyEntity[];
     sectionTopic?: LegacyEntity | null;
     grandParentTopic?: LegacyEntity | null;
     parentArgument?: LegacyEntity | null;
@@ -120,20 +121,20 @@ export function buildLegacyEntryBreadcrumb(
     || sectionTopic?.parentTopic
     || null
   ) as LegacyEntity | null;
+  const topicAncestors = Array.isArray(options?.ancestorTopics)
+    ? options.ancestorTopics
+    : [grandParentTopic, sectionTopic].filter((topic): topic is LegacyEntity => Boolean(topic?._id));
+  const ancestorIds = new Set<string>();
 
-  if (grandParentTopic?._id && grandParentTopic._id !== sectionTopic?._id) {
+  topicAncestors.forEach((topic) => {
+    const id = String(topic?._id || '');
+    if (!id || id === String(entry._id || '') || ancestorIds.has(id)) return;
+    ancestorIds.add(id);
     items.push({
-      title: getLinkTitle(grandParentTopic, 'Topic'),
-      url: buildEntryRoute('topic', grandParentTopic),
+      title: getLinkTitle(topic, 'Topic'),
+      url: buildEntryRoute('topic', topic),
     });
-  }
-
-  if (sectionTopic?._id) {
-    items.push({
-      title: getLinkTitle(sectionTopic, 'Topic'),
-      url: buildEntryRoute('topic', sectionTopic),
-    });
-  }
+  });
 
   const parentArgument = (options?.parentArgument || entry.parentArgument || null) as LegacyEntity | null;
   if (parentArgument?._id && (objectName === 'argument' || objectName === 'question' || objectName === 'issue' || objectName === 'opinion')) {
@@ -334,26 +335,15 @@ export const EntryRelatedTopics: React.FC<{ entry: LegacyEntity; topicLinks?: Le
   );
 };
 
-export const EntryMetaBlock: React.FC<{ entry: LegacyEntity }> = ({ entry }) => {
-  const createUsername = String(entry.createUsername || entry.editorUsername || entry.username || '').trim();
-  const editUsername = String(entry.editUsername || entry.editorUsername || createUsername).trim();
-  const posted = formatRelativeTime(entry.createDate || entry.editDate);
-  const edited = formatRelativeTime(entry.editDate || entry.createDate);
-  const postedLabel = posted || 'unknown time';
-  const editedLabel = edited || postedLabel;
+export const EntryLifecycleNotices: React.FC<{ entry: LegacyEntity }> = ({ entry }) => {
   const referenceDate = entry.referenceDate ? new Date(entry.referenceDate) : null;
   const hasReferenceDate = Boolean(referenceDate && !Number.isNaN(referenceDate.getTime()));
   const isArchived = Number(entry.screening?.status) === 3;
 
+  if (!isArchived && !hasReferenceDate) return null;
+
   return (
-    <>
-    <EntryTranslationsPanel
-      objectName={String(entry.objectName || '')}
-      objectId={String(entry._id || '')}
-      originalTitle={String(entry.title || '')}
-      originalContent={String(entry.content || entry.description || '')}
-    />
-    <div style={{ marginTop: '26px', paddingTop: '14px', borderTop: '1px solid #eee' }}>
+    <div className="wt-entry-lifecycle-stack">
       {isArchived && (
         <div className="alert alert-warning wt-entry-lifecycle-notice" role="status">
           <i className="fa fa-archive" aria-hidden="true"></i>{' '}
@@ -369,6 +359,31 @@ export const EntryMetaBlock: React.FC<{ entry: LegacyEntity }> = ({ entry }) => 
           </time>. Verify newer evidence before treating it as current.
         </div>
       )}
+    </div>
+  );
+};
+
+export const EntryMetaBlock: React.FC<{ entry: LegacyEntity; showLifecycleNotices?: boolean }> = ({
+  entry,
+  showLifecycleNotices = true,
+}) => {
+  const createUsername = String(entry.createUsername || entry.editorUsername || entry.username || '').trim();
+  const editUsername = String(entry.editUsername || entry.editorUsername || createUsername).trim();
+  const posted = formatRelativeTime(entry.createDate || entry.editDate);
+  const edited = formatRelativeTime(entry.editDate || entry.createDate);
+  const postedLabel = posted || 'unknown time';
+  const editedLabel = edited || postedLabel;
+
+  return (
+    <>
+    <EntryTranslationsPanel
+      objectName={String(entry.objectName || '')}
+      objectId={String(entry._id || '')}
+      originalTitle={String(entry.title || '')}
+      originalContent={String(entry.content || entry.description || '')}
+    />
+    <div style={{ marginTop: '26px', paddingTop: '14px', borderTop: '1px solid #eee' }}>
+      {showLifecycleNotices ? <EntryLifecycleNotices entry={entry} /> : null}
       <div className="media wt-category-x">
         <div className="media-left media-top">
           {createUsername ? (

@@ -235,4 +235,23 @@ describe('EntryQuickActions reactions', () => {
     })));
     expect(addToast).toHaveBeenCalledWith('success', expect.stringMatching(/submitted for screening/i));
   });
+
+  it('exposes inline editing through the More menu contract instead of the action row', async () => {
+    const QuickEditMenu = ({ onQuickEdit }: { onQuickEdit?: () => void }) => (
+      <button type="button" onClick={onQuickEdit}>Open quick edit</button>
+    );
+
+    render(
+      <EntryQuickActions
+        entry={makeEntry({ createUserId: 'user-1' })}
+        objectName="topic"
+        moreActions={<QuickEditMenu />}
+      />,
+    );
+    await waitFor(() => expect(mockedApiService.getEntryReactions).toHaveBeenCalled());
+
+    expect(screen.queryByRole('button', { name: /^Quick Edit$/i })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /open quick edit/i }));
+    expect(screen.getByRole('button', { name: /^Save$/i })).toBeInTheDocument();
+  });
 });
