@@ -61,7 +61,7 @@ describe('buildLegacyEntryBreadcrumb', () => {
       ancestorTopics: [
         entry({ _id: 'health', title: 'Health', friendlyUrl: 'health' }),
         entry({ _id: 'msg', title: 'Monosodium glutamate (MSG)', friendlyUrl: 'msg' }),
-        entry({ _id: 'test', title: 'test', friendlyUrl: 'test' }),
+        entry({ _id: 'test', title: 'test', friendlyUrl: undefined }),
       ],
     });
 
@@ -72,5 +72,6 @@ describe('buildLegacyEntryBreadcrumb', () => {
       'test',
       'msg topic',
     ]);
+    expect(breadcrumbs[3]?.url).toBe('/topics/entry/test/test');
   });
 });

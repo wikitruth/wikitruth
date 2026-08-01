@@ -17,7 +17,7 @@ type EntryLinkRef = Pick<LegacyEntity, '_id' | 'friendlyUrl' | 'title'>;
 
 function toTopicEntryPath(topic?: EntryLinkRef | null): string {
   const id = encodeURIComponent(String(topic?._id || ''));
-  const friendly = encodeURIComponent(String(topic?.friendlyUrl || topic?._id || ''));
+  const friendly = encodeURIComponent(String(topic?.friendlyUrl || topic?.title || topic?._id || ''));
   return `/topics/entry/${friendly}/${id}`;
 }
 
@@ -26,7 +26,7 @@ function toEntryPath(basePath: string, item?: EntryLinkRef | null): string {
   if (basePath === '/answers/entry') {
     return `${basePath}/${id}`;
   }
-  const friendly = encodeURIComponent(String(item?.friendlyUrl || item?._id || ''));
+  const friendly = encodeURIComponent(String(item?.friendlyUrl || item?.title || item?._id || ''));
   return `${basePath}/${friendly}/${id}`;
 }
 
