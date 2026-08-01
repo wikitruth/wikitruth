@@ -866,12 +866,25 @@ class ApiService {
     });
   }
 
-  async getOutlineTree(rootId?: string, depth: number = 2): Promise<OutlineTreeResponse> {
+  async getOutlineTree(
+    rootId?: string,
+    depth: number = 2,
+    options?: { ancestorDepth?: number; childLimit?: number; rootLimit?: number },
+  ): Promise<OutlineTreeResponse> {
     const params = new URLSearchParams();
     if (rootId) {
       params.set('rootId', rootId);
     }
     params.set('depth', String(depth));
+    if (typeof options?.ancestorDepth === 'number') {
+      params.set('ancestorDepth', String(options.ancestorDepth));
+    }
+    if (typeof options?.childLimit === 'number') {
+      params.set('childLimit', String(options.childLimit));
+    }
+    if (typeof options?.rootLimit === 'number') {
+      params.set('rootLimit', String(options.rootLimit));
+    }
     return this.request(`/outline/tree?${params.toString()}`);
   }
 

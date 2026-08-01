@@ -151,6 +151,7 @@ export interface OutlineTreeNode {
 export interface OutlineTreeResponse extends ApiBaseResponse {
   tree?: OutlineTreeNode;
   trees?: OutlineTreeNode[];
+  ancestors?: OutlineTreeNode[];
   truncated?: boolean;
 }
 

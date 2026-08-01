@@ -49,7 +49,12 @@ function topicNode(topic: Record<string, unknown>): OutlineTreeNode {
   };
 }
 
-async function buildTopicForest(roots: Record<string, unknown>[], depth: number, budget: TreeBudget): Promise<OutlineTreeNode[]> {
+async function buildTopicForest(
+  roots: Record<string, unknown>[],
+  depth: number,
+  budget: TreeBudget,
+  childLimit = 30,
+): Promise<OutlineTreeNode[]> {
   const selectedRoots = roots.slice(0, Math.max(0, budget.remaining));
   if (selectedRoots.length < roots.length) budget.truncated = true;
   budget.remaining -= selectedRoots.length;
@@ -61,7 +66,7 @@ async function buildTopicForest(roots: Record<string, unknown>[], depth: number,
       parentId: { $in: Array.from(parentById.keys()) },
       private: false,
       'screening.status': constants.SCREENING_STATUS.status1.code,
-    }).sort({ editDate: -1 }).limit(Math.min(MAX_TREE_NODES, budget.remaining + parents.length * 30)).lean();
+    }).sort({ editDate: -1 }).limit(Math.min(MAX_TREE_NODES, budget.remaining + parents.length * childLimit)).lean();
     const next: OutlineTreeNode[] = [];
     const perParent = new Map<string, number>();
     for (const child of children) {
@@ -69,7 +74,7 @@ async function buildTopicForest(roots: Record<string, unknown>[], depth: number,
       const parentId = String(child.parentId || '');
       const parent = parentById.get(parentId);
       const count = perParent.get(parentId) || 0;
-      if (!parent || count >= 30) { if (count >= 30) budget.truncated = true; continue; }
+      if (!parent || count >= childLimit) { if (count >= childLimit) budget.truncated = true; continue; }
       const node = topicNode(child);
       parent.children.push(node);
       next.push(node);
@@ -80,6 +85,27 @@ async function buildTopicForest(roots: Record<string, unknown>[], depth: number,
   }
   if (budget.remaining <= 0) budget.truncated = true;
   return trees;
+}
+
+function isPublicTopic(topic: Record<string, unknown> | null | undefined): topic is Record<string, unknown> {
+  if (!topic || topic.private === true) return false;
+  const screening = topic.screening as { status?: unknown } | undefined;
+  return typeof screening?.status === 'undefined'
+    || Number(screening.status) === constants.SCREENING_STATUS.status1.code;
+}
+
+async function loadTopicAncestors(root: Record<string, unknown>, ancestorDepth: number): Promise<OutlineTreeNode[]> {
+  const ancestors: OutlineTreeNode[] = [];
+  let parentId = String(root.parentId || '').trim();
+
+  while (parentId && ancestors.length < ancestorDepth) {
+    const parent = await db.Topic.findById(parentId).lean();
+    if (!isPublicTopic(parent)) break;
+    ancestors.unshift(topicNode(parent));
+    parentId = String(parent.parentId || '').trim();
+  }
+
+  return ancestors;
 }
 
 async function resolveEntry(id: string, kinds: EntryKind[]): Promise<ResolvedEntry | null> {
@@ -161,18 +187,30 @@ export = function (router: Router) {
   router.get('/tree', async function (req: WikitruthRequest, res: WikitruthResponse) {
     const rootId = String(req.query.rootId || '').trim();
     const depth = sanitizeLimit(req.query.depth, 2, 4);
+    const requestedAncestorDepth = Number(req.query.ancestorDepth);
+    const ancestorDepth = Number.isFinite(requestedAncestorDepth) && requestedAncestorDepth >= 0
+      ? Math.min(Math.floor(requestedAncestorDepth), 2)
+      : 0;
+    const childLimit = sanitizeLimit(req.query.childLimit, 30, 30);
+    const rootLimit = sanitizeLimit(req.query.rootLimit, 20, 20);
     const budget: TreeBudget = { remaining: MAX_TREE_NODES, truncated: false };
     if (rootId) {
       const root = await db.Topic.findById(rootId).lean();
-      if (!root) { res.status(404).json({ success: false, message: 'Root topic not found' }); return; }
-      const [tree] = await buildTopicForest([root], depth, budget);
-      res.json({ success: true, tree, truncated: budget.truncated });
+      if (!isPublicTopic(root)) { res.status(404).json({ success: false, message: 'Root topic not found' }); return; }
+      const [tree] = await buildTopicForest([root], depth, budget, childLimit);
+      const ancestors = await loadTopicAncestors(root, ancestorDepth);
+      res.json({ success: true, tree, ancestors, truncated: budget.truncated });
       return;
     }
     const roots = await db.Topic.find({
       parentId: null, private: false, 'screening.status': constants.SCREENING_STATUS.status1.code,
-    }).sort({ editDate: -1 }).limit(20).lean();
-    res.json({ success: true, trees: await buildTopicForest(roots, depth, budget), truncated: budget.truncated });
+    }).sort({ editDate: -1 }).limit(rootLimit).lean();
+    res.json({
+      success: true,
+      trees: await buildTopicForest(roots, depth, budget, childLimit),
+      ancestors: [],
+      truncated: budget.truncated,
+    });
   });
 
   router.get('/search', async function (req: WikitruthRequest, res: WikitruthResponse) {
