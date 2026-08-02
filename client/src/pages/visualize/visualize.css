@@ -414,12 +414,32 @@
   }
 
   .wt-viz-scope {
-    align-items: stretch;
-    flex-direction: column;
+    display: grid;
+    grid-template-areas:
+      "summary root"
+      "up up";
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+  }
+
+  .wt-viz-scope-summary {
+    grid-area: summary;
   }
 
   .wt-viz-scope-actions {
-    justify-content: flex-end;
+    display: contents;
+  }
+
+  .wt-viz-root-link {
+    grid-area: root;
+    justify-self: end;
+  }
+
+  .wt-viz-up-link {
+    grid-area: up;
+    justify-self: start;
+    max-width: 100%;
+    margin-top: 2px;
   }
 
   .wt-viz-canvas {
@@ -440,22 +460,25 @@
 
 @media (max-width: 430px) {
   .wt-viz-scope-summary {
-    align-items: flex-start;
-    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 7px;
   }
 
   .wt-viz-scope-copy {
-    padding: 0 3px 2px;
+    min-width: 0;
+    padding: 0;
+    line-height: 1.25;
   }
 
-  .wt-viz-scope-actions {
-    justify-content: flex-start;
-    width: 100%;
+  .wt-viz-root-link {
+    justify-content: center;
+    width: 36px;
+    padding-right: 0;
+    padding-left: 0;
   }
 
-  .wt-viz-up-link {
-    flex: 1 1 auto;
-    max-width: calc(100% - 96px);
+  .wt-viz-root-label {
+    display: none;
   }
 
   .wt-viz-controls {

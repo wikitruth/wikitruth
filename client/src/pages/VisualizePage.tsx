@@ -206,7 +206,10 @@ const VisualizePage: React.FC = () => {
               <i className="fa fa-arrow-up" aria-hidden="true"></i> {directParent.title}
             </Link>
           ) : null}
-          <Link to="/visualize" className="wt-viz-root-link"><i className="fa fa-home" aria-hidden="true"></i> Root view</Link>
+          <Link to="/visualize" className="wt-viz-root-link" aria-label="Root view">
+            <i className="fa fa-home" aria-hidden="true"></i>
+            <span className="wt-viz-root-label">Root view</span>
+          </Link>
         </div> : null}
       </div>
 
