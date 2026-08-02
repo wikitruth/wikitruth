@@ -2,6 +2,7 @@ import React from 'react';
 import type { Artifact } from '../../types';
 import type { LegacyEntity } from '../../types/legacy';
 import EntryRowDetails from './EntryRowDetails';
+import EntryRowShell from './EntryRowShell';
 
 interface ArtifactEntryRowProps {
   artifact: Artifact;
@@ -25,13 +26,12 @@ const ArtifactEntryRow: React.FC<ArtifactEntryRowProps> = ({
   const entryPath = `/artifacts/entry/${friendly || id}/${id}`;
 
   return (
-    <li
-      className="list-group-item"
-      data-id={artifact._id}
-      data-type="artifact"
-      data-private={artifact.private}
+    <EntryRowShell
+      entryId={artifact._id}
+      entryType="artifact"
+      iconClassName="fa fa-puzzle-piece text-primary"
+      isPrivate={artifact.private}
     >
-      <i className="fa fa-puzzle-piece text-primary" aria-hidden="true"></i>
       <EntryRowDetails
         entry={artifact as unknown as LegacyEntity}
         kind="artifact"
@@ -42,7 +42,7 @@ const ArtifactEntryRow: React.FC<ArtifactEntryRowProps> = ({
         showMore={showMore}
         hideAcceptedStatus={hideAcceptedStatus}
       />
-    </li>
+    </EntryRowShell>
   );
 };
 

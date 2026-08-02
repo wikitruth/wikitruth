@@ -2,11 +2,11 @@ import React from 'react';
 import { Topic } from '../../types';
 import type { LegacyEntity } from '../../types/legacy';
 import EntryRowDetails from './EntryRowDetails';
+import EntryRowShell from './EntryRowShell';
 
 interface TopicEntryRowProps {
   topic: Topic;
   subtitle?: boolean;
-  standalone?: boolean;
   labels?: boolean;
   contentPreview?: string;
   showMore?: boolean;
@@ -26,13 +26,12 @@ const TopicEntryRow: React.FC<TopicEntryRowProps> = ({
   };
 
   return (
-    <li
-      className="list-group-item"
-      data-id={topic._id}
-      data-type="topic"
-      data-private={topic.private}
+    <EntryRowShell
+      entryId={topic._id}
+      entryType="topic"
+      iconClassName="fa fa-folder-open text-color-3"
+      isPrivate={topic.private}
     >
-      <i className="fa fa-folder-open text-color-3" aria-hidden="true"></i>
       <EntryRowDetails
         entry={topic as unknown as LegacyEntity}
         kind="topic"
@@ -43,7 +42,7 @@ const TopicEntryRow: React.FC<TopicEntryRowProps> = ({
         showMore={showMore}
         hideAcceptedStatus={hideAcceptedStatus}
       />
-    </li>
+    </EntryRowShell>
   );
 };
 

@@ -2,6 +2,7 @@ import React from 'react';
 import { Argument } from '../../types';
 import type { LegacyEntity } from '../../types/legacy';
 import EntryRowDetails from './EntryRowDetails';
+import EntryRowShell from './EntryRowShell';
 
 interface ArgumentEntryRowProps {
   argument: Argument;
@@ -35,13 +36,12 @@ const ArgumentEntryRow: React.FC<ArgumentEntryRowProps> = ({
   };
 
   return (
-    <li
-      className="list-group-item"
-      data-id={argument._id}
-      data-type="argument"
-      data-private={argument.private}
+    <EntryRowShell
+      entryId={argument._id}
+      entryType="argument"
+      iconClassName={`glyphicon glyphicon-flash ${getVerdictClass()}`}
+      isPrivate={argument.private}
     >
-      <span className={`glyphicon glyphicon-flash ${getVerdictClass()}`} aria-hidden="true"></span>
       <EntryRowDetails
         entry={argument as unknown as LegacyEntity}
         kind="argument"
@@ -59,7 +59,7 @@ const ArgumentEntryRow: React.FC<ArgumentEntryRowProps> = ({
           ) : null
         }
       />
-    </li>
+    </EntryRowShell>
   );
 };
 

@@ -2,6 +2,7 @@ import React from 'react';
 import { Opinion } from '../../types';
 import type { LegacyEntity } from '../../types/legacy';
 import EntryRowDetails from './EntryRowDetails';
+import EntryRowShell from './EntryRowShell';
 import OpinionClassificationLabel from '../Entry/OpinionClassificationLabel';
 
 interface OpinionEntryRowProps {
@@ -22,13 +23,12 @@ const OpinionEntryRow: React.FC<OpinionEntryRowProps> = ({
   };
 
   return (
-    <li
-      className="list-group-item"
-      data-id={opinion._id}
-      data-type="opinion"
-      data-private={opinion.private}
+    <EntryRowShell
+      entryId={opinion._id}
+      entryType="opinion"
+      iconClassName="fa fa-comment text-info"
+      isPrivate={opinion.private}
     >
-      <i className="fa fa-comment text-info" aria-hidden="true"></i>
       <EntryRowDetails
         entry={opinion as unknown as LegacyEntity}
         kind="opinion"
@@ -38,16 +38,16 @@ const OpinionEntryRow: React.FC<OpinionEntryRowProps> = ({
         hideAcceptedStatus={hideAcceptedStatus}
         extraLabels={
           <>
-          <OpinionClassificationLabel value={opinion.extras?.classification} />{' '}
-          {opinion.discussionContext?.status === 'potentially_obsolete' ? (
-            <span className="label label-warning">older revision</span>
-          ) : opinion.discussionContext?.status === 'obsolete' ? (
-            <span className="label label-default">obsolete</span>
-          ) : null}
+            <OpinionClassificationLabel value={opinion.extras?.classification} />{' '}
+            {opinion.discussionContext?.status === 'potentially_obsolete' ? (
+              <span className="label label-warning">older revision</span>
+            ) : opinion.discussionContext?.status === 'obsolete' ? (
+              <span className="label label-default">obsolete</span>
+            ) : null}
           </>
         }
       />
-    </li>
+    </EntryRowShell>
   );
 };
 

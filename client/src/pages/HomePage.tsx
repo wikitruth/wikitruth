@@ -102,7 +102,6 @@ const HomePage: React.FC = () => {
             key={`entry-topic-${entry._id}`}
             topic={entry as unknown as Topic}
             subtitle={true}
-            standalone={true}
             contentPreview={String(entry.contentPreview || '')}
             showMore={Boolean(entry.showMore)}
           />

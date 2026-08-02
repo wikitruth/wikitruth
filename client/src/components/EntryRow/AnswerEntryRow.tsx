@@ -2,6 +2,7 @@ import React from 'react';
 import { Answer } from '../../types';
 import type { LegacyEntity } from '../../types/legacy';
 import EntryRowDetails from './EntryRowDetails';
+import EntryRowShell from './EntryRowShell';
 
 interface AnswerEntryRowProps {
   answer: Answer;
@@ -21,13 +22,12 @@ const AnswerEntryRow: React.FC<AnswerEntryRowProps> = ({
   };
 
   return (
-    <li
-      className="list-group-item"
-      data-id={answer._id}
-      data-type="answer"
-      data-private={answer.private}
+    <EntryRowShell
+      entryId={answer._id}
+      entryType="answer"
+      iconClassName="fa fa-check-circle-o text-color-3"
+      isPrivate={answer.private}
     >
-      <i className="fa fa-check-circle-o text-color-3" aria-hidden="true"></i>
       <EntryRowDetails
         entry={answer as unknown as LegacyEntity}
         kind="answer"
@@ -36,7 +36,7 @@ const AnswerEntryRow: React.FC<AnswerEntryRowProps> = ({
         subtitle={subtitle}
         hideAcceptedStatus={hideAcceptedStatus}
       />
-    </li>
+    </EntryRowShell>
   );
 };
 

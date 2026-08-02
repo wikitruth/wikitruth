@@ -9,6 +9,10 @@
   --wt-text-muted: #777777;
   --wt-border: #dddddd;
   --wt-navbar: #ffffff;
+  --wt-entry-row-padding-block: 12px;
+  --wt-entry-row-padding-inline: 14px;
+  --wt-entry-row-icon-column: 22px;
+  --wt-entry-row-column-gap: 10px;
 }
 
 [data-theme='dark'] {

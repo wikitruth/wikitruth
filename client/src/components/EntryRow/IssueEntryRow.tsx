@@ -2,6 +2,7 @@ import React from 'react';
 import { Issue } from '../../types';
 import type { LegacyEntity } from '../../types/legacy';
 import EntryRowDetails from './EntryRowDetails';
+import EntryRowShell from './EntryRowShell';
 
 interface IssueEntryRowProps {
   issue: Issue;
@@ -21,13 +22,12 @@ const IssueEntryRow: React.FC<IssueEntryRowProps> = ({
   };
 
   return (
-    <li
-      className="list-group-item"
-      data-id={issue._id}
-      data-type="issue"
-      data-private={issue.private}
+    <EntryRowShell
+      entryId={issue._id}
+      entryType="issue"
+      iconClassName="fa fa-exclamation-triangle text-warning"
+      isPrivate={issue.private}
     >
-      <i className="fa fa-exclamation-triangle text-warning" aria-hidden="true"></i>
       <EntryRowDetails
         entry={issue as unknown as LegacyEntity}
         kind="issue"
@@ -36,7 +36,7 @@ const IssueEntryRow: React.FC<IssueEntryRowProps> = ({
         subtitle={subtitle}
         hideAcceptedStatus={hideAcceptedStatus}
       />
-    </li>
+    </EntryRowShell>
   );
 };
 
