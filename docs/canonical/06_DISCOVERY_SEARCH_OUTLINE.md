@@ -20,6 +20,9 @@ Define how users discover and navigate knowledge graph content.
 - Private entry visibility in search depends on current user ownership.
 - Graph-aware filters may constrain relationship, verdict, evidence health,
   freshness, and tenant context while preserving moderation and privacy rules.
+- Unless a page-level state override is active, discovery lists, search results,
+  graph contents, related entries, child expansion, navigation badges, and child
+  counts use the reader's application-wide visibility preference.
 
 ## Outline Behavior
 

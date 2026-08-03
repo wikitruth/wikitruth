@@ -13,7 +13,7 @@ Capture the canonical lifecycle of submitted content and moderation flow.
 - `Archived` (3)
 - New API content creation defaults to pending screening for moderated entities.
 - Screening updates are performed through moderation APIs and are role-gated (screener/admin).
-- Reader-facing filters label states as `Accepted`, `Pending`, `Archived`, and `All states` while retaining legacy API values (`wiki`, `original`, `archived`, `all`).
+- Reader-facing page filters label states as `Accepted`, `Pending`, `Archived`, and `All states` while retaining legacy API values (`wiki`, `original`, `archived`, `all`). The application-wide `Accepted + pending` preference uses `view=active`.
 - Archived entries remain available for historical context and are not presented as current accepted content.
 - A valid reference date identifies time-sensitive information and prompts readers to check newer evidence; it does not trigger automatic expiry.
 
