@@ -26,4 +26,15 @@ describe('Explore theme styles', () => {
       /\[data-theme='dark'\] \.wt-explore-page \.btn-default\.active[\s\S]*?background-color:\s*#465463/s
     );
   });
+
+  it('keeps editorial entry rows flat instead of turning them into dark-mode cards', () => {
+    const css = fs.readFileSync(path.resolve(__dirname, 'global.css'), 'utf8');
+
+    expect(css).toMatch(
+      /\.list-group-item\.wt-entry-row,[\s\S]*?background-color:\s*transparent/s
+    );
+    expect(css).not.toMatch(
+      /\.wt-explore-results \.list-group\.wt-list \.wt-entry-row\s*{[^}]*background-color:/s
+    );
+  });
 });
