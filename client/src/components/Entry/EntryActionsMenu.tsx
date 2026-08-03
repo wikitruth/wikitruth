@@ -15,9 +15,17 @@ interface EntryActionsMenuProps {
   entry: LegacyEntity;
   editPath?: string;
   onQuickEdit?: () => void;
+  compact?: boolean;
+  showReplyAction?: boolean;
 }
 
-const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath, onQuickEdit }) => {
+const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({
+  entry,
+  editPath,
+  onQuickEdit,
+  compact = false,
+  showReplyAction = true,
+}) => {
   const { user, activeRole } = useAuth();
   const { requestSignIn } = useAuthPrompt();
   const navigate = useNavigate();
@@ -36,7 +44,7 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath, on
 
   useEffect(() => {
     const loadFollowState = async () => {
-      if (!user?._id || !objectName || !entry._id) {
+      if (!isOpen || !user?._id || !objectName || !entry._id) {
         setFollowed(false);
         return;
       }
@@ -57,7 +65,7 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath, on
     };
 
     void loadFollowState();
-  }, [entry._id, entry.objectType, objectName, user?._id]);
+  }, [entry._id, entry.objectType, isOpen, objectName, user?._id]);
 
   useEffect(() => {
     if (!statusMessage) {
@@ -336,6 +344,7 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath, on
         href="#"
         className="text-muted no-underline dropdown-toggle"
         title="See more options"
+        aria-label={compact ? 'More options' : undefined}
         aria-haspopup="true"
         aria-expanded={isOpen}
         onClick={(event) => {
@@ -343,7 +352,8 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath, on
           setIsOpen((value) => !value);
         }}
       >
-        <i className="glyphicon glyphicon-option-horizontal" aria-hidden="true"></i><span> more</span>
+        <i className="glyphicon glyphicon-option-horizontal" aria-hidden="true"></i>
+        {compact ? null : <span> more</span>}
       </a>
       {isOpen && (
         <ul
@@ -393,7 +403,7 @@ const EntryActionsMenu: React.FC<EntryActionsMenuProps> = ({ entry, editPath, on
                 <i className="fa fa-share" aria-hidden="true"></i> Share
               </button>
             </li>
-            {canReply && (
+            {showReplyAction && canReply && (
               <li>
                 <button type="button" className="btn btn-link" onClick={handleReply}>
                   <i className="fa fa-reply" aria-hidden="true"></i> Reply

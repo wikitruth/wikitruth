@@ -1,7 +1,21 @@
 import React from 'react';
-import { render, screen } from '../../test-utils/render';
+import { fireEvent, render, screen } from '../../test-utils/render';
 import type { LegacyEntity } from '../../types/legacy';
 import EntryRowDetails from './EntryRowDetails';
+
+jest.mock('../../context/AuthContext', () => ({
+  useAuth: () => ({
+    user: null,
+    isAuthenticated: false,
+    isLoading: false,
+    activeRole: 'reader',
+    availableRoles: ['reader'],
+  }),
+}));
+
+jest.mock('../../context/AuthPromptContext', () => ({
+  useAuthPrompt: () => ({ requestSignIn: jest.fn() }),
+}));
 
 function entry(overrides: Partial<LegacyEntity> = {}): LegacyEntity {
   return {
@@ -66,17 +80,14 @@ describe('EntryRowDetails', () => {
     expect(screen.getByText('A useful preview of the entry.')).toBeInTheDocument();
     expect(screen.getByTitle("View root's profile")).toHaveAttribute('href', '/members/root');
     expect(screen.getByText('yesterday')).toHaveAttribute('title', expect.stringContaining('2026'));
-    expect(screen.getByText('reply').closest('a')).toHaveAttribute(
-      'href',
-      '/opinions/create?parentId=question-1&parentType=question'
-    );
+    expect(screen.getByRole('link', { name: /^reply$/i })).toBeInTheDocument();
     expect(screen.getByText('3').closest('a')).toHaveAttribute(
       'href',
       '/questions/entry/sample-question/question-1/discussion'
     );
   });
 
-  it('renders artifact media without offering an opinion reply', () => {
+  it('renders artifact media and contextual reply actions', () => {
     const item = entry({
       _id: 'artifact-1',
       friendlyUrl: 'evidence',
@@ -98,13 +109,14 @@ describe('EntryRowDetails', () => {
       '/media/thumb.jpg'
     );
     expect(screen.getByTitle('Open original file')).toHaveAttribute('href', '/media/original.jpg');
-    expect(screen.queryByText('reply')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /^reply$/i })).toBeInTheDocument();
   });
 
-  it('uses persisted opinion and positive-reaction totals when legacy counters are absent', () => {
+  it('uses only explicit persisted discussion and positive-reaction totals', () => {
     render(
       <EntryRowDetails
         entry={entry({
+          comments: 4,
           childrenCount: { opinions: { total: 4 } },
           discoveryRanking: { positive: 3, negative: 1, total: 4 },
         })}
@@ -146,5 +158,44 @@ describe('EntryRowDetails', () => {
     );
 
     expect(screen.queryByLabelText('Accepted after screening')).not.toBeInTheDocument();
+  });
+
+  it('expands and collapses the full persisted content without injecting markup', () => {
+    render(
+      <EntryRowDetails
+        entry={entry({
+          contentPreview: 'Short preview',
+          content: 'Full content with <script>unsafe()</script> shown as text.',
+          showMore: true,
+        })}
+        kind="question"
+        entryPath="/questions/entry/sample-question/question-1"
+      />
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Show more' }));
+    expect(screen.getByText(/Full content with/)).toHaveTextContent('<script>unsafe()</script>');
+    expect(document.querySelector('script')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Show less' }));
+    expect(screen.getByText('Short preview')).toBeInTheDocument();
+  });
+
+  it('shows accepted child totals by entity type', () => {
+    render(
+      <EntryRowDetails
+        entry={entry({
+          childrenCount: {
+            topics: { accepted: 2, pending: 3, total: 5 },
+            arguments: { accepted: 1, pending: 4, total: 5 },
+          },
+        })}
+        kind="question"
+        entryPath="/questions/entry/sample-question/question-1"
+      />
+    );
+
+    expect(screen.getByTitle('Show 2 accepted topics')).toHaveTextContent('2');
+    expect(screen.getByTitle('Show 1 accepted facts')).toHaveTextContent('1');
+    expect(screen.queryByText('3')).not.toBeInTheDocument();
   });
 });

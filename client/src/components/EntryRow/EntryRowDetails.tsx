@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { LegacyEntity } from '../../types/legacy';
 import { formatRelativeTime } from '../../utils/dateFormat';
 import { getScreeningStatusPresentation } from '../../utils/screeningStatus';
+import EntryActionsMenu from '../Entry/EntryActionsMenu';
+import EntryReplyMenu from '../Entry/EntryReplyMenu';
+import EntryChildrenPanel from './EntryChildrenPanel';
+import { getEntryRowPath } from './entryRowPaths';
 
 export type EntryRowKind =
   'topic' | 'argument' | 'question' | 'answer' | 'artifact' | 'issue' | 'opinion';
@@ -29,22 +33,13 @@ const PARENT_FIELDS: Array<{ field: keyof LegacyEntity; kind: EntryRowKind }> = 
   { field: 'parentOpinion', kind: 'opinion' },
 ];
 
-function entryPath(entry: LegacyEntity, kind: EntryRowKind): string {
-  const id = encodeURIComponent(String(entry._id || ''));
-  const friendly = encodeURIComponent(String(entry.friendlyUrl || entry.title || entry._id || ''));
-  if (kind === 'answer') {
-    return `/answers/entry/${id}`;
-  }
-  return `/${kind === 'issue' ? 'issues' : `${kind}s`}/entry/${friendly}/${id}`;
-}
-
 function resolveParent(
   entry: LegacyEntity
 ): { entry: LegacyEntity; kind: EntryRowKind; path: string } | null {
   for (const candidate of PARENT_FIELDS) {
     const parent = entry[candidate.field] as LegacyEntity | undefined;
     if (parent?._id && parent.title) {
-      return { entry: parent, kind: candidate.kind, path: entryPath(parent, candidate.kind) };
+      return { entry: parent, kind: candidate.kind, path: getEntryRowPath(parent, candidate.kind) };
     }
   }
   return null;
@@ -65,10 +60,15 @@ const EntryRowDetails: React.FC<EntryRowDetailsProps> = ({
   hideAcceptedStatus = false,
   extraLabels,
 }) => {
+  const [contentExpanded, setContentExpanded] = useState(false);
+  const [childrenExpanded, setChildrenExpanded] = useState(false);
   const status = getScreeningStatusPresentation(entry.screening?.status);
   const acceptedStatus = status?.label === 'accepted';
   const parent = resolveParent(entry);
   const preview = String(contentPreview || entry.contentPreview || entry.description || '').trim();
+  const fullContent = String(entry.content || entry.description || preview).trim();
+  const canExpandContent = Boolean((showMore || entry.showMore) && fullContent && fullContent !== preview);
+  const renderedContent = contentExpanded && canExpandContent ? fullContent : preview;
   const editor = String(
     entry.editUsername || entry.editorUsername || entry.createUsername || ''
   ).trim();
@@ -79,11 +79,27 @@ const EntryRowDetails: React.FC<EntryRowDetailsProps> = ({
     rawDate && !Number.isNaN(new Date(rawDate).getTime())
       ? new Date(rawDate).toString()
       : undefined;
-  const comments = Number(entry.comments ?? entry.childrenCount?.opinions?.total ?? 0);
+  const comments = Number(entry.comments ?? 0);
   const positiveReactions = Number(entry.points ?? entry.discoveryRanking?.positive ?? 0);
   const discussPath = discussionPath(kind, path);
   const thumbnailPath = String(entry.thumbnailPath || '').trim();
   const filePath = String(entry.filePath || thumbnailPath).trim();
+  const childCounts = useMemo(() => {
+    const labels: Record<string, { label: string; icon: string }> = {
+      topics: { label: 'topics', icon: 'fa fa-folder-open' },
+      arguments: { label: 'facts', icon: 'glyphicon glyphicon-flash' },
+      questions: { label: 'questions', icon: 'fa fa-question-circle' },
+      answers: { label: 'answers', icon: 'fa fa-check-circle-o' },
+      artifacts: { label: 'artifacts', icon: 'fa fa-puzzle-piece' },
+      issues: { label: 'issues', icon: 'fa fa-exclamation-circle' },
+      opinions: { label: 'comments', icon: 'fa fa-comments-o' },
+    };
+    return Object.entries(labels).flatMap(([key, presentation]) => {
+      const count = Number(entry.childrenCount?.[key as keyof NonNullable<LegacyEntity['childrenCount']>]?.accepted || 0);
+      return count > 0 ? [{ key, count, ...presentation }] : [];
+    });
+  }, [entry.childrenCount]);
+  const hasChildren = childCounts.length > 0;
 
   return (
     <div className="wt-entry-row-main">
@@ -112,14 +128,18 @@ const EntryRowDetails: React.FC<EntryRowDetailsProps> = ({
         ) : null}
         {extraLabels}
       </div>
-      {preview ? (
+      {renderedContent ? (
         <div className="wt-entry-row-content">
-          {preview}
-          {showMore || entry.showMore ? (
-            <span className="text-muted" aria-label="Preview continues">
-              {' '}
-              ...
-            </span>
+          {renderedContent}
+          {canExpandContent ? (
+            <button
+              type="button"
+              className="btn btn-link wt-entry-row-show-more"
+              onClick={() => setContentExpanded((value) => !value)}
+              aria-expanded={contentExpanded}
+            >
+              {contentExpanded ? 'Show less' : 'Show more'}
+            </button>
           ) : null}
         </div>
       ) : null}
@@ -130,7 +150,7 @@ const EntryRowDetails: React.FC<EntryRowDetailsProps> = ({
           </a>
         </div>
       ) : null}
-      {subtitle || editor || dateLabel || comments > 0 || positiveReactions > 0 ? (
+      {subtitle || editor || dateLabel || comments > 0 || positiveReactions > 0 || hasChildren ? (
         <div className="wt-entry-row-footer text-muted">
           {editor ? (
             <span>
@@ -153,13 +173,8 @@ const EntryRowDetails: React.FC<EntryRowDetailsProps> = ({
               <i className="fa fa-dot-circle-o" aria-hidden="true"></i> root
             </Link>
           ) : null}
-          {kind !== 'artifact' ? (
-            <Link
-              to={`/opinions/create?parentId=${encodeURIComponent(entry._id)}&parentType=${kind}`}
-            >
-              <i className="fa fa-reply" aria-hidden="true"></i> reply
-            </Link>
-          ) : null}
+          <EntryReplyMenu entry={entry} objectName={kind} />
+          <EntryActionsMenu entry={{ ...entry, objectName: kind }} compact showReplyAction={false} />
           {discussPath && comments > 0 ? (
             <Link to={discussPath}>
               <i className="fa fa-comment-o" aria-hidden="true"></i> {comments}
@@ -174,8 +189,21 @@ const EntryRowDetails: React.FC<EntryRowDetailsProps> = ({
               <i className="fa fa-thumbs-o-up" aria-hidden="true"></i> {positiveReactions}
             </span>
           ) : null}
+          {childCounts.map((child) => (
+            <button
+              key={child.key}
+              type="button"
+              className="btn btn-link wt-entry-child-count"
+              onClick={() => setChildrenExpanded((value) => !value)}
+              aria-expanded={childrenExpanded}
+              title={`${childrenExpanded ? 'Hide' : 'Show'} ${child.count} accepted ${child.label}`}
+            >
+              <span className={child.icon} aria-hidden="true"></span> {child.count}
+            </button>
+          ))}
         </div>
       ) : null}
+      {hasChildren && childrenExpanded ? <EntryChildrenPanel entryId={entry._id} kind={kind} /> : null}
     </div>
   );
 };

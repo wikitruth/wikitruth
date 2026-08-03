@@ -133,6 +133,7 @@ export function appendEntryExtrasCore(
       hasChildren('arguments') ||
       hasChildren('questions') ||
       hasChildren('answers') ||
+      hasChildren('artifacts') ||
       hasChildren('issues') ||
       hasChildren('opinions')
     ) {

@@ -101,6 +101,22 @@ describe('apiService', () => {
     );
   });
 
+  it('loads expandable children without reusing a stale detail response', async () => {
+    const fetchMock = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ arguments: [{ _id: 'child-1', title: 'Child fact' }] }),
+    });
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+    const result = await apiService.getEntryChildren('argument', 'parent-1');
+
+    expect(result.arguments).toHaveLength(1);
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/arguments/entry/parent-1',
+      expect.objectContaining({ cache: 'no-store' }),
+    );
+  });
+
   it('calls dedicated topic-link mutation endpoints', async () => {
     await apiService.updateTopicLink('topic-link-1', { title: 'Renamed link' });
     await apiService.deleteTopicLink('topic-link-1');

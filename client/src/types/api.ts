@@ -213,6 +213,7 @@ export interface ArgumentEntryResponse extends ApiBaseResponse {
   parentTopic?: LegacyEntity;
   grandParentTopic?: LegacyEntity;
   topicLinks?: LegacyEntity[];
+  arguments?: LegacyEntity[];
   questions?: LegacyEntity[];
   issues?: LegacyEntity[];
   opinions?: LegacyEntity[];

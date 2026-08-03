@@ -47,4 +47,16 @@ describe('entry extras engagement counters', () => {
     expect(item.comments).toBe(7);
     expect(item.points).toBe(5);
   });
+
+  it('recognizes accepted artifacts as real child content', () => {
+    const item: EntryExtras = {
+      childrenCount: { artifacts: { accepted: 1 } },
+      editDate: new Date('2026-01-01T00:00:00.000Z'),
+      createDate: new Date('2026-01-01T00:00:00.000Z'),
+    };
+
+    appendEntryExtrasCore(item, undefined, undefined, undefined, dependencies());
+
+    expect(item.hasChildren).toBe(true);
+  });
 });

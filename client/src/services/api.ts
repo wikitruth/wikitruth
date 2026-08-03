@@ -34,6 +34,7 @@ import type {
   AnonymousContributionStatus,
   AnonymousEntryType,
   OutlineTreeResponse,
+  EntityBuckets,
 } from '../types/api';
 import fetchWithPasskeyStepUp from './api/passkeyFetch';
 
@@ -93,7 +94,7 @@ class ApiService {
     const method = options?.method?.toUpperCase() ?? 'GET';
     const cacheKey = `${method}:${url}`;
     const now = Date.now();
-    const shouldCacheGet = method === 'GET' && !url.startsWith('/reactions');
+    const shouldCacheGet = method === 'GET' && options?.cache !== 'no-store' && !url.startsWith('/reactions');
 
     if (shouldCacheGet) {
       const cached = this.cache.get(cacheKey);
@@ -635,6 +636,64 @@ class ApiService {
       method: 'PUT',
       body: buildArtifactFormData(payload),
     });
+  }
+
+  async getEntryChildren(objectName: string, id: string): Promise<EntityBuckets> {
+    const encodedId = encodeURIComponent(id);
+    switch (objectName) {
+      case 'topic': {
+        const response = await this.request<TopicEntryResponse>(`/topics/entry/${encodedId}`, { cache: 'no-store' });
+        return {
+          topics: response.topicChildren || response.topics || [],
+          arguments: response.arguments || [],
+          questions: response.questions || [],
+          artifacts: response.artifacts || [],
+          issues: response.issues || [],
+          opinions: response.opinions || [],
+        };
+      }
+      case 'argument': {
+        const response = await this.request<ArgumentEntryResponse>(`/arguments/entry/${encodedId}`, { cache: 'no-store' });
+        return {
+          arguments: response.arguments || [],
+          questions: response.questions || [],
+          issues: response.issues || [],
+          opinions: response.opinions || [],
+        };
+      }
+      case 'question': {
+        const response = await this.request<QuestionEntryResponse>(`/questions/entry/${encodedId}`, { cache: 'no-store' });
+        return {
+          answers: response.answers || [],
+          issues: response.issues || [],
+          opinions: response.opinions || [],
+        };
+      }
+      case 'answer': {
+        const response = await this.request<AnswerEntryResponse>(`/answers/entry/${encodedId}`, { cache: 'no-store' });
+        return { issues: response.issues || [], opinions: response.opinions || [] };
+      }
+      case 'artifact': {
+        const response = await this.request<ArtifactEntryResponse>(`/artifacts/entry/${encodedId}`, { cache: 'no-store' });
+        return {
+          artifacts: response.artifacts || [],
+          arguments: response.arguments || [],
+          questions: response.questions || [],
+          issues: response.issues || [],
+          opinions: response.opinions || [],
+        };
+      }
+      case 'issue': {
+        const response = await this.request<IssueEntryResponse>(`/issues/entry/${encodedId}`, { cache: 'no-store' });
+        return { opinions: response.opinions || [] };
+      }
+      case 'opinion': {
+        const response = await this.request<OpinionEntryResponse>(`/opinions/entry/${encodedId}`, { cache: 'no-store' });
+        return { issues: response.issues || [], opinions: response.opinions || [] };
+      }
+      default:
+        return {};
+    }
   }
 
   // Reactions

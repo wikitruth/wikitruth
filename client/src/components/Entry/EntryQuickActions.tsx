@@ -7,34 +7,18 @@ import type { EntryReactionCounts, EntryReactionState, ReactionChannel, Reaction
 import type { LegacyEntity } from '../../types/legacy';
 import ContextualContributionDrawer from './ContextualContributionDrawer';
 import { useAuthPrompt } from '../../context/AuthPromptContext';
-
-type SupportedObjectName = 'topic' | 'argument' | 'question' | 'answer' | 'issue' | 'opinion' | 'artifact';
+import EntryReplyMenu from './EntryReplyMenu';
+import {
+  getTopicIdForReply,
+  normalizeEntryObjectName,
+  type SupportedEntryObjectName,
+} from './entryReplyOptions';
 
 interface EntryQuickActionsProps {
   entry: LegacyEntity;
-  objectName?: SupportedObjectName;
+  objectName?: SupportedEntryObjectName;
   hasValue?: boolean;
   moreActions?: React.ReactElement<{ onQuickEdit?: () => void }>;
-}
-
-function getTopicIdForReply(entry: LegacyEntity, objectName: string): string {
-  if (objectName === 'topic') {
-    return String(entry._id || '');
-  }
-
-  if (entry.ownerId) {
-    return String(entry.ownerId);
-  }
-
-  if (entry.topicId) {
-    return String(entry.topicId);
-  }
-
-  if (entry.parentTopic?._id) {
-    return String(entry.parentTopic._id);
-  }
-
-  return '';
 }
 
 function getVisualizePath(entry: LegacyEntity, objectName: string): string | null {
@@ -56,22 +40,6 @@ function getVisualizePath(entry: LegacyEntity, objectName: string): string | nul
   }
 
   return '/visualize';
-}
-
-function normalizeObjectName(value: unknown): SupportedObjectName {
-  const raw = String(value || '').trim().toLowerCase();
-  if (
-    raw === 'topic' ||
-    raw === 'argument' ||
-    raw === 'question' ||
-    raw === 'answer' ||
-    raw === 'issue' ||
-    raw === 'opinion' ||
-    raw === 'artifact'
-  ) {
-    return raw;
-  }
-  return 'topic';
 }
 
 function createEmptyCounts(): EntryReactionCounts {
@@ -163,14 +131,13 @@ const EntryQuickActions: React.FC<EntryQuickActionsProps> = ({
   const { addToast } = useNotification();
   const { user } = useAuth();
   const { requestSignIn } = useAuthPrompt();
-  const objectName = normalizeObjectName(providedObjectName || entry.objectName);
+  const objectName = normalizeEntryObjectName(providedObjectName || entry.objectName);
   const entryId = String(entry._id || '');
   const topicIdForReply = getTopicIdForReply(entry, objectName);
   const visualizePath = getVisualizePath(entry, objectName);
   const [counts, setCounts] = useState<EntryReactionCounts>(() => createEmptyCounts());
   const [myReactions, setMyReactions] = useState<EntryReactionState>(() => createEmptyState());
   const [pendingKey, setPendingKey] = useState<string | null>(null);
-  const [showReplyMenu, setShowReplyMenu] = useState(false);
   const [showQuickEdit, setShowQuickEdit] = useState(false);
   const [showContributionDrawer, setShowContributionDrawer] = useState(false);
   const [editTitle, setEditTitle] = useState(String(entry.title || ''));
@@ -196,7 +163,6 @@ const EntryQuickActions: React.FC<EntryQuickActionsProps> = ({
 
   const toggleQuickEdit = () => {
     setShowQuickEdit((value) => !value);
-    setShowReplyMenu(false);
     setShowContributionDrawer(false);
   };
 
@@ -205,94 +171,6 @@ const EntryQuickActions: React.FC<EntryQuickActionsProps> = ({
       onQuickEdit: canQuickEdit ? toggleQuickEdit : undefined,
     })
     : null;
-
-  const replyMenuItems = useMemo(() => {
-    const items: Array<{
-      key: string;
-      label: string;
-      iconClass: string;
-      to: string;
-      dividerBefore?: boolean;
-    }> = [];
-
-    const encodeCurrentContext = (basePath: string) =>
-      `${basePath}?${encodeURIComponent(objectName)}=${encodeURIComponent(entryId)}`;
-    const createTopicId = encodeURIComponent(topicIdForReply || entryId);
-    const hasQuestionContext = Boolean(entry.parentQuestion?._id) || objectName === 'question';
-
-    if (objectName !== 'issue' && objectName !== 'opinion') {
-      if (!hasQuestionContext) {
-        if (objectName !== 'argument') {
-          items.push({
-            key: 'new-topic',
-            label: 'New Topic',
-            iconClass: 'glyphicon glyphicon-edit',
-            to: `/topics/create?topic=${createTopicId}`,
-          });
-        }
-        items.push(
-          {
-            key: 'new-fact',
-            label: 'New Fact',
-            iconClass: 'glyphicon glyphicon-flash',
-            to: encodeCurrentContext('/arguments/create'),
-          },
-          {
-            key: 'new-question',
-            label: 'New Question',
-            iconClass: 'fa fa-question-circle',
-            to: encodeCurrentContext('/questions/create'),
-          },
-          {
-            key: 'new-artifact',
-            label: 'New Artifact',
-            iconClass: 'fa fa-puzzle-piece',
-            to: encodeCurrentContext('/artifacts/create'),
-          },
-          {
-            key: 'new-issue',
-            label: 'New Issue',
-            iconClass: 'fa fa-exclamation-circle',
-            to: encodeCurrentContext('/issues/create'),
-            dividerBefore: true,
-          },
-        );
-      } else if (objectName !== 'answer') {
-        items.push(
-          {
-            key: 'new-answer',
-            label: 'New Answer',
-            iconClass: 'fa fa-question-circle',
-            to: encodeCurrentContext('/answers/create'),
-          },
-          {
-            key: 'new-issue',
-            label: 'New Issue',
-            iconClass: 'fa fa-exclamation-circle',
-            to: encodeCurrentContext('/issues/create'),
-            dividerBefore: true,
-          },
-        );
-      } else {
-        items.push({
-          key: 'new-issue',
-          label: 'New Issue',
-          iconClass: 'fa fa-exclamation-circle',
-          to: encodeCurrentContext('/issues/create'),
-        });
-      }
-    }
-
-    items.push({
-      key: 'new-comment',
-      label: 'New Comment',
-      iconClass: 'fa fa-comments-o',
-      to: encodeCurrentContext('/opinions/create'),
-      dividerBefore: items.length > 0 && !items[items.length - 1].dividerBefore,
-    });
-
-    return items;
-  }, [objectName, entryId, topicIdForReply, entry.parentQuestion?._id]);
 
   useEffect(() => {
     setEditTitle(String(entry.title || ''));
@@ -464,73 +342,15 @@ const EntryQuickActions: React.FC<EntryQuickActionsProps> = ({
   return (
     <>
       <div className="wt-entry-options-container clearfix" style={{ marginTop: '6px' }}>
-        <div className={`dropdown pull-left entry-options ${showReplyMenu ? 'open' : ''}`}>
-          <a
-            href="#"
-            className="text-muted no-underline dropdown-toggle"
-            aria-haspopup="true"
-            aria-expanded={showReplyMenu}
-            onClick={(event) => {
-              event.preventDefault();
-              setShowReplyMenu((value) => !value);
-              setShowQuickEdit(false);
-              setShowContributionDrawer(false);
-            }}
-            onBlur={() => {
-              window.setTimeout(() => setShowReplyMenu(false), 120);
-            }}
-          >
-            <i className="fa fa-reply" aria-hidden="true"></i> <span>Reply</span>
-          </a>
-          {showReplyMenu ? (
-            <ul className="dropdown-menu dropdown-menu-right-x">
-              <li className="dropdown-header">Reply With...</li>
-              <li>
-                <button
-                  type="button"
-                  className="btn btn-link"
-                  style={{ width: '100%', textAlign: 'left', color: '#333', padding: '3px 20px' }}
-                  onClick={() => {
-                    setShowReplyMenu(false);
-                    if (!user) {
-                      requestSignIn({
-                        intent: 'contribute',
-                        returnUrl: `/opinions/create?parentId=${encodeURIComponent(entryId)}&parentType=${encodeURIComponent(objectName)}`,
-                      });
-                      return;
-                    }
-                    setShowContributionDrawer(true);
-                  }}
-                >
-                  <i className="fa fa-bolt" aria-hidden="true"></i> Quick Contribution
-                </button>
-              </li>
-              <li role="separator" className="divider"></li>
-              {replyMenuItems.map((item) => (
-                <React.Fragment key={item.key}>
-                  {item.dividerBefore ? <li role="separator" className="divider"></li> : null}
-                  <li>
-                    <Link
-                      to={item.to}
-                      onClick={(event) => {
-                        setShowReplyMenu(false);
-                        if (!user) {
-                          event.preventDefault();
-                          requestSignIn({
-                            intent: item.key === 'new-comment' ? 'reply' : 'contribute',
-                            returnUrl: item.to,
-                          });
-                        }
-                      }}
-                    >
-                      <span className={item.iconClass} aria-hidden="true"></span> {item.label}
-                    </Link>
-                  </li>
-                </React.Fragment>
-              ))}
-            </ul>
-          ) : null}
-        </div>
+        <EntryReplyMenu
+          entry={entry}
+          objectName={objectName}
+          onOpen={() => {
+            setShowQuickEdit(false);
+            setShowContributionDrawer(false);
+          }}
+          onQuickContribution={() => setShowContributionDrawer(true)}
+        />
         {renderReactionAction('exposure', 'expose', 'Expose', 'fa-arrow-circle-o-up')}
         {renderReactionAction('exposure', 'bury', 'Bury', 'fa-arrow-circle-o-down')}
         {supportsValueReactions ? renderReactionAction('value', 'good', 'Good', 'fa-thumbs-o-up') : null}

@@ -2716,8 +2716,6 @@ function setScreeningModelCount(model: { childrenCount?: { pending?: number; rej
   model.childrenCount = childrenCount;
   if (model.childrenCount?.pending === 0 && model.childrenCount?.rejected === 0) {
     if (model.screening) model.screening.hidden = true;
-  } else if (model.childrenCount) {
-    model.childrenCount.archived = utils.randomInt(1, 9);
   }
 }
 

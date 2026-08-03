@@ -9,6 +9,20 @@ import OpinionEntryRow from './OpinionEntryRow';
 import QuestionEntryRow from './QuestionEntryRow';
 import TopicEntryRow from './TopicEntryRow';
 
+jest.mock('../../context/AuthContext', () => ({
+  useAuth: () => ({
+    user: null,
+    isAuthenticated: false,
+    isLoading: false,
+    activeRole: 'reader',
+    availableRoles: ['reader'],
+  }),
+}));
+
+jest.mock('../../context/AuthPromptContext', () => ({
+  useAuthPrompt: () => ({ requestSignIn: jest.fn() }),
+}));
+
 const baseEntry = {
   _id: 'entry-1',
   friendlyUrl: 'sample-entry',

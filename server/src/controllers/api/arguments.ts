@@ -151,7 +151,13 @@ async function GET_argument_entry(req: WikitruthRequest, res: WikitruthResponse)
   const issueOwnerType = argumentLinkId ? constants.OBJECT_TYPES.argumentLink : constants.OBJECT_TYPES.argument;
   const issueOwnerId = argumentLinkId || resolvedArgumentId;
 
-  const [questions, issues, opinions] = await Promise.all([
+  const [childArguments, questions, issues, opinions] = await Promise.all([
+    db.Argument.find({
+      ownerId: argument.ownerId,
+      parentId: resolvedArgumentId,
+      private: false,
+      'screening.status': constants.SCREENING_STATUS.status1.code,
+    }).sort({ editDate: -1 }).limit(5).lean(),
     db.Question.find({
       ownerType: constants.OBJECT_TYPES.argument,
       ownerId: questionOwnerId,
@@ -172,6 +178,12 @@ async function GET_argument_entry(req: WikitruthRequest, res: WikitruthResponse)
       'screening.status': constants.SCREENING_STATUS.status1.code,
     }).sort({ editDate: -1 }).limit(5).lean(),
   ]);
+
+  await flowUtils.setEditorsUsername(childArguments);
+  childArguments.forEach(function (result: Record<string, unknown>) {
+    flowUtils.appendEntryExtras(result, constants.OBJECT_TYPES.argument, req);
+    flowUtils.setVerdictModel(result);
+  });
 
   await flowUtils.setEditorsUsername(questions);
   questions.forEach(function (result: Record<string, unknown>) {
@@ -207,6 +219,7 @@ async function GET_argument_entry(req: WikitruthRequest, res: WikitruthResponse)
     grandParentTopic: context.grandParentTopic || null,
     topicLinks: dedupedTopicLinks,
     argument: argument,
+    arguments: childArguments,
     questions: questions,
     issues: issues,
     opinions: opinions,
