@@ -12,6 +12,7 @@ import { createCsrfProtection } from './middlewares/csrfProtection';
 import { civicCors } from './middlewares/civicCors';
 import { authenticateApiClient } from './middlewares/apiClientAuthentication';
 import { enforceAuthenticatedWebSession } from './services/webSessionService';
+import { startEmailDeliveryWorker } from './services/emailDeliveryWorker';
 
 import contents from './models/contents';
 import templates from './models/templates';
@@ -53,6 +54,16 @@ options = {
 
 app = module.exports = express();
 (globalThis as unknown as Record<string, unknown>).__wikitruth_app = app;
+app.post('/api/email-webhooks/resend', express.raw({ type: 'application/json', limit: '256kb' }), function (
+    req: import('express').Request,
+    res: import('express').Response,
+    next: import('express').NextFunction
+) {
+    Promise.resolve()
+        .then(() => require('./controllers/api/resendWebhook') as typeof import('./controllers/api/resendWebhook'))
+        .then(({ handleResendWebhook }) => handleResendWebhook(req, res))
+        .catch(next);
+});
 app.use(kraken(options));
 
 
@@ -243,6 +254,7 @@ app.server.listen(app.config.port, function(){
 app.on('start', function () {
     console.log('Application ready to serve requests.');
     console.log('Environment: %s', app.kraken.get('env:env'));
+    startEmailDeliveryWorker();
 });
 
 // Expose the same configured app via a typed ESM export so internal modules

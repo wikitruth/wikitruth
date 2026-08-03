@@ -35,8 +35,6 @@ import {
   isLoginAttemptBlocked,
   recordFailedLoginAttempt,
   getAccountIdFromUser,
-  buildAbsoluteUrl,
-  deliverEmail,
   type AuthAppContext,
   type AuthUserDocument,
 } from './authHelpers';
@@ -61,6 +59,8 @@ import {
   revokeOtherWebSessions,
 } from '../../services/webSessionService';
 import { buildAuthRuntimeConfig } from '../../services/authRuntimeConfigService';
+import { getWebAuthnConfig } from '../../services/webAuthnConfigService';
+import { queueAndDeliverEmail, queueEmail } from '../../services/emailOutboxService';
 
 const jwt = jwtMod as unknown as typeof import('jsonwebtoken');
 
@@ -167,9 +167,11 @@ export = function (router: Router) {
       const requireAccountVerification = Boolean(
         (req.app as unknown as AuthAppContext).config?.requireAccountVerification
       );
+      const verificationToken = requireAccountVerification ? createResetToken() : '';
 
       const account = await db.Account.create({
         isVerified: requireAccountVerification ? 'no' : 'yes',
+        verificationToken: verificationToken ? await encryptPassword(verificationToken) : undefined,
         'name.full': user.username,
         user: {
           id: user._id,
@@ -183,6 +185,30 @@ export = function (router: Router) {
       }
       user.roles.account = account._id;
       await user.save();
+
+      const appCtx = req.app as unknown as AuthAppContext;
+      const projectName = String(appCtx.config?.projectName || 'Wikitruth').trim();
+      const canonicalOrigin = getWebAuthnConfig(req).canonicalOrigin;
+      await queueEmail({
+        templateKey: 'welcome',
+        to: email,
+        locals: { projectName, recipientName: username, actionUrl: `${canonicalOrigin}/explore` },
+        idempotencyKey: `welcome:password:${String(user._id)}`,
+        actorUserId: String(user._id),
+      });
+      if (verificationToken) {
+        await queueEmail({
+          templateKey: 'account_verification',
+          to: email,
+          locals: {
+            projectName,
+            recipientName: username,
+            actionUrl: `${canonicalOrigin}/account/verification?token=${encodeURIComponent(verificationToken)}`,
+          },
+          idempotencyKey: `account-verification:signup:${String(user._id)}`,
+          actorUserId: String(user._id),
+        });
+      }
 
       await establishAuthenticatedSession(req, user, 'password', {
         rememberMe: Boolean(body.rememberMe),
@@ -700,21 +726,21 @@ export = function (router: Router) {
 
       const appCtx = req.app as unknown as AuthAppContext;
       const projectName = String(appCtx.config?.projectName || 'Wikitruth').trim();
-      const resetLink = buildAbsoluteUrl(
-        req,
-        `/reset-password?email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}`
-      );
-      const emailSent = await deliverEmail(req, res, {
-        to: user.email || email,
-        subject: `Reset your ${projectName} password`,
-        textPath: 'jade/login/forgot/email-text.jade',
-        htmlPath: 'jade/login/forgot/email-html.jade',
-        locals: {
-          username: user.username || email,
-          resetLink: resetLink,
-          projectName: projectName,
-        },
-      });
+      const resetLink = `${getWebAuthnConfig(req).canonicalOrigin}/reset-password?email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}`;
+      let emailQueued = false;
+      try {
+        await queueEmail({
+          templateKey: 'password_reset',
+          to: user.email || email,
+          locals: { recipientName: user.username || email, actionUrl: resetLink, projectName },
+          idempotencyKey: `password-reset:${String(user._id)}:${String(user.resetPasswordExpires)}`,
+          expiresAt: new Date(Number(user.resetPasswordExpires)),
+          maxAttempts: 3,
+        });
+        emailQueued = true;
+      } catch (error) {
+        console.error('Unable to queue password reset email:', error);
+      }
 
       const responsePayload: Record<string, unknown> = {
         success: true,
@@ -726,7 +752,7 @@ export = function (router: Router) {
           email: email,
           token: token,
           resetLink: resetLink,
-          emailSent: emailSent,
+          emailQueued,
         };
       }
 
@@ -872,20 +898,20 @@ export = function (router: Router) {
 
       const appCtx = req.app as unknown as AuthAppContext;
       const projectName = String(appCtx.config?.projectName || 'Wikitruth').trim();
-      const verifyUrl = buildAbsoluteUrl(
-        req,
-        `/account/verification?token=${encodeURIComponent(token)}`
-      );
-      const emailSent = await deliverEmail(req, res, {
-        to: req.user.email || nextEmail,
-        subject: `Verify Your ${projectName} Account`,
-        textPath: 'jade/account/verification/email-text.jade',
-        htmlPath: 'jade/account/verification/email-html.jade',
-        locals: {
-          verifyURL: verifyUrl,
-          projectName: projectName,
-        },
-      });
+      const verifyUrl = `${getWebAuthnConfig(req).canonicalOrigin}/account/verification?token=${encodeURIComponent(token)}`;
+      let emailSent = false;
+      try {
+        await queueAndDeliverEmail({
+          templateKey: 'account_verification',
+          to: req.user.email || nextEmail,
+          locals: { recipientName: String(req.user.username || ''), actionUrl: verifyUrl, projectName },
+          idempotencyKey: `account-verification:resend:${String(account._id)}:${Date.now()}`,
+          actorUserId: String(req.user._id || req.user.id || ''),
+        });
+        emailSent = true;
+      } catch (_error) {
+        emailSent = false;
+      }
 
       const payload: Record<string, unknown> = {
         success: true,

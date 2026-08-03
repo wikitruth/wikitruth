@@ -23,8 +23,8 @@ import {
   safeRelativeReturnPath,
 } from '../../services/webAuthnConfigService';
 import { buildEmailCodeRuntimeConfig } from '../../services/authRuntimeConfigService';
+import { queueAndDeliverEmail, queueEmail } from '../../services/emailOutboxService';
 import {
-  deliverEmail,
   getDefaultActiveRole,
   isValidEmail,
   sanitizeUser,
@@ -96,6 +96,19 @@ async function finishAuthentication(
     created ? 'Created an account with an email code' : 'Signed in with an email code',
     { created, remembered: context.rememberMe, tenantHandoff: Boolean(handoff) }
   );
+  if (created && user.email) {
+    await queueEmail({
+      templateKey: 'welcome',
+      to: user.email,
+      locals: {
+        projectName: 'Wikitruth',
+        recipientName: String(user.username || ''),
+        actionUrl: `${getWebAuthnConfig(req).canonicalOrigin}/explore`,
+      },
+      idempotencyKey: `welcome:email-code:${String(user._id || user.id || '')}`,
+      actorUserId: String(user._id || user.id || ''),
+    }).catch((error) => console.error('Unable to queue welcome email:', error));
+  }
   return {
     success: true,
     user: sanitizeUser(user),
@@ -159,28 +172,30 @@ export function registerAuthEmailCodeRoutes(router: Router): void {
       const targetTenant = targetOrigin
         ? await getCivicTenantForHost(new URL(targetOrigin).hostname)
         : null;
-      const appContext = req.app as unknown as AuthAppContext & {
-        config?: AuthAppContext['config'] & { smtp?: { credentials?: { user?: string } } };
-      };
+      const appContext = req.app as unknown as AuthAppContext;
       const projectName = String(targetTenant?.title || appContext.config?.projectName || 'Wikitruth');
       const signInUrl = new URL('/login', webAuthn.canonicalOrigin);
       signInUrl.searchParams.set('emailChallenge', result.challengeId);
       signInUrl.searchParams.set('emailToken', result.linkToken);
-      const hasConfiguredDelivery = Boolean(appContext.config?.smtp?.credentials?.user);
-      const emailSent = hasConfiguredDelivery
-        ? await deliverEmail(req, res, {
-            to: email,
-            subject: `${result.code} is your ${projectName} sign-in code`,
-            textPath: 'jade/login/email-code/email-text.jade',
-            htmlPath: 'jade/login/email-code/email-html.jade',
-            locals: {
-              code: result.code,
-              projectName,
-              expiresMinutes: String(Math.max(1, Math.round(result.expiresInSeconds / 60))),
-              signInLink: signInUrl.toString(),
-            },
-          })
-        : false;
+      let emailSent = false;
+      try {
+        await queueAndDeliverEmail({
+          templateKey: 'sign_in_code',
+          to: email,
+          locals: {
+            code: result.code,
+            projectName,
+            expiresMinutes: String(Math.max(1, Math.round(result.expiresInSeconds / 60))),
+            actionUrl: signInUrl.toString(),
+          },
+          idempotencyKey: `sign-in-code:${result.challengeId}`,
+          expiresAt: new Date(Date.now() + result.expiresInSeconds * 1000),
+          maxAttempts: 2,
+        });
+        emailSent = true;
+      } catch (_error) {
+        emailSent = false;
+      }
       await setEmailChallengeDelivery(result.challengeId, emailSent || process.env.NODE_ENV !== 'production');
       if (!emailSent && process.env.NODE_ENV === 'production') {
         res.status(502).json({ success: false, message: 'Unable to send a sign-in code right now' });

@@ -30,6 +30,16 @@ export const DEFAULT_NOTIFICATION_PREFERENCES: NotificationPreferences = {
   webPush: { enabled: false },
 };
 
+export function nextDigestAvailableAt(frequency: 'daily' | 'weekly', now = new Date()): Date {
+  const next = new Date(now);
+  next.setUTCHours(8, 0, 0, 0);
+  if (next <= now) next.setUTCDate(next.getUTCDate() + 1);
+  if (frequency === 'weekly') {
+    while (next.getUTCDay() !== 1) next.setUTCDate(next.getUTCDate() + 1);
+  }
+  return next;
+}
+
 function normalizePreferences(value: unknown): NotificationPreferences {
   const input = (value || {}) as Record<string, Record<string, unknown> | undefined>;
   return {
@@ -75,7 +85,8 @@ export async function queueNotificationDeliveries(input: {
     },
     {
       userId: input.userId, notificationId: input.notificationId, channel: 'email_digest',
-      status: input.preferences.emailDigest.enabled ? 'queued' : 'skipped', availableAt: now,
+      status: input.preferences.emailDigest.enabled ? 'queued' : 'skipped',
+      availableAt: nextDigestAvailableAt(input.preferences.emailDigest.frequency, now),
       payload: { ...input.payload, digestFrequency: input.preferences.emailDigest.frequency }, createDate: now, editDate: now,
     },
     {

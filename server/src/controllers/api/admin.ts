@@ -21,6 +21,7 @@ import { logEntryEvent } from '../../services/entryEventsService';
 import { registerAdminApiClientRoutes } from './adminApiClientRoutes';
 import { registerAdminCollectionRoutes, type AdminCollectionModels } from './adminCollectionRoutes';
 import { requirePrivilegedPasskeyAssurance } from '../../services/privilegedAuthService';
+import { registerAdminEmailOperationsRoutes } from './adminEmailOperationsRoutes';
 
 function ensureAdmin(req: WikitruthRequest, res: WikitruthResponse): boolean {
   if (!req.user || !req.user.canPlayRoleOf || !req.user.canPlayRoleOf('admin')) {
@@ -164,6 +165,7 @@ export = function (router: Router) {
     next();
   });
   registerAdminApiClientRoutes(router, ensureAdmin);
+  registerAdminEmailOperationsRoutes(router, ensureAdmin);
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAdmin(req, res)) {
       return;

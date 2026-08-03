@@ -36,6 +36,7 @@ logs/
 # Temporary files
 tmp/
 temp/
+.runtime/
 
 .build
 .vs

@@ -51,6 +51,7 @@ export = function (app: Application, mongoose: Mongoose) {
   require('./core/Subscription')(app, mongoose);
   require('./core/Notification')(app, mongoose);
   require('./core/NotificationOutbox')(app, mongoose);
+  require('./core/EmailOutbox')(app, mongoose);
   require('./core/KnowledgeReviewTask')(app, mongoose);
   require('./core/AnonymousContribution')(app, mongoose);
   require('./core/ReputationSnapshot')(app, mongoose);

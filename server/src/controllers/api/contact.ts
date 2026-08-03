@@ -4,6 +4,8 @@ import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 
 import * as httpClient from '../../utils/httpClient';
+import { getEmailOperationsSettings } from '../../services/emailProviderStore';
+import { queueEmail } from '../../services/emailOutboxService';
 
 type ContactBody = {
   name?: unknown;
@@ -17,31 +19,8 @@ type ContactAppContext = {
     grecaptcha?: {
       secret?: string;
     };
-    smtp?: {
-      from?: {
-        name?: string;
-        address?: string;
-      };
-    };
     systemEmail?: string;
     projectName?: string;
-  };
-  utility?: {
-    sendmail: (
-      req: WikitruthRequest,
-      res: WikitruthResponse,
-      options: {
-        from: string;
-        replyTo: string;
-        to: string;
-        subject: string;
-        textPath: string;
-        htmlPath: string;
-        locals: Record<string, string>;
-        success: () => void;
-        error: (err: unknown) => void;
-      }
-    ) => void;
   };
 };
 
@@ -99,40 +78,23 @@ export = function (router: Router) {
     }
 
     const appCtx = req.app as unknown as ContactAppContext;
-    const fromName = String(appCtx.config?.smtp?.from?.name || '').trim();
-    const fromAddress = String(appCtx.config?.smtp?.from?.address || '').trim();
-    const systemEmail = String(appCtx.config?.systemEmail || '').trim();
-    const projectName = String(appCtx.config?.projectName || '').trim();
-    const sendmail = appCtx.utility?.sendmail;
-
-    if (!sendmail) {
-      throw new Error('Mail utility is not configured');
+    const settings = getEmailOperationsSettings();
+    const systemEmail = String(settings.contactRecipient || appCtx.config?.systemEmail || '').trim();
+    const projectName = String(appCtx.config?.projectName || 'Wikitruth').trim();
+    if (!systemEmail) {
+      res.status(503).json({ error: 'Contact delivery is not configured' });
+      return;
     }
-
-    await new Promise<void>(function (resolve, reject) {
-      sendmail(req, res, {
-        from: `${fromName} <${fromAddress}>`,
-        replyTo: email,
-        to: systemEmail,
-        subject: `${projectName} contact form`,
-        textPath: 'jade/contact/email-text.jade',
-        htmlPath: 'jade/contact/email-html.jade',
-        locals: {
-          name: name,
-          email: email,
-          message: message,
-          projectName: projectName,
-        },
-        success: function () {
-          resolve();
-        },
-        error: function (err: unknown) {
-          reject(err);
-        },
-      });
+    await queueEmail({
+      templateKey: 'contact_form',
+      to: systemEmail,
+      replyTo: email,
+      locals: { senderName: name, senderEmail: email, message, projectName },
+      idempotencyKey: `contact:${Date.now()}:${String(req.ip || '')}:${email}`,
+      maxAttempts: 4,
     });
 
-    res.status(200).json({
+    res.status(202).json({
       success: true,
       message: 'We have received your message. Thank you.',
     });
