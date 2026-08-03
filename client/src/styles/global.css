@@ -458,18 +458,28 @@
   gap: 8px;
   width: 100%;
   padding: 6px 20px;
-  color: inherit;
+  color: var(--wt-text, #333);
   text-align: left;
   white-space: normal;
 }
 
+.wt-user-menu-choice:hover,
+.wt-user-menu-choice:focus {
+  color: var(--wt-text, #333);
+}
+
 .wt-user-menu-choice > i {
   margin-top: 3px;
+  color: var(--wt-text-muted, #777);
 }
 
 .wt-user-menu-choice strong,
 .wt-user-menu-choice small {
   display: block;
+}
+
+.wt-user-menu-choice strong {
+  color: var(--wt-text, #333);
 }
 
 .wt-user-menu-choice small {

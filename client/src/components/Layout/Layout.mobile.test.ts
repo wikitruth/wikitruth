@@ -21,6 +21,17 @@ describe('mobile off-canvas layout', () => {
     expect(css).toMatch(/@media \(max-width: 479px\)[\s\S]*?\.navbar-brand-label \.hidden-xxs\s*{[^}]*display:\s*none\s*!important/s);
   });
 
+  it('keeps content visibility choices readable in dark mode', () => {
+    const css = fs.readFileSync(
+      path.resolve(__dirname, '../../styles/global.css'),
+      'utf8'
+    );
+
+    expect(css).toMatch(/\.wt-user-menu-choice\s*{[^}]*color:\s*var\(--wt-text, #333\)/s);
+    expect(css).toMatch(/\.wt-user-menu-choice\s*>\s*i\s*{[^}]*color:\s*var\(--wt-text-muted, #777\)/s);
+    expect(css).toMatch(/\.wt-user-menu-choice strong\s*{[^}]*color:\s*var\(--wt-text, #333\)/s);
+  });
+
   it('allows long profile names to wrap instead of overflowing mobile screens', () => {
     const css = fs.readFileSync(
       path.resolve(__dirname, '../../styles/global.css'),
