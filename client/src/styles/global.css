@@ -665,9 +665,18 @@ button:focus-visible,
   .breadcrumb.wt-bc {
     position: relative;
     z-index: 1;
-    overflow-x: auto;
-    white-space: nowrap;
-    scrollbar-width: thin;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    overflow-x: visible;
+    white-space: normal;
+  }
+
+  .breadcrumb.wt-bc > li {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    white-space: normal;
   }
 
   .wt-access-message {

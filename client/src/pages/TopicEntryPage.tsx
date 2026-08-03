@@ -282,6 +282,7 @@ const TopicEntryPage: React.FC = () => {
 
       <TopicEntrySummary
         topic={topic}
+        entry={entry}
         parentTopic={relatedParentTopic}
         tagLabels={tagLabels}
         verdict={data?.verdict}

@@ -23,6 +23,7 @@ import {
   buildLegacyEntryBreadcrumb,
 } from '../components/Entry/EntryLegacyParity';
 import TruthSummaryPanel from '../components/Entry/TruthSummaryPanel';
+import EntryVerdictStatus from '../components/Entry/EntryVerdictStatus';
 
 const AnswerEntryPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -103,6 +104,9 @@ const AnswerEntryPage: React.FC = () => {
         iconColor="text-primary"
       />
       <EntryContextLine entry={answer} objectName="answer" />
+      <div className="wt-entry-labels">
+        <EntryVerdictStatus entry={answer} />
+      </div>
 
       <TruthSummaryPanel objectName="answer" objectId={String(answer._id || '')} />
 

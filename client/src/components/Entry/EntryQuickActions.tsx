@@ -341,7 +341,7 @@ const EntryQuickActions: React.FC<EntryQuickActionsProps> = ({
 
   return (
     <>
-      <div className="wt-entry-options-container clearfix" style={{ marginTop: '6px' }}>
+      <div className="wt-entry-options-container wt-entry-action-bar" style={{ marginTop: '6px' }}>
         <EntryReplyMenu
           entry={entry}
           objectName={objectName}

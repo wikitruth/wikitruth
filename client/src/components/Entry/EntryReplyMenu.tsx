@@ -58,7 +58,7 @@ const EntryReplyMenu: React.FC<EntryReplyMenuProps> = ({
   }, [isOpen]);
 
   return (
-    <div ref={dropdownRef} className={`dropdown entry-options ${isOpen ? 'open' : ''}`}>
+    <div ref={dropdownRef} className={`dropdown pull-left entry-options ${isOpen ? 'open' : ''}`}>
       <a
         ref={triggerRef}
         href="#"

@@ -133,7 +133,10 @@ describe('EntryQuickActions reactions', () => {
   });
 
   it('loads and submits reactions through the API service', async () => {
-    render(<EntryQuickActions entry={makeEntry()} objectName="topic" hasValue={true} />);
+    const { container } = render(<EntryQuickActions entry={makeEntry()} objectName="topic" hasValue={true} />);
+
+    expect(container.querySelector('.wt-entry-options-container')).toHaveClass('wt-entry-action-bar');
+    expect(screen.getByRole('link', { name: /^Reply$/i }).closest('.entry-options')).toHaveClass('pull-left');
 
     await waitFor(() => {
       expect(mockedApiService.getEntryReactions).toHaveBeenCalledWith({

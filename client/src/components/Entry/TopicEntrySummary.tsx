@@ -1,9 +1,11 @@
 import React from 'react';
 import type { LegacyEntity } from '../../types/legacy';
 import { EntryContextLine } from './EntryLegacyParity';
+import EntryVerdictStatus from './EntryVerdictStatus';
 
 interface TopicEntrySummaryProps {
   topic: LegacyEntity;
+  entry?: LegacyEntity;
   parentTopic?: LegacyEntity | null;
   tagLabels?: LegacyEntity[];
   verdict?: LegacyEntity;
@@ -24,6 +26,7 @@ function positiveCount(value: unknown): number {
 
 const TopicEntrySummary: React.FC<TopicEntrySummaryProps> = ({
   topic,
+  entry,
   parentTopic,
   tagLabels = [],
   verdict,
@@ -36,6 +39,7 @@ const TopicEntrySummary: React.FC<TopicEntrySummaryProps> = ({
     { key: 'pending', count: positiveCount(counts.pending), theme: 'warning', icon: 'question-circle', title: 'unverified' },
     { key: 'false', count: positiveCount(counts.false), theme: 'danger', icon: 'close', title: 'false' },
   ];
+  const hasVerdictCounts = verdictLabels.some((label) => label.count > 0);
   const labels = tagLabels
     .map((tag) => ({ tag, text: String(tag.text || tag.label || tag.title || '').trim() }))
     .filter(({ text }) => Boolean(text));
@@ -47,35 +51,39 @@ const TopicEntrySummary: React.FC<TopicEntrySummaryProps> = ({
         entry={{ ...topic, parentTopic: parentTopic || topic.parentTopic }}
         objectName="topic"
       />
-      <div className="wt-entry-labels" style={{ marginBottom: '8px' }}>
+      <div className="wt-entry-labels">
         {topic.screening?.status === 0 ? (
-          <span className="label label-warning" style={{ marginRight: '6px' }}>
+          <span className="label label-warning" title="Screening status: Pending">
             <i className="fa fa-question-circle" aria-hidden="true"></i> Pending
           </span>
         ) : null}
-        {verdictLabels.map((label) =>
-          label.count > 0 ? (
-            <span
-              key={label.key}
-              className={`label label-${label.theme}`}
-              style={{ marginRight: '6px' }}
-              title={label.title}
-            >
-              <i className={`fa fa-${label.icon}`} aria-hidden="true"></i> {label.count}
-            </span>
-          ) : null,
-        )}
+        <EntryVerdictStatus entry={entry || topic} />
+        {hasVerdictCounts ? (
+          <span className="wt-entry-verdict-counts" aria-label="Fact verdict counts">
+            <span className="wt-entry-verdict-counts-label">Facts:</span>
+            {verdictLabels.map((label) =>
+              label.count > 0 ? (
+                <span
+                  key={label.key}
+                  className={`label label-${label.theme}`}
+                  title={`${label.count} ${label.title} fact${label.count === 1 ? '' : 's'}`}
+                >
+                  <i className={`fa fa-${label.icon}`} aria-hidden="true"></i> {label.count}
+                </span>
+              ) : null,
+            )}
+          </span>
+        ) : null}
         {labels.map(({ tag, text }, index) => (
           <span
             key={String(tag.code || `tag-${index}`)}
             className={`label label-${String(tag.theme || 'info')}`}
-            style={{ marginRight: '6px' }}
           >
             <i className="fa fa-tag" aria-hidden="true"></i> {text}
           </span>
         ))}
         {isMainTopic && !hasMainLabel ? (
-          <span className="label label-info" style={{ marginRight: '6px' }}>
+          <span className="label label-info">
             <i className="fa fa-tag" aria-hidden="true"></i> Main
           </span>
         ) : null}

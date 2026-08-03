@@ -25,6 +25,7 @@ import {
   buildLegacyEntryBreadcrumb,
 } from '../components/Entry/EntryLegacyParity';
 import TruthSummaryPanel from '../components/Entry/TruthSummaryPanel';
+import EntryVerdictStatus from '../components/Entry/EntryVerdictStatus';
 
 const ArgumentEntryPage: React.FC = () => {
   const { id } = useParams();
@@ -203,6 +204,9 @@ const ArgumentEntryPage: React.FC = () => {
         iconColor="text-primary"
       />
       <EntryContextLine entry={argument} objectName="argument" />
+      <div className="wt-entry-labels">
+        <EntryVerdictStatus entry={entry} />
+      </div>
 
       <TruthSummaryPanel objectName="argument" objectId={String(argument._id || '')} />
 
@@ -289,21 +293,6 @@ const ArgumentEntryPage: React.FC = () => {
       )}
       
       <PageTabs tabs={tabs} activeTab="details" />
-
-      {/* Verdict Badge */}
-      {argument.verdict?.result && (
-        <div className="alert alert-sm" 
-             style={{ 
-               backgroundColor: argument.verdict.result === 'true' ? '#dff0d8' : 
-                                argument.verdict.result === 'false' ? '#f2dede' : '#fcf8e3',
-               border: 'none',
-               display: 'inline-block',
-               padding: '5px 10px',
-               marginTop: '10px'
-             }}>
-          <strong>Verdict:</strong> {argument.verdict.result.toUpperCase()}
-        </div>
-      )}
 
       {/* Argument content */}
       <div className="text-body collapsible" style={{ marginTop: '20px' }}>

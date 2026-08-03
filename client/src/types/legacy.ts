@@ -70,7 +70,11 @@ export interface LegacyEntity {
     opinions?: { total?: number; accepted?: number; pending?: number; rejected?: number; archived?: number };
   };
   verdict?: {
+    status?: number | string;
     result?: string;
+    label?: string;
+    theme?: string;
+    icon?: string;
   };
   verdicts?: {
     factual?: { status?: string; decisionMode?: string; evidenceRefs?: string[] };
