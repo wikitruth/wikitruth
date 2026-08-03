@@ -9,6 +9,8 @@ const verifyOwnership = jest.fn();
 const establishSession = jest.fn();
 const saveSession = jest.fn();
 const logEntryEvent = jest.fn();
+const queueAndDeliverEmail = jest.fn();
+const queueEmail = jest.fn();
 
 jest.mock('../../server/src/services/emailAuthService', () => {
   class EmailAuthError extends Error {
@@ -50,6 +52,10 @@ jest.mock('../../server/src/services/civicTenantService', () => ({
 }));
 jest.mock('../../server/src/services/entryEventsService', () => ({
   logEntryEvent: (...args: unknown[]) => logEntryEvent(...args),
+}));
+jest.mock('../../server/src/services/emailOutboxService', () => ({
+  queueAndDeliverEmail: (...args: unknown[]) => queueAndDeliverEmail(...args),
+  queueEmail: (...args: unknown[]) => queueEmail(...args),
 }));
 jest.mock('../../server/src/services/webAuthnConfigService', () => ({
   getWebAuthnConfig: () => ({ canonicalOrigin: 'http://localhost' }),
@@ -99,6 +105,8 @@ describe('email-code authentication routes', () => {
     saveSession.mockResolvedValue(undefined);
     verifyOwnership.mockResolvedValue(undefined);
     logEntryEvent.mockResolvedValue(undefined);
+    queueAndDeliverEmail.mockResolvedValue({ providerMessageId: 'email-1' });
+    queueEmail.mockResolvedValue({ _id: 'welcome-email-1' });
   });
 
   it('returns the same generic request response with non-production debug support', async () => {

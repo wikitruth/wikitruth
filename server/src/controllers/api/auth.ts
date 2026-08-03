@@ -59,8 +59,8 @@ import {
   revokeOtherWebSessions,
 } from '../../services/webSessionService';
 import { buildAuthRuntimeConfig } from '../../services/authRuntimeConfigService';
-import { getWebAuthnConfig } from '../../services/webAuthnConfigService';
 import { queueAndDeliverEmail, queueEmail } from '../../services/emailOutboxService';
+import { getTrustedEmailOrigin } from '../../services/emailOriginService';
 
 const jwt = jwtMod as unknown as typeof import('jsonwebtoken');
 
@@ -188,7 +188,7 @@ export = function (router: Router) {
 
       const appCtx = req.app as unknown as AuthAppContext;
       const projectName = String(appCtx.config?.projectName || 'Wikitruth').trim();
-      const canonicalOrigin = getWebAuthnConfig(req).canonicalOrigin;
+      const canonicalOrigin = getTrustedEmailOrigin(req);
       await queueEmail({
         templateKey: 'welcome',
         to: email,
@@ -726,7 +726,7 @@ export = function (router: Router) {
 
       const appCtx = req.app as unknown as AuthAppContext;
       const projectName = String(appCtx.config?.projectName || 'Wikitruth').trim();
-      const resetLink = `${getWebAuthnConfig(req).canonicalOrigin}/reset-password?email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}`;
+      const resetLink = `${getTrustedEmailOrigin(req)}/reset-password?email=${encodeURIComponent(email)}&token=${encodeURIComponent(token)}`;
       let emailQueued = false;
       try {
         await queueEmail({
@@ -898,7 +898,7 @@ export = function (router: Router) {
 
       const appCtx = req.app as unknown as AuthAppContext;
       const projectName = String(appCtx.config?.projectName || 'Wikitruth').trim();
-      const verifyUrl = `${getWebAuthnConfig(req).canonicalOrigin}/account/verification?token=${encodeURIComponent(token)}`;
+      const verifyUrl = `${getTrustedEmailOrigin(req)}/account/verification?token=${encodeURIComponent(token)}`;
       let emailSent = false;
       try {
         await queueAndDeliverEmail({

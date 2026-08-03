@@ -1,5 +1,4 @@
 import { createHash, randomUUID } from 'crypto';
-import appModForDb from '../app';
 import { decryptEmailPayload, encryptEmailPayload } from './emailProviderStore';
 import { renderEmailTemplate, type EmailTemplateKey, type EmailTemplateLocals } from './emailCatalog';
 import {
@@ -50,9 +49,17 @@ interface NotificationOutboxModel {
   updateMany: (query: Record<string, unknown>, update: Record<string, unknown>) => Promise<unknown>;
 }
 
-const db = (appModForDb as unknown as {
-  db: { models: { EmailOutbox: EmailOutboxModel; NotificationOutbox: NotificationOutboxModel } };
-}).db.models;
+interface EmailModels {
+  EmailOutbox: EmailOutboxModel;
+  NotificationOutbox: NotificationOutboxModel;
+}
+
+function models(): EmailModels {
+  const globalApp = (globalThis as unknown as Record<string, unknown>).__wikitruth_app;
+  const loaded = globalApp ? null : require('../app') as { default?: unknown };
+  const activeApp = globalApp || loaded?.default || loaded;
+  return (activeApp as { db: { models: EmailModels } }).db.models;
+}
 
 export interface QueueEmailInput {
   templateKey: EmailTemplateKey;
@@ -130,11 +137,11 @@ export async function queueEmail(input: QueueEmailInput): Promise<EmailOutboxRec
     editDate: now,
   };
   try {
-    const created = await db.EmailOutbox.create(value);
+    const created = await models().EmailOutbox.create(value);
     return created.toObject();
   } catch (error) {
     if (!duplicateKey(error)) throw error;
-    const existing = await db.EmailOutbox.findOne({ idempotencyKey }).select('+encryptedPayload').lean();
+    const existing = await models().EmailOutbox.findOne({ idempotencyKey }).select('+encryptedPayload').lean();
     if (!existing) throw error;
     return existing;
   }
@@ -142,7 +149,7 @@ export async function queueEmail(input: QueueEmailInput): Promise<EmailOutboxRec
 
 async function claim(id: unknown): Promise<EmailOutboxRecord | null> {
   const now = new Date();
-  return db.EmailOutbox.findOneAndUpdate(
+  return models().EmailOutbox.findOneAndUpdate(
     {
       _id: id,
       status: 'queued',
@@ -174,7 +181,7 @@ export async function deliverEmailOutboxItem(id: unknown): Promise<EmailDelivery
       idempotencyKey: item.idempotencyKey,
       ...rendered,
     });
-    await db.EmailOutbox.updateOne({ _id: item._id }, {
+    await models().EmailOutbox.updateOne({ _id: item._id }, {
       $set: {
         status: 'delivered',
         providerId: receipt.providerId,
@@ -189,7 +196,7 @@ export async function deliverEmailOutboxItem(id: unknown): Promise<EmailDelivery
       },
     });
     if (item.sourceNotificationOutboxIds?.length) {
-      await db.NotificationOutbox.updateMany(
+      await models().NotificationOutbox.updateMany(
         { _id: { $in: item.sourceNotificationOutboxIds } },
         { $set: { status: 'delivered', deliveredAt: new Date(), lastError: '', editDate: new Date() } },
       );
@@ -203,7 +210,7 @@ export async function deliverEmailOutboxItem(id: unknown): Promise<EmailDelivery
           code: 'EMAIL_DELIVERY_FAILED',
         });
     const retry = deliveryError.transient && item.attempts < item.maxAttempts;
-    await db.EmailOutbox.updateOne({ _id: item._id }, {
+    await models().EmailOutbox.updateOne({ _id: item._id }, {
       $set: {
         status: retry ? 'queued' : 'failed',
         availableAt: retry ? new Date(Date.now() + retryDelay(item.attempts)) : new Date(),
@@ -213,7 +220,7 @@ export async function deliverEmailOutboxItem(id: unknown): Promise<EmailDelivery
       },
     });
     if (!retry && item.sourceNotificationOutboxIds?.length) {
-      await db.NotificationOutbox.updateMany(
+      await models().NotificationOutbox.updateMany(
         { _id: { $in: item.sourceNotificationOutboxIds } },
         { $set: { status: 'failed', lastError: deliveryError.message.slice(0, 500), editDate: new Date() } },
       );
@@ -230,7 +237,7 @@ export async function queueAndDeliverEmail(input: QueueEmailInput): Promise<Emai
 
 export async function processEmailOutboxBatch(limit = 10): Promise<{ attempted: number; delivered: number }> {
   const now = new Date();
-  const rows = await db.EmailOutbox.find({
+  const rows = await models().EmailOutbox.find({
     status: 'queued',
     availableAt: { $lte: now },
     $or: [{ expiresAt: null }, { expiresAt: { $gt: now } }],
@@ -247,7 +254,7 @@ export async function processEmailOutboxBatch(limit = 10): Promise<{ attempted: 
 }
 
 export async function listRecentEmailDeliveries(limit = 50): Promise<PublicEmailDelivery[]> {
-  const rows = await db.EmailOutbox.find({}).sort({ createDate: -1 }).limit(Math.min(Math.max(limit, 1), 100)).lean();
+  const rows = await models().EmailOutbox.find({}).sort({ createDate: -1 }).limit(Math.min(Math.max(limit, 1), 100)).lean();
   return rows.map((row) => {
     const record = row as unknown as Record<string, unknown>;
     return {
@@ -271,7 +278,7 @@ export async function listRecentEmailDeliveries(limit = 50): Promise<PublicEmail
 }
 
 export async function retryEmailDelivery(id: string): Promise<boolean> {
-  const row = await db.EmailOutbox.findOneAndUpdate(
+  const row = await models().EmailOutbox.findOneAndUpdate(
     { _id: id, status: 'failed', attempts: { $lt: 8 } },
     { $set: { status: 'queued', availableAt: new Date(), lastError: '', errorCode: '', editDate: new Date() } },
     { new: true },
@@ -288,7 +295,7 @@ export async function applyProviderEvent(input: {
   const delivered = event === 'email.delivered' || event === 'delivered';
   const suppressed = event === 'email.complained' || event === 'email.bounced' || event === 'complained' || event === 'bounced';
   if (!delivered && !suppressed) return false;
-  const row = await db.EmailOutbox.findOneAndUpdate(
+  const row = await models().EmailOutbox.findOneAndUpdate(
     { providerType: input.providerType, providerMessageId: input.providerMessageId },
     { $set: delivered ? {
       status: 'delivered', deliveredAt: new Date(), editDate: new Date(), lastError: '', errorCode: '',

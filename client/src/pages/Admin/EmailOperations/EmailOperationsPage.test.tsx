@@ -56,7 +56,7 @@ it('renders provider health, template previews, and masked activity', async () =
   render(<EmailOperationsPage />);
   expect(await screen.findByRole('heading', { name: /email operations/i })).toBeInTheDocument();
   expect(await screen.findByText(/primary resend is available/i)).toBeInTheDocument();
-  expect(screen.getByText('a***@example.test')).toBeInTheDocument();
+  expect(screen.getAllByText('a***@example.test')).toHaveLength(2);
   expect(await screen.findByText('sign_in_code subject')).toBeInTheDocument();
   expect(screen.getByTitle(/synthetic html preview/i)).toHaveAttribute('sandbox');
 });

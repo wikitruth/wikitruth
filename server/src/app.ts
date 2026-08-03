@@ -12,7 +12,6 @@ import { createCsrfProtection } from './middlewares/csrfProtection';
 import { civicCors } from './middlewares/civicCors';
 import { authenticateApiClient } from './middlewares/apiClientAuthentication';
 import { enforceAuthenticatedWebSession } from './services/webSessionService';
-import { startEmailDeliveryWorker } from './services/emailDeliveryWorker';
 
 import contents from './models/contents';
 import templates from './models/templates';
@@ -254,6 +253,7 @@ app.server.listen(app.config.port, function(){
 app.on('start', function () {
     console.log('Application ready to serve requests.');
     console.log('Environment: %s', app.kraken.get('env:env'));
+    const { startEmailDeliveryWorker } = require('./services/emailDeliveryWorker') as typeof import('./services/emailDeliveryWorker');
     startEmailDeliveryWorker();
 });
 

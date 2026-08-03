@@ -58,9 +58,9 @@ from a typed catalog, and make delivery observable and safely testable.
 
 - [x] Add provider-store encryption, permission, adapter, catalog, outbox, worker, route, and webhook tests.
 - [x] Add client API and administrator-page interaction tests.
-- [ ] Run focused and full server/client suites, lint, type checks, builds, guardrails, and secret scans.
-- [ ] Verify the administrator flow with the Browser plugin at desktop and mobile viewports.
-- [ ] Complete a separate final diff and security review before closing this plan.
+- [x] Run focused and full server/client suites, lint, type checks, builds, guardrails, and secret scans.
+- [x] Verify the administrator flow with the Browser plugin at desktop and mobile viewports.
+- [x] Complete a separate final diff and security review before closing this plan.
 
 ## Deployment Boundary
 

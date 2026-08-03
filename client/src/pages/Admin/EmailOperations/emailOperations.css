@@ -130,6 +130,7 @@
 
 .wt-email-activity { margin-top: 26px; }
 .wt-email-activity .table { margin-bottom: 0; }
+.wt-email-activity-mobile { display: none; }
 .wt-email-activity td { vertical-align: middle !important; }
 .wt-email-activity td .label { margin-left: 7px; }
 .wt-email-activity td small { display: block; max-width: 190px; margin-top: 4px; overflow: hidden; color: var(--wt-text-muted); text-overflow: ellipsis; white-space: nowrap; }
@@ -153,7 +154,21 @@
   .wt-email-preview-toolbar { align-items: flex-start; flex-direction: column; }
   .wt-email-preview-frame { padding: 5px; }
   .wt-email-preview-frame iframe { min-height: 480px; }
-  .wt-email-activity .table { min-width: 800px; }
+  .wt-email-activity-table { display: none; }
+  .wt-email-activity-mobile { display: block; }
+  .wt-email-delivery-card { padding: 14px; border-bottom: 1px solid var(--wt-border); }
+  .wt-email-delivery-card:last-child { border-bottom: 0; }
+  .wt-email-delivery-card-heading,
+  .wt-email-delivery-card-footer,
+  .wt-email-delivery-card dl > div { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+  .wt-email-delivery-card-heading strong { overflow-wrap: anywhere; text-transform: capitalize; }
+  .wt-email-delivery-card dl { margin: 12px 0 6px; }
+  .wt-email-delivery-card dl > div { align-items: flex-start; margin: 5px 0; }
+  .wt-email-delivery-card dt { flex: 0 0 72px; color: var(--wt-text-muted); }
+  .wt-email-delivery-card dd { min-width: 0; margin: 0; overflow-wrap: anywhere; text-align: right; }
+  .wt-email-delivery-card .text-danger { margin: 8px 0; }
+  .wt-email-delivery-card-footer { margin-top: 10px; }
+  .wt-email-delivery-empty { margin: 0; padding: 18px 14px; }
 }
 
 @media (max-width: 420px) {

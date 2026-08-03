@@ -2,6 +2,7 @@ import express from 'express';
 import request from 'supertest';
 
 const mockPostForm = jest.fn();
+const mockQueueEmail = jest.fn();
 
 const mockDb = {
   User: {
@@ -27,6 +28,11 @@ const mockDb = {
 
 jest.mock('../../server/src/utils/httpClient', () => ({
   postForm: (...args: unknown[]) => mockPostForm(...args),
+}));
+
+jest.mock('../../server/src/services/emailOutboxService', () => ({
+  queueEmail: (...args: unknown[]) => mockQueueEmail(...args),
+  queueAndDeliverEmail: jest.fn(),
 }));
 
 jest.mock('../../server/src/app', () => ({
@@ -94,6 +100,7 @@ describe('auth captcha and role-switch endpoints', () => {
       done(null, `${password}-hash`);
     });
     mockDb.User.findOne.mockResolvedValue(null);
+    mockQueueEmail.mockResolvedValue({ _id: 'email-outbox-1' });
     mockDb.LoginAttempt.countDocuments.mockResolvedValue(0);
     mockDb.User.create.mockImplementation(async (payload: Record<string, unknown>) => ({
       _id: 'user-1',
@@ -146,6 +153,9 @@ describe('auth captcha and role-switch endpoints', () => {
     expect(response.body.activeRole).toBe('reader');
     expect(mockDb.User.create).toHaveBeenCalledWith(expect.objectContaining({
       onboarding: expect.objectContaining({ contributor: { completed: false } }),
+    }));
+    expect(mockQueueEmail).toHaveBeenCalledWith(expect.objectContaining({
+      templateKey: 'welcome', to: 'demo@example.com',
     }));
     expect(mockPostForm).toHaveBeenCalledWith(
       'https://www.google.com/recaptcha/api/siteverify',
