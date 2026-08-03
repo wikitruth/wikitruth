@@ -275,6 +275,13 @@ export function saveEmailProvider(input: SaveEmailProviderInput, options: EmailP
   validateProvider(input, mergedSecrets);
   const now = new Date().toISOString();
   const secretsChanged = JSON.stringify(existingSecrets) !== JSON.stringify(mergedSecrets);
+  const deliveryConfigurationChanged = Boolean(existing) && (
+    existing?.type !== input.type
+    || existing?.fromAddress !== input.fromAddress.trim().toLowerCase()
+    || String(existing?.host || '') !== String(input.host || '').trim()
+    || Number(existing?.port || 0) !== Number(input.type === 'smtp' ? input.port || 0 : 0)
+    || String(existing?.security || '') !== String(input.type === 'smtp' ? (input.security === 'starttls' ? 'starttls' : 'ssl') : '')
+  );
   const provider: StoredEmailProvider = {
     id: existing?.id || randomUUID(),
     name: input.name.trim(),
@@ -294,7 +301,7 @@ export function saveEmailProvider(input: SaveEmailProviderInput, options: EmailP
     createDate: existing?.createDate || now,
     editDate: now,
   };
-  if (existing && secretsChanged) provider.verifiedAt = null;
+  if (existing && (secretsChanged || deliveryConfigurationChanged)) provider.verifiedAt = null;
   if (existingIndex >= 0) store.providers[existingIndex] = provider;
   else store.providers.push(provider);
   writeStore(store, options);

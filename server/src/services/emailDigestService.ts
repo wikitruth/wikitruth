@@ -70,19 +70,26 @@ export async function queueDueNotificationDigests(limit = 250): Promise<number> 
       body: String(row.payload?.body || ''),
       link: String(row.payload?.link || ''),
     }));
-    await queueEmail({
-      templateKey: frequency === 'weekly' ? 'weekly_digest' : 'daily_digest',
-      to: email,
-      locals: {
-        projectName: 'Wikitruth',
-        recipientName: String(user?.username || ''),
-        actionUrl: String(process.env.WIKITRUTH_PUBLIC_ORIGIN || process.env.WEBAUTHN_CANONICAL_ORIGIN || '').replace(/\/$/, ''),
-        items,
-      },
-      idempotencyKey: `digest:${frequency}:${userId}:${periodKey(frequency, new Date())}`,
-      sourceNotificationOutboxIds: ids,
-    });
-    queued += 1;
+    try {
+      await queueEmail({
+        templateKey: frequency === 'weekly' ? 'weekly_digest' : 'daily_digest',
+        to: email,
+        locals: {
+          projectName: 'Wikitruth',
+          recipientName: String(user?.username || ''),
+          actionUrl: String(process.env.WIKITRUTH_PUBLIC_ORIGIN || process.env.WEBAUTHN_CANONICAL_ORIGIN || '').replace(/\/$/, ''),
+          items,
+        },
+        idempotencyKey: `digest:${frequency}:${userId}:${periodKey(frequency, new Date())}`,
+        sourceNotificationOutboxIds: ids,
+      });
+      queued += 1;
+    } catch (error) {
+      await db.NotificationOutbox.updateMany(
+        { _id: { $in: ids }, status: 'processing' },
+        { $set: { status: 'queued', lastError: String((error as Error)?.message || error).slice(0, 500), editDate: new Date() } },
+      );
+    }
   }
   return queued;
 }

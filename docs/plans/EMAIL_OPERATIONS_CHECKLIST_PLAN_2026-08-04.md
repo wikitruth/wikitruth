@@ -46,18 +46,18 @@ from a typed catalog, and make delivery observable and safely testable.
 
 ### Administrator Experience
 
-- [ ] Add an Email Operations route and Admin Dashboard entry.
-- [ ] Show active provider health and masked provider configuration.
-- [ ] Add provider editing and verification forms for Resend and SMTP.
-- [ ] Add the template catalog with HTML/plain-text preview and safe sample data.
-- [ ] Restrict test delivery to the current administrator's verified email address.
-- [ ] Show recent delivery activity and allow retry only for eligible failures.
-- [ ] Preserve usable desktop and `390px` mobile layouts in light and dark modes.
+- [x] Add an Email Operations route and Admin Dashboard entry.
+- [x] Show active provider health and masked provider configuration.
+- [x] Add provider editing and verification forms for Resend and SMTP.
+- [x] Add the template catalog with HTML/plain-text preview and safe sample data.
+- [x] Restrict test delivery to the current administrator's verified email address.
+- [x] Show recent delivery activity and allow retry only for eligible failures.
+- [x] Preserve usable desktop and `390px` mobile layouts in light and dark modes.
 
 ### Verification
 
-- [ ] Add provider-store encryption, permission, adapter, catalog, outbox, worker, route, and webhook tests.
-- [ ] Add client API and administrator-page interaction tests.
+- [x] Add provider-store encryption, permission, adapter, catalog, outbox, worker, route, and webhook tests.
+- [x] Add client API and administrator-page interaction tests.
 - [ ] Run focused and full server/client suites, lint, type checks, builds, guardrails, and secret scans.
 - [ ] Verify the administrator flow with the Browser plugin at desktop and mobile viewports.
 - [ ] Complete a separate final diff and security review before closing this plan.

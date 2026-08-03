@@ -16,6 +16,7 @@ This folder contains active engineering documentation, planning docs, and histor
 - Mobile app strategy: `docs/strategy/MOBILE_APP_STRATEGY_2026-02-24.md`
 - Host-neutral production release and rollback runbook: `docs/runbooks/PRODUCTION_RELEASE.md`
 - Private operator inventory template: `docs/runbooks/PRIVATE_OPERATOR_INVENTORY_TEMPLATE.md`
+- Email provider, template, delivery, and webhook operations: `docs/runbooks/EMAIL_OPERATIONS.md`
 - Historical React migration rollback plan: `docs/runbooks/ROLLBACK_PLAN.md`
 - Dependency upgrade classification: `docs/dependencies/dep-upgrade-classification-2026-04-22.md`
 

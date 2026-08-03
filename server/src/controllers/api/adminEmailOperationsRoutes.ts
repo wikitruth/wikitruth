@@ -65,11 +65,11 @@ async function audit(req: WikitruthRequest, eventType: string, message: string, 
   });
 }
 
-function enforceRateLimit(req: WikitruthRequest, res: WikitruthResponse, action: string): boolean {
+function enforceRateLimit(req: WikitruthRequest, res: WikitruthResponse, action: string, maximum = 5): boolean {
   const key = `${actor(req).id}:${action}`;
   const threshold = Date.now() - 60 * 60 * 1000;
   const recent = (requestWindows.get(key) || []).filter((timestamp) => timestamp > threshold);
-  if (recent.length >= 5) {
+  if (recent.length >= maximum) {
     res.status(429).json({ success: false, message: 'Email test limit reached. Try again later.' });
     return false;
   }
@@ -148,7 +148,7 @@ export function registerAdminEmailOperationsRoutes(router: Router, ensureAdmin: 
   });
 
   router.post('/email-operations/providers', async (req: WikitruthRequest, res: WikitruthResponse) => {
-    if (!ensureAdmin(req, res)) return;
+    if (!ensureAdmin(req, res) || !enforceRateLimit(req, res, 'provider-mutation', 20)) return;
     try {
       const provider = saveEmailProvider(providerInput((req.body || {}) as Record<string, unknown>));
       await audit(req, 'admin.email.provider.created', 'Created an email provider', {
@@ -161,7 +161,7 @@ export function registerAdminEmailOperationsRoutes(router: Router, ensureAdmin: 
   });
 
   router.put('/email-operations/providers/:id', async (req: WikitruthRequest, res: WikitruthResponse) => {
-    if (!ensureAdmin(req, res)) return;
+    if (!ensureAdmin(req, res) || !enforceRateLimit(req, res, 'provider-mutation', 20)) return;
     try {
       const provider = saveEmailProvider(providerInput((req.body || {}) as Record<string, unknown>, String(req.params.id || '')));
       await audit(req, 'admin.email.provider.updated', 'Updated an email provider', {
@@ -199,7 +199,7 @@ export function registerAdminEmailOperationsRoutes(router: Router, ensureAdmin: 
   });
 
   router.post('/email-operations/providers/:id/activate', async (req: WikitruthRequest, res: WikitruthResponse) => {
-    if (!ensureAdmin(req, res)) return;
+    if (!ensureAdmin(req, res) || !enforceRateLimit(req, res, 'provider-mutation', 20)) return;
     try {
       const provider = activateEmailProvider(String(req.params.id || ''));
       await audit(req, 'admin.email.provider.activated', 'Activated an email provider', {
@@ -212,7 +212,7 @@ export function registerAdminEmailOperationsRoutes(router: Router, ensureAdmin: 
   });
 
   router.post('/email-operations/providers/:id/enabled', async (req: WikitruthRequest, res: WikitruthResponse) => {
-    if (!ensureAdmin(req, res)) return;
+    if (!ensureAdmin(req, res) || !enforceRateLimit(req, res, 'provider-mutation', 20)) return;
     try {
       const provider = setEmailProviderEnabled(String(req.params.id || ''), req.body?.enabled === true);
       await audit(req, 'admin.email.provider.enabled', 'Changed email provider availability', {
@@ -225,7 +225,7 @@ export function registerAdminEmailOperationsRoutes(router: Router, ensureAdmin: 
   });
 
   router.delete('/email-operations/providers/:id', async (req: WikitruthRequest, res: WikitruthResponse) => {
-    if (!ensureAdmin(req, res)) return;
+    if (!ensureAdmin(req, res) || !enforceRateLimit(req, res, 'provider-mutation', 20)) return;
     try {
       const providerId = String(req.params.id || '');
       const provider = getStoredEmailProvider(providerId);
@@ -240,7 +240,7 @@ export function registerAdminEmailOperationsRoutes(router: Router, ensureAdmin: 
   });
 
   router.put('/email-operations/settings', async (req: WikitruthRequest, res: WikitruthResponse) => {
-    if (!ensureAdmin(req, res)) return;
+    if (!ensureAdmin(req, res) || !enforceRateLimit(req, res, 'settings-mutation', 20)) return;
     try {
       const settings = saveEmailOperationsSettings({ contactRecipient: String(req.body?.contactRecipient || '') });
       await audit(req, 'admin.email.settings.updated', 'Updated email operations settings', {

@@ -132,6 +132,11 @@ The runtime refuses backup or restore operations that resolve inside that tree.
 
 ### SMTP / Email Delivery
 
+These variables are a migration fallback only. The preferred configuration is
+**Admin → Email Operations**, which supports Resend and SMTP without an
+environment-file edit or application restart. Once a verified provider is
+activated there, it takes precedence over all fallback SMTP variables.
+
 | Variable | Purpose | Default |
 |---|---|---|
 | `SMTP_FROM_NAME` | From-display name for outgoing messages | `Wikitruth` |

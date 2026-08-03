@@ -88,29 +88,17 @@ npm install
 cp .env.example .env
 ```
 
-Update `.env` values (MongoDB URI, SMTP, and related settings), then run:
+Update the required local values such as the MongoDB URI, then run:
 
 ```bash
 npm run dev:all
 ```
 
-### Email (SMTP/Gmail) Setup
+### Email Delivery Setup
 
-Password reset, account verification, signup notifications, and contact-form delivery use SMTP configuration.
+Administrators configure Resend or SMTP from **Admin → Email Operations**. Provider credentials are encrypted in an ignored private runtime JSON store, are write-only in the UI, and take effect without editing `.env` or restarting the application. The page also configures contact routing, previews every supported HTML/plain-text message, sends tests to the current verified administrator, and displays masked delivery activity.
 
-Minimum SMTP variables:
-
-```bash
-SMTP_FROM_ADDRESS=your-email@gmail.com
-SMTP_USERNAME=your-email@gmail.com
-SMTP_PASSWORD=your-gmail-app-password
-SMTP_HOST=smtp.gmail.com
-SMTP_SSL=true
-SYSTEM_EMAIL=your-email@gmail.com
-```
-
-For Gmail, use an App Password from a 2FA-enabled Google account.
-See [docs/frontend/ENVIRONMENT_VARIABLES.md](./docs/frontend/ENVIRONMENT_VARIABLES.md) for the full config matrix.
+Existing `SMTP_*` variables remain an optional migration fallback until an administrator-managed provider is verified and activated. See [the Email Operations runbook](./docs/runbooks/EMAIL_OPERATIONS.md) for setup, webhook, backup, and rollback guidance.
 
 Development URLs:
 

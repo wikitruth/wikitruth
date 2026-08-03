@@ -46,6 +46,7 @@ describe('routeConfig', () => {
     expect(paths).toContain('/admin/civic-tenants');
     expect(paths).toContain('/admin/civic-operations');
     expect(paths).toContain('/admin/knowledge-health');
+    expect(paths).toContain('/admin/email-operations');
     expect(paths).toContain('/policies');
   });
 

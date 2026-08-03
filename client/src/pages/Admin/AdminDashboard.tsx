@@ -130,6 +130,15 @@ const AdminDashboard: React.FC = () => {
       {!isLoading && !error && counts ? (
         <div className="row">
           <div className="col-sm-3">
+            <div className="panel panel-info">
+              <div className="panel-heading">Email Operations</div>
+              <div className="panel-body">
+                <p className="text-muted" style={{ marginBottom: 10 }}>Configure providers, preview messages, and inspect delivery health.</p>
+                <Link to="/admin/email-operations" className="btn btn-info btn-xs">Manage Email</Link>
+              </div>
+            </div>
+          </div>
+          <div className="col-sm-3">
             <div className="panel panel-primary">
               <div className="panel-heading">Agent API</div>
               <div className="panel-body">

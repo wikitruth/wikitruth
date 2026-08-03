@@ -135,7 +135,7 @@ export function renderEmailTemplate(key: EmailTemplateKey, rawLocals: EmailTempl
   const definition = definitions[key];
   if (!definition) throw new Error('Unknown email template');
   const locals = { projectName: 'Wikitruth', ...rawLocals };
-  const subject = definition.subject(locals);
+  const subject = definition.subject(locals).replace(/[\r\n]+/g, ' ').trim();
   const intro = definition.intro(locals);
   const itemContent = renderItems(locals.items);
   const actionUrl = String(locals.actionUrl || '');
