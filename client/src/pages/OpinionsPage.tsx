@@ -17,6 +17,8 @@ import type { LegacyEntity } from '../types/legacy';
 import type { Opinion } from '../types';
 import { useNotification } from '../context/NotificationContext';
 import { normalizeOpinionClassification, type OpinionClassification } from '../components/Entry/OpinionClassificationLabel';
+import { ContentVisibilityScope } from '../context/ContentVisibilityContext';
+import { usePageContentVisibility } from '../hooks/usePageContentVisibility';
 
 const OpinionsPage: React.FC = () => {
   const [opinions, setOpinions] = useState<LegacyEntity[]>([]);
@@ -25,24 +27,16 @@ const OpinionsPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('editDate');
   const [classification, setClassification] = useState<'all' | OpinionClassification>('all');
-  const [viewMode, setViewMode] = useState<ViewMode>(() => {
-    const saved = localStorage.getItem('wt_view_mode');
-    return (saved === 'wiki' || saved === 'original' || saved === 'archived') ? saved : 'all';
-  });
+  const { override: viewMode, effectiveView, defaultLabel, setOverride } = usePageContentVisibility();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
   const { addToast } = useNotification();
   const { user, activeRole } = useAuth();
 
-  const handleViewModeChange = (mode: ViewMode) => {
-    setViewMode(mode);
-    localStorage.setItem('wt_view_mode', mode);
-  };
-
   const fetchOpinions = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await apiService.getOpinions(undefined, viewMode, classification);
+      const data = await apiService.getOpinions(undefined, effectiveView, classification);
       setOpinions(data.opinions || []);
     } catch {
       setError('Failed to load opinions');
@@ -50,7 +44,7 @@ const OpinionsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [addToast, viewMode, classification]);
+  }, [addToast, effectiveView, classification]);
 
   useEffect(() => {
     void fetchOpinions();
@@ -118,7 +112,7 @@ const OpinionsPage: React.FC = () => {
   ];
 
   return (
-    <div>
+    <ContentVisibilityScope view={effectiveView}><div>
       <PageMeta title="Opinions" description="Browse opinions and perspectives from the community" />
       <Breadcrumb items={breadcrumbItems} />
       
@@ -184,7 +178,7 @@ const OpinionsPage: React.FC = () => {
           </div>
           <div className="row" style={{ marginTop: '10px' }}>
             <div className="col-md-12">
-              <ContentViewFilter value={viewMode} onChange={handleViewModeChange} />
+              <ContentViewFilter value={viewMode as ViewMode} onChange={setOverride} defaultLabel={defaultLabel} />
             </div>
           </div>
         </div>
@@ -233,7 +227,7 @@ const OpinionsPage: React.FC = () => {
           description="Try adjusting your search criteria."
         />
       )}
-    </div>
+    </div></ContentVisibilityScope>
   );
 };
 

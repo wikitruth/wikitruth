@@ -30,7 +30,7 @@ describe('Children count guardrails', function () {
     expect(() =>
       assertChildrenCountInvariants(
         {
-          topics: { accepted: 4, pending: 1, rejected: 2, total: 7 },
+          topics: { accepted: 4, pending: 1, rejected: 2, archived: 3, total: 7 },
           arguments: { accepted: 3, pending: 0, rejected: 1, total: 4 },
         },
         { entryType: 1, entryId: 'topic-1' }
@@ -49,4 +49,3 @@ describe('Children count guardrails', function () {
     ).toThrow('childrenCount invariant violation');
   });
 });
-

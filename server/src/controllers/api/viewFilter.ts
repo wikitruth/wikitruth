@@ -15,7 +15,7 @@ type QueryWithScreening = Record<string, unknown> & {
   'screening.status'?: unknown;
 };
 
-export type ApiViewMode = 'default' | 'all' | 'wiki' | 'original' | 'archived';
+export type ApiViewMode = 'default' | 'all' | 'wiki' | 'active' | 'original' | 'archived';
 
 export function applyViewModeFilter(
   req: WikitruthRequest | any,
@@ -34,6 +34,13 @@ export function applyViewModeFilter(
     return 'original';
   }
 
+  if (viewMode === 'active') {
+    query['screening.status'] = {
+      $in: [constants.SCREENING_STATUS.status0.code, constants.SCREENING_STATUS.status1.code],
+    };
+    return 'active';
+  }
+
   if (viewMode === 'wiki') {
     query['screening.status'] = constants.SCREENING_STATUS.status1.code;
     return 'wiki';
@@ -48,4 +55,13 @@ export function applyViewModeFilter(
     query['screening.status'] = defaultStatus;
   }
   return 'default';
+}
+
+export function withViewModeFilter<T extends QueryWithScreening>(
+  req: WikitruthRequest | any,
+  query: T,
+  defaultStatus: unknown = constants.SCREENING_STATUS.status1.code,
+): T {
+  applyViewModeFilter(req, query, defaultStatus);
+  return query;
 }

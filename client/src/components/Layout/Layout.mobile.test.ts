@@ -54,10 +54,11 @@ describe('mobile off-canvas layout', () => {
 
     expect(css).toMatch(/\.wt-explore-page #browse\s*{[^}]*scroll-margin-top:\s*70px/s);
     expect(css).toMatch(/\.list-group-item\.wt-entry-row,[\s\S]*?grid-template-columns:\s*var\(--wt-entry-row-icon-column\) minmax\(0, 1fr\)/s);
-    expect(css).toMatch(/\.list-group-item\.wt-entry-row,[\s\S]*?padding:\s*var\(--wt-entry-row-padding-block\) var\(--wt-entry-row-padding-inline\)/s);
+    expect(css).toMatch(/\.list-group-item\.wt-entry-row,[\s\S]*?padding-block:\s*var\(--wt-entry-row-padding-block\)[\s\S]*?padding-inline:\s*var\(--wt-entry-row-padding-inline-start\) var\(--wt-entry-row-padding-inline-end\)/s);
     expect(css).toMatch(/\.list-group-item\.wt-entry-row\s*>\s*\.wt-entry-row-icon\s*{[^}]*position:\s*static[^}]*justify-content:\s*center/s);
     expect(css).toMatch(/\.list-group-item\.wt-entry-row\s*>\s*\.wt-entry-row-main,[\s\S]*?{[^}]*float:\s*none[^}]*margin-left:\s*0/s);
-    expect(themeCss).toMatch(/--wt-entry-row-padding-inline:\s*14px/);
+    expect(themeCss).toMatch(/--wt-entry-row-padding-inline-start:\s*0px/);
+    expect(themeCss).toMatch(/--wt-entry-row-padding-inline-end:\s*14px/);
     expect(themeCss).toMatch(/--wt-entry-row-column-gap:\s*10px/);
   });
 

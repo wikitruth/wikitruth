@@ -180,7 +180,7 @@ describe('EntryRowDetails', () => {
     expect(screen.getByText('Short preview')).toBeInTheDocument();
   });
 
-  it('shows accepted child totals by entity type', () => {
+  it('shows child totals for the effective accepted-only view', () => {
     render(
       <EntryRowDetails
         entry={entry({
@@ -194,8 +194,8 @@ describe('EntryRowDetails', () => {
       />
     );
 
-    expect(screen.getByTitle('Show 2 accepted topics')).toHaveTextContent('2');
-    expect(screen.getByTitle('Show 1 accepted facts')).toHaveTextContent('1');
+    expect(screen.getByTitle('Show 2 topics in accepted only')).toHaveTextContent('2');
+    expect(screen.getByTitle('Show 1 facts in accepted only')).toHaveTextContent('1');
     expect(screen.queryByText('3')).not.toBeInTheDocument();
   });
 });

@@ -5,6 +5,8 @@ import type { EntityBuckets } from '../../types/api';
 import type { LegacyEntity } from '../../types/legacy';
 import type { EntryRowKind } from './EntryRowDetails';
 import { getEntryRowPath } from './entryRowPaths';
+import { useContentVisibility } from '../../context/ContentVisibilityContext';
+import { visibilityLabel } from '../../utils/contentVisibility';
 
 type EntryChildrenPanelProps = {
   entryId: string;
@@ -29,12 +31,13 @@ const GROUPS: Array<{
 const EntryChildrenPanel: React.FC<EntryChildrenPanelProps> = ({ entryId, kind }) => {
   const [children, setChildren] = useState<EntityBuckets | null>(null);
   const [error, setError] = useState(false);
+  const { effectiveView } = useContentVisibility();
 
   useEffect(() => {
     let mounted = true;
     setChildren(null);
     setError(false);
-    void apiService.getEntryChildren(kind, entryId)
+    void apiService.getEntryChildren(kind, entryId, effectiveView)
       .then((response) => {
         if (mounted) setChildren(response);
       })
@@ -44,7 +47,7 @@ const EntryChildrenPanel: React.FC<EntryChildrenPanelProps> = ({ entryId, kind }
     return () => {
       mounted = false;
     };
-  }, [entryId, kind]);
+  }, [effectiveView, entryId, kind]);
 
   const visibleGroups = useMemo(
     () => GROUPS.map((group) => ({
@@ -61,7 +64,7 @@ const EntryChildrenPanel: React.FC<EntryChildrenPanelProps> = ({ entryId, kind }
     return <div className="wt-entry-children-message text-muted">Loading replies…</div>;
   }
   if (visibleGroups.length === 0) {
-    return <div className="wt-entry-children-message text-muted">No accepted replies to show.</div>;
+    return <div className="wt-entry-children-message text-muted">No replies in {visibilityLabel(effectiveView).toLowerCase()}.</div>;
   }
 
   return (

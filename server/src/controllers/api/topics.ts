@@ -3,7 +3,7 @@ import type { FlowUtilsModule, ConstantsModule, UtilsModule } from '../../types/
 
 import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
-import { applyViewModeFilter } from './viewFilter';
+import { applyViewModeFilter, withViewModeFilter } from './viewFilter';
 import { parseNumericTags, parseOptionalDate } from './entryWriteHelpers';
 import { rejectBlockingDuplicate } from './duplicateWriteGuard';
 import { recordEntryRevision } from './revisionWriteRecorder';
@@ -448,10 +448,9 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
     (async function loadCategories() {
       if (model.mainTopic) {
         const results = await flowUtils.getTopics(
-          {
+          withViewModeFilter(req, {
             parentId: model.topic!._id,
-            'screening.status': screeningStatus,
-          },
+          }, screeningStatus),
           {
             limit: 0,
             shortTitleLength: constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN,
@@ -462,10 +461,9 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
         await Promise.all(
           results.map(async function enrichCategory(result: Record<string, unknown>) {
             const subTopics = await flowUtils.getTopics(
-              {
+              withViewModeFilter(req, {
                 parentId: result._id,
-                'screening.status': screeningStatus,
-              },
+              }, screeningStatus),
               {
                 limit: constants.SETTINGS.SUBCATEGORY_LIST_SIZE,
                 shortTitleLength: constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN,
@@ -477,12 +475,11 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
 
             if (subTopics.length < constants.SETTINGS.SUBCATEGORY_LIST_SIZE) {
               const subArguments = await flowUtils.getArguments(
-                {
+                withViewModeFilter(req, {
                   parentId: null,
                   ownerId: result._id,
                   ownerType: constants.OBJECT_TYPES.topic,
-                  'screening.status': screeningStatus,
-                },
+                }, screeningStatus),
                 {
                   limit: constants.SETTINGS.SUBCATEGORY_LIST_SIZE - subTopics.length,
                   req: req,
@@ -506,10 +503,9 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
     })(),
     (async function loadTopics() {
       model.topics = await flowUtils.getTopics(
-        {
+        withViewModeFilter(req, {
           parentId: req.query.topic,
-          'screening.status': screeningStatus,
-        },
+        }, screeningStatus),
         {
           limit: 15,
           req: req,
@@ -525,10 +521,9 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
       }
     })(),
     (async function loadTopicLinks() {
-      const links = await db.TopicLink.find({
+      const links = await db.TopicLink.find(withViewModeFilter(req, {
         $or: [{ topicId: req.query.topic }, { parentId: req.query.topic }],
-        'screening.status': screeningStatus,
-      }).lean();
+      }, screeningStatus)).lean();
 
       if (!links || links.length === 0) {
         return;
@@ -551,7 +546,9 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
         return;
       }
 
-      const results = await db.Topic.find({ _id: { $in: Array.from(relatedTopicIdSet) } })
+      const results = await db.Topic.find(withViewModeFilter(req, {
+        _id: { $in: Array.from(relatedTopicIdSet) },
+      }, screeningStatus))
         .sort({ title: 1 })
         .lean();
 
@@ -565,12 +562,11 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
     })(),
     (async function loadArguments() {
       const results = await flowUtils.getArguments(
-        {
+        withViewModeFilter(req, {
           parentId: null,
           ownerId: req.query.topic,
           ownerType: constants.OBJECT_TYPES.topic,
-          'screening.status': screeningStatus,
-        },
+        }, screeningStatus),
         {
           limit: 0,
           req: req,
@@ -599,11 +595,10 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
       const questionOwnerId = topicLinkId
         ? String((model.topicLink as { topicId?: unknown } | undefined)?.topicId || model.topic!._id)
         : model.topic!._id;
-      const results = await db.Question.find({
+      const results = await db.Question.find(withViewModeFilter(req, {
         ownerType: constants.OBJECT_TYPES.topic,
         ownerId: questionOwnerId,
-        'screening.status': screeningStatus,
-      })
+      }, screeningStatus))
         .sort({ editDate: -1 })
         .limit(15)
         .lean();
@@ -614,11 +609,10 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
       model.questions = results;
     })(),
     (async function loadArtifacts() {
-      const results = await db.Artifact.find({
+      const results = await db.Artifact.find(withViewModeFilter(req, {
         ownerType: constants.OBJECT_TYPES.topic,
         ownerId: model.topic!._id,
-        'screening.status': screeningStatus,
-      })
+      }, screeningStatus))
         .sort({ editDate: -1 })
         .limit(15)
         .lean();
@@ -631,11 +625,10 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
     (async function loadIssues() {
       const issueOwnerType = topicLinkId ? constants.OBJECT_TYPES.topicLink : constants.OBJECT_TYPES.topic;
       const issueOwnerId = topicLinkId ? topicLinkId : model.topic!._id;
-      const results = await db.Issue.find({
+      const results = await db.Issue.find(withViewModeFilter(req, {
         ownerType: issueOwnerType,
         ownerId: issueOwnerId,
-        'screening.status': screeningStatus,
-      })
+      }, screeningStatus))
         .sort({ editDate: -1 })
         .limit(15)
         .lean();
@@ -648,12 +641,11 @@ async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
     (async function loadOpinions() {
       const opinionOwnerType = topicLinkId ? constants.OBJECT_TYPES.topicLink : constants.OBJECT_TYPES.topic;
       const opinionOwnerId = topicLinkId ? topicLinkId : model.topic!._id;
-      const results = await db.Opinion.find({
+      const results = await db.Opinion.find(withViewModeFilter(req, {
         parentId: null,
         ownerType: opinionOwnerType,
         ownerId: opinionOwnerId,
-        'screening.status': screeningStatus,
-      })
+      }, screeningStatus))
         .sort({ editDate: -1 })
         .limit(15)
         .lean();

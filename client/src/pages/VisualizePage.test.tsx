@@ -60,7 +60,7 @@ describe('VisualizePage', () => {
     render(<VisualizePage />, { route: '/visualize' });
 
     expect(await screen.findByRole('heading', { name: /visualize/i })).toBeInTheDocument();
-    expect(mockGetOutlineTree).toHaveBeenCalledWith(undefined, 1, { childLimit: 11, rootLimit: 20 });
+    expect(mockGetOutlineTree).toHaveBeenCalledWith(undefined, 1, { childLimit: 11, rootLimit: 20, view: 'wiki' });
     expect(screen.getByText('3 topics')).toBeInTheDocument();
     expect(screen.getByText('Root topics + 1 child level')).toBeInTheDocument();
     expect(screen.getByRole('region', { name: /knowledge graph/i })).toBeInTheDocument();
@@ -116,7 +116,7 @@ describe('VisualizePage', () => {
     );
 
     await waitFor(() => {
-      expect(mockGetOutlineTree).toHaveBeenCalledWith('addiction', 2, { ancestorDepth: 20, childLimit: 11 });
+      expect(mockGetOutlineTree).toHaveBeenCalledWith('addiction', 2, { ancestorDepth: 20, childLimit: 11, view: 'wiki' });
     });
     expect(screen.getByRole('link', { name: 'Health & Medicine' })).toHaveAttribute(
       'href',

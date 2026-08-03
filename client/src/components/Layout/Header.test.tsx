@@ -62,6 +62,16 @@ describe('Header parity navigation', () => {
     );
   });
 
+  it('offers the browser visibility preference to guests', async () => {
+    render(<Header />);
+
+    fireEvent.click(screen.getByRole('button', { name: /more navigation options/i }));
+
+    expect(await screen.findByRole('button', { name: /accepted only/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /accepted \+ pending/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /all public states/i })).toBeInTheDocument();
+  });
+
   it('renders application sections and converts legacy topic URLs', async () => {
     mockUseApplicationContext.mockReturnValue({
       application: {
@@ -124,6 +134,17 @@ describe('Header parity navigation', () => {
     mockUser = null;
     rerender(<Header />);
     expect(screen.getByRole('link', { name: /sign in/i })).toBeInTheDocument();
+  });
+
+  it('offers the saved visibility preference in the signed-in account menu', () => {
+    mockUser = { _id: 'user-1', username: 'email_user', email: 'email@example.test', roles: {} };
+    render(<Header />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Account menu for email_user' }));
+
+    expect(screen.getByRole('button', { name: /accepted only/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /accepted \+ pending/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /all public states/i })).toBeInTheDocument();
   });
 
   it('does not repeat the sign-in link on the sign-in page', () => {

@@ -13,6 +13,7 @@ import {
   type VisualizeGraphNode,
 } from './visualize/graphModel';
 import './visualize/visualize.css';
+import { useContentVisibility } from '../context/ContentVisibilityContext';
 
 function decodeTopicId(value: string): string {
   try {
@@ -27,6 +28,7 @@ const VisualizePage: React.FC = () => {
   const location = useLocation();
   const params = useParams<{ id?: string }>();
   const { theme } = useTheme();
+  const { effectiveView } = useContentVisibility();
   const [outline, setOutline] = useState<OutlineTreeResponse | null>(null);
   const [activeNode, setActiveNode] = useState<VisualizeGraphNode | null>(null);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
@@ -46,8 +48,8 @@ const VisualizePage: React.FC = () => {
       setError(null);
       try {
         const result = selectedTopicId
-          ? await apiService.getOutlineTree(selectedTopicId, 2, { ancestorDepth: 20, childLimit: 11 })
-          : await apiService.getOutlineTree(undefined, 1, { childLimit: 11, rootLimit: 20 });
+          ? await apiService.getOutlineTree(selectedTopicId, 2, { ancestorDepth: 20, childLimit: 11, view: effectiveView })
+          : await apiService.getOutlineTree(undefined, 1, { childLimit: 11, rootLimit: 20, view: effectiveView });
         if (selectedTopicId && (!result.tree || result.success === false)) {
           throw new Error(result.message || 'The requested public topic could not be loaded');
         }
@@ -66,7 +68,7 @@ const VisualizePage: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [selectedTopicId]);
+  }, [effectiveView, selectedTopicId]);
 
   const trees = useMemo<OutlineTreeNode[]>(() => {
     if (outline?.tree) return [outline.tree];

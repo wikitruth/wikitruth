@@ -1,5 +1,6 @@
 import React, { useEffect, useId, useState } from 'react';
 import apiService from '../../services/api';
+import { useContentVisibility } from '../../context/ContentVisibilityContext';
 
 interface TopicSearchResult {
   _id: string;
@@ -17,6 +18,7 @@ const TopicSearch: React.FC<TopicSearchProps> = ({ onSelect }) => {
   const [results, setResults] = useState<TopicSearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
+  const { effectiveView } = useContentVisibility();
 
   useEffect(() => {
     const trimmed = query.trim();
@@ -29,7 +31,7 @@ const TopicSearch: React.FC<TopicSearchProps> = ({ onSelect }) => {
     let cancelled = false;
     setLoading(true);
     const timer = window.setTimeout(() => {
-      void apiService.searchOutlineTargets(trimmed, { types: 'topic', limit: 8 })
+      void apiService.searchOutlineTargets(trimmed, { types: 'topic', limit: 8, view: effectiveView })
         .then((response) => {
           if (!cancelled) setResults(response.results || []);
         })
@@ -45,7 +47,7 @@ const TopicSearch: React.FC<TopicSearchProps> = ({ onSelect }) => {
       cancelled = true;
       window.clearTimeout(timer);
     };
-  }, [query]);
+  }, [effectiveView, query]);
 
   const chooseTopic = (topic: TopicSearchResult) => {
     setQuery(topic.title);

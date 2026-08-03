@@ -6,7 +6,7 @@ import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 import type { AuthUser } from '../../types/auth';
 import type { ServiceEntry, ServiceQuery } from '../../services/serviceTypes';
 import type { WikitruthConstants } from '../../types/constants';
-import { applyViewModeFilter } from './viewFilter';
+import { applyViewModeFilter, withViewModeFilter } from './viewFilter';
 
 import * as flowUtilsNs from '../../utils/flowUtils';
 import appModForDb from '../../app';
@@ -136,27 +136,24 @@ async function GET_question_entry(req: WikitruthRequest, res: WikitruthResponse)
   applyLegacyEntryContext(question, context);
 
   const [answers, issues, opinions] = await Promise.all([
-    db.Answer.find({
+    db.Answer.find(withViewModeFilter(req, {
       $or: [
         { questionId: questionId },
         { ownerType: constants.OBJECT_TYPES.question, ownerId: questionId },
       ],
       private: false,
-      'screening.status': constants.SCREENING_STATUS.status1.code,
-    }).sort({ editDate: -1 }).limit(5).lean(),
-    db.Issue.find({
+    })).sort({ editDate: -1 }).limit(5).lean(),
+    db.Issue.find(withViewModeFilter(req, {
       ownerType: constants.OBJECT_TYPES.question,
       ownerId: questionId,
       private: false,
-      'screening.status': constants.SCREENING_STATUS.status1.code,
-    }).sort({ editDate: -1 }).limit(5).lean(),
-    db.Opinion.find({
+    })).sort({ editDate: -1 }).limit(5).lean(),
+    db.Opinion.find(withViewModeFilter(req, {
       parentId: null,
       ownerType: constants.OBJECT_TYPES.question,
       ownerId: questionId,
       private: false,
-      'screening.status': constants.SCREENING_STATUS.status1.code,
-    }).sort({ editDate: -1 }).limit(5).lean(),
+    })).sort({ editDate: -1 }).limit(5).lean(),
   ]);
 
   await flowUtils.setEditorsUsername(answers);

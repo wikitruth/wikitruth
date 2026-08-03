@@ -112,7 +112,7 @@ describe('apiService', () => {
 
     expect(result.arguments).toHaveLength(1);
     expect(fetchMock).toHaveBeenCalledWith(
-      '/api/arguments/entry/parent-1',
+      '/api/arguments/entry/parent-1?view=wiki',
       expect.objectContaining({ cache: 'no-store' }),
     );
   });

@@ -19,6 +19,7 @@ import {
 import { parseBoolean, parseNumericTags, parseOptionalDate } from './entryWriteHelpers';
 import { rejectBlockingDuplicate } from './duplicateWriteGuard';
 import { recordEntryRevision } from './revisionWriteRecorder';
+import { applyViewModeFilter, withViewModeFilter } from './viewFilter';
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 export = function (router: Router) {
   // GET /api/artifacts - List artifacts
@@ -32,6 +33,7 @@ export = function (router: Router) {
         private: false,
         'screening.status': (model.screening as { status?: unknown } | undefined)?.status,
       };
+      applyViewModeFilter(req, query, (model.screening as { status?: unknown } | undefined)?.status);
       
       if (req.query.topic) {
         query.ownerId = req.query.topic;
@@ -62,36 +64,31 @@ export = function (router: Router) {
       }
 
       const [artifacts, argumentsList, questions, issues, opinions] = await Promise.all([
-        db.Artifact.find({
+        db.Artifact.find(withViewModeFilter(req, {
           parentId: artifactId,
           private: false,
-          'screening.status': constants.SCREENING_STATUS.status1.code,
-        }).sort({ editDate: -1 }).limit(5).lean(),
-        db.Argument.find({
+        })).sort({ editDate: -1 }).limit(5).lean(),
+        db.Argument.find(withViewModeFilter(req, {
           ownerType: constants.OBJECT_TYPES.artifact,
           ownerId: artifactId,
           private: false,
-          'screening.status': constants.SCREENING_STATUS.status1.code,
-        }).sort({ editDate: -1 }).limit(5).lean(),
-        db.Question.find({
+        })).sort({ editDate: -1 }).limit(5).lean(),
+        db.Question.find(withViewModeFilter(req, {
           ownerType: constants.OBJECT_TYPES.artifact,
           ownerId: artifactId,
           private: false,
-          'screening.status': constants.SCREENING_STATUS.status1.code,
-        }).sort({ editDate: -1 }).limit(5).lean(),
-        db.Issue.find({
+        })).sort({ editDate: -1 }).limit(5).lean(),
+        db.Issue.find(withViewModeFilter(req, {
           ownerType: constants.OBJECT_TYPES.artifact,
           ownerId: artifactId,
           private: false,
-          'screening.status': constants.SCREENING_STATUS.status1.code,
-        }).sort({ editDate: -1 }).limit(5).lean(),
-        db.Opinion.find({
+        })).sort({ editDate: -1 }).limit(5).lean(),
+        db.Opinion.find(withViewModeFilter(req, {
           parentId: null,
           ownerType: constants.OBJECT_TYPES.artifact,
           ownerId: artifactId,
           private: false,
-          'screening.status': constants.SCREENING_STATUS.status1.code,
-        }).sort({ editDate: -1 }).limit(5).lean(),
+        })).sort({ editDate: -1 }).limit(5).lean(),
       ]);
 
       await flowUtils.setEditorsUsername(artifacts);

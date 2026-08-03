@@ -29,6 +29,7 @@ export interface User {
   };
   preferences?: {
     privateProfile?: boolean;
+    contentVisibility?: import('../utils/contentVisibility').ContentVisibilityPreference;
   };
   createdDate?: Date;
   isActive?: string;
@@ -109,24 +110,28 @@ export interface Topic {
       accepted?: number;
       pending?: number;
       rejected?: number;
+      archived?: number;
     };
     arguments?: {
       total?: number;
       accepted?: number;
       pending?: number;
       rejected?: number;
+      archived?: number;
     };
     questions?: {
       total?: number;
       accepted?: number;
       pending?: number;
       rejected?: number;
+      archived?: number;
     };
     artifacts?: {
       total?: number;
       accepted?: number;
       pending?: number;
       rejected?: number;
+      archived?: number;
     };
   };
 }

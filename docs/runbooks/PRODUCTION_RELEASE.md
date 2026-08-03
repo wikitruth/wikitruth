@@ -111,6 +111,10 @@ Do not build from a dirty checkout and do not rely on an untracked local bundle.
 - [ ] Re-run audits and invariants after application.
 - [ ] Keep spam cleanup and unrelated data repair out of a code release unless
       separately authorized and backed up.
+- [ ] For the reader-visibility release, run
+      `npm run migrate:children-count-archived` in dry-run mode, review its
+      per-collection counts, then run the `:apply` command only after database
+      migration authorization. Re-run the dry-run and require `changed: 0`.
 
 For a staged v1-to-v2 migration, distinguish the initial copy from the final
 delta synchronization immediately before cutover.

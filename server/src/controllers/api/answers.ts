@@ -13,7 +13,7 @@ import * as utils from '../../utils/utils';
 import { rejectBlockingDuplicate } from './duplicateWriteGuard';
 import { recordEntryRevision } from './revisionWriteRecorder';
 import * as answersService from '../../services/answersService';
-import { applyViewModeFilter } from './viewFilter';
+import { applyViewModeFilter, withViewModeFilter } from './viewFilter';
 import { applyLegacyEntryContext, resolveLegacyEntryContext } from './entryContext';
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 export = function (router: Router) {
@@ -61,19 +61,17 @@ export = function (router: Router) {
       applyLegacyEntryContext(answer, context);
 
       const [issues, opinions] = await Promise.all([
-        db.Issue.find({
+        db.Issue.find(withViewModeFilter(req, {
           ownerType: constants.OBJECT_TYPES.answer,
           ownerId: answerId,
           private: false,
-          'screening.status': constants.SCREENING_STATUS.status1.code,
-        }).sort({ editDate: -1 }).limit(5).lean(),
-        db.Opinion.find({
+        })).sort({ editDate: -1 }).limit(5).lean(),
+        db.Opinion.find(withViewModeFilter(req, {
           parentId: null,
           ownerType: constants.OBJECT_TYPES.answer,
           ownerId: answerId,
           private: false,
-          'screening.status': constants.SCREENING_STATUS.status1.code,
-        }).sort({ editDate: -1 }).limit(5).lean(),
+        })).sort({ editDate: -1 }).limit(5).lean(),
       ]);
 
       await flowUtils.setEditorsUsername(issues);

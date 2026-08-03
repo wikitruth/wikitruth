@@ -6,6 +6,7 @@ import { useNotification } from '../context/NotificationContext';
 import { useAuth } from '../context/AuthContext';
 import { useApplicationContext } from '../context/ApplicationContext';
 import ExplorePage from './ExplorePage';
+import { AuthPromptProvider } from '../context/AuthPromptContext';
 
 jest.mock('../components/common/PageMeta', () => ({
   __esModule: true,
@@ -100,7 +101,7 @@ describe('ExplorePage parity controls', () => {
   });
 
   it('restores Explore header actions and keeps compact category and tab labels readable', async () => {
-    render(<ExplorePage />, { route: '/explore' });
+    render(<AuthPromptProvider><ExplorePage /></AuthPromptProvider>, { route: '/explore' });
 
     expect(await screen.findByRole('heading', { name: /explore/i })).toHaveClass('page-header');
     expect(screen.getByRole('link', { name: 'Jump to latest posts' })).toHaveAttribute('href', '#browse');
@@ -120,11 +121,11 @@ describe('ExplorePage parity controls', () => {
 
   it('collapses advanced filters and applies content state filtering', async () => {
     const user = userEvent.setup();
-    render(<ExplorePage />, { route: '/explore' });
+    render(<AuthPromptProvider><ExplorePage /></AuthPromptProvider>, { route: '/explore' });
 
     expect(await screen.findByText('Accepted question')).toBeInTheDocument();
-    expect(screen.getByText('Pending question')).toBeInTheDocument();
-    expect(screen.getByLabelText('Accepted after screening')).toBeInTheDocument();
+    expect(screen.queryByText('Pending question')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Accepted after screening')).not.toBeInTheDocument();
 
     const filterToggle = screen.getByRole('button', { name: 'Advanced filters' });
     expect(filterToggle).toHaveAttribute('aria-expanded', 'false');
@@ -135,6 +136,10 @@ describe('ExplorePage parity controls', () => {
       'true'
     );
     expect(document.getElementById('explore-advanced-filters')).toHaveClass('is-open');
+
+    await user.click(screen.getByRole('button', { name: 'All states' }));
+    await waitFor(() => expect(screen.getByText('Pending question')).toBeInTheDocument());
+    expect(screen.getByLabelText('Accepted after screening')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Accepted' }));
     await waitFor(() => expect(screen.queryByText('Pending question')).not.toBeInTheDocument());

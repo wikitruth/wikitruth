@@ -5,6 +5,7 @@ type ChildrenCountBucket = {
   accepted?: unknown;
   pending?: unknown;
   rejected?: unknown;
+  archived?: unknown;
 };
 
 type ChildrenCountNode = Record<string, ChildrenCountBucket | undefined>;
@@ -115,4 +116,3 @@ export {
   assertChildrenCountInvariants,
   normalizeChildrenCountUpdateTasks,
 };
-

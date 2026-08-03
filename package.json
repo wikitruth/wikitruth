@@ -88,6 +88,8 @@
     "migrate:verdict-votes:apply": "node --env-file-if-exists=.env scripts/migrations/verdict-vote-channels.js --apply",
     "migrate:graph-relationships": "node --env-file-if-exists=.env scripts/migrations/graph-relationships.js",
     "migrate:graph-relationships:apply": "node --env-file-if-exists=.env scripts/migrations/graph-relationships.js --apply",
+    "migrate:children-count-archived": "node --env-file-if-exists=.env scripts/migrations/children-count-archived.js",
+    "migrate:children-count-archived:apply": "node --env-file-if-exists=.env scripts/migrations/children-count-archived.js --apply",
     "setup:local-fixph": "node --env-file-if-exists=.env scripts/setup/local-fixph-tenant.js",
     "setup:local-fixph:clean": "node --env-file-if-exists=.env scripts/setup/local-fixph-tenant.js --clean",
     "setup:local-explore-parity": "node --env-file-if-exists=.env scripts/setup/local-explore-parity.js",

@@ -5,7 +5,7 @@ import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 import type { ServiceEntry, ServiceQuery } from '../../services/serviceTypes';
 import type { WikitruthConstants } from '../../types/constants';
-import { applyViewModeFilter } from './viewFilter';
+import { applyViewModeFilter, withViewModeFilter } from './viewFilter';
 import { createArgument, updateArgument } from './argumentWrites';
 
 import * as flowUtilsNs from '../../utils/flowUtils';
@@ -152,31 +152,27 @@ async function GET_argument_entry(req: WikitruthRequest, res: WikitruthResponse)
   const issueOwnerId = argumentLinkId || resolvedArgumentId;
 
   const [childArguments, questions, issues, opinions] = await Promise.all([
-    db.Argument.find({
+    db.Argument.find(withViewModeFilter(req, {
       ownerId: argument.ownerId,
       parentId: resolvedArgumentId,
       private: false,
-      'screening.status': constants.SCREENING_STATUS.status1.code,
-    }).sort({ editDate: -1 }).limit(5).lean(),
-    db.Question.find({
+    })).sort({ editDate: -1 }).limit(5).lean(),
+    db.Question.find(withViewModeFilter(req, {
       ownerType: constants.OBJECT_TYPES.argument,
       ownerId: questionOwnerId,
       private: false,
-      'screening.status': constants.SCREENING_STATUS.status1.code,
-    }).sort({ editDate: -1 }).limit(5).lean(),
-    db.Issue.find({
+    })).sort({ editDate: -1 }).limit(5).lean(),
+    db.Issue.find(withViewModeFilter(req, {
       ownerType: issueOwnerType,
       ownerId: issueOwnerId,
       private: false,
-      'screening.status': constants.SCREENING_STATUS.status1.code,
-    }).sort({ editDate: -1 }).limit(5).lean(),
-    db.Opinion.find({
+    })).sort({ editDate: -1 }).limit(5).lean(),
+    db.Opinion.find(withViewModeFilter(req, {
       parentId: null,
       ownerType: issueOwnerType,
       ownerId: issueOwnerId,
       private: false,
-      'screening.status': constants.SCREENING_STATUS.status1.code,
-    }).sort({ editDate: -1 }).limit(5).lean(),
+    })).sort({ editDate: -1 }).limit(5).lean(),
   ]);
 
   await flowUtils.setEditorsUsername(childArguments);

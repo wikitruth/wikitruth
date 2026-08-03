@@ -1,6 +1,7 @@
 import React from 'react';
 import SearchPage from './SearchPage';
 import { render, screen, waitFor } from '../test-utils/render';
+import { AuthPromptProvider } from '../context/AuthPromptContext';
 
 const mockSearch = jest.fn();
 const mockUseAuth = jest.fn();
@@ -50,11 +51,11 @@ describe('SearchPage', () => {
       argumentsMore: true,
     });
 
-    render(<SearchPage />, { route: '/search?q=truth' });
+    render(<AuthPromptProvider><SearchPage /></AuthPromptProvider>, { route: '/search?q=truth' });
 
     await waitFor(() => {
       expect(mockSearch).toHaveBeenCalledWith('truth', {
-        tab: 'all', content: 'all', relationship: 'any', evidence: 'all',
+        tab: 'all', content: 'all', relationship: 'any', evidence: 'all', view: 'wiki',
       });
     });
 
@@ -82,11 +83,11 @@ describe('SearchPage', () => {
       opinions: [],
     });
 
-    render(<SearchPage />, { route: '/search?q=journal&tab=topics&content=diary' });
+    render(<AuthPromptProvider><SearchPage /></AuthPromptProvider>, { route: '/search?q=journal&tab=topics&content=diary' });
 
     await waitFor(() => {
       expect(mockSearch).toHaveBeenCalledWith('journal', {
-        tab: 'topics', content: 'journal', relationship: 'any', evidence: 'all',
+        tab: 'topics', content: 'journal', relationship: 'any', evidence: 'all', view: 'wiki',
       });
     });
 
@@ -99,10 +100,10 @@ describe('SearchPage', () => {
   it('restores graph filters from the URL and keeps them shareable', async () => {
     mockSearch.mockResolvedValue({ ...emptySearchResponse(), tab: 'topics', results: false });
 
-    render(<SearchPage />, { route: '/search?q=records&tab=topics&relationship=refutes&evidence=linked' });
+    render(<AuthPromptProvider><SearchPage /></AuthPromptProvider>, { route: '/search?q=records&tab=topics&relationship=refutes&evidence=linked' });
 
     await waitFor(() => expect(mockSearch).toHaveBeenCalledWith('records', {
-      tab: 'topics', content: 'all', relationship: 'refutes', evidence: 'linked',
+      tab: 'topics', content: 'all', relationship: 'refutes', evidence: 'linked', view: 'wiki',
     }));
     expect(screen.getByLabelText(/evidence relationship/i)).toHaveValue('refutes');
     expect(screen.getByLabelText(/evidence state/i)).toHaveValue('linked');

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useSearchParams, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import apiService from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import QuestionEntryRow from '../components/EntryRow/QuestionEntryRow';
@@ -15,40 +15,33 @@ import type { Question } from '../types';
 import { useNotification } from '../context/NotificationContext';
 import EmptyState from '../components/common/EmptyState';
 import { useAuth } from '../context/AuthContext';
+import { ContentVisibilityScope } from '../context/ContentVisibilityContext';
+import { usePageContentVisibility } from '../hooks/usePageContentVisibility';
 
 const QuestionsPage: React.FC = () => {
   const { id } = useParams();
-  const [searchParams] = useSearchParams();
+  const { searchParams, override: viewMode, effectiveView, defaultLabel, setOverride } = usePageContentVisibility();
   const topicId = searchParams.get('topic') || id;
   
   const [questions, setQuestions] = useState<LegacyEntity[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('editDate');
-  const [viewMode, setViewMode] = useState<ViewMode>(() => {
-    const saved = localStorage.getItem('wt_view_mode');
-    return (saved === 'wiki' || saved === 'original' || saved === 'archived') ? saved : 'all';
-  });
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
   const { addToast } = useNotification();
   const { user, activeRole } = useAuth();
 
-  const handleViewModeChange = (mode: ViewMode) => {
-    setViewMode(mode);
-    localStorage.setItem('wt_view_mode', mode);
-  };
-
   const fetchQuestions = useCallback(async () => {
     try {
-      const result = await apiService.getQuestions(topicId, viewMode);
+      const result = await apiService.getQuestions(topicId, effectiveView);
       setQuestions(result.questions || []);
       setLoading(false);
     } catch {
       addToast('danger', 'Failed to load questions');
       setLoading(false);
     }
-  }, [addToast, topicId, viewMode]);
+  }, [addToast, effectiveView, topicId]);
 
   useEffect(() => {
     void fetchQuestions();
@@ -107,7 +100,7 @@ const QuestionsPage: React.FC = () => {
   ];
 
   return (
-    <div>
+    <ContentVisibilityScope view={effectiveView}><div>
       <PageMeta title="Questions" description="Browse questions from the community" />
       <Breadcrumb items={breadcrumbItems} />
       
@@ -157,7 +150,7 @@ const QuestionsPage: React.FC = () => {
           </div>
           <div className="row" style={{ marginTop: '10px' }}>
             <div className="col-md-12">
-              <ContentViewFilter value={viewMode} onChange={handleViewModeChange} />
+              <ContentViewFilter value={viewMode as ViewMode} onChange={setOverride} defaultLabel={defaultLabel} />
             </div>
           </div>
         </div>
@@ -211,7 +204,7 @@ const QuestionsPage: React.FC = () => {
           description="Try adjusting your search criteria."
         />
       )}
-    </div>
+    </div></ContentVisibilityScope>
   );
 };
 

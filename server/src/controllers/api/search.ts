@@ -7,6 +7,7 @@ import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 import * as flowUtilsNs from '../../utils/flowUtils';
 import constantsMod from '../../models/constants';
 import appModForDb from '../../app';
+import { applyViewModeFilter } from './viewFilter';
 const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
 const constants = constantsMod as unknown as ConstantsModule;
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
@@ -211,6 +212,7 @@ async function GET_search(req: WikitruthRequest, res: WikitruthResponse) {
   const model: SearchModel = {};
   flowUtils.setScreeningModel(req, model);
   const baseQuery = buildBaseQuery(model.screening?.status, cursor);
+  applyViewModeFilter(req, baseQuery, model.screening?.status);
   const privacyFilter = buildPrivacyFilter(content, req);
   const shouldLoad = function (section: SearchTab) {
     return allTabs || tab === section;

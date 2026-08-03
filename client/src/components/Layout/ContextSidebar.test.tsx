@@ -113,7 +113,7 @@ describe('ContextSidebar', () => {
 
     render(<ContextSidebar />, { route: '/answers/entry/answer-1/discussion' });
 
-    await waitFor(() => expect(mockedApi.getAnswerEntry).toHaveBeenCalledWith('answer-1'));
+    await waitFor(() => expect(mockedApi.getAnswerEntry).toHaveBeenCalledWith('answer-1', 'wiki'));
     expect(mockedApi.getAnswerEntry).not.toHaveBeenCalledWith('discussion');
   });
 

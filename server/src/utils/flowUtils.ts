@@ -1263,7 +1263,7 @@ function getDbConnectionForObjectType(entryType?: number) {
   return dbModel && dbModel.db ? dbModel.db : null;
 }
 
-type ChildCountBucket = { accepted: number; pending: number; rejected: number; total: number };
+type ChildCountBucket = { accepted: number; pending: number; rejected: number; archived?: number; total: number };
 type ChildrenCountShape = { topics: ChildCountBucket; arguments: ChildCountBucket; artifacts: ChildCountBucket; questions: ChildCountBucket; answers: ChildCountBucket; issues: ChildCountBucket; opinions: ChildCountBucket };
 type EntryWithChildrenCount = { _id?: unknown; ownerId?: unknown; childrenCount: ChildrenCountShape };
 type UpdateChildrenCountModel = Record<string, unknown> & { topic?: EntryWithChildrenCount; topicLink?: EntryWithChildrenCount; argument?: EntryWithChildrenCount; argumentLink?: EntryWithChildrenCount; artifact?: EntryWithChildrenCount; question?: EntryWithChildrenCount; answer?: EntryWithChildrenCount; issue?: EntryWithChildrenCount; opinion?: EntryWithChildrenCount };
@@ -1300,6 +1300,12 @@ async function updateChildrenCount(entryId: unknown, entryType: number | undefin
           const count = await countDocumentsWithSession(db.Topic, query, session);
           const linkCount = await countDocumentsWithSession(db.TopicLink, query, session);
           topics.rejected = count + linkCount;
+        },
+        archived: async function() {
+          const query = { parentId: entryId, 'screening.status': constants.SCREENING_STATUS.status3.code };
+          const count = await countDocumentsWithSession(db.Topic, query, session);
+          const linkCount = await countDocumentsWithSession(db.TopicLink, query, session);
+          topics.archived = count + linkCount;
         },
       });
       topics.total = topics.accepted + topics.pending + topics.rejected;
@@ -1343,6 +1349,16 @@ async function updateChildrenCount(entryId: unknown, entryType: number | undefin
           const linkCount = await countDocumentsWithSession(db.ArgumentLink, query, session);
           args.rejected = count + linkCount;
         },
+        archived: async function() {
+          const query = {
+            ownerId: q.ownerId,
+            parentId: q.parentId,
+            'screening.status': constants.SCREENING_STATUS.status3.code,
+          };
+          const count = await countDocumentsWithSession(db.Argument, query, session);
+          const linkCount = await countDocumentsWithSession(db.ArgumentLink, query, session);
+          args.archived = count + linkCount;
+        },
       });
       args.total = args.accepted + args.pending + args.rejected;
     }
@@ -1379,6 +1395,14 @@ async function updateChildrenCount(entryId: unknown, entryType: number | undefin
           };
           artifacts.rejected = await countDocumentsWithSession(db.Artifact, query, session);
         },
+        archived: async function() {
+          const query = {
+            ownerId: q.ownerId,
+            parentId: q.parentId,
+            'screening.status': constants.SCREENING_STATUS.status3.code,
+          };
+          artifacts.archived = await countDocumentsWithSession(db.Artifact, query, session);
+        },
       });
       artifacts.total = artifacts.accepted + artifacts.pending + artifacts.rejected;
     }
@@ -1403,6 +1427,12 @@ async function updateChildrenCount(entryId: unknown, entryType: number | undefin
           questions.rejected = await countDocumentsWithSession(db.Question, {
             ownerId: entryId,
             'screening.status': constants.SCREENING_STATUS.status2.code,
+          }, session);
+        },
+        archived: async function() {
+          questions.archived = await countDocumentsWithSession(db.Question, {
+            ownerId: entryId,
+            'screening.status': constants.SCREENING_STATUS.status3.code,
           }, session);
         },
       });
@@ -1431,6 +1461,12 @@ async function updateChildrenCount(entryId: unknown, entryType: number | undefin
             'screening.status': constants.SCREENING_STATUS.status2.code,
           }, session);
         },
+        archived: async () => {
+          answers.archived = await countDocumentsWithSession(db.Answer, {
+            questionId: entryId,
+            'screening.status': constants.SCREENING_STATUS.status3.code,
+          }, session);
+        },
       });
       answers.total = answers.accepted + answers.pending + answers.rejected;
     }
@@ -1457,6 +1493,12 @@ async function updateChildrenCount(entryId: unknown, entryType: number | undefin
             'screening.status': constants.SCREENING_STATUS.status2.code,
           }, session);
         },
+        archived: async function() {
+          issues.archived = await countDocumentsWithSession(db.Issue, {
+            ownerId: entryId,
+            'screening.status': constants.SCREENING_STATUS.status3.code,
+          }, session);
+        },
       });
       issues.total = issues.accepted + issues.pending + issues.rejected;
     }
@@ -1481,6 +1523,12 @@ async function updateChildrenCount(entryId: unknown, entryType: number | undefin
           opinions.rejected = await countDocumentsWithSession(db.Opinion, {
             ownerId: entryId,
             'screening.status': constants.SCREENING_STATUS.status2.code,
+          }, session);
+        },
+        archived: async function() {
+          opinions.archived = await countDocumentsWithSession(db.Opinion, {
+            ownerId: entryId,
+            'screening.status': constants.SCREENING_STATUS.status3.code,
           }, session);
         },
       });
@@ -2841,18 +2889,37 @@ function createContentPreview(content?: string): string {
   );
 }
 
-async function getCategories(model: Record<string, unknown>, topicId: unknown, req: { user?: { id?: unknown } }) {
-  let results = await getTopics({
+function categoryScreeningFilter(req: { query?: Record<string, unknown> }): unknown {
+  const view = String(req.query?.view || '').trim().toLowerCase();
+  if (view === 'all') return undefined;
+  if (view === 'active') {
+    return { $in: [constants.SCREENING_STATUS.status0.code, constants.SCREENING_STATUS.status1.code] };
+  }
+  if (view === 'original') return constants.SCREENING_STATUS.status0.code;
+  if (view === 'archived') return constants.SCREENING_STATUS.status3.code;
+  return constants.SCREENING_STATUS.status1.code;
+}
+
+function addCategoryScreeningFilter(
+  req: { query?: Record<string, unknown> },
+  query: Record<string, unknown>,
+): Record<string, unknown> {
+  const screening = categoryScreeningFilter(req);
+  if (typeof screening !== 'undefined') query['screening.status'] = screening;
+  return query;
+}
+
+async function getCategories(model: Record<string, unknown>, topicId: unknown, req: { user?: { id?: unknown }; query?: Record<string, unknown> }) {
+  const results = await getTopics(addCategoryScreeningFilter(req, {
     parentId: topicId,
     private: false,
-    'screening.status': constants.SCREENING_STATUS.status1.code,
-  }, {
+  }), {
     limit: 0,
     shortTitleLength: constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN,
     req: req,
   });
   await async.each(results, async function(result: EntryExtras & { _id?: unknown; subtopics?: unknown; subarguments?: unknown }) {
-    let subTopics = await getTopics({ parentId: result._id }, {
+    const subTopics = await getTopics(addCategoryScreeningFilter(req, { parentId: result._id }), {
       limit: constants.SETTINGS.SUBCATEGORY_LIST_SIZE,
       shortTitleLength: constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN,
       req: req,
@@ -2860,13 +2927,12 @@ async function getCategories(model: Record<string, unknown>, topicId: unknown, r
     result.subtopics = subTopics;
     if (subTopics.length < constants.SETTINGS.SUBCATEGORY_LIST_SIZE) {
       // if subtopics are less than 3, get some arguments
-      const query = {
+      const query = addCategoryScreeningFilter(req, {
         parentId: null,
         ownerId: result._id,
         ownerType: constants.OBJECT_TYPES.topic,
-        'screening.status': constants.SCREENING_STATUS.status1.code,
-      };
-      let subArguments = await getArguments(query, {
+      });
+      const subArguments = await getArguments(query, {
         limit: constants.SETTINGS.SUBCATEGORY_LIST_SIZE,
         req: req,
         shortTitleLength: constants.SETTINGS.TILE_MAX_SUB_ENTRY_LEN,

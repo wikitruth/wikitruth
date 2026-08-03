@@ -10,7 +10,7 @@ const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
 const constants = constantsMod as unknown as ConstantsModule;
 import * as utils from '../../utils/utils';
 import * as issuesService from '../../services/issuesService';
-import { applyViewModeFilter } from './viewFilter';
+import { applyViewModeFilter, withViewModeFilter } from './viewFilter';
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 import { logEntryEvent } from '../../services/entryEventsService';
 import { rejectBlockingDuplicate } from './duplicateWriteGuard';
@@ -61,7 +61,7 @@ export = function (router: Router) {
 };
 
 async function GET_issues(req: WikitruthRequest, res: WikitruthResponse) {
-  let model: Record<string, unknown> = {};
+  const model: Record<string, unknown> = {};
   flowUtils.setScreeningModel(req, model);
   
   const query: Record<string, unknown> = {
@@ -99,13 +99,12 @@ async function GET_issue_entry(req: WikitruthRequest, res: WikitruthResponse) {
   const context = await resolveLegacyEntryContext(req, constants.OBJECT_TYPES.issue, issueId);
   applyLegacyEntryContext(issue, context);
 
-  const opinions = await db.Opinion.find({
+  const opinions = await db.Opinion.find(withViewModeFilter(req, {
     parentId: null,
     ownerType: constants.OBJECT_TYPES.issue,
     ownerId: issueId,
     private: false,
-    'screening.status': constants.SCREENING_STATUS.status1.code,
-  }).sort({ editDate: -1 }).limit(5).lean();
+  })).sort({ editDate: -1 }).limit(5).lean();
 
   await flowUtils.setEditorsUsername(opinions);
   opinions.forEach(function (result: Record<string, unknown>) {

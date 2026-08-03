@@ -15,6 +15,8 @@ import type {
   TopicEntryResponse,
 } from '../../types/api';
 import type { LegacyEntity } from '../../types/legacy';
+import { useContentVisibility } from '../../context/ContentVisibilityContext';
+import { countForView } from '../../utils/contentVisibility';
 
 type SidebarCategory = LegacyEntity & {
   title?: string;
@@ -106,6 +108,7 @@ function normalizeEntryTopicLinks(raw: unknown): SidebarCategory[] {
 const ContextSidebar: React.FC = () => {
   const location = useLocation();
   const { user } = useAuth();
+  const { effectiveView } = useContentVisibility();
   const {
     application,
     applications,
@@ -131,7 +134,7 @@ const ContextSidebar: React.FC = () => {
     let mounted = true;
     const load = async () => {
       try {
-        const data = await apiService.getHomeData(localTenantContext);
+        const data = await apiService.getHomeData(localTenantContext, effectiveView);
         if (mounted) {
           setHomeContext(data);
         }
@@ -145,7 +148,7 @@ const ContextSidebar: React.FC = () => {
     return () => {
       mounted = false;
     };
-  }, [localTenantContext]);
+  }, [effectiveView, localTenantContext]);
 
   useEffect(() => {
     if (!entryId) {
@@ -167,6 +170,7 @@ const ContextSidebar: React.FC = () => {
           const response = await apiService.getTopicEntry(entryId, {
             topicLink: topicLinkQuery,
             id: topicLinkQuery,
+            view: effectiveView,
           });
           if (!mounted) {
             return;
@@ -212,22 +216,23 @@ const ContextSidebar: React.FC = () => {
             response = await apiService.getArgumentEntry(entryId, {
               argumentLink: argumentLinkQuery || undefined,
               id: argumentLinkQuery || undefined,
+              view: effectiveView,
             });
             break;
           case 'questions':
-            response = await apiService.getQuestionEntry(entryId);
+            response = await apiService.getQuestionEntry(entryId, effectiveView);
             break;
           case 'answers':
-            response = await apiService.getAnswerEntry(entryId);
+            response = await apiService.getAnswerEntry(entryId, effectiveView);
             break;
           case 'artifacts':
-            response = await apiService.getArtifactEntry(entryId);
+            response = await apiService.getArtifactEntry(entryId, effectiveView);
             break;
           case 'issues':
-            response = await apiService.getIssueEntry(entryId);
+            response = await apiService.getIssueEntry(entryId, effectiveView);
             break;
           case 'opinions':
-            response = await apiService.getOpinionEntry(entryId);
+            response = await apiService.getOpinionEntry(entryId, effectiveView);
             break;
           default:
             return;
@@ -266,7 +271,7 @@ const ContextSidebar: React.FC = () => {
     return () => {
       mounted = false;
     };
-  }, [argumentLinkQuery, section, entryId, topicContext?.topicLinks, topicLinkQuery]);
+  }, [argumentLinkQuery, effectiveView, section, entryId, topicContext?.topicLinks, topicLinkQuery]);
 
   useEffect(() => {
     if (!contextTopicId) {
@@ -277,7 +282,7 @@ const ContextSidebar: React.FC = () => {
     let mounted = true;
     const loadTopicContext = async () => {
       try {
-        const data = await apiService.getTopicEntry(contextTopicId);
+        const data = await apiService.getTopicEntry(contextTopicId, { view: effectiveView });
         if (mounted) {
           setTopicContext(data);
         }
@@ -292,7 +297,7 @@ const ContextSidebar: React.FC = () => {
     return () => {
       mounted = false;
     };
-  }, [contextTopicId]);
+  }, [contextTopicId, effectiveView]);
 
   const appsSection = useMemo<SidebarSection>(() => {
     const appItems: SidebarNavItem[] = [
@@ -328,7 +333,7 @@ const ContextSidebar: React.FC = () => {
   const exploreSection = useMemo<SidebarSection>(() => {
     const categories = appCategories as SidebarCategory[];
     const items: SidebarNavItem[] = categories.map((category, index) => {
-      const acceptedTopics = Number(category.childrenCount?.topics?.accepted || 0);
+      const acceptedTopics = countForView(category.childrenCount?.topics, effectiveView);
       const icon = String(category.icon || '').trim() || 'folder-open';
       return {
         key: `category-${index}-${String(category._id || '')}`,
@@ -344,7 +349,7 @@ const ContextSidebar: React.FC = () => {
       titleTo: application?.exploreUrl || '/explore',
       items,
     };
-  }, [appCategories, application?.exploreUrl]);
+  }, [appCategories, application?.exploreUrl, effectiveView]);
 
   const sectionItemsByRoot = useMemo<Record<string, SidebarSection>>(() => ({
     topics: {
@@ -436,7 +441,7 @@ const ContextSidebar: React.FC = () => {
         label: String(parentTopic.contextTitle || parentTopic.title || '(Untitled)'),
         to: buildTopicLink(parentTopic),
         icon: String(parentTopic.icon || '').trim() || 'folder-open',
-        badge: Number(parentTopic.childrenCount?.topics?.accepted || 0) || undefined,
+        badge: countForView(parentTopic.childrenCount?.topics, effectiveView) || undefined,
       });
     }
 
@@ -446,7 +451,7 @@ const ContextSidebar: React.FC = () => {
       label: String(topic.contextTitle || topic.title || '(Untitled)'),
       to: buildTopicLink(topic),
       icon: String(topic.icon || '').trim() || 'folder-open',
-      badge: Number(topic.childrenCount?.topics?.accepted || 0) || undefined,
+      badge: countForView(topic.childrenCount?.topics, effectiveView) || undefined,
       emphasize: true,
       level: currentLevel,
     });
@@ -457,7 +462,7 @@ const ContextSidebar: React.FC = () => {
         label: String(child.contextTitle || child.title || '(Untitled)'),
         to: buildTopicLink(child),
         icon: String(child.icon || '').trim() || 'folder-open',
-        badge: Number(child.childrenCount?.topics?.accepted || 0) || undefined,
+        badge: countForView(child.childrenCount?.topics, effectiveView) || undefined,
         level: currentLevel + 1,
       });
     });
@@ -478,7 +483,7 @@ const ContextSidebar: React.FC = () => {
         label: String(sibling.contextTitle || sibling.title || '(Untitled)'),
         to: buildTopicLink(sibling),
         icon: String(sibling.icon || '').trim() || 'folder-open',
-        badge: Number(sibling.childrenCount?.topics?.accepted || 0) || undefined,
+        badge: countForView(sibling.childrenCount?.topics, effectiveView) || undefined,
         level: currentLevel,
       });
     });
@@ -499,7 +504,7 @@ const ContextSidebar: React.FC = () => {
         label: String(parentSibling.contextTitle || parentSibling.title || '(Untitled)'),
         to: buildTopicLink(parentSibling),
         icon: String(parentSibling.icon || '').trim() || 'folder-open',
-        badge: Number(parentSibling.childrenCount?.topics?.accepted || 0) || undefined,
+        badge: countForView(parentSibling.childrenCount?.topics, effectiveView) || undefined,
       });
     });
 
@@ -516,7 +521,7 @@ const ContextSidebar: React.FC = () => {
       title: 'In This Section',
       items,
     };
-  }, [contextTopicId, section, sectionItemsByRoot, topicContext]);
+  }, [contextTopicId, effectiveView, section, sectionItemsByRoot, topicContext]);
 
   const diarySection = useMemo<SidebarSection | null>(() => {
     if (!user) {
@@ -534,10 +539,10 @@ const ContextSidebar: React.FC = () => {
         label: String(category.contextTitle || category.title || '(Untitled)'),
         to: buildTopicLink(category),
         icon: String(category.icon || '').trim() || 'folder-open',
-        badge: Number(category.childrenCount?.topics?.accepted || 0) || undefined,
+        badge: countForView(category.childrenCount?.topics, effectiveView) || undefined,
       })),
     };
-  }, [homeContext?.diaryCategories, user]);
+  }, [effectiveView, homeContext?.diaryCategories, user]);
 
   const groupsSection = useMemo<SidebarSection | null>(() => {
     if (!user) {

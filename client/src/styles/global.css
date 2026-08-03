@@ -452,6 +452,43 @@
   text-decoration: none;
 }
 
+.wt-user-menu-choice {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 8px;
+  width: 100%;
+  padding: 6px 20px;
+  color: inherit;
+  text-align: left;
+  white-space: normal;
+}
+
+.wt-user-menu-choice > i {
+  margin-top: 3px;
+}
+
+.wt-user-menu-choice strong,
+.wt-user-menu-choice small {
+  display: block;
+}
+
+.wt-user-menu-choice small {
+  margin-top: 1px;
+  color: var(--wt-text-muted, #777);
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.wt-content-view-summary {
+  min-height: 24px;
+  margin-bottom: 5px;
+  font-size: 12px;
+}
+
+.wt-content-view-summary .btn-link {
+  padding: 1px 0;
+}
+
 /* Keep keyboard location unmistakable without adding a ring to pointer clicks. */
 a:focus-visible,
 button:focus-visible,

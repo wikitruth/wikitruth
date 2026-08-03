@@ -7,6 +7,7 @@ import { useApplicationContext } from '../../context/ApplicationContext';
 import notificationsApi from '../../services/api/notifications';
 import { toModernAppSectionUrl } from '../../utils/paths';
 import ThemeToggle from './ThemeToggle';
+import HeaderContentVisibilityChoices from './HeaderContentVisibilityChoices';
 
 interface HeaderSection {
   title: string;
@@ -269,6 +270,12 @@ const Header: React.FC<HeaderProps> = ({
                       <i className="fa fa-user-circle"></i> Members
                     </Link>
                   </li>
+                  {!user ? (
+                    <>
+                      <li className="divider" aria-hidden="true"></li>
+                      <HeaderContentVisibilityChoices onSelected={() => setIsMoreOpen(false)} />
+                    </>
+                  ) : null}
                   <li className="divider" aria-hidden="true"></li>
                   {headerSections.map((section) => (
                     <li key={`${section.title}-${section.url || ''}`}>
@@ -407,6 +414,8 @@ const Header: React.FC<HeaderProps> = ({
                           ))}
                         </>
                       )}
+                      <li className="divider" aria-hidden="true"></li>
+                      <HeaderContentVisibilityChoices onSelected={() => setIsUserMenuOpen(false)} />
                       <li className="divider" aria-hidden="true"></li>
                       <li>
                         <Link to={applicationPath('/logout')} onClick={() => {

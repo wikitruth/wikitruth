@@ -116,7 +116,20 @@ export = function (router: Router) {
         return res.status(401).json({ error: 'Authentication required' });
       }
 
-      const privateProfile = Boolean(req.body?.privateProfile);
+      const nextPreferences: Record<string, unknown> = {};
+      if (Object.prototype.hasOwnProperty.call(req.body || {}, 'privateProfile')) {
+        nextPreferences.privateProfile = Boolean(req.body.privateProfile);
+      }
+      if (Object.prototype.hasOwnProperty.call(req.body || {}, 'contentVisibility')) {
+        const contentVisibility = String(req.body.contentVisibility || '').trim().toLowerCase();
+        if (!['accepted', 'active', 'all'].includes(contentVisibility)) {
+          return res.status(400).json({ error: 'Invalid content visibility preference' });
+        }
+        nextPreferences.contentVisibility = contentVisibility;
+      }
+      if (Object.keys(nextPreferences).length === 0) {
+        return res.status(400).json({ error: 'No supported preferences supplied' });
+      }
       const user = await db.User.findById(req.user._id || req.user.id);
       if (!user) {
         return res.status(404).json({ error: 'Member not found' });
@@ -124,7 +137,7 @@ export = function (router: Router) {
 
       user.preferences = {
         ...(user.preferences || {}),
-        privateProfile: privateProfile,
+        ...nextPreferences,
       };
       await user.save();
 

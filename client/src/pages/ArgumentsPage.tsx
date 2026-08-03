@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useSearchParams, Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import apiService from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ArgumentEntryRow from '../components/EntryRow/ArgumentEntryRow';
@@ -15,41 +15,34 @@ import type { Argument } from '../types';
 import { useNotification } from '../context/NotificationContext';
 import EmptyState from '../components/common/EmptyState';
 import { useAuth } from '../context/AuthContext';
+import { ContentVisibilityScope } from '../context/ContentVisibilityContext';
+import { usePageContentVisibility } from '../hooks/usePageContentVisibility';
 
 const ArgumentsPage: React.FC = () => {
   const { id } = useParams();
-  const [searchParams] = useSearchParams();
+  const { searchParams, override: viewMode, effectiveView, defaultLabel, setOverride } = usePageContentVisibility();
   const topicId = searchParams.get('topic') || id;
   
   const [argumentsList, setArgumentsList] = useState<LegacyEntity[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('editDate');
-  const [viewMode, setViewMode] = useState<ViewMode>(() => {
-    const saved = localStorage.getItem('wt_view_mode');
-    return (saved === 'wiki' || saved === 'original' || saved === 'archived') ? saved : 'all';
-  });
   const [filterVerdict, setFilterVerdict] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
   const { addToast } = useNotification();
   const { user, activeRole } = useAuth();
 
-  const handleViewModeChange = (mode: ViewMode) => {
-    setViewMode(mode);
-    localStorage.setItem('wt_view_mode', mode);
-  };
-
   const fetchArguments = useCallback(async () => {
     try {
-      const result = await apiService.getArguments(topicId, viewMode);
+      const result = await apiService.getArguments(topicId, effectiveView);
       setArgumentsList(result.arguments || []);
       setLoading(false);
     } catch {
       addToast('danger', 'Failed to load arguments');
       setLoading(false);
     }
-  }, [addToast, topicId, viewMode]);
+  }, [addToast, effectiveView, topicId]);
 
   useEffect(() => {
     void fetchArguments();
@@ -117,7 +110,7 @@ const ArgumentsPage: React.FC = () => {
   ];
 
   return (
-    <div>
+    <ContentVisibilityScope view={effectiveView}><div>
       <PageMeta title="Arguments" description="Browse arguments and claims" />
       <Breadcrumb items={breadcrumbItems} />
       
@@ -186,7 +179,7 @@ const ArgumentsPage: React.FC = () => {
           </div>
           <div className="row" style={{ marginTop: '10px' }}>
             <div className="col-md-12">
-              <ContentViewFilter value={viewMode} onChange={handleViewModeChange} />
+              <ContentViewFilter value={viewMode as ViewMode} onChange={setOverride} defaultLabel={defaultLabel} />
             </div>
           </div>
         </div>
@@ -242,7 +235,7 @@ const ArgumentsPage: React.FC = () => {
           description="Try adjusting your search or filters."
         />
       )}
-    </div>
+    </div></ContentVisibilityScope>
   );
 };
 

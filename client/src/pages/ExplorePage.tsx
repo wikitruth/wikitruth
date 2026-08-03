@@ -19,6 +19,13 @@ import { useNotification } from '../context/NotificationContext';
 import { useAuth } from '../context/AuthContext';
 import { useApplicationContext } from '../context/ApplicationContext';
 import { getTrustedRankingScore } from '../utils/trustedRanking';
+import { ContentVisibilityScope, useContentVisibility } from '../context/ContentVisibilityContext';
+import {
+  countForView,
+  normalizePageViewMode,
+  screeningMatchesView,
+  visibilityLabel,
+} from '../utils/contentVisibility';
 
 type ExploreTab = 'all' | 'topics' | 'arguments' | 'questions' | 'answers' | 'artifacts' | 'issues' | 'opinions';
 
@@ -65,12 +72,9 @@ function getArgumentEntryPath(argument: Pick<LegacyEntity, 'friendlyUrl' | '_id'
 const ExplorePage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
+  const { effectiveView: preferredView } = useContentVisibility();
   const [data, setData] = useState<HomeDataResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  const storedViewMode = (() => {
-    const saved = localStorage.getItem('wt_view_mode');
-    return saved === 'wiki' || saved === 'original' || saved === 'archived' ? saved : 'all';
-  })();
   const activeTab = ((): ExploreTab => {
     const raw = String(searchParams.get('tab') || 'all').toLowerCase();
     if (raw === 'topics' || raw === 'arguments' || raw === 'questions' || raw === 'answers' || raw === 'artifacts' || raw === 'issues' || raw === 'opinions') {
@@ -78,10 +82,8 @@ const ExplorePage: React.FC = () => {
     }
     return 'all';
   })();
-  const viewMode: ViewMode = (() => {
-    const raw = String(searchParams.get('view') || storedViewMode).toLowerCase();
-    return raw === 'wiki' || raw === 'original' || raw === 'archived' ? raw : 'all';
-  })();
+  const viewMode = normalizePageViewMode(searchParams.get('view'));
+  const effectiveView = viewMode === 'default' ? preferredView : viewMode;
   const keyword = String(searchParams.get('q') || '').trim();
   const screeningFilter = String(searchParams.get('screening') || 'all').trim();
   const verdictFilter = String(searchParams.get('status') || 'all').trim();
@@ -95,7 +97,7 @@ const ExplorePage: React.FC = () => {
     keyword || screeningFilter !== 'all' || verdictFilter !== 'all' || relationshipFilter !== 'all' || tagFilter
   );
   const [advancedFiltersOpen, setAdvancedFiltersOpen] = useState(hasAdvancedFilters);
-  const hideAcceptedStatus = viewMode === 'wiki';
+  const hideAcceptedStatus = effectiveView === 'wiki';
   const visualizePath = applicationPath(
     application?.exploreTopicId
       ? `/visualize/topic/${encodeURIComponent(String(application.exploreTopicId))}`
@@ -106,7 +108,7 @@ const ExplorePage: React.FC = () => {
     let mounted = true;
     const load = async () => {
       try {
-        const result = await apiService.getHomeData();
+        const result = await apiService.getHomeData(false, effectiveView);
         if (mounted) {
           setData(result);
         }
@@ -124,7 +126,7 @@ const ExplorePage: React.FC = () => {
     return () => {
       mounted = false;
     };
-  }, [addToast]);
+  }, [addToast, effectiveView]);
 
   useEffect(() => {
     if (hasAdvancedFilters) {
@@ -133,10 +135,9 @@ const ExplorePage: React.FC = () => {
   }, [hasAdvancedFilters]);
 
   const handleViewModeChange = (mode: ViewMode) => {
-    localStorage.setItem('wt_view_mode', mode);
     const next = new URLSearchParams(searchParams);
     next.delete('screening');
-    if (mode === 'all') {
+    if (mode === 'default') {
       next.delete('view');
     } else {
       next.set('view', mode);
@@ -147,8 +148,7 @@ const ExplorePage: React.FC = () => {
   const updateFilter = (name: string, value: string) => {
     const next = new URLSearchParams(searchParams);
     if (name === 'screening') {
-      localStorage.setItem('wt_view_mode', 'all');
-      next.delete('view');
+      next.set('view', 'all');
     }
     if (!value || value === 'all') {
       next.delete(name);
@@ -235,11 +235,8 @@ const ExplorePage: React.FC = () => {
       }
     }
 
-    if (viewMode !== 'all') {
-      const expectedStatus = viewMode === 'wiki' ? 1 : viewMode === 'original' ? 0 : 3;
-      if (Number(entry.screening?.status) !== expectedStatus) {
+    if (!screeningMatchesView(entry.screening?.status, effectiveView)) {
         return false;
-      }
     }
 
     if (verdictFilter !== 'all') {
@@ -259,13 +256,13 @@ const ExplorePage: React.FC = () => {
       return false;
     }
     if (relationshipFilter === 'with-issues') {
-      const issuesCount = Number(entry.childrenCount?.issues?.accepted || entry.childrenCount?.issues?.total || 0);
+      const issuesCount = countForView(entry.childrenCount?.issues, effectiveView);
       if (issuesCount <= 0) {
         return false;
       }
     }
     if (relationshipFilter === 'with-discussion') {
-      const discussionCount = Number(entry.childrenCount?.opinions?.accepted || entry.childrenCount?.opinions?.total || 0);
+      const discussionCount = countForView(entry.childrenCount?.opinions, effectiveView);
       if (discussionCount <= 0) {
         return false;
       }
@@ -283,19 +280,19 @@ const ExplorePage: React.FC = () => {
     }
 
     return true;
-  }, [keyword, relationshipFilter, screeningFilter, tagFilter, verdictFilter, viewMode]);
+  }, [effectiveView, keyword, relationshipFilter, screeningFilter, tagFilter, verdictFilter]);
 
   const filteredSections = useMemo(() => {
     const getPopularityScore = (entry: LegacyEntity): number => {
       const buckets = entry.childrenCount || {};
       const totals = [
-        buckets.topics?.accepted || buckets.topics?.total || 0,
-        buckets.arguments?.accepted || buckets.arguments?.total || 0,
-        buckets.questions?.accepted || buckets.questions?.total || 0,
-        buckets.answers?.accepted || buckets.answers?.total || 0,
-        buckets.artifacts?.accepted || buckets.artifacts?.total || 0,
-        buckets.issues?.accepted || buckets.issues?.total || 0,
-        buckets.opinions?.accepted || buckets.opinions?.total || 0,
+        countForView(buckets.topics, effectiveView),
+        countForView(buckets.arguments, effectiveView),
+        countForView(buckets.questions, effectiveView),
+        countForView(buckets.answers, effectiveView),
+        countForView(buckets.artifacts, effectiveView),
+        countForView(buckets.issues, effectiveView),
+        countForView(buckets.opinions, effectiveView),
       ]
         .map((value) => Number(value || 0))
         .reduce((sum, value) => sum + value, 0);
@@ -329,7 +326,7 @@ const ExplorePage: React.FC = () => {
       ...section,
       items: sortEntries((section.items || []).filter((entry) => filterEntry(entry as LegacyEntity))),
     }));
-  }, [filterEntry, sections, sortMode]);
+  }, [effectiveView, filterEntry, sections, sortMode]);
 
   const categories: ExploreCategory[] = (data?.appCategories || []) as ExploreCategory[];
 
@@ -338,7 +335,7 @@ const ExplorePage: React.FC = () => {
   }
 
   return (
-    <div className="wt-explore-page">
+    <ContentVisibilityScope view={effectiveView}><div className="wt-explore-page">
       <PageMeta title="Explore" description="Discover categories and latest posts" />
       <h1 className="page-header wt-header-2 wt-explore-page-header">
         <i className="fa fa-globe text-muted-x" aria-hidden="true"></i> Explore
@@ -359,12 +356,12 @@ const ExplorePage: React.FC = () => {
             const title = String(category.contextTitle || category.title || '(Untitled)');
             const subtopics = Array.isArray(category.subtopics) ? category.subtopics.slice(0, 5) : [];
             const subarguments = Array.isArray(category.subarguments) ? category.subarguments.slice(0, 5) : [];
-            const acceptedTopicCount = Number(category.childrenCount?.topics?.accepted || 0);
-            const acceptedArgumentCount = Number(category.childrenCount?.arguments?.accepted || 0);
-            const moreCount = acceptedTopicCount || acceptedArgumentCount;
-            const childType = acceptedTopicCount > 0
+            const topicCount = countForView(category.childrenCount?.topics, effectiveView);
+            const argumentCount = countForView(category.childrenCount?.arguments, effectiveView);
+            const moreCount = topicCount || argumentCount;
+            const childType = topicCount > 0
               ? 'topics'
-              : acceptedArgumentCount > 0
+              : argumentCount > 0
                 ? 'facts'
                 : 'items';
 
@@ -447,7 +444,7 @@ const ExplorePage: React.FC = () => {
             Trusted
           </button>
         </div>
-        <ContentViewFilter value={viewMode} onChange={handleViewModeChange} />
+        <ContentViewFilter value={viewMode} onChange={handleViewModeChange} defaultLabel={visibilityLabel(preferredView)} />
       </div>
       <button
         type="button"
@@ -626,7 +623,7 @@ const ExplorePage: React.FC = () => {
             );
           })}
       </div>
-    </div>
+    </div></ContentVisibilityScope>
   );
 };
 

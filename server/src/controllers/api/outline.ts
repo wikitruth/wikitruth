@@ -9,6 +9,7 @@ import { isOnboardingComplete } from './authHelpers';
 import { logEntryEvent } from '../../services/entryEventsService';
 import { notifySubscribers } from '../../services/notificationsService';
 import { recordEntryRevision } from './revisionWriteRecorder';
+import { withViewModeFilter } from './viewFilter';
 
 const constants = constantsMod as unknown as {
   OBJECT_TYPES: Record<string, number>;
@@ -68,6 +69,7 @@ function topicNode(topic: Record<string, unknown>): OutlineTreeNode {
 }
 
 async function buildTopicForest(
+  req: WikitruthRequest,
   roots: Record<string, unknown>[],
   depth: number,
   budget: TreeBudget,
@@ -80,11 +82,10 @@ async function buildTopicForest(
   let parents = trees;
   for (let level = 0; level < depth && parents.length && budget.remaining > 0; level += 1) {
     const parentById = new Map(parents.map((node) => [node._id, node]));
-    const children = await db.Topic.find({
+    const children = await db.Topic.find(withViewModeFilter(req, {
       parentId: { $in: Array.from(parentById.keys()) },
       private: false,
-      'screening.status': constants.SCREENING_STATUS.status1.code,
-    }).sort({ editDate: -1 }).limit(Math.min(MAX_TREE_NODES, budget.remaining + parents.length * childLimit)).lean();
+    })).sort({ editDate: -1 }).limit(Math.min(MAX_TREE_NODES, budget.remaining + parents.length * childLimit)).lean();
     const next: OutlineTreeNode[] = [];
     const perParent = new Map<string, number>();
     for (const child of children) {
@@ -105,11 +106,16 @@ async function buildTopicForest(
   return trees;
 }
 
-function isPublicTopic(topic: Record<string, unknown> | null | undefined): topic is Record<string, unknown> {
+function isPublicTopic(req: WikitruthRequest, topic: Record<string, unknown> | null | undefined): topic is Record<string, unknown> {
   if (!topic || topic.private === true) return false;
   const screening = topic.screening as { status?: unknown } | undefined;
-  return typeof screening?.status === 'undefined'
-    || Number(screening.status) === constants.SCREENING_STATUS.status1.code;
+  if (typeof screening?.status === 'undefined') return true;
+  const filter = withViewModeFilter(req, {} as Record<string, unknown>)['screening.status'];
+  if (typeof filter === 'undefined') return true;
+  if (filter && typeof filter === 'object' && '$in' in filter) {
+    return (filter.$in as unknown[]).map(Number).includes(Number(screening.status));
+  }
+  return Number(screening.status) === Number(filter);
 }
 
 function isPublicHierarchyContextTopic(
@@ -228,8 +234,8 @@ export = function (router: Router) {
     const budget: TreeBudget = { remaining: MAX_TREE_NODES, truncated: false };
     if (rootId) {
       const root = await db.Topic.findById(rootId).lean();
-      if (!isPublicTopic(root)) { res.status(404).json({ success: false, message: 'Root topic not found' }); return; }
-      const [tree] = await buildTopicForest([root], depth, budget, childLimit);
+      if (!isPublicTopic(req, root)) { res.status(404).json({ success: false, message: 'Root topic not found' }); return; }
+      const [tree] = await buildTopicForest(req, [root], depth, budget, childLimit);
       const ancestorResult = await loadTopicAncestors(root, ancestorDepth);
       const hierarchyContext: HierarchyContextStatus = !String(root.parentId || '').trim()
         ? 'root'
@@ -243,12 +249,12 @@ export = function (router: Router) {
       });
       return;
     }
-    const roots = await db.Topic.find({
-      parentId: null, private: false, 'screening.status': constants.SCREENING_STATUS.status1.code,
-    }).sort({ editDate: -1 }).limit(rootLimit).lean();
+    const roots = await db.Topic.find(withViewModeFilter(req, {
+      parentId: null, private: false,
+    })).sort({ editDate: -1 }).limit(rootLimit).lean();
     res.json({
       success: true,
-      trees: await buildTopicForest(roots, depth, budget, childLimit),
+      trees: await buildTopicForest(req, roots, depth, budget, childLimit),
       ancestors: [],
       hierarchyContext: 'root',
       truncated: budget.truncated,
@@ -263,9 +269,9 @@ export = function (router: Router) {
     const regex = new RegExp(escapeRegex(term), 'i');
     const kinds = (Object.keys(TARGET_MODEL_NAMES) as EntryKind[]).filter((kind) => requested.includes(kind));
     const rows = await Promise.all(kinds.map(async (kind) => {
-      const entries = await db[TARGET_MODEL_NAMES[kind]].find({
-        title: regex, private: false, 'screening.status': constants.SCREENING_STATUS.status1.code,
-      }).sort({ editDate: -1 }).limit(limit).lean();
+      const entries = await db[TARGET_MODEL_NAMES[kind]].find(withViewModeFilter(req, {
+        title: regex, private: false,
+      })).sort({ editDate: -1 }).limit(limit).lean();
       return entries.map((entry: Record<string, unknown>) => ({
         _id: String(entry._id || ''), title: String(entry.title || ''), friendlyUrl: entry.friendlyUrl || '', objectName: kind,
       }));

@@ -12,6 +12,7 @@ import OpinionEntryRow from '../components/EntryRow/OpinionEntryRow';
 import PageMeta from '../components/common/PageMeta';
 import { trackEvent } from '../utils/analytics';
 import { useAuth } from '../context/AuthContext';
+import { useContentVisibility } from '../context/ContentVisibilityContext';
 import { useNotification } from '../context/NotificationContext';
 import EmptyState from '../components/common/EmptyState';
 import type { SearchResponse } from '../types/api';
@@ -84,6 +85,7 @@ function normalizeEvidence(value: string | null): SearchEvidence {
 const SearchPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const { user } = useAuth();
+  const { effectiveView } = useContentVisibility();
 
   const query = searchParams.get('q') || '';
   const tab = normalizeTab(searchParams.get('tab'));
@@ -136,7 +138,7 @@ const SearchPage: React.FC = () => {
       try {
         setLoading(true);
         setSearched(true);
-        const response = await apiService.search(query, { tab, content, relationship, evidence });
+        const response = await apiService.search(query, { tab, content, relationship, evidence, view: effectiveView });
         trackEvent('search', 'engagement', query);
         setResults(response);
       } catch {
@@ -148,7 +150,7 @@ const SearchPage: React.FC = () => {
     };
 
     void run();
-  }, [addToast, query, tab, content, relationship, evidence]);
+  }, [addToast, content, effectiveView, evidence, query, relationship, tab]);
 
   const buildSearchLink = (next: { q?: string; tab?: SearchTab; content?: SearchContent }) => {
     const params = new URLSearchParams();

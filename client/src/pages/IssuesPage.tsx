@@ -16,6 +16,8 @@ import { useAuth } from '../context/AuthContext';
 import type { LegacyEntity } from '../types/legacy';
 import type { Issue } from '../types';
 import { useNotification } from '../context/NotificationContext';
+import { ContentVisibilityScope } from '../context/ContentVisibilityContext';
+import { usePageContentVisibility } from '../hooks/usePageContentVisibility';
 
 const IssuesPage: React.FC = () => {
   const [issues, setIssues] = useState<LegacyEntity[]>([]);
@@ -23,24 +25,16 @@ const IssuesPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('editDate');
-  const [viewMode, setViewMode] = useState<ViewMode>(() => {
-    const saved = localStorage.getItem('wt_view_mode');
-    return (saved === 'wiki' || saved === 'original' || saved === 'archived') ? saved : 'all';
-  });
+  const { override: viewMode, effectiveView, defaultLabel, setOverride } = usePageContentVisibility();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
   const { addToast } = useNotification();
   const { user, activeRole } = useAuth();
 
-  const handleViewModeChange = (mode: ViewMode) => {
-    setViewMode(mode);
-    localStorage.setItem('wt_view_mode', mode);
-  };
-
   const fetchIssues = useCallback(async () => {
     try {
       setLoading(true);
-      const data = await apiService.getIssues(undefined, viewMode);
+      const data = await apiService.getIssues(undefined, effectiveView);
       setIssues(data.issues || []);
     } catch {
       setError('Failed to load issues');
@@ -48,7 +42,7 @@ const IssuesPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, [addToast, viewMode]);
+  }, [addToast, effectiveView]);
 
   useEffect(() => {
     void fetchIssues();
@@ -111,7 +105,7 @@ const IssuesPage: React.FC = () => {
   ];
 
   return (
-    <div>
+    <ContentVisibilityScope view={effectiveView}><div>
       <PageMeta title="Issues" description="Browse issues and concerns raised by the community" />
       <Breadcrumb items={breadcrumbItems} />
       
@@ -162,7 +156,7 @@ const IssuesPage: React.FC = () => {
           </div>
           <div className="row" style={{ marginTop: '10px' }}>
             <div className="col-md-12">
-              <ContentViewFilter value={viewMode} onChange={handleViewModeChange} />
+              <ContentViewFilter value={viewMode as ViewMode} onChange={setOverride} defaultLabel={defaultLabel} />
             </div>
           </div>
         </div>
@@ -211,7 +205,7 @@ const IssuesPage: React.FC = () => {
           description="Try adjusting your search criteria."
         />
       )}
-    </div>
+    </div></ContentVisibilityScope>
   );
 };
 

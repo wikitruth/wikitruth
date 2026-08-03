@@ -135,12 +135,20 @@ class ApiService {
   }
 
   // Home
-  async getHomeData(civic = false): Promise<HomeDataResponse> {
-    return this.request<HomeDataResponse>(`/home${civic ? '?civic=1' : ''}`);
+  async getHomeData(civic = false, view?: string): Promise<HomeDataResponse> {
+    const params = new URLSearchParams();
+    if (civic) params.set('civic', '1');
+    if (view) params.set('view', view);
+    const query = params.toString();
+    return this.request<HomeDataResponse>(`/home${query ? `?${query}` : ''}`);
   }
 
-  async getApplicationContext(civic = false): Promise<ApplicationContextResponse> {
-    return this.request<ApplicationContextResponse>(`/application-context${civic ? '?civic=1' : ''}`);
+  async getApplicationContext(civic = false, view?: string): Promise<ApplicationContextResponse> {
+    const params = new URLSearchParams();
+    if (civic) params.set('civic', '1');
+    if (view) params.set('view', view);
+    const query = params.toString();
+    return this.request<ApplicationContextResponse>(`/application-context${query ? `?${query}` : ''}`);
   }
 
   async getInstallStatus(): Promise<InstallStatusResponse> {
@@ -224,7 +232,7 @@ class ApiService {
   async getTopics(topicId?: string, view?: string): Promise<LegacyApiResponse> {
     const params = new URLSearchParams();
     if (topicId) params.set('topic', topicId);
-    if (view && view !== 'all') params.set('view', view);
+    if (view) params.set('view', view);
     const qs = params.toString();
     const url = qs ? `/topics?${qs}` : '/topics';
     return this.request<LegacyApiResponse>(url);
@@ -236,6 +244,7 @@ class ApiService {
       topicLink?: string;
       mode?: string;
       id?: string;
+      view?: string;
     }
   ): Promise<TopicEntryResponse> {
     const params = new URLSearchParams();
@@ -248,6 +257,7 @@ class ApiService {
     if (options?.id) {
       params.set('id', String(options.id));
     }
+    if (options?.view) params.set('view', options.view);
     const suffix = params.toString();
     return this.request<TopicEntryResponse>(`/topics/entry/${id}${suffix ? `?${suffix}` : ''}`);
   }
@@ -317,7 +327,7 @@ class ApiService {
   async getArguments(topicId?: string, view?: string): Promise<LegacyApiResponse> {
     const params = new URLSearchParams();
     if (topicId) params.set('topic', topicId);
-    if (view && view !== 'all') params.set('view', view);
+    if (view) params.set('view', view);
     const qs = params.toString();
     const url = qs ? `/arguments?${qs}` : '/arguments';
     return this.request<LegacyApiResponse>(url);
@@ -329,6 +339,7 @@ class ApiService {
       argumentLink?: string;
       mode?: string;
       id?: string;
+      view?: string;
     }
   ): Promise<ArgumentEntryResponse> {
     const params = new URLSearchParams();
@@ -341,6 +352,7 @@ class ApiService {
     if (options?.id) {
       params.set('id', String(options.id));
     }
+    if (options?.view) params.set('view', options.view);
     const suffix = params.toString();
     return this.request<ArgumentEntryResponse>(`/arguments/entry/${id}${suffix ? `?${suffix}` : ''}`);
   }
@@ -413,14 +425,14 @@ class ApiService {
   async getQuestions(topicId?: string, view?: string): Promise<LegacyApiResponse> {
     const params = new URLSearchParams();
     if (topicId) params.set('topic', topicId);
-    if (view && view !== 'all') params.set('view', view);
+    if (view) params.set('view', view);
     const qs = params.toString();
     const url = qs ? `/questions?${qs}` : '/questions';
     return this.request<LegacyApiResponse>(url);
   }
 
-  async getQuestionEntry(id: string): Promise<QuestionEntryResponse> {
-    return this.request<QuestionEntryResponse>(`/questions/entry/${id}`);
+  async getQuestionEntry(id: string, view?: string): Promise<QuestionEntryResponse> {
+    return this.request<QuestionEntryResponse>(`/questions/entry/${id}${view ? `?view=${encodeURIComponent(view)}` : ''}`);
   }
 
   async createQuestion(payload: {
@@ -457,14 +469,14 @@ class ApiService {
   async getIssues(topicId?: string, view?: string): Promise<LegacyApiResponse> {
     const params = new URLSearchParams();
     if (topicId) params.set('topic', topicId);
-    if (view && view !== 'all') params.set('view', view);
+    if (view) params.set('view', view);
     const qs = params.toString();
     const url = qs ? `/issues?${qs}` : '/issues';
     return this.request<LegacyApiResponse>(url);
   }
 
-  async getIssueEntry(id: string): Promise<IssueEntryResponse> {
-    return this.request<IssueEntryResponse>(`/issues/entry/${id}`);
+  async getIssueEntry(id: string, view?: string): Promise<IssueEntryResponse> {
+    return this.request<IssueEntryResponse>(`/issues/entry/${id}${view ? `?view=${encodeURIComponent(view)}` : ''}`);
   }
 
   async createIssue(payload: {
@@ -505,15 +517,15 @@ class ApiService {
   async getOpinions(topicId?: string, view?: string, classification?: string): Promise<LegacyApiResponse> {
     const params = new URLSearchParams();
     if (topicId) params.set('topic', topicId);
-    if (view && view !== 'all') params.set('view', view);
+    if (view) params.set('view', view);
     if (classification && classification !== 'all') params.set('classification', classification);
     const qs = params.toString();
     const url = qs ? `/opinions?${qs}` : '/opinions';
     return this.request<LegacyApiResponse>(url);
   }
 
-  async getOpinionEntry(id: string): Promise<OpinionEntryResponse> {
-    return this.request<OpinionEntryResponse>(`/opinions/entry/${id}`);
+  async getOpinionEntry(id: string, view?: string): Promise<OpinionEntryResponse> {
+    return this.request<OpinionEntryResponse>(`/opinions/entry/${id}${view ? `?view=${encodeURIComponent(view)}` : ''}`);
   }
 
   async createOpinion(payload: {
@@ -551,14 +563,14 @@ class ApiService {
   async getAnswers(questionId?: string, view?: string): Promise<LegacyApiResponse> {
     const params = new URLSearchParams();
     if (questionId) params.set('question', questionId);
-    if (view && view !== 'all') params.set('view', view);
+    if (view) params.set('view', view);
     const qs = params.toString();
     const url = qs ? `/answers?${qs}` : '/answers';
     return this.request<LegacyApiResponse>(url);
   }
 
-  async getAnswerEntry(id: string): Promise<AnswerEntryResponse> {
-    return this.request<AnswerEntryResponse>(`/answers/entry/${id}`);
+  async getAnswerEntry(id: string, view?: string): Promise<AnswerEntryResponse> {
+    return this.request<AnswerEntryResponse>(`/answers/entry/${id}${view ? `?view=${encodeURIComponent(view)}` : ''}`);
   }
 
   async createAnswer(payload: {
@@ -591,13 +603,17 @@ class ApiService {
   }
 
   // Artifacts
-  async getArtifacts(topicId?: string): Promise<LegacyApiResponse> {
-    const url = topicId ? `/artifacts?topic=${topicId}` : '/artifacts';
+  async getArtifacts(topicId?: string, view?: string): Promise<LegacyApiResponse> {
+    const params = new URLSearchParams();
+    if (topicId) params.set('topic', topicId);
+    if (view) params.set('view', view);
+    const query = params.toString();
+    const url = query ? `/artifacts?${query}` : '/artifacts';
     return this.request<LegacyApiResponse>(url);
   }
 
-  async getArtifactEntry(id: string): Promise<ArtifactEntryResponse> {
-    return this.request<ArtifactEntryResponse>(`/artifacts/entry/${id}`);
+  async getArtifactEntry(id: string, view?: string): Promise<ArtifactEntryResponse> {
+    return this.request<ArtifactEntryResponse>(`/artifacts/entry/${id}${view ? `?view=${encodeURIComponent(view)}` : ''}`);
   }
 
   async createArtifact(payload: {
@@ -638,11 +654,12 @@ class ApiService {
     });
   }
 
-  async getEntryChildren(objectName: string, id: string): Promise<EntityBuckets> {
+  async getEntryChildren(objectName: string, id: string, view: string = 'wiki'): Promise<EntityBuckets> {
     const encodedId = encodeURIComponent(id);
+    const suffix = `?view=${encodeURIComponent(view)}`;
     switch (objectName) {
       case 'topic': {
-        const response = await this.request<TopicEntryResponse>(`/topics/entry/${encodedId}`, { cache: 'no-store' });
+        const response = await this.request<TopicEntryResponse>(`/topics/entry/${encodedId}${suffix}`, { cache: 'no-store' });
         return {
           topics: response.topicChildren || response.topics || [],
           arguments: response.arguments || [],
@@ -653,7 +670,7 @@ class ApiService {
         };
       }
       case 'argument': {
-        const response = await this.request<ArgumentEntryResponse>(`/arguments/entry/${encodedId}`, { cache: 'no-store' });
+        const response = await this.request<ArgumentEntryResponse>(`/arguments/entry/${encodedId}${suffix}`, { cache: 'no-store' });
         return {
           arguments: response.arguments || [],
           questions: response.questions || [],
@@ -662,7 +679,7 @@ class ApiService {
         };
       }
       case 'question': {
-        const response = await this.request<QuestionEntryResponse>(`/questions/entry/${encodedId}`, { cache: 'no-store' });
+        const response = await this.request<QuestionEntryResponse>(`/questions/entry/${encodedId}${suffix}`, { cache: 'no-store' });
         return {
           answers: response.answers || [],
           issues: response.issues || [],
@@ -670,11 +687,11 @@ class ApiService {
         };
       }
       case 'answer': {
-        const response = await this.request<AnswerEntryResponse>(`/answers/entry/${encodedId}`, { cache: 'no-store' });
+        const response = await this.request<AnswerEntryResponse>(`/answers/entry/${encodedId}${suffix}`, { cache: 'no-store' });
         return { issues: response.issues || [], opinions: response.opinions || [] };
       }
       case 'artifact': {
-        const response = await this.request<ArtifactEntryResponse>(`/artifacts/entry/${encodedId}`, { cache: 'no-store' });
+        const response = await this.request<ArtifactEntryResponse>(`/artifacts/entry/${encodedId}${suffix}`, { cache: 'no-store' });
         return {
           artifacts: response.artifacts || [],
           arguments: response.arguments || [],
@@ -684,11 +701,11 @@ class ApiService {
         };
       }
       case 'issue': {
-        const response = await this.request<IssueEntryResponse>(`/issues/entry/${encodedId}`, { cache: 'no-store' });
+        const response = await this.request<IssueEntryResponse>(`/issues/entry/${encodedId}${suffix}`, { cache: 'no-store' });
         return { opinions: response.opinions || [] };
       }
       case 'opinion': {
-        const response = await this.request<OpinionEntryResponse>(`/opinions/entry/${encodedId}`, { cache: 'no-store' });
+        const response = await this.request<OpinionEntryResponse>(`/opinions/entry/${encodedId}${suffix}`, { cache: 'no-store' });
         return { issues: response.issues || [], opinions: response.opinions || [] };
       }
       default:
@@ -752,6 +769,7 @@ class ApiService {
       limit?: number;
       relationship?: string;
       evidence?: string;
+      view?: string;
     }
   ): Promise<SearchResponse> {
     const params = new URLSearchParams();
@@ -771,6 +789,7 @@ class ApiService {
     if (options?.evidence && options.evidence !== 'all') {
       params.set('evidence', options.evidence);
     }
+    if (options?.view) params.set('view', options.view);
     return this.request<SearchResponse>(`/search?${params.toString()}`);
   }
 
@@ -873,7 +892,10 @@ class ApiService {
     return this.request<LegacyApiResponse>('/members/me');
   }
 
-  async updateCurrentMemberPreferences(payload: { privateProfile: boolean }): Promise<LegacyApiResponse> {
+  async updateCurrentMemberPreferences(payload: {
+    privateProfile?: boolean;
+    contentVisibility?: 'accepted' | 'active' | 'all';
+  }): Promise<LegacyApiResponse> {
     return this.request<LegacyApiResponse>('/members/me/preferences', {
       method: 'PUT',
       body: JSON.stringify(payload),
@@ -928,7 +950,7 @@ class ApiService {
   async getOutlineTree(
     rootId?: string,
     depth: number = 2,
-    options?: { ancestorDepth?: number; childLimit?: number; rootLimit?: number },
+    options?: { ancestorDepth?: number; childLimit?: number; rootLimit?: number; view?: string },
   ): Promise<OutlineTreeResponse> {
     const params = new URLSearchParams();
     if (rootId) {
@@ -944,6 +966,7 @@ class ApiService {
     if (typeof options?.rootLimit === 'number') {
       params.set('rootLimit', String(options.rootLimit));
     }
+    if (options?.view) params.set('view', options.view);
     return this.request(`/outline/tree?${params.toString()}`);
   }
 
@@ -952,6 +975,7 @@ class ApiService {
     options?: {
       types?: string;
       limit?: number;
+      view?: string;
     },
   ): Promise<{
     success?: boolean;
@@ -966,6 +990,7 @@ class ApiService {
     params.set('q', query);
     params.set('types', options?.types || 'topic,argument');
     params.set('limit', String(options?.limit || 20));
+    if (options?.view) params.set('view', options.view);
     return this.request(`/outline/search?${params.toString()}`);
   }
 }

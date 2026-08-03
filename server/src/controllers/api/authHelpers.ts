@@ -11,6 +11,7 @@ type AuthUserLike = {
   email?: string;
   roles?: unknown;
   onboarding?: unknown;
+  preferences?: Record<string, unknown>;
   passwordLoginDisabled?: boolean;
 };
 
@@ -21,6 +22,7 @@ type AuthUserDocument = {
   email?: string;
   roles?: Record<string, unknown>;
   onboarding?: Record<string, unknown>;
+  preferences?: Record<string, unknown>;
   canPlayRoleOf?: (role: string) => boolean;
   defaultReturnUrl?: () => string;
   isAdmin?: () => boolean;
@@ -167,6 +169,7 @@ function sanitizeUser(user: AuthUserLike | null | undefined) {
     email: user.email,
     roles: user.roles,
     onboarding: user.onboarding,
+    preferences: user.preferences,
     passwordLoginDisabled: Boolean(user.passwordLoginDisabled),
   };
 }

@@ -78,7 +78,7 @@ describe('ApplicationProvider', () => {
     );
 
     await waitFor(() => expect(screen.getByTestId('app-name')).toHaveTextContent('FixPH'));
-    expect(mockedApi.getApplicationContext).toHaveBeenCalledWith(true);
+    expect(mockedApi.getApplicationContext).toHaveBeenCalledWith(true, 'wiki');
     expect(screen.getByTestId('app-path')).toHaveTextContent('/search?tab=topics&civic=1#browse');
     expect(screen.getByTestId('platform-home')).toHaveTextContent('/');
     expect(document.body).toHaveClass('wt-tenant-app', 'app-fixtheph');
@@ -103,7 +103,7 @@ describe('ApplicationProvider', () => {
 
     render(<ApplicationProvider><Consumer /></ApplicationProvider>, { route: '/' });
 
-    await waitFor(() => expect(mockedApi.getApplicationContext).toHaveBeenCalledWith(false));
+    await waitFor(() => expect(mockedApi.getApplicationContext).toHaveBeenCalledWith(false, 'wiki'));
     expect(screen.getByTestId('app-name')).toHaveTextContent('Wikitruth');
     expect(screen.getByTestId('app-path')).toHaveTextContent('/search?tab=topics#browse');
     expect(document.body).not.toHaveClass('wt-tenant-app');

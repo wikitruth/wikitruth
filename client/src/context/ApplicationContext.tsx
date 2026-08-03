@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 import apiService from '../services/api';
 import type { Application } from '../types';
 import type { LegacyEntity } from '../types/legacy';
+import { useContentVisibility } from './ContentVisibilityContext';
 
 const PLATFORM_NAME = 'Wikitruth';
 const PLATFORM_DESCRIPTION = 'A systematic discourse and knowledge contribution using dialectics and vetting';
@@ -87,6 +88,7 @@ const ApplicationDocumentIdentity: React.FC<{ application: Application | null }>
 
 export const ApplicationProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
+  const { effectiveView } = useContentVisibility();
   const localTenantContext = useMemo(() => {
     const civicQuery = new URLSearchParams(location.search).get('civic');
     return location.pathname === '/civic' || location.pathname.startsWith('/civic/') || civicQuery === '1';
@@ -100,7 +102,7 @@ export const ApplicationProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await apiService.getApplicationContext(localTenantContext);
+      const response = await apiService.getApplicationContext(localTenantContext, effectiveView);
       setApplication(response.application || null);
       setApplications(response.applications || []);
       setAppCategories(response.appCategories || []);
@@ -113,7 +115,7 @@ export const ApplicationProvider: React.FC<{ children: React.ReactNode }> = ({ c
     } finally {
       setLoading(false);
     }
-  }, [localTenantContext]);
+  }, [effectiveView, localTenantContext]);
 
   useEffect(() => {
     void refresh();

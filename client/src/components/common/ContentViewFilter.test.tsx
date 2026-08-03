@@ -18,6 +18,18 @@ describe('ContentViewFilter', () => {
     expect(screen.getByText('Archived')).toBeInTheDocument();
   });
 
+  it('shows the account default when no page override is active', () => {
+    render(<ContentViewFilter value="default" defaultLabel="Accepted + pending" onChange={mockOnChange} />);
+    expect(screen.getByText(/Using your default:/)).toBeInTheDocument();
+    expect(screen.getByText('Accepted + pending')).toBeInTheDocument();
+  });
+
+  it('clears a page override without changing the account default', () => {
+    render(<ContentViewFilter value="archived" defaultLabel="Accepted only" onChange={mockOnChange} />);
+    fireEvent.click(screen.getByText(/Use my default/));
+    expect(mockOnChange).toHaveBeenCalledWith('default');
+  });
+
   it('marks the active option with aria-pressed', () => {
     render(<ContentViewFilter value="wiki" onChange={mockOnChange} />);
     expect(screen.getByText('Accepted').closest('button')).toHaveAttribute('aria-pressed', 'true');

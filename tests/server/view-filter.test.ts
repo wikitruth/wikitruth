@@ -22,6 +22,13 @@ describe('applyViewModeFilter', () => {
     expect(query['screening.status']).toBe(0);
   });
 
+  it('sets active mode to accepted and pending content', () => {
+    const query: Record<string, unknown> = {};
+    const mode = applyViewModeFilter({ query: { view: 'active' } }, query, 1);
+    expect(mode).toBe('active');
+    expect(query['screening.status']).toEqual({ $in: [0, 1] });
+  });
+
   it('removes screening filter in all mode', () => {
     const query: Record<string, unknown> = { 'screening.status': 1 };
     const mode = applyViewModeFilter({ query: { view: 'all' } }, query, 1);

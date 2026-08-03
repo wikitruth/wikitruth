@@ -5,6 +5,7 @@ import TopicsPage from './TopicsPage';
 import apiService from '../services/api';
 import { useNotification } from '../context/NotificationContext';
 import { useAuth } from '../context/AuthContext';
+import { AuthPromptProvider } from '../context/AuthPromptContext';
 
 jest.mock('../components/common/PageMeta', () => ({
   __esModule: true,
@@ -63,16 +64,16 @@ describe('TopicsPage content view filter', () => {
 
   it('loads with the default view and refetches when view filter changes', async () => {
     const user = userEvent.setup();
-    render(<TopicsPage />, { route: '/topics' });
+    render(<AuthPromptProvider><TopicsPage /></AuthPromptProvider>, { route: '/topics' });
 
-    await waitFor(() => expect(mockedApi.getTopics).toHaveBeenCalledWith(undefined, 'all'));
-
-    await user.click(await screen.findByRole('button', { name: /accepted/i }));
-    await waitFor(() => expect(mockedApi.getTopics).toHaveBeenLastCalledWith(undefined, 'wiki'));
-    expect(localStorage.getItem('wt_view_mode')).toBe('wiki');
+    await waitFor(() => expect(mockedApi.getTopics).toHaveBeenCalledWith(undefined, 'wiki'));
+    await user.click(await screen.findByRole('button', { name: /all states/i }));
+    await waitFor(() => expect(mockedApi.getTopics).toHaveBeenLastCalledWith(undefined, 'all'));
+    expect(screen.getByRole('button', { name: /all states/i })).toHaveAttribute('aria-pressed', 'true');
+    expect(localStorage.getItem('wt_view_mode')).toBeNull();
 
     await user.click(screen.getByRole('button', { name: /pending/i }));
     await waitFor(() => expect(mockedApi.getTopics).toHaveBeenLastCalledWith(undefined, 'original'));
-    expect(localStorage.getItem('wt_view_mode')).toBe('original');
+    expect(screen.getByRole('button', { name: /pending/i })).toHaveAttribute('aria-pressed', 'true');
   });
 });

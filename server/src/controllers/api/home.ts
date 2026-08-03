@@ -14,10 +14,11 @@ import constantsMod from '../../models/constants';
 import { attachAuthorReputation } from '../../services/reputationService';
 import { resolveActiveApplication, visibleApplications } from '../../services/applicationContextService';
 import { loadHomeRankings } from '../../services/homeRankingService';
+import { applyViewModeFilter } from './viewFilter';
 const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
 const constants = constantsMod as unknown as ConstantsModule;
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
-interface HomeQuery {
+interface HomeQuery extends Record<string, unknown> {
   parentId?: unknown;
   ownerType?: number;
   private: boolean;
@@ -91,6 +92,7 @@ async function GET_home(req: WikitruthRequest, res: WikitruthResponse) {
         'screening.status': model.screening?.status,
       };
       injectCategoryId(query);
+      applyViewModeFilter(req, query, model.screening?.status);
       const results = await db.Topic.find(query).sort({ editDate: -1 }).limit(MAX_RESULT).lean();
       await flowUtils.setEditorsUsername(results);
       await flowUtils.setEntryParents(results, constants.OBJECT_TYPES.topic);
@@ -110,6 +112,7 @@ async function GET_home(req: WikitruthRequest, res: WikitruthResponse) {
         'screening.status': model.screening?.status,
       };
       injectCategoryId(query);
+      applyViewModeFilter(req, query, model.screening?.status);
       const results = await db.Argument.find(query)
         .sort({ editDate: -1 })
         .limit(MAX_RESULT)
@@ -133,6 +136,7 @@ async function GET_home(req: WikitruthRequest, res: WikitruthResponse) {
         'screening.status': model.screening?.status,
       };
       injectCategoryId(query);
+      applyViewModeFilter(req, query, model.screening?.status);
       const results = await db.Question.find(query)
         .sort({ editDate: -1 })
         .limit(MAX_RESULT)
@@ -155,6 +159,7 @@ async function GET_home(req: WikitruthRequest, res: WikitruthResponse) {
         'screening.status': model.screening?.status,
       };
       injectCategoryId(query);
+      applyViewModeFilter(req, query, model.screening?.status);
       const results = await db.Artifact.find(query)
         .sort({ editDate: -1 })
         .limit(MAX_RESULT)
@@ -176,6 +181,7 @@ async function GET_home(req: WikitruthRequest, res: WikitruthResponse) {
         'screening.status': model.screening?.status,
       };
       injectCategoryId(query);
+      applyViewModeFilter(req, query, model.screening?.status);
       const results = await db.Answer.find(query).sort({ editDate: -1 }).limit(MAX_RESULT).lean();
       await flowUtils.setEditorsUsername(results);
       await flowUtils.setEntryParents(results, constants.OBJECT_TYPES.answer);
@@ -195,6 +201,7 @@ async function GET_home(req: WikitruthRequest, res: WikitruthResponse) {
         'screening.status': model.screening?.status,
       };
       injectCategoryId(query);
+      applyViewModeFilter(req, query, model.screening?.status);
       const results = await db.Issue.find(query).sort({ editDate: -1 }).limit(MAX_RESULT).lean();
       await flowUtils.setEntryParents(results, constants.OBJECT_TYPES.issue);
       await flowUtils.setEditorsUsername(results);
@@ -214,6 +221,7 @@ async function GET_home(req: WikitruthRequest, res: WikitruthResponse) {
         'screening.status': model.screening?.status,
       };
       injectCategoryId(query);
+      applyViewModeFilter(req, query, model.screening?.status);
       const results = await db.Opinion.find(query).sort({ editDate: -1 }).limit(MAX_RESULT).lean();
       await flowUtils.setEntryParents(results, constants.OBJECT_TYPES.opinion);
       await flowUtils.setEditorsUsername(results);

@@ -10,7 +10,7 @@ const flowUtils = flowUtilsNs as unknown as FlowUtilsModule;
 const constants = constantsMod as unknown as ConstantsModule;
 import * as utils from '../../utils/utils';
 import * as opinionsService from '../../services/opinionsService';
-import { applyViewModeFilter } from './viewFilter';
+import { applyViewModeFilter, withViewModeFilter } from './viewFilter';
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
 import { logEntryEvent } from '../../services/entryEventsService';
 import { rejectBlockingDuplicate } from './duplicateWriteGuard';
@@ -108,17 +108,15 @@ async function GET_opinion_entry(req: WikitruthRequest, res: WikitruthResponse) 
   applyLegacyEntryContext(opinion, context);
 
   const [issues, opinions] = await Promise.all([
-    db.Issue.find({
+    db.Issue.find(withViewModeFilter(req, {
       ownerType: opinion.ownerType,
       ownerId: opinion.ownerId,
       private: false,
-      'screening.status': constants.SCREENING_STATUS.status1.code,
-    }).sort({ editDate: -1 }).limit(5).lean(),
-    db.Opinion.find({
+    })).sort({ editDate: -1 }).limit(5).lean(),
+    db.Opinion.find(withViewModeFilter(req, {
       parentId: opinionId,
       private: false,
-      'screening.status': constants.SCREENING_STATUS.status1.code,
-    }).sort({ editDate: -1 }).limit(5).lean(),
+    })).sort({ editDate: -1 }).limit(5).lean(),
   ]);
 
   await flowUtils.setEditorsUsername(issues);

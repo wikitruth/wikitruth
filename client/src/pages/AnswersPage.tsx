@@ -16,6 +16,8 @@ import { useAuth } from '../context/AuthContext';
 import type { LegacyEntity } from '../types/legacy';
 import type { Answer } from '../types';
 import { useNotification } from '../context/NotificationContext';
+import { ContentVisibilityScope } from '../context/ContentVisibilityContext';
+import { usePageContentVisibility } from '../hooks/usePageContentVisibility';
 
 const AnswersPage: React.FC = () => {
   const [answers, setAnswers] = useState<LegacyEntity[]>([]);
@@ -23,25 +25,17 @@ const AnswersPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('editDate');
-  const [viewMode, setViewMode] = useState<ViewMode>(() => {
-    const saved = localStorage.getItem('wt_view_mode');
-    return (saved === 'wiki' || saved === 'original' || saved === 'archived') ? saved : 'all';
-  });
+  const { override: viewMode, effectiveView, defaultLabel, setOverride } = usePageContentVisibility();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
   const { addToast } = useNotification();
   const { user, activeRole } = useAuth();
 
-  const handleViewModeChange = (mode: ViewMode) => {
-    setViewMode(mode);
-    localStorage.setItem('wt_view_mode', mode);
-  };
-
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        const result = await apiService.getAnswers(undefined, viewMode);
+        const result = await apiService.getAnswers(undefined, effectiveView);
         setAnswers(result?.answers || []);
       } catch (err: unknown) {
         const msg = err instanceof Error ? err.message : 'Failed to load answers';
@@ -53,7 +47,7 @@ const AnswersPage: React.FC = () => {
     };
 
     fetchData();
-  }, [addToast, viewMode]);
+  }, [addToast, effectiveView]);
 
   // Filter and sort answers
   const filteredAndSortedAnswers = React.useMemo(() => {
@@ -112,7 +106,7 @@ const AnswersPage: React.FC = () => {
   ];
 
   return (
-    <div>
+    <ContentVisibilityScope view={effectiveView}><div>
       <PageMeta title="Answers" description="Browse all answers in the knowledge base" />
       <Breadcrumb items={breadcrumbItems} />
       
@@ -163,7 +157,7 @@ const AnswersPage: React.FC = () => {
           </div>
           <div className="row" style={{ marginTop: '10px' }}>
             <div className="col-md-12">
-              <ContentViewFilter value={viewMode} onChange={handleViewModeChange} />
+              <ContentViewFilter value={viewMode as ViewMode} onChange={setOverride} defaultLabel={defaultLabel} />
             </div>
           </div>
         </div>
@@ -212,7 +206,7 @@ const AnswersPage: React.FC = () => {
           description="Try adjusting your search criteria."
         />
       )}
-    </div>
+    </div></ContentVisibilityScope>
   );
 };
 

@@ -50,6 +50,9 @@ Capture the canonical lifecycle of submitted content and moderation flow.
 - Parent/owner child counters are recomputed on moderation state changes and deletions.
 - Batch counter updates support transactional mode.
 - Guardrails assert `childrenCount` consistency (`total == accepted + pending + rejected` per bucket).
+- Archived child counts are stored in a separate `archived` bucket so the
+  legacy `total` invariant remains backward compatible while reader visibility
+  counts can include retained historical content.
 - Privileged moderation, verdict, role, merge, and revision actions append tamper-evident hash-chained events.
 
 ## Lifecycle Invariant

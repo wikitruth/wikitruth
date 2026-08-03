@@ -7,6 +7,8 @@ import EntryActionsMenu from '../Entry/EntryActionsMenu';
 import EntryReplyMenu from '../Entry/EntryReplyMenu';
 import EntryChildrenPanel from './EntryChildrenPanel';
 import { getEntryRowPath } from './entryRowPaths';
+import { useContentVisibility } from '../../context/ContentVisibilityContext';
+import { countForView, visibilityLabel } from '../../utils/contentVisibility';
 
 export type EntryRowKind =
   'topic' | 'argument' | 'question' | 'answer' | 'artifact' | 'issue' | 'opinion';
@@ -62,6 +64,7 @@ const EntryRowDetails: React.FC<EntryRowDetailsProps> = ({
 }) => {
   const [contentExpanded, setContentExpanded] = useState(false);
   const [childrenExpanded, setChildrenExpanded] = useState(false);
+  const { effectiveView } = useContentVisibility();
   const status = getScreeningStatusPresentation(entry.screening?.status);
   const acceptedStatus = status?.label === 'accepted';
   const parent = resolveParent(entry);
@@ -95,10 +98,13 @@ const EntryRowDetails: React.FC<EntryRowDetailsProps> = ({
       opinions: { label: 'comments', icon: 'fa fa-comments-o' },
     };
     return Object.entries(labels).flatMap(([key, presentation]) => {
-      const count = Number(entry.childrenCount?.[key as keyof NonNullable<LegacyEntity['childrenCount']>]?.accepted || 0);
+      const count = countForView(
+        entry.childrenCount?.[key as keyof NonNullable<LegacyEntity['childrenCount']>],
+        effectiveView,
+      );
       return count > 0 ? [{ key, count, ...presentation }] : [];
     });
-  }, [entry.childrenCount]);
+  }, [effectiveView, entry.childrenCount]);
   const hasChildren = childCounts.length > 0;
 
   return (
@@ -196,7 +202,7 @@ const EntryRowDetails: React.FC<EntryRowDetailsProps> = ({
               className="btn btn-link wt-entry-child-count"
               onClick={() => setChildrenExpanded((value) => !value)}
               aria-expanded={childrenExpanded}
-              title={`${childrenExpanded ? 'Hide' : 'Show'} ${child.count} accepted ${child.label}`}
+              title={`${childrenExpanded ? 'Hide' : 'Show'} ${child.count} ${child.label} in ${visibilityLabel(effectiveView).toLowerCase()}`}
             >
               <span className={child.icon} aria-hidden="true"></span> {child.count}
             </button>

@@ -4,6 +4,7 @@ import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 import { AuthProvider } from '../context/AuthContext';
 import { ThemeProvider } from '../context/ThemeContext';
 import { NotificationProvider } from '../context/NotificationContext';
+import { ContentVisibilityProvider } from '../context/ContentVisibilityContext';
 import ToastContainer from '../components/common/ToastContainer';
 import '../styles/print.css';
 import '../styles/layout-mobile.css';
@@ -22,8 +23,10 @@ const AppProviders: React.FC<AppProvidersProps> = ({ children }) => {
     <ThemeProvider>
       <NotificationProvider>
         <AuthProvider>
-          {children}
-          <ToastContainer />
+          <ContentVisibilityProvider>
+            {children}
+            <ToastContainer />
+          </ContentVisibilityProvider>
         </AuthProvider>
       </NotificationProvider>
     </ThemeProvider>

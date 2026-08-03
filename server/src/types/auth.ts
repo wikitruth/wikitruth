@@ -17,6 +17,7 @@ export interface AuthUser {
   roles?: AuthRoles;
   preferences?: Record<string, unknown> & {
     privateProfile?: boolean;
+    contentVisibility?: 'accepted' | 'active' | 'all';
   };
   canPlayRoleOf: (role: string) => boolean;
   defaultReturnUrl: () => string;
