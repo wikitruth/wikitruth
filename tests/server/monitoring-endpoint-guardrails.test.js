@@ -12,6 +12,10 @@ jest.mock('../../server/src/services/realtimeEvents', () => ({
   publishRealtimeEvent: jest.fn(),
 }));
 
+jest.mock('../../server/src/services/operationalTelemetryService', () => ({
+  recordOperationalEvent: jest.fn().mockResolvedValue({}),
+}));
+
 function createApp() {
   const app = express();
   app.use(bodyParser.json());

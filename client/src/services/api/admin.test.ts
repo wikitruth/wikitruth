@@ -200,4 +200,22 @@ describe('adminApi', () => {
       expect.objectContaining({ method: 'POST', body: JSON.stringify({ action: 'restore', snapshotId, previewToken: 'signed-token', confirmText: `RESTORE ${snapshotId}` }) })
     );
   });
+
+  it('loads telemetry and applies audited alert actions', async () => {
+    document.cookie = '_csrfToken=test-admin-csrf';
+    const fetchMock = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true, telemetry: { events: [], history: [], rules: [], alerts: [] }, alert: { _id: 'alert/1' } }),
+    });
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+    await adminApi.operationalTelemetry();
+    await adminApi.updateOperationalAlert('alert/1', 'acknowledge', 'Investigating');
+
+    expect(fetchMock).toHaveBeenNthCalledWith(1, '/api/admin/operational-telemetry', expect.any(Object));
+    expect(fetchMock).toHaveBeenNthCalledWith(2, '/api/admin/operational-telemetry/alerts/alert%2F1/actions', expect.objectContaining({
+      method: 'POST', body: JSON.stringify({ action: 'acknowledge', acknowledgement: 'Investigating' }),
+      headers: expect.objectContaining({ 'x-csrf-token': 'test-admin-csrf' }),
+    }));
+  });
 });

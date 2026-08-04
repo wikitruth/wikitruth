@@ -63,6 +63,10 @@ export = function (app: Application, mongoose: Mongoose) {
   require('./core/CivicRecord')(app, mongoose);
   require('./core/CivicEntryLink')(app, mongoose);
   require('./core/CivicResponseRequest')(app, mongoose);
+  require('./core/OperationalEvent')(app, mongoose);
+  require('./core/HealthSnapshot')(app, mongoose);
+  require('./core/OperationalAlertRule')(app, mongoose);
+  require('./core/OperationalAlert')(app, mongoose);
 
   require('./core/TrustedClient')(app, mongoose);
   //require('./schema/core/Word')(app, mongoose);

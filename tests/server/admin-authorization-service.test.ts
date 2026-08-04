@@ -39,6 +39,8 @@ describe('admin authorization service', () => {
     expect(permissionForAdminRequest('POST', '/db-backup', { action: 'backup' })).toBe('backups.create');
     expect(permissionForAdminRequest('POST', '/db-backup', { action: 'restore' })).toBe('backups.restore');
     expect(permissionForAdminRequest('GET', '/system-health')).toBe('system.read');
+    expect(permissionForAdminRequest('GET', '/operational-telemetry')).toBe('system.read');
+    expect(permissionForAdminRequest('PUT', '/operational-telemetry/rules/1')).toBe('security.manage');
     expect(permissionForAdminRequest('POST', '/people/actions')).toBe('users.manage');
   });
 });

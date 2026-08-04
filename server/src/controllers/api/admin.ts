@@ -26,6 +26,7 @@ import { registerAdminAccessRoutes } from './adminAccessRoutes';
 import { requirePrivilegedPasskeyAssurance } from '../../services/privilegedAuthService';
 import { registerAdminEmailOperationsRoutes } from './adminEmailOperationsRoutes';
 import { registerAdminPeopleRoutes } from './adminPeopleRoutes';
+import { registerAdminOperationalRoutes } from './adminOperationalRoutes';
 import {
   ADMIN_PERMISSIONS,
   type AuthorizationModels,
@@ -40,6 +41,7 @@ import {
   preservesCapableAdministrator,
 } from '../../services/adminAccessService';
 import { buildAdminSystemHealth } from '../../services/adminSystemHealthService';
+import { captureHealthSnapshot } from '../../services/operationalTelemetryService';
 import * as flowUtils from '../../utils/flowUtils';
 
 function ensureAdmin(req: WikitruthRequest, res: WikitruthResponse): boolean {
@@ -179,6 +181,7 @@ export = function (router: Router) {
   registerAdminApiClientRoutes(router, ensureAdmin);
   registerAdminEmailOperationsRoutes(router, ensureAdmin);
   registerAdminPeopleRoutes(router, ensureAdmin);
+  registerAdminOperationalRoutes(router, ensureAdmin);
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAdmin(req, res)) {
       return;
@@ -213,6 +216,7 @@ export = function (router: Router) {
       models: db as unknown as SystemHealthModels,
       backupRoot: flowUtils.getBackupDir(),
     });
+    await captureHealthSnapshot(health).catch(() => undefined);
     res.json({ success: true, health });
   });
   registerAdminCollectionRoutes(router, ensureAdmin, db as unknown as AdminCollectionModels, sanitizeAdminUser);

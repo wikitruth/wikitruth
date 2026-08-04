@@ -255,6 +255,8 @@ app.on('start', function () {
     console.log('Environment: %s', app.kraken.get('env:env'));
     const { startEmailDeliveryWorker } = require('./services/emailDeliveryWorker') as typeof import('./services/emailDeliveryWorker');
     startEmailDeliveryWorker();
+    const { startOperationalHealthWorker } = require('./services/operationalHealthWorker') as typeof import('./services/operationalHealthWorker');
+    startOperationalHealthWorker();
 });
 
 // Expose the same configured app via a typed ESM export so internal modules

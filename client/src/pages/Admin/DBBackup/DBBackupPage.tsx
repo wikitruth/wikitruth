@@ -4,6 +4,7 @@ import Alert from '../../../components/common/Alert';
 import Button from '../../../components/common/Button';
 import adminApi, { type AdminSystemHealth, type BackupSnapshot, type HealthComponent, type HealthStatus, type RestorePreview } from '../../../services/api/admin';
 import AdminOperationsShell from '../common/AdminOperationsShell';
+import OperationalTelemetryPanel from '../SystemOperations/OperationalTelemetryPanel';
 
 function stateLabel(value: HealthStatus): string {
   return value === 'healthy' ? 'Healthy' : value === 'attention' ? 'Needs attention'
@@ -31,7 +32,10 @@ const componentOrder = [
 ] as const;
 
 const DBBackupPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'health' | 'backups'>('health');
+  const [activeTab, setActiveTab] = useState<'health' | 'telemetry' | 'backups'>(() => (
+    typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('tab') === 'alerts'
+      ? 'telemetry' : 'health'
+  ));
   const [health, setHealth] = useState<AdminSystemHealth | null>(null);
   const [snapshots, setSnapshots] = useState<BackupSnapshot[]>([]);
   const [hasGitBackup, setHasGitBackup] = useState(false);
@@ -123,6 +127,7 @@ const DBBackupPage: React.FC = () => {
       {message ? <Alert type="success">{message}</Alert> : null}
       <div className="wt-admin-tabs" role="tablist" aria-label="System operations sections">
         <button type="button" role="tab" aria-selected={activeTab === 'health'} className={activeTab === 'health' ? 'active' : ''} onClick={() => setActiveTab('health')}>Health</button>
+        <button type="button" role="tab" aria-selected={activeTab === 'telemetry'} className={activeTab === 'telemetry' ? 'active' : ''} onClick={() => setActiveTab('telemetry')}>Events & alerts</button>
         <button type="button" role="tab" aria-selected={activeTab === 'backups'} className={activeTab === 'backups' ? 'active' : ''} onClick={() => setActiveTab('backups')}>Backups</button>
       </div>
 
@@ -142,6 +147,8 @@ const DBBackupPage: React.FC = () => {
         </div></section>
         <section className="wt-admin-section"><header className="wt-admin-section-header"><div><h2>Health details</h2><p>Measured values; unavailable evidence remains an honest em dash.</p></div></header><div className="wt-admin-section-body"><dl className="wt-admin-detail-list">{healthDetails.map(([label, value]) => <div className="wt-admin-detail-row" key={label}><dt>{label}</dt><dd className={label.includes('commit') ? 'wt-admin-code' : ''}>{detailValue(value)}</dd></div>)}</dl></div></section>
       </div> : null}
+
+      {!loading && activeTab === 'telemetry' ? <OperationalTelemetryPanel /> : null}
 
       {!loading && activeTab === 'backups' ? <>
         <section className="wt-admin-section">

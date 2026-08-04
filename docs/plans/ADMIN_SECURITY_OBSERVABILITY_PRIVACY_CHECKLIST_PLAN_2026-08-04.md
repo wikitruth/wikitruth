@@ -33,11 +33,11 @@ telemetry, and governed privacy operations.
 
 ### 3. Operational Telemetry and Alerts
 
-- [ ] Store sanitized operational events and periodic health snapshots with
+- [x] Store sanitized operational events and periodic health snapshots with
   bounded retention and no request bodies, secrets, tokens, or raw PII.
-- [ ] Expose permission-protected health history, recent errors, alert-rule, and
+- [x] Expose permission-protected health history, recent errors, alert-rule, and
   alert-state APIs with validation, deduplication, and acknowledgement actions.
-- [ ] Add a responsive System Operations interface for health trends, recent
+- [x] Add a responsive System Operations interface for health trends, recent
   failures, alert configuration, and administrator notification state.
 
 ### 4. Privacy Operations

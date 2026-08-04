@@ -124,6 +124,21 @@ const apiErrorHandler: ErrorRequestHandler = function (err, req, res, next) {
     message: err && typeof err === 'object' && 'message' in err ? (err as { message?: string }).message : 'unknown error',
   });
 
+  void import('../services/operationalTelemetryService.js')
+    .then(({ recordOperationalEvent }) => recordOperationalEvent({
+      kind: 'api_error',
+      severity: normalized.status >= 500 ? 'error' : 'warning',
+      source: 'express-api',
+      code: normalized.code,
+      message: err && typeof err === 'object' && 'message' in err ? (err as { message?: string }).message : normalized.message,
+      path: requestPath,
+      requestId,
+    }))
+    .catch((telemetryError) => logger.error('operational.telemetry.persist_failed', {
+      kind: 'api_error',
+      errorType: telemetryError instanceof Error ? telemetryError.name : 'unknown',
+    }));
+
   const payload = {
     success: false,
     error: {

@@ -18,6 +18,7 @@ type CountModel = {
 export type SystemHealthModels = {
   EmailOutbox?: CountModel;
   NotificationOutbox?: CountModel;
+  OperationalEvent?: CountModel;
 };
 
 export type SystemHealthConnection = {
@@ -151,6 +152,16 @@ export async function buildAdminSystemHealth(options: {
     ? status('attention', 'The email worker most recently reported an error.', { ...worker, lastErrorMessage: undefined })
     : email;
   const storage = storageHealth();
+  const recentErrorCount = options.models.OperationalEvent
+    ? await options.models.OperationalEvent.countDocuments({
+      severity: { $in: ['error', 'critical'] }, occurredAt: { $gte: new Date(Date.now() - 60 * 60 * 1000) },
+    })
+    : null;
+  const recentErrors = recentErrorCount === null
+    ? status('unknown', 'The sanitized operational event store is unavailable.')
+    : status(recentErrorCount >= 5 ? 'attention' : 'healthy', recentErrorCount
+      ? `${recentErrorCount} sanitized error event${recentErrorCount === 1 ? '' : 's'} occurred in the last hour.`
+      : 'No sanitized error events occurred in the last hour.', { count: recentErrorCount, windowMinutes: 60 });
   const components = { application, mongo, email: delivery, notifications, storage, backup, audit, external };
   const values = Object.values(components).map((component) => component.status);
   const overall: HealthStatus = values.includes('unavailable') ? 'unavailable'
@@ -162,6 +173,6 @@ export async function buildAdminSystemHealth(options: {
     overall,
     components,
     migrationLedger: status('unknown', 'No persisted migration ledger is configured; release checks remain the source of migration evidence.'),
-    recentErrors: status('unknown', 'Client monitoring is realtime and not a durable error history; queue failures are reported above.'),
+    recentErrors,
   };
 }

@@ -10,6 +10,7 @@ jest.mock('../../../services/api/admin', () => ({
   default: {
     systemHealth: jest.fn(), dbBackupStatus: jest.fn(), runDbBackup: jest.fn(),
     previewDbRestore: jest.fn(), runDbRestore: jest.fn(),
+    operationalTelemetry: jest.fn(), updateOperationalAlert: jest.fn(), updateOperationalAlertRule: jest.fn(),
   },
 }));
 
@@ -47,6 +48,27 @@ beforeEach(() => {
     restorePublicData: true, restorePrivateData: true, snapshotId: snapshot.id,
     preRestoreSnapshotId: 'pre-restore-1', completedAt: '2026-08-04T00:02:00.000Z', summary: {},
   } });
+  mockedAdminApi.operationalTelemetry.mockResolvedValue({
+    events: [{ _id: 'event-1', kind: 'api_error', severity: 'error', source: 'express-api', code: 'INTERNAL_ERROR', fingerprint: 'hash', message: 'Sanitized failure', path: '/api/topics/:id', requestId: 'req-1', occurredAt: '2026-08-04T00:00:00.000Z' }],
+    history: [{ _id: 'health-1', overall: 'healthy', generatedAt: '2026-08-04T00:00:00.000Z', components: [] }],
+    alerts: [{ _id: 'alert-1', ruleId: 'rule-1', status: 'active', severity: 'critical', title: 'Repeated server errors', summary: 'Threshold 5; observed 6.', occurrenceCount: 2, firstTriggeredAt: '2026-08-04T00:00:00.000Z', lastTriggeredAt: '2026-08-04T00:01:00.000Z' }],
+    rules: [{ _id: 'rule-1', name: 'Repeated server errors', enabled: true, source: 'events', metric: 'api_error', threshold: 5, windowMinutes: 15, cooldownMinutes: 30, severity: 'critical', builtIn: true }],
+    retention: { eventsDays: 30, healthDays: 90, alertsDays: 180 },
+  });
+});
+
+it('shows bounded health history, active alerts, sanitized events, and configurable rules', async () => {
+  const user = userEvent.setup();
+  render(<DBBackupPage />);
+  await screen.findByRole('heading', { name: /system operations/i });
+  await user.click(screen.getByRole('tab', { name: /events & alerts/i }));
+
+  expect(await screen.findByRole('heading', { name: /health history/i })).toBeInTheDocument();
+  expect(screen.getByText('Repeated server errors')).toBeInTheDocument();
+  await user.click(screen.getByRole('tab', { name: /recent events/i }));
+  expect(screen.getByText('Sanitized failure')).toBeInTheDocument();
+  await user.click(screen.getByRole('tab', { name: /alert rules/i }));
+  expect(screen.getByLabelText(/repeated server errors threshold/i)).toHaveValue(5);
 });
 
 it('shows measured health and requires a verified restore preview plus exact confirmation', async () => {

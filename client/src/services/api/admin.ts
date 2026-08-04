@@ -1,13 +1,13 @@
 import API_BASE_URL from './baseUrl';
 import fetchWithPasskeyStepUp from './passkeyFetch';
 import type {
-  AdminAccessSnapshot, AdminDashboardResponse, AdminGroupAccessSnapshot, AdminListParams, AdminListResponse, AdminMutationPayload, AdminRecord,
+  AdminAccessSnapshot, AdminDashboardResponse, AdminGroupAccessSnapshot, AdminListParams, AdminListResponse, AdminMutationPayload, AdminRecord, OperationalAlert, OperationalAlertRule, OperationalTelemetry,
   AdminSystemHealth, BackupSnapshot, PeopleListResponse, RestorePreview, UserSecurity,
 } from './adminOperationsTypes';
 export type {
   AdminDashboardResponse, AdminListParams, AdminListResponse, AdminMutationPayload, AdminPermission,
   AdminRecord, AdminSystemHealth, AdminAccessSnapshot, AdminGroupAccessSnapshot, BackupSnapshot, DirectPermissionState, HealthComponent, HealthStatus, PeopleItem, PermissionCatalogRow,
-  PeopleListResponse, RestorePreview, UserSecurity,
+  OperationalAlert, OperationalAlertRule, OperationalEvent, OperationalTelemetry, HealthSnapshot, PeopleListResponse, RestorePreview, UserSecurity,
 } from './adminOperationsTypes';
 
 type MutationResponse = {
@@ -161,6 +161,19 @@ export const adminApi = {
       }),
     }),
   systemHealth: () => request<{ success: boolean; health: AdminSystemHealth }>(`${API_BASE_URL}/admin/system-health`),
+  operationalTelemetry: () => request<{ success: boolean; telemetry: OperationalTelemetry }>(
+    `${API_BASE_URL}/admin/operational-telemetry`,
+  ).then((response) => response.telemetry),
+  updateOperationalAlertRule: (id: string, input: Pick<OperationalAlertRule,
+  'enabled' | 'threshold' | 'windowMinutes' | 'cooldownMinutes' | 'severity'>) => request<{ success: boolean; rule: OperationalAlertRule }>(
+    `${API_BASE_URL}/admin/operational-telemetry/rules/${encodeURIComponent(id)}`,
+    { method: 'PUT', body: JSON.stringify(input) },
+  ).then((response) => response.rule),
+  updateOperationalAlert: (id: string, action: 'acknowledge' | 'resolve', acknowledgement: string) => request<{
+    success: boolean; alert: OperationalAlert;
+  }>(`${API_BASE_URL}/admin/operational-telemetry/alerts/${encodeURIComponent(id)}/actions`, {
+    method: 'POST', body: JSON.stringify({ action, acknowledgement }),
+  }).then((response) => response.alert),
   listAuditEvents: (params?: {
     page?: number;
     limit?: number;

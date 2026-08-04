@@ -108,3 +108,25 @@ export type AdminSystemHealth = {
   generatedAt: string; overall: HealthStatus; components: Record<string, HealthComponent>;
   migrationLedger: HealthComponent; recentErrors: HealthComponent;
 };
+
+export type OperationalEvent = {
+  _id: string; kind: string; severity: 'info' | 'warning' | 'error' | 'critical'; source: string;
+  code: string; fingerprint: string; message: string; path: string; requestId: string; occurredAt: string;
+};
+export type HealthSnapshot = {
+  _id: string; overall: HealthStatus; generatedAt: string;
+  components: Array<{ key: string; status: HealthStatus; summary: string }>;
+};
+export type OperationalAlertRule = {
+  _id: string; name: string; enabled: boolean; source: 'health' | 'events'; metric: string;
+  threshold: number; windowMinutes: number; cooldownMinutes: number; severity: 'warning' | 'critical'; builtIn: boolean;
+};
+export type OperationalAlert = {
+  _id: string; ruleId: string; status: 'active' | 'acknowledged' | 'resolved'; severity: 'warning' | 'critical';
+  title: string; summary: string; occurrenceCount: number; firstTriggeredAt: string; lastTriggeredAt: string;
+  acknowledgedAt?: string | null; acknowledgement?: string; resolvedAt?: string | null;
+};
+export type OperationalTelemetry = {
+  events: OperationalEvent[]; history: HealthSnapshot[]; rules: OperationalAlertRule[]; alerts: OperationalAlert[];
+  retention: { eventsDays: number; healthDays: number; alertsDays: number };
+};

@@ -33,6 +33,15 @@ const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX_EVENTS = 120;
 const requestRateWindow = new Map<string, { count: number; resetAt: number }>();
 
+function persistOperationalEvent(input: Record<string, unknown>): void {
+  void import('../../services/operationalTelemetryService.js')
+    .then(({ recordOperationalEvent }) => recordOperationalEvent(input as Parameters<typeof recordOperationalEvent>[0]))
+    .catch((error) => logger.error('operational.telemetry.persist_failed', {
+      kind: String(input.kind || 'unknown'),
+      errorType: error instanceof Error ? error.name : 'unknown',
+    }));
+}
+
 function readOriginHost(req: WikitruthRequest): string | null {
   const origin = String(req.get('origin') || '').trim();
   if (!origin) {
@@ -136,11 +145,12 @@ export = function (router: Router) {
       requestId: requestId,
       source: 'react-client',
       eventType: body.type || 'unknown',
-      message: body.message || 'unknown',
-      stack: body.stack || null,
-      path: body.path || req.path,
-      userAgent: body.userAgent || req.get('user-agent') || null,
       timestamp: body.timestamp || new Date().toISOString(),
+    });
+
+    persistOperationalEvent({
+      kind: 'client_error', severity: 'error', source: 'react-client', code: body.type,
+      message: body.message, path: body.path || req.path, requestId, occurredAt: body.timestamp,
     });
 
     publishRealtimeEvent({
@@ -148,8 +158,6 @@ export = function (router: Router) {
       requestId: requestId,
       data: {
         eventType: body.type || 'unknown',
-        message: body.message || 'unknown',
-        path: body.path || req.path,
       },
     });
 
@@ -184,15 +192,18 @@ export = function (router: Router) {
     logger.error('client.csp.violation', {
       requestId: requestId,
       source: 'react-client',
-      documentUri: String(report['document-uri'] || report.document_uri || req.get('referer') || ''),
       violatedDirective: String(
         report['violated-directive'] || report['effective-directive'] || report.effective_directive || '',
       ),
-      blockedUri: String(report['blocked-uri'] || report.blocked_uri || ''),
-      originalPolicy: String(report['original-policy'] || report.original_policy || ''),
       disposition: String(report.disposition || ''),
-      userAgent: req.get('user-agent') || null,
       timestamp: new Date().toISOString(),
+    });
+
+    persistOperationalEvent({
+      kind: 'csp_violation', severity: 'warning', source: 'browser-csp',
+      code: report['violated-directive'] || report['effective-directive'] || report.effective_directive,
+      message: report['blocked-uri'] || report.blocked_uri || 'Content Security Policy violation',
+      path: report['document-uri'] || report.document_uri || req.get('referer') || '', requestId,
     });
 
     publishRealtimeEvent({
@@ -200,7 +211,6 @@ export = function (router: Router) {
       requestId: requestId,
       data: {
         violatedDirective: report['violated-directive'] || report['effective-directive'] || null,
-        blockedUri: report['blocked-uri'] || null,
       },
     });
 
