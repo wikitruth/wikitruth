@@ -28,6 +28,102 @@ export type AdminListResponse = {
   query: string;
 };
 
+export type AdminPermission =
+  | 'admin.access' | 'admin.overview.read' | 'users.manage' | 'content.manage'
+  | 'moderation.review' | 'security.manage' | 'email.manage' | 'tenants.manage'
+  | 'backups.read' | 'backups.create' | 'backups.restore' | 'system.read' | 'audit.read';
+
+export type AdminDashboardResponse = {
+  success: boolean;
+  counts: Record<string, number>;
+  queues: { quarantined: number; emailQueued: number; emailFailed: number; notificationFailed: number };
+  authorization: { adminId: string; effectivePermissions: AdminPermission[]; legacySuperAdmin: boolean };
+  permissionCatalog: AdminPermission[];
+};
+
+export type PeopleItem = {
+  id: string;
+  username: string;
+  email: string;
+  name: string;
+  state: string;
+  reason: string;
+  verified: boolean;
+  roles: Record<string, unknown>;
+  timeCreated: string | null;
+  contributionCount: number;
+  activeSessions: number;
+  activePasskeys: number;
+  activeApiClients: number;
+  lastSeen: string | null;
+  signals: string[];
+  canUndo: boolean;
+};
+
+export type PeopleListResponse = {
+  success: boolean;
+  items: PeopleItem[];
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
+  summary: { needsReview: number; quarantined: number; noActivity: number; recentlyJoined: number };
+  filters: Record<string, unknown>;
+};
+
+export type UserSecurity = {
+  user: {
+    id: string;
+    username: string;
+    email: string;
+    state: string;
+    isActive: boolean;
+    passwordLoginDisabled: boolean;
+    linkedAdminId: string;
+    linkedAccountId: string;
+  };
+  activeSessions: number;
+  lastSeen: string | null;
+  activePasskeys: number;
+  activeApiClients: number;
+  unusedRecoveryCodes: number;
+  verified: boolean;
+  locked: boolean;
+};
+
+export type BackupSnapshot = {
+  id: string;
+  kind: 'manual' | 'pre_restore';
+  createdAt: string;
+  complete: boolean;
+  totalDocuments: number;
+  totalBytes: number;
+  checksum: string;
+  summary: { public: Record<string, number>; private: Record<string, number> };
+  offsite: { configured: boolean; verifiedAt: string | null; reference: string };
+};
+
+export type RestorePreview = {
+  snapshot: BackupSnapshot;
+  verification: { valid: boolean; checkedAt: string; expectedChecksum: string; actualChecksum: string };
+  isolatedRestoreTest: { supported: boolean; valid: boolean; testedAt: string; message: string; collections: Record<string, number> };
+  comparison: Array<{ collection: string; current: number | null; snapshot: number; change: number | null; scope: 'public' | 'private' }>;
+  confirmationPhrase: string;
+  automaticPreRestoreSnapshot: boolean;
+  expiresAt: string;
+  token: string;
+};
+
+export type HealthStatus = 'healthy' | 'attention' | 'unavailable' | 'unknown';
+export type HealthComponent = { status: HealthStatus; summary: string; detail?: Record<string, unknown> };
+export type AdminSystemHealth = {
+  generatedAt: string;
+  overall: HealthStatus;
+  components: Record<string, HealthComponent>;
+  migrationLedger: HealthComponent;
+  recentErrors: HealthComponent;
+};
+
 type MutationResponse = {
   success: boolean;
   user?: AdminRecord;
@@ -96,7 +192,36 @@ const detailRequest = async (path: string, id: string): Promise<AdminRecord | nu
 };
 
 export const adminApi = {
-  dashboard: () => request<Record<string, unknown>>(`${API_BASE_URL}/admin`),
+  dashboard: () => request<AdminDashboardResponse>(`${API_BASE_URL}/admin`),
+  people: (params: {
+    page?: number; limit?: number; q?: string; state?: string; verification?: string;
+    activity?: string; role?: string; risk?: string; createdDays?: number;
+  } = {}) => {
+    const query = new URLSearchParams();
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== '') query.set(key, String(value));
+    });
+    return request<PeopleListResponse>(`${API_BASE_URL}/admin/people${query.toString() ? `?${query.toString()}` : ''}`);
+  },
+  previewPeopleAction: (ids: string[], action: string) => request<{
+    success: boolean; previewToken: string; expiresAt: string; action: string;
+    targets: Array<{ id: string; username: string; email: string; activeSessions: number; retainedContributions: number; blockers: string[] }>;
+    blockerCount: number;
+  }>(`${API_BASE_URL}/admin/people/actions/preview`, {
+    method: 'POST', body: JSON.stringify({ ids, action }),
+  }),
+  runPeopleAction: (previewToken: string, reason: string) => request<{
+    success: boolean; action: string; actionId: string; affected: number; revokedSessions: number; undoUntil: string | null;
+  }>(`${API_BASE_URL}/admin/people/actions`, {
+    method: 'POST', body: JSON.stringify({ previewToken, reason }),
+  }),
+  userSecurity: (id: string) => request<{ success: boolean; security: UserSecurity }>(
+    `${API_BASE_URL}/admin/users/${encodeURIComponent(id)}/security`,
+  ),
+  runUserSecurityAction: (id: string, action: string, reason = '') => request<Record<string, unknown>>(
+    `${API_BASE_URL}/admin/users/${encodeURIComponent(id)}/security`,
+    { method: 'POST', body: JSON.stringify({ action, reason }) },
+  ),
   users: (params?: AdminListParams) => listRequest('users', params),
   accounts: (params?: AdminListParams) => listRequest('accounts', params),
   administrators: (params?: AdminListParams) => listRequest('administrators', params),
@@ -106,33 +231,37 @@ export const adminApi = {
   dbBackupStatus: () =>
     request<{
       success: boolean;
-      backup: { backupDir: string; privateBackupDir: string; hasGitBackup: boolean };
+      backup: { hasGitBackup: boolean; snapshotCount: number; latestSnapshot: BackupSnapshot | null; snapshots: BackupSnapshot[] };
     }>(`${API_BASE_URL}/admin/db-backup`),
   runDbBackup: () =>
     request<{
       success: boolean;
       message: string;
-      backup: {
-        backupDir: string;
-        privateBackupDir: string;
-        completedAt: string;
-        summary: { public: Record<string, number>; private: Record<string, number> };
-      };
+      backup: BackupSnapshot;
     }>(`${API_BASE_URL}/admin/db-backup`, {
       method: 'POST',
       body: JSON.stringify({ action: 'backup' }),
     }),
-  runDbRestore: (options: {
-    restorePublicData: boolean;
-    restorePrivateData: boolean;
-    confirmText: string;
-  }) =>
+  verifyBackupSnapshot: (snapshotId: string) => request<Record<string, unknown>>(
+    `${API_BASE_URL}/admin/db-backup/snapshots/${encodeURIComponent(snapshotId)}/verify`, { method: 'POST', body: '{}' },
+  ),
+  testBackupSnapshot: (snapshotId: string) => request<Record<string, unknown>>(
+    `${API_BASE_URL}/admin/db-backup/snapshots/${encodeURIComponent(snapshotId)}/test`, { method: 'POST', body: '{}' },
+  ),
+  previewDbRestore: (snapshotId: string, options: { restorePublicData: boolean; restorePrivateData: boolean }) =>
+    request<{ success: boolean; preview: RestorePreview }>(
+      `${API_BASE_URL}/admin/db-backup/snapshots/${encodeURIComponent(snapshotId)}/preview`,
+      { method: 'POST', body: JSON.stringify(options) },
+    ),
+  runDbRestore: (options: { snapshotId: string; previewToken: string; confirmText: string }) =>
     request<{
       success: boolean;
       message: string;
       restore: {
         restorePublicData: boolean;
         restorePrivateData: boolean;
+        snapshotId: string;
+        preRestoreSnapshotId: string;
         completedAt: string;
         summary: Record<string, unknown>;
       };
@@ -140,11 +269,12 @@ export const adminApi = {
       method: 'POST',
       body: JSON.stringify({
         action: 'restore',
-        restorePublicData: options.restorePublicData,
-        restorePrivateData: options.restorePrivateData,
+        snapshotId: options.snapshotId,
+        previewToken: options.previewToken,
         confirmText: options.confirmText,
       }),
     }),
+  systemHealth: () => request<{ success: boolean; health: AdminSystemHealth }>(`${API_BASE_URL}/admin/system-health`),
   listAuditEvents: (params?: {
     page?: number;
     limit?: number;

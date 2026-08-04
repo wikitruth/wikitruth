@@ -16,6 +16,7 @@ const OnboardingPage = lazy(() => import('../pages/Account/OnboardingPage'));
 const SettingsPage = lazy(() => import('../pages/Account/SettingsPage'));
 const VerificationPage = lazy(() => import('../pages/Account/VerificationPage'));
 const AdminDashboard = lazy(() => import('../pages/Admin/AdminDashboard'));
+const PeopleOperationsPage = lazy(() => import('../pages/Admin/People/PeopleOperationsPage'));
 const UsersList = lazy(() => import('../pages/Admin/Users/UsersList'));
 const UserDetails = lazy(() => import('../pages/Admin/Users/UserDetails'));
 const AccountsList = lazy(() => import('../pages/Admin/Accounts/AccountsList'));
@@ -132,6 +133,7 @@ export const appRoutes: AppRoute[] = [
   { path: '/account/settings', element: protectedRoute(<SettingsPage />) },
   { path: '/account/verification', element: protectedRoute(<VerificationPage />) },
   { path: '/admin', element: protectedRoute(<AdminDashboard />, ['admin']) },
+  { path: '/admin/people', element: protectedRoute(<PeopleOperationsPage />, ['admin']) },
   { path: '/admin/users', element: protectedRoute(<UsersList />, ['admin']) },
   { path: '/admin/users/:id', element: protectedRoute(<UserDetails />, ['admin']) },
   { path: '/admin/accounts', element: protectedRoute(<AccountsList />, ['admin']) },
@@ -145,6 +147,7 @@ export const appRoutes: AppRoute[] = [
   { path: '/admin/statuses', element: protectedRoute(<StatusesList />, ['admin']) },
   { path: '/admin/statuses/:id', element: protectedRoute(<StatusDetails />, ['admin']) },
   { path: '/admin/db-backup', element: protectedRoute(<DBBackupPage />, ['admin']) },
+  { path: '/admin/system-operations', element: protectedRoute(<DBBackupPage />, ['admin']) },
   { path: '/admin/audit', element: protectedRoute(<AuditTimelinePage />, ['admin']) },
   { path: '/admin/moderation/signals', element: protectedRoute(<SignalsAppealsPage />, ['reviewer', 'admin']) },
   { path: '/admin/anonymous-contributions', element: protectedRoute(<AnonymousContributionsPage />, ['screener', 'reviewer', 'admin']) },

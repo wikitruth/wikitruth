@@ -20,6 +20,7 @@ interface AdminDetailsPageProps {
     confirmMessage: string;
     onDelete: (id: string) => Promise<unknown>;
   };
+  hiddenFields?: string[];
 }
 
 const SENSITIVE_FIELD_NAMES = new Set([
@@ -88,6 +89,7 @@ const AdminDetailsPage: React.FC<AdminDetailsPageProps> = ({
   loadItem,
   updateAction,
   deleteAction,
+  hiddenFields = [],
 }) => {
   const navigate = useNavigate();
   const { id = '' } = useParams<{ id: string }>();
@@ -323,7 +325,7 @@ const AdminDetailsPage: React.FC<AdminDetailsPageProps> = ({
             <table className="table table-bordered">
               <tbody>
                 {Object.entries(item)
-                  .filter(([key]) => key !== '__v' && !isSensitiveField(key))
+                  .filter(([key]) => key !== '__v' && !hiddenFields.includes(key) && !isSensitiveField(key))
                   .map(([key, value]) => (
                     <tr key={key}>
                       <th style={{ width: '30%' }}>{key}</th>

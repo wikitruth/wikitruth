@@ -47,6 +47,8 @@ describe('routeConfig', () => {
     expect(paths).toContain('/admin/civic-operations');
     expect(paths).toContain('/admin/knowledge-health');
     expect(paths).toContain('/admin/email-operations');
+    expect(paths).toContain('/admin/people');
+    expect(paths).toContain('/admin/system-operations');
     expect(paths).toContain('/policies');
   });
 
@@ -94,8 +96,10 @@ describe('routeConfig', () => {
       '/outline/link',
       '/notifications',
       '/admin',
+      '/admin/people',
       '/admin/users',
       '/admin/db-backup',
+      '/admin/system-operations',
       '/admin/moderation/signals',
       '/admin/anonymous-contributions',
       '/admin/civic-operations',

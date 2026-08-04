@@ -16,6 +16,9 @@ jest.mock('../../services/api/admin', () => ({
   __esModule: true,
   default: {
     dashboard: jest.fn(),
+    systemHealth: jest.fn(),
+    userSecurity: jest.fn(),
+    runUserSecurityAction: jest.fn(),
     users: jest.fn(),
     accounts: jest.fn(),
     administrators: jest.fn(),
@@ -56,8 +59,18 @@ beforeEach(() => {
   jest.clearAllMocks();
   mockedCreateRealtimeChannel.mockClear();
   mockedAdminApi.dashboard.mockResolvedValue({
+    success: true,
     counts: { users: 2, accounts: 1, categories: 3, statuses: 1, administrators: 1, groups: 4 },
-  } as Record<string, unknown>);
+    queues: { quarantined: 0, emailQueued: 0, emailFailed: 0, notificationFailed: 0 },
+    authorization: { adminId: 'admin-1', effectivePermissions: ['admin.access'], legacySuperAdmin: true },
+    permissionCatalog: ['admin.access'],
+  });
+  mockedAdminApi.systemHealth.mockResolvedValue({ success: true, health: {
+    generatedAt: '2026-08-04T00:00:00.000Z', overall: 'healthy',
+    components: { mongo: { status: 'healthy', summary: 'MongoDB responded.' } },
+    migrationLedger: { status: 'unknown', summary: 'No migration ledger.' },
+    recentErrors: { status: 'unknown', summary: 'No error store.' },
+  } });
   const emptyPage = { success: true, items: [], total: 0, page: 1, limit: 25, pages: 1, query: '' };
   mockedAdminApi.users.mockResolvedValue(emptyPage);
   mockedAdminApi.accounts.mockResolvedValue(emptyPage);
@@ -65,6 +78,11 @@ beforeEach(() => {
   mockedAdminApi.user.mockResolvedValue(null);
   mockedAdminApi.account.mockResolvedValue(null);
   mockedAdminApi.administrator.mockResolvedValue(null);
+  mockedAdminApi.userSecurity.mockResolvedValue({ success: true, security: {
+    user: { id: 'user-1', username: 'example-user', email: 'user@example.test', state: 'active', isActive: true, passwordLoginDisabled: false, linkedAdminId: '', linkedAccountId: '' },
+    activeSessions: 1, lastSeen: '2026-08-04T00:00:00.000Z', activePasskeys: 2,
+    activeApiClients: 0, unusedRecoveryCodes: 4, verified: true, locked: false,
+  } });
   mockedAdminApi.createUser.mockResolvedValue({} as never);
   mockedAdminApi.updateUser.mockResolvedValue({} as never);
   mockedAdminApi.updateUserRoles.mockResolvedValue({} as never);
@@ -78,8 +96,8 @@ afterEach(() => {
 describe('Admin pages', () => {
   it('renders admin dashboard', async () => {
     render(<AdminDashboard />);
-    expect(await screen.findByRole('heading', { name: /admin dashboard/i })).toBeInTheDocument();
-    expect(screen.getByText(/realtime status/i)).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /admin operations/i })).toBeInTheDocument();
+    expect(await screen.findByText(/realtime channel/i)).toBeInTheDocument();
     expect(await screen.findByText(/administrators/i)).toBeInTheDocument();
     expect(await screen.findByText(/groups/i)).toBeInTheDocument();
     expect(mockedCreateRealtimeChannel).toHaveBeenCalledTimes(1);
@@ -253,7 +271,8 @@ describe('Admin pages', () => {
     expect(
       await screen.findByRole('heading', { level: 1, name: /user details/i })
     ).toBeInTheDocument();
-    expect(screen.getByText(/role and password actions/i)).toBeInTheDocument();
+    expect(await screen.findByText(/account operations/i)).toBeInTheDocument();
+    expect(screen.getByText(/security posture/i)).toBeInTheDocument();
   });
 
   it('does not expose stored credentials in user details', async () => {
@@ -278,7 +297,7 @@ describe('Admin pages', () => {
     expect(screen.queryByText('stored-password-hash')).not.toBeInTheDocument();
     expect(screen.queryByText(/stored-client-secret/)).not.toBeInTheDocument();
     expect(screen.getByText(/\[redacted\]/)).toBeInTheDocument();
-    expect(screen.getByText(/verified/)).toBeInTheDocument();
+    expect(screen.getAllByText(/verified/i).length).toBeGreaterThan(0);
   });
 
   it('retries a failed direct detail request', async () => {
@@ -295,10 +314,9 @@ describe('Admin pages', () => {
     );
 
     expect(await screen.findByText('Temporary admin failure')).toBeInTheDocument();
-    const callsBeforeRetry = mockedAdminApi.user.mock.calls.length;
     await user.click(screen.getByRole('button', { name: /retry/i }));
     expect(await screen.findByText('Recovered detail')).toBeInTheDocument();
-    expect(mockedAdminApi.user.mock.calls.length).toBeGreaterThan(callsBeforeRetry);
+    expect(mockedAdminApi.user.mock.calls.length).toBeGreaterThanOrEqual(2);
   });
 
   it('renders a direct not-found detail response without scanning the list', async () => {
@@ -339,11 +357,8 @@ describe('Admin pages', () => {
     expect(mockedAdminApi.updateUserRoles).not.toHaveBeenCalled();
   });
 
-  it('keeps the detail page available when deletion fails', async () => {
-    const user = userEvent.setup();
-    jest.spyOn(window, 'confirm').mockReturnValue(true);
+  it('keeps permanent deletion out of the account recovery flow', async () => {
     mockedAdminApi.user.mockResolvedValue({ _id: 'user-1', username: 'Root user' });
-    mockedAdminApi.deleteUser.mockRejectedValueOnce(new Error('The root user cannot be deleted'));
 
     render(
       <Routes>
@@ -353,9 +368,8 @@ describe('Admin pages', () => {
     );
 
     await screen.findByDisplayValue('Root user');
-    await user.click(screen.getByRole('button', { name: /^delete$/i }));
-
-    expect(await screen.findByText('The root user cannot be deleted')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^delete$/i })).not.toBeInTheDocument();
+    expect(screen.getByText(/permanent deletion is intentionally absent/i)).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /user details/i })).toBeInTheDocument();
   });
 

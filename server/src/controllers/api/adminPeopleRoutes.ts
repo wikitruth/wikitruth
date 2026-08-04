@@ -377,7 +377,12 @@ export function registerAdminPeopleRoutes(router: Router, ensureAdmin: EnsureAdm
     res.json({
       success: true,
       security: {
-        user: { id, username: user.username || '', email: user.email || '', state: operationState(user), isActive: user.isActive === 'yes', passwordLoginDisabled: Boolean(user.passwordLoginDisabled) },
+        user: {
+          id, username: user.username || '', email: user.email || '', state: operationState(user),
+          isActive: user.isActive === 'yes', passwordLoginDisabled: Boolean(user.passwordLoginDisabled),
+          linkedAdminId: user.roles?.admin ? String(user.roles.admin) : '',
+          linkedAccountId: user.roles?.account ? String(user.roles.account) : '',
+        },
         activeSessions: security.sessions.get(id)?.count || 0,
         lastSeen: security.sessions.get(id)?.lastSeen || security.apiClients.get(id)?.lastSeen || null,
         activePasskeys: security.passkeys.get(id)?.count || 0,

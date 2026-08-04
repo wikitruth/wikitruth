@@ -136,4 +136,45 @@ describe('adminApi', () => {
       expect.objectContaining({ method: 'DELETE' })
     );
   });
+
+  it('previews people actions before applying them', async () => {
+    document.cookie = '_csrfToken=test-admin-csrf';
+    const fetchMock = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true, previewToken: 'signed-preview', targets: [] }),
+    });
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+    await adminApi.previewPeopleAction(['user/1'], 'quarantine');
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/admin/people/actions/preview',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ ids: ['user/1'], action: 'quarantine' }),
+        headers: expect.objectContaining({ 'x-csrf-token': 'test-admin-csrf' }),
+      })
+    );
+  });
+
+  it('previews and confirms a snapshot restore through separate guarded calls', async () => {
+    document.cookie = '_csrfToken=test-admin-csrf';
+    const fetchMock = jest.fn().mockResolvedValue({ ok: true, json: async () => ({ success: true }) });
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+    const snapshotId = 'snapshot/2026-08-04';
+
+    await adminApi.previewDbRestore(snapshotId, { restorePublicData: true, restorePrivateData: false });
+    await adminApi.runDbRestore({ snapshotId, previewToken: 'signed-token', confirmText: `RESTORE ${snapshotId}` });
+
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      1,
+      '/api/admin/db-backup/snapshots/snapshot%2F2026-08-04/preview',
+      expect.objectContaining({ method: 'POST', body: JSON.stringify({ restorePublicData: true, restorePrivateData: false }) })
+    );
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      '/api/admin/db-backup',
+      expect.objectContaining({ method: 'POST', body: JSON.stringify({ action: 'restore', snapshotId, previewToken: 'signed-token', confirmText: `RESTORE ${snapshotId}` }) })
+    );
+  });
 });

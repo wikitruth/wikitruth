@@ -42,9 +42,9 @@ embedding a web shell or arbitrary database/process controls.
       session revocation, and a bounded undo flow.
 - [x] Add account-security visibility and safe controls for sessions, password
       login, lock state, and verification.
-- [ ] Replace raw relationship IDs in the primary account-support flow with
+- [x] Replace raw relationship IDs in the primary account-support flow with
       readable identity data.
-- [ ] Build responsive People operations UI and interaction tests.
+- [x] Build responsive People operations UI and interaction tests.
 
 ### 3. Backup and restore safety
 
@@ -66,10 +66,10 @@ embedding a web shell or arbitrary database/process controls.
       notifications, backups, audit integrity, and release identity.
 - [x] Represent healthy, attention, unavailable, and unknown states without
       fabricating values.
-- [ ] Redesign the admin dashboard around urgent queues and grouped destinations.
-- [ ] Ensure every dashboard destination is a real link and permission-aware.
-- [ ] Add responsive System operations UI for health and backup workflows.
-- [ ] Retain existing specialist moderation, tenant, email, and audit pages.
+- [x] Redesign the admin dashboard around urgent queues and grouped destinations.
+- [x] Ensure every dashboard destination is a real link and permission-aware.
+- [x] Add responsive System operations UI for health and backup workflows.
+- [x] Retain existing specialist moderation, tenant, email, and audit pages.
 
 ### 5. Verification and delivery
 
