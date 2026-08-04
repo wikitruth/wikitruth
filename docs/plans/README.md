@@ -2,13 +2,16 @@
 
 Active and historical planning documents are organized under this folder.
 
-## Pending Snapshot (2026-07-31)
+## Pending Snapshot (2026-08-04)
 
 - Active checklist backlog:
   - `docs/plans/LEGACY_MODERN_FEATURE_COMPLETENESS_AUDIT_PLAN_2026-07-11.md` open `[ ]`: **0** (all non-deferred implementation and verification work is complete; retained here because it records explicit deferred product decisions)
 - Deferred checklist backlog:
-  - `docs/plans/deferred/**` open `[ ]`: **147** total
-  - Legacy-renderer retirement, React Native delivery, automatic content expiry, strict-debate pilots, real-world seed operations, and non-canonical imported ideas remain explicitly deferred.
+  - `docs/plans/deferred/**` open `[ ]`: **196** total
+  - Legacy-renderer isolation/retirement, migration/cutover controls, verified
+    off-host backups, large-scale spam cleanup, React Native delivery, automatic
+    content expiry, strict-debate pilots, real-world seed operations, and
+    non-canonical imported ideas remain explicitly deferred.
 - Deferred non-checklist history:
   - `docs/plans/DEPENDENCY_UPGRADE_PLAN_2026-02-24.md` remains at its canonical reference path; its safe 2026-07-31 advisory refresh is complete and only legacy-renderer retirement remains a deferred implementation wave.
   - `docs/plans/deferred/DEPRECATION_REPLACEMENT_PLAN.md` has no active work outside the deferred legacy renderer.
@@ -23,15 +26,16 @@ Active and historical planning documents are organized under this folder.
 - Product programs: legacy-renderer retirement, React Native delivery,
   automatic content expiry, broad strict-debate enforcement, root-folder
   hygiene, and real-world content operations remain deferred.
-- Upstream maintenance: monitor React Router's inactive RSC-mode advisory and
-  brace-expansion advisories in retained legacy/current tooling parents; do not
-  force incompatible downgrades or overrides.
+- Upstream maintenance: React Router's RSC-mode advisory is resolved through the
+  patched v8 library-mode migration. Continue monitoring advisories in retained
+  legacy renderer/tooling parents; do not force incompatible overrides.
 - Release operations: a future production release must separately use supported
   Node 22/24, verify real SMTP delivery and physical-device passkeys, prepare
   content migration, and receive explicit deployment authorization.
 
 ## Active Plans
 
+- `docs/plans/ADMIN_SECURITY_OBSERVABILITY_PRIVACY_CHECKLIST_PLAN_2026-08-04.md`
 - `docs/plans/LEGACY_MODERN_FEATURE_COMPLETENESS_AUDIT_PLAN_2026-07-11.md`
 
 ## Completed Plans

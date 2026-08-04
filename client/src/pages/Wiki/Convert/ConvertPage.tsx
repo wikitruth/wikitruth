@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
 import moderationApi, { type ModerationEntry, type ModerationTarget } from '../../../services/api/moderation';
 import { useAuth } from '../../../context/AuthContext';
 

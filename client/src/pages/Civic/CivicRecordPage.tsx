@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router';
 import LoadingSpinner from '../../components/LoadingSpinner';
 import PageMeta from '../../components/common/PageMeta';
 import { useCivicTenant } from '../../context/CivicTenantContext';

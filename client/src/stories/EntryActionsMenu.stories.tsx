@@ -1,5 +1,5 @@
 import React from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 import EntryActionsMenu from '../components/Entry/EntryActionsMenu';
 import { AuthProvider } from '../context/AuthContext';
 

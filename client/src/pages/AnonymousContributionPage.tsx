@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import Alert from '../components/common/Alert';
 import Breadcrumb from '../components/common/Breadcrumb';
 import Button from '../components/common/Button';

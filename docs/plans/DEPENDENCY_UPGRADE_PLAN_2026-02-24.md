@@ -160,3 +160,18 @@ Do not upgrade blindly while Dust/Jade comparison mode remains active.
   server/client builds, and the Storybook build. The current machine's Node
   `25.9.0` remains outside the supported Node 22/24 matrix and is not production
   release evidence.
+
+## Implementation Progress (2026-08-04)
+
+- React Router's RSC-mode CSRF advisory was resolved by migrating from the
+  removed v8 compatibility package `react-router-dom@7.18.2` to the upstream
+  patched `react-router@8.3.0` library-mode API.
+- All tracked client imports now use `react-router`; Jest transforms the
+  ESM-only dependency while Webpack consumes it natively. The repository Node
+  floor is `22.22.0`, matching the patched package requirement.
+- All 124 client suites / 380 tests, the focused parity suite, smoke/type/lint
+  guardrails, and the production client build passed. The production audit is
+  now 21 affected package nodes across 11 advisory identifiers, all within the
+  explicitly deferred legacy-renderer chain.
+- Detailed evidence is recorded in
+  `docs/qa/DEPENDENCY_AUDIT_2026-08-04.md`.

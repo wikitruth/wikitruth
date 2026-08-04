@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router';
 import Alert from '../../components/common/Alert';
 import PageMeta from '../../components/common/PageMeta';
 import { useAuth } from '../../context/AuthContext';

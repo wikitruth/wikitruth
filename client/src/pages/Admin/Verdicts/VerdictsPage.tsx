@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import PageMeta from '../../../components/common/PageMeta';
 import moderationApi, { type ModerationEntry, type ModerationStatusOption } from '../../../services/api/moderation';
 import { useAuth } from '../../../context/AuthContext';

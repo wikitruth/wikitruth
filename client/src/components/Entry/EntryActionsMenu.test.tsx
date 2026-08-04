@@ -10,8 +10,8 @@ import { useAuthPrompt } from '../../context/AuthPromptContext';
 
 const mockNavigate = jest.fn();
 
-jest.mock('react-router-dom', () => {
-  const actual = jest.requireActual('react-router-dom');
+jest.mock('react-router', () => {
+  const actual = jest.requireActual('react-router');
   return {
     ...actual,
     useNavigate: () => mockNavigate,

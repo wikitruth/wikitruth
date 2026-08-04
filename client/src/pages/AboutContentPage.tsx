@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 
 import Breadcrumb from '../components/common/Breadcrumb';
 import PageMeta from '../components/common/PageMeta';

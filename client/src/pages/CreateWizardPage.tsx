@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router';
 import PageMeta from '../components/common/PageMeta';
 import Alert from '../components/common/Alert';
 import { useAuth } from '../context/AuthContext';

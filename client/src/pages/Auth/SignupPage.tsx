@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import Input from '../../components/Form/Input';
 import Checkbox from '../../components/Form/Checkbox';
 import Button from '../../components/common/Button';

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router';
 import LoadingSpinner from '../../../components/LoadingSpinner';
 import Alert from '../../../components/common/Alert';
 import ProfileShell from '../../../components/Members/ProfileShell';

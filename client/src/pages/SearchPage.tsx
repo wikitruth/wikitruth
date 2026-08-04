@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router';
 import apiService from '../services/api';
 import LoadingSpinner from '../components/LoadingSpinner';
 import TopicEntryRow from '../components/EntryRow/TopicEntryRow';

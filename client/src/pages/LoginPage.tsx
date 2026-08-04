@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { browserSupportsWebAuthnAutofill } from '@simplewebauthn/browser';
-import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { useNavigate, Link, useSearchParams } from 'react-router';
 import Input from '../components/Form/Input';
 import Button from '../components/common/Button';
 import Alert from '../components/common/Alert';

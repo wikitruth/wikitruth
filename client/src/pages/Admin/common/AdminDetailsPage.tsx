@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router';
 import type { AdminMutationPayload, AdminRecord } from '../../../services/api/admin';
 
 interface AdminDetailsPageProps {

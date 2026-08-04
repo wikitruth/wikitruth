@@ -1,6 +1,6 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router';
 import { render, screen, waitFor } from '../test-utils/render';
 import { AuthPromptProvider, useAuthPrompt } from './AuthPromptContext';
 

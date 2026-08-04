@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import apiService from '../services/api';
 import type { Answer, Application, Argument, Artifact, Issue, Opinion, Question, Topic } from '../types';
 import type { LegacyEntity } from '../types/legacy';

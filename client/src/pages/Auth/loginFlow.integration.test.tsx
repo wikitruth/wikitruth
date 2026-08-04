@@ -6,8 +6,8 @@ import { render, screen } from '../../test-utils/render';
 const mockNavigate = jest.fn();
 const mockLogin = jest.fn();
 
-jest.mock('react-router-dom', () => {
-  const actual = jest.requireActual('react-router-dom');
+jest.mock('react-router', () => {
+  const actual = jest.requireActual('react-router');
   return {
     ...actual,
     useNavigate: () => mockNavigate,

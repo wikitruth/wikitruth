@@ -11,7 +11,15 @@ module.exports = {
         tsconfig: '<rootDir>/client/tsconfig.json',
       },
     ],
+    '^.+\\.m?js$': [
+      'babel-jest',
+      {
+        presets: [['@babel/preset-env', { targets: { node: 'current' } }]],
+        plugins: [require.resolve('./scripts/testing/babel-plugin-jest-import-meta.cjs')],
+      },
+    ],
   },
+  transformIgnorePatterns: ['/node_modules/(?!(react-router|cookie-es)/)'],
   moduleNameMapper: {
     '\\.(css|less|scss|sass)$': '<rootDir>/client/src/test-utils/styleMock.ts',
     '\\.(gif|ttf|eot|svg|png|jpe?g|webp)$': '<rootDir>/client/src/test-utils/fileMock.ts',

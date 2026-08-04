@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router';
 import Alert from '../../../components/common/Alert';
 import Breadcrumb from '../../../components/common/Breadcrumb';
 import PageHeader from '../../../components/common/PageHeader';

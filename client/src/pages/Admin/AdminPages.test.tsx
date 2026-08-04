@@ -1,6 +1,6 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router';
 import AdminDashboard from './AdminDashboard';
 import AccountsList from './Accounts/AccountsList';
 import AccountDetails from './Accounts/AccountDetails';

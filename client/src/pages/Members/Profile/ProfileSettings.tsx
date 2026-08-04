@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import Checkbox from '../../../components/Form/Checkbox';
 import Input from '../../../components/Form/Input';
 import Button from '../../../components/common/Button';

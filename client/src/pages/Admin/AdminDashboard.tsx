@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 import adminApi, { type AdminDashboardResponse, type AdminPermission, type AdminSystemHealth, type HealthStatus } from '../../services/api/admin';
 import { createRealtimeChannel } from '../../services/realtime';

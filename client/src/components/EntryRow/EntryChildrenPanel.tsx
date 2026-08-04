@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import apiService from '../../services/api';
 import type { EntityBuckets } from '../../types/api';
 import type { LegacyEntity } from '../../types/legacy';

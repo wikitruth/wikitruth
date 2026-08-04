@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import GeoPatternBackground from '../common/GeoPatternBackground';
 import type { LegacyEntity } from '../../types/legacy';
 

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router';
 import apiService from '../services/api';
 import type { HomeDataResponse } from '../types/api';
 import type { LegacyEntity } from '../types/legacy';

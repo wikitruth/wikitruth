@@ -7,8 +7,8 @@ import { useAuth } from '../../../context/AuthContext';
 
 const navigate = jest.fn();
 
-jest.mock('react-router-dom', () => ({
-  ...jest.requireActual('react-router-dom'),
+jest.mock('react-router', () => ({
+  ...jest.requireActual('react-router'),
   useNavigate: () => navigate,
   useParams: () => ({ id: 'topic-1' }),
   useSearchParams: () => [new URLSearchParams('type=topic')],

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router';
 import OptimizedImage from '../common/OptimizedImage';
 import ApplicationLink from '../common/ApplicationLink';
 import { useAuth } from '../../context/AuthContext';

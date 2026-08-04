@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router';
 import LoadingSpinner from '../components/LoadingSpinner';
 import Alert from '../components/common/Alert';
 import Breadcrumb from '../components/common/Breadcrumb';

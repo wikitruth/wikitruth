@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { useAuth } from '../../context/AuthContext';
 import { useAuthPrompt } from '../../context/AuthPromptContext';
 import type { LegacyEntity } from '../../types/legacy';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link, Navigate, useLocation } from 'react-router-dom';
+import { Link, Navigate, useLocation } from 'react-router';
 import { useAuth } from '../../context/AuthContext';
 import { buildSignInPath } from '../../utils/authFlow';
 import LoadingSpinner from '../LoadingSpinner';

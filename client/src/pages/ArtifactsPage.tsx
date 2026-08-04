@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ArtifactEntryRow from '../components/EntryRow/ArtifactEntryRow';
 import apiService from '../services/api';

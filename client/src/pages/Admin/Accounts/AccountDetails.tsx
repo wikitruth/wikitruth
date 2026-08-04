@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams } from 'react-router';
 import adminApi from '../../../services/api/admin';
 import AdminDetailsPage from '../common/AdminDetailsPage';
 

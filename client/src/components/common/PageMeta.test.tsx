@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, waitFor } from '@testing-library/react';
 import { HelmetProvider } from 'react-helmet-async';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 import PageMeta from './PageMeta';
 import { ApplicationContext, type ApplicationContextValue } from '../../context/ApplicationContext';
 

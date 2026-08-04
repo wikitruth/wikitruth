@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import Input from '../../../../components/Form/Input';
 import TextArea from '../../../../components/Form/TextArea';
 import Button from '../../../../components/common/Button';

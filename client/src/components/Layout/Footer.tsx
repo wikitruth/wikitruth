@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import { useApplicationContext } from '../../context/ApplicationContext';
 import ApplicationLink from '../common/ApplicationLink';
 import { toModernAppSectionUrl } from '../../utils/paths';

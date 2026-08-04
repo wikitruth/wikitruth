@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import DeterministicAvatar from '../common/DeterministicAvatar';
 
 type ProfileTab = 'overview' | 'contributions' | 'topics' | 'journal' | 'following' | 'pages' | 'settings';

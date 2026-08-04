@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import type { LegacyEntity } from '../../types/legacy';
 import { formatRelativeTime } from '../../utils/dateFormat';
 import DeterministicAvatar from '../common/DeterministicAvatar';

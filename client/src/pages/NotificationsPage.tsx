@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import Alert from '../components/common/Alert';
 import PageMeta from '../components/common/PageMeta';
 import notificationsApi, { type NotificationDelivery, type NotificationRecord } from '../services/api/notifications';

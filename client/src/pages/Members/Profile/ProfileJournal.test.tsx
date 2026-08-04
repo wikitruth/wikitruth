@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router';
 import { render, screen, waitFor } from '../../../test-utils/render';
 import ProfileJournal from './ProfileJournal';
 import apiService from '../../../services/api';

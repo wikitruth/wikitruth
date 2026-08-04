@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router';
 import Input from '../../../../components/Form/Input';
 import TextArea from '../../../../components/Form/TextArea';
 import Button from '../../../../components/common/Button';

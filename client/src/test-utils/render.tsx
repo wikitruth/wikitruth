@@ -1,6 +1,6 @@
 import React, { ReactElement, ReactNode } from 'react';
 import { render as rtlRender, RenderOptions } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter } from 'react-router';
 import { HelmetProvider } from 'react-helmet-async';
 
 interface TestProvidersProps {

@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '../../test-utils/render';
 import { useAuth } from '../../context/AuthContext';
 import ProtectedRoute from './ProtectedRoute';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router';
 
 jest.mock('../../context/AuthContext', () => ({
   useAuth: jest.fn(),

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router';
 import VisualizePage from './VisualizePage';
 import { fireEvent, render, screen, waitFor } from '../test-utils/render';
 

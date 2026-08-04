@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import Alert from '../../../components/common/Alert';
 import Button from '../../../components/common/Button';
 import LoadingSpinner from '../../../components/LoadingSpinner';

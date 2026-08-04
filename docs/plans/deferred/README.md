@@ -2,15 +2,16 @@
 
 These plans are intentionally deferred and are not part of the active execution queue.
 
-## Pending Snapshot (2026-07-31)
+## Pending Snapshot (2026-08-04)
 
-- Deferred checklist docs with open `[ ]`: **7**
-- Total deferred open `[ ]` items: **147**
+- Deferred checklist docs with open `[ ]`: **9**
+- Total deferred open `[ ]` items: **196**
 
 ## Deferred Checklist Plans
 
 - `docs/plans/deferred/ROOT_FOLDER_HYGIENE_DEFERRED_CHECKLIST_2026-04-08.md`
 - `docs/plans/deferred/LEGACY_TOOLCHAIN_RETIREMENT_DEFERRED_CHECKLIST_2026-04-08.md`
+- `docs/plans/deferred/V2_LAUNCH_READINESS_DEFERRED_CHECKLIST_2026-08-04.md`
 - `docs/plans/deferred/REACT_NATIVE_MONOREPO_CHECKLIST_PLAN_2026-04-19.md`
 - `docs/plans/deferred/plan-2026-04-14/02_IMPLEMENTATION_CHECKLIST_CORE_PLATFORM.md`
 - `docs/plans/deferred/plan-2026-04-14/03_IMPLEMENTATION_CHECKLIST_PRODUCT_WORKFLOWS.md`
