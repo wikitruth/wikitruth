@@ -5,8 +5,6 @@ import type { Router } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 import {
   bodyOf,
-  queryOf,
-  type AdminAuditEventsQueryContract,
   type AdminDbBackupActionBodyContract,
 } from '../../types/controllerContracts';
 
@@ -14,10 +12,9 @@ import appModForDb from '../../app';
 import config from '../../config/config';
 import * as flowUtils from '../../utils/flowUtils';
 import {
-  listPrivilegedEvents,
   logEntryEvent,
-  verifyPrivilegedEventChain,
 } from '../../services/entryEventsService';
+import { registerAdminAuditRoutes } from './adminAuditRoutes';
 import {
   type BackupDatabaseConnection,
 } from '../../services/databaseBackupService';
@@ -81,14 +78,6 @@ function ensureDir(dirPath: string): void {
     return;
   }
   fs.mkdirSync(dirPath, { recursive: true });
-}
-
-function toPositiveInt(value: unknown, fallback: number): number {
-  const parsed = Number(value);
-  if (!Number.isFinite(parsed) || parsed <= 0) {
-    return fallback;
-  }
-  return Math.floor(parsed);
 }
 
 function toRestoreBoolean(value: unknown, fallback: boolean): boolean {
@@ -481,44 +470,5 @@ export function registerAdminBackupRoutes(router: Router, ensureAdmin: EnsureAdm
     });
   });
 
-  router.get('/audit-events', async function (req: WikitruthRequest, res: WikitruthResponse) {
-    if (!ensureAdmin(req, res)) {
-      return;
-    }
-
-    const query = queryOf<AdminAuditEventsQueryContract>(req);
-    const page = toPositiveInt(query.page, 1);
-    const limit = Math.min(toPositiveInt(query.limit, 25), 100);
-    const objectType = Number(query.objectType || 0);
-    const eventTypes = String(query.eventTypes || '')
-      .split(',')
-      .map((item) => item.trim())
-      .filter(Boolean);
-
-    const result = await listPrivilegedEvents({
-      page,
-      limit,
-      eventTypes,
-      objectType: objectType > 0 ? objectType : null,
-    });
-
-    res.json({
-      success: true,
-      events: result.items,
-      total: result.total,
-      page: result.page,
-      limit: result.limit,
-    });
-  });
-
-  router.get('/audit-events/verify', async function (req: WikitruthRequest, res: WikitruthResponse) {
-    if (!ensureAdmin(req, res)) {
-      return;
-    }
-    const verification = await verifyPrivilegedEventChain();
-    res.status(verification.valid ? 200 : 409).json({
-      success: verification.valid,
-      verification,
-    });
-  });
+  registerAdminAuditRoutes(router, ensureAdmin);
 }

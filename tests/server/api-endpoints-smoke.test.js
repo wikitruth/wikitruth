@@ -60,6 +60,7 @@ describe('API endpoint smoke coverage', function () {
     const adminApi = read('server/src/controllers/api/admin.ts');
     const adminCollections = read('server/src/controllers/api/adminCollectionRoutes.ts');
     const adminBackupRoutes = read('server/src/controllers/api/adminBackupRoutes.ts');
+    const adminAuditRoutes = read('server/src/controllers/api/adminAuditRoutes.ts');
 
     [
       "router.get('/'",
@@ -100,8 +101,9 @@ describe('API endpoint smoke coverage', function () {
     [
       "router.get('/db-backup'",
       "router.post('/db-backup'",
-      "router.get('/audit-events'",
     ].forEach((contract) => expect(adminBackupRoutes).toContain(contract));
+    expect(adminAuditRoutes).toContain("router.get('/audit-events'");
+    expect(adminBackupRoutes).toContain('registerAdminAuditRoutes(router, ensureAdmin)');
   });
 
   it('exposes profile and custom-page member APIs required by modern client', function () {
