@@ -30,6 +30,7 @@ describe('routeConfig', () => {
     expect(paths).toContain('/members/:username/contributions');
     expect(paths).toContain('/members/profile/contributions');
     expect(paths).toContain('/account/settings');
+    expect(paths).toContain('/account/privacy');
     expect(paths).toContain('/search');
     expect(paths).toContain('/screening');
     expect(paths).toContain('/convert');
@@ -49,6 +50,7 @@ describe('routeConfig', () => {
     expect(paths).toContain('/admin/email-operations');
     expect(paths).toContain('/admin/people');
     expect(paths).toContain('/admin/system-operations');
+    expect(paths).toContain('/admin/privacy-requests');
     expect(paths).toContain('/policies');
   });
 
@@ -73,6 +75,7 @@ describe('routeConfig', () => {
     const protectedPaths = [
       '/account',
       '/account/settings',
+      '/account/privacy',
       '/topics/create',
       '/arguments/create',
       '/questions/create',
@@ -100,6 +103,7 @@ describe('routeConfig', () => {
       '/admin/users',
       '/admin/db-backup',
       '/admin/system-operations',
+      '/admin/privacy-requests',
       '/admin/moderation/signals',
       '/admin/anonymous-contributions',
       '/admin/civic-operations',

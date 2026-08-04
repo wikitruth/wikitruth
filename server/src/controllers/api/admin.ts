@@ -27,6 +27,7 @@ import { requirePrivilegedPasskeyAssurance } from '../../services/privilegedAuth
 import { registerAdminEmailOperationsRoutes } from './adminEmailOperationsRoutes';
 import { registerAdminPeopleRoutes } from './adminPeopleRoutes';
 import { registerAdminOperationalRoutes } from './adminOperationalRoutes';
+import { registerAdminPrivacyRoutes } from './adminPrivacyRoutes';
 import {
   ADMIN_PERMISSIONS,
   type AuthorizationModels,
@@ -182,6 +183,7 @@ export = function (router: Router) {
   registerAdminEmailOperationsRoutes(router, ensureAdmin);
   registerAdminPeopleRoutes(router, ensureAdmin);
   registerAdminOperationalRoutes(router, ensureAdmin);
+  registerAdminPrivacyRoutes(router, ensureAdmin);
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAdmin(req, res)) {
       return;

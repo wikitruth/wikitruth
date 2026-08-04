@@ -67,6 +67,7 @@ export = function (app: Application, mongoose: Mongoose) {
   require('./core/HealthSnapshot')(app, mongoose);
   require('./core/OperationalAlertRule')(app, mongoose);
   require('./core/OperationalAlert')(app, mongoose);
+  require('./core/PrivacyRequest')(app, mongoose);
 
   require('./core/TrustedClient')(app, mongoose);
   //require('./schema/core/Word')(app, mongoose);

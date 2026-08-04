@@ -1,0 +1,59 @@
+.wt-privacy-page { max-width: 1160px; margin: 0 auto; padding: 26px 20px 50px; color: var(--wt-text); }
+.wt-privacy-page-header { display: flex; justify-content: space-between; gap: 24px; align-items: flex-start; margin-bottom: 24px; }
+.wt-privacy-page-header h1 { margin: 4px 0 6px; font-size: clamp(30px, 5vw, 44px); }
+.wt-privacy-page-header p { max-width: 760px; margin: 0; color: var(--wt-text-muted); font-size: 16px; }
+.wt-privacy-eyebrow { color: var(--wt-brand-primary); font-size: 12px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+.wt-privacy-choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 26px; }
+.wt-privacy-choice-grid > article { display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 14px; padding: 20px; border: 1px solid var(--wt-border); border-radius: 10px; background: var(--wt-surface); }
+.wt-privacy-choice-grid > article.danger { border-color: color-mix(in srgb, var(--wt-admin-danger, #c82c35) 38%, var(--wt-border)); }
+.wt-privacy-choice-grid h2 { margin: 0 0 7px; font-size: 20px; }
+.wt-privacy-choice-grid p { min-height: 64px; color: var(--wt-text-muted); }
+.wt-privacy-choice-icon { display: grid; width: 44px; height: 44px; place-items: center; border-radius: 9px; color: var(--wt-brand-primary); background: color-mix(in srgb, var(--wt-brand-primary) 12%, var(--wt-surface)); font-size: 19px; }
+.wt-privacy-request-list { overflow: hidden; border: 1px solid var(--wt-border); border-radius: 10px; background: var(--wt-surface); }
+.wt-privacy-request-list > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--wt-border); }
+.wt-privacy-request-list > header h2 { margin: 0; font-size: 20px; }
+.wt-privacy-request-list > header p { margin: 2px 0 0; color: var(--wt-text-muted); font-size: 13px; }
+.wt-privacy-request { display: grid; grid-template-columns: minmax(220px, .8fr) minmax(280px, 1.2fr) auto; gap: 22px; padding: 18px; border-bottom: 1px solid var(--wt-border); }
+.wt-privacy-request:last-child { border-bottom: 0; }
+.wt-privacy-request h3 { margin: 8px 0 2px; font-size: 17px; }
+.wt-privacy-request-main > p { margin: 5px 0 0; color: var(--wt-text-muted); font-size: 12px; }
+.wt-privacy-status { display: inline-flex; padding: 3px 7px; border: 1px solid var(--wt-border); border-radius: 999px; color: var(--wt-text-muted); background: var(--wt-surface-muted); font-size: 10px; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; }
+.wt-privacy-status.approved, .wt-privacy-status.ready, .wt-privacy-status.completed { color: var(--wt-admin-success, #218739); border-color: color-mix(in srgb, var(--wt-admin-success, #218739) 45%, var(--wt-border)); }
+.wt-privacy-status.blocked, .wt-privacy-status.failed, .wt-privacy-status.rejected { color: var(--wt-admin-danger, #c82c35); border-color: color-mix(in srgb, var(--wt-admin-danger, #c82c35) 45%, var(--wt-border)); }
+.wt-privacy-status.in_review, .wt-privacy-status.processing { color: var(--wt-admin-warning, #b55d00); border-color: color-mix(in srgb, var(--wt-admin-warning, #b55d00) 45%, var(--wt-border)); }
+.wt-privacy-timeline { position: relative; margin: 0; padding: 0; list-style: none; }
+.wt-privacy-timeline li { position: relative; padding: 0 0 12px 18px; border-left: 1px solid var(--wt-border); }
+.wt-privacy-timeline li:last-child { padding-bottom: 0; }
+.wt-privacy-timeline li::before { position: absolute; top: 4px; left: -4px; width: 7px; height: 7px; border-radius: 50%; background: var(--wt-brand-primary); content: ''; }
+.wt-privacy-timeline strong, .wt-privacy-timeline span { display: block; }
+.wt-privacy-timeline strong { font-size: 12px; text-transform: capitalize; }
+.wt-privacy-timeline span { color: var(--wt-text-muted); font-size: 11px; }
+.wt-privacy-timeline p { margin: 3px 0 0; font-size: 12px; }
+.wt-privacy-request-actions { display: flex; min-width: 145px; align-items: flex-end; flex-direction: column; gap: 7px; }
+.wt-privacy-request-actions small { max-width: 180px; color: var(--wt-text-muted); text-align: right; }
+.wt-privacy-empty { margin: 0; padding: 28px 18px; color: var(--wt-text-muted); }
+.wt-privacy-hold { margin-top: 9px; color: var(--wt-admin-danger, #c82c35); font-size: 12px; font-weight: 700; }
+.wt-privacy-critical-note { display: flex; gap: 12px; padding: 14px; border-left: 4px solid var(--wt-admin-danger, #c82c35); background: color-mix(in srgb, var(--wt-admin-danger, #c82c35) 10%, var(--wt-surface)); }
+.wt-privacy-critical-note > i { margin-top: 2px; color: var(--wt-admin-danger, #c82c35); font-size: 18px; }
+.wt-privacy-critical-note p { margin: 4px 0 0; }
+.wt-privacy-filters { grid-template-columns: minmax(240px, 1.5fr) minmax(150px, .7fr) minmax(170px, .8fr); }
+.wt-privacy-drawer { width: min(560px, 96vw); }
+.wt-privacy-review-strip { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 8px; padding: 10px 12px; border: 1px solid var(--wt-border); border-radius: 6px; background: var(--wt-surface-muted); }
+.wt-privacy-impact-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-bottom: 12px; }
+.wt-privacy-impact-grid > div { min-width: 0; padding: 9px; border: 1px solid var(--wt-border); border-radius: 5px; background: var(--wt-surface-muted); }
+.wt-privacy-impact-grid strong, .wt-privacy-impact-grid small { display: block; }
+.wt-privacy-impact-grid small { overflow: hidden; color: var(--wt-text-muted); text-overflow: ellipsis; }
+.wt-privacy-action-footer { position: sticky; bottom: -22px; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 7px; margin: 18px -22px -22px; padding: 12px 22px; border-top: 1px solid var(--wt-border); background: var(--wt-surface); }
+
+@media (max-width: 700px) {
+  .wt-privacy-page { padding: 18px 14px 36px; }
+  .wt-privacy-page-header { flex-direction: column; }
+  .wt-privacy-choice-grid { grid-template-columns: 1fr; }
+  .wt-privacy-choice-grid p { min-height: 0; }
+  .wt-privacy-request { grid-template-columns: 1fr; gap: 14px; }
+  .wt-privacy-request-actions { align-items: stretch; }
+  .wt-privacy-request-actions small { max-width: none; text-align: left; }
+  .wt-privacy-filters { grid-template-columns: 1fr; }
+  .wt-privacy-filters > :first-child { grid-column: auto; }
+  .wt-privacy-impact-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

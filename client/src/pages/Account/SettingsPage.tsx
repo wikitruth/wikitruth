@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router';
 import Alert from '../../components/common/Alert';
 import Button from '../../components/common/Button';
 import Input from '../../components/Form/Input';
@@ -270,6 +271,13 @@ const SettingsPage: React.FC = () => {
                     </div>
                   </div>
                 ))}
+            </div>
+          </div>
+          <div className="panel panel-info">
+            <div className="panel-heading"><h3 className="panel-title">Privacy &amp; Data</h3></div>
+            <div className="panel-body">
+              <p className="text-muted">Request an authenticated data export or account anonymization and track its review status.</p>
+              <Link className="btn btn-info btn-block" to="/account/privacy"><i className="fa fa-shield" aria-hidden="true" /> Open privacy controls</Link>
             </div>
           </div>
         </div>

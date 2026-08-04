@@ -218,4 +218,23 @@ describe('adminApi', () => {
       headers: expect.objectContaining({ 'x-csrf-token': 'test-admin-csrf' }),
     }));
   });
+
+  it('previews and executes privacy requests through guarded admin endpoints', async () => {
+    document.cookie = '_csrfToken=test-admin-csrf';
+    const preview = { previewToken: 'preview-token', confirmationPhrase: 'ANONYMIZE ada' };
+    const fetchMock = jest.fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ success: true, preview }) })
+      .mockResolvedValueOnce({ ok: true, json: async () => ({ success: true, request: { id: 'privacy/1', status: 'completed' } }) });
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+    await expect(adminApi.previewPrivacyAnonymization('privacy/1')).resolves.toEqual(preview);
+    await adminApi.runPrivacyRequestAction('privacy/1', {
+      action: 'execute', previewToken: 'preview-token', confirmation: 'ANONYMIZE ada',
+    });
+
+    expect(fetchMock).toHaveBeenNthCalledWith(1, '/api/admin/privacy-requests/privacy%2F1/preview', expect.objectContaining({ method: 'POST' }));
+    expect(fetchMock).toHaveBeenNthCalledWith(2, '/api/admin/privacy-requests/privacy%2F1/actions', expect.objectContaining({
+      method: 'POST', headers: expect.objectContaining({ 'x-csrf-token': 'test-admin-csrf' }),
+    }));
+  });
 });

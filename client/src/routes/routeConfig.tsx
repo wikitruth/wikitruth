@@ -15,6 +15,7 @@ const AccountPage = lazy(() => import('../pages/Account/AccountPage'));
 const OnboardingPage = lazy(() => import('../pages/Account/OnboardingPage'));
 const SettingsPage = lazy(() => import('../pages/Account/SettingsPage'));
 const VerificationPage = lazy(() => import('../pages/Account/VerificationPage'));
+const PrivacyPage = lazy(() => import('../pages/Account/PrivacyPage'));
 const AdminDashboard = lazy(() => import('../pages/Admin/AdminDashboard'));
 const PeopleOperationsPage = lazy(() => import('../pages/Admin/People/PeopleOperationsPage'));
 const UsersList = lazy(() => import('../pages/Admin/Users/UsersList'));
@@ -108,6 +109,7 @@ const PolicyCenterPage = lazy(() => import('../pages/PolicyCenterPage'));
 const ApiClientsPage = lazy(() => import('../pages/Admin/ApiClients/ApiClientsPage'));
 const KnowledgeHealthPage = lazy(() => import('../pages/Admin/KnowledgeHealth/KnowledgeHealthPage'));
 const EmailOperationsPage = lazy(() => import('../pages/Admin/EmailOperations/EmailOperationsPage'));
+const PrivacyRequestsPage = lazy(() => import('../pages/Admin/Privacy/PrivacyRequestsPage'));
 
 export interface AppRoute {
   path: string;
@@ -132,6 +134,7 @@ export const appRoutes: AppRoute[] = [
   { path: '/account/onboarding', element: protectedRoute(<OnboardingPage />) },
   { path: '/account/settings', element: protectedRoute(<SettingsPage />) },
   { path: '/account/verification', element: protectedRoute(<VerificationPage />) },
+  { path: '/account/privacy', element: protectedRoute(<PrivacyPage />) },
   { path: '/admin', element: protectedRoute(<AdminDashboard />, ['admin']) },
   { path: '/admin/people', element: protectedRoute(<PeopleOperationsPage />, ['admin']) },
   { path: '/admin/users', element: protectedRoute(<UsersList />, ['admin']) },
@@ -156,6 +159,7 @@ export const appRoutes: AppRoute[] = [
   { path: '/admin/api-clients', element: protectedRoute(<ApiClientsPage />, ['admin']) },
   { path: '/admin/knowledge-health', element: protectedRoute(<KnowledgeHealthPage />, ['reviewer', 'admin']) },
   { path: '/admin/email-operations', element: protectedRoute(<EmailOperationsPage />, ['admin']) },
+  { path: '/admin/privacy-requests', element: protectedRoute(<PrivacyRequestsPage />, ['admin']) },
   { path: '/civic', element: <CivicTenantProvider><CivicWorkspacePage /></CivicTenantProvider> },
   { path: '/civic/:section', element: <CivicTenantProvider><CivicWorkspacePage /></CivicTenantProvider> },
   { path: '/civic/records/:id', element: <CivicTenantProvider><CivicRecordPage /></CivicTenantProvider> },

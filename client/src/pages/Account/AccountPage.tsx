@@ -79,6 +79,9 @@ const AccountPage: React.FC = () => {
         <Link to="/account/verification" className="btn btn-default">
           <i className="fa fa-shield"></i> Verification
         </Link>
+        <Link to="/account/privacy" className="btn btn-default">
+          <i className="fa fa-lock"></i> Privacy &amp; data
+        </Link>
       </div>
     </div>
   );

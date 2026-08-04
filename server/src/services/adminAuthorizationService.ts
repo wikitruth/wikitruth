@@ -128,6 +128,7 @@ export function permissionForAdminRequest(
   if (path.startsWith('/knowledge-health') || path.startsWith('/verdicts') || path.startsWith('/moderation') || path.startsWith('/anonymous-contributions')) return 'moderation.review';
   if (path.startsWith('/audit-events')) return 'audit.read';
   if (path.startsWith('/operational-telemetry')) return normalizedMethod === 'GET' ? 'system.read' : 'security.manage';
+  if (path.startsWith('/privacy-requests')) return 'security.manage';
   if (path.startsWith('/system-health')) return 'system.read';
   if (path.startsWith('/db-backup')) {
     if (normalizedMethod === 'GET') return 'backups.read';

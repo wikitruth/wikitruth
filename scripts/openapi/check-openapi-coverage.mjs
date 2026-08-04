@@ -18,7 +18,7 @@ const groups = [
     'authPasskeyRoutes.ts',
     'authSessionRoutes.ts',
   ]], ['/contact', ['contact.ts']],
-  ['/admin', ['admin.ts', 'adminCollectionRoutes.ts', 'adminBackupRoutes.ts', 'adminApiClientRoutes.ts']],
+  ['/admin', ['admin.ts', 'adminCollectionRoutes.ts', 'adminBackupRoutes.ts', 'adminApiClientRoutes.ts', 'adminOperationalRoutes.ts', 'adminPrivacyRoutes.ts']],
   ['/moderation', ['moderation.ts', 'moderationArtifactRoutes.ts', 'moderationDuplicateRoutes.ts', 'moderationIssueRoutes.ts', 'moderationRevisionRoutes.ts', 'moderationSignalsRoutes.ts', 'moderationVerdictChannelRoutes.ts']],
   ['/outline', ['outline.ts']], ['/monitoring', ['monitoring.ts']], ['/realtime', ['realtime.ts']],
   ['/reactions', ['reactions.ts']], ['/notifications', ['notifications.ts']], ['/timeline', ['timeline.ts']],
@@ -27,6 +27,7 @@ const groups = [
   ['/civic', ['civic.ts', 'civicAdministration.ts', 'civicEntryLinks.ts', 'civicResponses.ts']],
   ['/tenants/{tenantId}/civic', ['civic.ts', 'civicAdministration.ts', 'civicEntryLinks.ts', 'civicResponses.ts']],
   ['/epistemic', ['epistemic.ts']], ['/translations', ['translations.ts']],
+  ['/privacy', ['privacy.ts']],
 ];
 
 function joinRoute(prefix, route) {

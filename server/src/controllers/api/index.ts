@@ -40,6 +40,7 @@ import { enforceApiClientScope } from '../../middlewares/apiClientScopes';
 import attachAgent from './agent';
 import attachEpistemic from './epistemic';
 import attachTranslations from './translations';
+import attachPrivacy from './privacy';
 import { apiVersionPolicy } from '../../middlewares/apiVersionPolicy';
 import { enforceAgentMutationReliability } from '../../middlewares/agentMutationReliability';
 
@@ -81,6 +82,7 @@ export = function (router: Router) {
   const agentRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const epistemicRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const translationsRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
+  const privacyRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
 
   [topicsRouter, argumentsRouter, questionsRouter, answersRouter, issuesRouter, opinionsRouter, artifactsRouter]
     .forEach((entryRouter) => entryRouter.use(requireContributorOnboarding));
@@ -122,6 +124,7 @@ export = function (router: Router) {
   attachAgent(agentRouter);
   attachEpistemic(epistemicRouter);
   attachTranslations(translationsRouter);
+  attachPrivacy(privacyRouter);
 
   router.use('/home', homeRouter);
   router.use('/application-context', applicationContextRouter);
@@ -153,4 +156,5 @@ export = function (router: Router) {
   router.use('/agent', agentRouter);
   router.use('/epistemic', epistemicRouter);
   router.use('/translations', translationsRouter);
+  router.use('/privacy', privacyRouter);
 };

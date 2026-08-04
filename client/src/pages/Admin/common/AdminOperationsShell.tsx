@@ -15,7 +15,7 @@ const sections = [
   { label: 'Overview', to: '/admin', paths: ['/admin'] },
   { label: 'People', to: '/admin/people', paths: ['/admin/people', '/admin/users', '/admin/accounts', '/admin/administrators', '/admin/groups'] },
   { label: 'Content & moderation', to: '/admin/knowledge-health', paths: ['/admin/knowledge-health', '/admin/verdicts', '/admin/moderation', '/admin/anonymous-contributions', '/admin/categories', '/admin/statuses'] },
-  { label: 'Security', to: '/admin/api-clients', paths: ['/admin/api-clients', '/admin/audit'] },
+  { label: 'Security', to: '/admin/api-clients', paths: ['/admin/api-clients', '/admin/audit', '/admin/privacy-requests'] },
   { label: 'Communications', to: '/admin/email-operations', paths: ['/admin/email-operations'] },
   { label: 'Tenants', to: '/admin/civic-tenants', paths: ['/admin/civic-tenants', '/admin/civic-operations'] },
   { label: 'System operations', to: '/admin/system-operations', paths: ['/admin/system-operations', '/admin/db-backup'] },

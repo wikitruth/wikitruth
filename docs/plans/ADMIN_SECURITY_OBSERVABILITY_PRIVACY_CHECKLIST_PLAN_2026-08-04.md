@@ -2,7 +2,7 @@
 
 ## Status
 
-Active. This plan covers a local implementation milestone only. It does not
+Verification in progress. This plan covers a local implementation milestone only. It does not
 authorize a push, production deployment, remote restart, production-data
 operation, or canonical-card change.
 
@@ -42,19 +42,19 @@ telemetry, and governed privacy operations.
 
 ### 4. Privacy Operations
 
-- [ ] Add an audited privacy-request lifecycle for export and anonymization with
+- [x] Add an audited privacy-request lifecycle for export and anonymization with
   legal-hold, review, approval, execution, rejection, and cancellation controls.
-- [ ] Build safe export generation and authenticated, expiring download behavior
+- [x] Build safe export generation and authenticated, expiring download behavior
   without logging or exposing export contents.
-- [ ] Build preview-before-execute anonymization that scrubs account PII, revokes
+- [x] Build preview-before-execute anonymization that scrubs account PII, revokes
   sessions, preserves public contribution attribution under a stable pseudonym,
   and refuses protected administrator/legal-hold cases.
-- [ ] Add an efficient responsive admin workspace and authenticated self-service
+- [x] Add an efficient responsive admin workspace and authenticated self-service
   request entry/status view.
 
 ### 5. Verification and Delivery
 
-- [ ] Generate and inspect coordinated admin UI concepts before implementation.
+- [x] Generate and inspect coordinated admin UI concepts before implementation.
 - [ ] Run focused and full relevant server/client tests, type checks, lint,
   source guardrails, production builds, and dependency/security checks.
 - [ ] Verify primary workflows in the in-app browser at desktop and 390 px mobile

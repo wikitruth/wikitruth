@@ -41,6 +41,8 @@ describe('admin authorization service', () => {
     expect(permissionForAdminRequest('GET', '/system-health')).toBe('system.read');
     expect(permissionForAdminRequest('GET', '/operational-telemetry')).toBe('system.read');
     expect(permissionForAdminRequest('PUT', '/operational-telemetry/rules/1')).toBe('security.manage');
+    expect(permissionForAdminRequest('GET', '/privacy-requests')).toBe('security.manage');
+    expect(permissionForAdminRequest('POST', '/privacy-requests/1/actions')).toBe('security.manage');
     expect(permissionForAdminRequest('POST', '/people/actions')).toBe('users.manage');
   });
 });

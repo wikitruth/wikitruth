@@ -1,5 +1,7 @@
 import API_BASE_URL from './baseUrl';
 import fetchWithPasskeyStepUp from './passkeyFetch';
+import type { AnonymizationPreview, PrivacyRequest } from './privacyTypes';
+export type { AnonymizationPreview, PrivacyRequest, PrivacyRequestStatus, PrivacyRequestType } from './privacyTypes';
 import type {
   AdminAccessSnapshot, AdminDashboardResponse, AdminGroupAccessSnapshot, AdminListParams, AdminListResponse, AdminMutationPayload, AdminRecord, OperationalAlert, OperationalAlertRule, OperationalTelemetry,
   AdminSystemHealth, BackupSnapshot, PeopleListResponse, RestorePreview, UserSecurity,
@@ -161,6 +163,20 @@ export const adminApi = {
       }),
     }),
   systemHealth: () => request<{ success: boolean; health: AdminSystemHealth }>(`${API_BASE_URL}/admin/system-health`),
+  privacyRequests: () => request<{ success: boolean; requests: PrivacyRequest[] }>(
+    `${API_BASE_URL}/admin/privacy-requests`,
+  ).then((response) => response.requests),
+  previewPrivacyAnonymization: (id: string) => request<{ success: boolean; preview: AnonymizationPreview }>(
+    `${API_BASE_URL}/admin/privacy-requests/${encodeURIComponent(id)}/preview`,
+    { method: 'POST', body: '{}' },
+  ).then((response) => response.preview),
+  runPrivacyRequestAction: (id: string, input: {
+    action: 'review' | 'approve' | 'reject' | 'hold' | 'clear_hold' | 'execute';
+    note?: string; previewToken?: string; confirmation?: string;
+  }) => request<{ success: boolean; request: PrivacyRequest }>(
+    `${API_BASE_URL}/admin/privacy-requests/${encodeURIComponent(id)}/actions`,
+    { method: 'POST', body: JSON.stringify(input) },
+  ).then((response) => response.request),
   operationalTelemetry: () => request<{ success: boolean; telemetry: OperationalTelemetry }>(
     `${API_BASE_URL}/admin/operational-telemetry`,
   ).then((response) => response.telemetry),

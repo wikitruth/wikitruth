@@ -25,6 +25,7 @@ const operationGroups: OperationGroup[] = [
     { label: 'Agent API credentials', to: '/admin/api-clients', permission: 'security.manage' },
     { label: 'Privileged audit', to: '/admin/audit', permission: 'audit.read' },
     { label: 'Admin groups', to: '/admin/groups', permission: 'security.manage' },
+    { label: 'Privacy requests', to: '/admin/privacy-requests', permission: 'security.manage' },
   ] },
   { title: 'Communications', description: 'Configure providers, preview templates, and inspect delivery.', icon: 'envelope-o', links: [
     { label: 'Email operations', to: '/admin/email-operations', permission: 'email.manage' },
