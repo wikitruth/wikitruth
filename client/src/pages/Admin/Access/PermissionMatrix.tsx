@@ -6,16 +6,17 @@ import type {
 } from '../../../services/api/admin';
 
 type GroupPermissionRow = Omit<PermissionCatalogRow, 'direct' | 'inheritedFrom' | 'effective'> & { granted: boolean };
+type PermissionRow = PermissionCatalogRow | GroupPermissionRow;
 
 type Props = {
-  rows: PermissionCatalogRow[] | GroupPermissionRow[];
+  rows: PermissionRow[];
   states: Record<string, DirectPermissionState>;
   onChange: (permission: AdminPermission, state: DirectPermissionState) => void;
   groupMode?: boolean;
   disabled?: boolean;
 };
 
-function isAdministratorRow(row: PermissionCatalogRow | GroupPermissionRow): row is PermissionCatalogRow {
+function isAdministratorRow(row: PermissionRow): row is PermissionCatalogRow {
   return 'direct' in row;
 }
 
@@ -25,10 +26,10 @@ const PermissionMatrix: React.FC<Props> = ({ rows, states, onChange, groupMode =
   const families = useMemo(() => {
     const matching = rows.filter((row) => !normalizedQuery || [row.name, row.label, row.description, row.familyLabel]
       .some((value) => value.toLowerCase().includes(normalizedQuery)));
-    return matching.reduce<Array<{ id: string; label: string; rows: typeof rows }>>((result, row) => {
+    return matching.reduce<Array<{ id: string; label: string; rows: PermissionRow[] }>>((result, row) => {
       const existing = result.find((family) => family.id === row.family);
       if (existing) existing.rows.push(row);
-      else result.push({ id: row.family, label: row.familyLabel, rows: [row] as typeof rows });
+      else result.push({ id: row.family, label: row.familyLabel, rows: [row] });
       return result;
     }, []);
   }, [normalizedQuery, rows]);
