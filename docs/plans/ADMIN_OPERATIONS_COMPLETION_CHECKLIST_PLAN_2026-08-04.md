@@ -48,23 +48,23 @@ embedding a web shell or arbitrary database/process controls.
 
 ### 3. Backup and restore safety
 
-- [ ] Store timestamped backup snapshots with immutable manifests, collection
+- [x] Store timestamped backup snapshots with immutable manifests, collection
       counts, byte totals, and SHA-256 checksums.
-- [ ] List snapshots and distinguish completeness, verification, and off-site
+- [x] List snapshots and distinguish completeness, verification, and off-site
       state honestly.
-- [ ] Add checksum verification and current-versus-snapshot restore preview.
-- [ ] Add an isolated temporary-database restore test.
-- [ ] Require a valid preview token, exact confirmation phrase, and automatic
+- [x] Add checksum verification and current-versus-snapshot restore preview.
+- [x] Add an isolated temporary-database restore test.
+- [x] Require a valid preview token, exact confirmation phrase, and automatic
       pre-restore snapshot before any restore.
-- [ ] Keep legacy recovery compatibility without presenting routine one-click
+- [x] Keep legacy recovery compatibility without presenting routine one-click
       restore.
-- [ ] Add backup-service and route regression tests.
+- [x] Add backup-service and route regression tests.
 
 ### 4. System health and operational information architecture
 
-- [ ] Add a read-only health summary for application, MongoDB, storage, email,
+- [x] Add a read-only health summary for application, MongoDB, storage, email,
       notifications, backups, audit integrity, and release identity.
-- [ ] Represent healthy, attention, unavailable, and unknown states without
+- [x] Represent healthy, attention, unavailable, and unknown states without
       fabricating values.
 - [ ] Redesign the admin dashboard around urgent queues and grouped destinations.
 - [ ] Ensure every dashboard destination is a real link and permission-aware.

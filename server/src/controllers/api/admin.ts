@@ -16,6 +16,8 @@ import {
 import appModForDb from '../../app';
 import constants from '../../models/constants';
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
+import type { SystemHealthConnection, SystemHealthModels } from '../../services/adminSystemHealthService';
+const adminDatabaseConnection = (appModForDb as unknown as { db: SystemHealthConnection }).db;
 import { registerAdminBackupRoutes } from './adminBackupRoutes';
 import { logEntryEvent } from '../../services/entryEventsService';
 import { registerAdminApiClientRoutes } from './adminApiClientRoutes';
@@ -30,6 +32,8 @@ import {
   permissionForAdminRequest,
   resolveAdminAuthorization,
 } from '../../services/adminAuthorizationService';
+import { buildAdminSystemHealth } from '../../services/adminSystemHealthService';
+import * as flowUtils from '../../utils/flowUtils';
 
 function ensureAdmin(req: WikitruthRequest, res: WikitruthResponse): boolean {
   if (!req.user || !req.user.canPlayRoleOf || !req.user.canPlayRoleOf('admin')) {
@@ -233,21 +237,36 @@ export = function (router: Router) {
       return;
     }
 
-    const [users, accounts, categories, statuses, administrators, groups] = await Promise.all([
+    const [users, accounts, categories, statuses, administrators, groups, quarantined, emailQueued, emailFailed, notificationFailed] = await Promise.all([
       db.User.countDocuments(),
       db.Account.countDocuments(),
       db.Category.countDocuments(),
       db.Status.countDocuments(),
       db.Admin.countDocuments(),
       db.Group.countDocuments(),
+      db.User.countDocuments({ 'adminOperations.state': 'quarantined' }),
+      db.EmailOutbox?.countDocuments ? db.EmailOutbox.countDocuments({ status: 'queued' }) : Promise.resolve(0),
+      db.EmailOutbox?.countDocuments ? db.EmailOutbox.countDocuments({ status: 'failed' }) : Promise.resolve(0),
+      db.NotificationOutbox?.countDocuments ? db.NotificationOutbox.countDocuments({ status: 'failed' }) : Promise.resolve(0),
     ]);
 
     res.json({
       success: true,
       counts: { users, accounts, categories, statuses, administrators, groups },
+      queues: { quarantined, emailQueued, emailFailed, notificationFailed },
       authorization: res.locals.adminAuthorization,
       permissionCatalog: ADMIN_PERMISSIONS,
     });
+  });
+
+  router.get('/system-health', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureAdmin(req, res)) return;
+    const health = await buildAdminSystemHealth({
+      connection: adminDatabaseConnection,
+      models: db as unknown as SystemHealthModels,
+      backupRoot: flowUtils.getBackupDir(),
+    });
+    res.json({ success: true, health });
   });
   registerAdminCollectionRoutes(router, ensureAdmin, db as unknown as AdminCollectionModels, sanitizeAdminUser);
 

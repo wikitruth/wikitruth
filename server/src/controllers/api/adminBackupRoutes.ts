@@ -19,9 +19,19 @@ import {
   verifyPrivilegedEventChain,
 } from '../../services/entryEventsService';
 import {
-  createDatabaseBackup,
   type BackupDatabaseConnection,
 } from '../../services/databaseBackupService';
+import {
+  compareSnapshotToCurrent,
+  createBackupSnapshot,
+  listBackupSnapshots,
+  loadSnapshotManifest,
+  signRestorePreview,
+  snapshotRoots,
+  testSnapshotRestore,
+  verifyBackupSnapshot,
+  verifyRestorePreview,
+} from '../../services/backupSnapshotService';
 import fs from 'fs';
 import path from 'path';
 
@@ -171,10 +181,12 @@ export function getBootstrapBackupAvailability(): BackupAvailability {
 export async function restoreDatabaseBackup(options: {
   restorePublicData: boolean;
   restorePrivateData: boolean;
+  publicRoot?: string;
+  privateUsersRoot?: string;
 }): Promise<RestoreSummary> {
   const { restorePublicData, restorePrivateData } = options;
-  const backupDir = flowUtils.getBackupDir();
-  const privateBackupDir = path.join(flowUtils.getBackupDir(true), 'users');
+  const backupDir = options.publicRoot || flowUtils.getBackupDir();
+  const privateBackupDir = options.privateUsersRoot || path.join(flowUtils.getBackupDir(true), 'users');
   const collections = config.mongodb?.collections || {};
   const dbName = String(config.mongodb?.dbname || '').trim();
   const modelMapping = (collections.modelMapping || {}) as Record<string, string>;
@@ -233,17 +245,91 @@ export function registerAdminBackupRoutes(router: Router, ensureAdmin: EnsureAdm
     }
 
     const backupDir = flowUtils.getBackupDir();
-    const privateBackupDir = path.join(flowUtils.getBackupDir(true), 'users');
     const hasGitBackup = Boolean(config.mongodb?.gitBackup);
+    const snapshots = listBackupSnapshots(backupDir);
 
     res.json({
       success: true,
       backup: {
-        backupDir: backupDir,
-        privateBackupDir: privateBackupDir,
         hasGitBackup: hasGitBackup,
+        snapshotCount: snapshots.length,
+        latestSnapshot: snapshots[0] || null,
+        snapshots,
       },
     });
+  });
+
+  router.post('/db-backup/snapshots/:id/verify', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureAdmin(req, res)) return;
+    try {
+      const verification = verifyBackupSnapshot(flowUtils.getBackupDir(), String(req.params.id || ''));
+      res.status(verification.valid ? 200 : 409).json({ success: verification.valid, verification });
+    } catch (error) {
+      res.status(400).json({ success: false, message: error instanceof Error ? error.message : 'Snapshot verification failed' });
+    }
+  });
+
+  router.post('/db-backup/snapshots/:id/test', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureAdmin(req, res)) return;
+    try {
+      const test = await testSnapshotRestore({
+        connection: databaseConnection,
+        backupRoot: flowUtils.getBackupDir(),
+        snapshotId: String(req.params.id || ''),
+      });
+      res.status(test.valid ? 200 : 409).json({ success: test.valid, test });
+    } catch (error) {
+      res.status(400).json({ success: false, message: error instanceof Error ? error.message : 'Restore test failed' });
+    }
+  });
+
+  router.post('/db-backup/snapshots/:id/preview', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!ensureAdmin(req, res)) return;
+    try {
+      const snapshotId = String(req.params.id || '');
+      const backupRoot = flowUtils.getBackupDir();
+      const manifest = loadSnapshotManifest(backupRoot, snapshotId);
+      const verification = verifyBackupSnapshot(backupRoot, snapshotId);
+      if (!verification.valid) {
+        res.status(409).json({ success: false, message: 'Snapshot integrity verification failed.', verification });
+        return;
+      }
+      const restorePublicData = toRestoreBoolean(req.body?.restorePublicData, true);
+      const restorePrivateData = toRestoreBoolean(req.body?.restorePrivateData, true);
+      if (!restorePublicData && !restorePrivateData) {
+        res.status(400).json({ success: false, message: 'At least one restore scope must be selected.' });
+        return;
+      }
+      const [comparison, test] = await Promise.all([
+        compareSnapshotToCurrent(databaseConnection, manifest),
+        testSnapshotRestore({ connection: databaseConnection, backupRoot, snapshotId }),
+      ]);
+      if (!test.valid) {
+        res.status(409).json({ success: false, message: 'Snapshot did not pass isolated restore testing.', verification, test });
+        return;
+      }
+      const secret = String((req.app as unknown as { config?: { cryptoKey?: string } }).config?.cryptoKey || '');
+      const expiresAt = Date.now() + 10 * 60 * 1000;
+      const token = signRestorePreview(secret, {
+        snapshotId, checksum: manifest.checksum, restorePublicData, restorePrivateData,
+        actorUserId: String(req.user?._id || req.user?.id || ''), expiresAt,
+      });
+      res.json({
+        success: true,
+        preview: {
+          snapshot: manifest,
+          verification,
+          isolatedRestoreTest: test,
+          comparison: comparison.filter((row) => row.scope === 'public' ? restorePublicData : restorePrivateData),
+          confirmationPhrase: `RESTORE ${snapshotId}`,
+          automaticPreRestoreSnapshot: true,
+          expiresAt: new Date(expiresAt).toISOString(),
+          token,
+        },
+      });
+    } catch (error) {
+      res.status(400).json({ success: false, message: error instanceof Error ? error.message : 'Restore preview failed' });
+    }
   });
 
   router.post('/db-backup', async function (req: WikitruthRequest, res: WikitruthResponse) {
@@ -254,9 +340,7 @@ export function registerAdminBackupRoutes(router: Router, ensureAdmin: EnsureAdm
     const body = bodyOf<AdminDbBackupActionBodyContract>(req);
     const action = String(body.action || body.buttonAction || 'backup');
     const backupDir = flowUtils.getBackupDir();
-    const privateBackupDir = path.join(flowUtils.getBackupDir(true), 'users');
     ensureDir(backupDir);
-    ensureDir(privateBackupDir);
 
     const collections = config.mongodb?.collections || {};
     const userId = String(req.user?._id || req.user?.id || '');
@@ -264,16 +348,16 @@ export function registerAdminBackupRoutes(router: Router, ensureAdmin: EnsureAdm
 
     if (action === 'backup') {
       const users = await db.User.find({}).sort({ username: 1 }).select('_id username').lean();
-      const summary = await createDatabaseBackup({
+      const snapshot = await createBackupSnapshot({
         connection: databaseConnection,
+        backupRoot: backupDir,
         databaseName: String(config.mongodb?.dbname || '').trim(),
-        publicRoot: backupDir,
-        privateUsersRoot: privateBackupDir,
         publicCollections: (collections.backupList || []) as string[],
         privateCollections: (collections.privateBackupList || []) as string[],
         users,
+        createdByUserId: userId,
+        offsiteConfigured: Boolean(config.mongodb?.gitBackup),
       });
-      const completedAt = new Date().toISOString();
 
       await logEntryEvent({
         scope: 'privileged',
@@ -285,37 +369,41 @@ export function registerAdminBackupRoutes(router: Router, ensureAdmin: EnsureAdm
         actorUsername: username,
         message: 'Completed database backup',
         payload: {
-          backupDir,
-          privateBackupDir,
-          summary,
+          snapshotId: snapshot.id,
+          checksum: snapshot.checksum,
+          summary: snapshot.summary,
         },
       });
 
       res.json({
         success: true,
         message: 'Backup completed',
-        backup: {
-          backupDir: backupDir,
-          privateBackupDir: privateBackupDir,
-          completedAt,
-          summary,
-        },
+        backup: snapshot,
       });
       return;
     }
 
     if (action === 'restore') {
-      const confirmText = String(body.confirmText || body.confirm || '').trim().toUpperCase();
-      if (confirmText !== 'RESTORE') {
+      const snapshotId = String(req.body?.snapshotId || '').trim();
+      const confirmText = String(body.confirmText || body.confirm || '').trim();
+      const preview = verifyRestorePreview(
+        String((req.app as unknown as { config?: { cryptoKey?: string } }).config?.cryptoKey || ''),
+        String(req.body?.previewToken || ''),
+      );
+      if (!preview || preview.snapshotId !== snapshotId || preview.actorUserId !== userId) {
         res.status(400).json({
           success: false,
-          message: 'Restore confirmation failed. Type RESTORE to continue.',
+          message: 'Restore preview is missing, invalid, or expired. Preview the snapshot again.',
         });
         return;
       }
+      if (confirmText !== `RESTORE ${snapshotId}`) {
+        res.status(400).json({ success: false, message: `Restore confirmation failed. Type RESTORE ${snapshotId} to continue.` });
+        return;
+      }
 
-      const restorePublicData = toRestoreBoolean(body.restorePublicData, true);
-      const restorePrivateData = toRestoreBoolean(body.restorePrivateData, true);
+      const restorePublicData = Boolean(preview.restorePublicData);
+      const restorePrivateData = Boolean(preview.restorePrivateData);
       if (!restorePublicData && !restorePrivateData) {
         res.status(400).json({
           success: false,
@@ -324,10 +412,33 @@ export function registerAdminBackupRoutes(router: Router, ensureAdmin: EnsureAdm
         return;
       }
 
+      const manifest = loadSnapshotManifest(backupDir, snapshotId);
+      const verification = verifyBackupSnapshot(backupDir, snapshotId);
+      if (!verification.valid || preview.checksum !== manifest.checksum) {
+        res.status(409).json({ success: false, message: 'Snapshot integrity changed after preview. Restore cancelled.', verification });
+        return;
+      }
+      const isolatedTest = await testSnapshotRestore({ connection: databaseConnection, backupRoot: backupDir, snapshotId });
+      if (!isolatedTest.valid) {
+        res.status(409).json({ success: false, message: 'Isolated restore testing did not pass. Restore cancelled.', isolatedTest });
+        return;
+      }
+      const users = await db.User.find({}).sort({ username: 1 }).select('_id username').lean();
+      const preRestoreSnapshot = await createBackupSnapshot({
+        connection: databaseConnection, backupRoot: backupDir,
+        databaseName: String(config.mongodb?.dbname || '').trim(),
+        publicCollections: (collections.backupList || []) as string[],
+        privateCollections: (collections.privateBackupList || []) as string[],
+        users, createdByUserId: userId, kind: 'pre_restore', offsiteConfigured: Boolean(config.mongodb?.gitBackup),
+      });
+      const roots = snapshotRoots(backupDir, snapshotId);
       const summary = await restoreDatabaseBackup({
         restorePublicData,
         restorePrivateData,
+        publicRoot: roots.publicRoot,
+        privateUsersRoot: roots.privateUsersRoot,
       });
+      const postRestoreComparison = await compareSnapshotToCurrent(databaseConnection, manifest);
 
       await logEntryEvent({
         scope: 'privileged',
@@ -341,7 +452,10 @@ export function registerAdminBackupRoutes(router: Router, ensureAdmin: EnsureAdm
         payload: {
           restorePublicData,
           restorePrivateData,
+          snapshotId,
+          preRestoreSnapshotId: preRestoreSnapshot.id,
           summary,
+          postRestoreComparison,
         },
       });
 
@@ -351,8 +465,11 @@ export function registerAdminBackupRoutes(router: Router, ensureAdmin: EnsureAdm
         restore: {
           restorePublicData,
           restorePrivateData,
+          snapshotId,
+          preRestoreSnapshotId: preRestoreSnapshot.id,
           completedAt: new Date().toISOString(),
           summary,
+          postRestoreComparison,
         },
       });
       return;

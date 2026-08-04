@@ -128,6 +128,8 @@ export function permissionForAdminRequest(
   if (path.startsWith('/system-health')) return 'system.read';
   if (path.startsWith('/db-backup')) {
     if (normalizedMethod === 'GET') return 'backups.read';
+    if (path.endsWith('/verify')) return 'backups.read';
+    if (path.endsWith('/test') || path.endsWith('/preview')) return 'backups.restore';
     const action = String(body.action || body.buttonAction || 'backup').toLowerCase();
     return action.includes('restore') ? 'backups.restore' : 'backups.create';
   }

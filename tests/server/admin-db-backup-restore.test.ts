@@ -7,7 +7,15 @@ const createTopic = jest.fn();
 const countDocuments = jest.fn();
 const getBackupDir = jest.fn();
 const logEntryEvent = jest.fn();
-const createDatabaseBackup = jest.fn();
+const createBackupSnapshot = jest.fn();
+const listBackupSnapshots = jest.fn();
+const loadSnapshotManifest = jest.fn();
+const verifyBackupSnapshot = jest.fn();
+const compareSnapshotToCurrent = jest.fn();
+const testSnapshotRestore = jest.fn();
+const signRestorePreview = jest.fn();
+const verifyRestorePreview = jest.fn();
+const snapshotRoots = jest.fn();
 
 jest.mock('../../server/src/app', () => ({
   db: {
@@ -61,8 +69,16 @@ jest.mock('../../server/src/services/entryEventsService', () => ({
   }),
 }));
 
-jest.mock('../../server/src/services/databaseBackupService', () => ({
-  createDatabaseBackup: (...args: unknown[]) => createDatabaseBackup(...args),
+jest.mock('../../server/src/services/backupSnapshotService', () => ({
+  createBackupSnapshot: (...args: unknown[]) => createBackupSnapshot(...args),
+  listBackupSnapshots: (...args: unknown[]) => listBackupSnapshots(...args),
+  loadSnapshotManifest: (...args: unknown[]) => loadSnapshotManifest(...args),
+  verifyBackupSnapshot: (...args: unknown[]) => verifyBackupSnapshot(...args),
+  compareSnapshotToCurrent: (...args: unknown[]) => compareSnapshotToCurrent(...args),
+  testSnapshotRestore: (...args: unknown[]) => testSnapshotRestore(...args),
+  signRestorePreview: (...args: unknown[]) => signRestorePreview(...args),
+  verifyRestorePreview: (...args: unknown[]) => verifyRestorePreview(...args),
+  snapshotRoots: (...args: unknown[]) => snapshotRoots(...args),
 }));
 
 jest.mock('fs', () => ({
@@ -122,10 +138,26 @@ describe('admin db backup restore route', () => {
     createTopic.mockResolvedValue({ _id: 'topic-1' });
     countDocuments.mockResolvedValue(0);
     logEntryEvent.mockResolvedValue(undefined);
-    createDatabaseBackup.mockResolvedValue({
-      public: { topics: 1 },
-      private: { 'alice:topics': 1 },
+    const manifest = {
+      format: 'wikitruth.backup-snapshot', version: 1, id: '2026-08-04T00-00-00-000Z-12345678',
+      createdAt: '2026-08-04T00:00:00.000Z', createdByUserId: 'admin-1', kind: 'manual',
+      complete: true, totalDocuments: 2, totalBytes: 200, checksum: 'checksum', collections: [],
+      summary: { public: { topics: 1 }, private: { 'alice:topics': 1 } },
+      publicCollections: ['topics'], privateCollections: ['topics'],
+      offsite: { configured: false, verifiedAt: null, reference: '' },
+    };
+    createBackupSnapshot.mockResolvedValue(manifest);
+    listBackupSnapshots.mockReturnValue([manifest]);
+    loadSnapshotManifest.mockReturnValue(manifest);
+    verifyBackupSnapshot.mockReturnValue({ valid: true, snapshotId: manifest.id, expectedChecksum: 'checksum', actualChecksum: 'checksum' });
+    compareSnapshotToCurrent.mockResolvedValue([{ collection: 'topics', current: 1, snapshot: 1, change: 0, scope: 'public' }]);
+    testSnapshotRestore.mockResolvedValue({ supported: true, valid: true, collections: { topics: 2 }, message: 'ok' });
+    signRestorePreview.mockReturnValue('preview-token');
+    verifyRestorePreview.mockReturnValue({
+      snapshotId: manifest.id, checksum: 'checksum', restorePublicData: true, restorePrivateData: true,
+      actorUserId: 'admin-1', expiresAt: Date.now() + 10000,
     });
+    snapshotRoots.mockReturnValue({ publicRoot: '/tmp/snapshot/public', privateUsersRoot: '/tmp/snapshot/private/users' });
   });
 
   it('waits for a complete backup and records its summary', async () => {
@@ -135,7 +167,7 @@ describe('admin db backup restore route', () => {
       .send({ action: 'backup' })
       .expect(200);
 
-    expect(createDatabaseBackup).toHaveBeenCalledTimes(1);
+    expect(createBackupSnapshot).toHaveBeenCalledTimes(1);
     expect(response.body.message).toBe('Backup completed');
     expect(response.body.backup.summary).toEqual({
       public: { topics: 1 },
@@ -149,38 +181,44 @@ describe('admin db backup restore route', () => {
     }));
   });
 
-  it('rejects restore requests without RESTORE confirmation text', async () => {
+  it('previews a checksum-verified, isolated restore before issuing a token', async () => {
     const app = createApp();
     const response = await request(app)
-      .post('/api/admin/db-backup')
-      .send({ action: 'restore', confirmText: 'nope', restorePublicData: true, restorePrivateData: true })
-      .expect(400);
+      .post('/api/admin/db-backup/snapshots/2026-08-04T00-00-00-000Z-12345678/preview')
+      .send({ restorePublicData: true, restorePrivateData: true })
+      .expect(200);
 
-    expect(response.body.success).toBe(false);
-    expect(response.body.message).toMatch(/type RESTORE/i);
+    expect(response.body.preview.token).toBe('preview-token');
+    expect(response.body.preview.automaticPreRestoreSnapshot).toBe(true);
+    expect(testSnapshotRestore).toHaveBeenCalledTimes(1);
   });
 
-  it('rejects restore requests when no scope is selected', async () => {
+  it('rejects restore requests without a valid preview', async () => {
     const app = createApp();
+    verifyRestorePreview.mockReturnValueOnce(null);
     const response = await request(app)
       .post('/api/admin/db-backup')
-      .send({ action: 'restore', confirmText: 'RESTORE', restorePublicData: false, restorePrivateData: false })
+      .send({ action: 'restore', snapshotId: 'snapshot', confirmText: 'RESTORE snapshot', previewToken: 'invalid' })
       .expect(400);
 
     expect(response.body.success).toBe(false);
-    expect(response.body.message).toMatch(/at least one restore scope/i);
+    expect(response.body.message).toMatch(/preview/i);
   });
 
   it('restores public and private scopes and records restore audit event', async () => {
     const app = createApp();
     const response = await request(app)
       .post('/api/admin/db-backup')
-      .send({ action: 'restore', confirmText: 'RESTORE', restorePublicData: true, restorePrivateData: true })
+      .send({
+        action: 'restore', snapshotId: '2026-08-04T00-00-00-000Z-12345678',
+        confirmText: 'RESTORE 2026-08-04T00-00-00-000Z-12345678', previewToken: 'preview-token',
+      })
       .expect(200);
 
     expect(response.body.success).toBe(true);
     expect(response.body.restore.restorePublicData).toBe(true);
     expect(response.body.restore.restorePrivateData).toBe(true);
+    expect(response.body.restore.preRestoreSnapshotId).toBe('2026-08-04T00-00-00-000Z-12345678');
 
     expect(deleteManyTopic).toHaveBeenCalledWith({});
     expect(deleteManyTopic).toHaveBeenCalledWith({
