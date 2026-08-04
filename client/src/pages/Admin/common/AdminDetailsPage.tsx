@@ -21,6 +21,8 @@ interface AdminDetailsPageProps {
     onDelete: (id: string) => Promise<unknown>;
   };
   hiddenFields?: string[];
+  embedded?: boolean;
+  showRecord?: boolean;
 }
 
 const SENSITIVE_FIELD_NAMES = new Set([
@@ -90,6 +92,8 @@ const AdminDetailsPage: React.FC<AdminDetailsPageProps> = ({
   updateAction,
   deleteAction,
   hiddenFields = [],
+  embedded = false,
+  showRecord = true,
 }) => {
   const navigate = useNavigate();
   const { id = '' } = useParams<{ id: string }>();
@@ -231,13 +235,13 @@ const AdminDetailsPage: React.FC<AdminDetailsPageProps> = ({
   };
 
   return (
-    <div className="container">
-      <h1 className="h3">{title}</h1>
-      <p>
+    <div className={embedded ? 'wt-admin-basic-details' : 'container wt-admin-basic-details'}>
+      {!embedded ? <div className="wt-admin-basic-details-header">
+        <h1 className="h3">{title}</h1>
         <Link to={backPath} className="btn btn-default btn-sm">
           Back to list
         </Link>
-      </p>
+      </div> : null}
 
       {isLoading ? <p className="text-muted">Loading...</p> : null}
       {error ? (
@@ -321,7 +325,7 @@ const AdminDetailsPage: React.FC<AdminDetailsPageProps> = ({
             </form>
           ) : null}
 
-          <div className="table-responsive">
+          {showRecord ? <div className="table-responsive wt-admin-record-table">
             <table className="table table-bordered">
               <tbody>
                 {Object.entries(item)
@@ -334,7 +338,7 @@ const AdminDetailsPage: React.FC<AdminDetailsPageProps> = ({
                   ))}
               </tbody>
             </table>
-          </div>
+          </div> : null}
         </div>
       ) : null}
     </div>

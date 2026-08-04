@@ -73,15 +73,45 @@ embedding a web shell or arbitrary database/process controls.
 
 ### 5. Verification and delivery
 
-- [ ] Run focused server and client tests for every new flow.
-- [ ] Run TypeScript checks, lint/guardrails, production builds, and diff checks.
-- [ ] Exercise desktop and 390 px mobile admin workflows in the Browser runtime.
-- [ ] Verify light/dark rendering, keyboard focus, overflow, console health, and
+- [x] Run focused server and client tests for every new flow.
+- [x] Run TypeScript checks, lint/guardrails, production builds, and diff checks.
+- [x] Exercise desktop and 390 px mobile admin workflows in the Browser runtime.
+- [x] Verify light/dark rendering, keyboard focus, overflow, console health, and
       preview-before-commit interactions.
-- [ ] Compare browser screenshots with the accepted ImageGen direction and
+- [x] Compare browser screenshots with the accepted ImageGen direction and
       record the fidelity ledger.
-- [ ] Commit completed chunks locally on `develop`; do not push or deploy without
+- [x] Commit completed chunks locally on `develop`; do not push or deploy without
       separate explicit authorization.
+
+## Verification record
+
+- Focused client: 3 suites and 17 tests passed for core admin, People, and
+  backup/restore interactions.
+- Focused server: 2 suites and 19 tests passed for shell and icon contracts; the
+  full implementation pass also completed 111 server suites / 444 tests and 124
+  client suites / 380 tests.
+- TypeScript: modern and legacy configurations passed without new suppressions,
+  `any` usage, or `@ts-nocheck` additions.
+- Delivery gates: lint, production server/client builds, 295-operation OpenAPI
+  coverage, file-size budget, and `git diff --check` passed.
+- Browser: Chrome at 1440 x 1000 and 390 x 844 verified light/dark themes, no
+  horizontal overflow, visible keyboard focus, clean application logs in a
+  fresh tab, preview gating, required reasons, and exact restore confirmation.
+
+## ImageGen fidelity ledger
+
+- Kept: compact operational status strip, open grouped cards, high-signal queue
+  table, readable People filters, labelled mobile rows, and focused safety
+  drawers for quarantine and restore previews.
+- Adapted: Wikitruth's existing header, footer, Bootstrap-compatible controls,
+  typography, and content density remain so the milestone feels native to the
+  product rather than introducing a separate design system.
+- Strengthened: the implementation exposes measured/unknown states honestly,
+  uses reversible account controls, and requires checksum/test/phrase gates that
+  were only illustrative in the generated concepts.
+- Deliberately omitted: concept-only destinations and fabricated metrics, a new
+  sidebar shell, permanent account deletion, arbitrary database/process tools,
+  and unverified off-site/provider success claims.
 
 ## Explicit exclusions
 

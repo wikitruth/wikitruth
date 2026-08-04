@@ -149,7 +149,7 @@ export async function renderReactShell(req: Request, application: ApplicationDef
     '__WT_CANONICAL_URL__': escapeHtml(canonicalUrl),
     '__WT_LOGO_URL__': escapeHtml(logo),
     '__WT_OG_TYPE__': escapeHtml(routeMetadata?.ogType || 'website'),
-    '__WT_ICON_LINKS__': faviconLinks(tenant?.branding?.favicon),
+    '<!-- __WT_ICON_LINKS__ -->': faviconLinks(tenant?.branding?.favicon),
     '__WT_THEME_COLOR__': escapeHtml(tenant?.branding?.primaryColor || '#ffffff'),
     '__WT_TILE_IMAGE__': escapeHtml(`${tenant?.branding?.favicon?.replace(/\/[^/]+$/, '') || '/img/favicons'}/ms-icon-144x144.png`),
     '__WT_STRUCTURED_DATA__': structuredData,

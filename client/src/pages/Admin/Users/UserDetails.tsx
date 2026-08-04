@@ -5,6 +5,7 @@ import Alert from '../../../components/common/Alert';
 import Button from '../../../components/common/Button';
 import adminApi, { type AdminRecord, type UserSecurity } from '../../../services/api/admin';
 import AdminDetailsPage from '../common/AdminDetailsPage';
+import AdminOperationsShell from '../common/AdminOperationsShell';
 import '../adminOperations.css';
 
 function recordId(record: AdminRecord): string {
@@ -79,10 +80,16 @@ const UserDetails: React.FC = () => {
   ] : [], [security]);
 
   return (
-    <>
+    <AdminOperationsShell
+      title="User details"
+      description="Review profile data, access posture, recovery readiness, and reversible account controls in one place."
+      actions={<Link className="btn btn-default" to="/admin/people"><i className="fa fa-arrow-left" aria-hidden="true" /> Back to people</Link>}
+    >
       <AdminDetailsPage
         title="User details"
         backPath="/admin/people"
+        embedded
+        showRecord={false}
         loadItem={adminApi.user}
         hiddenFields={['_id', 'roles', 'adminOperations', 'securityOperations']}
         updateAction={{
@@ -102,7 +109,7 @@ const UserDetails: React.FC = () => {
         }}
       />
 
-      <div className="container wt-admin-account-operations">
+      <div className="wt-admin-account-operations">
         <div className="wt-admin-page-header compact">
           <div><h2>Account operations</h2><p>Readable identity links, access posture, and guarded recovery controls for this account.</p></div>
           <div className="wt-admin-page-actions"><Link className="btn btn-default" to="/admin/audit">View audit trail</Link><Button type="button" variant="default" icon={loadingSecurity ? 'spinner fa-spin' : 'refresh'} onClick={() => void loadOperations()} disabled={busy || loadingSecurity}>Refresh</Button></div>
@@ -158,7 +165,7 @@ const UserDetails: React.FC = () => {
           <p className="wt-admin-safe-note"><strong>Permanent deletion is intentionally absent.</strong> Use quarantine or deactivate from <Link to="/admin/people">People operations</Link> so contributions remain attributable and recovery stays possible.</p>
         </> : null}
       </div>
-    </>
+    </AdminOperationsShell>
   );
 };
 

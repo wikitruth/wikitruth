@@ -293,10 +293,9 @@ describe('Admin pages', () => {
       { route: '/admin/users/user-1' }
     );
 
-    expect(await screen.findByText('example-user')).toBeInTheDocument();
+    expect(await screen.findByDisplayValue('example-user')).toBeInTheDocument();
     expect(screen.queryByText('stored-password-hash')).not.toBeInTheDocument();
     expect(screen.queryByText(/stored-client-secret/)).not.toBeInTheDocument();
-    expect(screen.getByText(/\[redacted\]/)).toBeInTheDocument();
     expect(screen.getAllByText(/verified/i).length).toBeGreaterThan(0);
   });
 
@@ -315,7 +314,7 @@ describe('Admin pages', () => {
 
     expect(await screen.findByText('Temporary admin failure')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /retry/i }));
-    expect(await screen.findByText('Recovered detail')).toBeInTheDocument();
+    expect(await screen.findByDisplayValue('Recovered detail')).toBeInTheDocument();
     expect(mockedAdminApi.user.mock.calls.length).toBeGreaterThanOrEqual(2);
   });
 
