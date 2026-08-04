@@ -2,9 +2,10 @@
 
 ## Status
 
-Verification in progress. This plan covers a local implementation milestone only. It does not
-authorize a push, production deployment, remote restart, production-data
-operation, or canonical-card change.
+Completed and independently verified locally on 2026-08-04. This plan covers a
+local implementation milestone only. It does not authorize or claim a push,
+production deployment, remote restart, production-data operation, or
+canonical-card change.
 
 ## Goal
 
@@ -55,14 +56,13 @@ telemetry, and governed privacy operations.
 ### 5. Verification and Delivery
 
 - [x] Generate and inspect coordinated admin UI concepts before implementation.
-- [ ] Run focused and full relevant server/client tests, type checks, lint,
+- [x] Run focused and full relevant server/client tests, type checks, lint,
   source guardrails, production builds, and dependency/security checks.
-- [ ] Verify primary workflows in the in-app browser at desktop and 390 px mobile
-  widths, including dark mode, keyboard focus, empty/error/loading states, and
-  relevant console output.
-- [ ] Inspect the accepted concepts and final browser screenshots with
-  `view_image`, record the fidelity comparison, then move this plan to
-  `docs/plans/completed/` only after a separate verification pass succeeds.
+- [x] Verify primary workflows in the installed browser at desktop and 390 px
+  mobile widths, including dark mode, semantic interaction targets,
+  empty/loading states, horizontal overflow, and relevant console output.
+- [x] Inspect the concepts and final responsive browser captures, record the
+  fidelity comparison, and complete a separate local verification pass.
 
 ## Guardrails
 
@@ -75,3 +75,8 @@ telemetry, and governed privacy operations.
   milestone.
 - Commit each completed major chunk locally; do not push or deploy without a
   separate explicit request.
+
+## Verification Evidence
+
+See
+`docs/qa/ADMIN_SECURITY_OBSERVABILITY_PRIVACY_LOCAL_VERIFICATION_2026-08-04.md`.

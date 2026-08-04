@@ -33,10 +33,12 @@ Upstream references:
   `react-router-dom`; the production tree reports 21 affected package nodes
   across 11 advisory identifiers (`6` critical, `8` high, `6` moderate,
   `1` low).
-- All 124 client suites / 380 tests passed.
+- All 127 client suites / 388 tests and all 115 server suites / 458 tests
+  passed after the administrator security, telemetry, and privacy milestones.
 - Client parity tests passed 6 suites / 41 tests.
-- Production client build and the full smoke/type/lint/source-guardrail suite
-  passed.
+- Production client and server builds, OpenAPI coverage for 306 mounted
+  operations, documentation drift checks, and the full
+  smoke/type/lint/source-guardrail suite passed.
 
 The local verification machine runs Node `25.9.0`, which is outside the declared
 Node 22/24 production range. That warning is recorded and is not treated as
