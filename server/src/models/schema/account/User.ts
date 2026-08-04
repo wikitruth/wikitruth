@@ -32,6 +32,27 @@ const factory: SchemaFactory = function (app, mongoose) {
       },
     },
     isActive: String,
+    adminOperations: {
+      state: {
+        type: String,
+        enum: ['active', 'needs_review', 'quarantined', 'deactivated'],
+        default: 'active',
+        index: true,
+      },
+      reason: { type: String, default: '', maxlength: 500 },
+      riskLabels: [{ type: String, maxlength: 80 }],
+      changedAt: { type: Date, default: null },
+      changedByUserId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+      actionId: { type: String, default: '' },
+      previousState: { type: String, default: '' },
+      previousIsActive: { type: String, default: '' },
+      undoUntil: { type: Date, default: null },
+    },
+    securityOperations: {
+      lockedAt: { type: Date, default: null },
+      lockedReason: { type: String, default: '', maxlength: 500 },
+      lockedByUserId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+    },
     timeCreated: { type: Date, default: Date.now },
     resetPasswordToken: String,
     resetPasswordExpires: Date,
@@ -113,6 +134,7 @@ const factory: SchemaFactory = function (app, mongoose) {
   // userSchema.index({ username: 1 }, { unique: true });
   // userSchema.index({ email: 1 }, { unique: true });
   userSchema.index({ timeCreated: 1 });
+  userSchema.index({ 'adminOperations.state': 1, timeCreated: -1 });
   userSchema.index({ 'twitter.id': 1 });
   userSchema.index({ 'github.id': 1 });
   userSchema.index({ 'facebook.id': 1 });

@@ -22,6 +22,14 @@ import { registerAdminApiClientRoutes } from './adminApiClientRoutes';
 import { registerAdminCollectionRoutes, type AdminCollectionModels } from './adminCollectionRoutes';
 import { requirePrivilegedPasskeyAssurance } from '../../services/privilegedAuthService';
 import { registerAdminEmailOperationsRoutes } from './adminEmailOperationsRoutes';
+import { registerAdminPeopleRoutes } from './adminPeopleRoutes';
+import {
+  ADMIN_PERMISSIONS,
+  type AuthorizationModels,
+  buildAdminAuthorization,
+  permissionForAdminRequest,
+  resolveAdminAuthorization,
+} from '../../services/adminAuthorizationService';
 
 function ensureAdmin(req: WikitruthRequest, res: WikitruthResponse): boolean {
   if (!req.user || !req.user.canPlayRoleOf || !req.user.canPlayRoleOf('admin')) {
@@ -53,6 +61,8 @@ const ADMIN_USER_RESPONSE_FIELDS = [
   'isActive',
   'timeCreated',
   'passwordLoginDisabled',
+  'adminOperations',
+  'securityOperations',
   'preferences',
 ] as const;
 
@@ -155,17 +165,69 @@ function encryptPassword(password: string): Promise<string> {
   });
 }
 
+async function adminIdentityBlocker(
+  req: WikitruthRequest,
+  user: Record<string, unknown> | null,
+): Promise<string | null> {
+  if (!user) return null;
+  const targetId = String(user._id || '');
+  const targetUsername = String(user.username || '').trim().toLowerCase();
+  const roles = user.roles && typeof user.roles === 'object'
+    ? user.roles as Record<string, unknown>
+    : {};
+  if (targetId && targetId === String(req.user?._id || req.user?.id || '')) {
+    return 'You cannot remove or restrict your own administrator identity.';
+  }
+  if (targetUsername === 'root') {
+    return 'The root administrator identity is protected.';
+  }
+  if (roles.admin) {
+    const activeAdminCount = await db.User.countDocuments({
+      'roles.admin': { $ne: null },
+      isActive: 'yes',
+    });
+    if (activeAdminCount <= 1) return 'The last active administrator cannot be removed or restricted.';
+  }
+  return null;
+}
+
 export = function (router: Router) {
   router.use(async function (req: WikitruthRequest, res: WikitruthResponse, next: WikitruthNext) {
-    if (!['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
-      next();
+    if (!ensureAdmin(req, res)) return;
+    const user = req.user as unknown as Record<string, unknown>;
+    const roles = user?.roles && typeof user.roles === 'object' ? user.roles as Record<string, unknown> : null;
+    const authorization = roles?.admin
+      ? await resolveAdminAuthorization(user, db as unknown as AuthorizationModels)
+      : buildAdminAuthorization({ _id: 'legacy-admin', permissions: [] }, []);
+    if (!authorization) {
+      res.status(403).json({ success: false, message: 'Administrator record is unavailable' });
       return;
     }
-    if (!ensureAdmin(req, res) || !(await requirePrivilegedPasskeyAssurance(req, res))) return;
+    const permission = permissionForAdminRequest(
+      req.method,
+      req.path,
+      (req.body || {}) as Record<string, unknown>,
+    );
+    if (!authorization.can(permission)) {
+      res.status(403).json({
+        success: false,
+        message: `Administrator permission required: ${permission}`,
+        requiredPermission: permission,
+      });
+      return;
+    }
+    res.locals.adminAuthorization = {
+      adminId: authorization.adminId,
+      effectivePermissions: authorization.effectivePermissions,
+      legacySuperAdmin: authorization.legacySuperAdmin,
+    };
+    if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)
+      && !(await requirePrivilegedPasskeyAssurance(req, res))) return;
     next();
   });
   registerAdminApiClientRoutes(router, ensureAdmin);
   registerAdminEmailOperationsRoutes(router, ensureAdmin);
+  registerAdminPeopleRoutes(router, ensureAdmin);
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAdmin(req, res)) {
       return;
@@ -183,6 +245,8 @@ export = function (router: Router) {
     res.json({
       success: true,
       counts: { users, accounts, categories, statuses, administrators, groups },
+      authorization: res.locals.adminAuthorization,
+      permissionCatalog: ADMIN_PERMISSIONS,
     });
   });
   registerAdminCollectionRoutes(router, ensureAdmin, db as unknown as AdminCollectionModels, sanitizeAdminUser);
@@ -258,6 +322,37 @@ export = function (router: Router) {
       return;
     }
 
+    const user = await db.User.findById(req.params.id).lean();
+    if (!user) {
+      res.status(404).json({ success: false, message: 'User not found' });
+      return;
+    }
+    const blocker = await adminIdentityBlocker(req, user as Record<string, unknown>);
+    if (blocker) {
+      res.status(409).json({ success: false, message: blocker });
+      return;
+    }
+    const confirmText = String(req.body?.confirmText || '').trim();
+    if (confirmText !== `DELETE ${String(user.username || '')}`) {
+      res.status(400).json({
+        success: false,
+        message: `Permanent deletion requires the exact phrase DELETE ${String(user.username || '')}. Prefer quarantine when content must be retained.`,
+      });
+      return;
+    }
+    const contributionModels = ['Topic', 'Argument', 'Question', 'Answer', 'Issue', 'Opinion', 'Artifact'];
+    const contributionCounts = await Promise.all(contributionModels.map((modelName) => (
+      db[modelName]?.countDocuments
+        ? db[modelName].countDocuments({ createUserId: user._id })
+        : Promise.resolve(0)
+    )));
+    if (contributionCounts.some((count) => Number(count) > 0)) {
+      res.status(409).json({
+        success: false,
+        message: 'This account owns retained contributions and cannot be permanently deleted. Quarantine it instead.',
+      });
+      return;
+    }
     await db.User.findByIdAndDelete(req.params.id);
     res.json({ success: true });
   });
@@ -332,6 +427,12 @@ export = function (router: Router) {
     const user = await db.User.findById(req.params.id);
     if (!user) {
       res.status(404).json({ success: false, message: 'User not found' });
+      return;
+    }
+
+    const blocker = await adminIdentityBlocker(req, user.toObject ? user.toObject() : user);
+    if (blocker) {
+      res.status(409).json({ success: false, message: blocker });
       return;
     }
 
@@ -628,6 +729,12 @@ export = function (router: Router) {
       return;
     }
 
+    const linkedUserId = String(admin.user?.id || '');
+    if (linkedUserId === String(req.user?._id || req.user?.id || '')) {
+      res.status(409).json({ success: false, message: 'You cannot change your own administrator permissions.' });
+      return;
+    }
+
     const body = bodyOf<AdminPermissionsBodyContract>(req);
     admin.permissions = parsePermissions(body.permissions);
     await admin.save();
@@ -705,6 +812,11 @@ export = function (router: Router) {
     const linkedUserId = String(admin.user?.id || '');
     if (linkedUserId) {
       const user = await db.User.findById(linkedUserId);
+      const blocker = await adminIdentityBlocker(req, user?.toObject ? user.toObject() : user);
+      if (blocker) {
+        res.status(409).json({ success: false, message: blocker });
+        return;
+      }
       if (user?.roles) {
         user.roles.admin = null;
         await user.save();
