@@ -115,6 +115,29 @@ describe('adminApi', () => {
     );
   });
 
+  it('loads and atomically updates the effective administrator access model', async () => {
+    document.cookie = '_csrfToken=test-admin-csrf';
+    const access = { administrator: { id: 'a/1' }, catalog: [], groups: [] };
+    const fetchMock = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true, access }),
+    });
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+    await expect(adminApi.administratorAccess('a/1')).resolves.toEqual(access);
+    await adminApi.updateAdministratorAccess('a/1', {
+      permissions: [{ name: 'users.manage', permit: true }],
+      groups: ['operators'],
+    });
+
+    expect(fetchMock).toHaveBeenNthCalledWith(1, '/api/admin/administrators/a%2F1/access', expect.any(Object));
+    expect(fetchMock).toHaveBeenNthCalledWith(2, '/api/admin/administrators/a%2F1/access', expect.objectContaining({
+      method: 'PUT',
+      body: JSON.stringify({ permissions: [{ name: 'users.manage', permit: true }], groups: ['operators'] }),
+      headers: expect.objectContaining({ 'x-csrf-token': 'test-admin-csrf' }),
+    }));
+  });
+
   it('deletes accounts and administrators via dedicated endpoints', async () => {
     document.cookie = '_csrfToken=test-admin-csrf';
     const fetchMock = jest

@@ -22,6 +22,7 @@ import { registerAdminBackupRoutes } from './adminBackupRoutes';
 import { logEntryEvent } from '../../services/entryEventsService';
 import { registerAdminApiClientRoutes } from './adminApiClientRoutes';
 import { registerAdminCollectionRoutes, type AdminCollectionModels } from './adminCollectionRoutes';
+import { registerAdminAccessRoutes } from './adminAccessRoutes';
 import { requirePrivilegedPasskeyAssurance } from '../../services/privilegedAuthService';
 import { registerAdminEmailOperationsRoutes } from './adminEmailOperationsRoutes';
 import { registerAdminPeopleRoutes } from './adminPeopleRoutes';
@@ -32,6 +33,12 @@ import {
   permissionForAdminRequest,
   resolveAdminAuthorization,
 } from '../../services/adminAuthorizationService';
+import {
+  type AdminAccessModels,
+  normalizeGroupIds,
+  normalizePermissionRows,
+  preservesCapableAdministrator,
+} from '../../services/adminAccessService';
 import { buildAdminSystemHealth } from '../../services/adminSystemHealthService';
 import * as flowUtils from '../../utils/flowUtils';
 
@@ -91,66 +98,6 @@ function toBoolean(value: unknown): boolean {
     return ['1', 'true', 'yes', 'on'].includes(value.toLowerCase());
   }
   return Boolean(value);
-}
-
-function parseList(value: unknown): string[] {
-  if (Array.isArray(value)) {
-    return value.map((item) => String(item || '').trim()).filter(Boolean);
-  }
-  if (typeof value === 'string') {
-    const trimmed = value.trim();
-    if (!trimmed) {
-      return [];
-    }
-    if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
-      try {
-        const parsed = JSON.parse(trimmed);
-        if (Array.isArray(parsed)) {
-          return parsed.map((item) => String(item || '').trim()).filter(Boolean);
-        }
-      } catch (_err) {
-        // fallback to comma split
-      }
-    }
-    return trimmed.split(',').map((item) => item.trim()).filter(Boolean);
-  }
-  return [];
-}
-
-function parsePermissions(value: unknown): Array<{ name: string; permit: boolean }> {
-  if (Array.isArray(value)) {
-    return value
-      .map((entry) => {
-        if (!entry || typeof entry !== 'object') {
-          return null;
-        }
-        const row = entry as { name?: unknown; permit?: unknown };
-        const name = String(row.name || '').trim();
-        if (!name) {
-          return null;
-        }
-        return { name: name, permit: toBoolean(row.permit) };
-      })
-      .filter(Boolean) as Array<{ name: string; permit: boolean }>;
-  }
-
-  if (typeof value === 'string') {
-    const trimmed = value.trim();
-    if (!trimmed) {
-      return [];
-    }
-    try {
-      const parsed = JSON.parse(trimmed);
-      if (Array.isArray(parsed)) {
-        return parsePermissions(parsed);
-      }
-    } catch (_err) {
-      // fallback to comma-separated names with permit=true
-    }
-    return parseList(trimmed).map((name) => ({ name, permit: true }));
-  }
-
-  return [];
 }
 
 function encryptPassword(password: string): Promise<string> {
@@ -269,6 +216,7 @@ export = function (router: Router) {
     res.json({ success: true, health });
   });
   registerAdminCollectionRoutes(router, ensureAdmin, db as unknown as AdminCollectionModels, sanitizeAdminUser);
+  registerAdminAccessRoutes(router, ensureAdmin, db as unknown as AdminAccessModels & any);
 
   router.post('/users', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!ensureAdmin(req, res)) {
@@ -755,8 +703,37 @@ export = function (router: Router) {
     }
 
     const body = bodyOf<AdminPermissionsBodyContract>(req);
-    admin.permissions = parsePermissions(body.permissions);
+    let permissions;
+    try {
+      permissions = normalizePermissionRows(body.permissions);
+    } catch (error) {
+      res.status(400).json({ success: false, message: error instanceof Error ? error.message : 'Invalid permissions' });
+      return;
+    }
+    const assignedGroups = await db.AdminGroup.find({ _id: { $in: (admin.groups || []).map(String) } }).lean();
+    if (buildAdminAuthorization({ _id: admin._id, permissions, groups: admin.groups || [] }, assignedGroups).legacySuperAdmin) {
+      res.status(400).json({ success: false, message: 'This change would create the legacy full-access fallback. Use an explicit permission or group grant.' });
+      return;
+    }
+    const safe = await preservesCapableAdministrator(db as unknown as AdminAccessModels, {
+      admin: {
+        id: String(admin._id),
+        permissions,
+        groups: (admin.groups || []).map(String),
+      },
+    });
+    if (!safe) {
+      res.status(409).json({ success: false, message: 'This change would remove the last active security administrator.' });
+      return;
+    }
+    admin.permissions = permissions;
     await admin.save();
+    await logEntryEvent({
+      scope: 'privileged', eventType: 'admin.permissions.updated', objectType: constants.OBJECT_TYPES.user,
+      objectName: 'administrator-access', objectId: String(admin._id),
+      actorUserId: String(req.user?._id || req.user?.id || ''), actorUsername: String(req.user?.username || ''),
+      message: 'Administrator direct permissions updated', payload: { administratorId: String(admin._id), permissions },
+    });
     res.json({ success: true, admin: await db.Admin.findById(admin._id).lean() });
   });
 
@@ -771,9 +748,42 @@ export = function (router: Router) {
       return;
     }
 
+    if (String(admin.user?.id || '') === String(req.user?._id || req.user?.id || '')) {
+      res.status(409).json({ success: false, message: 'You cannot change your own administrator groups.' });
+      return;
+    }
     const body = bodyOf<AdminPermissionsBodyContract>(req);
-    admin.groups = parseList(body.groups);
+    const allGroups = await db.AdminGroup.find({}).lean();
+    let groups;
+    try {
+      groups = normalizeGroupIds(body.groups, allGroups.map((group: { _id?: unknown }) => String(group._id || '')));
+    } catch (error) {
+      res.status(400).json({ success: false, message: error instanceof Error ? error.message : 'Invalid groups' });
+      return;
+    }
+    const permissions = normalizePermissionRows((admin.permissions || []).map((row: { name?: unknown; permit?: unknown }) => ({
+      name: String(row.name || ''), permit: Boolean(row.permit),
+    })));
+    const assignedGroups = allGroups.filter((group: { _id?: unknown }) => groups.includes(String(group._id || '')));
+    if (buildAdminAuthorization({ _id: admin._id, permissions, groups }, assignedGroups).legacySuperAdmin) {
+      res.status(400).json({ success: false, message: 'This change would create the legacy full-access fallback. Use an explicit permission or group grant.' });
+      return;
+    }
+    const safe = await preservesCapableAdministrator(db as unknown as AdminAccessModels, {
+      admin: { id: String(admin._id), permissions, groups },
+    });
+    if (!safe) {
+      res.status(409).json({ success: false, message: 'This change would remove the last active security administrator.' });
+      return;
+    }
+    admin.groups = groups;
     await admin.save();
+    await logEntryEvent({
+      scope: 'privileged', eventType: 'admin.groups.updated', objectType: constants.OBJECT_TYPES.user,
+      objectName: 'administrator-access', objectId: String(admin._id),
+      actorUserId: String(req.user?._id || req.user?.id || ''), actorUsername: String(req.user?.username || ''),
+      message: 'Administrator group assignments updated', payload: { administratorId: String(admin._id), groups },
+    });
     res.json({ success: true, admin: await db.Admin.findById(admin._id).lean() });
   });
 
@@ -853,6 +863,15 @@ export = function (router: Router) {
     }
 
     const payload = sanitizeMutationPayload((req.body || {}) as Record<string, unknown>);
+    try {
+      payload.permissions = normalizePermissionRows(payload.permissions || []);
+      if ((payload.permissions as Array<{ permit: boolean }>).some((row) => !row.permit)) {
+        throw new Error('Administrator groups grant permissions and cannot contain direct denies');
+      }
+    } catch (error) {
+      res.status(400).json({ success: false, message: error instanceof Error ? error.message : 'Invalid group permissions' });
+      return;
+    }
     const group = await db.AdminGroup.create(payload);
     res.status(201).json({ success: true, group });
   });
@@ -863,6 +882,10 @@ export = function (router: Router) {
     }
 
     const payload = sanitizeMutationPayload((req.body || {}) as Record<string, unknown>);
+    if (Object.prototype.hasOwnProperty.call(payload, 'permissions')) {
+      res.status(400).json({ success: false, message: 'Use the group access endpoint to change permissions safely.' });
+      return;
+    }
     const group = await db.AdminGroup.findByIdAndUpdate(req.params.id, payload, { new: true }).lean();
     if (!group) {
       res.status(404).json({ success: false, message: 'Admin group not found' });
@@ -877,6 +900,11 @@ export = function (router: Router) {
       return;
     }
 
+    const assignedCount = await db.Admin.countDocuments({ groups: req.params.id });
+    if (assignedCount > 0) {
+      res.status(409).json({ success: false, message: 'Remove this group from all administrators before deleting it.' });
+      return;
+    }
     await db.AdminGroup.findByIdAndDelete(req.params.id);
     res.json({ success: true });
   });

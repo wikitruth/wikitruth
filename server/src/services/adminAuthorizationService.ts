@@ -1,20 +1,22 @@
-export const ADMIN_PERMISSIONS = [
-  'admin.access',
-  'admin.overview.read',
-  'users.manage',
-  'content.manage',
-  'moderation.review',
-  'security.manage',
-  'email.manage',
-  'tenants.manage',
-  'backups.read',
-  'backups.create',
-  'backups.restore',
-  'system.read',
-  'audit.read',
+export const ADMIN_PERMISSION_DEFINITIONS = [
+  { name: 'admin.access', label: 'Full administrator access', description: 'Grants every current administrator permission.', family: 'platform', familyLabel: 'Platform administration', risk: 'critical' },
+  { name: 'admin.overview.read', label: 'View admin overview', description: 'View the administrator dashboard and operational summaries.', family: 'platform', familyLabel: 'Platform administration', risk: 'low' },
+  { name: 'users.manage', label: 'Manage people and accounts', description: 'Create, update, restrict, and link user and account records.', family: 'people', familyLabel: 'People and identity', risk: 'high' },
+  { name: 'security.manage', label: 'Manage security and access', description: 'Manage administrators, groups, API clients, and security controls.', family: 'people', familyLabel: 'People and identity', risk: 'critical' },
+  { name: 'content.manage', label: 'Manage content configuration', description: 'Manage categories, states, and supporting content configuration.', family: 'content', familyLabel: 'Content and moderation', risk: 'medium' },
+  { name: 'moderation.review', label: 'Review moderation queues', description: 'Review knowledge health, verdicts, moderation, and anonymous contributions.', family: 'content', familyLabel: 'Content and moderation', risk: 'high' },
+  { name: 'email.manage', label: 'Manage email operations', description: 'Configure email providers, previews, tests, and delivery operations.', family: 'communications', familyLabel: 'Communications and tenants', risk: 'high' },
+  { name: 'tenants.manage', label: 'Manage tenant applications', description: 'Manage civic application and tenant configuration.', family: 'communications', familyLabel: 'Communications and tenants', risk: 'high' },
+  { name: 'backups.read', label: 'View backups', description: 'View backup inventory, status, and verification results.', family: 'operations', familyLabel: 'System operations', risk: 'medium' },
+  { name: 'backups.create', label: 'Create backups', description: 'Create on-host database backup snapshots.', family: 'operations', familyLabel: 'System operations', risk: 'high' },
+  { name: 'backups.restore', label: 'Test and restore backups', description: 'Run restore previews, restore tests, and approved restoration.', family: 'operations', familyLabel: 'System operations', risk: 'critical' },
+  { name: 'system.read', label: 'View system operations', description: 'View health, sanitized telemetry, and operational alerts.', family: 'operations', familyLabel: 'System operations', risk: 'medium' },
+  { name: 'audit.read', label: 'View audit events', description: 'View and verify the privileged audit chain.', family: 'operations', familyLabel: 'System operations', risk: 'high' },
 ] as const;
 
-export type AdminPermission = typeof ADMIN_PERMISSIONS[number];
+export const ADMIN_PERMISSIONS = ADMIN_PERMISSION_DEFINITIONS.map((permission) => permission.name);
+
+export type AdminPermission = typeof ADMIN_PERMISSION_DEFINITIONS[number]['name'];
 
 export interface PermissionRow {
   name?: unknown;

@@ -24,11 +24,11 @@ telemetry, and governed privacy operations.
 
 ### 2. Administrator Permissions
 
-- [ ] Replace comma-delimited permission/group editing with a catalog-backed,
+- [x] Replace comma-delimited permission/group editing with a catalog-backed,
   searchable, accessible permission matrix and explicit group assignments.
-- [ ] Add group permission management so inherited access is visible before an
+- [x] Add group permission management so inherited access is visible before an
   administrator saves a direct override.
-- [ ] Preserve direct-over-group precedence, self-change restrictions, and the
+- [x] Preserve direct-over-group precedence, self-change restrictions, and the
   last-capable-administrator invariant in API validation and tests.
 
 ### 3. Operational Telemetry and Alerts

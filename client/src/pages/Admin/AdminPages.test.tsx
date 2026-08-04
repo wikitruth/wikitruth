@@ -39,6 +39,12 @@ jest.mock('../../services/api/admin', () => ({
     user: jest.fn(),
     account: jest.fn(),
     administrator: jest.fn(),
+    administratorAccess: jest.fn(),
+    updateAdministratorAccess: jest.fn(),
+    adminGroupAccess: jest.fn(),
+    updateAdminGroupAccess: jest.fn(),
+    linkAdministratorUser: jest.fn(),
+    unlinkAdministratorUser: jest.fn(),
   },
 }));
 
@@ -78,6 +84,18 @@ beforeEach(() => {
   mockedAdminApi.user.mockResolvedValue(null);
   mockedAdminApi.account.mockResolvedValue(null);
   mockedAdminApi.administrator.mockResolvedValue(null);
+  mockedAdminApi.administratorAccess.mockResolvedValue({
+    administrator: {
+      id: 'admin-1', name: {}, user: { id: 'user-2', name: 'operator' },
+      selfProtected: false, legacySuperAdmin: false,
+    },
+    catalog: [{
+      name: 'users.manage', label: 'Manage people and accounts', description: 'Manage people.',
+      family: 'people', familyLabel: 'People and identity', risk: 'high', direct: 'inherit',
+      inheritedFrom: ['Operators'], effective: true,
+    }],
+    groups: [{ id: 'operators', name: 'Operators', assigned: true, permissions: [{ name: 'users.manage', permit: true }] }],
+  });
   mockedAdminApi.userSecurity.mockResolvedValue({ success: true, security: {
     user: { id: 'user-1', username: 'example-user', email: 'user@example.test', state: 'active', isActive: true, passwordLoginDisabled: false, linkedAdminId: '', linkedAccountId: '' },
     activeSessions: 1, lastSeen: '2026-08-04T00:00:00.000Z', activePasskeys: 2,
@@ -379,10 +397,15 @@ describe('Admin pages', () => {
   });
 
   it('renders administrator details action panel', async () => {
-    render(<AdminDetails />);
+    render(
+      <Routes><Route path="/admin/administrators/:id" element={<AdminDetails />} /></Routes>,
+      { route: '/admin/administrators/admin-1' }
+    );
     expect(
       await screen.findByRole('heading', { name: /administrator details/i })
     ).toBeInTheDocument();
     expect(screen.getByText(/permissions, groups, and linked user/i)).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /permission matrix/i })).toBeInTheDocument();
+    expect(screen.getByText(/inherited from operators/i)).toBeInTheDocument();
   });
 });

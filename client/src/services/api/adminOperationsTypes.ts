@@ -18,6 +18,45 @@ export type AdminPermission =
   | 'moderation.review' | 'security.manage' | 'email.manage' | 'tenants.manage'
   | 'backups.read' | 'backups.create' | 'backups.restore' | 'system.read' | 'audit.read';
 
+export type PermissionRisk = 'low' | 'medium' | 'high' | 'critical';
+export type DirectPermissionState = 'inherit' | 'allow' | 'deny';
+export type PermissionCatalogRow = {
+  name: AdminPermission;
+  label: string;
+  description: string;
+  family: string;
+  familyLabel: string;
+  risk: PermissionRisk;
+  direct: DirectPermissionState;
+  inheritedFrom: string[];
+  effective: boolean;
+};
+export type AdminAccessSnapshot = {
+  administrator: {
+    id: string;
+    name: Record<string, unknown>;
+    user: { id?: string; name?: string };
+    selfProtected: boolean;
+    legacySuperAdmin: boolean;
+  };
+  catalog: PermissionCatalogRow[];
+  groups: Array<{
+    id: string;
+    name: string;
+    assigned: boolean;
+    permissions: Array<{ name: AdminPermission; permit: boolean }>;
+  }>;
+};
+export type AdminGroupAccessSnapshot = {
+  group: { id: string; name: string };
+  catalog: Array<Omit<PermissionCatalogRow, 'direct' | 'inheritedFrom' | 'effective'> & { granted: boolean }>;
+  administrators: Array<{
+    id: string;
+    name: Record<string, unknown>;
+    user: { id?: string; name?: string };
+  }>;
+};
+
 export type AdminDashboardResponse = {
   success: boolean;
   counts: Record<string, number>;
@@ -69,4 +108,3 @@ export type AdminSystemHealth = {
   generatedAt: string; overall: HealthStatus; components: Record<string, HealthComponent>;
   migrationLedger: HealthComponent; recentErrors: HealthComponent;
 };
-

@@ -1,12 +1,12 @@
 import API_BASE_URL from './baseUrl';
 import fetchWithPasskeyStepUp from './passkeyFetch';
 import type {
-  AdminDashboardResponse, AdminListParams, AdminListResponse, AdminMutationPayload, AdminRecord,
+  AdminAccessSnapshot, AdminDashboardResponse, AdminGroupAccessSnapshot, AdminListParams, AdminListResponse, AdminMutationPayload, AdminRecord,
   AdminSystemHealth, BackupSnapshot, PeopleListResponse, RestorePreview, UserSecurity,
 } from './adminOperationsTypes';
 export type {
   AdminDashboardResponse, AdminListParams, AdminListResponse, AdminMutationPayload, AdminPermission,
-  AdminRecord, AdminSystemHealth, BackupSnapshot, HealthComponent, HealthStatus, PeopleItem,
+  AdminRecord, AdminSystemHealth, AdminAccessSnapshot, AdminGroupAccessSnapshot, BackupSnapshot, DirectPermissionState, HealthComponent, HealthStatus, PeopleItem, PermissionCatalogRow,
   PeopleListResponse, RestorePreview, UserSecurity,
 } from './adminOperationsTypes';
 
@@ -361,6 +361,26 @@ export const adminApi = {
     });
     return response.admin || null;
   },
+  administratorAccess: (id: string) => request<{ success: boolean; access: AdminAccessSnapshot }>(
+    `${API_BASE_URL}/admin/administrators/${encodeURIComponent(id)}/access`,
+  ).then((response) => response.access),
+  updateAdministratorAccess: (id: string, input: {
+    permissions: Array<{ name: string; permit: boolean }>;
+    groups: string[];
+  }) => request<{ success: boolean; access: AdminAccessSnapshot }>(
+    `${API_BASE_URL}/admin/administrators/${encodeURIComponent(id)}/access`,
+    { method: 'PUT', body: JSON.stringify(input) },
+  ).then((response) => response.access),
+  adminGroupAccess: (id: string) => request<{ success: boolean; access: AdminGroupAccessSnapshot }>(
+    `${API_BASE_URL}/admin/groups/${encodeURIComponent(id)}/access`,
+  ).then((response) => response.access),
+  updateAdminGroupAccess: (id: string, input: {
+    name: string;
+    permissions: Array<{ name: string; permit: boolean }>;
+  }) => request<{ success: boolean; access: AdminGroupAccessSnapshot }>(
+    `${API_BASE_URL}/admin/groups/${encodeURIComponent(id)}/access`,
+    { method: 'PUT', body: JSON.stringify(input) },
+  ).then((response) => response.access),
   updateAdministratorGroups: async (id: string, groups: string[]) => {
     const response = await request<MutationResponse>(`${API_BASE_URL}/admin/administrators/${encodeURIComponent(id)}/groups`, {
       method: 'PUT',
