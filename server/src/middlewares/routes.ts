@@ -294,6 +294,7 @@ function mapLegacyPathToModern(req: Request): string {
     '/outline',
     '/civic',
     '/policies',
+    '/transparency',
   ];
 
   for (const prefix of modernPathPrefixes) {
@@ -410,6 +411,7 @@ export default function registerLegacyPathRedirects(app: AppRouteRegistrar, _pas
     '/civic',
     '/civic/*',
     '/policies',
+    '/transparency',
     '/500',
     '/503',
   ];

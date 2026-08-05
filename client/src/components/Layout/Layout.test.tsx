@@ -58,4 +58,14 @@ describe('Layout', () => {
     expect(screen.getByTestId('layout-footer')).toHaveAttribute('data-compact', 'false');
     expect(screen.getByTestId('page-content').parentElement).toHaveClass('col-md-9');
   });
+
+  it('uses the standard shell but a full-width content canvas for transparency', () => {
+    render(<Layout><div data-testid="page-content" /></Layout>, { route: '/transparency' });
+
+    expect(screen.queryByTestId('context-sidebar')).not.toBeInTheDocument();
+    expect(screen.getByTestId('layout-header')).toHaveAttribute('data-has-sidebar-toggle', 'true');
+    expect(screen.getByTestId('layout-header')).toHaveAttribute('data-focused', 'false');
+    expect(screen.getByTestId('layout-footer')).toHaveAttribute('data-compact', 'false');
+    expect(screen.getByTestId('page-content').parentElement).toHaveClass('col-xs-12', 'wt-wide-content-column');
+  });
 });

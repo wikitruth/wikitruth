@@ -1,0 +1,212 @@
+.wt-transparency-page {
+  --wt-trust-success: #3f9f68;
+  --wt-trust-warning: #d99722;
+  --wt-trust-archived: #788696;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 30px 14px 42px;
+  color: var(--wt-text);
+}
+
+.wt-trust-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 22px;
+}
+
+.wt-trust-heading h1 { margin: 0 0 6px; font-size: 42px; font-weight: 700; letter-spacing: -.8px; }
+.wt-trust-heading p { margin: 0; color: var(--wt-text-muted); font-size: 18px; }
+.wt-trust-freshness { flex: 0 0 auto; padding-bottom: 3px; font-size: 15px !important; }
+.wt-trust-freshness .fa { margin-right: 7px; }
+
+.wt-trust-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  margin-left: 5px;
+  color: var(--wt-text-muted);
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+.wt-trust-info:focus { border-radius: 50%; outline: 2px solid var(--wt-brand-primary); outline-offset: 1px; }
+.wt-trust-loading { min-height: 320px; padding-top: 80px; text-align: center; }
+
+.wt-trust-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 16px;
+  overflow: hidden;
+  border: 1px solid var(--wt-border);
+  border-radius: 7px;
+  background: var(--wt-surface);
+}
+
+.wt-trust-summary-item {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  min-height: 92px;
+  padding: 14px 20px;
+  border-right: 1px solid var(--wt-border);
+}
+
+.wt-trust-summary-item:last-child { border-right: 0; }
+.wt-trust-summary-item > .fa { color: var(--wt-brand-primary); font-size: 27px; text-align: center; }
+.wt-trust-summary-item.success > .fa { color: var(--wt-trust-success); }
+.wt-trust-summary-item.warning > .fa { color: var(--wt-trust-warning); }
+.wt-trust-summary-item.archived > .fa { color: var(--wt-trust-archived); }
+.wt-trust-summary-item small { display: block; color: var(--wt-text); font-size: 14px; font-weight: 500; }
+.wt-trust-summary-item strong { display: block; margin-top: 4px; font-size: 25px; line-height: 1; }
+
+.wt-trust-primary-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.wt-trust-panel, .wt-trust-governance, .wt-trust-method {
+  border: 1px solid var(--wt-border);
+  border-radius: 7px;
+  background: var(--wt-surface);
+}
+
+.wt-trust-panel { padding: 18px 20px; }
+.wt-trust-panel h2, .wt-trust-governance h2, .wt-trust-method h2 {
+  margin: 0;
+  color: var(--wt-text);
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.wt-trust-quality-list, .wt-trust-lifecycle-list { margin: 12px 0 0; padding: 0; list-style: none; }
+.wt-trust-quality-row {
+  display: grid;
+  grid-template-columns: 24px minmax(150px, 1.2fr) minmax(130px, 1fr) 46px;
+  gap: 9px;
+  align-items: center;
+  min-height: 42px;
+}
+
+.wt-trust-quality-icon { color: var(--wt-brand-primary); font-size: 17px; text-align: center; }
+.wt-trust-quality-label { min-width: 0; font-size: 14px; }
+.wt-trust-quality-row > strong { font-size: 14px; text-align: right; }
+.wt-trust-bar { display: block; height: 8px; overflow: hidden; border-radius: 5px; background: var(--wt-surface-muted); }
+.wt-trust-bar > span { display: block; height: 100%; background: var(--wt-brand-primary); }
+.wt-trust-bar.is-suppressed > span { display: none; }
+
+.wt-trust-lifecycle-bar { display: flex; height: 20px; margin: 20px 0 14px; overflow: hidden; border-radius: 4px; background: var(--wt-surface-muted); }
+.wt-trust-lifecycle-bar span, .wt-trust-dot { display: block; }
+.wt-trust-lifecycle-bar .accepted, .wt-trust-dot.accepted { background: var(--wt-trust-success); }
+.wt-trust-lifecycle-bar .pending, .wt-trust-dot.pending { background: var(--wt-trust-warning); }
+.wt-trust-lifecycle-bar .archived, .wt-trust-dot.archived { background: var(--wt-trust-archived); }
+.wt-trust-lifecycle-list li { display: grid; grid-template-columns: 11px minmax(0, 1fr) auto; gap: 9px; align-items: start; padding: 6px 0; }
+.wt-trust-dot { width: 9px; height: 9px; margin-top: 5px; border-radius: 2px; }
+.wt-trust-lifecycle-list li > span:nth-child(2) strong, .wt-trust-lifecycle-list small { display: block; }
+.wt-trust-lifecycle-list small { margin-top: 2px; color: var(--wt-text-muted); font-size: 12px; line-height: 1.35; }
+
+.wt-trust-governance { margin-top: 16px; overflow: hidden; }
+.wt-trust-governance > h2 { padding: 16px 20px 8px; }
+.wt-trust-governance-list details { border-top: 1px solid var(--wt-border); }
+.wt-trust-governance-list details:first-child { border-top: 0; }
+.wt-trust-governance-list summary {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) 90px 18px;
+  gap: 10px;
+  align-items: center;
+  min-height: 48px;
+  padding: 8px 20px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.wt-trust-governance-list summary::-webkit-details-marker, .wt-trust-privacy summary::-webkit-details-marker { display: none; }
+.wt-trust-governance-list summary:focus-visible, .wt-trust-privacy summary:focus-visible { outline: 3px solid color-mix(in srgb, var(--wt-brand-primary) 45%, transparent); outline-offset: -3px; }
+.wt-trust-governance-list summary > .fa:first-child { color: var(--wt-brand-primary); font-size: 18px; text-align: center; }
+.wt-trust-governance-list summary > strong { text-align: right; }
+.wt-trust-governance-list details[open] summary .fa-chevron-down { transform: rotate(180deg); }
+.wt-trust-governance-list summary .fa-chevron-down { color: var(--wt-text-muted); font-size: 11px; transition: transform .16s ease; }
+.wt-trust-governance-list details p { margin: 0; padding: 0 56px 14px; color: var(--wt-text-muted); font-size: 13px; }
+
+.wt-trust-privacy { margin-top: 16px; border: 1px solid color-mix(in srgb, var(--wt-brand-primary) 70%, var(--wt-border)); border-radius: 7px; background: color-mix(in srgb, var(--wt-brand-primary) 6%, var(--wt-surface)); }
+.wt-trust-privacy summary { display: grid; grid-template-columns: 38px minmax(0, 1fr) 18px; gap: 12px; align-items: center; min-height: 58px; padding: 10px 18px; cursor: pointer; list-style: none; }
+.wt-trust-privacy summary > .fa-shield { color: var(--wt-brand-primary); font-size: 28px; text-align: center; }
+.wt-trust-privacy summary strong, .wt-trust-privacy summary small { display: block; }
+.wt-trust-privacy summary strong { color: var(--wt-brand-primary); font-size: 17px; }
+.wt-trust-privacy summary small { margin-top: 2px; color: var(--wt-text-muted); font-size: 13px; }
+.wt-trust-privacy[open] summary > .fa-chevron-right { transform: rotate(90deg); }
+.wt-trust-privacy > ul { margin: 0 18px 14px 69px; color: var(--wt-text-muted); font-size: 13px; }
+
+.wt-trust-method { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 26px; align-items: center; margin-top: 16px; padding: 16px 20px; }
+.wt-trust-method p { margin: 5px 0 0; color: var(--wt-text-muted); font-size: 13px; }
+.wt-trust-method-actions { display: flex; gap: 10px; }
+.wt-trust-method-actions .btn { min-height: 44px; padding: 10px 14px; border-color: var(--wt-brand-primary); color: var(--wt-brand-primary); background: var(--wt-surface); font-size: 14px; }
+.wt-trust-method-actions .fa { margin-right: 6px; }
+.wt-trust-method-details { position: relative; }
+.wt-trust-method-details summary { display: flex; align-items: center; cursor: pointer; list-style: none; }
+.wt-trust-method-details summary::-webkit-details-marker { display: none; }
+.wt-trust-method-details[open] summary { color: var(--wt-text); background: var(--wt-surface-muted); }
+.wt-trust-method-details ul {
+  position: absolute;
+  z-index: 12;
+  right: 0;
+  bottom: calc(100% + 8px);
+  width: min(360px, calc(100vw - 40px));
+  margin: 0;
+  padding: 14px 16px 14px 32px;
+  border: 1px solid var(--wt-border);
+  border-radius: 7px;
+  color: var(--wt-text-muted);
+  background: var(--wt-surface);
+  box-shadow: 0 8px 24px color-mix(in srgb, #000 18%, transparent);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+@media (max-width: 991px) {
+  .wt-trust-primary-grid { grid-template-columns: 1fr; }
+  .wt-trust-method { grid-template-columns: 1fr; }
+  .wt-trust-method-actions { justify-content: flex-start; }
+}
+
+@media (max-width: 767px) {
+  .wt-transparency-page { padding: 24px 0 32px; }
+  .wt-trust-heading { display: block; margin-bottom: 20px; }
+  .wt-trust-heading h1 { font-size: 32px; letter-spacing: -.5px; }
+  .wt-trust-heading p { font-size: 16px; line-height: 1.45; }
+  .wt-trust-freshness { margin-top: 12px !important; font-size: 14px !important; }
+  .wt-trust-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wt-trust-summary-item { grid-template-columns: 28px minmax(0, 1fr); min-height: 82px; padding: 12px 13px; border-bottom: 1px solid var(--wt-border); }
+  .wt-trust-summary-item:nth-child(2) { border-right: 0; }
+  .wt-trust-summary-item:nth-child(n+3) { border-bottom: 0; }
+  .wt-trust-summary-item > .fa { font-size: 23px; }
+  .wt-trust-summary-item small { font-size: 13px; }
+  .wt-trust-summary-item strong { font-size: 21px; }
+  .wt-trust-panel { padding: 16px 14px; }
+  .wt-trust-panel h2, .wt-trust-governance h2, .wt-trust-method h2 { font-size: 19px; }
+  .wt-trust-quality-row { grid-template-columns: 22px minmax(125px, 1fr) minmax(72px, .7fr) 36px; min-height: 50px; border-bottom: 1px solid var(--wt-border); }
+  .wt-trust-quality-row:last-child { border-bottom: 0; }
+  .wt-trust-quality-label { font-size: 13px; }
+  .wt-trust-quality-label .wt-trust-info { display: none; }
+  .wt-trust-lifecycle-bar { height: 14px; }
+  .wt-trust-governance > h2 { padding: 15px 14px 8px; }
+  .wt-trust-governance-list summary { grid-template-columns: 24px minmax(0, 1fr) 38px 14px; min-height: 52px; padding: 8px 14px; }
+  .wt-trust-governance-list details p { padding: 0 38px 14px; }
+  .wt-trust-privacy summary { padding: 10px 13px; }
+  .wt-trust-privacy summary small { font-size: 12px; }
+  .wt-trust-privacy > ul { margin-left: 50px; padding-left: 16px; }
+  .wt-trust-method { padding: 16px 14px; }
+  .wt-trust-method-actions { display: grid; grid-template-columns: 1fr; }
+  .wt-trust-method-actions .btn { text-align: left; }
+  .wt-trust-method-details summary { width: 100%; }
+  .wt-trust-method-details ul {
+    position: static;
+    width: 100%;
+    margin-top: 8px;
+    box-shadow: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wt-trust-governance-list summary .fa-chevron-down { transition: none; }
+}

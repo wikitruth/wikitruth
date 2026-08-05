@@ -110,6 +110,7 @@ const ApiClientsPage = lazy(() => import('../pages/Admin/ApiClients/ApiClientsPa
 const KnowledgeHealthPage = lazy(() => import('../pages/Admin/KnowledgeHealth/KnowledgeHealthPage'));
 const EmailOperationsPage = lazy(() => import('../pages/Admin/EmailOperations/EmailOperationsPage'));
 const PrivacyRequestsPage = lazy(() => import('../pages/Admin/Privacy/PrivacyRequestsPage'));
+const TransparencyPage = lazy(() => import('../pages/Transparency/TransparencyPage'));
 
 export interface AppRoute {
   path: string;
@@ -164,6 +165,7 @@ export const appRoutes: AppRoute[] = [
   { path: '/civic/:section', element: <CivicTenantProvider><CivicWorkspacePage /></CivicTenantProvider> },
   { path: '/civic/records/:id', element: <CivicTenantProvider><CivicRecordPage /></CivicTenantProvider> },
   { path: '/policies', element: <PolicyCenterPage /> },
+  { path: '/transparency', element: <TransparencyPage /> },
   { path: '/topics', element: <TopicsPage /> },
   { path: '/topics/create', element: protectedRoute(<TopicCreatePage />) },
   { path: '/topics/entry/:friendlyUrl/:id', element: <TopicEntryPage /> },

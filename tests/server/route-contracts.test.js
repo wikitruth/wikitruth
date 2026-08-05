@@ -19,6 +19,12 @@ describe('Server route contracts', function () {
     expect(routesSource).toContain('/app');
   });
 
+  it('serves the public transparency dashboard from the modern application shell', function () {
+    const source = fs.readFileSync(path.join(process.cwd(), 'server/src/middlewares/routes.ts'), 'utf8');
+    expect(source).toContain("'/transparency'");
+    expect(source.match(/'\/transparency'/g)).toHaveLength(2);
+  });
+
   it('keeps modern app and api home handlers wired', function () {
     const apiIndexSource = readProjectFile('server/src/controllers/api/index.ts');
     const homeApiSource = readProjectFile('server/src/controllers/api/home.ts');

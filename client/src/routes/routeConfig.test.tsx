@@ -52,6 +52,7 @@ describe('routeConfig', () => {
     expect(paths).toContain('/admin/system-operations');
     expect(paths).toContain('/admin/privacy-requests');
     expect(paths).toContain('/policies');
+    expect(paths).toContain('/transparency');
   });
 
   it('maps journal routes to the dedicated journal page', () => {

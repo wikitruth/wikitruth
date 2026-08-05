@@ -11121,6 +11121,33 @@
           }
         }
       }
+    },
+    "/transparency/trust": {
+      "get": {
+        "operationId": "getTransparencyTrust",
+        "summary": "Read privacy-safe public trust aggregates",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicTrustDashboardResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -13229,6 +13256,127 @@
           "item": {
             "type": "object",
             "additionalProperties": true
+          }
+        }
+      },
+      "PublicTrustMetric": {
+        "type": "object",
+        "required": [
+          "key",
+          "label",
+          "display",
+          "description",
+          "suppressed"
+        ],
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "display": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "percent": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100
+          },
+          "value": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "numerator": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "denominator": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "suppressed": {
+            "type": "boolean"
+          },
+          "suppressionReason": {
+            "type": "string",
+            "enum": [
+              "small_cohort",
+              "no_data"
+            ]
+          }
+        }
+      },
+      "PublicTrustDashboard": {
+        "type": "object",
+        "required": [
+          "generatedAt",
+          "scope",
+          "summary",
+          "quality",
+          "lifecycle",
+          "governance",
+          "privacy",
+          "methodology"
+        ],
+        "properties": {
+          "generatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "scope": {
+            "type": "object"
+          },
+          "summary": {
+            "type": "object"
+          },
+          "quality": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicTrustMetric"
+            }
+          },
+          "lifecycle": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "governance": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicTrustMetric"
+            }
+          },
+          "privacy": {
+            "type": "object"
+          },
+          "methodology": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "PublicTrustDashboardResponse": {
+        "type": "object",
+        "required": [
+          "success",
+          "dashboard"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "dashboard": {
+            "$ref": "#/components/schemas/PublicTrustDashboard"
           }
         }
       }

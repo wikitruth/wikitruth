@@ -28,6 +28,7 @@ describe('API endpoint smoke coverage', function () {
       "router.use('/monitoring', monitoringRouter)",
       "router.use('/realtime', realtimeRouter)",
       "router.use('/reactions', reactionsRouter)",
+      "router.use('/transparency', transparencyRouter)",
     ].forEach((contract) => expect(apiIndex).toContain(contract));
   });
 
@@ -127,6 +128,13 @@ describe('API endpoint smoke coverage', function () {
     expect(monitoringApi).toContain("router.post('/errors'");
     expect(monitoringApi).toContain("router.post('/csp'");
     expect(monitoringApi).toContain("logger.error('client.runtime.error'");
+  });
+
+  it('exposes the privacy-safe public trust dashboard endpoint', function () {
+    const transparencyApi = read('server/src/controllers/api/transparency.ts');
+    expect(transparencyApi).toContain("router.get('/trust'");
+    expect(transparencyApi).toContain("'Cache-Control'");
+    expect(transparencyApi).not.toMatch(/username|email|ipAddress|sessionId/);
   });
 
   it('exposes moderation API handlers used by modern entry actions', function () {

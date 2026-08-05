@@ -294,6 +294,14 @@ const Header: React.FC<HeaderProps> = ({
                   ))}
                   <li className="divider" aria-hidden="true"></li>
                   <li>
+                    <Link to={applicationPath('/transparency')} onClick={() => {
+                      setIsMoreOpen(false);
+                      setIsMobileNavOpen(false);
+                    }}>
+                      <i className="fa fa-shield"></i> Transparency &amp; Trust
+                    </Link>
+                  </li>
+                  <li>
                     <ApplicationLink href={applicationPath(toModernAppSectionUrl(application?.aboutUrl || '/about'))} onClick={() => {
                       setIsMoreOpen(false);
                       setIsMobileNavOpen(false);

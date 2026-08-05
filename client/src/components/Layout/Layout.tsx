@@ -12,6 +12,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const focusedAuthLayout = /\/(login|signup)\/?$/.test(location.pathname);
+  const wideContentLayout = location.pathname === '/transparency';
+  const hidesContextSidebar = focusedAuthLayout || wideContentLayout;
 
   const closeSidebar = useCallback(() => setSidebarOpen(false), []);
   const toggleSidebar = useCallback(() => setSidebarOpen((value) => !value), []);
@@ -50,11 +52,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className={`row row-offcanvas row-offcanvas-right${sidebarOpen ? ' active' : ''}`}>
             <div className={focusedAuthLayout
               ? 'col-xs-12 wt-main-column'
+              : wideContentLayout
+                ? 'col-xs-12 wt-main-column wt-wide-content-column'
               : 'col-sm-12 col-md-9 col-lg-9-x wt-main-column'}>
               {children}
             </div>
 
-            {!focusedAuthLayout ? (
+            {!hidesContextSidebar ? (
               <div
                 className="col-xs-7-x col-sm-4 col-md-3 col-lg-3-x sidebar-offcanvas"
                 id="sidebar"
