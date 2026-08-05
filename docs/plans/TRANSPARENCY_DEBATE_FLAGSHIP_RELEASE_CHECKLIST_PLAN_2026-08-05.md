@@ -116,9 +116,9 @@ SHA to the existing V2 environment.
       multilingual variants. Real dissent, appeal outcomes, and reviewer
       activity remain intentionally unseeded until governed participants act.
 - [x] Prepare an idempotent dry-run-first publication bundle or governed import.
-- [ ] Publish only after backup and release gates; never fabricate public counts,
+- [x] Publish only after backup and release gates; never fabricate public counts,
       verdicts, reviewers, or consensus.
-- [ ] Record the exact published URLs and post-publication checks.
+- [x] Record the exact published URLs and post-publication checks.
 
 ### 5. Validation and Publication
 
@@ -134,24 +134,28 @@ SHA to the existing V2 environment.
       fidelity ledger and `view_image` inspection.
 - [x] Inspect staged/publication paths for secrets, personal data, host details,
       dumps, generated QA artifacts, and populated inventory.
-- [ ] Create focused semantic commits and push the final SHA to
+- [x] Create focused semantic commits and push the final SHA to
       `origin/develop`; verify remote SHA and worktree state.
 
 ### 6. V2 Production Release
 
-- [ ] Resolve the populated private operator inventory without printing or
+- [x] Resolve the populated private operator inventory without printing or
       committing its sensitive values.
-- [ ] Record V2 previous SHA, service health, co-tenant health, capacity, and
+- [x] Record V2 previous SHA, service health, co-tenant health, capacity, and
       rollback path.
-- [ ] Create and verify the required restricted pre-change backup.
-- [ ] Materialize and build exactly the pushed release SHA as an immutable
+- [x] Create and verify the required restricted pre-change backup.
+- [x] Materialize and build exactly the pushed release SHA as an immutable
       release.
-- [ ] Activate only the inventoried V2 service; do not change DNS, V1, or the
+- [x] Activate only the inventoried V2 service; do not change DNS, V1, or the
       official domain.
-- [ ] Verify build identity, service stability, HTTPS, homepage, deep links,
-      dashboard, debate, authentication, email, passkeys, privacy, telemetry,
-      permissions, static assets, and database invariants.
-- [ ] Record deployed and live-verified states separately, including any gates
+- [x] Verify build identity, service stability, HTTPS, homepage, deep links,
+      dashboard, authentication configuration/UI, privacy and permission
+      boundaries, static assets, co-tenant health, and database invariants.
+- [ ] Verify the structured-debate surface after canonical approval and
+      implementation; complete real-inbox email delivery and physical-device
+      passkey ceremonies when the required operator accounts/devices are
+      available.
+- [x] Record deployed and live-verified states separately, including any gates
       that require a physical device or real inbox.
 
 ## Completion Rule
@@ -188,3 +192,32 @@ gate, keep the plan active and report the exact unverified boundary.
   desktop/mobile captures were each inspected at original detail with
   `view_image`; Browser also verified the disclosure contents, theme switch,
   standard shell, and absence of horizontal overflow.
+
+## Release and Flagship Publication Record (2026-08-05)
+
+- Tested, pushed, deployed, and loaded release:
+  `83db5d487182d21173b8b51c30ea88d3efaa372d`.
+- V2 code activation passed loopback candidate smoke, atomic activation,
+  loaded-working-directory identity, zero-restart/fatal-log checks, public TLS,
+  static-asset digest parity, and shared-host health checks. V1 and DNS were not
+  changed and the official legacy endpoint remained available.
+- The restricted pre-change MongoDB archive passed checksum, mode/ownership,
+  and `mongorestore --dryRun` verification. Its private location and digest are
+  recorded only in the operator inventory.
+- The publication dry run planned 15 inserts with zero verdicts and zero
+  reviewer votes. Apply created 15 pending entries, 15 immutable revisions, 15
+  submission events, 3 pending Filipino translations, 4 knowledge evidence or
+  qualification links, and 3 FixPH evidence links. The post-apply dry run was
+  `0 insert / 15 unchanged` and reviewer-vote count remained zero.
+- Wikitruth topic:
+  `https://v2.wikitruth.net/topics/entry/global-mean-sea-level-rise/6306a192ee817788564bf031`.
+- FixPH cluster anchor:
+  `https://v2.wikitruth.net/civic/records/c363fe6db6ecbcdad10a3d5d`.
+- FixPH project:
+  `https://v2.wikitruth.net/civic/records/f2da598e9a2ca55b02f967e0`.
+- Public dashboard:
+  `https://v2.wikitruth.net/transparency`; after cache refresh it reported
+  1,126 public records, 1,111 accepted, 15 under review, and 0 archived.
+- Live Browser acceptance covered desktop and 390 px mobile dashboard layout,
+  dark mode, privacy disclosure, topic and FixPH rendering, and login/register
+  surfaces. No horizontal overflow or application alert was observed.
