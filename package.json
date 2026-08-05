@@ -46,6 +46,8 @@
     "test:parity:authenticated:disposable": "node --env-file-if-exists=.env scripts/qa/run-disposable-authenticated-parity.mjs",
     "test:policy:pilot": "node --env-file-if-exists=.env scripts/qa/content-policy-pilot.mjs",
     "test:epistemic:pilot": "node --env-file-if-exists=.env scripts/qa/epistemic-flagship-pilot.mjs",
+    "content:flagships:check": "node --env-file-if-exists=.env scripts/content/flagship-pilots.mjs",
+    "content:flagships:apply": "node --env-file-if-exists=.env scripts/content/flagship-pilots.mjs --apply",
     "test:agent:authenticated:disposable": "node --env-file-if-exists=.env scripts/qa/run-disposable-agent-browser.mjs",
     "test:public:browser": "node --env-file-if-exists=.env scripts/qa/run-public-modern-browser.mjs",
     "test:civic:authenticated:disposable": "node --env-file-if-exists=.env scripts/qa/run-disposable-civic-browser.mjs",

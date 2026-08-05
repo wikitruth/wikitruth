@@ -1,0 +1,218 @@
+{
+  "version": "2026-08-05-v1",
+  "publicationMode": "pending-review",
+  "reviewPolicy": {
+    "neverSeedVerdicts": true,
+    "neverSeedReviewerVotes": true,
+    "minimumIndependentReviewers": 3,
+    "translationStatus": "pending",
+    "notes": "The importer publishes real evidence as pending work. Reviewers, consensus, appeals, and accepted status must be produced by real governed activity."
+  },
+  "wikitruth": {
+    "parentTopicCandidates": ["science", "global-issues"],
+    "topic": {
+      "key": "global-mean-sea-level-rise",
+      "title": "Global Mean Sea Level Rise",
+      "friendlyUrl": "global-mean-sea-level-rise",
+      "content": "Global mean sea level is a measured climate indicator derived from tide gauges and satellite altimetry. This pilot separates the global trend from regional and local relative sea-level change, which can differ because of ocean circulation, land motion, and other local processes.",
+      "references": "NASA Sea Level Change; NOAA Climate.gov; IPCC Sixth Assessment Report",
+      "translations": [
+        {
+          "locale": "fil",
+          "title": "Pagtaas ng Pandaigdigang Karaniwang Antas ng Dagat",
+          "content": "Ang pandaigdigang karaniwang antas ng dagat ay isang sinusukat na palatandaan ng klima mula sa mga tide gauge at satellite altimetry. Ibinubukod ng pilot na ito ang pandaigdigang trend mula sa rehiyonal at lokal na pagbabago sa antas ng dagat, na maaaring maiba dahil sa galaw ng karagatan, paggalaw ng lupa, at iba pang lokal na proseso."
+        }
+      ]
+    },
+    "claims": [
+      {
+        "key": "global-sea-level-rise-has-accelerated",
+        "title": "Global mean sea level has risen and its rate of rise has accelerated",
+        "friendlyUrl": "global-sea-level-rise-has-accelerated",
+        "against": false,
+        "content": "The IPCC assesses that global mean sea level rose by about 0.20 metres from 1901 to 2018. Its average rate increased from 1.3 millimetres per year during 1901–1971 to 3.7 millimetres per year during 2006–2018. NASA and NOAA observing records independently document the continuing global rise.",
+        "references": "IPCC AR6 WGI Summary for Policymakers A.1.7; NASA Sea Level Vital Sign; NOAA Climate Change: Global Sea Level",
+        "translations": [
+          {
+            "locale": "fil",
+            "title": "Tumaas ang pandaigdigang karaniwang antas ng dagat at bumilis ang pagtaas nito",
+            "content": "Ayon sa pagtatasa ng IPCC, tumaas nang humigit-kumulang 0.20 metro ang pandaigdigang karaniwang antas ng dagat mula 1901 hanggang 2018. Ang karaniwang bilis nito ay tumaas mula 1.3 milimetro bawat taon noong 1901–1971 tungo sa 3.7 milimetro bawat taon noong 2006–2018. Hiwalay ding itinatala ng NASA at NOAA ang patuloy na pandaigdigang pagtaas."
+          }
+        ]
+      },
+      {
+        "key": "local-sea-level-can-depart-from-global-mean",
+        "title": "Local relative sea-level change can differ substantially from the global mean",
+        "friendlyUrl": "local-sea-level-can-differ-from-global-mean",
+        "against": false,
+        "content": "A global mean does not imply that every coastline changes at the same rate. Ocean circulation, winds, land subsidence or uplift, groundwater withdrawal, and glacial-isostatic adjustment can produce substantial local departures. Local planning should therefore use regional observations and projections rather than the global average alone.",
+        "references": "NASA Sea Level Evaluation and Assessment Tool; NOAA Climate Change: Global Sea Level",
+        "translations": [
+          {
+            "locale": "fil",
+            "title": "Maaaring malaki ang pagkakaiba ng lokal na pagbabago sa antas ng dagat sa pandaigdigang karaniwan",
+            "content": "Hindi nangangahulugan ang pandaigdigang karaniwan na pare-pareho ang pagbabago sa bawat baybayin. Maaaring magdulot ng malaking lokal na pagkakaiba ang galaw ng karagatan at hangin, paglubog o pag-angat ng lupa, pagkuha ng tubig sa ilalim ng lupa, at pangmatagalang paggalaw ng lupa matapos matunaw ang sinaunang yelo. Dapat gumamit ang lokal na pagpaplano ng rehiyonal na obserbasyon at projection, hindi lamang ng pandaigdigang karaniwan."
+          }
+        ]
+      }
+    ],
+    "artifacts": [
+      {
+        "key": "ipcc-ar6-wgi-spm-sea-level",
+        "title": "IPCC AR6 Working Group I Summary for Policymakers",
+        "friendlyUrl": "ipcc-ar6-wgi-spm-sea-level",
+        "source": "https://www.ipcc.ch/report/ar6/wg1/chapter/summary-for-policymakers/",
+        "publisher": "Intergovernmental Panel on Climate Change",
+        "publicationDate": "2021-08-09",
+        "content": "Primary assessment source for observed global mean sea-level change, acceleration, causes, confidence ranges, and projections.",
+        "verifiabilityNotes": "Review sections A.1.7, A.4.3, and B.5.3; retain assessed uncertainty ranges and confidence language."
+      },
+      {
+        "key": "nasa-sea-level-vital-sign",
+        "title": "NASA Sea Level Vital Sign",
+        "friendlyUrl": "nasa-sea-level-vital-sign",
+        "source": "https://climate.nasa.gov/vital-signs/sea-level/",
+        "publisher": "National Aeronautics and Space Administration",
+        "content": "Official public observing page for satellite-era global mean sea-level measurements, uncertainty, causes, and downloadable data.",
+        "verifiabilityNotes": "The latest value changes as observations are processed. Verify the displayed date, uncertainty, and baseline before quoting a current number."
+      },
+      {
+        "key": "noaa-global-sea-level-explainer",
+        "title": "NOAA Climate Change: Global Sea Level",
+        "friendlyUrl": "noaa-global-sea-level-explainer",
+        "source": "https://www.climate.gov/news-features/understanding-climate/climate-change-global-sea-level",
+        "publisher": "National Oceanic and Atmospheric Administration",
+        "publicationDate": "2023-08-22",
+        "content": "Official reviewed explainer covering global observations, measurement methods, drivers, regional differences, and uncertainty in future pathways.",
+        "verifiabilityNotes": "Use the dated values as historical observations and preserve the distinction between global and local relative sea level."
+      }
+    ],
+    "openIssue": {
+      "key": "sea-level-global-local-interpretation",
+      "title": "Keep global and local sea-level claims explicitly separated",
+      "friendlyUrl": "keep-global-and-local-sea-level-claims-separated",
+      "content": "Reviewers should reject wording that applies the global mean directly to a particular coastline without regional evidence. Check baselines, time windows, vertical land motion, and uncertainty before accepting locally specific conclusions.",
+      "issueType": 30
+    },
+    "reviewCalibration": {
+      "requiredChecks": [
+        "Confirm that every numerical claim names its time window and unit.",
+        "Confirm that IPCC confidence and uncertainty ranges are not silently removed.",
+        "Confirm that global mean and local relative sea level are not conflated.",
+        "Confirm that current NASA values are treated as date-stamped observations rather than permanent constants."
+      ],
+      "materialQualification": "Regional or local sea level can rise faster, rise slower, or temporarily fall while global mean sea level rises.",
+      "appealTriggers": [
+        "A cited source was updated or corrected.",
+        "The claim mixes incompatible baselines or time periods.",
+        "A global measurement is presented as a location-specific forecast."
+      ],
+      "revalidation": "Review at least annually and whenever an IPCC assessment or the NASA/NOAA observing series changes materially."
+    }
+  },
+  "fixph": {
+    "tenantId": "fixtheph",
+    "countryCode": "PH",
+    "clusterKey": "ph-epr-plastic-packaging-implementation",
+    "records": [
+      {
+        "key": "emb-epr-institution",
+        "kind": "institution",
+        "title": "Environmental Management Bureau Extended Producer Responsibility Program",
+        "friendlyUrl": "environmental-management-bureau-epr-program",
+        "summary": "The EMB administers the public EPR portal and supports registration and implementation of EPR programs under Republic Act No. 11898.",
+        "description": "This record is a responsibility anchor for the EPR implementation cluster. It does not evaluate institutional performance by itself.",
+        "severity": "info"
+      },
+      {
+        "key": "epr-registry-compliance-monitoring",
+        "kind": "project",
+        "parentKey": "emb-epr-institution",
+        "title": "EPR program registry and compliance monitoring",
+        "friendlyUrl": "epr-program-registry-and-compliance-monitoring",
+        "summary": "Republic Act No. 11898 requires an EPR Registry, compliance monitoring, and a reliable, secure, transparent public database.",
+        "description": "Track official registration, independently audited recovery and diversion results, public reporting, and implementation milestones without treating registration alone as proof of compliance.",
+        "severity": "medium",
+        "responsibilityRole": "EPR registry and compliance monitoring"
+      },
+      {
+        "key": "epr-2025-recovery-target",
+        "kind": "observation",
+        "parentKey": "epr-registry-compliance-monitoring",
+        "title": "The statutory plastic-packaging recovery target for 2025 is 50 percent",
+        "friendlyUrl": "epr-2025-plastic-packaging-recovery-target",
+        "summary": "The EPR target schedule reaches 50 percent by December 31, 2025, with reported accomplishments subject to independent third-party compliance audit.",
+        "description": "This is a statutory target, not a claim that the target was achieved. Achievement requires verified official outcome data.",
+        "severity": "info",
+        "observedAt": "2025-12-31",
+        "sourceUrl": "https://epr.emb.gov.ph/Application/faq"
+      },
+      {
+        "key": "verify-epr-results-against-targets",
+        "kind": "action",
+        "parentKey": "epr-registry-compliance-monitoring",
+        "title": "Verify published EPR recovery results against statutory targets",
+        "friendlyUrl": "verify-epr-recovery-results-against-targets",
+        "summary": "Compare official independently audited recovery and diversion accomplishments with the statutory schedule as results become publicly available.",
+        "description": "Record the numerator, denominator, reporting period, auditor, covered plastic footprint, corrections, and any unresolved methodology limitations. Do not infer compliance from registration counts alone.",
+        "severity": "medium"
+      },
+      {
+        "key": "epr-legislative-and-implementation-timeline",
+        "kind": "history",
+        "parentKey": "emb-epr-institution",
+        "title": "EPR Act and implementing-rules timeline",
+        "friendlyUrl": "epr-act-and-implementing-rules-timeline",
+        "summary": "Republic Act No. 11898 became law in 2022 and DENR Administrative Order No. 2023-02 established its implementing rules in January 2023.",
+        "description": "Use this record to separate legal requirements, implementation milestones, and later evidence about outcomes.",
+        "severity": "info"
+      }
+    ],
+    "artifacts": [
+      {
+        "key": "ra-11898-lawphil",
+        "title": "Republic Act No. 11898 — Extended Producer Responsibility Act of 2022",
+        "friendlyUrl": "republic-act-11898-epr-act-2022",
+        "source": "https://ldr.senate.gov.ph/legislative%2Bissuances/Republic%20Act%20No.%2011898",
+        "publisher": "Senate of the Philippines Legislative Reference Bureau",
+        "publicationDate": "2022-07-23",
+        "content": "Public legal text establishing EPR for plastic packaging waste, the registry, monitoring duties, public-database requirements, audit rules, and recovery targets.",
+        "verifiabilityNotes": "Cross-check against the enrolled law PDF and later official amendments before relying on a specific section."
+      },
+      {
+        "key": "dao-2023-02-epr-irr",
+        "title": "DENR Administrative Order No. 2023-02 — EPR Implementing Rules and Regulations",
+        "friendlyUrl": "denr-administrative-order-2023-02-epr-irr",
+        "source": "https://emb.gov.ph/wp-content/uploads/2023/01/DAO-No.-2023-02-re-IRR-of-RA-No.-11898.pdf",
+        "publisher": "Department of Environment and Natural Resources",
+        "publicationDate": "2023-01-24",
+        "content": "Official implementing rules defining procedures, responsibilities, registration, reporting, audit, recovery, and enforcement under Republic Act No. 11898.",
+        "verifiabilityNotes": "Cite the relevant rule and page; check for later circulars or amendments."
+      },
+      {
+        "key": "emb-epr-portal-faq",
+        "title": "Environmental Management Bureau EPR Portal and FAQ",
+        "friendlyUrl": "environmental-management-bureau-epr-portal-faq",
+        "source": "https://epr.emb.gov.ph/Application/faq",
+        "publisher": "Environmental Management Bureau",
+        "content": "Official public guidance for EPR registration, target schedules, and independent third-party validation of reported recovery accomplishments.",
+        "verifiabilityNotes": "The portal is operational content and may change. Capture retrieval dates and archive relevant versions before making time-sensitive claims."
+      }
+    ],
+    "reviewCalibration": {
+      "requiredChecks": [
+        "Separate statutory targets from verified accomplishments.",
+        "Treat registration counts as participation evidence, not recovery-performance evidence.",
+        "Require an independently audited official result before marking a target achieved.",
+        "Record reporting period, covered footprint, calculation method, and corrections."
+      ],
+      "materialQualification": "The cluster documents legal duties and a verification workflow; it does not assert that the 2025 target was met.",
+      "appealTriggers": [
+        "An official audited result or correction changes the recorded outcome.",
+        "The target schedule or implementing rules are amended.",
+        "A record confuses registrations, collection activity, and verified recovery accomplishment."
+      ],
+      "revalidation": "Review after each official reporting cycle and whenever DENR or EMB publishes an amendment, audited result, or correction."
+    }
+  }
+}
