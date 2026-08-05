@@ -111,6 +111,7 @@ const KnowledgeHealthPage = lazy(() => import('../pages/Admin/KnowledgeHealth/Kn
 const EmailOperationsPage = lazy(() => import('../pages/Admin/EmailOperations/EmailOperationsPage'));
 const PrivacyRequestsPage = lazy(() => import('../pages/Admin/Privacy/PrivacyRequestsPage'));
 const TransparencyPage = lazy(() => import('../pages/Transparency/TransparencyPage'));
+const StructuredDebatePage = lazy(() => import('../pages/StructuredDebate/StructuredDebatePage'));
 
 export interface AppRoute {
   path: string;
@@ -166,6 +167,8 @@ export const appRoutes: AppRoute[] = [
   { path: '/civic/records/:id', element: <CivicTenantProvider><CivicRecordPage /></CivicTenantProvider> },
   { path: '/policies', element: <PolicyCenterPage /> },
   { path: '/transparency', element: <TransparencyPage /> },
+  { path: '/structured-debates/new', element: protectedRoute(<StructuredDebatePage />, ['reviewer', 'admin']) },
+  { path: '/structured-debates/:id', element: <StructuredDebatePage /> },
   { path: '/topics', element: <TopicsPage /> },
   { path: '/topics/create', element: protectedRoute(<TopicCreatePage />) },
   { path: '/topics/entry/:friendlyUrl/:id', element: <TopicEntryPage /> },

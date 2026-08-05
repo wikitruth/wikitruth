@@ -28,6 +28,11 @@ jest.mock('../../services/api', () => ({
   },
 }));
 
+jest.mock('./StructuredDebateEntryAction', () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
 const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
 const mockUseNotification = useNotification as jest.MockedFunction<typeof useNotification>;
 const mockUseAuthPrompt = useAuthPrompt as jest.MockedFunction<typeof useAuthPrompt>;

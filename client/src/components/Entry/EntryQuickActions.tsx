@@ -8,6 +8,7 @@ import type { LegacyEntity } from '../../types/legacy';
 import ContextualContributionDrawer from './ContextualContributionDrawer';
 import { useAuthPrompt } from '../../context/AuthPromptContext';
 import EntryReplyMenu from './EntryReplyMenu';
+import StructuredDebateEntryAction from './StructuredDebateEntryAction';
 import {
   getTopicIdForReply,
   normalizeEntryObjectName,
@@ -362,6 +363,7 @@ const EntryQuickActions: React.FC<EntryQuickActionsProps> = ({
             </Link>
           </div>
         ) : null}
+        <StructuredDebateEntryAction objectName={objectName} entryId={entryId} title={String(entry.title || 'Structured debate')} />
         {resolvedMoreActions}
       </div>
       {showContributionDrawer ? (

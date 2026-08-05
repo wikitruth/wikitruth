@@ -53,6 +53,8 @@ describe('routeConfig', () => {
     expect(paths).toContain('/admin/privacy-requests');
     expect(paths).toContain('/policies');
     expect(paths).toContain('/transparency');
+    expect(paths).toContain('/structured-debates/new');
+    expect(paths).toContain('/structured-debates/:id');
   });
 
   it('maps journal routes to the dedicated journal page', () => {
@@ -110,6 +112,7 @@ describe('routeConfig', () => {
       '/admin/civic-operations',
       '/admin/verdicts',
       '/admin/knowledge-health',
+      '/structured-debates/new',
     ];
 
     protectedPaths.forEach((routePath) => {

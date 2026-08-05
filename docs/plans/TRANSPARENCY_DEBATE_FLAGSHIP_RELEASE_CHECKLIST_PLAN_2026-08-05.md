@@ -64,14 +64,14 @@ SHA to the existing V2 environment.
 
 - [x] Update canonical cards 92 and 95 only after explicit owner approval to
       reactivate the pilot; broad enforcement remains deferred.
-- [ ] Require an explicit participant opt-in and stance selection.
-- [ ] Keep ordinary replies and free-form discussion available and unchanged.
-- [ ] Limit pilot membership, phases, and contribution cadence through an
+- [x] Require an explicit participant opt-in and stance selection.
+- [x] Keep ordinary replies and free-form discussion available and unchanged.
+- [x] Limit pilot membership, phases, and contribution cadence through an
       explicit versioned format.
-- [ ] Separate participant argument from reviewer summary and verdict status.
-- [ ] Preserve a public audit trail of phase transitions and contributions while
+- [x] Separate participant argument from reviewer summary and verdict status.
+- [x] Preserve a public audit trail of phase transitions and contributions while
       keeping private identity/security data out of public responses.
-- [ ] Allow an authorized facilitator to pause, close, or cancel a pilot without
+- [x] Allow an authorized facilitator to pause, close, or cancel a pilot without
       deleting its history.
 
 ## Accepted Structured-Debate Design Spec
@@ -130,13 +130,13 @@ SHA to the existing V2 environment.
 
 ### 3. Opt-in Structured-Debate Pilot
 
-- [ ] Add durable pilot, participant, phase, contribution, and transition data
+- [x] Add durable pilot, participant, phase, contribution, and transition data
       contracts after canonical approval.
-- [ ] Add public-read and governed-write APIs with role, consent, validation,
+- [x] Add public-read and governed-write APIs with role, consent, validation,
       cadence, evidence, and audit guardrails.
-- [ ] Add an entry-linked pilot surface and a dedicated responsive debate page.
-- [ ] Prove that normal discussion and verdict paths remain unchanged.
-- [ ] Add server/client tests for opt-in, authorization, phase gates, withdrawal,
+- [x] Add an entry-linked pilot surface and a dedicated responsive debate page.
+- [x] Prove that normal discussion and verdict paths remain unchanged.
+- [x] Add server/client tests for opt-in, authorization, phase gates, withdrawal,
       public projection, and closed/cancelled behavior.
 
 ### 4. Real-world Flagship Content Operations
