@@ -15,7 +15,9 @@ Provide a quick-reference execution map for major planned tracks.
 
 ## Pilot Exit Targets
 
-- Controlled custom-debate pilot with published findings.
+- Controlled opt-in structured-debate pilot with published findings. The
+  software surface is entry-scoped and voluntary; the operational exit target
+  requires governed participants and a published evaluation.
 - Reviewer calibration stress test for controversial topics.
 - One flagship Wikitruth topic and one flagship FixPH issue cluster shipped end-to-end.
 
@@ -28,5 +30,9 @@ Provide a quick-reference execution map for major planned tracks.
 - Tracks 1 through 4: scoped software baseline `implemented`.
 - Track 5: policy and tooling `implemented`; live seeding, calibration, and sustained curation remain operational.
 - Track 6: FixPH civic software baseline `implemented`; real-world adoption remains operational.
-- The custom-debate pilot is explicitly `deferred`; the remaining pilot exit targets are content-operations work.
+- The opt-in structured-debate pilot software is `approved for implementation`;
+  running the governed participant pilot and publishing findings remain
+  content-operations work.
+- Broad strict-debate enforcement remains explicitly `deferred` until the
+  operational pilot is evaluated and separately approved.
 - Source baseline: `docs/plans/deferred/plan-2026-04-14/09_GAP_CHECKLIST_PLAN.md`.

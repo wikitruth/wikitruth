@@ -62,7 +62,7 @@ SHA to the existing V2 environment.
 
 ## Structured-Debate Pilot Contract
 
-- [ ] Update canonical cards 92 and 95 only after explicit owner approval to
+- [x] Update canonical cards 92 and 95 only after explicit owner approval to
       reactivate the pilot; broad enforcement remains deferred.
 - [ ] Require an explicit participant opt-in and stance selection.
 - [ ] Keep ordinary replies and free-form discussion available and unchanged.

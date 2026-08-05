@@ -9,7 +9,13 @@ Define the intended future workflow UX and engagement model.
 - Inline create/edit/reply on entry pages instead of page-jump-only flows.
 - Unified create wizard with context-target selection from global navigation.
 - True entry-type conversion flow that preserves history.
-- Structured discussion modes including strict debate patterns and thread controls.
+- An opt-in, entry-scoped structured-debate pilot with explicit participant
+  consent, stance selection, versioned phases, contribution cadence, evidence
+  prompts, facilitator controls, and a public audit trail.
+- Ordinary replies and free-form discussion remain available outside the pilot;
+  joining a pilot never changes an entry's verdict or screening state.
+- Future strict-debate patterns and broad thread enforcement remain a separate
+  target that requires pilot evidence and explicit canonical approval.
 - Comment classification routing (`supplement`, `objection`, `question`).
 
 ## Discovery and Reading Targets
@@ -39,5 +45,8 @@ Define the intended future workflow UX and engagement model.
 - Implemented completion work: inline entry-page authoring, complete
   comment-classification UX, explicit Home ranking buckets, truth summaries,
   delivery preferences, multilingual variants, and graph-aware search filters.
-- Broad strict-debate enforcement is explicitly `deferred` pending governed rules and pilot evidence.
+- The narrow opt-in structured-debate pilot is `approved for implementation`.
+  It is isolated, reversible, and has no automatic verdict power.
+- Broad strict-debate enforcement is explicitly `deferred` pending governed
+  rules, published pilot findings, and separate canonical approval.
 - Source baseline: `docs/plans/deferred/plan-2026-04-14/09_GAP_CHECKLIST_PLAN.md` and `docs/plans/deferred/plan-2026-04-14/07_VALIDATED_CHECKLIST_PRODUCT_WORKFLOWS.md`.
