@@ -29,6 +29,7 @@ const groups = [
   ['/epistemic', ['epistemic.ts']], ['/translations', ['translations.ts']],
   ['/privacy', ['privacy.ts']],
   ['/transparency', ['transparency.ts']],
+  ['/structured-debates', ['structuredDebates.ts']],
 ];
 
 function joinRoute(prefix, route) {

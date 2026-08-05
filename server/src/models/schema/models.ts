@@ -55,6 +55,9 @@ export = function (app: Application, mongoose: Mongoose) {
   require('./core/KnowledgeReviewTask')(app, mongoose);
   require('./core/AnonymousContribution')(app, mongoose);
   require('./core/ReputationSnapshot')(app, mongoose);
+  require('./core/StructuredDebatePilot')(app, mongoose);
+  require('./core/StructuredDebateParticipant')(app, mongoose);
+  require('./core/StructuredDebateContribution')(app, mongoose);
   require('./core/ApiClient')(app, mongoose);
   require('./core/IdempotencyRecord')(app, mongoose);
   require('./core/CivicTenant')(app, mongoose);

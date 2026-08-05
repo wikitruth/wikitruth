@@ -42,6 +42,7 @@ import attachEpistemic from './epistemic';
 import attachTranslations from './translations';
 import attachPrivacy from './privacy';
 import attachTransparency from './transparency';
+import attachStructuredDebates from './structuredDebates';
 import { apiVersionPolicy } from '../../middlewares/apiVersionPolicy';
 import { enforceAgentMutationReliability } from '../../middlewares/agentMutationReliability';
 
@@ -85,6 +86,7 @@ export = function (router: Router) {
   const translationsRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const privacyRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const transparencyRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
+  const structuredDebatesRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
 
   [topicsRouter, argumentsRouter, questionsRouter, answersRouter, issuesRouter, opinionsRouter, artifactsRouter]
     .forEach((entryRouter) => entryRouter.use(requireContributorOnboarding));
@@ -128,6 +130,7 @@ export = function (router: Router) {
   attachTranslations(translationsRouter);
   attachPrivacy(privacyRouter);
   attachTransparency(transparencyRouter);
+  attachStructuredDebates(structuredDebatesRouter);
 
   router.use('/home', homeRouter);
   router.use('/application-context', applicationContextRouter);
@@ -161,4 +164,5 @@ export = function (router: Router) {
   router.use('/translations', translationsRouter);
   router.use('/privacy', privacyRouter);
   router.use('/transparency', transparencyRouter);
+  router.use('/structured-debates', structuredDebatesRouter);
 };

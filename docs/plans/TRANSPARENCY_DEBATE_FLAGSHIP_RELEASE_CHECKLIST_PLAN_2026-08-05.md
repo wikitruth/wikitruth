@@ -74,6 +74,37 @@ SHA to the existing V2 environment.
 - [ ] Allow an authorized facilitator to pause, close, or cancel a pilot without
       deleting its history.
 
+## Accepted Structured-Debate Design Spec
+
+- Desktop concept:
+  `/Users/dsalunga/.codex/generated_images/019fb8bf-f649-7f20-9c31-2ab06c4c3ac3/exec-bf384929-7b9d-4105-8faf-33e5adea303e.png`
+- Mobile concept:
+  `/Users/dsalunga/.codex/generated_images/019fb8bf-f649-7f20-9c31-2ab06c4c3ac3/exec-c5e2f69e-8c14-48fc-980d-88f1278c4f6b.png`
+- Palette: existing light/dark Wikitruth theme variables, blue actions, amber
+  current-phase state, green support state, and magenta challenge state; no
+  gradients, glow, winner treatment, or truth-score treatment.
+- Typography: existing application sans-serif stack; 34-38 px desktop title,
+  30-32 px mobile title, 18-20 px section headings, and explicit 14-16 px
+  control/body typography.
+- Container model: desktop uses a phase rail above two stance lanes separated
+  by an audit rail, with a narrow participation/facilitator column and one
+  contribution composer. Mobile uses the same families with stance/audit tabs,
+  open contribution rows, a nearby composer, and disclosure-based secondary
+  controls.
+- Interaction: explicit join consent and stance selection; stance remains
+  locked while opted in; only the current phase and cadence permit a
+  contribution; withdrawal stops future contributions without erasing history;
+  open discussion remains a separate visible route.
+- Public identity: show only the public username/display attribution already
+  exposed by Wikitruth. Never expose user ids, emails, sessions, security data,
+  or private moderation notes.
+- Icons: existing Font Awesome metaphors for balance, phase/cadence, evidence,
+  history, pause, advance, close, cancel, and withdrawal. Controls remain
+  code-native and at least 44 px on touch surfaces.
+- Above-the-fold copy is limited to the page title, linked-entry title, pilot
+  status/format, phase names, current participation state, and current-turn
+  guidance. No automatic verdict, winner, score, or popularity language.
+
 ## Implementation Checklist
 
 ### 1. Audit and Design
