@@ -159,8 +159,9 @@ SHA to the existing V2 environment.
       advisory is absent; the audit still reports the separately tracked legacy
       rendering dependency chain, whose safe fix is a breaking modernization.
 - [x] Verify the dashboard at desktop and 390 px mobile in Browser, including
-      light/dark themes, disclosures, and horizontal-overflow checks. Pilot
-      verification remains pending implementation.
+      light/dark themes, disclosures, and horizontal-overflow checks. Verify the
+      pilot at the same viewports, including lane tabs, participant composition,
+      facilitator safeguards, and contribution reset behavior.
 - [x] Compare the rendered dashboard against the accepted concept with a written
       fidelity ledger and `view_image` inspection.
 - [x] Inspect staged/publication paths for secrets, personal data, host details,
@@ -223,6 +224,32 @@ gate, keep the plan active and report the exact unverified boundary.
   desktop/mobile captures were each inspected at original detail with
   `view_image`; Browser also verified the disclosure contents, theme switch,
   standard shell, and absence of horizontal overflow.
+
+## Structured-Debate Fidelity Ledger (2026-08-05)
+
+- Information hierarchy: matched. The proposition and ordinary-discussion
+  escape route lead into the phase rail, optional participation state, balanced
+  support/audit/challenge lanes, and secondary rules disclosure.
+- Responsive structure: matched. Desktop keeps the three debate lanes visible;
+  the 390 px layout uses accessible lane tabs and a single reading column.
+  Browser measured the page and viewport at 390 px with no horizontal overflow.
+- Visual language: matched. The implementation uses native Wikitruth theme
+  variables and Font Awesome assets, with restrained green support, amber phase,
+  and magenta challenge semantics in both light and dark themes.
+- Interaction: matched and hardened. Browser verified mobile lane switching,
+  evidence-linked participant submission and composer reset, and facilitator
+  controls whose cancellation action stays disabled until a public reason is
+  supplied. Ordinary discussion remains visible and separate throughout.
+- Governance fidelity: improved over the concept. Viewer capabilities are
+  server-projected; stance and consent are explicit; withdrawal preserves the
+  public record; and the UI contains no winner, score, popularity, or automatic
+  verdict treatment.
+- Intentional layout difference: participation and facilitator controls use a
+  full-width band rather than the concept's narrow side column so consent copy,
+  touch targets, and public reasons remain legible without crowding.
+- Inspection evidence: generated desktop/mobile concepts and final rendered
+  desktop/mobile light/dark captures were inspected at original detail with
+  `view_image`. Browser also verified facilitator and active-participant states.
 
 ## Release and Flagship Publication Record (2026-08-05)
 
