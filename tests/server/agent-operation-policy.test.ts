@@ -67,6 +67,12 @@ describe('agent operation and credential policies', () => {
     expect(resolveAgentOperationPolicy('HEAD', '/topics')).toEqual(expect.objectContaining({
       operationId: 'knowledge.entry.list', requiredScope: 'entries:read',
     }));
+    expect(resolveAgentOperationPolicy('GET', '/v1/agent/identity')).toEqual(expect.objectContaining({
+      operationId: 'agent.identity.read', agentAllowed: true,
+    }));
+    expect(resolveAgentOperationPolicy('POST', '/api/v1/topics')).toEqual(expect.objectContaining({
+      operationId: 'knowledge.entry.create', requiredScope: 'entries:create',
+    }));
     expect(resolveAgentOperationPolicy('PUT', '/moderation/verdict-channel')).toEqual(expect.objectContaining({
       agentAllowed: false,
     }));

@@ -25,7 +25,12 @@ const policies = (operationPolicyData as AgentOperationPolicy[]).map((policy) =>
 export function resolveAgentOperationPolicy(method: string, path: string): AgentOperationPolicy | null {
   const requestMethod = String(method || '').toUpperCase();
   const normalizedMethod = requestMethod === 'HEAD' ? 'GET' : requestMethod;
-  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  const requestPath = path.startsWith('/') ? path : `/${path}`;
+  // Kraken leaves the version segment in req.path for /api/v1 while the
+  // compatibility API is already API-relative. Policies use one canonical form.
+  const normalizedPath = requestPath
+    .replace(/^\/api(?:\/v1)?(?=\/|$)/i, '')
+    .replace(/^\/v1(?=\/|$)/i, '') || '/';
   const match = policies.find((policy) => (
     (policy.method === '*' || policy.method === normalizedMethod) && policy.matcher.test(normalizedPath)
   ));
