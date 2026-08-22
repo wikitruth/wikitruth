@@ -13,6 +13,9 @@ Define the core runtime shape of Wikitruth.
 - `/app/*` remains a compatibility alias for modern routes.
 - `/api/v1/*` is the stable integration and agent contract; `/api/*` uses the same router tree as a compatibility alias.
 - Responses identify API version and stability, unsupported requested versions fail closed, and OpenAPI coverage is checked against every mounted controller operation.
+- Agent authorization is operation-based rather than inferred from broad route
+  prefixes. One operation-policy registry drives runtime enforcement,
+  capability discovery, OpenAPI scope metadata, and authorization tests.
 
 ## Request Pipeline Expectations
 

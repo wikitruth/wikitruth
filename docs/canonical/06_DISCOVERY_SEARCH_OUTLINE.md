@@ -34,6 +34,8 @@ Define how users discover and navigate knowledge graph content.
 - Link operations trigger children-count updates.
 - Link mutations require contributor onboarding and, for API clients, `graph:write` scope.
 - Link mutations validate visibility and relationship semantics and produce revision/audit evidence.
+- API clients may create governed graph relationships but cannot directly
+  delete graph links. Destructive graph changes remain human-reviewed.
 
 ## Routing Surface (Modern Client)
 

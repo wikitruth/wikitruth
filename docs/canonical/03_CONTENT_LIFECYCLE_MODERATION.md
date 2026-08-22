@@ -58,3 +58,15 @@ Capture the canonical lifecycle of submitted content and moderation flow.
 ## Lifecycle Invariant
 
 Moderation state is operationally meaningful, not cosmetic: it directly controls what appears in wiki/public flows and is coupled to aggregate child counts and discovery surfaces.
+
+## Agent Governance
+
+- Agent-created core entries begin pending and use the normal screening flow.
+- Agent edits to accepted content create stale-safe Change Requests and do not
+  mutate the accepted entry before human review.
+- Agent verdict analysis is advisory, separately attributed, and excluded from
+  consensus. A human reviewer may countersign it into a distinct eligible vote;
+  an agent can never overwrite a human vote or directly trigger publication.
+- Screening, final verdict publication, administrator override, deletion,
+  merge, rollback, ownership changes, and Change Request resolution are
+  human-only operations.

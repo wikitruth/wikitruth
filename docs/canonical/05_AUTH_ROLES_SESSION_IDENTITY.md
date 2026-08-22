@@ -96,6 +96,16 @@ Define the current authentication and role model.
 - Agent mutations accept bounded idempotency keys and attributable run metadata;
   retries return the original result rather than creating duplicate content.
 - Agent dry runs execute validation and duplicate checks without mutation.
+- Agent credentials use operation-specific scopes for knowledge reads, pending
+  creates, edit proposals, graph contributions, civic contributions,
+  moderation advice, translations, structured-debate participation, and run
+  observation. Legacy scope names may map only to their safe compatible subset.
+- Credential policies may further restrict tenant IDs, entry types, parent
+  roots, ownership, visibility, and source requirements. Policy restrictions
+  can only reduce the authority granted by scopes and the accountable user.
+- Unattended administrator credentials are not supported. Agent credentials
+  cannot manage users, roles, tenant membership/configuration, privacy actions,
+  backups, restores, or other human-assured system operations.
 
 ## Identity Invariant
 

@@ -21,6 +21,11 @@ Define the high-priority governance and integrity contract for the core platform
   and public evidence bundles.
 - Replay-safe agent mutations, dry-run validation, attributable agent runs, and
   scoped activity delivery.
+- Bounded asynchronous agent jobs, cursor-based delta consumption, generated
+  TypeScript/Python SDKs, and operation-level credential policy enforcement.
+- Pending agent translation suggestions and clearly labelled opt-in structured
+  debate contributions remain reviewable inputs, never popularity or automatic
+  verdict signals.
 
 ## Reliability and Operations Targets
 
