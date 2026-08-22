@@ -81,7 +81,11 @@ const EntryTranslationsPanelContent: React.FC<EntryTranslationsPanelProps> = ({ 
           <article lang={active.locale} className="well well-sm">
             <h3 style={{ marginTop: 5 }}>{active.title}</h3>
             <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(active.content) }} />
-            <small className="text-muted">Translation of revision {active.sourceRevisionNumber} by {active.createUsername || 'a contributor'}{active.stale ? '. The source has since changed.' : '.'}</small>
+            <small className="text-muted">
+              Translation of revision {active.sourceRevisionNumber} by {active.createUsername || 'a contributor'}
+              {active.authorshipType === 'agent' ? ` via ${active.agentAttribution?.clientName || 'a software agent'}` : ''}
+              {active.stale ? '. The source has since changed.' : '.'}
+            </small>
           </article>
         ) : null}
 
@@ -91,7 +95,9 @@ const EntryTranslationsPanelContent: React.FC<EntryTranslationsPanelProps> = ({ 
             <input className="form-control" aria-label="Translation review reason" value={reason} onChange={(event) => setReason(event.target.value)} style={{ margin: '8px 0' }} />
             {translations.filter((translation) => translation.status === 'pending').map((translation) => (
               <div key={translation._id} style={{ marginTop: 8 }}>
-                <span className="label label-warning">{translation.locale}</span> {translation.title} {translation.stale ? <span className="label label-danger">stale</span> : null}{' '}
+                <span className="label label-warning">{translation.locale}</span>{' '}
+                {translation.authorshipType === 'agent' ? <span className="label label-info">Agent suggestion</span> : null}{' '}
+                {translation.title} {translation.stale ? <span className="label label-danger">stale</span> : null}{' '}
                 <button type="button" className="btn btn-success btn-xs" disabled={loading || translation.stale} onClick={() => void review(translation, 'publish')}>Publish</button>{' '}
                 <button type="button" className="btn btn-default btn-xs" disabled={loading} onClick={() => void review(translation, 'reject')}>Reject</button>
               </div>

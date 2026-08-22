@@ -8,6 +8,8 @@ const factory: SchemaFactory = function (app, mongoose) {
     reason: { type: String, default: '' },
     actorUserId: { type: mongoose.Schema.ObjectId, ref: 'User', default: null },
     actorUsername: { type: String, default: '' },
+    authorshipType: { type: String, enum: ['human', 'agent'], default: 'human' },
+    apiClientName: { type: String, default: '' },
     date: { type: Date, default: Date.now },
   }, { _id: true });
   const schema = new mongoose.Schema({
@@ -26,6 +28,14 @@ const factory: SchemaFactory = function (app, mongoose) {
     createUsername: { type: String, default: '' },
     editUserId: { type: mongoose.Schema.ObjectId, ref: 'User', required: true },
     editUsername: { type: String, default: '' },
+    authorshipType: { type: String, enum: ['human', 'agent'], default: 'human', index: true },
+    apiClientId: { type: mongoose.Schema.ObjectId, ref: 'ApiClient', default: null, index: true },
+    apiClientName: { type: String, default: '' },
+    agentRunId: { type: String, default: '', index: true },
+    agentModel: { type: String, default: '' },
+    agentProvider: { type: String, default: '' },
+    agentPurpose: { type: String, default: '' },
+    agentSourceManifest: [{ type: mongoose.Schema.Types.Mixed }],
     reviewUserId: { type: mongoose.Schema.ObjectId, ref: 'User', default: null },
     reviewUsername: { type: String, default: '' },
     reviewReason: { type: String, default: '' },
@@ -35,6 +45,7 @@ const factory: SchemaFactory = function (app, mongoose) {
   });
   schema.index({ objectType: 1, objectId: 1, locale: 1 }, { unique: true });
   schema.index({ status: 1, editDate: -1 });
+  schema.index({ apiClientId: 1, agentRunId: 1, editDate: -1 });
   schema.set('autoIndex', true);
   app.db.model('EntryTranslation', schema);
 };

@@ -44,6 +44,22 @@ describe('StructuredDebateWorkspace', () => {
     expect(await axe(container)).toHaveNoViolations();
   });
 
+  it('labels software-agent contributions separately from the accountable participant', () => {
+    const debate = fixture();
+    debate.contributions[0] = {
+      ...debate.contributions[0], authorshipType: 'agent',
+      agentAttribution: { clientName: 'Debate research helper', runId: 'run-1', model: 'local', provider: 'local', purpose: '', sources: [] },
+    };
+    debate.audit.push({
+      kind: 'contribution', eventType: 'contribution_submitted', label: 'contribution submitted',
+      actor: 'public-supporter', occurredAt: '2026-08-05T01:00:00.000Z', authorshipType: 'agent',
+      agentAttribution: debate.contributions[0].agentAttribution,
+    });
+    render(<StructuredDebateWorkspace debate={debate} signedIn busy={false} {...callbacks} />);
+    expect(screen.getByText('Agent contribution')).toBeInTheDocument();
+    expect(screen.getByText(/via Debate research helper/i)).toBeInTheDocument();
+  });
+
   it('requires both explicit acknowledgements before joining', async () => {
     render(<StructuredDebateWorkspace debate={fixture()} signedIn busy={false} {...callbacks} />);
     const join = screen.getByRole('button', { name: /Join the supporting side/i });

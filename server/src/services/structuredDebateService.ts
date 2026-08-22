@@ -29,6 +29,7 @@ import {
 } from './structuredDebateAccess';
 import { StructuredDebateError } from './structuredDebateErrors';
 import { buildPublicStructuredDebate } from './structuredDebateProjection';
+import type { AgentAttributionFields } from './agentAttributionService';
 
 export { StructuredDebateError } from './structuredDebateErrors';
 export { buildPublicStructuredDebate } from './structuredDebateProjection';
@@ -351,6 +352,7 @@ export async function submitStructuredDebateContribution(input: {
   content: unknown;
   evidenceLinks: unknown;
   user: AuthUser;
+  attribution?: AgentAttributionFields;
 }): Promise<Record<string, unknown>> {
   const pilot = await pilotDocument(input.pilotId);
   if (pilot.status !== 'open') {
@@ -385,6 +387,10 @@ export async function submitStructuredDebateContribution(input: {
     throw new StructuredDebateError(400, 'DEBATE_EVIDENCE_REQUIRED', 'At least one public evidence link is required.');
   }
   try {
+    const attribution = input.attribution || {
+      authorshipType: 'human', apiClientId: null, apiClientName: '', agentRunId: '', agentModel: '',
+      agentProvider: '', agentPurpose: '', agentSourceManifest: [],
+    };
     await db.StructuredDebateContribution.create({
       pilotId: pilot._id,
       participantId: participant._id,
@@ -395,6 +401,7 @@ export async function submitStructuredDebateContribution(input: {
       contributionType: normalizeContributionType(input.contributionType),
       content,
       evidenceLinks,
+      ...attribution,
       revisionNumber: 1,
       createDate: new Date(),
       editDate: new Date(),

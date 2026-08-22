@@ -102,6 +102,14 @@ export interface StructuredDebateContributionRecord {
   contributionType: StructuredDebateContributionType;
   content: string;
   evidenceLinks: StructuredDebateEvidenceLink[];
+  authorshipType?: 'human' | 'agent';
+  apiClientId?: unknown;
+  apiClientName?: string;
+  agentRunId?: string;
+  agentModel?: string;
+  agentProvider?: string;
+  agentPurpose?: string;
+  agentSourceManifest?: Array<Record<string, string>>;
   revisionNumber: number;
   createDate: Date;
   editDate: Date;

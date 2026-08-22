@@ -17,6 +17,7 @@ import {
   structuredDebateUserId,
 } from './structuredDebateAccess';
 import { StructuredDebateError } from './structuredDebateErrors';
+import { publicAgentAttribution } from './agentAttributionService';
 
 type ProjectionModels = {
   StructuredDebatePilot: Model<StructuredDebatePilotRecord>;
@@ -80,6 +81,8 @@ export async function buildPublicStructuredDebate(
     ...contributions.map((contribution) => ({
       kind: 'contribution', eventType: 'contribution_submitted', label: 'contribution submitted',
       actor: contribution.publicUsername, stance: contribution.stance, phaseKey: contribution.phaseKey,
+      authorshipType: contribution.authorshipType === 'agent' ? 'agent' : 'human',
+      agentAttribution: publicAgentAttribution(contribution as unknown as Record<string, any>),
       contributionId: String(contribution._id), occurredAt: new Date(contribution.createDate).toISOString(),
     })),
   ].sort((left, right) => left.occurredAt.localeCompare(right.occurredAt));
@@ -116,6 +119,8 @@ export async function buildPublicStructuredDebate(
       publicUsername: contribution.publicUsername, stance: contribution.stance,
       phaseKey: contribution.phaseKey, contributionType: contribution.contributionType,
       content: contribution.content,
+      authorshipType: contribution.authorshipType === 'agent' ? 'agent' : 'human',
+      agentAttribution: publicAgentAttribution(contribution as unknown as Record<string, any>),
       evidenceLinks: contribution.evidenceLinks.map((link) => ({ url: link.url, label: link.label })),
       revisionNumber: contribution.revisionNumber,
       createDate: new Date(contribution.createDate).toISOString(), editDate: new Date(contribution.editDate).toISOString(),

@@ -53,6 +53,9 @@ function appFor(scopes: string[], policy: Record<string, unknown> = {}) {
   app.post('/outline/link', (_req, res) => res.status(201).json({ success: true }));
   app.put('/topics/links/:id', (_req, res) => res.json({ success: true }));
   app.delete('/topics/links/:id', (_req, res) => res.json({ success: true }));
+  app.post('/translations/:objectName/:id', (_req, res) => res.status(201).json({ success: true }));
+  app.post('/structured-debates/:id/contributions', (_req, res) => res.status(201).json({ success: true }));
+  app.post('/structured-debates/:id/join', (_req, res) => res.status(201).json({ success: true }));
   return app;
 }
 
@@ -140,6 +143,18 @@ describe('agent operation and credential policies', () => {
     await request(appFor(['graph:write'])).put('/topics/links/link-1').send({}).expect(403)
       .expect(({ body }) => expect(body.error.code).toBe('HUMAN_AUTHORITY_REQUIRED'));
     await request(appFor(['graph:write'])).delete('/topics/links/link-1').expect(403)
+      .expect(({ body }) => expect(body.error.code).toBe('HUMAN_AUTHORITY_REQUIRED'));
+  });
+
+  it('bounds translation entry types and keeps debate consent under human control', async () => {
+    const topicOnly = appFor(['translations:write'], { entryTypes: ['topic'] });
+    await request(topicOnly).post('/translations/artifact/artifact-1').send({}).expect(403)
+      .expect(({ body }) => expect(body.error.code).toBe('AGENT_ENTRY_TYPE_RESTRICTED'));
+    await request(topicOnly).post('/translations/topic/topic-1').send({}).expect(201);
+
+    const debateAgent = appFor(['debates:participate']);
+    await request(debateAgent).post('/structured-debates/pilot-1/contributions').send({}).expect(201);
+    await request(debateAgent).post('/structured-debates/pilot-1/join').send({}).expect(403)
       .expect(({ body }) => expect(body.error.code).toBe('HUMAN_AUTHORITY_REQUIRED'));
   });
 });

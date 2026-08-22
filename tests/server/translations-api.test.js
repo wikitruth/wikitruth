@@ -17,9 +17,14 @@ jest.mock('../../server/src/services/entryRevisionService', () => ({ ensureCurre
 jest.mock('../../server/src/services/entryEventsService', () => ({ logEntryEvent: (...args) => mockLogEntryEvent(...args) }));
 jest.mock('../../server/src/services/notificationsService', () => ({ notifySubscribers: jest.fn() }));
 
-function appFor(user) {
+function appFor(user, agent = null) {
   const app = express(); app.use(express.json());
-  app.use((req, _res, next) => { req.user = user; next(); });
+  app.use((req, _res, next) => {
+    req.user = user;
+    req.apiClient = agent;
+    req.agentRun = agent ? { runId: 'translate-run-1', model: 'local-translate-v1', provider: 'local', purpose: 'Translation suggestion', sourceManifest: [{ url: 'https://example.test/source' }] } : null;
+    next();
+  });
   const router = express.Router(); require('../../server/src/controllers/api/translations')(router);
   app.use('/api/translations', router); return app;
 }
@@ -48,5 +53,22 @@ describe('revision-linked translations api', () => {
     expect(mockFindOneAndUpdate).toHaveBeenCalledWith(expect.any(Object), expect.objectContaining({
       $set: expect.objectContaining({ sourceRevisionId: 'revision-2', sourceRevisionNumber: 2, status: 'pending' }),
     }), expect.objectContaining({ upsert: true }));
+  });
+
+  it('stores pending agent suggestions with accountable public attribution', async () => {
+    const user = { _id: 'user-1', username: 'translator', canPlayRoleOf: () => true };
+    const agent = { id: 'client-record-1', name: 'Translation helper' };
+    await request(appFor(user, agent)).post('/api/translations/topic/topic-1').send({
+      locale: 'fil', title: 'Isinaling pamagat', content: 'Ito ang sapat na mahabang salin ng nilalaman.',
+    }).expect(201);
+    expect(mockFindOneAndUpdate).toHaveBeenCalledWith(expect.any(Object), expect.objectContaining({
+      $set: expect.objectContaining({
+        status: 'pending', authorshipType: 'agent', apiClientId: 'client-record-1',
+        apiClientName: 'Translation helper', agentRunId: 'translate-run-1',
+      }),
+    }), expect.objectContaining({ upsert: true }));
+    expect(mockLogEntryEvent).toHaveBeenCalledWith(expect.objectContaining({
+      payload: expect.objectContaining({ authorshipType: 'agent', apiClientName: 'Translation helper' }),
+    }));
   });
 });

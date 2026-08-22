@@ -17,6 +17,15 @@ export type EntryTranslation = {
   createUsername?: string;
   reviewUsername?: string;
   reviewReason?: string;
+  authorshipType?: 'human' | 'agent';
+  agentAttribution?: {
+    clientName: string;
+    runId: string;
+    model: string;
+    provider: string;
+    purpose: string;
+    sources: Array<{ url: string; artifactId: string; checksum: string }>;
+  } | null;
 };
 
 export const translationsApi = {

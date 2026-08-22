@@ -218,6 +218,8 @@ describe('OpenAPI contract', function () {
       'PublicEvidenceBundle',
       'PublicEvidenceJsonLd',
       'EntryTranslationRequest',
+      'AgentPublicAttribution',
+      'StructuredDebateContributionRequest',
       'NotificationPreferences',
       'AgentValidationRequest',
     ].forEach((schemaName) => expect(schemas[schemaName]).toBeDefined());

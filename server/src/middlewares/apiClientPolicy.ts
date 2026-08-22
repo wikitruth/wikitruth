@@ -116,6 +116,11 @@ export async function enforceApiClientPolicy(
       return;
     }
   }
+  if (operation.mutationKind === 'translation') {
+    const translationTarget = /^\/translations\/(topic|argument|question|answer|artifact|issue|opinion)\/([^/]+)/i.exec(req.path);
+    entryType = translationTarget?.[1] || null;
+    entryId = translationTarget?.[2] || null;
+  }
   if (entryType && credentialPolicy.entryTypes.length
     && !credentialPolicy.entryTypes.includes(entryType as typeof credentialPolicy.entryTypes[number])) {
     fail(res, 'AGENT_ENTRY_TYPE_RESTRICTED', `This credential is not permitted to access ${entryType} entries.`);
@@ -145,7 +150,7 @@ export async function enforceApiClientPolicy(
     return;
   }
   if (credentialPolicy.sourceRequired
-    && ['create', 'propose_edit', 'moderation_advice', 'civic_create', 'civic_update'].includes(String(operation.mutationKind || ''))
+    && ['create', 'propose_edit', 'moderation_advice', 'civic_create', 'civic_update', 'translation'].includes(String(operation.mutationKind || ''))
     && !hasSource(req)) {
     fail(res, 'AGENT_SOURCE_REQUIRED', 'This credential requires a source reference or source manifest for content mutations.');
     return;

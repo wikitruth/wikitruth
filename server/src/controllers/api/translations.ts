@@ -7,6 +7,7 @@ import { ensureCurrentRevision } from '../../services/entryRevisionService';
 import { logEntryEvent } from '../../services/entryEventsService';
 import { notifySubscribers } from '../../services/notificationsService';
 import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
+import { agentAttributionFromRequest, publicAgentAttribution } from '../../services/agentAttributionService';
 
 const db = (appModForDb as unknown as { db: { models: Record<string, unknown> } }).db.models as {
   EntryTranslation: {
@@ -42,6 +43,17 @@ function locale(value: unknown): string {
   return /^[a-z]{2,3}(?:-[a-z0-9]{2,8})*$/.test(normalized) ? normalized : '';
 }
 
+function publicTranslation(item: Record<string, unknown>): Record<string, unknown> {
+  const value = { ...item };
+  delete value.apiClientId;
+  delete value.agentSourceManifest;
+  return {
+    ...value,
+    authorshipType: value.authorshipType === 'agent' ? 'agent' : 'human',
+    agentAttribution: publicAgentAttribution(item),
+  };
+}
+
 export = function attachTranslations(router: Router) {
   router.get('/:objectName/:id', async (req: WikitruthRequest, res: WikitruthResponse) => {
     const parsed = target(req, res); if (!parsed) return;
@@ -54,7 +66,7 @@ export = function attachTranslations(router: Router) {
       ensureCurrentRevision({ objectType: parsed.objectType, objectId: parsed.objectId }),
     ]);
     res.json({ success: true, currentRevision: { id: currentRevision._id, number: currentRevision.revisionNumber }, translations: translations.map((item) => ({
-      ...item, stale: String(item.sourceRevisionId || '') !== String(currentRevision._id || ''),
+      ...publicTranslation(item), stale: String(item.sourceRevisionId || '') !== String(currentRevision._id || ''),
     })) });
   });
 
@@ -69,10 +81,11 @@ export = function attachTranslations(router: Router) {
     }
     const currentRevision = await ensureCurrentRevision({ objectType: parsed.objectType, objectId: parsed.objectId });
     const existing = await db.EntryTranslation.findOne({ objectType: parsed.objectType, objectId: parsed.objectId, locale: language });
-    if (existing && String(existing.createUserId || '') !== actorId(req) && !req.user.canPlayRoleOf?.('admin')) {
+    if (existing && String(existing.createUserId || '') !== actorId(req) && (req.apiClient || !req.user.canPlayRoleOf?.('admin'))) {
       res.status(403).json({ success: false, message: 'Only the translator or an administrator may update this variant' }); return;
     }
     const now = new Date();
+    const attribution = agentAttributionFromRequest(req);
     const translation = await db.EntryTranslation.findOneAndUpdate(
       { objectType: parsed.objectType, objectId: parsed.objectId, locale: language },
       {
@@ -80,17 +93,18 @@ export = function attachTranslations(router: Router) {
           ...parsed, locale: language, title, content, contentPreview: content.slice(0, 240),
           sourceRevisionId: currentRevision._id, sourceRevisionNumber: currentRevision.revisionNumber,
           status: 'pending', editUserId: actorId(req), editUsername: req.user.username || '', editDate: now,
+          ...attribution,
           reviewUserId: null, reviewUsername: '', reviewReason: '', reviewDate: null,
         },
         $setOnInsert: { createUserId: actorId(req), createUsername: req.user.username || '', createDate: now },
-        $push: { history: { action: existing ? 'updated' : 'submitted', actorUserId: actorId(req), actorUsername: req.user.username || '', date: now } },
+        $push: { history: { action: existing ? 'updated' : 'submitted', actorUserId: actorId(req), actorUsername: req.user.username || '', authorshipType: attribution.authorshipType, apiClientName: attribution.apiClientName, date: now } },
       },
       { upsert: true, new: true, setDefaultsOnInsert: true },
     ).lean();
     await logEntryEvent({
       eventType: 'translation.submitted', objectType: parsed.objectType, objectName: parsed.objectName, objectId: parsed.objectId,
       actorUserId: actorId(req), actorUsername: String(req.user.username || ''), message: `${language} translation submitted`,
-      payload: { translationId: translation._id, locale: language, sourceRevisionId: currentRevision._id },
+      payload: { translationId: translation._id, locale: language, sourceRevisionId: currentRevision._id, authorshipType: attribution.authorshipType, apiClientName: attribution.apiClientName, agentRunId: attribution.agentRunId },
     });
     res.status(existing ? 200 : 201).json({ success: true, translation });
   });

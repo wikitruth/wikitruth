@@ -42,4 +42,16 @@ describe('EntryTranslationsPanel', () => {
     await user.click(screen.getByRole('button', { name: /Submit for review/i }));
     await waitFor(() => expect(mockedApi.submit).toHaveBeenCalledWith('topic', 'entry-1', expect.objectContaining({ locale: 'es' })));
   });
+
+  it('labels pending software-agent translation suggestions for reviewers', async () => {
+    mockedAuth.mockReturnValue({ user: { _id: 'reviewer-1', username: 'reviewer', roles: { reviewer: true } } } as ReturnType<typeof useAuth>);
+    mockedApi.list.mockResolvedValue({ success: true, currentRevision: { id: 'r2', number: 2 }, translations: [{
+      _id: 't-agent', objectName: 'topic', objectId: 'entry-1', locale: 'fil', title: 'Agent draft', content: 'Pending translated content.',
+      sourceRevisionId: 'r2', sourceRevisionNumber: 2, status: 'pending', createUsername: 'accountable-translator',
+      authorshipType: 'agent', agentAttribution: { clientName: 'Translation helper', runId: 'run-1', model: 'local', provider: 'local', purpose: '', sources: [] },
+    }] });
+    render(<EntryTranslationsPanel objectName="topic" objectId="entry-1" originalTitle="Title" originalContent="Content" />);
+    expect(await screen.findByText('Agent suggestion')).toBeInTheDocument();
+    expect(screen.getByText('Agent draft')).toBeInTheDocument();
+  });
 });

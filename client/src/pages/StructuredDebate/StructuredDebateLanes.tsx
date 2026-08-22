@@ -24,7 +24,15 @@ const ContributionCard: React.FC<{ contribution: StructuredDebateContribution }>
   <article className={`wt-debate-contribution ${contribution.stance}`}>
     <header>
       <span className="wt-debate-avatar" aria-hidden="true">{contribution.publicUsername.charAt(0).toUpperCase()}</span>
-      <span><strong>{contribution.publicUsername}</strong><small>{contribution.contributionType} · {contribution.phaseKey}</small></span>
+      <span>
+        <strong>{contribution.publicUsername}</strong>
+        <small>{contribution.contributionType} · {contribution.phaseKey}</small>
+        {contribution.authorshipType === 'agent' ? (
+          <span className="wt-debate-agent-label" title={`Submitted by ${contribution.agentAttribution?.clientName || 'a software agent'} for this accountable participant`}>
+            <i className="fa fa-cog" aria-hidden="true"></i> Agent contribution
+          </span>
+        ) : null}
+      </span>
       <time dateTime={contribution.createDate}>{formatDate(contribution.createDate)}</time>
     </header>
     <p>{contribution.content}</p>
@@ -61,7 +69,7 @@ const AuditItem: React.FC<{ event: StructuredDebateAuditEvent }> = ({ event }) =
     <span className="wt-debate-audit-dot" aria-hidden="true"></span>
     <div>
       <strong>{event.label}</strong>
-      <span>{event.actor}{event.stance ? ` · ${event.stance}` : ''}{event.publicReason ? ` · ${event.publicReason}` : ''}</span>
+      <span>{event.actor}{event.authorshipType === 'agent' ? ` via ${event.agentAttribution?.clientName || 'software agent'}` : ''}{event.stance ? ` · ${event.stance}` : ''}{event.publicReason ? ` · ${event.publicReason}` : ''}</span>
       <time dateTime={event.occurredAt}>{formatDate(event.occurredAt)}</time>
     </div>
   </li>

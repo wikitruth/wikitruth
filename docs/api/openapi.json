@@ -980,9 +980,6 @@
           }
         ],
         "x-agent-allowed": true,
-        "x-agent-operation-id": "knowledge.entry.create",
-        "x-required-agent-scope": "entries:create",
-        "x-agent-mutation-kind": "create",
         "parameters": [
           {
             "name": "X-Agent-Run-Id",
@@ -1016,7 +1013,10 @@
               "maxLength": 50000
             }
           }
-        ]
+        ],
+        "x-agent-operation-id": "knowledge.entry.create",
+        "x-required-agent-scope": "entries:create",
+        "x-agent-mutation-kind": "create"
       },
       "get": {
         "summary": "List answers",
@@ -1186,9 +1186,6 @@
           }
         ],
         "x-agent-allowed": true,
-        "x-agent-operation-id": "knowledge.entry.create",
-        "x-required-agent-scope": "entries:create",
-        "x-agent-mutation-kind": "create",
         "parameters": [
           {
             "name": "X-Agent-Run-Id",
@@ -1222,7 +1219,10 @@
               "maxLength": 50000
             }
           }
-        ]
+        ],
+        "x-agent-operation-id": "knowledge.entry.create",
+        "x-required-agent-scope": "entries:create",
+        "x-agent-mutation-kind": "create"
       },
       "get": {
         "summary": "List arguments",
@@ -1409,9 +1409,6 @@
           }
         ],
         "x-agent-allowed": true,
-        "x-agent-operation-id": "knowledge.entry.create",
-        "x-required-agent-scope": "entries:create",
-        "x-agent-mutation-kind": "create",
         "parameters": [
           {
             "name": "X-Agent-Run-Id",
@@ -1445,7 +1442,10 @@
               "maxLength": 50000
             }
           }
-        ]
+        ],
+        "x-agent-operation-id": "knowledge.entry.create",
+        "x-required-agent-scope": "entries:create",
+        "x-agent-mutation-kind": "create"
       },
       "get": {
         "summary": "List artifacts",
@@ -2172,9 +2172,6 @@
           }
         ],
         "x-agent-allowed": true,
-        "x-agent-operation-id": "knowledge.entry.create",
-        "x-required-agent-scope": "entries:create",
-        "x-agent-mutation-kind": "create",
         "parameters": [
           {
             "name": "X-Agent-Run-Id",
@@ -2208,7 +2205,10 @@
               "maxLength": 50000
             }
           }
-        ]
+        ],
+        "x-agent-operation-id": "knowledge.entry.create",
+        "x-required-agent-scope": "entries:create",
+        "x-agent-mutation-kind": "create"
       },
       "get": {
         "summary": "List issues",
@@ -2707,9 +2707,6 @@
           }
         ],
         "x-agent-allowed": true,
-        "x-agent-operation-id": "knowledge.entry.create",
-        "x-required-agent-scope": "entries:create",
-        "x-agent-mutation-kind": "create",
         "parameters": [
           {
             "name": "X-Agent-Run-Id",
@@ -2743,7 +2740,10 @@
               "maxLength": 50000
             }
           }
-        ]
+        ],
+        "x-agent-operation-id": "knowledge.entry.create",
+        "x-required-agent-scope": "entries:create",
+        "x-agent-mutation-kind": "create"
       },
       "get": {
         "summary": "List opinions",
@@ -2913,9 +2913,6 @@
           }
         ],
         "x-agent-allowed": true,
-        "x-agent-operation-id": "knowledge.entry.create",
-        "x-required-agent-scope": "entries:create",
-        "x-agent-mutation-kind": "create",
         "parameters": [
           {
             "name": "X-Agent-Run-Id",
@@ -2949,7 +2946,10 @@
               "maxLength": 50000
             }
           }
-        ]
+        ],
+        "x-agent-operation-id": "knowledge.entry.create",
+        "x-required-agent-scope": "entries:create",
+        "x-agent-mutation-kind": "create"
       },
       "get": {
         "summary": "List questions",
@@ -3436,9 +3436,6 @@
           }
         ],
         "x-agent-allowed": true,
-        "x-agent-operation-id": "knowledge.entry.create",
-        "x-required-agent-scope": "entries:create",
-        "x-agent-mutation-kind": "create",
         "parameters": [
           {
             "name": "X-Agent-Run-Id",
@@ -3472,7 +3469,10 @@
               "maxLength": 50000
             }
           }
-        ]
+        ],
+        "x-agent-operation-id": "knowledge.entry.create",
+        "x-required-agent-scope": "entries:create",
+        "x-agent-mutation-kind": "create"
       },
       "get": {
         "summary": "List topics",
@@ -4249,9 +4249,6 @@
             "AgentBearerAuth": []
           }
         ],
-        "x-agent-operation-id": "moderation.change-request.create",
-        "x-required-agent-scope": "entries:propose-edit",
-        "x-agent-mutation-kind": "propose_edit",
         "parameters": [
           {
             "name": "X-Agent-Run-Id",
@@ -4294,7 +4291,10 @@
               "type": "string"
             }
           }
-        ]
+        ],
+        "x-agent-operation-id": "moderation.change-request.create",
+        "x-required-agent-scope": "entries:propose-edit",
+        "x-agent-mutation-kind": "propose_edit"
       }
     },
     "/moderation/change-requests/{id}": {
@@ -5565,10 +5565,6 @@
           }
         ],
         "x-agent-allowed": true,
-        "x-agent-operation-id": "civic.record.create",
-        "x-required-agent-scope": "civic:contribute",
-        "x-agent-mutation-kind": "civic_create",
-        "x-agent-tenant-scoped": true,
         "parameters": [
           {
             "name": "X-Agent-Run-Id",
@@ -5602,7 +5598,11 @@
               "maxLength": 50000
             }
           }
-        ]
+        ],
+        "x-agent-operation-id": "civic.record.create",
+        "x-required-agent-scope": "civic:contribute",
+        "x-agent-mutation-kind": "civic_create",
+        "x-agent-tenant-scoped": true
       }
     },
     "/civic/records/{id}": {
@@ -8372,9 +8372,6 @@
             "AgentBearerAuth": []
           }
         ],
-        "x-agent-operation-id": "moderation.signal.create",
-        "x-required-agent-scope": "moderation:advise",
-        "x-agent-mutation-kind": "moderation_advice",
         "parameters": [
           {
             "name": "X-Agent-Run-Id",
@@ -8408,7 +8405,10 @@
               "maxLength": 50000
             }
           }
-        ]
+        ],
+        "x-agent-operation-id": "moderation.signal.create",
+        "x-required-agent-scope": "moderation:advise",
+        "x-agent-mutation-kind": "moderation_advice"
       },
       "get": {
         "operationId": "getModerationSignals",
@@ -8532,9 +8532,6 @@
             "AgentBearerAuth": []
           }
         ],
-        "x-agent-operation-id": "moderation.appeal.create",
-        "x-required-agent-scope": "moderation:advise",
-        "x-agent-mutation-kind": "moderation_advice",
         "parameters": [
           {
             "name": "X-Agent-Run-Id",
@@ -8568,7 +8565,10 @@
               "maxLength": 50000
             }
           }
-        ]
+        ],
+        "x-agent-operation-id": "moderation.appeal.create",
+        "x-required-agent-scope": "moderation:advise",
+        "x-agent-mutation-kind": "moderation_advice"
       },
       "get": {
         "operationId": "getModerationAppeals",
@@ -8769,9 +8769,6 @@
           }
         ],
         "x-agent-allowed": true,
-        "x-agent-operation-id": "knowledge.graph.create",
-        "x-required-agent-scope": "graph:write",
-        "x-agent-mutation-kind": "graph_create",
         "parameters": [
           {
             "name": "X-Agent-Run-Id",
@@ -8805,7 +8802,10 @@
               "maxLength": 50000
             }
           }
-        ]
+        ],
+        "x-agent-operation-id": "knowledge.graph.create",
+        "x-required-agent-scope": "graph:write",
+        "x-agent-mutation-kind": "graph_create"
       }
     },
     "/monitoring/csp": {
@@ -13510,7 +13510,7 @@
     "/structured-debates/{id}/contributions": {
       "post": {
         "operationId": "postStructuredDebatesIdContributions",
-        "summary": "POST /structured-debates/{id}/contributions",
+        "summary": "Submit a labelled contribution for an already-consented participant",
         "parameters": [
           {
             "name": "id",
@@ -13554,11 +13554,11 @@
           }
         ],
         "requestBody": {
-          "required": false,
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/GenericMutationRequest"
+                "$ref": "#/components/schemas/StructuredDebateContributionRequest"
               }
             }
           }
@@ -13592,6 +13592,7 @@
             "AgentBearerAuth": []
           }
         ],
+        "description": "Agent credentials may contribute only through their accountable user when that user already joined the pilot. Agent authorship is public and has no verdict impact.",
         "x-agent-operation-id": "debate.contribute",
         "x-required-agent-scope": "debates:participate",
         "x-agent-mutation-kind": "debate_contribution"
@@ -13692,9 +13693,6 @@
             "AgentBearerAuth": []
           }
         ],
-        "x-agent-operation-id": "moderation.verdict-advice.create",
-        "x-required-agent-scope": "moderation:advise",
-        "x-agent-mutation-kind": "moderation_advice",
         "parameters": [
           {
             "name": "X-Agent-Run-Id",
@@ -13728,7 +13726,10 @@
               "maxLength": 50000
             }
           }
-        ]
+        ],
+        "x-agent-operation-id": "moderation.verdict-advice.create",
+        "x-required-agent-scope": "moderation:advise",
+        "x-agent-mutation-kind": "moderation_advice"
       },
       "get": {
         "operationId": "getModerationVerdictAdvice",
@@ -16644,6 +16645,94 @@
           "nextCursor": {
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "AgentPublicAttribution": {
+        "type": "object",
+        "required": [
+          "clientName",
+          "runId"
+        ],
+        "properties": {
+          "clientName": {
+            "type": "string"
+          },
+          "runId": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string"
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "artifactId": {
+                  "type": "string"
+                },
+                "checksum": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "StructuredDebateContributionRequest": {
+        "type": "object",
+        "required": [
+          "contributionType",
+          "content",
+          "evidenceLinks"
+        ],
+        "properties": {
+          "contributionType": {
+            "type": "string",
+            "enum": [
+              "argument",
+              "evidence",
+              "response",
+              "clarification",
+              "closing"
+            ]
+          },
+          "content": {
+            "type": "string",
+            "minLength": 40,
+            "maxLength": 2000
+          },
+          "evidenceLinks": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 5,
+            "items": {
+              "type": "object",
+              "required": [
+                "url"
+              ],
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "format": "uri"
+                },
+                "label": {
+                  "type": "string",
+                  "maxLength": 160
+                }
+              }
+            }
           }
         }
       }

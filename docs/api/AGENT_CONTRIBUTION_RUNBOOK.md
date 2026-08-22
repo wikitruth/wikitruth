@@ -122,6 +122,21 @@ review, transition, and lifecycle authority remain human-only.
 human votes. Advice is visibly agent-authored and has no consensus weight until
 an authorized human explicitly countersigns it against the same revision.
 
+## Translation And Structured Debate
+
+`translations:write` submits a locale variant against the current immutable
+entry revision. Agent translations always return to `pending`, retain the
+accountable translator and run attribution, and require human publication.
+Credentials cannot overwrite another translator's variant merely because the
+accountable user is an administrator.
+
+`debates:participate` permits `POST /structured-debates/{id}/contributions` only.
+The accountable user must already have joined personally with versioned consent
+and public-attribution acceptance. Agents cannot create, join, withdraw, or
+facilitate a pilot. Their labelled contribution consumes the participant's
+normal turn and phase allowance, remains in the public audit trail, and has no
+automatic verdict impact.
+
 ## SDKs
 
 Repository clients are available under `sdks/typescript` and `sdks/python`.

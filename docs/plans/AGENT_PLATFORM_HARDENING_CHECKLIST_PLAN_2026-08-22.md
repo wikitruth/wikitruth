@@ -79,8 +79,8 @@ administrator or truth authority.
 - [x] Generate TypeScript and Python SDKs with retries, headers, cursor helpers,
       dry runs, jobs, and event support.
 - [x] Correct the agent runbook and provide end-to-end examples.
-- [ ] Enable pending translation suggestions by agents.
-- [ ] Enable clearly labelled structured-debate contributions by agents only for
+- [x] Enable pending translation suggestions by agents.
+- [x] Enable clearly labelled structured-debate contributions by agents only for
       an accountable participant and never as automatic verdict input.
 
 ## 7. Verification And Closure

@@ -92,6 +92,7 @@
 .wt-debate-contribution.challenges .wt-debate-avatar { background: var(--wt-debate-challenge); }
 .wt-debate-contribution header strong, .wt-debate-contribution header small { display: block; }
 .wt-debate-contribution header small, .wt-debate-contribution time { color: var(--wt-text-muted); font-size: 11px; }
+.wt-debate-agent-label { display: inline-flex; gap: 4px; align-items: center; width: max-content; margin-top: 5px; padding: 2px 6px; border: 1px solid color-mix(in srgb, var(--wt-brand-primary) 35%, var(--wt-border)); border-radius: 10px; color: var(--wt-brand-primary); background: color-mix(in srgb, var(--wt-brand-primary) 8%, var(--wt-surface)); font-size: 10px; font-weight: 700; }
 .wt-debate-contribution p { margin: 12px 0; line-height: 1.5; white-space: pre-wrap; }
 .wt-debate-evidence { margin: 0; padding: 9px 0 0; border-top: 1px solid var(--wt-border); list-style: none; font-size: 12px; }
 .wt-debate-evidence li + li { margin-top: 5px; }

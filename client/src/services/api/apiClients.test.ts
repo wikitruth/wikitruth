@@ -12,7 +12,7 @@ describe('apiClientsApi', () => {
       policy: { tenantIds: [], entryTypes: ['topic'] as const, parentRootIds: [], ownContentOnly: true, maxVisibility: 'public_only' as const, sourceRequired: true, maxBatchSize: 10 },
       expiresAt: null, rateLimitPerMinute: 60,
     };
-    await apiClientsApi.create({ ...payload, scopes: [...payload.scopes] });
+    await apiClientsApi.create({ ...payload, scopes: [...payload.scopes], policy: { ...payload.policy, entryTypes: [...payload.policy.entryTypes] } });
     expect(fetchMock).toHaveBeenCalledWith('/api/admin/api-clients', expect.objectContaining({
       method: 'POST',
       headers: expect.objectContaining({ 'x-csrf-token': 'agent-csrf' }),

@@ -180,6 +180,11 @@ describe('opt-in structured-debate service', () => {
       content: 'This is a sufficiently detailed opening contribution supported by public evidence.',
       evidenceLinks: [{ url: 'https://example.org/support', label: 'Supporting source' }],
       user: supporter,
+      attribution: {
+        authorshipType: 'agent', apiClientId: 'client-record-1', apiClientName: 'Debate research helper',
+        agentRunId: 'debate-run-1', agentModel: 'local-research-v1', agentProvider: 'local',
+        agentPurpose: 'Participant-approved evidence drafting', agentSourceManifest: [{ url: 'https://example.org/support' }],
+      },
     });
     await expect(service.submitStructuredDebateContribution({
       pilotId: PILOT_ID,
@@ -211,6 +216,14 @@ describe('opt-in structured-debate service', () => {
     const closed = await service.transitionStructuredDebate({ pilotId: PILOT_ID, action: 'close', user: facilitator });
     expect(closed.status).toBe('closed');
     expect(closed.contributions).toHaveLength(2);
+    expect(closed.contributions[0]).toEqual(expect.objectContaining({
+      authorshipType: 'agent',
+      agentAttribution: expect.objectContaining({ clientName: 'Debate research helper', runId: 'debate-run-1' }),
+    }));
+    expect(closed.audit).toEqual(expect.arrayContaining([
+      expect.objectContaining({ eventType: 'contribution_submitted', authorshipType: 'agent' }),
+    ]));
+    expect(JSON.stringify(closed)).not.toContain('client-record-1');
     await expect(service.submitStructuredDebateContribution({
       pilotId: PILOT_ID,
       contributionType: 'closing',

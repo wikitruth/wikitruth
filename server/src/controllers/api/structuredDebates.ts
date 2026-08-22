@@ -13,6 +13,7 @@ import {
   transitionStructuredDebate,
   withdrawStructuredDebate,
 } from '../../services/structuredDebateService';
+import { agentAttributionFromRequest } from '../../services/agentAttributionService';
 
 function authenticatedUser(req: WikitruthRequest): AuthUser {
   if (!req.user) {
@@ -112,6 +113,7 @@ export = function (router: Router) {
         content: req.body?.content,
         evidenceLinks: req.body?.evidenceLinks,
         user: authenticatedUser(req),
+        attribution: agentAttributionFromRequest(req),
       });
       res.status(201).json({ success: true, debate });
     } catch (error) {

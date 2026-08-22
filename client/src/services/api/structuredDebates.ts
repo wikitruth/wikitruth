@@ -37,6 +37,15 @@ export interface StructuredDebateContribution {
   phaseKey: StructuredDebatePhaseKey;
   contributionType: StructuredDebateContributionType;
   content: string;
+  authorshipType?: 'human' | 'agent';
+  agentAttribution?: {
+    clientName: string;
+    runId: string;
+    model: string;
+    provider: string;
+    purpose: string;
+    sources: Array<{ url: string; artifactId: string; checksum: string }>;
+  } | null;
   evidenceLinks: Array<{ url: string; label: string }>;
   revisionNumber: number;
   createDate: string;
@@ -57,6 +66,8 @@ export interface StructuredDebateAuditEvent {
   phaseKey?: StructuredDebatePhaseKey;
   publicReason?: string;
   contributionId?: string;
+  authorshipType?: 'human' | 'agent';
+  agentAttribution?: StructuredDebateContribution['agentAttribution'];
 }
 
 export interface StructuredDebate {
