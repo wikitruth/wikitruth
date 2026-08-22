@@ -25,7 +25,7 @@ const groups = [
     'authSessionRoutes.ts',
   ]], ['/contact', ['contact.ts']],
   ['/admin', ['admin.ts', 'adminCollectionRoutes.ts', 'adminBackupRoutes.ts', 'adminApiClientRoutes.ts', 'adminOperationalRoutes.ts', 'adminPrivacyRoutes.ts']],
-  ['/moderation', ['moderation.ts', 'moderationArtifactRoutes.ts', 'moderationDuplicateRoutes.ts', 'moderationIssueRoutes.ts', 'moderationRevisionRoutes.ts', 'moderationSignalsRoutes.ts', 'moderationVerdictChannelRoutes.ts']],
+  ['/moderation', ['moderation.ts', 'moderationArtifactRoutes.ts', 'moderationDuplicateRoutes.ts', 'moderationIssueRoutes.ts', 'moderationRevisionRoutes.ts', 'moderationSignalsRoutes.ts', 'moderationVerdictAdviceRoutes.ts', 'moderationVerdictChannelRoutes.ts']],
   ['/outline', ['outline.ts']], ['/monitoring', ['monitoring.ts']], ['/realtime', ['realtime.ts']],
   ['/reactions', ['reactions.ts']], ['/notifications', ['notifications.ts']], ['/timeline', ['timeline.ts']],
   ['/install', ['install.ts']], ['/pages', ['pages.ts']], ['/anonymous-contributions', ['anonymousContributions.ts']],
