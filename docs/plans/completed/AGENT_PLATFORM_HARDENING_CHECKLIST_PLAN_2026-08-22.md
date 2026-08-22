@@ -90,14 +90,37 @@ administrator or truth authority.
 - [x] Add advisory-vote, countersign, civic boundary, graph boundary,
       translation, debate, job, rate-limit, and SDK contract tests.
 - [x] Run focused server and client suites after each implementation group.
-- [ ] Run full server/client tests, lint, type checks, source guardrails,
+- [x] Run full server/client tests, lint, type checks, source guardrails,
       OpenAPI checks, and production builds.
-- [ ] Run browser acceptance for credential policy management at desktop and
+- [x] Run browser acceptance for credential policy management at desktop and
       390 px mobile widths.
-- [ ] Perform a separate closure pass, reconcile this checklist, and move it to
+- [x] Perform a separate closure pass, reconcile this checklist, and move it to
       `docs/plans/completed/` only when no item remains pending or deferred.
+
+## Verification Evidence
+
+- Full server suite: 127 suites and 516 tests passed.
+- Full client suite: 132 suites and 412 tests passed. Two integration tests that
+  timed out during the concurrent validation sweep passed alone and in the
+  subsequent unloaded full run.
+- ESLint completed with zero errors and six pre-existing test warnings; modern
+  and legacy TypeScript checks passed.
+- Type-suppression, `any`, CommonJS, file-size, server-path, mixed-import, and
+  legacy-isolation guardrails passed.
+- OpenAPI coverage passed for 322 mounted operations; the TypeScript SDK built
+  and both Python SDK tests passed.
+- Production server and client builds passed.
+- Disposable Chrome acceptance passed at 1280 x 800 and 390 x 844 for admin
+  login, local passkey assurance, credential creation, bearer authentication,
+  usage review, rotation, old-secret invalidation, mobile layout, revocation,
+  and current-secret invalidation.
+- Browser evidence is under
+  `docs/qa/artifacts/agent-browser-disposable-2026-08-22/`. It reports no console
+  errors, no retained raw token, and zero mutable fixture residue. The only
+  warnings are expected script-fetch certificate warnings from local HTTPS.
 
 ## Status
 
-`in_progress` - approved by the repository owner on 2026-08-22; implementation
-is local/develop work only and is not authorized for production deployment.
+`completed` - formally verified on 2026-08-22 with no pending or deferred plan
+items. Implementation and acceptance remained local/develop only; no production
+or VPS deployment was performed or authorized.
