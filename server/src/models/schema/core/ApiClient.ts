@@ -12,8 +12,22 @@ const factory: SchemaFactory = function (app, mongoose) {
     secretHash: { type: String, required: true, select: false },
     scopes: [{
       type: String,
-      enum: ['entries:read', 'contributions:write', 'graph:write', 'civic:write', 'moderation:write', 'admin:write'],
+      enum: [
+        'entries:read', 'entries:create', 'entries:propose-edit', 'contributions:write',
+        'graph:write', 'civic:read', 'civic:contribute', 'civic:write',
+        'moderation:advise', 'moderation:write', 'translations:write',
+        'debates:participate', 'agent:runs:read',
+      ],
     }],
+    policy: {
+      tenantIds: [{ type: String }],
+      entryTypes: [{ type: String, enum: ['topic', 'argument', 'question', 'answer', 'artifact', 'issue', 'opinion'] }],
+      parentRootIds: [{ type: mongoose.Schema.ObjectId }],
+      ownContentOnly: { type: Boolean, default: true },
+      maxVisibility: { type: String, enum: ['public_only', 'owned_private'], default: 'public_only' },
+      sourceRequired: { type: Boolean, default: false },
+      maxBatchSize: { type: Number, min: 1, max: 100, default: 25 },
+    },
     status: { type: String, enum: ['active', 'revoked'], default: 'active', required: true, index: true },
     expiresAt: { type: Date, default: null, index: true },
     rateLimitPerMinute: { type: Number, min: 10, max: 600, default: 60 },

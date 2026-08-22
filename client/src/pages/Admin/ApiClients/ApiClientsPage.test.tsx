@@ -24,6 +24,7 @@ describe('ApiClientsPage', () => {
       client: {
         id: 'client-1', clientId: '1234567890abcdef12345678', name: 'Research agent', description: '',
         userId: 'user-1', tokenPrefix: 'wt_agent_prefix', scopes: ['entries:read'], status: 'active',
+        policy: { tenantIds: [], entryTypes: ['topic'], parentRootIds: [], ownContentOnly: true, maxVisibility: 'public_only', sourceRequired: false, maxBatchSize: 25 },
         expiresAt: null, rateLimitPerMinute: 60, requestCount: 0,
       },
     });
@@ -36,7 +37,8 @@ describe('ApiClientsPage', () => {
     await user.type(screen.getByLabelText(/agent name/i), 'Research agent');
     await user.click(screen.getByRole('button', { name: /create agent credential/i }));
     await waitFor(() => expect(api.create).toHaveBeenCalledWith(expect.objectContaining({
-      name: 'Research agent', userId: 'user-1', scopes: ['entries:read', 'contributions:write'], rateLimitPerMinute: 60,
+      name: 'Research agent', userId: 'user-1', scopes: ['entries:read', 'entries:create'], rateLimitPerMinute: 60,
+      policy: expect.objectContaining({ ownContentOnly: true, maxVisibility: 'public_only', maxBatchSize: 25 }),
     })));
     expect(await screen.findByLabelText(/one-time agent token/i)).toHaveValue('wt_agent_1234567890abcdef12345678.one-time-secret');
     expect(screen.getByText(/will not be shown again/i)).toBeInTheDocument();

@@ -8,7 +8,8 @@ describe('apiClientsApi', () => {
     const fetchMock = jest.fn().mockResolvedValue({ ok: true, json: async () => ({ success: true, token: 'once' }) });
     globalThis.fetch = fetchMock as unknown as typeof fetch;
     const payload = {
-      name: 'Research agent', userId: 'user-1', scopes: ['entries:read', 'contributions:write'] as const,
+      name: 'Research agent', userId: 'user-1', scopes: ['entries:read', 'entries:create'] as const,
+      policy: { tenantIds: [], entryTypes: ['topic'] as const, parentRootIds: [], ownContentOnly: true, maxVisibility: 'public_only' as const, sourceRequired: true, maxBatchSize: 10 },
       expiresAt: null, rateLimitPerMinute: 60,
     };
     await apiClientsApi.create({ ...payload, scopes: [...payload.scopes] });

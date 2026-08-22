@@ -45,6 +45,7 @@ import attachTransparency from './transparency';
 import attachStructuredDebates from './structuredDebates';
 import { apiVersionPolicy } from '../../middlewares/apiVersionPolicy';
 import { enforceAgentMutationReliability } from '../../middlewares/agentMutationReliability';
+import { enforceApiClientPolicy } from '../../middlewares/apiClientPolicy';
 
 export = function (router: Router) {
   router.use(apiVersionPolicy);
@@ -52,6 +53,7 @@ export = function (router: Router) {
   router.use(mobileContracts.mobileApiContractMiddleware);
   router.use(sanitizeContentMiddleware);
   router.use(enforceApiClientScope);
+  router.use(enforceApiClientPolicy);
   router.use(enforceAgentMutationReliability);
 
   const homeRouter = apiError.wrapAsyncRouter(express.Router()) as Router;

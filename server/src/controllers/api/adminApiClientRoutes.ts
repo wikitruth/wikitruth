@@ -7,6 +7,7 @@ import constants from '../../models/constants';
 import { logEntryEvent } from '../../services/entryEventsService';
 import {
   generateApiClientToken,
+  normalizeApiClientPolicy,
   normalizeApiClientScopes,
   toApiClientIdentity,
 } from '../../services/apiClientService';
@@ -77,7 +78,8 @@ export function registerAdminApiClientRoutes(router: Router, ensureAdmin: Ensure
     const name = String(req.body?.name || '').trim();
     const description = String(req.body?.description || '').trim();
     const userId = String(req.body?.userId || '').trim();
-    const scopes = normalizeApiClientScopes(req.body?.scopes, { allowAdmin: process.env.ALLOW_AGENT_ADMIN_SCOPE === 'true' });
+    const scopes = normalizeApiClientScopes(req.body?.scopes);
+    const policy = normalizeApiClientPolicy(req.body?.policy);
     const expiresAt = expiry(req.body?.expiresAt);
     const rateLimitPerMinute = Math.max(10, Math.min(600, Number(req.body?.rateLimitPerMinute || 60)));
     if (name.length < 3 || !userId || !scopes.length) {
@@ -103,6 +105,7 @@ export function registerAdminApiClientRoutes(router: Router, ensureAdmin: Ensure
       tokenPrefix: credential.tokenPrefix,
       secretHash: credential.secretHash,
       scopes,
+      policy,
       status: 'active',
       expiresAt: expiresAt || null,
       rateLimitPerMinute,
@@ -112,7 +115,7 @@ export function registerAdminApiClientRoutes(router: Router, ensureAdmin: Ensure
       editDate: new Date(),
     });
     await audit(req, 'agent.credential.created', userId, `Agent credential created: ${name}`, {
-      apiClientId: String(client._id || ''), clientId: credential.clientId, scopes,
+      apiClientId: String(client._id || ''), clientId: credential.clientId, scopes, policy,
     });
     res.status(201).json({
       success: true,

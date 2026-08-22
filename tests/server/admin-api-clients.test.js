@@ -61,6 +61,7 @@ describe('administrator API client lifecycle', () => {
     expect(stored.secretHash).toMatch(/^[a-f\d]{64}$/);
     expect(stored).not.toHaveProperty('token');
     expect(stored.scopes).toEqual(['entries:read']);
+    expect(stored.policy).toEqual(expect.objectContaining({ ownContentOnly: true, maxVisibility: 'public_only' }));
     expect(audit).toHaveBeenCalledWith(expect.objectContaining({ eventType: 'agent.credential.created' }));
   });
 

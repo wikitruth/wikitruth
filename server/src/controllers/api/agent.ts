@@ -5,6 +5,7 @@ import type { WikitruthRequest, WikitruthResponse } from '../../types/http';
 import constants from '../../models/constants';
 import { subscribeRealtime, type RealtimeEvent } from '../../services/realtimeEvents';
 import type { ApiClientScope } from '../../services/apiClientService';
+import { listAgentOperationPolicies } from '../../services/agentOperationPolicy';
 
 const ENTRY_TYPES: Record<string, number> = {
   topic: constants.OBJECT_TYPES.topic,
@@ -48,10 +49,13 @@ function boundedPage(value: unknown, fallback: number, max: number): number {
 }
 
 function validationScope(operation: string): ApiClientScope | null {
-  if (operation === 'contribution') return 'contributions:write';
+  if (operation === 'contribution') return 'entries:create';
+  if (operation === 'entry_edit') return 'entries:propose-edit';
   if (operation === 'graph_link') return 'graph:write';
-  if (operation === 'verdict_vote') return 'moderation:write';
-  if (operation === 'civic_record') return 'civic:write';
+  if (operation === 'verdict_advice') return 'moderation:advise';
+  if (operation === 'civic_record') return 'civic:contribute';
+  if (operation === 'translation') return 'translations:write';
+  if (operation === 'debate_contribution') return 'debates:participate';
   return null;
 }
 
@@ -94,14 +98,28 @@ async function validateDryRun(req: WikitruthRequest, res: WikitruthResponse): Pr
     if (!['child', 'support', 'oppose', 'related', 'evidence', 'source', 'dependency', 'supports', 'refutes', 'qualifies', 'background'].includes(String(payload.relationship || ''))) {
       errors.push({ field: 'payload.relationship', message: 'A supported graph relationship is required.' });
     }
-  } else if (operation === 'verdict_vote') {
+  } else if (operation === 'entry_edit') {
+    if (!String(req.body?.entryType || '').trim()) errors.push({ field: 'entryType', message: 'A supported entryType is required.' });
+    if (!String(payload.entryId || '').trim()) errors.push({ field: 'payload.entryId', message: 'entryId is required.' });
+    if (!String(payload.baseRevision || '').trim()) errors.push({ field: 'payload.baseRevision', message: 'baseRevision is required to prevent stale edits.' });
+    if (!payload.proposedChanges || typeof payload.proposedChanges !== 'object') errors.push({ field: 'payload.proposedChanges', message: 'proposedChanges are required.' });
+    warnings.push({ field: 'operation', message: 'Accepted content is never replaced directly; the edit enters human review as a change request.' });
+  } else if (operation === 'verdict_advice') {
     if (!['factual', 'ethical'].includes(String(payload.channel || ''))) errors.push({ field: 'payload.channel', message: 'Channel must be factual or ethical.' });
     if (String(payload.rationale || '').trim().length < 10) errors.push({ field: 'payload.rationale', message: 'A substantive rationale is required.' });
-    warnings.push({ field: 'operation', message: 'A valid vote remains advisory until human consensus publishes a verdict.' });
+    warnings.push({ field: 'operation', message: 'Agent analysis is advisory and cannot count toward consensus until a human reviewer countersigns it.' });
   } else if (operation === 'civic_record') {
     if (!String(payload.title || '').trim()) errors.push({ field: 'payload.title', message: 'A civic record title is required.' });
     if (!String(payload.recordType || '').trim()) errors.push({ field: 'payload.recordType', message: 'recordType is required.' });
     warnings.push({ field: 'operation', message: 'Tenant policy and extension-schema validation also run during mutation.' });
+  } else if (operation === 'translation') {
+    if (!String(payload.locale || '').trim()) errors.push({ field: 'payload.locale', message: 'locale is required.' });
+    if (String(payload.content || '').trim().length < 10) errors.push({ field: 'payload.content', message: 'Translated content is required.' });
+    warnings.push({ field: 'operation', message: 'Agent translations remain pending until reviewed by a person.' });
+  } else if (operation === 'debate_contribution') {
+    if (!String(payload.debateId || '').trim()) errors.push({ field: 'payload.debateId', message: 'debateId is required.' });
+    if (String(payload.content || '').trim().length < 10) errors.push({ field: 'payload.content', message: 'Contribution content is required.' });
+    warnings.push({ field: 'operation', message: 'Agent authorship is displayed separately from human participants.' });
   }
 
   res.json({
@@ -137,6 +155,16 @@ export = function (router: Router) {
   router.get('/capabilities', function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!requireAgent(req, res)) return;
     const scopes = new Set(req.apiClient?.scopes || []);
+    const policies = listAgentOperationPolicies();
+    const operations = policies.filter((policy) => policy.agentAllowed
+      && (!policy.requiredScope || scopes.has(policy.requiredScope)))
+      .map((policy) => ({
+        operationId: policy.operationId,
+        method: policy.method,
+        pathPattern: policy.pattern,
+        requiredScope: policy.requiredScope || null,
+        mutationKind: policy.mutationKind || null,
+      }));
     res.json({
       success: true,
       apiVersion: 'v1',
@@ -148,17 +176,23 @@ export = function (router: Router) {
         dryRunEndpoint: '/api/v1/agent/validate',
       },
       scopes: Array.from(scopes),
+      credentialPolicy: req.apiClient?.policy,
       contributionContract: {
         screening: 'pending', duplicateChecks: true, contributorOnboarding: true,
-        automaticVerdict: false, attribution: 'api_client_accountable_user_and_agent_run',
+        acceptedEdits: 'reviewed_change_request', automaticVerdict: false,
+        verdictAdvice: 'human_countersign_required', attribution: 'api_client_accountable_user_and_agent_run',
       },
       endpoints: {
         read: scopes.has('entries:read') ? ['/api/v1/topics', '/api/v1/arguments', '/api/v1/questions', '/api/v1/answers', '/api/v1/artifacts', '/api/v1/issues', '/api/v1/opinions'] : [],
-        contribute: scopes.has('contributions:write') ? ['/api/v1/topics', '/api/v1/arguments', '/api/v1/questions', '/api/v1/answers', '/api/v1/artifacts', '/api/v1/issues', '/api/v1/opinions'] : [],
+        create: scopes.has('entries:create') ? ['/api/v1/topics', '/api/v1/arguments', '/api/v1/questions', '/api/v1/answers', '/api/v1/artifacts', '/api/v1/issues', '/api/v1/opinions'] : [],
+        proposeEdit: scopes.has('entries:propose-edit') ? ['/api/v1/{entryType}/entry/{id}', '/api/v1/moderation/change-requests'] : [],
         graph: scopes.has('graph:write') ? ['/api/v1/outline/link'] : [],
-        civic: scopes.has('civic:write') ? ['/api/v1/civic/records', '/api/v1/tenants/{tenantId}/civic/records'] : [],
-        moderation: scopes.has('moderation:write') ? ['/api/v1/moderation/verdict-votes', '/api/v1/moderation/change-requests'] : [],
-        operations: ['/api/v1/agent/validate', '/api/v1/agent/activity', '/api/v1/agent/runs/{runId}', '/api/v1/agent/events'],
+        civicRead: scopes.has('civic:read') ? ['/api/v1/civic/records', '/api/v1/tenants/{tenantId}/civic/records'] : [],
+        civicContribute: scopes.has('civic:contribute') ? ['/api/v1/civic/records', '/api/v1/tenants/{tenantId}/civic/records'] : [],
+        moderationAdvice: scopes.has('moderation:advise') ? ['/api/v1/moderation/verdict-advice', '/api/v1/moderation/signals', '/api/v1/moderation/appeals'] : [],
+        translations: scopes.has('translations:write') ? ['/api/v1/translations/{objectName}/{id}'] : [],
+        debates: scopes.has('debates:participate') ? ['/api/v1/structured-debates/{id}/contributions'] : [],
+        operations,
       },
     });
   });

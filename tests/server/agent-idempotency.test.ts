@@ -31,7 +31,8 @@ function createApp() {
   app.use((req, _res, next) => {
     req.apiClient = {
       id: '507f1f77bcf86cd799439011', clientId: 'client-1', name: 'Research agent', userId: 'user-1',
-      tokenPrefix: 'prefix', scopes: ['contributions:write'], rateLimitPerMinute: 60, expiresAt: null,
+      tokenPrefix: 'prefix', scopes: ['entries:create'], rateLimitPerMinute: 60, expiresAt: null,
+      policy: { tenantIds: [], entryTypes: [], parentRootIds: [], ownContentOnly: true, maxVisibility: 'public_only', sourceRequired: false, maxBatchSize: 25 },
     };
     req.requestId = 'request-123';
     next();

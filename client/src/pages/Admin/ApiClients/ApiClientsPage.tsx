@@ -1,15 +1,43 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import PageMeta from '../../../components/common/PageMeta';
-import apiClientsApi, { type ApiClientRecord, type ApiClientScope } from '../../../services/api/apiClients';
+import apiClientsApi, {
+  type ApiClientPolicy,
+  type ApiClientRecord,
+  type ApiClientScope,
+} from '../../../services/api/apiClients';
 import type { AdminRecord } from '../../../services/api/admin';
 
 const SCOPES: Array<{ value: ApiClientScope; label: string; help: string }> = [
-  { value: 'entries:read', label: 'Read entries', help: 'Read public knowledge and civic API data.' },
-  { value: 'contributions:write', label: 'Create contributions', help: 'Submit pending topics, claims, questions, answers, artifacts, issues, and comments.' },
+  { value: 'entries:read', label: 'Read entries', help: 'Read permitted knowledge entries and public evidence.' },
+  { value: 'entries:create', label: 'Create entries', help: 'Submit new entries into pending screening.' },
+  { value: 'entries:propose-edit', label: 'Propose entry edits', help: 'Propose governed edits without directly replacing accepted content.' },
   { value: 'graph:write', label: 'Edit graph links', help: 'Propose governed typed outline relationships.' },
-  { value: 'civic:write', label: 'Edit civic records', help: 'Contribute within tenant membership limits.' },
-  { value: 'moderation:write', label: 'Moderation contributions', help: 'Submit votes or change requests only when the owner has the required role.' },
+  { value: 'civic:read', label: 'Read civic records', help: 'Read records within permitted civic tenants.' },
+  { value: 'civic:contribute', label: 'Contribute civic records', help: 'Create or edit within tenant and ownership limits.' },
+  { value: 'moderation:advise', label: 'Moderation advice', help: 'Submit signals, appeals, and advisory verdict analysis for human review.' },
+  { value: 'translations:write', label: 'Suggest translations', help: 'Submit clearly attributed translation suggestions.' },
+  { value: 'debates:participate', label: 'Debate contributions', help: 'Add attributed contributions to existing structured debates.' },
+  { value: 'agent:runs:read', label: 'Manage agent runs', help: 'Read run activity and submit bounded jobs.' },
 ];
+
+const ENTRY_TYPES: ApiClientPolicy['entryTypes'] = [
+  'topic', 'argument', 'question', 'answer', 'artifact', 'issue', 'opinion',
+];
+
+const DEFAULT_POLICY: ApiClientPolicy = {
+  tenantIds: [],
+  entryTypes: [...ENTRY_TYPES],
+  parentRootIds: [],
+  ownContentOnly: true,
+  maxVisibility: 'public_only',
+  sourceRequired: false,
+  maxBatchSize: 25,
+};
+
+const listValue = (value: string): string[] => value
+  .split(/[\s,]+/)
+  .map((item) => item.trim())
+  .filter(Boolean);
 
 const ApiClientsPage: React.FC = () => {
   const [clients, setClients] = useState<ApiClientRecord[]>([]);
@@ -17,7 +45,8 @@ const ApiClientsPage: React.FC = () => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [userId, setUserId] = useState('');
-  const [scopes, setScopes] = useState<ApiClientScope[]>(['entries:read', 'contributions:write']);
+  const [scopes, setScopes] = useState<ApiClientScope[]>(['entries:read', 'entries:create']);
+  const [policy, setPolicy] = useState<ApiClientPolicy>(DEFAULT_POLICY);
   const [expiresAt, setExpiresAt] = useState('');
   const [rateLimit, setRateLimit] = useState(60);
   const [oneTimeToken, setOneTimeToken] = useState('');
@@ -47,7 +76,7 @@ const ApiClientsPage: React.FC = () => {
       setSaving(true);
       setError(null);
       const result = await apiClientsApi.create({
-        name: name.trim(), description: description.trim(), userId, scopes,
+        name: name.trim(), description: description.trim(), userId, scopes, policy,
         expiresAt: expiresAt ? new Date(expiresAt).toISOString() : null,
         rateLimitPerMinute: rateLimit,
       });
@@ -86,6 +115,12 @@ const ApiClientsPage: React.FC = () => {
   const toggleScope = (scope: ApiClientScope) => setScopes((current) => (
     current.includes(scope) ? current.filter((value) => value !== scope) : [...current, scope]
   ));
+  const toggleEntryType = (entryType: ApiClientPolicy['entryTypes'][number]) => setPolicy((current) => ({
+    ...current,
+    entryTypes: current.entryTypes.includes(entryType)
+      ? current.entryTypes.filter((value) => value !== entryType)
+      : [...current.entryTypes, entryType],
+  }));
 
   return (
     <div className="container">
@@ -111,6 +146,23 @@ const ApiClientsPage: React.FC = () => {
             </div>
             <div className="form-group"><label htmlFor="agent-description">Purpose</label><input id="agent-description" className="form-control" value={description} onChange={(event) => setDescription(event.target.value)} /></div>
             <fieldset><legend style={{ fontSize: 15 }}>Scopes</legend>{SCOPES.map((scope) => <div className="checkbox" key={scope.value}><label><input type="checkbox" checked={scopes.includes(scope.value)} onChange={() => toggleScope(scope.value)} /> <strong>{scope.label}</strong> <span className="text-muted">{scope.help}</span></label></div>)}</fieldset>
+            <fieldset>
+              <legend style={{ fontSize: 15 }}>Credential boundaries</legend>
+              <p className="text-muted small">Leave tenant and parent-root lists empty for no additional boundary. Entry types are always explicit.</p>
+              <div className="form-group">
+                <label>Entry types</label>
+                <div>{ENTRY_TYPES.map((entryType) => <label className="checkbox-inline" key={entryType}><input type="checkbox" checked={policy.entryTypes.includes(entryType)} onChange={() => toggleEntryType(entryType)} /> {entryType}</label>)}</div>
+              </div>
+              <div className="row">
+                <div className="col-sm-6 form-group"><label htmlFor="agent-tenants">Tenant IDs</label><input id="agent-tenants" className="form-control" placeholder="fixph, another-tenant" value={policy.tenantIds.join(', ')} onChange={(event) => setPolicy((current) => ({ ...current, tenantIds: listValue(event.target.value) }))} /></div>
+                <div className="col-sm-6 form-group"><label htmlFor="agent-roots">Parent root IDs</label><input id="agent-roots" className="form-control" placeholder="MongoDB IDs" value={policy.parentRootIds.join(', ')} onChange={(event) => setPolicy((current) => ({ ...current, parentRootIds: listValue(event.target.value) }))} /></div>
+              </div>
+              <div className="row">
+                <div className="col-sm-4 form-group"><label htmlFor="agent-visibility">Maximum visibility</label><select id="agent-visibility" className="form-control" value={policy.maxVisibility} onChange={(event) => setPolicy((current) => ({ ...current, maxVisibility: event.target.value as ApiClientPolicy['maxVisibility'] }))}><option value="public_only">Public only</option><option value="owned_private">Owned private content</option></select></div>
+                <div className="col-sm-4 form-group"><label htmlFor="agent-batch-size">Maximum job batch size</label><input id="agent-batch-size" type="number" min={1} max={100} className="form-control" value={policy.maxBatchSize} onChange={(event) => setPolicy((current) => ({ ...current, maxBatchSize: Number(event.target.value) }))} /></div>
+                <div className="col-sm-4"><div className="checkbox"><label><input type="checkbox" checked={policy.ownContentOnly} onChange={(event) => setPolicy((current) => ({ ...current, ownContentOnly: event.target.checked }))} /> Restrict edits to owned content</label></div><div className="checkbox"><label><input type="checkbox" checked={policy.sourceRequired} onChange={(event) => setPolicy((current) => ({ ...current, sourceRequired: event.target.checked }))} /> Require source metadata</label></div></div>
+              </div>
+            </fieldset>
             <div className="row">
               <div className="col-sm-6 form-group"><label htmlFor="agent-expiry">Expiry (optional)</label><input id="agent-expiry" type="datetime-local" className="form-control" value={expiresAt} onChange={(event) => setExpiresAt(event.target.value)} /></div>
               <div className="col-sm-6 form-group"><label htmlFor="agent-rate">Requests per minute</label><input id="agent-rate" type="number" min={10} max={600} className="form-control" value={rateLimit} onChange={(event) => setRateLimit(Number(event.target.value))} /></div>
@@ -123,7 +175,7 @@ const ApiClientsPage: React.FC = () => {
       <div className="panel panel-default">
         <div className="panel-heading"><strong>Credentials</strong></div>
         {loading ? <div className="panel-body text-muted">Loading...</div> : (
-          <div className="table-responsive"><table className="table table-striped"><thead><tr><th>Agent</th><th>Accountable user</th><th>Scopes</th><th>Use</th><th>Status</th><th>Actions</th></tr></thead><tbody>{clients.map((client) => <tr key={client.id}><td><strong>{client.name}</strong><div className="text-muted small"><code>{client.tokenPrefix}...</code></div></td><td>{client.accountableUser?.username || client.userId}</td><td>{client.scopes.map((scope) => <span className="label label-default" key={scope} style={{ marginRight: 3 }}>{scope}</span>)}</td><td>{client.requestCount} request(s)<div className="text-muted small">{client.lastUsedAt ? `Last used ${new Date(client.lastUsedAt).toLocaleString()}` : 'Never used'}</div></td><td><span className={`label label-${client.status === 'active' ? 'success' : 'default'}`}>{client.status}</span></td><td>{client.status === 'active' ? <><button className="btn btn-xs btn-default" type="button" onClick={() => void rotate(client)}>Rotate</button>{' '}<button className="btn btn-xs btn-danger" type="button" onClick={() => void revoke(client)}>Revoke</button></> : null}</td></tr>)}</tbody></table></div>
+          <div className="table-responsive"><table className="table table-striped"><thead><tr><th>Agent</th><th>Accountable user</th><th>Scopes and boundaries</th><th>Use</th><th>Status</th><th>Actions</th></tr></thead><tbody>{clients.map((client) => <tr key={client.id}><td><strong>{client.name}</strong><div className="text-muted small"><code>{client.tokenPrefix}...</code></div></td><td>{client.accountableUser?.username || client.userId}</td><td>{client.scopes.map((scope) => <span className="label label-default" key={scope} style={{ marginRight: 3 }}>{scope}</span>)}<div className="text-muted small">Types: {client.policy.entryTypes.join(', ') || 'none'}; visibility: {client.policy.maxVisibility}; batch: {client.policy.maxBatchSize}</div>{client.policy.tenantIds.length ? <div className="text-muted small">Tenants: {client.policy.tenantIds.join(', ')}</div> : null}{client.policy.parentRootIds.length ? <div className="text-muted small">Parent roots: {client.policy.parentRootIds.join(', ')}</div> : null}</td><td>{client.requestCount} request(s)<div className="text-muted small">{client.lastUsedAt ? `Last used ${new Date(client.lastUsedAt).toLocaleString()}` : 'Never used'}</div></td><td><span className={`label label-${client.status === 'active' ? 'success' : 'default'}`}>{client.status}</span></td><td>{client.status === 'active' ? <><button className="btn btn-xs btn-default" type="button" onClick={() => void rotate(client)}>Rotate</button>{' '}<button className="btn btn-xs btn-danger" type="button" onClick={() => void revoke(client)}>Revoke</button></> : null}</td></tr>)}</tbody></table></div>
         )}
       </div>
     </div>

@@ -2,7 +2,19 @@ import API_BASE_URL from './baseUrl';
 import type { AdminRecord } from './admin';
 import fetchWithPasskeyStepUp from './passkeyFetch';
 
-export type ApiClientScope = 'entries:read' | 'contributions:write' | 'graph:write' | 'civic:write' | 'moderation:write';
+export type ApiClientScope = 'entries:read' | 'entries:create' | 'entries:propose-edit' | 'graph:write'
+  | 'civic:read' | 'civic:contribute' | 'moderation:advise' | 'translations:write'
+  | 'debates:participate' | 'agent:runs:read';
+
+export interface ApiClientPolicy {
+  tenantIds: string[];
+  entryTypes: Array<'topic' | 'argument' | 'question' | 'answer' | 'artifact' | 'issue' | 'opinion'>;
+  parentRootIds: string[];
+  ownContentOnly: boolean;
+  maxVisibility: 'public_only' | 'owned_private';
+  sourceRequired: boolean;
+  maxBatchSize: number;
+}
 
 export interface ApiClientRecord {
   id: string;
@@ -12,6 +24,7 @@ export interface ApiClientRecord {
   userId: string;
   tokenPrefix: string;
   scopes: ApiClientScope[];
+  policy: ApiClientPolicy;
   status: 'active' | 'revoked';
   expiresAt: string | null;
   rateLimitPerMinute: number;
@@ -46,6 +59,7 @@ export const apiClientsApi = {
     description?: string;
     userId: string;
     scopes: ApiClientScope[];
+    policy: ApiClientPolicy;
     expiresAt?: string | null;
     rateLimitPerMinute: number;
   }) => request<{ success: boolean; client: ApiClientRecord; token: string; tokenReturnedOnce: true }>('/admin/api-clients', {

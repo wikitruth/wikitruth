@@ -90,7 +90,7 @@ describe('scoped API client authentication', () => {
   });
 
   it('authenticates before CSRF and attributes a pending standard contribution', async () => {
-    const fixture = credentialFixture(['contributions:write']);
+    const fixture = credentialFixture(['entries:create']);
     const { app, updateOne } = createApp(fixture);
     const response = await request(app)
       .post('/api/v1/topics')
@@ -112,7 +112,7 @@ describe('scoped API client authentication', () => {
       .expect(403)
       .expect(({ body }) => expect(body.error.code).toBe('AGENT_SCOPE_REQUIRED'));
 
-    const expired = credentialFixture(['contributions:write'], { expiresAt: new Date(Date.now() - 1000) });
+    const expired = credentialFixture(['entries:create'], { expiresAt: new Date(Date.now() - 1000) });
     await request(createApp(expired).app)
       .post('/api/v1/topics')
       .set('Authorization', `Bearer ${expired.credential.token}`)
@@ -128,7 +128,7 @@ describe('scoped API client authentication', () => {
   });
 
   it('publishes identity and bounded capabilities without exposing the secret hash', async () => {
-    const fixture = credentialFixture(['entries:read', 'contributions:write', 'graph:write']);
+    const fixture = credentialFixture(['entries:read', 'entries:create', 'graph:write']);
     const response = await request(createApp(fixture).app)
       .get('/api/v1/agent/capabilities')
       .set('Authorization', `Bearer ${fixture.credential.token}`)
@@ -137,7 +137,10 @@ describe('scoped API client authentication', () => {
       screening: 'pending', automaticVerdict: false, attribution: 'api_client_accountable_user_and_agent_run',
     }));
     expect(JSON.stringify(response.body)).not.toContain('secretHash');
-    expect(response.body.endpoints.contribute).toContain('/api/v1/artifacts');
+    expect(response.body.endpoints.create).toContain('/api/v1/artifacts');
+    expect(response.body.endpoints.operations).toEqual(expect.arrayContaining([
+      expect.objectContaining({ operationId: 'knowledge.entry.create', requiredScope: 'entries:create' }),
+    ]));
   });
 
   it('validates graph contributions without mutation or final-decision authority', async () => {
@@ -154,13 +157,13 @@ describe('scoped API client authentication', () => {
   });
 
   it('does not let moderation-scoped agents publish a final verdict', async () => {
-    const fixture = credentialFixture(['moderation:write']);
+    const fixture = credentialFixture(['moderation:advise']);
     await request(createApp(fixture).app)
       .put('/api/v1/moderation/verdict-channel')
       .set('Authorization', `Bearer ${fixture.credential.token}`)
       .send({ status: 'supported' })
       .expect(403)
-      .expect(({ body }) => expect(body.error.code).toBe('AGENT_MODERATION_CONTRIBUTION_ONLY'));
+      .expect(({ body }) => expect(body.error.code).toBe('HUMAN_AUTHORITY_REQUIRED'));
   });
 
   it('enforces each client rate limit independently', async () => {
