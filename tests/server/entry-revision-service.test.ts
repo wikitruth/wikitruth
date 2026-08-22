@@ -186,6 +186,51 @@ describe('entry revision and change-request service', () => {
     expect(mockRevisions.at(-1)).toEqual(expect.objectContaining({ source: 'change_request' }));
   });
 
+  it('requires the declared base revision and persists agent proposal attribution', async () => {
+    await captureEntryRevision({
+      objectType: 1,
+      objectId: 'topic-1',
+      entry: { ...mockCurrentEntry },
+      source: 'create',
+      summary: 'Initial state',
+    });
+    await expect(createChangeRequest({
+      objectType: 1,
+      objectId: 'topic-1',
+      proposedChanges: { title: 'Stale suggestion' },
+      summary: 'Suggest a title from an old revision.',
+      expectedBaseRevisionId: 'revision-old',
+      actorId: 'user-1',
+      actorUsername: 'accountable-user',
+    })).rejects.toThrow(/base revision is stale/i);
+
+    const request = await createChangeRequest({
+      objectType: 1,
+      objectId: 'topic-1',
+      proposedChanges: { title: 'Current suggestion' },
+      summary: 'Suggest a title from the current revision.',
+      expectedBaseRevisionId: 'revision-1',
+      actorId: 'user-1',
+      actorUsername: 'accountable-user',
+      apiClientId: '507f1f77bcf86cd799439011',
+      apiClientName: 'Research agent',
+      agentRunId: 'run-001',
+      agentModel: 'research-v2',
+      agentProvider: 'local',
+      agentPurpose: 'Improve accepted entries',
+      sourceManifest: [{ artifactId: 'artifact-1' }],
+    });
+    expect(request).toEqual(expect.objectContaining({
+      baseRevisionId: 'revision-1',
+      apiClientId: '507f1f77bcf86cd799439011',
+      agentRunId: 'run-001',
+    }));
+    expect(mockPublishRealtimeEvent).toHaveBeenCalledWith(expect.objectContaining({
+      type: 'agent.change_request.created',
+      data: expect.objectContaining({ changeRequestId: request._id, status: 'open' }),
+    }));
+  });
+
   it('stores API client attribution and emits an agent revision event', async () => {
     await captureEntryRevision({
       objectType: 1,

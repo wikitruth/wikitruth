@@ -204,7 +204,15 @@ export async function createChangeRequest(options: {
   summary: string;
   actorId: string;
   actorUsername: string;
-}): Promise<RevisionRecord> {
+  expectedBaseRevisionId?: string;
+  apiClientId?: string | null;
+  apiClientName?: string | null;
+  agentRunId?: string | null;
+  agentModel?: string | null;
+  agentProvider?: string | null;
+  agentPurpose?: string | null;
+  sourceManifest?: Array<Record<string, string>>;
+}): Promise<ChangeRequestRecord> {
   const proposedChanges = sanitizeProposedChanges(options.proposedChanges);
   if (!Object.keys(proposedChanges).length) {
     throw new Error('At least one supported proposed field is required');
@@ -213,6 +221,10 @@ export async function createChangeRequest(options: {
     throw new Error('Change request summary must be at least 10 characters');
   }
   const baseRevision = await ensureCurrentRevision(options);
+  if (options.expectedBaseRevisionId
+    && String(baseRevision._id || '') !== String(options.expectedBaseRevisionId || '')) {
+    throw new Error('Base revision is stale because the entry has a newer revision');
+  }
   const request = await changeRequestModel().create({
     objectType: options.objectType,
     objectId: options.objectId,
@@ -224,6 +236,13 @@ export async function createChangeRequest(options: {
     status: 'open',
     createUserId: options.actorId,
     createUsername: options.actorUsername,
+    apiClientId: options.apiClientId || null,
+    apiClientName: options.apiClientName || '',
+    agentRunId: options.agentRunId || '',
+    agentModel: options.agentModel || '',
+    agentProvider: options.agentProvider || '',
+    agentPurpose: options.agentPurpose || '',
+    sourceManifest: options.sourceManifest || [],
   });
   await logEntryEvent({
     eventType: 'change_request.created',
@@ -232,8 +251,28 @@ export async function createChangeRequest(options: {
     actorUserId: options.actorId,
     actorUsername: options.actorUsername,
     message: options.summary.trim(),
-    payload: { changeRequestId: String(request._id || ''), fields: Object.keys(proposedChanges) },
+    payload: {
+      changeRequestId: String(request._id || ''), fields: Object.keys(proposedChanges),
+      apiClientId: options.apiClientId || null, apiClientName: options.apiClientName || '',
+      agentRunId: options.agentRunId || '', agentModel: options.agentModel || '',
+      agentProvider: options.agentProvider || '', agentPurpose: options.agentPurpose || '',
+      sourceManifest: options.sourceManifest || [], baseRevisionId: String(baseRevision._id || ''),
+    },
   });
+  if (options.apiClientId) {
+    publishRealtimeEvent({
+      type: 'agent.change_request.created',
+      data: {
+        apiClientId: options.apiClientId,
+        agentRunId: options.agentRunId || '',
+        changeRequestId: String(request._id || ''),
+        objectType: options.objectType,
+        objectId: options.objectId,
+        baseRevisionId: String(baseRevision._id || ''),
+        status: 'open',
+      },
+    });
+  }
   return request;
 }
 

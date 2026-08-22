@@ -24,6 +24,22 @@ function actor(req: WikitruthRequest): { actorId: string; actorUsername: string 
   };
 }
 
+function normalizedRevisionId(value: unknown): string {
+  return String(value || '').trim().replace(/^W\//, '').replace(/^"|"$/g, '');
+}
+
+function agentAttribution(req: WikitruthRequest) {
+  return {
+    apiClientId: req.apiClient?.id || null,
+    apiClientName: req.apiClient?.name || '',
+    agentRunId: req.agentRun?.runId || '',
+    agentModel: req.agentRun?.model || '',
+    agentProvider: req.agentRun?.provider || '',
+    agentPurpose: req.agentRun?.purpose || '',
+    sourceManifest: req.agentRun?.sourceManifest || [],
+  };
+}
+
 export function registerModerationRevisionRoutes(router: Router): void {
   router.post('/change-requests', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!req.user) {
@@ -35,19 +51,29 @@ export function registerModerationRevisionRoutes(router: Router): void {
       res.status(400).json({ success: false, message: 'A change-request target is required' });
       return;
     }
+    const expectedBaseRevisionId = normalizedRevisionId(
+      req.get('if-match') || req.body?.baseRevisionId || req.body?.baseRevision,
+    );
+    if (req.apiClient && !expectedBaseRevisionId) {
+      res.status(428).json({ success: false, message: 'Agent change requests require If-Match or baseRevisionId' });
+      return;
+    }
     try {
       const request = await createChangeRequest({
         objectType: target.objectType,
         objectId: target.id,
         proposedChanges: req.body?.proposedChanges || req.body?.changes,
         summary: String(req.body?.summary || '').trim(),
+        expectedBaseRevisionId: expectedBaseRevisionId || undefined,
+        ...agentAttribution(req),
         ...actor(req),
       });
       res.status(201).json({ success: true, request });
     } catch (error) {
-      res.status(400).json({
+      const message = error instanceof Error ? error.message : 'Unable to create change request';
+      res.status(/stale/i.test(message) ? 409 : 400).json({
         success: false,
-        message: error instanceof Error ? error.message : 'Unable to create change request',
+        message,
       });
     }
   });

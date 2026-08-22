@@ -30,7 +30,10 @@ const identity = (scopes: string[], policy: Record<string, unknown> = {}) => ({
 });
 
 function appFor(scopes: string[], policy: Record<string, unknown> = {}) {
-  const app = express();
+  const app = express() as express.Express & { db?: unknown };
+  app.db = { models: {
+    Topic: { findById: () => ({ lean: async () => ({ _id: 'topic-1', createUserId: 'someone-else', screening: { status: 1 } }) }) },
+  } };
   app.use(express.json());
   app.use((req, _res, next) => {
     req.apiClient = identity(scopes, policy);
@@ -43,6 +46,7 @@ function appFor(scopes: string[], policy: Record<string, unknown> = {}) {
   app.post('/artifacts', (_req, res) => res.status(201).json({ success: true }));
   app.put('/moderation/verdict-channel', (_req, res) => res.json({ success: true }));
   app.post('/unknown-write', (_req, res) => res.json({ success: true }));
+  app.post('/moderation/change-requests', (_req, res) => res.status(201).json({ success: true }));
   return app;
 }
 
@@ -92,5 +96,21 @@ describe('agent operation and credential policies', () => {
     await request(app).post('/topics')
       .set('X-Agent-Source-Manifest', JSON.stringify([{ url: 'https://example.test/evidence' }]))
       .send({ title: 'Manifest sourced' }).expect(201);
+  });
+
+  it('applies credential policy to the generic change-request target', async () => {
+    const app = appFor(['entries:propose-edit'], {
+      entryTypes: ['topic'], ownContentOnly: true, maxVisibility: 'public_only', sourceRequired: true,
+    });
+    await request(app).post('/moderation/change-requests').send({
+      objectType: 1,
+      objectId: 'topic-1',
+      proposedChanges: { title: 'Sourced proposal', references: 'https://example.test/source' },
+    }).expect(403).expect(({ body }) => expect(body.error.code).toBe('AGENT_OWNERSHIP_RESTRICTED'));
+    await request(app).post('/moderation/change-requests').send({
+      objectType: 999,
+      objectId: 'topic-1',
+      proposedChanges: { title: 'Unsupported type' },
+    }).expect(400).expect(({ body }) => expect(body.error.code).toBe('AGENT_TARGET_REQUIRED'));
   });
 });

@@ -23,6 +23,13 @@ const factory: SchemaFactory = function (app, mongoose) {
     createDate: { type: Date, default: Date.now, index: true },
     createUserId: { type: mongoose.Schema.ObjectId, ref: 'User', required: true, index: true },
     createUsername: { type: String, default: '' },
+    apiClientId: { type: mongoose.Schema.ObjectId, ref: 'ApiClient', default: null, index: true },
+    apiClientName: { type: String, default: '' },
+    agentRunId: { type: String, default: '', index: true },
+    agentModel: { type: String, default: '' },
+    agentProvider: { type: String, default: '' },
+    agentPurpose: { type: String, default: '' },
+    sourceManifest: [{ type: mongoose.Schema.Types.Mixed }],
     decisionDate: { type: Date, default: null },
     decisionUserId: { type: mongoose.Schema.ObjectId, ref: 'User', default: null },
     decisionUsername: { type: String, default: '' },
@@ -34,4 +41,3 @@ const factory: SchemaFactory = function (app, mongoose) {
 };
 
 export = factory;
-

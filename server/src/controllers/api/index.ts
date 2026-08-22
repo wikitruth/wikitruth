@@ -46,6 +46,7 @@ import attachStructuredDebates from './structuredDebates';
 import { apiVersionPolicy } from '../../middlewares/apiVersionPolicy';
 import { enforceAgentMutationReliability } from '../../middlewares/agentMutationReliability';
 import { enforceApiClientPolicy } from '../../middlewares/apiClientPolicy';
+import { routeAgentAcceptedEditProposal } from '../../middlewares/agentAcceptedEditProposal';
 
 export = function (router: Router) {
   router.use(apiVersionPolicy);
@@ -55,6 +56,7 @@ export = function (router: Router) {
   router.use(enforceApiClientScope);
   router.use(enforceApiClientPolicy);
   router.use(enforceAgentMutationReliability);
+  router.use(routeAgentAcceptedEditProposal);
 
   const homeRouter = apiError.wrapAsyncRouter(express.Router()) as Router;
   const applicationContextRouter = apiError.wrapAsyncRouter(express.Router()) as Router;

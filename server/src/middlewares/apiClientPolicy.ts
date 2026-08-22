@@ -4,10 +4,20 @@ import type { NextFunction } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../types/http';
 import { entryTypeFromOperationPath, resolveAgentOperationPolicy } from '../services/agentOperationPolicy';
 import { resolveCivicTenant } from '../services/civicTenantService';
+import constants from '../models/constants';
 
 const MODEL_BY_ENTRY_TYPE: Record<string, string> = {
   topic: 'Topic', argument: 'Argument', question: 'Question', answer: 'Answer',
   artifact: 'Artifact', issue: 'Issue', opinion: 'Opinion',
+};
+const ENTRY_TYPE_BY_OBJECT_TYPE: Record<number, string> = {
+  [constants.OBJECT_TYPES.topic]: 'topic',
+  [constants.OBJECT_TYPES.argument]: 'argument',
+  [constants.OBJECT_TYPES.question]: 'question',
+  [constants.OBJECT_TYPES.answer]: 'answer',
+  [constants.OBJECT_TYPES.artifact]: 'artifact',
+  [constants.OBJECT_TYPES.issue]: 'issue',
+  [constants.OBJECT_TYPES.opinion]: 'opinion',
 };
 const PARENT_FIELDS = ['parentId', 'ownerId', 'topicId', 'questionId', 'groupId', 'categoryId'];
 
@@ -21,6 +31,8 @@ function requestEntryId(path: string): string | null {
 
 function hasSource(req: WikitruthRequest): boolean {
   const body = req.body || {};
+  const proposed = body.proposedChanges && typeof body.proposedChanges === 'object'
+    ? body.proposedChanges as Record<string, unknown> : {};
   const manifestHeader = req.get('x-agent-source-manifest');
   let manifestHasItems = false;
   if (manifestHeader) {
@@ -31,7 +43,9 @@ function hasSource(req: WikitruthRequest): boolean {
       manifestHasItems = false;
     }
   }
-  return ['references', 'source', 'archiveUrl', 'checksum'].some((field) => String(body[field] || '').trim())
+  return ['references', 'source', 'archiveUrl', 'checksum'].some((field) => (
+    String(body[field] || '').trim() || String(proposed[field] || '').trim()
+  ))
     || Boolean(req.agentRun?.sourceManifest?.length)
     || manifestHasItems;
 }
@@ -86,7 +100,16 @@ export async function enforceApiClientPolicy(
     return;
   }
   const credentialPolicy = req.apiClient.policy;
-  const entryType = operation.entryTypeFromPath ? entryTypeFromOperationPath(req.path) : null;
+  let entryType = operation.entryTypeFromPath ? entryTypeFromOperationPath(req.path) : null;
+  let entryId = requestEntryId(req.path);
+  if (operation.operationId === 'moderation.change-request.create') {
+    entryType = ENTRY_TYPE_BY_OBJECT_TYPE[Number(req.body?.objectType ?? req.body?.type)] || null;
+    entryId = String(req.body?.objectId || req.body?.id || '').trim() || null;
+    if (!entryType || !entryId) {
+      res.status(400).json({ success: false, error: { code: 'AGENT_TARGET_REQUIRED', message: 'A supported objectType and objectId are required.' } });
+      return;
+    }
+  }
   if (entryType && credentialPolicy.entryTypes.length
     && !credentialPolicy.entryTypes.includes(entryType as typeof credentialPolicy.entryTypes[number])) {
     fail(res, 'AGENT_ENTRY_TYPE_RESTRICTED', `This credential is not permitted to access ${entryType} entries.`);
@@ -110,7 +133,6 @@ export async function enforceApiClientPolicy(
     return;
   }
 
-  const entryId = requestEntryId(req.path);
   let entry: Record<string, unknown> | null = null;
   if (entryId && entryType) {
     const modelName = MODEL_BY_ENTRY_TYPE[entryType];

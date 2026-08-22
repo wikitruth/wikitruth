@@ -38,6 +38,8 @@ export interface ChangeRequestRecord extends Record<string, unknown> {
   baseSnapshotHash?: unknown;
   proposedChanges?: EntrySnapshot;
   status?: unknown;
+  apiClientId?: unknown;
+  agentRunId?: unknown;
 }
 
 export interface EntryDocumentLike extends Record<string, unknown> {
