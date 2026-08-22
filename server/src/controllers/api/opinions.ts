@@ -20,7 +20,7 @@ import { applyLegacyEntryContext, resolveLegacyEntryContext } from './entryConte
 import { ensureCurrentRevision } from '../../services/entryRevisionService';
 import { enforceIssueFirstGate } from '../../services/issueGateService';
 
-export = function (router: Router) {
+function attachOpinions(router: Router) {
   // Get opinions list
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
@@ -419,3 +419,10 @@ async function PUT_opinion_update(req: WikitruthRequest, res: WikitruthResponse)
     },
   });
 }
+
+namespace attachOpinions {
+  export const createEntry = POST_opinion_create;
+  export const updateEntry = PUT_opinion_update;
+}
+
+export = attachOpinions;

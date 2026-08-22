@@ -29,6 +29,10 @@ function requestEntryId(path: string): string | null {
   return /^\/(?:topics|arguments|questions|answers|artifacts|issues|opinions)\/entry\/([^/]+)/i.exec(path)?.[1] || null;
 }
 
+function requestCivicRecordId(path: string): string | null {
+  return /^\/(?:tenants\/[^/]+\/)?civic\/records\/([^/]+)/i.exec(path)?.[1] || null;
+}
+
 function hasSource(req: WikitruthRequest): boolean {
   const body = req.body || {};
   const proposed = body.proposedChanges && typeof body.proposedChanges === 'object'
@@ -121,6 +125,18 @@ export async function enforceApiClientPolicy(
     const tenant = req.civicTenant || await resolveCivicTenant(req);
     if (!credentialPolicy.tenantIds.includes(tenant.tenantId)) {
       fail(res, 'AGENT_TENANT_RESTRICTED', 'This credential is not permitted to access the selected civic tenant.');
+      return;
+    }
+  }
+  if (credentialPolicy.ownContentOnly
+    && ['civic_update', 'civic_link'].includes(String(operation.mutationKind || ''))) {
+    const civicRecordId = requestCivicRecordId(req.path);
+    const tenant = req.civicTenant || await resolveCivicTenant(req);
+    const civicRecord = civicRecordId
+      ? await models(req).CivicRecord?.findOne({ _id: civicRecordId, tenantId: tenant.tenantId }).lean()
+      : null;
+    if (!civicRecord || String(civicRecord.createUserId || '') !== String(req.user?._id || req.user?.id || '')) {
+      fail(res, 'AGENT_OWNERSHIP_RESTRICTED', 'This credential may modify or link only civic records owned by its accountable user.');
       return;
     }
   }

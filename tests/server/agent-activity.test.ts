@@ -14,14 +14,16 @@ function queryChain(rows: Array<Record<string, unknown>>) {
 }
 
 function createApp() {
-  const revisionFind = jest.fn(() => queryChain([{ _id: 'revision-1', agentRunId: 'run-001' }]));
+  const revisionFind = jest.fn(() => queryChain([{ _id: '507f1f77bcf86cd799439099', agentRunId: 'run-001' }]));
   const requestFind = jest.fn(() => queryChain([{ _id: 'request-1', agentRunId: 'run-001', status: 'completed' }]));
+  const jobFind = jest.fn(() => queryChain([]));
   const revisionCount = jest.fn(async () => 1);
   const app = express() as express.Express & { db?: unknown };
   app.db = {
     models: {
       EntryRevision: { find: revisionFind, countDocuments: revisionCount },
       IdempotencyRecord: { find: requestFind },
+      AgentJob: { find: jobFind },
     },
   };
   app.use((req, _res, next) => {
@@ -46,6 +48,17 @@ describe('agent activity API', () => {
     expect(revisionFind).toHaveBeenCalledWith({ apiClientId: '507f1f77bcf86cd799439011', agentRunId: 'run-001' });
   });
 
+  it('uses stable revision cursors and rejects malformed cursors', async () => {
+    const { app, revisionFind } = createApp();
+    await request(app).get('/agent/activity?cursor=bad').expect(400)
+      .expect(({ body }) => expect(body.error.code).toBe('CURSOR_INVALID'));
+    await request(app).get('/agent/activity?cursor=507f1f77bcf86cd799439088').expect(200);
+    expect(revisionFind).toHaveBeenCalledWith({
+      apiClientId: '507f1f77bcf86cd799439011',
+      _id: { $lt: '507f1f77bcf86cd799439088' },
+    });
+  });
+
   it('reports a run using only requests and revisions owned by the credential', async () => {
     const { app, revisionFind, requestFind } = createApp();
     const response = await request(app).get('/agent/runs/run-001').expect(200);
@@ -54,4 +67,3 @@ describe('agent activity API', () => {
     expect(revisionFind).toHaveBeenCalledWith({ apiClientId: '507f1f77bcf86cd799439011', agentRunId: 'run-001' });
   });
 });
-

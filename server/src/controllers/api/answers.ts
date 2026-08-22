@@ -16,7 +16,7 @@ import * as answersService from '../../services/answersService';
 import { applyViewModeFilter, withViewModeFilter } from './viewFilter';
 import { applyLegacyEntryContext, resolveLegacyEntryContext } from './entryContext';
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
-export = function (router: Router) {
+function attachAnswers(router: Router) {
   // GET /api/answers - List answers
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
@@ -279,3 +279,10 @@ async function PUT_answer_update(req: WikitruthRequest, res: WikitruthResponse) 
     },
   });
 }
+
+namespace attachAnswers {
+  export const createEntry = POST_answer_create;
+  export const updateEntry = PUT_answer_update;
+}
+
+export = attachAnswers;

@@ -33,6 +33,7 @@ function appFor(scopes: string[], policy: Record<string, unknown> = {}) {
   const app = express() as express.Express & { db?: unknown };
   app.db = { models: {
     Topic: { findById: () => ({ lean: async () => ({ _id: 'topic-1', createUserId: 'someone-else', screening: { status: 1 } }) }) },
+    CivicRecord: { findOne: () => ({ lean: async () => ({ _id: 'civic-1', tenantId: 'fixtheph', createUserId: 'someone-else' }) }) },
   } };
   app.use(express.json());
   app.use((req, _res, next) => {
@@ -47,6 +48,8 @@ function appFor(scopes: string[], policy: Record<string, unknown> = {}) {
   app.put('/moderation/verdict-channel', (_req, res) => res.json({ success: true }));
   app.post('/unknown-write', (_req, res) => res.json({ success: true }));
   app.post('/moderation/change-requests', (_req, res) => res.status(201).json({ success: true }));
+  app.post('/civic/records', (_req, res) => res.status(201).json({ success: true }));
+  app.put('/civic/records/:id', (_req, res) => res.json({ success: true }));
   return app;
 }
 
@@ -115,5 +118,15 @@ describe('agent operation and credential policies', () => {
       objectId: 'topic-1',
       proposedChanges: { title: 'Unsupported type' },
     }).expect(400).expect(({ body }) => expect(body.error.code).toBe('AGENT_TARGET_REQUIRED'));
+  });
+
+  it('keeps civic contributions tenant-bounded and civic edits owner-bounded', async () => {
+    const wrongTenant = appFor(['civic:contribute'], { tenantIds: ['another-tenant'] });
+    await request(wrongTenant).post('/civic/records').send({ kind: 'incident' }).expect(403)
+      .expect(({ body }) => expect(body.error.code).toBe('AGENT_TENANT_RESTRICTED'));
+
+    const ownOnly = appFor(['civic:contribute'], { tenantIds: ['fixtheph'], ownContentOnly: true });
+    await request(ownOnly).put('/civic/records/civic-1').send({ title: 'Agent edit' }).expect(403)
+      .expect(({ body }) => expect(body.error.code).toBe('AGENT_OWNERSHIP_RESTRICTED'));
   });
 });

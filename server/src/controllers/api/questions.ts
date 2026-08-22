@@ -55,7 +55,7 @@ type QuestionWriteBody = {
   private?: unknown;
 };
 
-export = function (router: Router) {
+function attachQuestions(router: Router) {
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       await GET_questions(req, res);
@@ -354,3 +354,10 @@ async function PUT_question_update(req: WikitruthRequest, res: WikitruthResponse
     },
   });
 }
+
+namespace attachQuestions {
+  export const createEntry = POST_question_create;
+  export const updateEntry = PUT_question_update;
+}
+
+export = attachQuestions;

@@ -18,7 +18,7 @@ import { recordEntryRevision } from './revisionWriteRecorder';
 import { notifySubscribers } from '../../services/notificationsService';
 import { applyLegacyEntryContext, resolveLegacyEntryContext } from './entryContext';
 
-export = function (router: Router) {
+function attachIssues(router: Router) {
   // Get issues list
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
@@ -338,3 +338,10 @@ async function PUT_issue_update(req: WikitruthRequest, res: WikitruthResponse) {
     },
   });
 }
+
+namespace attachIssues {
+  export const createEntry = POST_issue_create;
+  export const updateEntry = PUT_issue_update;
+}
+
+export = attachIssues;

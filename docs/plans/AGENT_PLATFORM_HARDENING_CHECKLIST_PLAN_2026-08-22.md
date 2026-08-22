@@ -58,12 +58,12 @@ administrator or truth authority.
 
 ## 4. Validation And Jobs
 
-- [ ] Share validators between dry-run and mutation command handlers.
-- [ ] Fix civic validation to use the canonical `kind` field and tenant schema.
-- [ ] Add bounded validate/execute agent jobs with per-item results,
+- [x] Share validators between dry-run and mutation command handlers.
+- [x] Fix civic validation to use the canonical `kind` field and tenant schema.
+- [x] Add bounded validate/execute agent jobs with per-item results,
       idempotency, cancellation, polling, and progress events.
-- [ ] Add cursor pagination for agent activity and job collections.
-- [ ] Keep jobs resumable and avoid one large cross-command transaction.
+- [x] Add cursor pagination for agent activity and job collections.
+- [x] Keep jobs resumable and avoid one large cross-command transaction.
 
 ## 5. Efficiency And Operations
 
@@ -86,7 +86,7 @@ administrator or truth authority.
 ## 7. Verification And Closure
 
 - [x] Add operation-by-operation authorization matrix coverage.
-- [ ] Add all-seven create and accepted-edit proposal tests.
+- [x] Add all-seven create and accepted-edit proposal tests.
 - [ ] Add advisory-vote, countersign, civic boundary, graph boundary,
       translation, debate, job, rate-limit, and SDK contract tests.
 - [ ] Run focused server and client suites after each implementation group.

@@ -68,7 +68,7 @@ function parseCursor(req: WikitruthRequest): Date | null {
   return parsed;
 }
 
-export = function (router: Router) {
+function attachTopics(router: Router) {
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
       await GET_topics(req, res);
@@ -370,6 +370,13 @@ async function PUT_topic_update(req: WikitruthRequest, res: WikitruthResponse) {
     },
   });
 }
+
+namespace attachTopics {
+  export const createEntry = POST_topic_create;
+  export const updateEntry = PUT_topic_update;
+}
+
+export = attachTopics;
 
 async function GET_topic_entry(req: WikitruthRequest, res: WikitruthResponse) {
   const model: TopicScreeningModel = {};

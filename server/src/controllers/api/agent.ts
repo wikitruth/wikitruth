@@ -7,6 +7,16 @@ import { subscribeRealtime, type RealtimeEvent } from '../../services/realtimeEv
 import type { ApiClientScope } from '../../services/apiClientService';
 import { listAgentOperationPolicies } from '../../services/agentOperationPolicy';
 
+type AgentRuntimeServices = typeof import('../../services/agentRuntimeServices');
+let cachedRuntimeServices: AgentRuntimeServices | null = null;
+
+function runtimeServices(): AgentRuntimeServices {
+  if (!cachedRuntimeServices) {
+    cachedRuntimeServices = require('../../services/agentRuntimeServices') as AgentRuntimeServices;
+  }
+  return cachedRuntimeServices;
+}
+
 const ENTRY_TYPES: Record<string, number> = {
   topic: constants.OBJECT_TYPES.topic,
   argument: constants.OBJECT_TYPES.argument,
@@ -60,6 +70,29 @@ function validationScope(operation: string): ApiClientScope | null {
 }
 
 async function validateDryRun(req: WikitruthRequest, res: WikitruthResponse): Promise<void> {
+  if (Array.isArray(req.body?.commands)) {
+    const { validateAgentCommandForContext } = runtimeServices();
+    const commands = req.body.commands as unknown[];
+    const maximum = req.apiClient?.policy.maxBatchSize || 25;
+    if (!commands.length || commands.length > maximum) {
+      res.status(400).json({ success: false, dryRun: true, valid: false, error: { code: 'AGENT_BATCH_SIZE_INVALID', message: `Provide 1 to ${maximum} commands.` } });
+      return;
+    }
+    const context = { app: req.app, apiClient: req.apiClient!, user: req.user!, agentRun: req.agentRun! };
+    const results = await Promise.all(commands.map((command, index) => validateAgentCommandForContext(command, index, context)));
+    const commandIds = results.map((result) => result.command?.commandId).filter(Boolean);
+    const duplicateCommandIds = commandIds.filter((id, index) => commandIds.indexOf(id) !== index);
+    res.json({
+      success: true, dryRun: true,
+      valid: results.every((result) => result.valid) && duplicateCommandIds.length === 0,
+      maximumBatchSize: maximum,
+      duplicateCommandIds: Array.from(new Set(duplicateCommandIds)),
+      results,
+      automaticFinalDecision: false,
+      normalizedAgentRun: req.agentRun || null,
+    });
+    return;
+  }
   const operation = String(req.body?.operation || 'contribution').trim().toLowerCase();
   const requiredScope = validationScope(operation);
   if (!requiredScope) {
@@ -86,7 +119,7 @@ async function validateDryRun(req: WikitruthRequest, res: WikitruthResponse): Pr
     }
     if (objectType && !errors.length) {
       // Load only for dry runs so identity/capability checks stay datastore-light.
-      const { findDuplicateCandidatesForDraft } = require('../../services/entryMergeService') as typeof import('../../services/entryMergeService');
+      const { findDuplicateCandidatesForDraft } = runtimeServices();
       duplicates = await findDuplicateCandidatesForDraft(objectType, payload) as unknown as Array<Record<string, unknown>>;
       if (duplicates.some((candidate) => candidate.rule === 'exact_title' || candidate.rule === 'exact_content')) {
         errors.push({ field: 'payload', message: 'An exact duplicate exists in this contribution scope.' });
@@ -109,9 +142,14 @@ async function validateDryRun(req: WikitruthRequest, res: WikitruthResponse): Pr
     if (String(payload.rationale || '').trim().length < 10) errors.push({ field: 'payload.rationale', message: 'A substantive rationale is required.' });
     warnings.push({ field: 'operation', message: 'Agent analysis is advisory and cannot count toward consensus until a human reviewer countersigns it.' });
   } else if (operation === 'civic_record') {
-    if (!String(payload.title || '').trim()) errors.push({ field: 'payload.title', message: 'A civic record title is required.' });
-    if (!String(payload.recordType || '').trim()) errors.push({ field: 'payload.recordType', message: 'recordType is required.' });
-    warnings.push({ field: 'operation', message: 'Tenant policy and extension-schema validation also run during mutation.' });
+    const { validateAgentCivicDraft } = runtimeServices();
+    const civicValidation = await validateAgentCivicDraft(
+      req.body?.tenantId ?? payload.tenantId,
+      payload,
+      req.apiClient?.policy.tenantIds || [],
+    );
+    errors.push(...civicValidation.errors);
+    warnings.push(...civicValidation.warnings);
   } else if (operation === 'translation') {
     if (!String(payload.locale || '').trim()) errors.push({ field: 'payload.locale', message: 'locale is required.' });
     if (String(payload.content || '').trim().length < 10) errors.push({ field: 'payload.content', message: 'Translated content is required.' });
@@ -206,31 +244,132 @@ export = function (router: Router) {
     if (!requireAgent(req, res)) return;
     const page = boundedPage(req.query.page, 1, 10_000);
     const limit = boundedPage(req.query.limit, 25, 100);
-    const query: Record<string, unknown> = { apiClientId: req.apiClient!.id };
+    const cursor = String(req.query.cursor || '').trim();
+    if (cursor && !/^[a-f\d]{24}$/i.test(cursor)) {
+      res.status(400).json({ success: false, error: { code: 'CURSOR_INVALID', message: 'cursor must be a revision ID returned by this collection.' } });
+      return;
+    }
+    const baseQuery: Record<string, unknown> = { apiClientId: req.apiClient!.id };
     const runId = String(req.query.runId || '').trim();
-    if (runId) query.agentRunId = runId;
+    if (runId) baseQuery.agentRunId = runId;
+    const query = cursor ? { ...baseQuery, _id: { $lt: cursor } } : baseQuery;
     const db = models(req);
-    const [total, revisions] = await Promise.all([
-      db.EntryRevision.countDocuments(query),
-      db.EntryRevision.find(query).sort({ createDate: -1 }).skip((page - 1) * limit).limit(limit)
-        .select('-snapshot').lean(),
+    const revisionsQuery = db.EntryRevision.find(query).sort({ _id: -1 });
+    if (!cursor && page > 1) revisionsQuery.skip((page - 1) * limit);
+    const [total, rows] = await Promise.all([
+      db.EntryRevision.countDocuments(baseQuery),
+      revisionsQuery.limit(limit + 1).select('-snapshot').lean(),
     ]);
-    res.json({ success: true, page, limit, total, revisions });
+    const hasMore = rows.length > limit;
+    const revisions = hasMore ? rows.slice(0, limit) : rows;
+    res.json({
+      success: true, page, limit, total, revisions,
+      nextCursor: hasMore ? String(revisions.at(-1)?._id || '') : null,
+    });
   });
 
   router.get('/runs/:runId', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!requireAgent(req, res)) return;
     const runId = String(req.params.runId || '').trim();
     const db = models(req);
-    const [requests, revisions] = await Promise.all([
+    const [requests, revisions, jobs] = await Promise.all([
       db.IdempotencyRecord.find({ apiClientId: req.apiClient!.id, agentRunId: runId })
         .sort({ createDate: -1 }).select('-responseBody -keyHash -fingerprint').lean(),
       db.EntryRevision.find({ apiClientId: req.apiClient!.id, agentRunId: runId })
         .sort({ createDate: -1 }).select('-snapshot').lean(),
+      db.AgentJob.find({ apiClientId: req.apiClient!.id, agentRunId: runId })
+        .sort({ createDate: -1 }).select('-commands').lean(),
     ]);
     const status = requests.some((request: Record<string, unknown>) => request.status === 'pending')
-      ? 'processing' : requests.length || revisions.length ? 'completed' : 'not_found';
-    res.json({ success: true, runId, status, requests, revisions });
+      || jobs.some((job: Record<string, unknown>) => ['queued', 'running', 'cancel_requested'].includes(String(job.status || '')))
+      ? 'processing' : requests.length || revisions.length || jobs.length ? 'completed' : 'not_found';
+    res.json({ success: true, runId, status, requests, revisions, jobs });
+  });
+
+  router.get('/jobs', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!requireAgent(req, res)) return;
+    const { resumeAgentJobs } = runtimeServices();
+    void resumeAgentJobs(req.app);
+    const limit = boundedPage(req.query.limit, 25, 100);
+    const cursor = String(req.query.cursor || '').trim();
+    if (cursor && !/^[a-f\d]{24}$/i.test(cursor)) {
+      res.status(400).json({ success: false, error: { code: 'CURSOR_INVALID', message: 'cursor must be a job ID returned by this collection.' } });
+      return;
+    }
+    const query: Record<string, unknown> = { apiClientId: req.apiClient!.id };
+    if (cursor) query._id = { $lt: cursor };
+    const jobs = await models(req).AgentJob.find(query).sort({ _id: -1 }).limit(limit + 1).select('-commands').lean();
+    const hasMore = jobs.length > limit;
+    const items = hasMore ? jobs.slice(0, limit) : jobs;
+    res.json({ success: true, items, nextCursor: hasMore ? String(items.at(-1)?._id || '') : null });
+  });
+
+  router.post('/jobs', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!requireAgent(req, res)) return;
+    const { validateAgentCommandForContext, scheduleAgentJob } = runtimeServices();
+    const commands = Array.isArray(req.body?.commands) ? req.body.commands as unknown[] : [];
+    const maximum = req.apiClient!.policy.maxBatchSize;
+    if (!commands.length || commands.length > maximum) {
+      res.status(400).json({ success: false, error: { code: 'AGENT_BATCH_SIZE_INVALID', message: `Provide 1 to ${maximum} commands.` } });
+      return;
+    }
+    const context = { app: req.app, apiClient: req.apiClient!, user: req.user!, agentRun: req.agentRun! };
+    const validations = await Promise.all(commands.map((command, index) => validateAgentCommandForContext(command, index, context)));
+    const commandIds = validations.map((result) => result.command?.commandId).filter(Boolean);
+    const duplicates = commandIds.filter((id, index) => commandIds.indexOf(id) !== index);
+    if (validations.some((result) => !result.valid) || duplicates.length) {
+      res.status(400).json({ success: false, error: { code: 'AGENT_JOB_INVALID', message: 'Every job command must pass validation and use a unique commandId.' }, validations, duplicateCommandIds: Array.from(new Set(duplicates)) });
+      return;
+    }
+    const normalizedCommands = validations.map((result) => result.command);
+    const job = await models(req).AgentJob.create({
+      apiClientId: req.apiClient!.id,
+      accountableUserId: req.apiClient!.userId,
+      agentRunId: req.agentRun!.runId,
+      agentModel: req.agentRun!.model,
+      agentProvider: req.agentRun!.provider,
+      agentPurpose: req.agentRun!.purpose,
+      sourceManifest: req.agentRun!.sourceManifest,
+      status: 'queued', commands: normalizedCommands, results: [], nextIndex: 0,
+      createDate: new Date(), editDate: new Date(), expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+    });
+    scheduleAgentJob(req.app, String(job._id || ''));
+    res.status(202).json({ success: true, job: { id: String(job._id || ''), status: 'queued', commandCount: commands.length, agentRunId: req.agentRun!.runId } });
+  });
+
+  router.get('/jobs/:id', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!requireAgent(req, res)) return;
+    const { resumeAgentJobs } = runtimeServices();
+    void resumeAgentJobs(req.app);
+    const job = await models(req).AgentJob.findOne({ _id: req.params.id, apiClientId: req.apiClient!.id }).lean();
+    if (!job) {
+      res.status(404).json({ success: false, error: { code: 'AGENT_JOB_NOT_FOUND', message: 'Agent job not found.' } });
+      return;
+    }
+    res.json({ success: true, job });
+  });
+
+  router.post('/jobs/:id/cancel', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!requireAgent(req, res)) return;
+    const { scheduleAgentJob } = runtimeServices();
+    const db = models(req);
+    const job = await db.AgentJob.findOne({ _id: req.params.id, apiClientId: req.apiClient!.id }).lean();
+    if (!job) {
+      res.status(404).json({ success: false, error: { code: 'AGENT_JOB_NOT_FOUND', message: 'Agent job not found.' } });
+      return;
+    }
+    if (!['queued', 'running', 'cancel_requested'].includes(String(job.status || ''))) {
+      res.status(409).json({ success: false, error: { code: 'AGENT_JOB_NOT_CANCELLABLE', message: 'The job is already in a terminal state.' } });
+      return;
+    }
+    const nextStatus = job.status === 'queued' ? 'cancelled' : 'cancel_requested';
+    const update: Record<string, unknown> = { status: nextStatus, editDate: new Date() };
+    if (nextStatus === 'cancelled') update.completedDate = new Date();
+    await db.AgentJob.updateOne(
+      { _id: job._id, apiClientId: req.apiClient!.id, status: job.status }, { $set: update },
+    );
+    if (nextStatus === 'cancel_requested') scheduleAgentJob(req.app, String(job._id || ''));
+    res.status(202).json({ success: true, job: { id: String(job._id || ''), status: nextStatus } });
   });
 
   router.get('/events', function (req: WikitruthRequest, res: WikitruthResponse) {

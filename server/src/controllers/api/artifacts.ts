@@ -21,7 +21,7 @@ import { rejectBlockingDuplicate } from './duplicateWriteGuard';
 import { recordEntryRevision } from './revisionWriteRecorder';
 import { applyViewModeFilter, withViewModeFilter } from './viewFilter';
 const db = (appModForDb as unknown as { db: { models: Record<string, any> } }).db.models;
-export = function (router: Router) {
+function attachArtifacts(router: Router) {
   // GET /api/artifacts - List artifacts
   router.get('/', async function (req: WikitruthRequest, res: WikitruthResponse) {
     try {
@@ -407,3 +407,10 @@ async function PUT_artifact_update(req: WikitruthRequest, res: WikitruthResponse
     },
   });
 }
+
+namespace attachArtifacts {
+  export const createEntry = POST_artifact_create;
+  export const updateEntry = PUT_artifact_update;
+}
+
+export = attachArtifacts;
