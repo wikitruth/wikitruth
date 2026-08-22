@@ -1,0 +1,48 @@
+.wt-agent-credential-table {
+  table-layout: fixed;
+}
+
+.wt-agent-credential-table th,
+.wt-agent-credential-table td,
+.wt-agent-credential-table code {
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.table-responsive > .wt-agent-credential-table > thead > tr > th,
+.table-responsive > .wt-agent-credential-table > tbody > tr > td {
+  white-space: normal;
+}
+
+@media (min-width: 601px) {
+  .wt-agent-credential-table th:nth-child(1) { width: 18%; }
+  .wt-agent-credential-table th:nth-child(2) { width: 18%; }
+  .wt-agent-credential-table th:nth-child(3) { width: 28%; }
+  .wt-agent-credential-table th:nth-child(4) { width: 12%; }
+  .wt-agent-credential-table th:nth-child(5) { width: 9%; }
+  .wt-agent-credential-table th:nth-child(6) { width: 15%; }
+}
+
+@media (max-width: 600px) {
+  .table-responsive > .wt-agent-credential-table,
+  .wt-agent-credential-table tbody,
+  .wt-agent-credential-table tr,
+  .wt-agent-credential-table td {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .wt-agent-credential-table td {
+    display: block;
+  }
+
+  .wt-agent-credential-table td::before {
+    display: block;
+    margin-bottom: 3px;
+  }
+
+  .wt-agent-credential-table code {
+    word-break: break-all;
+  }
+}

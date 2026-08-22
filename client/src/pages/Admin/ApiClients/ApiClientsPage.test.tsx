@@ -62,6 +62,10 @@ describe('ApiClientsPage', () => {
     }] });
     const user = userEvent.setup();
     render(<ApiClientsPage />);
+    expect(await screen.findByRole('table')).toHaveClass('responsive');
+    const credentialRow = screen.getByText('Research agent').closest('tr');
+    expect(credentialRow?.querySelector('td[data-label="Agent"]')).toBeInTheDocument();
+    expect(credentialRow?.querySelector('td[data-label="Accountable user"]')).toHaveTextContent('user-1');
     await user.click(await screen.findByRole('button', { name: 'Usage' }));
     expect(await screen.findByRole('heading', { name: /research agent usage/i })).toBeInTheDocument();
     expect(screen.getByText('Rate limited')).toBeInTheDocument();

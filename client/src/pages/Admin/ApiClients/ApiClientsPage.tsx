@@ -7,6 +7,8 @@ import apiClientsApi, {
   type ApiClientScope,
 } from '../../../services/api/apiClients';
 import type { AdminRecord } from '../../../services/api/admin';
+import '../adminOperations.css';
+import './ApiClientsPage.css';
 
 const SCOPES: Array<{ value: ApiClientScope; label: string; help: string }> = [
   { value: 'entries:read', label: 'Read entries', help: 'Read permitted knowledge entries and public evidence.' },
@@ -195,7 +197,31 @@ const ApiClientsPage: React.FC = () => {
       <div className="panel panel-default">
         <div className="panel-heading"><strong>Credentials</strong></div>
         {loading ? <div className="panel-body text-muted">Loading...</div> : (
-          <div className="table-responsive"><table className="table table-striped"><thead><tr><th>Agent</th><th>Accountable user</th><th>Scopes and boundaries</th><th>Use</th><th>Status</th><th>Actions</th></tr></thead><tbody>{clients.map((client) => <tr key={client.id}><td><strong>{client.name}</strong><div className="text-muted small"><code>{client.tokenPrefix}...</code></div></td><td>{client.accountableUser?.username || client.userId}</td><td>{client.scopes.map((scope) => <span className="label label-default" key={scope} style={{ marginRight: 3 }}>{scope}</span>)}<div className="text-muted small">Types: {client.policy.entryTypes.join(', ') || 'none'}; visibility: {client.policy.maxVisibility}; batch: {client.policy.maxBatchSize}</div>{client.policy.tenantIds.length ? <div className="text-muted small">Tenants: {client.policy.tenantIds.join(', ')}</div> : null}{client.policy.parentRootIds.length ? <div className="text-muted small">Parent roots: {client.policy.parentRootIds.join(', ')}</div> : null}</td><td>{client.requestCount} request(s)<div className="text-muted small">{client.lastUsedAt ? `Last used ${new Date(client.lastUsedAt).toLocaleString()}` : 'Never used'}</div></td><td><span className={`label label-${client.status === 'active' ? 'success' : 'default'}`}>{client.status}</span></td><td><button className="btn btn-xs btn-info" type="button" disabled={usageLoadingId === client.id} onClick={() => void showUsage(client)}>{usageLoadingId === client.id ? 'Loading...' : 'Usage'}</button>{client.status === 'active' ? <>{' '}<button className="btn btn-xs btn-default" type="button" onClick={() => void rotate(client)}>Rotate</button>{' '}<button className="btn btn-xs btn-danger" type="button" onClick={() => void revoke(client)}>Revoke</button></> : null}</td></tr>)}</tbody></table></div>
+          <div className="table-responsive">
+            <table className="table table-striped wt-admin-table responsive wt-agent-credential-table">
+              <thead><tr><th>Agent</th><th>Accountable user</th><th>Scopes and boundaries</th><th>Use</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody>{clients.map((client) => (
+                <tr key={client.id}>
+                  <td data-label="Agent"><strong>{client.name}</strong><div className="text-muted small"><code>{client.tokenPrefix}...</code></div></td>
+                  <td data-label="Accountable user">{client.accountableUser?.username || client.userId}</td>
+                  <td data-label="Scopes and boundaries">
+                    {client.scopes.map((scope) => <span className="label label-default" key={scope} style={{ marginRight: 3 }}>{scope}</span>)}
+                    <div className="text-muted small">Types: {client.policy.entryTypes.join(', ') || 'none'}; visibility: {client.policy.maxVisibility}; batch: {client.policy.maxBatchSize}</div>
+                    {client.policy.tenantIds.length ? <div className="text-muted small">Tenants: {client.policy.tenantIds.join(', ')}</div> : null}
+                    {client.policy.parentRootIds.length ? <div className="text-muted small">Parent roots: {client.policy.parentRootIds.join(', ')}</div> : null}
+                  </td>
+                  <td data-label="Use">{client.requestCount} request(s)<div className="text-muted small">{client.lastUsedAt ? `Last used ${new Date(client.lastUsedAt).toLocaleString()}` : 'Never used'}</div></td>
+                  <td data-label="Status"><span className={`label label-${client.status === 'active' ? 'success' : 'default'}`}>{client.status}</span></td>
+                  <td data-label="Actions">
+                    <div className="wt-admin-row-actions">
+                      <button className="btn btn-xs btn-info" type="button" disabled={usageLoadingId === client.id} onClick={() => void showUsage(client)}>{usageLoadingId === client.id ? 'Loading...' : 'Usage'}</button>
+                      {client.status === 'active' ? <><button className="btn btn-xs btn-default" type="button" onClick={() => void rotate(client)}>Rotate</button><button className="btn btn-xs btn-danger" type="button" onClick={() => void revoke(client)}>Revoke</button></> : null}
+                    </div>
+                  </td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
         )}
       </div>
 

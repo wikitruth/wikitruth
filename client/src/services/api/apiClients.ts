@@ -50,6 +50,27 @@ export interface AgentUsageReport {
   advice: Record<string, number>;
 }
 
+const DEFAULT_ENTRY_TYPES: ApiClientPolicy['entryTypes'] = [
+  'topic', 'argument', 'question', 'answer', 'artifact', 'issue', 'opinion',
+];
+
+function normalizeClientRecord(client: ApiClientRecord): ApiClientRecord {
+  const policy = client.policy || {} as Partial<ApiClientPolicy>;
+  return {
+    ...client,
+    scopes: Array.isArray(client.scopes) ? client.scopes : [],
+    policy: {
+      tenantIds: Array.isArray(policy.tenantIds) ? policy.tenantIds : [],
+      entryTypes: Array.isArray(policy.entryTypes) && policy.entryTypes.length ? policy.entryTypes : [...DEFAULT_ENTRY_TYPES],
+      parentRootIds: Array.isArray(policy.parentRootIds) ? policy.parentRootIds : [],
+      ownContentOnly: policy.ownContentOnly !== false,
+      maxVisibility: policy.maxVisibility === 'owned_private' ? 'owned_private' : 'public_only',
+      sourceRequired: policy.sourceRequired === true,
+      maxBatchSize: Number.isFinite(policy.maxBatchSize) ? Math.max(1, Math.min(100, Number(policy.maxBatchSize))) : 25,
+    },
+  };
+}
+
 const csrfToken = (): string | null => {
   const match = typeof document === 'undefined' ? null : document.cookie.match(/(?:^|;\s*)_csrfToken=([^;]+)/);
   return match ? decodeURIComponent(match[1]) : null;
@@ -67,9 +88,15 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export const apiClientsApi = {
-  list: () => request<{ success: boolean; clients: ApiClientRecord[] }>('/admin/api-clients'),
+  list: async () => {
+    const response = await request<{ success: boolean; clients: ApiClientRecord[] }>('/admin/api-clients');
+    return { ...response, clients: (response.clients || []).map(normalizeClientRecord) };
+  },
   usage: (id: string, days = 30) => request<AgentUsageReport>(`/admin/api-clients/${encodeURIComponent(id)}/usage?days=${days}`),
-  users: () => request<AdminRecord[]>('/admin/users'),
+  users: async () => {
+    const response = await request<AdminRecord[] | { items?: AdminRecord[] }>('/admin/users?page=1&limit=100');
+    return Array.isArray(response) ? response : response.items || [];
+  },
   create: (payload: {
     name: string;
     description?: string;

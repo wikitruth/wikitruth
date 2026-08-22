@@ -35,4 +35,31 @@ describe('apiClientsApi', () => {
     await apiClientsApi.usage('client/1', 14);
     expect(fetchMock).toHaveBeenCalledWith('/api/admin/api-clients/client%2F1/usage?days=14', expect.objectContaining({ credentials: 'include' }));
   });
+
+  it('normalizes the paginated accountable-user collection', async () => {
+    const fetchMock = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true, items: [{ _id: 'user-1', username: 'owner' }] }),
+    });
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+    await expect(apiClientsApi.users()).resolves.toEqual([{ _id: 'user-1', username: 'owner' }]);
+    expect(fetchMock).toHaveBeenCalledWith('/api/admin/users?page=1&limit=100', expect.objectContaining({ credentials: 'include' }));
+  });
+
+  it('normalizes legacy credential records without policy boundaries', async () => {
+    const fetchMock = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ success: true, clients: [{ id: 'legacy-1', scopes: ['entries:read'] }] }),
+    });
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+    const response = await apiClientsApi.list();
+    expect(response.clients[0]).toEqual(expect.objectContaining({
+      policy: expect.objectContaining({
+        entryTypes: ['topic', 'argument', 'question', 'answer', 'artifact', 'issue', 'opinion'],
+        ownContentOnly: true,
+        maxVisibility: 'public_only',
+        maxBatchSize: 25,
+      }),
+    }));
+  });
 });

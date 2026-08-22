@@ -22,8 +22,15 @@ const headless = !['0', 'false', 'no'].includes(String(process.env.WT_AGENT_BROW
 
 async function login(page, identity) {
   await page.goto(`${baseUrl}/login`, { waitUntil: 'domcontentloaded' });
-  await page.getByLabel('Username or Email').fill(identity.username);
-  await page.getByLabel('Password').fill(identity.password);
+  const usernameField = page.getByLabel('Username or Email');
+  const passwordToggle = page.getByRole('button', { name: 'Use password instead' });
+  const needsPasswordToggle = await Promise.race([
+    usernameField.waitFor().then(() => false),
+    passwordToggle.waitFor().then(() => true),
+  ]);
+  if (needsPasswordToggle) await passwordToggle.click();
+  await usernameField.fill(identity.username);
+  await page.getByPlaceholder('Enter your password').fill(identity.password);
   await page.getByRole('button', { name: 'Sign In', exact: true }).click();
   await page.waitForURL((url) => url.pathname !== '/login', { timeout: 20_000 });
 }
@@ -43,6 +50,28 @@ async function bearerIdentity(context, token) {
   return { status: response.status(), payload };
 }
 
+async function grantDisposablePasskeyAssurance(connection, identity) {
+  const session = await connection.collection('sessions').findOne({
+    session: { $regex: String(identity.userId) },
+  });
+  assert.ok(session?._id && session.session, 'Authenticated admin session was not persisted');
+  const now = new Date().toISOString();
+  const sessionValue = JSON.parse(session.session);
+  sessionValue.authentication = {
+    method: 'passkey', authenticatedAt: now, passkeyVerifiedAt: now,
+    passkeyCredentialId: `qa-${pilotStamp()}`,
+  };
+  await connection.collection('sessions').updateOne(
+    { _id: session._id },
+    { $set: { session: JSON.stringify(sessionValue), expires: new Date(Date.now() + 60 * 60 * 1000) } },
+  );
+  await connection.collection('passkeycredentials').insertMany([0, 1].map((index) => ({
+    _id: new mongoose.Types.ObjectId(), userId: identity.userId,
+    credentialId: `qa-${pilotStamp()}-${index}`, status: 'active',
+    rpId: '127.0.0.1', createDate: new Date(), editDate: new Date(),
+  })));
+}
+
 async function cleanup(connection, identities) {
   const userIds = identities.map((identity) => identity.userId);
   const accountIds = identities.map((identity) => identity.accountId);
@@ -50,6 +79,7 @@ async function cleanup(connection, identities) {
   const sessionPattern = userIds.map(String).join('|');
   const queries = {
     apiclients: { userId: { $in: userIds } },
+    passkeycredentials: { userId: { $in: userIds } },
     sessions: { session: { $regex: sessionPattern } },
     users: { _id: { $in: userIds } },
     accounts: { _id: { $in: accountIds } },
@@ -97,6 +127,8 @@ async function main() {
 
     await login(page, admin);
     steps.push('platform-admin-login');
+    await grantDisposablePasskeyAssurance(connection, admin);
+    steps.push('local-passkey-assurance-fixture');
     await page.goto(`${baseUrl}/admin/api-clients`, { waitUntil: 'domcontentloaded' });
     await page.getByRole('heading', { name: 'Agent API Credentials' }).waitFor();
     const agentName = `Browser agent ${pilotStamp()}`;
@@ -111,12 +143,27 @@ async function main() {
     const originalToken = await tokenField.inputValue();
     assert.match(originalToken, /^wt_agent_[a-f\d]{24}\.[A-Za-z0-9_-]{32,}$/);
     const originalIdentity = await bearerIdentity(context, originalToken);
-    assert.equal(originalIdentity.status, 200);
+    assert.equal(originalIdentity.status, 200, JSON.stringify(originalIdentity.payload));
     assert.equal(originalIdentity.payload?.accountableUser?.username, accountable.username);
-    assert.deepEqual(originalIdentity.payload?.client?.scopes, ['entries:read', 'contributions:write', 'graph:write']);
+    assert.deepEqual(originalIdentity.payload?.client?.scopes, ['entries:read', 'entries:create', 'graph:write']);
     steps.push('credential-created-and-bearer-authenticated');
+    await page.getByRole('button', { name: 'Hide token' }).click();
+    await tokenField.waitFor({ state: 'detached' });
 
     const row = page.getByRole('row').filter({ hasText: agentName });
+    await row.getByRole('button', { name: 'Usage' }).click();
+    const desktopUsage = page.getByRole('heading', { name: `${agentName} usage` });
+    await desktopUsage.waitFor();
+    const desktopUsagePanel = page.locator('section').filter({ has: desktopUsage });
+    await desktopUsagePanel.getByText('Requests', { exact: true }).waitFor();
+    const desktopWidths = await page.evaluate(() => ({ viewport: window.innerWidth, document: document.documentElement.scrollWidth }));
+    assert.ok(desktopWidths.document <= desktopWidths.viewport, `Agent page overflowed at desktop: ${desktopWidths.document}px > ${desktopWidths.viewport}px`);
+    const desktopTableWidths = await page.locator('.table-responsive').evaluate((element) => ({ client: element.clientWidth, scroll: element.scrollWidth }));
+    assert.ok(desktopTableWidths.scroll <= desktopTableWidths.client, `Credential table overflowed at desktop: ${desktopTableWidths.scroll}px > ${desktopTableWidths.client}px`);
+    await page.screenshot({ path: path.join(outDir, 'credential-usage-desktop.png'), fullPage: true });
+    await desktopUsagePanel.getByRole('button', { name: 'Close usage report' }).click();
+    steps.push('credential-usage-desktop');
+
     page.once('dialog', (dialog) => dialog.accept());
     await row.getByRole('button', { name: 'Rotate' }).click();
     await page.waitForFunction((previousToken) => {
@@ -125,8 +172,10 @@ async function main() {
     }, originalToken);
     const rotatedToken = await tokenField.inputValue();
     assert.notEqual(rotatedToken, originalToken);
-    assert.equal((await bearerIdentity(context, originalToken)).status, 401);
-    assert.equal((await bearerIdentity(context, rotatedToken)).status, 200);
+    const invalidatedOriginalIdentity = await bearerIdentity(context, originalToken);
+    assert.equal(invalidatedOriginalIdentity.status, 401, JSON.stringify(invalidatedOriginalIdentity.payload));
+    const rotatedIdentity = await bearerIdentity(context, rotatedToken);
+    assert.equal(rotatedIdentity.status, 200, JSON.stringify(rotatedIdentity.payload));
     steps.push('credential-rotation-invalidated-old-secret');
 
     await page.setViewportSize({ width: 390, height: 844 });
@@ -134,18 +183,42 @@ async function main() {
     await page.getByRole('heading', { name: 'Agent API Credentials' }).waitFor();
     const widths = await page.evaluate(() => ({ viewport: window.innerWidth, document: document.documentElement.scrollWidth }));
     assert.ok(widths.document <= widths.viewport, `Agent page overflowed: ${widths.document}px > ${widths.viewport}px`);
-    steps.push('agent-management-mobile-overflow');
-
     const mobileRow = page.getByRole('row').filter({ hasText: agentName });
+    await mobileRow.getByRole('button', { name: 'Usage' }).click();
+    const mobileUsage = page.getByRole('heading', { name: `${agentName} usage` });
+    await mobileUsage.waitFor();
+    await page.getByText('Governance and safety events', { exact: true }).waitFor();
+    const mobileUsageWidths = await page.evaluate(() => ({ viewport: window.innerWidth, document: document.documentElement.scrollWidth }));
+    assert.ok(mobileUsageWidths.document <= mobileUsageWidths.viewport, `Usage panel overflowed: ${mobileUsageWidths.document}px > ${mobileUsageWidths.viewport}px`);
+    const mobileTableWidths = await page.locator('.table-responsive').evaluate((element) => ({
+      client: element.clientWidth,
+      scroll: element.scrollWidth,
+      offenders: [element, ...Array.from(element.querySelectorAll('*'))]
+        .filter((candidate) => candidate.scrollWidth > candidate.clientWidth + 1)
+        .slice(0, 8)
+        .map((candidate) => ({
+          tag: candidate.tagName,
+          className: candidate.className,
+          client: candidate.clientWidth,
+          scroll: candidate.scrollWidth,
+          text: candidate.textContent?.trim().slice(0, 80),
+        })),
+    }));
+    assert.ok(mobileTableWidths.scroll <= mobileTableWidths.client, `Credential table overflowed on mobile: ${JSON.stringify(mobileTableWidths)}`);
+    await page.screenshot({ path: path.join(outDir, 'credential-usage-mobile.png'), fullPage: true });
+    await page.getByRole('button', { name: 'Close usage report' }).click();
+    steps.push('agent-management-and-usage-mobile-overflow');
+
     page.once('dialog', (dialog) => dialog.accept());
     await mobileRow.getByRole('button', { name: 'Revoke' }).click();
     await mobileRow.getByText('revoked', { exact: true }).waitFor();
-    assert.equal((await bearerIdentity(context, rotatedToken)).status, 401);
+    const revokedIdentity = await bearerIdentity(context, rotatedToken);
+    assert.equal(revokedIdentity.status, 401, JSON.stringify(revokedIdentity.payload));
     steps.push('credential-revocation-invalidated-current-secret');
     assert.deepEqual(consoleErrors, []);
     credentialEvidence = {
       ownerUserId: String(accountable.userId),
-      scopes: ['entries:read', 'contributions:write', 'graph:write'],
+      scopes: ['entries:read', 'entries:create', 'graph:write'],
       rateLimitPerMinute: 37,
       originalTokenInvalidAfterRotation: true,
       rotatedTokenInvalidAfterRevocation: true,
