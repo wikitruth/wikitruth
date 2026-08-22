@@ -64,6 +64,26 @@ export interface VerdictConsensusSummary {
   revalidationIntervalDays: number;
 }
 
+export interface VerdictAdvice {
+  _id: string;
+  objectType: number;
+  objectName: string;
+  objectId: string;
+  baseRevisionId: string;
+  channel: VerdictChannel;
+  channelStatus: string;
+  rationale: string;
+  framework?: string;
+  evidenceRefs: string[];
+  confidence: number;
+  status: 'pending' | 'reviewing' | 'countersigned' | 'rejected' | 'stale';
+  apiClientName: string;
+  agentModel?: string;
+  agentProvider?: string;
+  agentPurpose?: string;
+  createDate?: string;
+}
+
 export interface ModerationEntry {
   _id?: string;
   title?: string;

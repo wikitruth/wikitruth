@@ -13,6 +13,7 @@ import moderationApi, {
   type VerdictChannel,
   type VerdictConsensusSummary,
   type VerdictDecisionHistory,
+  type VerdictAdvice,
 } from '../../../services/api/moderation';
 import { useAuth } from '../../../context/AuthContext';
 
@@ -63,6 +64,8 @@ const VerdictUpdatePage: React.FC = () => {
   const [conflictDeclared, setConflictDeclared] = useState(false);
   const [conflictDetails, setConflictDetails] = useState('');
   const [summary, setSummary] = useState<VerdictConsensusSummary | null>(null);
+  const [advice, setAdvice] = useState<VerdictAdvice[]>([]);
+  const [adviceNotes, setAdviceNotes] = useState<Record<string, string>>({});
   const [sensitivity, setSensitivity] = useState<'standard' | 'elevated' | 'critical'>('standard');
   const [overrideStatus, setOverrideStatus] = useState('pending');
   const [overrideReasoning, setOverrideReasoning] = useState('');
@@ -79,14 +82,16 @@ const VerdictUpdatePage: React.FC = () => {
       return;
     }
     try {
-      const [entryResult, votesResult] = await Promise.all([
+      const [entryResult, votesResult, adviceResult] = await Promise.all([
         moderationApi.entry(target),
         moderationApi.listVerdictVotes(target, channel),
+        moderationApi.listVerdictAdvice(target, channel),
       ]);
       setEntry(entryResult.entry);
       setDecisionHistory(entryResult.decisionHistory || []);
       setChannelStatuses(entryResult.verdictChannelStatuses || { factual: [], ethical: [] });
       setSummary(votesResult.summary);
+      setAdvice(adviceResult.advice || []);
       setSensitivity(votesResult.summary?.sensitivity || 'standard');
       const current = entryResult.entry?.verdictChannels?.[channel];
       setOverrideStatus(current?.status || 'pending');
@@ -162,6 +167,32 @@ const VerdictUpdatePage: React.FC = () => {
       await load();
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : 'Failed to update verdict sensitivity');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const resolveAdvice = async (item: VerdictAdvice, action: 'countersign' | 'reject') => {
+    const decisionNote = String(adviceNotes[item._id] || '').trim();
+    if (decisionNote.length < 5) {
+      setError('Add a decision note of at least 5 characters before resolving agent advice.');
+      return;
+    }
+    try {
+      setSaving(true);
+      setError(null);
+      const response = await moderationApi.resolveVerdictAdvice(item._id, {
+        action, decisionNote, expertise: expertise.trim() || undefined,
+        affiliation: affiliation.trim() || undefined, conflictDeclared,
+        conflictDetails: conflictDeclared ? conflictDetails.trim() : undefined,
+      });
+      setMessage(action === 'countersign' && response.eligibleVoteCreated
+        ? 'Agent analysis countersigned. Your human reviewer vote was recorded and consensus was recalculated.'
+        : 'Agent analysis rejected without creating a vote.');
+      setAdviceNotes((current) => ({ ...current, [item._id]: '' }));
+      await load();
+    } catch (resolveError) {
+      setError(resolveError instanceof Error ? resolveError.message : 'Failed to resolve agent advice');
     } finally {
       setSaving(false);
     }
@@ -250,6 +281,24 @@ const VerdictUpdatePage: React.FC = () => {
             {currentChannel?.policyVersion ? ` · Policy ${currentChannel.policyVersion}` : ''}
           </p>
           {currentChannel?.overrideReason ? <div className="alert alert-warning"><strong>Override reason:</strong> {currentChannel.overrideReason}</div> : null}
+        </div>
+      </div>
+
+      <div className="panel panel-default">
+        <div className="panel-heading"><strong>Agent analysis awaiting human review</strong></div>
+        <div className="panel-body">
+          <p className="text-muted">These are attributed suggestions only. They do not count toward consensus unless you independently review and countersign one.</p>
+          {advice.length ? advice.map((item) => (
+            <div key={item._id} className="well well-sm">
+              <p><span className="label label-info">Agent advisory</span>{' '}<strong>{item.apiClientName}</strong>{item.agentModel ? ` · ${item.agentModel}` : ''}</p>
+              <p><strong>{LABELS[item.channelStatus] || item.channelStatus}</strong> · {item.confidence}% confidence</p>
+              <p>{item.rationale}</p>
+              {item.evidenceRefs?.length ? <p className="text-muted small">Evidence artifacts: {item.evidenceRefs.join(', ')}</p> : null}
+              <div className="form-group"><label htmlFor={`advice-note-${item._id}`}>Human review note</label><textarea id={`advice-note-${item._id}`} className="form-control" rows={2} value={adviceNotes[item._id] || ''} onChange={(event) => setAdviceNotes((current) => ({ ...current, [item._id]: event.target.value }))} /></div>
+              <Button type="button" variant="success" size="sm" disabled={saving} icon="check" onClick={() => void resolveAdvice(item, 'countersign')}>Countersign as my vote</Button>{' '}
+              <Button type="button" variant="default" size="sm" disabled={saving} icon="times" onClick={() => void resolveAdvice(item, 'reject')}>Reject advice</Button>
+            </div>
+          )) : <p className="text-muted">No pending agent analysis for this channel.</p>}
         </div>
       </div>
 

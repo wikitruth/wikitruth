@@ -61,6 +61,9 @@ describe('agent operation and credential policies', () => {
     expect(resolveAgentOperationPolicy('PUT', '/moderation/verdict-channel')).toEqual(expect.objectContaining({
       agentAllowed: false,
     }));
+    expect(resolveAgentOperationPolicy('PUT', '/moderation/verdict-advice/advice-1')).toEqual(expect.objectContaining({
+      operationId: 'moderation.verdict-advice.review', agentAllowed: false,
+    }));
     expect(resolveAgentOperationPolicy('POST', '/unknown-write')).toBeNull();
     listAgentOperationPolicies().forEach((operation) => {
       if (operation.requiredScope) expect(API_CLIENT_SCOPES).toContain(operation.requiredScope);

@@ -8,6 +8,7 @@ import type {
   VerdictChannel,
   VerdictChannelValue,
   VerdictConsensusSummary,
+  VerdictAdvice,
 } from './moderationVerdictTypes';
 
 export type {
@@ -20,6 +21,7 @@ export type {
   VerdictChannelValue,
   VerdictConsensusSummary,
   VerdictDecisionHistory,
+  VerdictAdvice,
 } from './moderationVerdictTypes';
 
 interface ModerationMutationResponse {
@@ -405,6 +407,24 @@ export const moderationApi = {
   ),
   listVerdictVotes: (target: ModerationTarget, channel?: VerdictChannel) =>
     request<VerdictVotesListResponse>(`/moderation/verdict-votes?${toQuery(target)}${channel ? `&channel=${channel}` : ''}`),
+  listVerdictAdvice: (target: ModerationTarget, channel?: VerdictChannel, status = 'pending') =>
+    request<{ success: boolean; advice: VerdictAdvice[] }>(
+      `/moderation/verdict-advice?${toQuery(target)}${channel ? `&channel=${channel}` : ''}&status=${encodeURIComponent(status)}`,
+    ),
+  resolveVerdictAdvice: (
+    id: string,
+    payload: {
+      action: 'countersign' | 'reject';
+      decisionNote: string;
+      expertise?: string;
+      affiliation?: string;
+      conflictDeclared?: boolean;
+      conflictDetails?: string;
+    },
+  ) => request<{ success: boolean; advice: VerdictAdvice; eligibleVoteCreated: boolean; summary?: VerdictConsensusSummary }>(
+    `/moderation/verdict-advice/${encodeURIComponent(id)}`,
+    { method: 'PUT', body: JSON.stringify(payload) },
+  ),
   submitReaderSignal: (
     target: ModerationTarget,
     payload: {

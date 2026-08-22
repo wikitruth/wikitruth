@@ -21,6 +21,8 @@ jest.mock('../../../services/api/moderation', () => ({
     submitVerdictVote: jest.fn(),
     updateVerdictChannel: jest.fn(),
     updateVerdictPolicy: jest.fn(),
+    listVerdictAdvice: jest.fn(),
+    resolveVerdictAdvice: jest.fn(),
   },
 }));
 jest.mock('../../../context/AuthContext', () => ({ useAuth: jest.fn() }));
@@ -109,6 +111,16 @@ describe('VerdictUpdatePage', () => {
     });
     api.updateVerdictChannel.mockResolvedValue({ success: true });
     api.updateVerdictPolicy.mockResolvedValue({ success: true, sensitivity: 'standard', policy: summary });
+    api.listVerdictAdvice.mockResolvedValue({ success: true, advice: [] });
+    api.resolveVerdictAdvice.mockResolvedValue({
+      success: true,
+      eligibleVoteCreated: true,
+      advice: {
+        _id: 'advice-1', objectType: 1, objectName: 'topic', objectId: 'topic-1', baseRevisionId: 'revision-1',
+        channel: 'factual', channelStatus: 'supported', rationale: 'Primary evidence supports the claim.',
+        evidenceRefs: [], confidence: 80, status: 'countersigned', apiClientName: 'Research agent',
+      },
+    });
   });
 
   it('lets a reviewer vote without exposing administrator final say', async () => {
@@ -141,5 +153,22 @@ describe('VerdictUpdatePage', () => {
         overrideReason: 'A time-sensitive correction is required after reviewing the evidence.',
       }),
     ));
+  });
+
+  it('clearly labels agent analysis and requires a human note before countersign', async () => {
+    api.listVerdictAdvice.mockResolvedValue({ success: true, advice: [{
+      _id: 'advice-1', objectType: 1, objectName: 'topic', objectId: 'topic-1', baseRevisionId: 'revision-1',
+      channel: 'factual', channelStatus: 'supported', rationale: 'Primary evidence supports the claim.',
+      evidenceRefs: [], confidence: 80, status: 'pending', apiClientName: 'Research agent', agentModel: 'research-v2',
+    }] });
+    const user = userEvent.setup();
+    render(<VerdictUpdatePage />);
+    expect(await screen.findByText('Agent advisory')).toBeInTheDocument();
+    expect(screen.getByText(/do not count toward consensus/i)).toBeInTheDocument();
+    await user.type(screen.getByLabelText(/human review note/i), 'I reviewed the cited evidence independently.');
+    await user.click(screen.getByRole('button', { name: /countersign as my vote/i }));
+    await waitFor(() => expect(api.resolveVerdictAdvice).toHaveBeenCalledWith('advice-1', expect.objectContaining({
+      action: 'countersign', decisionNote: 'I reviewed the cited evidence independently.',
+    })));
   });
 });

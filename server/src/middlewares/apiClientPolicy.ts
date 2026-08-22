@@ -43,9 +43,11 @@ function hasSource(req: WikitruthRequest): boolean {
       manifestHasItems = false;
     }
   }
+  const evidenceRefs = Array.isArray(body.evidenceRefs) ? body.evidenceRefs : proposed.evidenceRefs;
   return ['references', 'source', 'archiveUrl', 'checksum'].some((field) => (
     String(body[field] || '').trim() || String(proposed[field] || '').trim()
   ))
+    || (Array.isArray(evidenceRefs) && evidenceRefs.length > 0)
     || Boolean(req.agentRun?.sourceManifest?.length)
     || manifestHasItems;
 }
@@ -102,7 +104,7 @@ export async function enforceApiClientPolicy(
   const credentialPolicy = req.apiClient.policy;
   let entryType = operation.entryTypeFromPath ? entryTypeFromOperationPath(req.path) : null;
   let entryId = requestEntryId(req.path);
-  if (operation.operationId === 'moderation.change-request.create') {
+  if (operation.operationId === 'moderation.change-request.create' || operation.mutationKind === 'moderation_advice') {
     entryType = ENTRY_TYPE_BY_OBJECT_TYPE[Number(req.body?.objectType ?? req.body?.type)] || null;
     entryId = String(req.body?.objectId || req.body?.id || '').trim() || null;
     if (!entryType || !entryId) {
@@ -127,7 +129,7 @@ export async function enforceApiClientPolicy(
     return;
   }
   if (credentialPolicy.sourceRequired
-    && ['create', 'propose_edit', 'civic_create', 'civic_update'].includes(String(operation.mutationKind || ''))
+    && ['create', 'propose_edit', 'moderation_advice', 'civic_create', 'civic_update'].includes(String(operation.mutationKind || ''))
     && !hasSource(req)) {
     fail(res, 'AGENT_SOURCE_REQUIRED', 'This credential requires a source reference or source manifest for content mutations.');
     return;

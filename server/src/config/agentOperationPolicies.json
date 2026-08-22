@@ -26,6 +26,7 @@
   { "operationId": "moderation.appeal.create", "method": "POST", "pattern": "^/moderation/appeals/?$", "agentAllowed": true, "requiredScope": "moderation:advise", "mutationKind": "moderation_advice" },
   { "operationId": "moderation.verdict-advice.create", "method": "POST", "pattern": "^/moderation/verdict-advice/?$", "agentAllowed": true, "requiredScope": "moderation:advise", "mutationKind": "moderation_advice" },
   { "operationId": "moderation.verdict-advice.read", "method": "GET", "pattern": "^/moderation/verdict-advice/?$", "agentAllowed": true, "requiredScope": "moderation:advise" },
+  { "operationId": "moderation.verdict-advice.review", "method": "PUT", "pattern": "^/moderation/verdict-advice/[^/]+/?$", "agentAllowed": false },
   { "operationId": "moderation.verdict-vote.human", "method": "POST", "pattern": "^/moderation/verdict-votes/?$", "agentAllowed": false },
   { "operationId": "moderation.final.human", "method": "*", "pattern": "^/moderation/(screening|verdict-channel|verdicts|delete|merge|rollback|take-ownership|ownership-migration)", "agentAllowed": false },
   { "operationId": "civic.read", "method": "GET", "pattern": "^/(?:tenants/[^/]+/)?civic/(tenant|me|jurisdictions|overview|records(?:/[^/]+)?|candidates/compare|records/[^/]+/(?:links|responses))/?$", "agentAllowed": true, "requiredScope": "civic:read", "tenantScoped": true },

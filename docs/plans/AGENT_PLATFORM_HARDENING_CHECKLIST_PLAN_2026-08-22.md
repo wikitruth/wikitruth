@@ -14,7 +14,7 @@ administrator or truth authority.
       backup, and restore remain human-only.
 - [x] Accepted content is changed by agents only through stale-safe Change
       Requests that a human reviewer resolves.
-- [ ] Agent review input is visibly advisory and cannot count toward or publish
+- [x] Agent review input is visibly advisory and cannot count toward or publish
       consensus until a human reviewer countersigns it.
 - [x] Existing credentials remain revocable and attributable while legacy scope
       names receive a safe compatibility interpretation.
@@ -48,9 +48,9 @@ administrator or truth authority.
 - [x] Route agent edits of accepted entries through Change Requests.
 - [x] Require an explicit base revision for protected accepted-content edits.
 - [x] Keep pending or agent-owned draft edits attributable and policy-bounded.
-- [ ] Store agent verdict analysis separately from eligible human votes.
-- [ ] Add human countersign/reject operations with stale-state protection.
-- [ ] Ensure agents cannot overwrite a human review vote or trigger consensus.
+- [x] Store agent verdict analysis separately from eligible human votes.
+- [x] Add human countersign/reject operations with stale-state protection.
+- [x] Ensure agents cannot overwrite a human review vote or trigger consensus.
 - [ ] Require `graph:write` for every graph-link mutation and keep destructive
       graph operations human-only.
 - [ ] Restrict civic agent mutations to content contribution paths, never tenant

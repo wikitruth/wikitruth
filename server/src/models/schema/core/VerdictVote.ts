@@ -30,6 +30,7 @@ const factory: SchemaFactory = function (app, mongoose) {
     outcomeDate: { type: Date, default: null },
     voterUserId: { type: mongoose.Schema.ObjectId, ref: 'User', required: true, index: true },
     voterUsername: { type: String, default: '' },
+    sourceAdviceId: { type: mongoose.Schema.ObjectId, ref: 'VerdictAdvice', default: null, index: true },
     createDate: { type: Date, default: Date.now, index: true },
     editDate: { type: Date, default: Date.now },
   });
