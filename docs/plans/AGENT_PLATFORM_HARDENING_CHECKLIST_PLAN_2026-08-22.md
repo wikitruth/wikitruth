@@ -67,9 +67,9 @@ administrator or truth authority.
 
 ## 5. Efficiency And Operations
 
-- [ ] Replace process-local rate windows with durable atomic rate buckets.
-- [ ] Batch last-used/request accounting rather than writing on every request.
-- [ ] Preserve revocation correctness while using a short-lived credential cache.
+- [x] Replace process-local rate windows with durable atomic rate buckets.
+- [x] Batch last-used/request accounting rather than writing on every request.
+- [x] Preserve revocation correctness while using a short-lived credential cache.
 - [ ] Add usage, denial, replay, job, and advisory-review observability.
 
 ## 6. Integration Experience

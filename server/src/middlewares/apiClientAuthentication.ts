@@ -7,9 +7,15 @@ import {
   parseApiClientToken,
   toApiClientIdentity,
 } from '../services/apiClientService';
+import {
+  consumeAgentRateLimit,
+  queueApiClientUsage,
+  resetAgentUsageForTests,
+} from '../services/agentUsageService';
 
-type RateWindow = { startedAt: number; count: number };
-const rateWindows = new Map<string, RateWindow>();
+type CachedCredential = { version: string; expiresAt: number; client: Record<string, any> };
+let credentialCaches = new WeakMap<object, Map<string, CachedCredential>>();
+const CREDENTIAL_CACHE_MS = 15_000;
 
 function bearerToken(req: Request): string | null {
   const authorization = String(req.headers.authorization || '').trim();
@@ -19,6 +25,35 @@ function bearerToken(req: Request): string | null {
 
 function fail(res: Response, status: number, code: string, message: string): void {
   res.status(status).json({ success: false, error: { code, message } });
+}
+
+async function selectedRecord(query: any): Promise<Record<string, any> | null> {
+  const selected = query && typeof query.lean === 'function' ? await query.lean() : await query;
+  if (!selected) return null;
+  return selected.toObject ? selected.toObject() : selected;
+}
+
+async function activeClient(models: Record<string, any>, clientId: string): Promise<Record<string, any> | null> {
+  let credentialCache = credentialCaches.get(models.ApiClient as object);
+  if (!credentialCache) {
+    credentialCache = new Map<string, CachedCredential>();
+    credentialCaches.set(models.ApiClient as object, credentialCache);
+  }
+  const probeQuery = models.ApiClient.findOne({ clientId }).select('status expiresAt editDate');
+  const probe = await selectedRecord(probeQuery);
+  if (!probe || probe.status !== 'active') {
+    credentialCache.delete(clientId);
+    return null;
+  }
+  const version = `${String(probe._id || '')}:${new Date(probe.editDate || 0).getTime()}`;
+  const cached = credentialCache.get(clientId);
+  if (cached && cached.version === version && cached.expiresAt > Date.now()) {
+    return { ...cached.client, status: probe.status, expiresAt: probe.expiresAt, editDate: probe.editDate };
+  }
+  const client = await selectedRecord(models.ApiClient.findOne({ clientId }).select('+secretHash'));
+  if (!client || client.status !== 'active') return null;
+  credentialCache.set(clientId, { version, expiresAt: Date.now() + CREDENTIAL_CACHE_MS, client });
+  return client;
 }
 
 export async function authenticateApiClient(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -37,7 +72,7 @@ export async function authenticateApiClient(req: Request, res: Response, next: N
     fail(res, 503, 'AGENT_AUTH_UNAVAILABLE', 'Agent authentication is temporarily unavailable.');
     return;
   }
-  const client = await models?.ApiClient?.findOne({ clientId: parsed.clientId }).select('+secretHash');
+  const client = await activeClient(models, parsed.clientId);
   if (!client || client.status !== 'active' || !apiClientSecretsMatch(String(client.secretHash || ''), parsed.secret)) {
     fail(res, 401, 'AGENT_TOKEN_INVALID', 'The agent credential is invalid or revoked.');
     return;
@@ -48,16 +83,21 @@ export async function authenticateApiClient(req: Request, res: Response, next: N
   }
 
   const limit = Math.max(10, Math.min(600, Number(client.rateLimitPerMinute || 60)));
-  const now = Date.now();
-  const previous = rateWindows.get(parsed.clientId);
-  const window = !previous || now - previous.startedAt >= 60_000 ? { startedAt: now, count: 0 } : previous;
-  window.count += 1;
-  rateWindows.set(parsed.clientId, window);
+  let rate;
+  try {
+    rate = await consumeAgentRateLimit({
+      models, apiClientId: String(client._id || ''), limit, ip: String(req.ip || ''),
+    });
+  } catch (error) {
+    console.error('Agent rate-limit check failed:', error);
+    fail(res, 503, 'AGENT_RATE_LIMIT_UNAVAILABLE', 'Agent rate limiting is temporarily unavailable.');
+    return;
+  }
   res.setHeader('X-RateLimit-Limit', String(limit));
-  res.setHeader('X-RateLimit-Remaining', String(Math.max(0, limit - window.count)));
-  res.setHeader('X-RateLimit-Reset', String(Math.ceil((window.startedAt + 60_000) / 1000)));
-  if (window.count > limit) {
-    res.setHeader('Retry-After', String(Math.max(1, Math.ceil((window.startedAt + 60_000 - now) / 1000))));
+  res.setHeader('X-RateLimit-Remaining', String(rate.remaining));
+  res.setHeader('X-RateLimit-Reset', String(Math.ceil(rate.resetAt.getTime() / 1000)));
+  if (!rate.allowed) {
+    res.setHeader('Retry-After', String(Math.max(1, Math.ceil((rate.resetAt.getTime() - Date.now()) / 1000))));
     fail(res, 429, 'AGENT_RATE_LIMITED', 'The agent request rate limit was exceeded.');
     return;
   }
@@ -67,18 +107,13 @@ export async function authenticateApiClient(req: Request, res: Response, next: N
     fail(res, 401, 'AGENT_OWNER_INACTIVE', 'The accountable user is unavailable or inactive.');
     return;
   }
-  req.apiClient = toApiClientIdentity(client.toObject ? client.toObject() : client);
+  req.apiClient = toApiClientIdentity(client);
   req.user = user;
-  await models.ApiClient.updateOne(
-    { _id: client._id, status: 'active' },
-    {
-      $set: { lastUsedAt: new Date(), lastUsedIp: String(req.ip || ''), editDate: new Date() },
-      $inc: { requestCount: 1 },
-    },
-  );
+  queueApiClientUsage(models, String(client._id || ''), String(req.ip || ''));
   next();
 }
 
 export function resetApiClientRateWindowsForTests(): void {
-  rateWindows.clear();
+  credentialCaches = new WeakMap<object, Map<string, CachedCredential>>();
+  resetAgentUsageForTests();
 }

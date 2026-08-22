@@ -6,6 +6,7 @@ import {
   authenticateApiClient,
   resetApiClientRateWindowsForTests,
 } from '../../server/src/middlewares/apiClientAuthentication';
+import { flushApiClientUsageForTests } from '../../server/src/services/agentUsageService';
 import { enforceApiClientScope } from '../../server/src/middlewares/apiClientScopes';
 import attachAgent from '../../server/src/controllers/api/agent';
 import {
@@ -33,7 +34,7 @@ function credentialFixture(scopes: string[], options: { status?: string; expires
   return { credential, client };
 }
 
-function createApp(fixture: ReturnType<typeof credentialFixture>) {
+function createApp(fixture: ReturnType<typeof credentialFixture>, rateCounts = new Map<string, number>()) {
   const app = express() as express.Express & { db?: unknown };
   const updateOne = jest.fn().mockResolvedValue({ acknowledged: true });
   const user = {
@@ -52,6 +53,14 @@ function createApp(fixture: ReturnType<typeof credentialFixture>) {
       ApiClient: {
         findOne: () => ({ select: async () => fixture.client }),
         updateOne,
+      },
+      ApiClientRateBucket: {
+        findOneAndUpdate: (filter: { apiClientId: string; windowStart: Date }) => {
+          const key = `${filter.apiClientId}:${filter.windowStart.toISOString()}`;
+          const count = (rateCounts.get(key) || 0) + 1;
+          rateCounts.set(key, count);
+          return Promise.resolve({ ...filter, count });
+        },
       },
       User: { findById: async () => user },
     },
@@ -100,6 +109,7 @@ describe('scoped API client authentication', () => {
     expect(response.body).toEqual(expect.objectContaining({
       actor: 'accountable-user', apiClient: 'Research agent', screening: { status: 0 },
     }));
+    await flushApiClientUsageForTests();
     expect(updateOne).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ $inc: { requestCount: 1 } }));
   });
 
@@ -143,6 +153,18 @@ describe('scoped API client authentication', () => {
     ]));
   });
 
+  it('observes credential revocation immediately despite the short-lived cache', async () => {
+    const fixture = credentialFixture(['entries:read']);
+    const { app } = createApp(fixture);
+    await request(app).get('/api/v1/topics')
+      .set('Authorization', `Bearer ${fixture.credential.token}`).expect(200);
+    fixture.client.status = 'revoked';
+    (fixture.client as typeof fixture.client & { editDate?: Date }).editDate = new Date();
+    await request(app).get('/api/v1/topics')
+      .set('Authorization', `Bearer ${fixture.credential.token}`).expect(401)
+      .expect(({ body }) => expect(body.error.code).toBe('AGENT_TOKEN_INVALID'));
+  });
+
   it('validates graph contributions without mutation or final-decision authority', async () => {
     const fixture = credentialFixture(['graph:write']);
     const response = await request(createApp(fixture).app)
@@ -166,13 +188,16 @@ describe('scoped API client authentication', () => {
       .expect(({ body }) => expect(body.error.code).toBe('HUMAN_AUTHORITY_REQUIRED'));
   });
 
-  it('enforces each client rate limit independently', async () => {
+  it('enforces one durable rate limit across application processes', async () => {
     const fixture = credentialFixture(['entries:read'], { rate: 10 });
-    const { app } = createApp(fixture);
+    const sharedRateCounts = new Map<string, number>();
+    const firstProcess = createApp(fixture, sharedRateCounts).app;
+    const secondProcess = createApp(fixture, sharedRateCounts).app;
     for (let index = 0; index < 10; index += 1) {
+      const app = index % 2 === 0 ? firstProcess : secondProcess;
       await request(app).get('/api/v1/topics').set('Authorization', `Bearer ${fixture.credential.token}`).expect(200);
     }
-    await request(app)
+    await request(secondProcess)
       .get('/api/v1/topics')
       .set('Authorization', `Bearer ${fixture.credential.token}`)
       .expect(429)
