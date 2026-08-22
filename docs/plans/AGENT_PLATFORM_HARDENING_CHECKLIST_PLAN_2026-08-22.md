@@ -70,7 +70,7 @@ administrator or truth authority.
 - [x] Replace process-local rate windows with durable atomic rate buckets.
 - [x] Batch last-used/request accounting rather than writing on every request.
 - [x] Preserve revocation correctness while using a short-lived credential cache.
-- [ ] Add usage, denial, replay, job, and advisory-review observability.
+- [x] Add usage, denial, replay, job, and advisory-review observability.
 
 ## 6. Integration Experience
 
@@ -87,9 +87,9 @@ administrator or truth authority.
 
 - [x] Add operation-by-operation authorization matrix coverage.
 - [x] Add all-seven create and accepted-edit proposal tests.
-- [ ] Add advisory-vote, countersign, civic boundary, graph boundary,
+- [x] Add advisory-vote, countersign, civic boundary, graph boundary,
       translation, debate, job, rate-limit, and SDK contract tests.
-- [ ] Run focused server and client suites after each implementation group.
+- [x] Run focused server and client suites after each implementation group.
 - [ ] Run full server/client tests, lint, type checks, source guardrails,
       OpenAPI checks, and production builds.
 - [ ] Run browser acceptance for credential policy management at desktop and
