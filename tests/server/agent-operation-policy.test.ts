@@ -50,6 +50,9 @@ function appFor(scopes: string[], policy: Record<string, unknown> = {}) {
   app.post('/moderation/change-requests', (_req, res) => res.status(201).json({ success: true }));
   app.post('/civic/records', (_req, res) => res.status(201).json({ success: true }));
   app.put('/civic/records/:id', (_req, res) => res.json({ success: true }));
+  app.post('/outline/link', (_req, res) => res.status(201).json({ success: true }));
+  app.put('/topics/links/:id', (_req, res) => res.json({ success: true }));
+  app.delete('/topics/links/:id', (_req, res) => res.json({ success: true }));
   return app;
 }
 
@@ -128,5 +131,15 @@ describe('agent operation and credential policies', () => {
     const ownOnly = appFor(['civic:contribute'], { tenantIds: ['fixtheph'], ownContentOnly: true });
     await request(ownOnly).put('/civic/records/civic-1').send({ title: 'Agent edit' }).expect(403)
       .expect(({ body }) => expect(body.error.code).toBe('AGENT_OWNERSHIP_RESTRICTED'));
+  });
+
+  it('requires graph scope for creation and reserves graph changes and deletion for humans', async () => {
+    await request(appFor(['entries:create'])).post('/outline/link').send({}).expect(403)
+      .expect(({ body }) => expect(body.error.code).toBe('AGENT_SCOPE_REQUIRED'));
+    await request(appFor(['graph:write'])).post('/outline/link').send({}).expect(201);
+    await request(appFor(['graph:write'])).put('/topics/links/link-1').send({}).expect(403)
+      .expect(({ body }) => expect(body.error.code).toBe('HUMAN_AUTHORITY_REQUIRED'));
+    await request(appFor(['graph:write'])).delete('/topics/links/link-1').expect(403)
+      .expect(({ body }) => expect(body.error.code).toBe('HUMAN_AUTHORITY_REQUIRED'));
   });
 });

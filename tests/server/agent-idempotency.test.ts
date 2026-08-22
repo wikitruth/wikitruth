@@ -51,6 +51,7 @@ const headers = {
   'X-Agent-Model': 'research-model-v2',
   'X-Agent-Provider': 'local',
   'X-Agent-Purpose': 'Import a reviewed source set',
+  'X-Agent-Source-Manifest': JSON.stringify([{ artifactId: 'artifact-1', checksum: 'sha256:abc' }]),
 };
 
 describe('agent mutation reliability', () => {
@@ -64,7 +65,7 @@ describe('agent mutation reliability', () => {
 
   it('returns the original response for an identical retry and rejects key drift', async () => {
     const { app, records, handlerCalls } = createApp();
-    const body = { title: 'Auditable claim', agentMetadata: { sourceManifest: [{ artifactId: 'artifact-1', checksum: 'sha256:abc' }] } };
+    const body = { title: 'Auditable claim' };
     const first = await request(app).post('/topics').set(headers).send(body).expect(201);
     await new Promise((resolve) => setImmediate(resolve));
     const replay = await request(app).post('/topics').set(headers).send(body).expect(201);

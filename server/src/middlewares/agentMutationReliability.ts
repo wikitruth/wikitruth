@@ -28,7 +28,15 @@ function boundedHeader(req: WikitruthRequest, name: string, max: number): string
 }
 
 function sourceManifest(req: WikitruthRequest): Array<Record<string, string>> {
-  const raw = req.body?.agentMetadata?.sourceManifest;
+  let raw = req.body?.agentMetadata?.sourceManifest;
+  const header = String(req.get('x-agent-source-manifest') || '').trim();
+  if (!Array.isArray(raw) && header && Buffer.byteLength(header, 'utf8') <= 50_000) {
+    try {
+      raw = JSON.parse(header) as unknown;
+    } catch (_error) {
+      raw = [];
+    }
+  }
   if (!Array.isArray(raw)) return [];
   return raw.slice(0, 50).map((item: unknown) => {
     const source = item && typeof item === 'object' && !Array.isArray(item) ? item as Record<string, unknown> : {};

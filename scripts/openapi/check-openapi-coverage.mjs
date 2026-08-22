@@ -6,6 +6,12 @@ import path from 'node:path';
 const root = process.cwd();
 const specPath = path.join(root, 'docs/api/openapi.json');
 const write = process.argv.includes('--write');
+const agentPolicies = JSON.parse(fs.readFileSync(path.join(root, 'server/src/config/agentOperationPolicies.json'), 'utf8'));
+const agentScopes = [
+  'entries:read', 'entries:create', 'entries:propose-edit', 'graph:write',
+  'civic:read', 'civic:contribute', 'moderation:advise', 'translations:write',
+  'debates:participate', 'agent:runs:read',
+];
 const groups = [
   ['/home', ['home.ts']], ['/application-context', ['applicationContext.ts']],
   ['/topics', ['topics.ts']], ['/arguments', ['arguments.ts']], ['/questions', ['questions.ts']],
@@ -100,16 +106,34 @@ function addComponents(spec) {
   };
   schemas.ApiErrorResponse = { type: 'object', required: ['success', 'error'], properties: { success: { type: 'boolean', enum: [false] }, error: { $ref: '#/components/schemas/ApiError' } } };
   schemas.ApiClientIdentity = {
-    type: 'object', required: ['clientId', 'name', 'scopes', 'ownerUserId'],
-    properties: { clientId: { type: 'string' }, name: { type: 'string' }, scopes: { type: 'array', items: { type: 'string' } }, ownerUserId: { type: 'string' }, expiresAt: { type: 'string', format: 'date-time', nullable: true } },
-    example: { clientId: '4f86a29c50bc49a1b540a8d1', name: 'Research agent', scopes: ['entries:read', 'contributions:write'], ownerUserId: '66f000000000000000000001' },
+    type: 'object', required: ['id', 'clientId', 'name', 'userId', 'scopes', 'policy'],
+    properties: {
+      id: { type: 'string' }, clientId: { type: 'string' }, name: { type: 'string' }, userId: { type: 'string' },
+      tokenPrefix: { type: 'string' }, scopes: { type: 'array', items: { type: 'string', enum: agentScopes } },
+      rateLimitPerMinute: { type: 'integer', minimum: 10, maximum: 600 },
+      expiresAt: { type: 'string', format: 'date-time', nullable: true },
+      policy: { $ref: '#/components/schemas/ApiClientPolicy' },
+    },
+    example: { id: '66f000000000000000000010', clientId: '4f86a29c50bc49a1b540a8d1', name: 'Research agent', scopes: ['entries:read', 'entries:create'], userId: '66f000000000000000000001' },
+  };
+  schemas.ApiClientPolicy = {
+    type: 'object', required: ['tenantIds', 'entryTypes', 'parentRootIds', 'ownContentOnly', 'maxVisibility', 'sourceRequired', 'maxBatchSize'],
+    properties: {
+      tenantIds: { type: 'array', maxItems: 100, items: { type: 'string' } },
+      entryTypes: { type: 'array', items: { type: 'string', enum: ['topic', 'argument', 'question', 'answer', 'artifact', 'issue', 'opinion'] } },
+      parentRootIds: { type: 'array', maxItems: 100, items: { type: 'string' } },
+      ownContentOnly: { type: 'boolean', default: true },
+      maxVisibility: { type: 'string', enum: ['public_only', 'owned_private'], default: 'public_only' },
+      sourceRequired: { type: 'boolean', default: false },
+      maxBatchSize: { type: 'integer', minimum: 1, maximum: 100, default: 25 },
+    },
   };
   schemas.ApiClientCreateRequest = {
-    type: 'object', required: ['name', 'ownerUserId', 'scopes'],
-    properties: { name: { type: 'string', maxLength: 120 }, ownerUserId: { type: 'string' }, scopes: { type: 'array', items: { type: 'string', enum: ['entries:read', 'contributions:write', 'graph:write', 'civic:write', 'moderation:write', 'admin:write'] } }, expiresAt: { type: 'string', format: 'date-time', nullable: true }, rateLimitPerMinute: { type: 'integer', minimum: 1, maximum: 1000 } },
+    type: 'object', required: ['name', 'userId', 'scopes'],
+    properties: { name: { type: 'string', minLength: 3, maxLength: 120 }, description: { type: 'string', maxLength: 500 }, userId: { type: 'string' }, scopes: { type: 'array', minItems: 1, items: { type: 'string', enum: agentScopes } }, policy: { $ref: '#/components/schemas/ApiClientPolicy' }, expiresAt: { type: 'string', format: 'date-time', nullable: true }, rateLimitPerMinute: { type: 'integer', minimum: 10, maximum: 600 } },
   };
   schemas.ApiClientCredentialResponse = { type: 'object', properties: { success: { type: 'boolean' }, token: { type: 'string', description: 'Shown once; store securely' }, client: { $ref: '#/components/schemas/ApiClientIdentity' } } };
-  schemas.AgentCapabilities = { type: 'object', properties: { identity: { $ref: '#/components/schemas/ApiClientIdentity' }, capabilities: { type: 'object', additionalProperties: { type: 'array', items: { type: 'string' } } } } };
+  schemas.AgentCapabilities = { type: 'object', properties: { success: { type: 'boolean' }, apiVersion: { type: 'string' }, authentication: { type: 'string' }, scopes: { type: 'array', items: { type: 'string', enum: agentScopes } }, credentialPolicy: { $ref: '#/components/schemas/ApiClientPolicy' }, contributionContract: { type: 'object' }, endpoints: { type: 'object' } } };
   schemas.GraphLinkRequest = { type: 'object', required: ['parentId', 'targetId', 'relationship'], properties: { parentId: { type: 'string' }, targetId: { type: 'string' }, relationship: { type: 'string', enum: ['child', 'support', 'oppose', 'related', 'evidence', 'source', 'dependency'] } } };
   schemas.VerdictVoteRequest = { type: 'object', required: ['objectType', 'objectId', 'channel', 'status', 'reasoning', 'confidence', 'conflictDeclared'], properties: { objectType: { type: 'integer' }, objectId: { type: 'string' }, channel: { type: 'string', enum: ['factual', 'ethical'] }, status: { type: 'string' }, reasoning: { type: 'string', minLength: 20 }, evidenceReferences: { type: 'array', items: { type: 'string' } }, confidence: { type: 'integer', minimum: 0, maximum: 100 }, expertise: { type: 'string' }, conflictDeclared: { type: 'boolean' }, ethicalFramework: { type: 'string' } } };
   schemas.AdminFinalSayRequest = { type: 'object', required: ['objectType', 'objectId', 'channel', 'status', 'reasoning', 'overrideReason', 'acknowledgeOverride'], properties: { objectType: { type: 'integer' }, objectId: { type: 'string' }, channel: { type: 'string', enum: ['factual', 'ethical'] }, status: { type: 'string' }, reasoning: { type: 'string', minLength: 10 }, framework: { type: 'string' }, evidenceRefs: { type: 'array', items: { type: 'string' } }, overrideReason: { type: 'string', minLength: 10 }, acknowledgeOverride: { type: 'boolean', enum: [true] } } };
@@ -131,7 +155,26 @@ function addComponents(spec) {
   schemas.PublicEvidenceJsonLd = { type: 'object', required: ['@context', '@id', '@type', 'identifier'], properties: { '@context': { type: 'object' }, '@id': { type: 'string', format: 'uri' }, '@type': { type: 'string' }, identifier: { type: 'string' }, citation: { type: 'array', items: { type: 'object' } } }, additionalProperties: true };
   schemas.EntryTranslationRequest = { type: 'object', required: ['locale', 'title', 'content'], properties: { locale: { type: 'string' }, title: { type: 'string', minLength: 3 }, content: { type: 'string', minLength: 10 } } };
   schemas.NotificationPreferences = { type: 'object', properties: { inApp: { type: 'boolean' }, emailDigest: { type: 'string', enum: ['off', 'daily', 'weekly'] }, webPush: { type: 'boolean' } } };
-  schemas.AgentValidationRequest = { type: 'object', required: ['method', 'path'], properties: { method: { type: 'string' }, path: { type: 'string' }, body: { type: 'object' }, idempotencyKey: { type: 'string' }, run: { type: 'object' } } };
+  schemas.AgentCommand = {
+    type: 'object', required: ['commandId', 'operation', 'entryType', 'payload'],
+    properties: {
+      commandId: { type: 'string', pattern: '^[A-Za-z0-9._:-]{3,120}$' },
+      operation: { type: 'string', enum: ['entry.create', 'entry.propose_edit'] },
+      entryType: { type: 'string', enum: ['topic', 'argument', 'question', 'answer', 'artifact', 'issue', 'opinion'] },
+      entryId: { type: 'string' }, baseRevisionId: { type: 'string' }, payload: { type: 'object' },
+    },
+  };
+  schemas.AgentValidationRequest = {
+    oneOf: [
+      { type: 'object', required: ['commands'], properties: { commands: { type: 'array', minItems: 1, maxItems: 100, items: { $ref: '#/components/schemas/AgentCommand' } } } },
+      { type: 'object', required: ['operation', 'payload'], properties: { operation: { type: 'string', enum: ['contribution', 'entry_edit', 'graph_link', 'verdict_advice', 'civic_record', 'translation', 'debate_contribution'] }, entryType: { type: 'string' }, tenantId: { type: 'string' }, payload: { type: 'object' } } },
+    ],
+  };
+  schemas.AgentJobRequest = { type: 'object', required: ['commands'], properties: { commands: { type: 'array', minItems: 1, maxItems: 100, items: { $ref: '#/components/schemas/AgentCommand' } } } };
+  schemas.AgentCommandResult = { type: 'object', required: ['commandId', 'operation', 'status', 'statusCode', 'completedDate'], properties: { commandId: { type: 'string' }, operation: { type: 'string' }, status: { type: 'string', enum: ['succeeded', 'failed'] }, statusCode: { type: 'integer' }, response: {}, completedDate: { type: 'string', format: 'date-time' } } };
+  schemas.AgentJob = { type: 'object', required: ['agentRunId', 'status'], properties: { _id: { type: 'string' }, id: { type: 'string' }, agentRunId: { type: 'string' }, status: { type: 'string', enum: ['queued', 'running', 'cancel_requested', 'cancelled', 'completed', 'completed_with_errors', 'failed'] }, nextIndex: { type: 'integer' }, succeededCount: { type: 'integer' }, failedCount: { type: 'integer' }, results: { type: 'array', items: { $ref: '#/components/schemas/AgentCommandResult' } }, createDate: { type: 'string', format: 'date-time' }, completedDate: { type: 'string', format: 'date-time', nullable: true } } };
+  schemas.AgentJobResponse = { type: 'object', required: ['success', 'job'], properties: { success: { type: 'boolean' }, job: { $ref: '#/components/schemas/AgentJob' } } };
+  schemas.AgentJobCollection = { type: 'object', required: ['success', 'items'], properties: { success: { type: 'boolean' }, items: { type: 'array', items: { $ref: '#/components/schemas/AgentJob' } }, nextCursor: { type: 'string', nullable: true } } };
   schemas.AdminCollectionResponse = {
     type: 'object', required: ['success', 'items', 'total', 'page', 'limit', 'pages', 'query'],
     properties: {
@@ -165,15 +208,9 @@ function specialize(spec) {
   if (paths['/agent/identity']?.get) Object.assign(paths['/agent/identity'].get, { summary: 'Inspect the authenticated agent identity', security: [{ AgentBearerAuth: [] }], responses: response('ApiClientIdentity') });
   if (paths['/agent/capabilities']?.get) Object.assign(paths['/agent/capabilities'].get, { summary: 'Discover routes allowed by the token scopes', security: [{ AgentBearerAuth: [] }], responses: response('AgentCapabilities') });
   if (paths['/admin/api-clients']?.post) Object.assign(paths['/admin/api-clients'].post, { summary: 'Create a scoped agent credential', requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/ApiClientCreateRequest' } } } }, responses: { '201': { description: 'Credential created; raw token is shown once', content: { 'application/json': { schema: { $ref: '#/components/schemas/ApiClientCredentialResponse' } } } }, '400': { $ref: '#/components/responses/BadRequest' }, '403': { $ref: '#/components/responses/Forbidden' } } });
-  if (paths['/outline/link']?.post) Object.assign(paths['/outline/link'].post, { summary: 'Create a governed knowledge-graph relationship', 'x-required-agent-scope': 'graph:write', security: [{ AgentBearerAuth: [] }, { BearerAuth: [] }], requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/GraphLinkRequest' } } } } });
-  if (paths['/moderation/verdict-votes']?.post) Object.assign(paths['/moderation/verdict-votes'].post, { summary: 'Submit a channel-specific consensus vote', 'x-required-agent-scope': 'moderation:write', requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/VerdictVoteRequest' } } } } });
+  if (paths['/outline/link']?.post) Object.assign(paths['/outline/link'].post, { summary: 'Create a governed knowledge-graph relationship', requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/GraphLinkRequest' } } } } });
+  if (paths['/moderation/verdict-votes']?.post) Object.assign(paths['/moderation/verdict-votes'].post, { summary: 'Submit a human channel-specific consensus vote', requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/VerdictVoteRequest' } } } } });
   if (paths['/moderation/verdict-channel']?.put) Object.assign(paths['/moderation/verdict-channel'].put, { summary: 'Publish an explicit administrator final-say decision', description: 'This exceptional route is unavailable to API clients and records an audited override of the current consensus snapshot.', requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/AdminFinalSayRequest' } } } } });
-  ['/topics', '/arguments', '/questions', '/answers', '/artifacts', '/issues', '/opinions'].forEach((route) => {
-    if (paths[route]?.post) Object.assign(paths[route].post, { 'x-required-agent-scope': 'contributions:write', security: [{ AgentBearerAuth: [] }, { BearerAuth: [] }] });
-  });
-  ['/civic/records', '/tenants/{tenantId}/civic/records'].forEach((route) => {
-    if (paths[route]?.post) Object.assign(paths[route].post, { 'x-required-agent-scope': 'civic:write', security: [{ AgentBearerAuth: [] }, { BearerAuth: [] }] });
-  });
   if (paths['/search']?.get) paths['/search'].get.parameters = [
     { name: 'q', in: 'query', required: true, schema: { type: 'string' } },
     { name: 'tab', in: 'query', schema: { type: 'string', enum: ['all', 'topics', 'arguments', 'questions', 'answers', 'artifacts', 'issues', 'opinions'] } },
@@ -193,6 +230,27 @@ function specialize(spec) {
   if (paths['/translations/{objectName}/{id}']?.post) Object.assign(paths['/translations/{objectName}/{id}'].post, { summary: 'Submit a revision-linked entry translation', requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/EntryTranslationRequest' } } } } });
   if (paths['/notifications/preferences']?.put) Object.assign(paths['/notifications/preferences'].put, { summary: 'Update notification delivery preferences', requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/NotificationPreferences' } } } } });
   if (paths['/agent/validate']?.post) Object.assign(paths['/agent/validate'].post, { summary: 'Dry-run and validate an accountable agent mutation', security: [{ AgentBearerAuth: [] }], requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/AgentValidationRequest' } } } } });
+  if (paths['/agent/jobs']?.post) Object.assign(paths['/agent/jobs'].post, {
+    summary: 'Queue a bounded durable agent command job',
+    parameters: [
+      { name: 'X-Agent-Run-Id', in: 'header', required: true, schema: { type: 'string', minLength: 4, maxLength: 120 } },
+      { name: 'Idempotency-Key', in: 'header', required: true, schema: { type: 'string', minLength: 8, maxLength: 200 } },
+    ],
+    requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/AgentJobRequest' } } } },
+    responses: { '202': { description: 'Job accepted', content: { 'application/json': { schema: { $ref: '#/components/schemas/AgentJobResponse' } } } }, '400': { $ref: '#/components/responses/BadRequest' }, '401': { $ref: '#/components/responses/Unauthorized' }, '403': { $ref: '#/components/responses/Forbidden' }, '429': { $ref: '#/components/responses/RateLimited' } },
+  });
+  if (paths['/agent/jobs']?.get) Object.assign(paths['/agent/jobs'].get, {
+    summary: 'List agent jobs using a stable opaque cursor',
+    parameters: [{ name: 'cursor', in: 'query', schema: { type: 'string' } }, { name: 'limit', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 100, default: 25 } }],
+    responses: response('AgentJobCollection'),
+  });
+  if (paths['/agent/jobs/{id}']?.get) Object.assign(paths['/agent/jobs/{id}'].get, { summary: 'Poll one agent job and its per-command results', responses: response('AgentJobResponse') });
+  if (paths['/agent/jobs/{id}/cancel']?.post) Object.assign(paths['/agent/jobs/{id}/cancel'].post, { summary: 'Request cooperative cancellation of an agent job', responses: { '202': { description: 'Cancellation accepted', content: { 'application/json': { schema: { $ref: '#/components/schemas/AgentJobResponse' } } } }, '404': { $ref: '#/components/responses/NotFound' } } });
+  if (paths['/agent/activity']?.get) Object.assign(paths['/agent/activity'].get, {
+    summary: 'List attributed agent revisions using a stable cursor',
+    parameters: [{ name: 'cursor', in: 'query', schema: { type: 'string' } }, { name: 'runId', in: 'query', schema: { type: 'string' } }, { name: 'limit', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 100, default: 25 } }],
+  });
+  if (paths['/agent/events']?.get) Object.assign(paths['/agent/events'].get, { summary: 'Stream attributed agent job and review events', responses: { '200': { description: 'Server-sent event stream', content: { 'text/event-stream': { schema: { type: 'string' } } } } } });
   ['users', 'accounts', 'administrators', 'groups', 'categories', 'statuses'].forEach((collection) => {
     const listOperation = paths[`/admin/${collection}`]?.get;
     if (listOperation) Object.assign(listOperation, {
@@ -221,6 +279,56 @@ function specialize(spec) {
   });
 }
 
+function concreteAgentPath(openApiPath) {
+  return openApiPath.replace(/{tenantId}/g, 'fixtheph').replace(/{[^}]+}/g, '507f1f77bcf86cd799439011');
+}
+
+function agentPolicy(method, openApiPath) {
+  const candidate = concreteAgentPath(openApiPath);
+  return agentPolicies.find((policy) => (
+    (policy.method === '*' || policy.method === method.toUpperCase())
+    && new RegExp(policy.pattern, 'i').test(candidate)
+  )) || null;
+}
+
+function applyAgentPolicies(spec) {
+  Object.entries(spec.paths).forEach(([openApiPath, methods]) => {
+    Object.entries(methods).forEach(([method, operation]) => {
+      if (!['get', 'post', 'put', 'patch', 'delete'].includes(method)) return;
+      const policy = agentPolicy(method, openApiPath);
+      delete operation['x-required-agent-scope'];
+      delete operation['x-agent-mutation-kind'];
+      delete operation['x-agent-operation-id'];
+      delete operation['x-agent-tenant-scoped'];
+      delete operation['x-human-authority-required'];
+      operation['x-agent-allowed'] = Boolean(policy?.agentAllowed);
+      operation.security = (operation.security || []).filter((item) => !Object.hasOwn(item, 'AgentBearerAuth'));
+      if (policy?.agentAllowed) {
+        operation['x-agent-operation-id'] = policy.operationId;
+        if (policy.requiredScope) operation['x-required-agent-scope'] = policy.requiredScope;
+        if (policy.mutationKind) operation['x-agent-mutation-kind'] = policy.mutationKind;
+        if (policy.tenantScoped) operation['x-agent-tenant-scoped'] = true;
+        operation.security.push({ AgentBearerAuth: [] });
+        if (!['get', 'head'].includes(method) && openApiPath !== '/agent/validate') {
+          operation.parameters ||= [];
+          const parameterNames = new Set(operation.parameters.map((parameter) => String(parameter.name || '').toLowerCase()));
+          const addHeader = (name, description, schema) => {
+            if (!parameterNames.has(name.toLowerCase())) operation.parameters.push({ name, in: 'header', required: false, description, schema });
+          };
+          addHeader('X-Agent-Run-Id', 'Required for AgentBearerAuth mutations; identifies the attributable run.', { type: 'string', minLength: 4, maxLength: 120 });
+          addHeader('Idempotency-Key', 'Required for AgentBearerAuth mutations; reuse only for an identical retry.', { type: 'string', minLength: 8, maxLength: 200 });
+          addHeader('X-Agent-Source-Manifest', 'Optional JSON array of bounded source references used for attribution and source-required policies.', { type: 'string', maxLength: 50000 });
+          if (policy.mutationKind === 'propose_edit') addHeader('If-Match', 'Base revision identifier required for an agent proposal against accepted content.', { type: 'string' });
+        }
+      } else if (policy && !policy.agentAllowed) {
+        operation['x-agent-operation-id'] = policy.operationId;
+        operation['x-human-authority-required'] = true;
+      }
+      if (!operation.security.length) delete operation.security;
+    });
+  });
+}
+
 const spec = JSON.parse(fs.readFileSync(specPath, 'utf8'));
 spec.info.version = '1.1.0';
 spec.info.description = 'Stable v1 contract for Wikitruth browser, civic-tenant, administrative, and accountable software-agent integrations.';
@@ -237,6 +345,7 @@ routes.forEach((route) => {
   }
 });
 specialize(spec);
+applyAgentPolicies(spec);
 
 if (write) {
   fs.writeFileSync(specPath, `${JSON.stringify(spec, null, 2)}\n`);

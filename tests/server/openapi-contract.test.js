@@ -114,6 +114,9 @@ describe('OpenAPI contract', function () {
       '/agent/activity',
       '/agent/runs/{runId}',
       '/agent/events',
+      '/agent/jobs',
+      '/agent/jobs/{id}',
+      '/agent/jobs/{id}/cancel',
       '/notifications/preferences',
       '/notifications/outbox',
       '/notifications/outbox/{id}/retry',
@@ -189,9 +192,16 @@ describe('OpenAPI contract', function () {
       'CivicTenantMembership',
       'ApiErrorResponse',
       'ApiClientIdentity',
+      'ApiClientPolicy',
       'ApiClientCreateRequest',
       'ApiClientCredentialResponse',
       'AgentCapabilities',
+      'AgentCommand',
+      'AgentCommandResult',
+      'AgentJob',
+      'AgentJobRequest',
+      'AgentJobResponse',
+      'AgentJobCollection',
       'GraphLinkRequest',
       'VerdictVoteRequest',
       'AdminFinalSayRequest',
@@ -230,10 +240,31 @@ describe('OpenAPI contract', function () {
 
   it('documents agent scopes and final-say separation', function () {
     const spec = readOpenApi();
-    expect(spec.paths['/topics'].post['x-required-agent-scope']).toBe('contributions:write');
+    expect(spec.paths['/topics'].post['x-required-agent-scope']).toBe('entries:create');
     expect(spec.paths['/outline/link'].post['x-required-agent-scope']).toBe('graph:write');
-    expect(spec.paths['/moderation/verdict-votes'].post['x-required-agent-scope']).toBe('moderation:write');
+    expect(spec.paths['/civic/records'].post['x-required-agent-scope']).toBe('civic:contribute');
+    expect(spec.paths['/agent/jobs'].post['x-required-agent-scope']).toBe('agent:runs:read');
+    expect(spec.paths['/moderation/verdict-votes'].post['x-agent-allowed']).toBe(false);
+    expect(spec.paths['/moderation/verdict-votes'].post['x-human-authority-required']).toBe(true);
     expect(spec.paths['/moderation/verdict-channel'].put.description).toMatch(/unavailable to API clients/i);
+  });
+
+  it('derives agent authorization metadata from the operation policy registry', function () {
+    const spec = readOpenApi();
+    const policies = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'server/src/config/agentOperationPolicies.json'), 'utf8'));
+    Object.entries(spec.paths).forEach(([contractPath, methods]) => {
+      Object.entries(methods).forEach(([method, operation]) => {
+        if (!['get', 'post', 'put', 'patch', 'delete'].includes(method)) return;
+        const concretePath = contractPath.replace(/{tenantId}/g, 'fixtheph').replace(/{[^}]+}/g, '507f1f77bcf86cd799439011');
+        const policy = policies.find((candidate) => (
+          (candidate.method === '*' || candidate.method === method.toUpperCase())
+          && new RegExp(candidate.pattern, 'i').test(concretePath)
+        ));
+        expect(operation['x-agent-allowed']).toBe(Boolean(policy?.agentAllowed));
+        expect(operation['x-required-agent-scope']).toBe(policy?.agentAllowed ? policy.requiredScope : undefined);
+        if (policy?.agentAllowed) expect(operation.security).toContainEqual({ AgentBearerAuth: [] });
+      });
+    });
   });
 
   it('documents searchable paginated admin collections and direct details', function () {

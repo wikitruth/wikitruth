@@ -33,7 +33,7 @@ administrator or truth authority.
 
 - [x] Replace broad path-prefix scope inference with a shared operation-policy
       registry.
-- [ ] Use the registry for enforcement, capabilities, OpenAPI metadata, and
+- [x] Use the registry for enforcement, capabilities, OpenAPI metadata, and
       authorization matrix tests.
 - [x] Split read, create, edit-proposal, graph, civic, moderation-advice,
       translation, debate, and run-observation scopes.
@@ -51,9 +51,9 @@ administrator or truth authority.
 - [x] Store agent verdict analysis separately from eligible human votes.
 - [x] Add human countersign/reject operations with stale-state protection.
 - [x] Ensure agents cannot overwrite a human review vote or trigger consensus.
-- [ ] Require `graph:write` for every graph-link mutation and keep destructive
+- [x] Require `graph:write` for every graph-link mutation and keep destructive
       graph operations human-only.
-- [ ] Restrict civic agent mutations to content contribution paths, never tenant
+- [x] Restrict civic agent mutations to content contribution paths, never tenant
       membership, jurisdiction, configuration, or lifecycle authority.
 
 ## 4. Validation And Jobs
@@ -74,11 +74,11 @@ administrator or truth authority.
 
 ## 6. Integration Experience
 
-- [ ] Publish complete OpenAPI security, scope, policy, concurrency, and job
+- [x] Publish complete OpenAPI security, scope, policy, concurrency, and job
       contracts for every supported agent operation.
-- [ ] Generate TypeScript and Python SDKs with retries, headers, cursor helpers,
+- [x] Generate TypeScript and Python SDKs with retries, headers, cursor helpers,
       dry runs, jobs, and event support.
-- [ ] Correct the agent runbook and provide end-to-end examples.
+- [x] Correct the agent runbook and provide end-to-end examples.
 - [ ] Enable pending translation suggestions by agents.
 - [ ] Enable clearly labelled structured-debate contributions by agents only for
       an accountable participant and never as automatic verdict input.

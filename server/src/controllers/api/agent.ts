@@ -210,7 +210,7 @@ export = function (router: Router) {
       reliability: {
         idempotencyHeader: 'Idempotency-Key',
         runHeader: 'X-Agent-Run-Id',
-        attributionHeaders: ['X-Agent-Model', 'X-Agent-Provider', 'X-Agent-Purpose'],
+        attributionHeaders: ['X-Agent-Model', 'X-Agent-Provider', 'X-Agent-Purpose', 'X-Agent-Source-Manifest'],
         dryRunEndpoint: '/api/v1/agent/validate',
       },
       scopes: Array.from(scopes),
