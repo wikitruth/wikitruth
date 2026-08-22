@@ -66,11 +66,78 @@ async function audit(req: WikitruthRequest, eventType: string, userId: string, m
   });
 }
 
+type AggregateRow = Record<string, unknown>;
+type AggregateModel = { aggregate?: (pipeline: Record<string, unknown>[]) => Promise<AggregateRow[]> };
+
+async function aggregate(model: AggregateModel | undefined, pipeline: Record<string, unknown>[]): Promise<AggregateRow[]> {
+  if (!model?.aggregate) return [];
+  return model.aggregate(pipeline);
+}
+
+function countsByKey(rows: AggregateRow[]): Record<string, number> {
+  return Object.fromEntries(rows.map((row) => [String(row._id || 'unknown'), Number(row.count || 0)]));
+}
+
 export function registerAdminApiClientRoutes(router: Router, ensureAdmin: EnsureAdmin): void {
   router.get('/api-clients', async function (req: WikitruthRequest, res: WikitruthResponse) {
     if (!canManage(req, res, ensureAdmin)) return;
     const clients = await db.ApiClient.find().sort({ createDate: -1 }).populate('userId', 'username email').lean();
     res.json({ success: true, clients: clients.map(publicClient) });
+  });
+
+  router.get('/api-clients/:id/usage', async function (req: WikitruthRequest, res: WikitruthResponse) {
+    if (!canManage(req, res, ensureAdmin)) return;
+    const days = Math.max(1, Math.min(180, Number.parseInt(String(req.query.days || '30'), 10) || 30));
+    const to = new Date();
+    const from = new Date(to.getTime() - days * 24 * 60 * 60 * 1000);
+    const client = await db.ApiClient.findById(req.params.id).lean();
+    if (!client) {
+      res.status(404).json({ success: false, message: 'API client not found' });
+      return;
+    }
+
+    const match = { apiClientId: client._id, createDate: { $gte: from } };
+    const [usageRows, eventRows, jobRows, adviceRows] = await Promise.all([
+      aggregate(db.ApiClientRateBucket, [
+        { $match: { apiClientId: client._id, windowStart: { $gte: from } } },
+        {
+          $group: {
+            _id: null,
+            requests: { $sum: '$count' },
+            rateLimitedRequests: { $sum: { $cond: [{ $gt: ['$count', '$limit'] }, { $subtract: ['$count', '$limit'] }, 0] } },
+            peakRequestsPerMinute: { $max: '$count' },
+            activeMinutes: { $sum: 1 },
+          },
+        },
+      ]),
+      aggregate(db.AgentOperationEvent, [
+        { $match: { apiClientId: client._id, occurredAt: { $gte: from } } },
+        { $group: { _id: '$kind', count: { $sum: 1 } } },
+      ]),
+      aggregate(db.AgentJob, [
+        { $match: match },
+        { $group: { _id: '$status', count: { $sum: 1 } } },
+      ]),
+      aggregate(db.VerdictAdvice, [
+        { $match: match },
+        { $group: { _id: '$status', count: { $sum: 1 } } },
+      ]),
+    ]);
+    const usage = usageRows[0] || {};
+    res.json({
+      success: true,
+      client: { id: String(client._id || ''), name: String(client.name || '') },
+      period: { days, from: from.toISOString(), to: to.toISOString() },
+      usage: {
+        requests: Number(usage.requests || 0),
+        rateLimitedRequests: Number(usage.rateLimitedRequests || 0),
+        peakRequestsPerMinute: Number(usage.peakRequestsPerMinute || 0),
+        activeMinutes: Number(usage.activeMinutes || 0),
+      },
+      events: countsByKey(eventRows),
+      jobs: countsByKey(jobRows),
+      advice: countsByKey(adviceRows),
+    });
   });
 
   router.post('/api-clients', async function (req: WikitruthRequest, res: WikitruthResponse) {

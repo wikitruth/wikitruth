@@ -3,6 +3,7 @@
 import { createHash } from 'crypto';
 import type { NextFunction } from 'express';
 import type { WikitruthRequest, WikitruthResponse } from '../types/http';
+import { recordAgentOperationEvent } from '../services/agentObservabilityService';
 
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 const IDEMPOTENCY_TTL_MS = 7 * 24 * 60 * 60 * 1000;
@@ -115,16 +116,28 @@ export async function enforceAgentMutationReliability(
   }
   if (!claimed) {
     if (String(record.fingerprint || '') !== fingerprint) {
+      recordAgentOperationEvent(req.app, {
+        kind: 'idempotency_conflict', apiClientId: req.apiClient.id, clientId: req.apiClient.clientId,
+        agentRunId: agentRun.runId, method: req.method, path: req.path, statusCode: 409, code: 'IDEMPOTENCY_KEY_REUSED',
+      });
       fail(res, 409, 'IDEMPOTENCY_KEY_REUSED', 'This idempotency key was already used for a different request.');
       return;
     }
     if (record.status === 'completed') {
+      recordAgentOperationEvent(req.app, {
+        kind: 'idempotent_replay', apiClientId: req.apiClient.id, clientId: req.apiClient.clientId,
+        agentRunId: agentRun.runId, method: req.method, path: req.path, statusCode: Number(record.responseStatus || 200), code: 'IDEMPOTENT_REPLAY',
+      });
       res.setHeader('Idempotent-Replay', 'true');
       res.status(Number(record.responseStatus || 200)).json(record.responseBody ?? { success: true });
       return;
     }
     const createdAt = new Date(record.createDate || 0).getTime();
     if (Date.now() - createdAt <= PENDING_STALE_MS) {
+      recordAgentOperationEvent(req.app, {
+        kind: 'idempotency_conflict', apiClientId: req.apiClient.id, clientId: req.apiClient.clientId,
+        agentRunId: agentRun.runId, method: req.method, path: req.path, statusCode: 409, code: 'IDEMPOTENCY_REQUEST_PENDING',
+      });
       res.setHeader('Retry-After', '2');
       fail(res, 409, 'IDEMPOTENCY_REQUEST_PENDING', 'The original request is still being processed.');
       return;

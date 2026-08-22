@@ -14076,6 +14076,59 @@
         "x-agent-operation-id": "agent.jobs.cancel",
         "x-required-agent-scope": "agent:runs:read"
       }
+    },
+    "/admin/api-clients/{id}/usage": {
+      "get": {
+        "operationId": "getAdminApiClientsIdUsage",
+        "summary": "Read privacy-safe agent credential usage aggregates",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "days",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 180,
+              "default": 30
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentUsageReport"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          }
+        },
+        "x-agent-allowed": false,
+        "x-agent-operation-id": "administration.human",
+        "x-human-authority-required": true
+      }
     }
   },
   "components": {
@@ -16732,6 +16785,112 @@
                   "maxLength": 160
                 }
               }
+            }
+          }
+        }
+      },
+      "AgentUsageReport": {
+        "type": "object",
+        "required": [
+          "success",
+          "client",
+          "period",
+          "usage",
+          "events",
+          "jobs",
+          "advice"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "client": {
+            "type": "object",
+            "required": [
+              "id",
+              "name"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          "period": {
+            "type": "object",
+            "required": [
+              "days",
+              "from",
+              "to"
+            ],
+            "properties": {
+              "days": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 180
+              },
+              "from": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "to": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          },
+          "usage": {
+            "type": "object",
+            "required": [
+              "requests",
+              "rateLimitedRequests",
+              "peakRequestsPerMinute",
+              "activeMinutes"
+            ],
+            "properties": {
+              "requests": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "rateLimitedRequests": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "peakRequestsPerMinute": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "activeMinutes": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          "events": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "jobs": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 0
+            }
+          },
+          "advice": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 0
             }
           }
         }

@@ -5,6 +5,7 @@ import type { Application } from 'express';
 import { toApiClientIdentity } from './apiClientService';
 import { executeAgentCommand, type AgentExecutionContext } from './agentCommandExecution';
 import { publishRealtimeEvent } from './realtimeEvents';
+import { recordAgentOperationEvent } from './agentObservabilityService';
 
 const LEASE_MS = 5 * 60 * 1000;
 const workerId = `${process.pid}-${randomBytes(6).toString('hex')}`;
@@ -43,6 +44,13 @@ function jobEvent(job: Record<string, any>, type: string, data: Record<string, u
   });
 }
 
+function observeJob(app: Application, job: Record<string, any>, kind: 'job_completed' | 'job_failed' | 'job_cancelled', code: string, metadata: Record<string, unknown> = {}): void {
+  recordAgentOperationEvent(app, {
+    kind, apiClientId: String(job.apiClientId || ''), agentRunId: String(job.agentRunId || ''),
+    operationId: 'agent.jobs.execute', code, metadata: { jobId: String(job._id || ''), ...metadata },
+  });
+}
+
 async function claimJob(app: Application, jobId: string): Promise<Record<string, any> | null> {
   const now = new Date();
   return models(app).AgentJob.findOneAndUpdate(
@@ -76,9 +84,10 @@ export async function processAgentJob(app: Application, jobId: string): Promise<
   ).lean();
   if (cancelled) {
     jobEvent(cancelled, 'agent.job.cancelled', { nextIndex: Number(cancelled.nextIndex || 0) });
+    observeJob(app, cancelled, 'job_cancelled', 'AGENT_JOB_CANCELLED', { nextIndex: Number(cancelled.nextIndex || 0) });
     return;
   }
-  let job = await claimJob(app, jobId);
+  const job = await claimJob(app, jobId);
   if (!job) return;
   const context = await jobContext(app, job);
   if (!context) {
@@ -87,6 +96,7 @@ export async function processAgentJob(app: Application, jobId: string): Promise<
       $unset: { leaseOwner: 1, leaseExpiresAt: 1 },
     });
     jobEvent(job, 'agent.job.failed', { error: 'credential_or_owner_inactive' });
+    observeJob(app, job, 'job_failed', 'AGENT_JOB_OWNER_INACTIVE');
     return;
   }
 
@@ -118,6 +128,7 @@ export async function processAgentJob(app: Application, jobId: string): Promise<
         $unset: { leaseOwner: 1, leaseExpiresAt: 1 },
       });
       jobEvent(job, 'agent.job.cancelled', { nextIndex: index });
+      observeJob(app, job, 'job_cancelled', 'AGENT_JOB_CANCELLED', { nextIndex: index });
       return;
     }
     await db.AgentJob.updateOne({ _id: jobId, leaseOwner: workerId }, {
@@ -144,6 +155,9 @@ export async function processAgentJob(app: Application, jobId: string): Promise<
     status, total: job.commands.length,
     succeededCount: Number(job.succeededCount || 0), failedCount: Number(job.failedCount || 0),
   });
+  observeJob(app, job, 'job_completed', status === 'completed' ? 'AGENT_JOB_COMPLETED' : 'AGENT_JOB_COMPLETED_WITH_ERRORS', {
+    status, succeededCount: Number(job.succeededCount || 0), failedCount: Number(job.failedCount || 0),
+  });
 }
 
 export function scheduleAgentJob(app: Application, jobId: string): void {
@@ -156,6 +170,10 @@ export function scheduleAgentJob(app: Application, jobId: string): void {
         await models(app).AgentJob.updateOne({ _id: jobId }, {
           $set: { status: 'failed', error: error instanceof Error ? error.message : 'Agent job failed', completedDate: new Date(), editDate: new Date() },
           $unset: { leaseOwner: 1, leaseExpiresAt: 1 },
+        });
+        recordAgentOperationEvent(app, {
+          kind: 'job_failed', operationId: 'agent.jobs.execute', code: 'AGENT_JOB_FAILED',
+          metadata: { jobId },
         });
       })
       .finally(() => scheduledJobs.delete(jobId));

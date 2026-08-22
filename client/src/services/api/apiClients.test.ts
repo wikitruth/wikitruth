@@ -28,4 +28,11 @@ describe('apiClientsApi', () => {
     expect(fetchMock).toHaveBeenNthCalledWith(1, '/api/admin/api-clients/client%2F1/rotate', expect.objectContaining({ method: 'POST' }));
     expect(fetchMock).toHaveBeenNthCalledWith(2, '/api/admin/api-clients/client%2F1', expect.objectContaining({ method: 'DELETE' }));
   });
+
+  it('loads a bounded credential usage period', async () => {
+    const fetchMock = jest.fn().mockResolvedValue({ ok: true, json: async () => ({ success: true }) });
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+    await apiClientsApi.usage('client/1', 14);
+    expect(fetchMock).toHaveBeenCalledWith('/api/admin/api-clients/client%2F1/usage?days=14', expect.objectContaining({ credentials: 'include' }));
+  });
 });

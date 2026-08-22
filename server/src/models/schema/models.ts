@@ -61,6 +61,7 @@ export = function (app: Application, mongoose: Mongoose) {
   require('./core/StructuredDebateContribution')(app, mongoose);
   require('./core/ApiClient')(app, mongoose);
   require('./core/ApiClientRateBucket')(app, mongoose);
+  require('./core/AgentOperationEvent')(app, mongoose);
   require('./core/IdempotencyRecord')(app, mongoose);
   require('./core/AgentJob')(app, mongoose);
   require('./core/CivicTenant')(app, mongoose);

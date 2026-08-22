@@ -7,6 +7,10 @@ const createClient = jest.fn();
 const findClientById = jest.fn();
 const updateClient = jest.fn();
 const audit = jest.fn();
+const aggregateRateBuckets = jest.fn();
+const aggregateEvents = jest.fn();
+const aggregateJobs = jest.fn();
+const aggregateAdvice = jest.fn();
 
 jest.mock('../../server/src/app', () => ({
   db: {
@@ -17,6 +21,10 @@ jest.mock('../../server/src/app', () => ({
         findById: (...args) => findClientById(...args),
         findByIdAndUpdate: (...args) => updateClient(...args),
       },
+      ApiClientRateBucket: { aggregate: (...args) => aggregateRateBuckets(...args) },
+      AgentOperationEvent: { aggregate: (...args) => aggregateEvents(...args) },
+      AgentJob: { aggregate: (...args) => aggregateJobs(...args) },
+      VerdictAdvice: { aggregate: (...args) => aggregateAdvice(...args) },
       User: { findById: () => ({ lean: async () => ({ _id: 'user-1', username: 'owner', isActive: 'yes' }) }) },
     },
   },
@@ -44,6 +52,13 @@ describe('administrator API client lifecycle', () => {
     createClient.mockImplementation(async (payload) => ({
       _id: 'client-object-1', ...payload, toObject() { return { _id: this._id, ...payload }; },
     }));
+    findClientById.mockReturnValue({ lean: async () => ({
+      _id: 'client-object-1', clientId: '1234567890abcdef12345678', name: 'Research agent',
+    }) });
+    aggregateRateBuckets.mockResolvedValue([{ requests: 42, rateLimitedRequests: 3, peakRequestsPerMinute: 18, activeMinutes: 8 }]);
+    aggregateEvents.mockResolvedValue([{ _id: 'request_denied', count: 2 }, { _id: 'idempotent_replay', count: 1 }]);
+    aggregateJobs.mockResolvedValue([{ _id: 'completed', count: 4 }]);
+    aggregateAdvice.mockResolvedValue([{ _id: 'countersigned', count: 1 }, { _id: 'rejected', count: 2 }]);
     updateClient.mockReturnValue({ lean: async () => ({
       _id: 'client-object-1', clientId: '1234567890abcdef12345678', name: 'Agent', userId: 'user-1',
       tokenPrefix: 'wt_agent_prefix', scopes: ['entries:read'], status: 'revoked', rateLimitPerMinute: 60,
@@ -76,5 +91,21 @@ describe('administrator API client lifecycle', () => {
   it('never lets an agent credential manage credentials', async () => {
     await request(app({ agent: true })).get('/api/admin/api-clients').expect(403);
     expect(createClient).not.toHaveBeenCalled();
+  });
+
+  it('reports privacy-safe usage aggregates to administrators', async () => {
+    const response = await request(app()).get('/api/admin/api-clients/client-object-1/usage?days=7').expect(200);
+    expect(response.body).toEqual(expect.objectContaining({
+      client: { id: 'client-object-1', name: 'Research agent' },
+      period: expect.objectContaining({ days: 7 }),
+      usage: { requests: 42, rateLimitedRequests: 3, peakRequestsPerMinute: 18, activeMinutes: 8 },
+      events: { request_denied: 2, idempotent_replay: 1 },
+      jobs: { completed: 4 },
+      advice: { countersigned: 1, rejected: 2 },
+    }));
+    expect(aggregateEvents).toHaveBeenCalledWith(expect.arrayContaining([
+      expect.objectContaining({ $match: expect.objectContaining({ apiClientId: 'client-object-1' }) }),
+    ]));
+    expect(JSON.stringify(response.body)).not.toMatch(/token|secret|sourceManifest|requestBody/i);
   });
 });

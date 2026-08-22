@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import PageMeta from '../../../components/common/PageMeta';
 import apiClientsApi, {
+  type AgentUsageReport,
   type ApiClientPolicy,
   type ApiClientRecord,
   type ApiClientScope,
@@ -39,6 +40,11 @@ const listValue = (value: string): string[] => value
   .map((item) => item.trim())
   .filter(Boolean);
 
+const sumCounts = (counts: Record<string, number>): number => Object.values(counts)
+  .reduce((total, count) => total + Number(count || 0), 0);
+
+const humanize = (value: string): string => value.replace(/_/g, ' ').replace(/^./, (letter) => letter.toUpperCase());
+
 const ApiClientsPage: React.FC = () => {
   const [clients, setClients] = useState<ApiClientRecord[]>([]);
   const [users, setUsers] = useState<AdminRecord[]>([]);
@@ -52,6 +58,8 @@ const ApiClientsPage: React.FC = () => {
   const [oneTimeToken, setOneTimeToken] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [usageLoadingId, setUsageLoadingId] = useState('');
+  const [usageReport, setUsageReport] = useState<AgentUsageReport | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -109,6 +117,18 @@ const ApiClientsPage: React.FC = () => {
       await load();
     } catch (actionError) {
       setError(actionError instanceof Error ? actionError.message : 'Unable to revoke credential');
+    }
+  };
+
+  const showUsage = async (client: ApiClientRecord) => {
+    try {
+      setUsageLoadingId(client.id);
+      setError(null);
+      setUsageReport(await apiClientsApi.usage(client.id));
+    } catch (actionError) {
+      setError(actionError instanceof Error ? actionError.message : 'Unable to load credential usage');
+    } finally {
+      setUsageLoadingId('');
     }
   };
 
@@ -175,9 +195,34 @@ const ApiClientsPage: React.FC = () => {
       <div className="panel panel-default">
         <div className="panel-heading"><strong>Credentials</strong></div>
         {loading ? <div className="panel-body text-muted">Loading...</div> : (
-          <div className="table-responsive"><table className="table table-striped"><thead><tr><th>Agent</th><th>Accountable user</th><th>Scopes and boundaries</th><th>Use</th><th>Status</th><th>Actions</th></tr></thead><tbody>{clients.map((client) => <tr key={client.id}><td><strong>{client.name}</strong><div className="text-muted small"><code>{client.tokenPrefix}...</code></div></td><td>{client.accountableUser?.username || client.userId}</td><td>{client.scopes.map((scope) => <span className="label label-default" key={scope} style={{ marginRight: 3 }}>{scope}</span>)}<div className="text-muted small">Types: {client.policy.entryTypes.join(', ') || 'none'}; visibility: {client.policy.maxVisibility}; batch: {client.policy.maxBatchSize}</div>{client.policy.tenantIds.length ? <div className="text-muted small">Tenants: {client.policy.tenantIds.join(', ')}</div> : null}{client.policy.parentRootIds.length ? <div className="text-muted small">Parent roots: {client.policy.parentRootIds.join(', ')}</div> : null}</td><td>{client.requestCount} request(s)<div className="text-muted small">{client.lastUsedAt ? `Last used ${new Date(client.lastUsedAt).toLocaleString()}` : 'Never used'}</div></td><td><span className={`label label-${client.status === 'active' ? 'success' : 'default'}`}>{client.status}</span></td><td>{client.status === 'active' ? <><button className="btn btn-xs btn-default" type="button" onClick={() => void rotate(client)}>Rotate</button>{' '}<button className="btn btn-xs btn-danger" type="button" onClick={() => void revoke(client)}>Revoke</button></> : null}</td></tr>)}</tbody></table></div>
+          <div className="table-responsive"><table className="table table-striped"><thead><tr><th>Agent</th><th>Accountable user</th><th>Scopes and boundaries</th><th>Use</th><th>Status</th><th>Actions</th></tr></thead><tbody>{clients.map((client) => <tr key={client.id}><td><strong>{client.name}</strong><div className="text-muted small"><code>{client.tokenPrefix}...</code></div></td><td>{client.accountableUser?.username || client.userId}</td><td>{client.scopes.map((scope) => <span className="label label-default" key={scope} style={{ marginRight: 3 }}>{scope}</span>)}<div className="text-muted small">Types: {client.policy.entryTypes.join(', ') || 'none'}; visibility: {client.policy.maxVisibility}; batch: {client.policy.maxBatchSize}</div>{client.policy.tenantIds.length ? <div className="text-muted small">Tenants: {client.policy.tenantIds.join(', ')}</div> : null}{client.policy.parentRootIds.length ? <div className="text-muted small">Parent roots: {client.policy.parentRootIds.join(', ')}</div> : null}</td><td>{client.requestCount} request(s)<div className="text-muted small">{client.lastUsedAt ? `Last used ${new Date(client.lastUsedAt).toLocaleString()}` : 'Never used'}</div></td><td><span className={`label label-${client.status === 'active' ? 'success' : 'default'}`}>{client.status}</span></td><td><button className="btn btn-xs btn-info" type="button" disabled={usageLoadingId === client.id} onClick={() => void showUsage(client)}>{usageLoadingId === client.id ? 'Loading...' : 'Usage'}</button>{client.status === 'active' ? <>{' '}<button className="btn btn-xs btn-default" type="button" onClick={() => void rotate(client)}>Rotate</button>{' '}<button className="btn btn-xs btn-danger" type="button" onClick={() => void revoke(client)}>Revoke</button></> : null}</td></tr>)}</tbody></table></div>
         )}
       </div>
+
+      {usageReport ? (
+        <section className="panel panel-info" aria-labelledby="agent-usage-title">
+          <div className="panel-heading">
+            <button type="button" className="close" aria-label="Close usage report" onClick={() => setUsageReport(null)}><span aria-hidden="true">&times;</span></button>
+            <strong id="agent-usage-title" role="heading" aria-level={3}>{usageReport.client.name} usage</strong>
+            <span className="text-muted"> &middot; last {usageReport.period.days} days</span>
+          </div>
+          <div className="panel-body">
+            <div className="row text-center">
+              <div className="col-xs-6 col-sm-3"><strong className="h3">{usageReport.usage.requests}</strong><div className="text-muted">Requests</div></div>
+              <div className="col-xs-6 col-sm-3"><strong className="h3">{usageReport.usage.rateLimitedRequests}</strong><div className="text-muted">Rate limited</div></div>
+              <div className="col-xs-6 col-sm-3"><strong className="h3">{sumCounts(usageReport.jobs)}</strong><div className="text-muted">Jobs</div></div>
+              <div className="col-xs-6 col-sm-3"><strong className="h3">{sumCounts(usageReport.advice)}</strong><div className="text-muted">Advice submissions</div></div>
+            </div>
+            <hr />
+            <div className="row">
+              <div className="col-sm-4"><strong>Peak rate</strong><div>{usageReport.usage.peakRequestsPerMinute} request(s) per minute</div><div className="text-muted small">Active during {usageReport.usage.activeMinutes} minute(s)</div></div>
+              <div className="col-sm-4"><strong>Job outcomes</strong>{Object.keys(usageReport.jobs).length ? Object.entries(usageReport.jobs).map(([key, count]) => <div key={key}>{humanize(key)}: {count}</div>) : <div className="text-muted">No jobs</div>}</div>
+              <div className="col-sm-4"><strong>Governance and safety events</strong>{Object.keys(usageReport.events).length ? Object.entries(usageReport.events).map(([key, count]) => <div key={key}>{humanize(key)}: {count}</div>) : <div className="text-muted">No recorded events</div>}</div>
+            </div>
+            {Object.keys(usageReport.advice).length ? <p className="small text-muted" style={{ marginTop: 12 }}>Advice review: {Object.entries(usageReport.advice).map(([key, count]) => `${humanize(key)} ${count}`).join(', ')}.</p> : null}
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 };

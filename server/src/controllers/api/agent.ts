@@ -6,6 +6,7 @@ import constants from '../../models/constants';
 import { subscribeRealtime, type RealtimeEvent } from '../../services/realtimeEvents';
 import type { ApiClientScope } from '../../services/apiClientService';
 import { listAgentOperationPolicies } from '../../services/agentOperationPolicy';
+import { recordAgentOperationEvent } from '../../services/agentObservabilityService';
 
 type AgentRuntimeServices = typeof import('../../services/agentRuntimeServices');
 let cachedRuntimeServices: AgentRuntimeServices | null = null;
@@ -332,6 +333,11 @@ export = function (router: Router) {
       sourceManifest: req.agentRun!.sourceManifest,
       status: 'queued', commands: normalizedCommands, results: [], nextIndex: 0,
       createDate: new Date(), editDate: new Date(), expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+    });
+    recordAgentOperationEvent(req.app, {
+      kind: 'job_queued', apiClientId: req.apiClient!.id, clientId: req.apiClient!.clientId,
+      agentRunId: req.agentRun!.runId, operationId: 'agent.jobs.create', method: 'POST', path: '/agent/jobs',
+      statusCode: 202, code: 'AGENT_JOB_QUEUED', metadata: { jobId: String(job._id || ''), commandCount: commands.length },
     });
     scheduleAgentJob(req.app, String(job._id || ''));
     res.status(202).json({ success: true, job: { id: String(job._id || ''), status: 'queued', commandCount: commands.length, agentRunId: req.agentRun!.runId } });

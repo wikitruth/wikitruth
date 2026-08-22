@@ -11,6 +11,7 @@ import { apiErrorHandler } from './middlewares/apiError';
 import { createCsrfProtection } from './middlewares/csrfProtection';
 import { civicCors } from './middlewares/civicCors';
 import { authenticateApiClient } from './middlewares/apiClientAuthentication';
+import { observeAgentRequests } from './services/agentObservabilityService';
 import { enforceAuthenticatedWebSession } from './services/webSessionService';
 
 import contents from './models/contents';
@@ -33,13 +34,11 @@ const config = require(path.join(process.cwd(), 'config/config')),
     cons = require('consolidate'),
     kraken = require('kraken-js');
 
-let options, app;
-
 /*
  * Create and configure application. Also exports application instance for use by tests.
  * See https://github.com/krakenjs/kraken-js#options for additional configuration options.
  */
-options = {
+const options = {
     // Ensure kraken resolves basedir to the project root regardless of compiled location
     basedir: process.cwd(),
     onconfig: function (config: unknown, next: (err: Error | null, config?: unknown) => void) {
@@ -51,7 +50,7 @@ options = {
     }
 };
 
-app = module.exports = express();
+const app = module.exports = express();
 (globalThis as unknown as Record<string, unknown>).__wikitruth_app = app;
 app.post('/api/email-webhooks/resend', express.raw({ type: 'application/json', limit: '256kb' }), function (
     req: import('express').Request,
@@ -145,7 +144,7 @@ if (helmetConfig.enabled) {
     }));
 }
 
-let sessionStore = MongoStore.create({mongoUrl: config.mongodb.uri});
+const sessionStore = MongoStore.create({mongoUrl: config.mongodb.uri});
 sessionStore.on('error', function (error: unknown) {
     console.error('Mongo session store error:', error);
     // You can implement fallback logic here, like switching to a MemoryStore
@@ -173,6 +172,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(enforceAuthenticatedWebSession);
 app.use(authenticateApiClient);
+app.use(observeAgentRequests);
 const csrfConfig = config.csrf || {};
 const csrfCookie = csrfConfig.cookie || {};
 const csrfProtection = createCsrfProtection({

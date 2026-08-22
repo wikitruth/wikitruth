@@ -133,6 +133,18 @@ function addComponents(spec) {
     properties: { name: { type: 'string', minLength: 3, maxLength: 120 }, description: { type: 'string', maxLength: 500 }, userId: { type: 'string' }, scopes: { type: 'array', minItems: 1, items: { type: 'string', enum: agentScopes } }, policy: { $ref: '#/components/schemas/ApiClientPolicy' }, expiresAt: { type: 'string', format: 'date-time', nullable: true }, rateLimitPerMinute: { type: 'integer', minimum: 10, maximum: 600 } },
   };
   schemas.ApiClientCredentialResponse = { type: 'object', properties: { success: { type: 'boolean' }, token: { type: 'string', description: 'Shown once; store securely' }, client: { $ref: '#/components/schemas/ApiClientIdentity' } } };
+  schemas.AgentUsageReport = {
+    type: 'object', required: ['success', 'client', 'period', 'usage', 'events', 'jobs', 'advice'],
+    properties: {
+      success: { type: 'boolean', enum: [true] },
+      client: { type: 'object', required: ['id', 'name'], properties: { id: { type: 'string' }, name: { type: 'string' } } },
+      period: { type: 'object', required: ['days', 'from', 'to'], properties: { days: { type: 'integer', minimum: 1, maximum: 180 }, from: { type: 'string', format: 'date-time' }, to: { type: 'string', format: 'date-time' } } },
+      usage: { type: 'object', required: ['requests', 'rateLimitedRequests', 'peakRequestsPerMinute', 'activeMinutes'], properties: { requests: { type: 'integer', minimum: 0 }, rateLimitedRequests: { type: 'integer', minimum: 0 }, peakRequestsPerMinute: { type: 'integer', minimum: 0 }, activeMinutes: { type: 'integer', minimum: 0 } } },
+      events: { type: 'object', additionalProperties: { type: 'integer', minimum: 0 } },
+      jobs: { type: 'object', additionalProperties: { type: 'integer', minimum: 0 } },
+      advice: { type: 'object', additionalProperties: { type: 'integer', minimum: 0 } },
+    },
+  };
   schemas.AgentCapabilities = { type: 'object', properties: { success: { type: 'boolean' }, apiVersion: { type: 'string' }, authentication: { type: 'string' }, scopes: { type: 'array', items: { type: 'string', enum: agentScopes } }, credentialPolicy: { $ref: '#/components/schemas/ApiClientPolicy' }, contributionContract: { type: 'object' }, endpoints: { type: 'object' } } };
   schemas.GraphLinkRequest = { type: 'object', required: ['parentId', 'targetId', 'relationship'], properties: { parentId: { type: 'string' }, targetId: { type: 'string' }, relationship: { type: 'string', enum: ['child', 'support', 'oppose', 'related', 'evidence', 'source', 'dependency'] } } };
   schemas.VerdictVoteRequest = { type: 'object', required: ['objectType', 'objectId', 'channel', 'status', 'reasoning', 'confidence', 'conflictDeclared'], properties: { objectType: { type: 'integer' }, objectId: { type: 'string' }, channel: { type: 'string', enum: ['factual', 'ethical'] }, status: { type: 'string' }, reasoning: { type: 'string', minLength: 20 }, evidenceReferences: { type: 'array', items: { type: 'string' } }, confidence: { type: 'integer', minimum: 0, maximum: 100 }, expertise: { type: 'string' }, conflictDeclared: { type: 'boolean' }, ethicalFramework: { type: 'string' } } };
@@ -210,6 +222,14 @@ function specialize(spec) {
   if (paths['/agent/identity']?.get) Object.assign(paths['/agent/identity'].get, { summary: 'Inspect the authenticated agent identity', security: [{ AgentBearerAuth: [] }], responses: response('ApiClientIdentity') });
   if (paths['/agent/capabilities']?.get) Object.assign(paths['/agent/capabilities'].get, { summary: 'Discover routes allowed by the token scopes', security: [{ AgentBearerAuth: [] }], responses: response('AgentCapabilities') });
   if (paths['/admin/api-clients']?.post) Object.assign(paths['/admin/api-clients'].post, { summary: 'Create a scoped agent credential', requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/ApiClientCreateRequest' } } } }, responses: { '201': { description: 'Credential created; raw token is shown once', content: { 'application/json': { schema: { $ref: '#/components/schemas/ApiClientCredentialResponse' } } } }, '400': { $ref: '#/components/responses/BadRequest' }, '403': { $ref: '#/components/responses/Forbidden' } } });
+  if (paths['/admin/api-clients/{id}/usage']?.get) Object.assign(paths['/admin/api-clients/{id}/usage'].get, {
+    summary: 'Read privacy-safe agent credential usage aggregates',
+    parameters: [
+      { name: 'id', in: 'path', required: true, schema: { type: 'string' } },
+      { name: 'days', in: 'query', schema: { type: 'integer', minimum: 1, maximum: 180, default: 30 } },
+    ],
+    responses: { ...response('AgentUsageReport'), '404': { $ref: '#/components/responses/NotFound' } },
+  });
   if (paths['/outline/link']?.post) Object.assign(paths['/outline/link'].post, { summary: 'Create a governed knowledge-graph relationship', requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/GraphLinkRequest' } } } } });
   if (paths['/moderation/verdict-votes']?.post) Object.assign(paths['/moderation/verdict-votes'].post, { summary: 'Submit a human channel-specific consensus vote', requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/VerdictVoteRequest' } } } } });
   if (paths['/moderation/verdict-channel']?.put) Object.assign(paths['/moderation/verdict-channel'].put, { summary: 'Publish an explicit administrator final-say decision', description: 'This exceptional route is unavailable to API clients and records an audited override of the current consensus snapshot.', requestBody: { required: true, content: { 'application/json': { schema: { $ref: '#/components/schemas/AdminFinalSayRequest' } } } } });

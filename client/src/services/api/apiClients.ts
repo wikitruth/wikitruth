@@ -35,6 +35,21 @@ export interface ApiClientRecord {
   accountableUser?: { id: string; username: string; email: string };
 }
 
+export interface AgentUsageReport {
+  success: boolean;
+  client: { id: string; name: string };
+  period: { days: number; from: string; to: string };
+  usage: {
+    requests: number;
+    rateLimitedRequests: number;
+    peakRequestsPerMinute: number;
+    activeMinutes: number;
+  };
+  events: Record<string, number>;
+  jobs: Record<string, number>;
+  advice: Record<string, number>;
+}
+
 const csrfToken = (): string | null => {
   const match = typeof document === 'undefined' ? null : document.cookie.match(/(?:^|;\s*)_csrfToken=([^;]+)/);
   return match ? decodeURIComponent(match[1]) : null;
@@ -53,6 +68,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 
 export const apiClientsApi = {
   list: () => request<{ success: boolean; clients: ApiClientRecord[] }>('/admin/api-clients'),
+  usage: (id: string, days = 30) => request<AgentUsageReport>(`/admin/api-clients/${encodeURIComponent(id)}/usage?days=${days}`),
   users: () => request<AdminRecord[]>('/admin/users'),
   create: (payload: {
     name: string;

@@ -12,6 +12,7 @@ import {
   queueApiClientUsage,
   resetAgentUsageForTests,
 } from '../services/agentUsageService';
+import { recordAgentOperationEvent } from '../services/agentObservabilityService';
 
 type CachedCredential = { version: string; expiresAt: number; client: Record<string, any> };
 let credentialCaches = new WeakMap<object, Map<string, CachedCredential>>();
@@ -73,11 +74,23 @@ export async function authenticateApiClient(req: Request, res: Response, next: N
     return;
   }
   const client = await activeClient(models, parsed.clientId);
-  if (!client || client.status !== 'active' || !apiClientSecretsMatch(String(client.secretHash || ''), parsed.secret)) {
+  if (!client || client.status !== 'active') {
+    fail(res, 401, 'AGENT_TOKEN_INVALID', 'The agent credential is invalid or revoked.');
+    return;
+  }
+  if (!apiClientSecretsMatch(String(client.secretHash || ''), parsed.secret)) {
+    recordAgentOperationEvent(req.app, {
+      kind: 'authentication_denied', apiClientId: String(client._id || ''), clientId: parsed.clientId,
+      method: req.method, path: req.path, statusCode: 401, code: 'AGENT_TOKEN_INVALID',
+    });
     fail(res, 401, 'AGENT_TOKEN_INVALID', 'The agent credential is invalid or revoked.');
     return;
   }
   if (client.expiresAt && new Date(client.expiresAt).getTime() <= Date.now()) {
+    recordAgentOperationEvent(req.app, {
+      kind: 'authentication_denied', apiClientId: String(client._id || ''), clientId: parsed.clientId,
+      method: req.method, path: req.path, statusCode: 401, code: 'AGENT_TOKEN_EXPIRED',
+    });
     fail(res, 401, 'AGENT_TOKEN_EXPIRED', 'The agent credential has expired.');
     return;
   }
@@ -98,12 +111,21 @@ export async function authenticateApiClient(req: Request, res: Response, next: N
   res.setHeader('X-RateLimit-Reset', String(Math.ceil(rate.resetAt.getTime() / 1000)));
   if (!rate.allowed) {
     res.setHeader('Retry-After', String(Math.max(1, Math.ceil((rate.resetAt.getTime() - Date.now()) / 1000))));
+    recordAgentOperationEvent(req.app, {
+      kind: 'rate_limited', apiClientId: String(client._id || ''), clientId: parsed.clientId,
+      method: req.method, path: req.path, statusCode: 429, code: 'AGENT_RATE_LIMITED',
+      metadata: { limit, count: rate.count, resetAt: rate.resetAt.toISOString() },
+    });
     fail(res, 429, 'AGENT_RATE_LIMITED', 'The agent request rate limit was exceeded.');
     return;
   }
 
   const user = await models?.User?.findById(client.userId);
   if (!user || (user.isActive && user.isActive !== 'yes')) {
+    recordAgentOperationEvent(req.app, {
+      kind: 'authentication_denied', apiClientId: String(client._id || ''), clientId: parsed.clientId,
+      method: req.method, path: req.path, statusCode: 401, code: 'AGENT_OWNER_INACTIVE',
+    });
     fail(res, 401, 'AGENT_OWNER_INACTIVE', 'The accountable user is unavailable or inactive.');
     return;
   }

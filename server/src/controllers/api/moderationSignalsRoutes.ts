@@ -32,6 +32,7 @@ import { writeVerdictDecision } from './verdictDecisionWriter';
 import { queueKnowledgeReviewTask } from '../../services/knowledgeReviewTaskService';
 import { ensureCurrentRevision } from '../../services/entryRevisionService';
 import { publishRealtimeEvent } from '../../services/realtimeEvents';
+import { recordAgentOperationEvent } from '../../services/agentObservabilityService';
 
 function validObjectIds(value: unknown): string[] {
   return Array.isArray(value)
@@ -236,6 +237,11 @@ export function registerModerationSignalsRoutes(router: Router): void {
             status: 'pending',
           },
         });
+        recordAgentOperationEvent(req.app, {
+          kind: 'advice_submitted', apiClientId: req.apiClient.id, clientId: req.apiClient.clientId,
+          agentRunId: req.agentRun?.runId || '', operationId: 'moderation.verdict-advice.create',
+          code: 'VERDICT_ADVICE_SUBMITTED', metadata: { adviceId: String(advice._id || ''), channel: parsed.value.channel },
+        });
         if (db.User?.find) {
           const reviewers = await db.User.find({
             $or: [{ 'roles.reviewer': true }, { 'roles.admin': { $ne: null } }],
@@ -314,6 +320,10 @@ export function registerModerationSignalsRoutes(router: Router): void {
             adviceId: String(advice._id || ''), status: 'rejected', eligibleVoteCreated: false,
           },
         });
+        recordAgentOperationEvent(req.app, {
+          kind: 'advice_rejected', apiClientId: String(advice.apiClientId || ''), agentRunId: String(advice.agentRunId || ''),
+          operationId: 'moderation.verdict-advice.review', code: 'VERDICT_ADVICE_REJECTED', metadata: { adviceId: String(advice._id || '') },
+        });
         res.json({ success: true, advice: rejected, eligibleVoteCreated: false });
         return;
       }
@@ -330,6 +340,10 @@ export function registerModerationSignalsRoutes(router: Router): void {
             apiClientId: String(advice.apiClientId || ''), agentRunId: String(advice.agentRunId || ''),
             adviceId: String(advice._id || ''), status: 'stale', eligibleVoteCreated: false,
           },
+        });
+        recordAgentOperationEvent(req.app, {
+          kind: 'advice_stale', apiClientId: String(advice.apiClientId || ''), agentRunId: String(advice.agentRunId || ''),
+          operationId: 'moderation.verdict-advice.review', code: 'VERDICT_ADVICE_STALE', metadata: { adviceId: String(advice._id || '') },
         });
         res.status(409).json({ success: false, message: 'Verdict advice is stale because the entry has a newer revision' });
         return;
@@ -366,6 +380,10 @@ export function registerModerationSignalsRoutes(router: Router): void {
             adviceId: String(advice._id || ''), status: 'countersigned', eligibleVoteCreated: true,
             voteId: String(result.vote?._id || ''),
           },
+        });
+        recordAgentOperationEvent(req.app, {
+          kind: 'advice_countersigned', apiClientId: String(advice.apiClientId || ''), agentRunId: String(advice.agentRunId || ''),
+          operationId: 'moderation.verdict-advice.review', code: 'VERDICT_ADVICE_COUNTERSIGNED', metadata: { adviceId: String(advice._id || ''), voteId: String(result.vote?._id || '') },
         });
         res.json({ success: true, advice: resolved, eligibleVoteCreated: true, ...result });
       } catch (error) {
