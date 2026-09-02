@@ -105,7 +105,7 @@
   "dependencies": {
     "@simplewebauthn/browser": "^13.3.0",
     "@simplewebauthn/server": "^13.3.2",
-    "@tiptap/core": "^3.27.3",
+    "@tiptap/core": "^3.30.4",
     "@tiptap/extension-code-block-lowlight": "^3.27.3",
     "@tiptap/extension-image": "^3.27.3",
     "@tiptap/extension-link": "^3.27.3",
