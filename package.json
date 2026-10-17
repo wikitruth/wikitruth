@@ -124,7 +124,7 @@
     "backbone": "^1.6.0",
     "bcrypt": "^6.0.0",
     "body-parser": "^2.3.0",
-    "compression": "^1.8.1",
+    "compression": "^1.8.2",
     "connect-mongo": "6.0.0",
     "consolidate": "^0.15.1",
     "cookie-parser": "^1.4.7",
