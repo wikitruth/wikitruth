@@ -123,7 +123,7 @@
     "async": "^3.2.6",
     "backbone": "^1.6.0",
     "bcrypt": "^6.0.0",
-    "body-parser": "^2.3.0",
+    "body-parser": "^2.4.0",
     "compression": "^1.8.1",
     "connect-mongo": "6.0.0",
     "consolidate": "^0.15.1",
